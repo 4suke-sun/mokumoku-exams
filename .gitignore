@@ -1,0 +1,11 @@
+.env
+.env.*
+!.env.example
+.drafts/
+.pr-secrets-denylist
+node_modules/
+.next/
+cdk.out/
+dist/
+coverage/
+.DS_Store
