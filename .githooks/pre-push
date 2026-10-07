@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+# push 前に、(1) main への push なら HEAD にリリースタグが付いているか、
+# (2) 範囲内の全コミットの追加行・ファイル名・変更範囲・メッセージ・作者に、
+# 混入させるべきでないものが無いか、を確認する。
+# 有効化: git config core.hooksPath .githooks(npm install の prepare でも設定される)
+set -euo pipefail
+
+protected_branch='main'
+input="$(cat)"
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ -z "${local_sha:-}" ] && continue
+  [ "$local_sha" = "0000000000000000000000000000000000000000" ] && continue
+
+  remote_branch=${remote_ref#refs/heads/}
+  if [ "$remote_branch" = "$protected_branch" ]; then
+    if ! git describe --tags --exact-match "$local_sha" >/dev/null 2>&1; then
+      echo "main へ push しようとしていますが、HEAD (${local_sha:0:7}) にリリースタグがありません。" >&2
+      echo "push を中止しました。先にタグを付けてください(例: git tag -a vX.Y.Z -m '...')。" >&2
+      exit 1
+    fi
+  fi
+done <<< "$input"
+
+printf '%s\n' "$input" | node scripts/check-push-secrets.mjs

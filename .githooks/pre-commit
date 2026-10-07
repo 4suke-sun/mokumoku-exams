@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# commit 前に、ステージした差分(追加行・ファイル名・変更範囲)を検査する。
+# 履歴に載ってからでは消しにくいので、push 前より手前で止める。
+# 有効化: git config core.hooksPath .githooks(npm install の prepare でも設定される)
+set -euo pipefail
+
+node scripts/check-commit-secrets.mjs

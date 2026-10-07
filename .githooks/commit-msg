@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# コミットメッセージに、書いてはいけない内容が無いかを検査する。
+set -euo pipefail
+
+node scripts/check-commit-secrets.mjs --message "$1"

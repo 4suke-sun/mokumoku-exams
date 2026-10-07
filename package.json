@@ -1,0 +1,11 @@
+{
+  "name": "mokumoku-exams",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "prepare": "git config core.hooksPath .githooks",
+    "test": "node --test \"scripts/**/*.test.mjs\"",
+    "check:commit": "node scripts/check-commit-secrets.mjs"
+  }
+}
