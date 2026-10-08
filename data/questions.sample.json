@@ -1,0 +1,86 @@
+{
+  "examCode": "SAMPLE",
+  "questions": [
+    {
+      "questionId": "SAMPLE-0001",
+      "examCode": "SAMPLE",
+      "domain": "domain1",
+      "questionType": "single",
+      "difficulty": "easy",
+      "questionText": "動作確認用の問題です。信号機で、進んでよいことを表す色はどれですか。",
+      "choices": [
+        { "key": "A", "text": "赤", "explanation": "赤は、止まれを表すため不正解です。" },
+        { "key": "B", "text": "青(緑)", "explanation": "青(緑)は、進んでよいことを表すため正解です。" },
+        { "key": "C", "text": "黄", "explanation": "黄は、止まる準備を表すため不正解です。" }
+      ],
+      "correctAnswers": ["B"],
+      "explanation": "信号機の青(緑)は、進んでよいことを表します。\n\nこの問題は動作確認用の架空のものです。"
+    },
+    {
+      "questionId": "SAMPLE-0002",
+      "examCode": "SAMPLE",
+      "domain": "domain1",
+      "questionType": "multiple",
+      "difficulty": "medium",
+      "questionText": "動作確認用の問題です。次のうち、果物を 2 つ選んでください。",
+      "choices": [
+        { "key": "A", "text": "りんご", "explanation": "りんごは果物のため正解です。" },
+        { "key": "B", "text": "にんじん", "explanation": "にんじんは野菜のため不正解です。" },
+        { "key": "C", "text": "みかん", "explanation": "みかんは果物のため正解です。" },
+        { "key": "D", "text": "キャベツ", "explanation": "キャベツは野菜のため不正解です。" },
+        { "key": "E", "text": "だいこん", "explanation": "だいこんは野菜のため不正解です。" }
+      ],
+      "correctAnswers": ["A", "C"],
+      "explanation": "りんごとみかんは果物です。にんじん、キャベツ、だいこんは野菜です。",
+      "supplement": "この問題は動作確認用の架空のものです。"
+    },
+    {
+      "questionId": "SAMPLE-0003",
+      "examCode": "SAMPLE",
+      "domain": "domain1",
+      "questionType": "single",
+      "difficulty": "easy",
+      "questionText": "動作確認用の問題です。1 週間は何日ですか。",
+      "choices": [
+        { "key": "A", "text": "5 日" },
+        { "key": "B", "text": "7 日" },
+        { "key": "C", "text": "10 日" },
+        { "key": "D", "text": "12 日" }
+      ],
+      "correctAnswers": ["B"],
+      "explanation": "1 週間は 7 日です。"
+    },
+    {
+      "questionId": "SAMPLE-0004",
+      "examCode": "SAMPLE",
+      "domain": "domain2",
+      "questionType": "single",
+      "difficulty": "medium",
+      "questionText": "動作確認用の問題です。物事を順序立てて進めるときに、最初に行うこととして最も適切なものはどれですか。",
+      "choices": [
+        { "key": "A", "text": "目的をはっきりさせる" },
+        { "key": "B", "text": "結果を確認せずに終える" },
+        { "key": "C", "text": "手順をすべて省く" }
+      ],
+      "correctAnswers": ["A"],
+      "explanation": "何のために行うのかを先に決めると、あとの手順を選びやすくなります。",
+      "references": [{ "title": "サンプルの参考資料", "url": "https://example.com/sample" }]
+    },
+    {
+      "questionId": "SAMPLE-0005",
+      "examCode": "SAMPLE",
+      "domain": "domain2",
+      "questionType": "multiple",
+      "difficulty": "hard",
+      "questionText": "動作確認用の問題です。振り返りで確認することを 2 つ選んでください。",
+      "choices": [
+        { "key": "A", "text": "うまくいった点" },
+        { "key": "B", "text": "天気予報" },
+        { "key": "C", "text": "次に改善する点" },
+        { "key": "D", "text": "昨日の夕食" }
+      ],
+      "correctAnswers": ["A", "C"],
+      "explanation": "振り返りでは、うまくいった点と、次に改善する点を確認します。"
+    }
+  ]
+}

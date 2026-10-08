@@ -85,6 +85,8 @@ export const MESSAGE_PHRASE_PATTERNS: Pattern[] = [
 ];
 
 const NOREPLY = /@users\.noreply\.github\.com$/;
+// GitHub 上でマージしたときに、GitHub が作るマージコミットのコミッター(作者ではなく、コミッターにだけ認める)
+const GITHUB_WEB_COMMITTER = "noreply@github.com";
 
 /**
  * `git diff -U0` などの unified diff から、追加行を { file, line, text } で取り出す。
@@ -183,12 +185,13 @@ export function checkEntries(
   return { blocks: [...new Set(blocks)], warns: [...new Set(warns)] };
 }
 
-/** 作者とコミッターのメールアドレスが、すべて GitHub の noreply アドレスか。 */
+/** 作者とコミッターのメールアドレスが、GitHub の noreply アドレスか(コミッターは、GitHub 上のマージも認める)。 */
 export function checkAuthors(entries: CommitAuthor[]): string[] {
   const hits: string[] = [];
   for (const { sha, authorEmail, committerEmail } of entries) {
     if (!NOREPLY.test(authorEmail)) hits.push(`noreply ではない作者アドレス: コミット ${sha}`);
-    if (!NOREPLY.test(committerEmail)) hits.push(`noreply ではないコミッターアドレス: コミット ${sha}`);
+    if (!NOREPLY.test(committerEmail) && committerEmail !== GITHUB_WEB_COMMITTER)
+      hits.push(`noreply ではないコミッターアドレス: コミット ${sha}`);
   }
   return hits;
 }

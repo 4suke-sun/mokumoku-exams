@@ -20,8 +20,10 @@ npm install   # 依存を入れ、検査フック(.githooks)を有効にしま�
 | `npm run build` | ビルド |
 | `npm test` | テスト(Vitest) |
 | `npm run check:release-notes` | リリースノートとタグの対応の検査 |
+| `npm run validate:data` | 資格マスタと問題データの検査(仕様: `docs/data-spec.md`) |
+| `npm run check:lessons` | 学びの記録(`docs/app/lessons/`)の書式の検査。`-- --write` で一覧を更新 |
 
-PR を出す前に、上の 5 つ(`format` 以外)がローカルで通ることを確認してください。同じものが CI でも実行されます。
+PR を出す前に、上のコマンド(`format` 以外)がローカルで通ることを確認してください。同じものが CI でも実行されます。
 
 ## ブランチ
 
@@ -70,6 +72,7 @@ Closes #12
 - PR は、原則、**版単位**です。1 つの版(例: v0.0.2)を 1 つの PR にまとめ、その版の Issue を `Closes` で閉じます。
 - 不具合の修正や hotfix は、Issue 単位の PR でかまいません。
 - PR のタイトルも、Conventional Commits の形式にします。
+- `main` への直接 push は、しません。このリポジトリの現在のプランでは、ブランチ保護(PR の必須化)が使えないため、`main` への push のたびに、CI が機密検査を実行して検知します(止めるものではなく、検知して直すためのものです)。ブランチ保護が使えるようになったら、PR の必須化に切り替えます。
 - 版を切る PR には、`data/release-notes.json` にその版のエントリを足します(新しい版を先頭に)。
 
 ## リリース

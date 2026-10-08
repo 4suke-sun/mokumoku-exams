@@ -1,0 +1,29 @@
+{
+  "exams": [
+    {
+      "examCode": "SAMPLE",
+      "status": "published",
+      "vendor": "Example",
+      "edition": "S01",
+      "name": "サンプル資格(動作確認用)",
+      "shortName": "サンプル",
+      "category": "Foundational",
+      "passingScore": 70,
+      "totalScore": 100,
+      "officialQuestionCount": 5,
+      "officialTimeMinutes": 10,
+      "domains": [
+        { "code": "domain1", "name": "基礎の用語", "weight": 0.6 },
+        { "code": "domain2", "name": "考え方", "weight": 0.4 }
+      ]
+    },
+    {
+      "examCode": "SAMPLE2",
+      "status": "coming-soon",
+      "vendor": "Example",
+      "name": "サンプル資格 2(動作確認用)",
+      "shortName": "サンプル 2",
+      "note": "近日公開予定です。"
+    }
+  ]
+}

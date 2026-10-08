@@ -13,13 +13,16 @@
     "build": "npm run build --workspaces --if-present",
     "test": "vitest run && npm run test --workspaces --if-present",
     "check:commit": "node scripts/check-commit-secrets.ts",
-    "check:release-notes": "node scripts/check-release-notes.ts"
+    "check:release-notes": "node scripts/check-release-notes.ts",
+    "check:lessons": "node scripts/check-lessons.ts",
+    "validate:data": "node scripts/validate-exam-data.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
     "@types/node": "22.20.5",
     "typescript": "7.0.2",
-    "vitest": "5.0.3"
+    "vitest": "5.0.3",
+    "zod": "4.6.5"
   },
   "workspaces": [
     "packages/*"

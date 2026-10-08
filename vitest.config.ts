@@ -4,5 +4,7 @@ import { defineConfig } from "vitest/config";
 export default defineConfig({
   test: {
     include: ["scripts/**/*.test.ts"],
+    // git や node の子プロセスを起動するテストがあるため、既定(5 秒)より長くする
+    testTimeout: 30_000,
   },
 });

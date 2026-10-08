@@ -1,0 +1,156 @@
+# 問題データの仕様
+
+資格マスタ(`exams.json`)と問題データ(`questions.<コード>.json`)の形を定めます。アプリの実装には依存せず、
+**この仕様に従っていれば、表示・採点・分野別の分析ができる**ことを目標にします。
+
+スキーマの正本は `scripts/lib/exam-data/schema.ts`(Zod)で、この文書は、その意味を説明します。
+検査は `npm run validate:data` で行います(CI でも実行します)。
+
+## 1. ファイル
+
+データは `data/` に置きます。
+
+| ファイル | 役割 | 必須 |
+| --- | --- | --- |
+| `exams.json` | 資格マスタ | 必須 |
+| `questions.<コード>.json` | 資格ごとの問題。`<コード>` は資格コードの英小文字 | 公開中の資格に必須 |
+
+次の付随ファイルは、それぞれの機能の Issue で、形を定めます。この文書の対象外です。
+
+| ファイル | 役割 |
+| --- | --- |
+| `curriculum.<コード>.json` | 学習モードの教科書パート |
+| `summary.<コード>.json` | 直前チェック用の要約 |
+| `freeform.<コード>.json` | 自由記述の問題と、判定の観点 |
+
+## 2. 資格マスタ `exams.json`
+
+```jsonc
+{
+  "exams": [
+    {
+      "examCode": "SAMPLE",           // 英大文字で始まる英大文字と数字(2〜16 文字)。一意
+      "status": "published",          // "published"(公開中)| "coming-soon"(近日公開)
+      "vendor": "Example",            // 提供元。一覧のグループ分けに使う
+      "edition": "S01",               // 試験の版
+      "name": "サンプル資格",
+      "shortName": "サンプル",
+      "category": "Foundational",     // 自由な文字列(区分)
+      "passingScore": 70,             // 合格点
+      "totalScore": 100,              // 満点(合格点 ≤ 満点)
+      "officialQuestionCount": 5,     // 本番モードの出題数
+      "officialTimeMinutes": 10,      // 本番モードの制限時間(分)
+      "domains": [
+        { "code": "domain1", "name": "基礎の用語", "weight": 0.6 },
+        { "code": "domain2", "name": "考え方", "weight": 0.4 }
+      ]
+    },
+    {
+      "examCode": "SAMPLE2",
+      "status": "coming-soon",
+      "vendor": "Example",
+      "name": "サンプル資格 2",
+      "shortName": "サンプル 2",
+      "note": "近日公開予定です。"        // 任意。一覧に添える文言
+    }
+  ]
+}
+```
+
+- **公開中**(`published`)の資格は、上の項目がすべて必要です。問題データのファイルも必要です。
+- **近日公開**(`coming-soon`)の資格は、`examCode`・`vendor`・`name`・`shortName` と、任意の `note` だけを持ちます。
+  一覧に表示するだけで、問題データは持ちません。
+- 分野は `domain1`〜`domainN` のコードで表します。**表示名はマスタ側にだけ**置きます(問題側に名前を書くと、
+  表記のゆれで集計が崩れるためです)。分野の数は、資格ごとに異なります。
+- `weight` は公式の配点を小数にした値で、合計は 1(許容誤差 0.005)です。
+
+## 3. 問題 `questions.<コード>.json`
+
+```jsonc
+{
+  "examCode": "SAMPLE",
+  "questions": [
+    {
+      "questionId": "SAMPLE-0001",     // <資格コード>-<4 桁の連番>。一意。削除しても再利用しない
+      "examCode": "SAMPLE",
+      "domain": "domain1",             // マスタの分野のコード
+      "questionType": "single",        // "single"(択一)| "multiple"(複数選択)
+      "difficulty": "easy",            // 任意: "easy" | "medium" | "hard"
+      "questionText": "設問文",
+      "choices": [
+        { "key": "A", "text": "選択肢", "explanation": "選択肢ごとの解説(任意)" },
+        { "key": "B", "text": "選択肢" }
+      ],
+      "correctAnswers": ["B"],         // 常に配列。択一でも 1 要素の配列
+      "explanation": "総合解説",
+      "supplement": "補足(任意)",
+      "references": [{ "title": "参考資料", "url": "https://example.com/" }],  // 任意
+      "tags": ["任意のタグ"]            // 任意
+    }
+  ]
+}
+```
+
+| 必須 | 任意 |
+| --- | --- |
+| `questionId`、`examCode`、`domain`、`questionType`、`questionText`、`choices`(各 `key`・`text`)、`correctAnswers`、`explanation` | `difficulty`、`choices[].explanation`、`supplement`、`references`、`tags` |
+
+- 選択肢は 2〜10 個です。
+- 項目の名前の綴りを誤ると(未知の項目)、検査が失敗します。
+
+## 4. 機械検査する規則
+
+`npm run validate:data` が、次を検査します。報告は、ファイル名・項目の位置・問題の ID と、規則の種類だけです(設問文や選択肢の本文は出しません)。
+
+**1 つの問題の中**
+
+1. `choices[].key` は、`A` から連番で、重複しない。
+2. `correctAnswers` は空でなく、重複せず、すべて `choices[].key` の中にある。
+3. `questionType` は正解の数と一致する(1 つなら `single`、2 つ以上なら `multiple`)。
+4. 同じ文言の選択肢がない(空白と全角・半角の違いをならして比べる)。
+5. `references[].url` は、`http://` か `https://` で始まる。
+
+**1 つのファイルの中**
+
+6. `questionId` は重複しない。接頭辞は、ファイルの資格コードと一致する。
+7. 同じ設問文の問題がない(空白と全角・半角の違いをならして比べる)。
+8. 各問題の `examCode` は、ファイルの `examCode` と一致する。
+
+**ファイルをまたぐ**
+
+9. 各問題の `domain` は、資格マスタの分野のコードにある。
+10. 公開中の資格には、問題データのファイルがある。問題データは、資格マスタにある公開中の資格のものだけ。
+11. 問題数は、本番モードの出題数(`officialQuestionCount`)以上。
+12. ファイル名のコードと、ファイルの `examCode` が一致する。
+
+**資格マスタ**
+
+13. `examCode` は重複しない。
+14. 合格点は満点以下。分野のコードは重複せず、重みの合計は 1(許容誤差 0.005)。
+
+## 5. 採点の考え方
+
+- 演習の得点は、**正答数 ÷ 出題数 × 100(%)** で、全資格に共通です。分野の重みは、採点には使いません
+  (出題に含まれない分野が 0 点になり、全問正解でも満点にならないため)。
+- 合格ラインは、`passingScore / totalScore` を割合にして比べます(700/1000 も 70/100 も 70%)。
+- 分野の重みは、ダッシュボードの合格予測にだけ使います。
+
+## 6. 文字の書き方
+
+設問文・選択肢・解説は、**プレーンテキスト**で書きます。段落は空行で区切ります。Markdown の記法(`**太字**`、コードのフェンスなど)は使いません
+(書くと、文字がそのまま表示されます)。
+
+## 7. ID の運用
+
+- `questionId` は永続です。問題を削除しても、番号を詰めません(受験履歴・ブックマーク・復習が ID を参照するため)。
+- 資格の試験の版が変わったら、`edition` を更新します。分野の再配置が必要なら、新しい資格コードで扱います。分野の重みだけの変更は、マスタの更新で済みます。
+
+## 8. 自由記述
+
+自由記述は、選択肢のない、**学習者向けのモード**です。本番モードの出題には含めません。
+問題と、判定の観点の形は、別の Issue で定めます(`freeform.<コード>.json`)。
+
+## 9. サンプルデータ
+
+`data/` の `SAMPLE`(公開中)と `SAMPLE2`(近日公開)は、動作確認用の架空の資格です。実在の試験の問題は含みません。
+実データを追加するときは、そのつど、扱いを決めます。

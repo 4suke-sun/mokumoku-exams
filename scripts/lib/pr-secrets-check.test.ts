@@ -135,6 +135,13 @@ describe("checkAuthors", () => {
     expect(hits).toEqual(["noreply ではない作者アドレス: コミット bbbbbbb"]);
   });
 
+  it("GitHub 上のマージコミットのコミッターは認めるが、作者としては認めない", () => {
+    expect(checkAuthors([{ sha: "ddddddd", authorEmail: ok, committerEmail: "noreply@github.com" }])).toEqual([]);
+    expect(checkAuthors([{ sha: "eeeeeee", authorEmail: "noreply@github.com", committerEmail: ok }])).toEqual([
+      "noreply ではない作者アドレス: コミット eeeeeee",
+    ]);
+  });
+
   it("noreply 以外のコミッターを止める", () => {
     const hits = checkAuthors([{ sha: "ccccccc", authorEmail: ok, committerEmail: "someone@example.com" }]);
     expect(hits).toEqual(["noreply ではないコミッターアドレス: コミット ccccccc"]);
