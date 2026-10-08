@@ -12,6 +12,8 @@ import {
 // フィクスチャの値は、実在しない組み立て済みのダミー。
 const fakeKey = "AK" + "IA" + "ABCDEFGHIJKLMNOP";
 const fakeAccount = "9".repeat(12);
+const fakeProfileAssignment = "AWS_" + "PROFILE=somename";
+const fakeLocalPath = "/Us" + "ers/someone/work";
 
 describe("parseAddedLines", () => {
   it("追加行をファイルと行番号つきで取り出す", () => {
@@ -83,7 +85,7 @@ describe("checkEntries", () => {
 
   it("プロファイル名はプレースホルダーなら通す", () => {
     expect(checkEntries(entry("AWS_PROFILE=<プロファイル名>")).blocks).toHaveLength(0);
-    expect(checkEntries(entry("AWS_" + "PROFILE=somename")).blocks).toHaveLength(1);
+    expect(checkEntries(entry(fakeProfileAssignment)).blocks).toHaveLength(1);
   });
 
   it("拒否リストの語を、語を出さずに止める", () => {
@@ -92,7 +94,7 @@ describe("checkEntries", () => {
   });
 
   it("ローカルパスは警告にとどめる", () => {
-    const { blocks, warns } = checkEntries(entry("/Us" + "ers/someone/work"));
+    const { blocks, warns } = checkEntries(entry(fakeLocalPath));
     expect(blocks).toHaveLength(0);
     expect(warns).toHaveLength(1);
   });

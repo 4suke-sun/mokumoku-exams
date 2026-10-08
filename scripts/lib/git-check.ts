@@ -14,10 +14,6 @@ export const ZERO_SHA = "0000000000000000000000000000000000000000";
 // 空の木。基準になるブランチが無いとき(最初の push)は、履歴の最初からを検査範囲にする。
 export const EMPTY_TREE = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
 
-// 検査ロジック自身のテスト(ダミーの秘密情報パターンを含む)は、内容の検査から除く。
-// ファイル名と変更範囲の検査は、全ファイルが対象のまま。
-const EXCLUDE_TESTS = [":(exclude,glob)**/*.test.*", ":(exclude,glob)**/*.spec.*"];
-
 /** git を実行する。失敗したら例外を投げる(検査できなかったものを、成功として扱わない)。 */
 export function git(args: string[]): string {
   return execFileSync("git", ["-c", "core.quotePath=false", ...args], {
@@ -42,7 +38,8 @@ export function tryGit(args: string[]): string {
  */
 export function checkDiff(diffArgs: string[]): CheckResult {
   const files = git(["diff", "--name-only", ...diffArgs]).split("\n").filter(Boolean);
-  const diff = git(["diff", "-U0", ...diffArgs, "--", ".", ...EXCLUDE_TESTS]);
+  // テストファイルも除外しない。テストのダミー値は、文字列の連結で組み立てて、検査に当たらないようにする。
+  const diff = git(["diff", "-U0", ...diffArgs]);
   const { blocks, warns } = checkEntries(parseAddedLines(diff), readLocalDenylist());
   return {
     blocks: [...checkSensitiveFilenames(files), ...checkUnexpectedPaths(files), ...blocks],
