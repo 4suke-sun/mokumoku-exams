@@ -20,8 +20,9 @@ npm install   # 依存を入れ、検査フック(.githooks)を有効にしま�
 | `npm run build` | ビルド |
 | `npm test` | テスト(Vitest) |
 | `npm run check:release-notes` | リリースノートとタグの対応の検査 |
+| `npm run check:lessons` | 学びの記録(`docs/app/lessons/`)の書式の検査。`-- --write` で一覧を更新 |
 
-PR を出す前に、上の 5 つ(`format` 以外)がローカルで通ることを確認してください。同じものが CI でも実行されます。
+PR を出す前に、上のコマンド(`format` 以外)がローカルで通ることを確認してください。同じものが CI でも実行されます。
 
 ## ブランチ
 
