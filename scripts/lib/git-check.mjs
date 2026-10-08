@@ -10,6 +10,8 @@ import {
 import { readLocalDenylist } from "./local-denylist.mjs";
 
 export const ZERO_SHA = "0000000000000000000000000000000000000000";
+// 空の木。基準になるブランチが無いとき(最初の push)は、履歴の最初からを検査範囲にする。
+export const EMPTY_TREE = "4b825dc642cb6eb9a060e54bf8d69288fbee4904";
 
 // テストファイルは、検査ロジック自身のフィクスチャを誤検出するため、内容の検査からは除く。
 // ファイル名と変更範囲の検査は、全ファイルが対象のまま。
@@ -28,10 +30,13 @@ export function tryGit(args) {
   }
 }
 
-/** diffArgs(例: ["--cached"] や ["abc..def"])の差分を検査する。追加行だけを見る。 */
+/**
+ * diffArgs(例: ["--cached"] や ["abc", "def"])の差分を検査する。追加行だけを見る。
+ * git の実行に失敗したら例外を投げる(検査できなかったものを、成功として扱わない)。
+ */
 export function checkDiff(diffArgs) {
-  const files = tryGit(["diff", "--name-only", ...diffArgs]).split("\n").filter(Boolean);
-  const diff = tryGit(["diff", "-U0", ...diffArgs, "--", ".", ...EXCLUDE_TESTS]);
+  const files = git(["diff", "--name-only", ...diffArgs]).split("\n").filter(Boolean);
+  const diff = git(["diff", "-U0", ...diffArgs, "--", ".", ...EXCLUDE_TESTS]);
   const { blocks, warns } = checkEntries(parseAddedLines(diff), readLocalDenylist());
   return {
     blocks: [...checkSensitiveFilenames(files), ...checkUnexpectedPaths(files), ...blocks],
@@ -39,9 +44,9 @@ export function checkDiff(diffArgs) {
   };
 }
 
-/** 範囲 start..end の、コミットメッセージと作者を検査する。 */
+/** 範囲 start..end の、コミットメッセージと作者を検査する。start が null なら、end までの全コミット。 */
 export function checkCommits(start, end) {
-  const out = tryGit(["log", "--format=%H%x1f%ae%x1f%B%x1e", `${start}..${end}`]);
+  const out = git(["log", "--format=%H%x1f%ae%x1f%B%x1e", start ? `${start}..${end}` : end]);
   const denylist = readLocalDenylist();
   const blocks = [];
   const authors = [];
@@ -54,13 +59,32 @@ export function checkCommits(start, end) {
   return [...checkAuthors(authors), ...blocks];
 }
 
-/** 検査すべき範囲の開始点。新規ブランチなら main からの全体を見る。 */
+/**
+ * 検査すべき範囲の開始点。新規ブランチなら、リモートの main(origin/main)との共通の祖先。
+ * origin/main が無い(最初の push)ときは null を返し、履歴の最初からを検査する。
+ * ローカルの main は、リモートに何があるかの根拠にならないので、基準にしない。
+ */
 export function baseFor(localSha) {
-  for (const ref of ["origin/main", "main"]) {
-    const merge = tryGit(["merge-base", ref, localSha]).trim();
-    if (merge) return merge;
+  const merge = tryGit(["merge-base", "origin/main", localSha]).trim();
+  return merge || null;
+}
+
+/**
+ * 範囲内の各コミットの差分を、コミットごとに検査する(あとで消した値も、途中のコミットから見つける)。
+ * start が null なら、end までの全コミット。
+ */
+export function checkEachCommit(start, end) {
+  const shas = git(["rev-list", "--reverse", start ? `${start}..${end}` : end]).split("\n").filter(Boolean);
+  const blocks = [];
+  const warns = [];
+  for (const sha of shas) {
+    const parents = git(["rev-list", "--parents", "-n", "1", sha]).trim().split(" ").slice(1);
+    const result = checkDiff(parents.length > 0 ? [parents[0], sha] : [EMPTY_TREE, sha]);
+    const short = sha.slice(0, 7);
+    blocks.push(...result.blocks.map((b) => `${b} (コミット ${short})`));
+    warns.push(...result.warns.map((w) => `${w} (コミット ${short})`));
   }
-  return null;
+  return { blocks, warns };
 }
 
 export function report(title, blocks, warns, hint) {
