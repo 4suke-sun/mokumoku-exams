@@ -26,3 +26,4 @@
 ## 一覧
 
 - [0001 言語とツールの統一(TypeScript、Biome、Vitest)](./0001-language-and-tooling.md)
+- [0002 データの検証に Zod を使う](./0002-schema-validation-zod.md)

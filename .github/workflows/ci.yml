@@ -34,6 +34,7 @@ jobs:
       - run: npm test
       - run: npm run check:release-notes
       - run: npm run check:lessons
+      - run: npm run validate:data
       # PR の範囲(全コミットの追加行・ファイル名・メッセージ・作者)の機密検査。手元の pre-push と同じ検査
       - name: 機密検査(PR の範囲)
         if: github.event_name == 'pull_request'

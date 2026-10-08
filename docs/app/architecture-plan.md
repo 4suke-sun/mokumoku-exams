@@ -40,5 +40,6 @@ flowchart LR
 ## 関連する判断(ADR)
 
 - [0001 言語とツールの統一(TypeScript、Biome、Vitest)](./adr/0001-language-and-tooling.md)
+- [0002 データの検証に Zod を使う](./adr/0002-schema-validation-zod.md)
 
 実装が進むにつれて、認証、データ、ホスティングの判断を、ADR として追加します。
