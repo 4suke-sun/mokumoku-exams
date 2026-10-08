@@ -14,8 +14,7 @@ export function readLocalDenylist(): string[] {
       stdio: ["ignore", "pipe", "ignore"],
     }).trim();
     return parseDenylist(readFileSync(join(root, ".pr-secrets-denylist"), "utf8"));
-  }
-  catch {
+  } catch {
     return [];
   }
 }

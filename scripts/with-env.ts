@@ -10,8 +10,7 @@ import { spawnSync } from "node:child_process";
 
 try {
   process.loadEnvFile(new URL("../.env", import.meta.url));
-}
-catch (error) {
+} catch (error) {
   // .env が無いのは正常(CI など)。それ以外(構文エラー等)は気づけるよう表に出す。
   if ((error as NodeJS.ErrnoException)?.code !== "ENOENT") throw error;
 }

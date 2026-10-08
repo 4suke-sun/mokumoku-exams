@@ -8,12 +8,15 @@
 - 小さな段階(v0.0.1 → v0.1.0 → …)に分けて進める。各段階の終わりで、人が確認してから次へ進む。
 - 段階ごとに `data/release-notes.json` へその版のエントリを追記し、同じ版のタグ(`vX.Y.Z`)を切る(1:1)。
 - 迷う点は、実装の前に質問する。勝手に仕様を足さない。
+- PR は原則、版単位(1 つの版を 1 つの PR にまとめ、その版の Issue を `Closes` で閉じる)。
+  E2E などが整ったあとの不具合・hotfix は、Issue 単位でよい。
+- v1.0.0 はまだ先(検証・作問のパイプラインの確立、他の資格の取り込みがそろってから)。当面は、マイナー番号を v0.9.0、v0.10.0、v0.11.0 …と上げていく。
 - 履歴の書き換え(公開済みの履歴への `reset`、`--force` / `--force-with-lease` の push、`filter-repo` など)は
   原則しない。必要なら、理由を説明して人の承認を待つ。
 
 ## 技術構成
 
-- 言語は TypeScript で統一する(`scripts/` も含む)。テストは Vitest。
+- 言語は TypeScript で統一する(`scripts/` も含む)。テストは Vitest。lint と整形は Biome(`npm run lint` / `npm run format`)。
   TypeScript は Node の型除去で直接実行する(ビルド不要。`node scripts/xxx.ts`)。型検査は `tsc --noEmit`。
 - npm workspaces のモノレポ: `packages/app`(Next.js / TypeScript / App Router / Tailwind)、
   `packages/infra`(素の AWS CDK / TypeScript。Amplify は使わない)。

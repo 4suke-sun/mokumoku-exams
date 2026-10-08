@@ -6,9 +6,12 @@
  * 失敗したら push を止める(このスクリプト自身のエラーでも素通りさせない)。
  */
 import { readFileSync } from "node:fs";
-import { ZERO_SHA, baseFor, checkCommits, checkEachCommit, report } from "./lib/git-check.ts";
+import { baseFor, checkCommits, checkEachCommit, report, ZERO_SHA } from "./lib/git-check.ts";
 
-const lines = readFileSync(0, "utf8").split("\n").map((l) => l.trim()).filter(Boolean);
+const lines = readFileSync(0, "utf8")
+  .split("\n")
+  .map((l) => l.trim())
+  .filter(Boolean);
 const blocks: string[] = [];
 const warns: string[] = [];
 
@@ -25,8 +28,7 @@ try {
     for (const b of [...diff.blocks, ...checkCommits(start, localSha)]) blocks.push(`[${remoteRef}] ${b}`);
     warns.push(...diff.warns);
   }
-}
-catch {
+} catch {
   blocks.push("検査を完了できませんでした(git の実行に失敗。リモートの SHA がローカルに無い場合などに起きます)");
 }
 
