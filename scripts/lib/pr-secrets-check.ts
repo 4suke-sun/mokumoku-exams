@@ -54,7 +54,10 @@ export const SECRET_CONTENT_PATTERNS: Pattern[] = [
   { name: "シークレットキーらしき代入", re: /aws_secret_access_key\s*[:=]\s*['"]?[A-Za-z0-9/+=]{40}/i },
   { name: "秘密鍵ヘッダー", re: /-----BEGIN (RSA |EC |OPENSSH |DSA |ENCRYPTED )?PRIVATE KEY-----/ },
   { name: "JWT らしきトークン", re: /\beyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\b/ },
-  { name: "パスワード・API キーらしき代入", re: /(?:secret|api[_-]?key|access[_-]?token|password)\s*[:=]\s*['"][^'"\s]{8,}['"]/i },
+  {
+    name: "パスワード・API キーらしき代入",
+    re: /(?:secret|api[_-]?key|access[_-]?token|password)\s*[:=]\s*['"][^'"\s]{8,}['"]/i,
+  },
 ];
 
 // 環境固有の値の実値。秘密情報ではないが、履歴に載ると消しにくい。
@@ -62,7 +65,10 @@ export const SECRET_CONTENT_PATTERNS: Pattern[] = [
 export const ENV_INFO_PATTERNS: Pattern[] = [
   { name: "プロファイル名の実値", re: /\bAWS_PROFILE=(?!<|\$|xxx|your|example|\.\.\.)[A-Za-z0-9_.-]+/i },
   // ドキュメントの例示用 ID(123456789012)と、EXAMPLE を含むゾーン ID は、実値ではないので止めない。
-  { name: "アカウント ID", re: /(?:account[=:]\s*['"]?|arn:aws[a-z-]*:[a-z0-9-]*:[a-z0-9-]*:)(?!123456789012\b)\d{12}\b/i },
+  {
+    name: "アカウント ID",
+    re: /(?:account[=:]\s*['"]?|arn:aws[a-z-]*:[a-z0-9-]*:[a-z0-9-]*:)(?!123456789012\b)\d{12}\b/i,
+  },
   { name: "ホストゾーン ID", re: /\bZ(?!\w*EXAMPLE)(?=[0-9A-Z]*\d)[0-9A-Z]{12,31}\b/ },
 ];
 
@@ -94,23 +100,18 @@ export function parseAddedLines(diffText: string): AddedLine[] {
     if (raw.startsWith("diff --git ")) {
       inHunk = false;
       file = null;
-    }
-    else if (!inHunk && raw.startsWith("+++ ")) {
+    } else if (!inHunk && raw.startsWith("+++ ")) {
       file = raw === "+++ /dev/null" ? null : raw.replace(/^\+\+\+ "?[a-z]\//, "").replace(/"$/, "");
-    }
-    else if (!inHunk && raw.startsWith("--- ")) {
+    } else if (!inHunk && raw.startsWith("--- ")) {
       // 見出し。何もしない
-    }
-    else if (raw.startsWith("@@")) {
+    } else if (raw.startsWith("@@")) {
       inHunk = true;
       const m = raw.match(/\+(\d+)/);
       line = m ? Number(m[1]) : 0;
-    }
-    else if (inHunk && raw.startsWith("+") && file) {
+    } else if (inHunk && raw.startsWith("+") && file) {
       entries.push({ file, line, text: raw.slice(1) });
       line++;
-    }
-    else if (inHunk && raw.startsWith(" ") && file) {
+    } else if (inHunk && raw.startsWith(" ") && file) {
       line++;
     }
   }
@@ -149,7 +150,7 @@ export function checkSensitiveFilenames(files: string[]): string[] {
   const hits: string[] = [];
   for (const file of files) {
     for (const p of SENSITIVE_FILENAME_PATTERNS) {
-      if (p.re.test(file) && !(p.allow && p.allow.test(file))) hits.push(`${p.name}らしきファイル: ${file}`);
+      if (p.re.test(file) && !p.allow?.test(file)) hits.push(`${p.name}らしきファイル: ${file}`);
     }
   }
   return hits;

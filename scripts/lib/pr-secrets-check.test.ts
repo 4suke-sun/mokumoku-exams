@@ -106,7 +106,9 @@ describe("checkEntries", () => {
   });
 
   it("問題のない文面は通す", () => {
-    const { blocks, warns } = checkEntries(textToEntries("docs: 手順を追加する\n\n本文", "message"), [], { message: true });
+    const { blocks, warns } = checkEntries(textToEntries("docs: 手順を追加する\n\n本文", "message"), [], {
+      message: true,
+    });
     expect([blocks, warns]).toEqual([[], []]);
   });
 });

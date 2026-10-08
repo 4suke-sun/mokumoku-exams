@@ -1,4 +1,6 @@
 import { execFileSync } from "node:child_process";
+import { readLocalDenylist } from "./local-denylist.ts";
+import type { CheckResult, CommitAuthor } from "./pr-secrets-check.ts";
 import {
   checkAuthors,
   checkEntries,
@@ -7,8 +9,6 @@ import {
   parseAddedLines,
   textToEntries,
 } from "./pr-secrets-check.ts";
-import type { CheckResult, CommitAuthor } from "./pr-secrets-check.ts";
-import { readLocalDenylist } from "./local-denylist.ts";
 
 export const ZERO_SHA = "0000000000000000000000000000000000000000";
 // 空の木。基準になるブランチが無いとき(最初の push)は、履歴の最初からを検査範囲にする。
@@ -26,8 +26,7 @@ export function git(args: string[]): string {
 export function tryGit(args: string[]): string {
   try {
     return git(args);
-  }
-  catch {
+  } catch {
     return "";
   }
 }
@@ -37,7 +36,9 @@ export function tryGit(args: string[]): string {
  * git の実行に失敗したら例外を投げる。
  */
 export function checkDiff(diffArgs: string[]): CheckResult {
-  const files = git(["diff", "--name-only", ...diffArgs]).split("\n").filter(Boolean);
+  const files = git(["diff", "--name-only", ...diffArgs])
+    .split("\n")
+    .filter(Boolean);
   // テストファイルも除外しない。テストのダミー値は、文字列の連結で組み立てて、検査に当たらないようにする。
   const diff = git(["diff", "-U0", ...diffArgs]);
   const { blocks, warns } = checkEntries(parseAddedLines(diff), readLocalDenylist());
@@ -53,7 +54,10 @@ export function checkCommits(start: string | null, end: string): string[] {
   const denylist = readLocalDenylist();
   const blocks: string[] = [];
   const authors: CommitAuthor[] = [];
-  for (const record of out.split("\x1e").map((r) => r.trim()).filter(Boolean)) {
+  for (const record of out
+    .split("\x1e")
+    .map((r) => r.trim())
+    .filter(Boolean)) {
     const [sha = "", authorEmail = "", committerEmail = "", body = ""] = record.split("\x1f");
     const short = sha.slice(0, 7);
     authors.push({ sha: short, authorEmail, committerEmail });
@@ -77,7 +81,9 @@ export function baseFor(localSha: string): string | null {
  * start が null なら、end までの全コミット。
  */
 export function checkEachCommit(start: string | null, end: string): CheckResult {
-  const shas = git(["rev-list", "--reverse", start ? `${start}..${end}` : end]).split("\n").filter(Boolean);
+  const shas = git(["rev-list", "--reverse", start ? `${start}..${end}` : end])
+    .split("\n")
+    .filter(Boolean);
   const blocks: string[] = [];
   const warns: string[] = [];
   for (const sha of shas) {
