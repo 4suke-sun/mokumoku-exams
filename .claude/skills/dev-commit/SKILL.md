@@ -31,7 +31,7 @@ description: git commit の前に、ステージした差分とコミットメ�
 ## Step 1. 機械的な検査
 
 ```sh
-node scripts/check-commit-secrets.mjs
+node scripts/check-commit-secrets.ts
 ```
 
 終了コードが 0 でなければ、指摘を直す(pre-commit フックと同じ検査)。通してから Step 2 へ進む。

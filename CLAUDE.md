@@ -13,6 +13,8 @@
 
 ## 技術構成
 
+- 言語は TypeScript で統一する(`scripts/` も含む)。テストは Vitest。
+  TypeScript は Node の型除去で直接実行する(ビルド不要。`node scripts/xxx.ts`)。型検査は `tsc --noEmit`。
 - npm workspaces のモノレポ: `packages/app`(Next.js / TypeScript / App Router / Tailwind)、
   `packages/infra`(素の AWS CDK / TypeScript。Amplify は使わない)。
 - 認証は Cognito UserPool のみ。セルフサインアップ禁止、管理者の招待制、管理者グループ。

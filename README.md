@@ -9,11 +9,12 @@ GitHub の Issue で確認できます。
 
 ## 開発の始め方
 
-必要なもの: Node.js 22 以上
+必要なもの: Node.js 22.18 以上(TypeScript をそのまま実行できる版)
 
 ```sh
 npm install   # 検査フック(.githooks)も有効になります
-npm test      # 検査ロジックのテスト
+npm test      # テスト(Vitest)
+npm run typecheck   # 型検査(tsc)
 ```
 
 環境固有の値(プロファイル名・ドメインなど)は、`.env.example` をコピーした `.env`(gitignore 済み)に書きます。

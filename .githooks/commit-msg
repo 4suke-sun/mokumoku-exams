@@ -2,4 +2,4 @@
 # コミットメッセージに、書いてはいけない内容が無いかを検査する。
 set -euo pipefail
 
-node scripts/check-commit-secrets.mjs --message "$1"
+node scripts/check-commit-secrets.ts --message "$1"

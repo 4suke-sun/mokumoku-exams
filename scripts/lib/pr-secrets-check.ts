@@ -4,8 +4,34 @@
  * 純粋な関数にして単体テストする。報告には値を載せず、場所(ファイル:行)と種類だけを返す。
  */
 
-// allow: このパターンに一致していれば、一致していても許可する(例: .env.example)。
-export const SENSITIVE_FILENAME_PATTERNS = [
+export interface AddedLine {
+  file: string;
+  line: number;
+  text: string;
+}
+
+export interface CheckResult {
+  blocks: string[];
+  warns: string[];
+}
+
+export interface CommitAuthor {
+  sha: string;
+  authorEmail: string;
+  committerEmail: string;
+}
+
+interface Pattern {
+  name: string;
+  re: RegExp;
+}
+
+interface FilenamePattern extends Pattern {
+  /** このパターンに一致していれば、一致していても許可する(例: .env.example) */
+  allow?: RegExp;
+}
+
+export const SENSITIVE_FILENAME_PATTERNS: FilenamePattern[] = [
   { name: ".env ファイル", re: /(^|\/)\.env(\..+)?$/, allow: /\.env\.(example|sample)$/ },
   { name: "credentials.json", re: /(^|\/)credentials\.json$/ },
   { name: "秘密鍵ファイル", re: /(^|\/)id_(rsa|ed25519|dsa|ecdsa)$/ },
@@ -14,7 +40,7 @@ export const SENSITIVE_FILENAME_PATTERNS = [
 ];
 
 // 変更範囲の検査: 作業の成果物ではないもの(エディタ設定、下書き、手元専用の設定など)。
-export const UNEXPECTED_PATH_PATTERNS = [
+export const UNEXPECTED_PATH_PATTERNS: Pattern[] = [
   { name: "エディタの設定", re: /(^|\/)(\.vscode|\.idea)\// },
   { name: "下書き置き場", re: /(^|\/)\.drafts\// },
   { name: "手元専用の設定", re: /(^|\/)\.claude\/settings\.local\.json$/ },
@@ -23,7 +49,7 @@ export const UNEXPECTED_PATH_PATTERNS = [
   { name: "ログファイル", re: /\.log$/ },
 ];
 
-export const SECRET_CONTENT_PATTERNS = [
+export const SECRET_CONTENT_PATTERNS: Pattern[] = [
   { name: "アクセスキー ID", re: /\bAKIA[0-9A-Z]{16}\b/ },
   { name: "シークレットキーらしき代入", re: /aws_secret_access_key\s*[:=]\s*['"]?[A-Za-z0-9/+=]{40}/i },
   { name: "秘密鍵ヘッダー", re: /-----BEGIN (RSA |EC |OPENSSH |DSA |ENCRYPTED )?PRIVATE KEY-----/ },
@@ -33,7 +59,7 @@ export const SECRET_CONTENT_PATTERNS = [
 
 // 環境固有の値の実値。秘密情報ではないが、履歴に載ると消しにくい。
 // 値は .env やプレースホルダー(<...> や xxx)で扱う。
-export const ENV_INFO_PATTERNS = [
+export const ENV_INFO_PATTERNS: Pattern[] = [
   { name: "プロファイル名の実値", re: /\bAWS_PROFILE=(?!<|\$|xxx|your|example|\.\.\.)[A-Za-z0-9_.-]+/i },
   // ドキュメントの例示用 ID(123456789012)と、EXAMPLE を含むゾーン ID は、実値ではないので止めない。
   { name: "アカウント ID", re: /(?:account[=:]\s*['"]?|arn:aws[a-z-]*:[a-z0-9-]*:[a-z0-9-]*:)(?!123456789012\b)\d{12}\b/i },
@@ -41,13 +67,13 @@ export const ENV_INFO_PATTERNS = [
 ];
 
 // 警告のみ(止めはしない)。
-export const PII_CONTENT_PATTERNS = [
+export const PII_CONTENT_PATTERNS: Pattern[] = [
   { name: "ローカルのユーザーディレクトリのパス", re: /\/Users\/[A-Za-z0-9_.-]+/ },
   { name: "個人向けメールアドレス", re: /[A-Za-z0-9._%+-]+@(gmail|yahoo|outlook|hotmail|icloud)\.com/i },
 ];
 
 // コミットメッセージと PR・Issue の下書きだけに適用する。作業の会話や内部メモへの言及。
-export const MESSAGE_PHRASE_PATTERNS = [
+export const MESSAGE_PHRASE_PATTERNS: Pattern[] = [
   { name: "作業の指示・会話への言及", re: /(ユーザー|人)の指示(で|により|に従)|指示により|会話の(中|なか)で/ },
   { name: "内部メモ", re: /\b(TODO|FIXME|XXX)\b.*(メモ|あとで|後で)|作業メモ/ },
 ];
@@ -56,24 +82,35 @@ const NOREPLY = /@users\.noreply\.github\.com$/;
 
 /**
  * `git diff -U0` などの unified diff から、追加行を { file, line, text } で取り出す。
+ * `+++ ` や `--- ` で始まる行は、ハンクの外(ファイルの見出し)にあるときだけ見出しとして扱う。
+ * ハンクの中の `+++ …` は、内容が `++ …` の追加行なので、追加行として検査する。
  */
-export function parseAddedLines(diffText) {
-  const entries = [];
-  let file = null;
+export function parseAddedLines(diffText: string): AddedLine[] {
+  const entries: AddedLine[] = [];
+  let file: string | null = null;
   let line = 0;
+  let inHunk = false;
   for (const raw of diffText.split("\n")) {
-    if (raw.startsWith("+++ ")) {
-      file = raw === "+++ /dev/null" ? null : raw.replace(/^\+\+\+ [a-z]\//, "");
+    if (raw.startsWith("diff --git ")) {
+      inHunk = false;
+      file = null;
+    }
+    else if (!inHunk && raw.startsWith("+++ ")) {
+      file = raw === "+++ /dev/null" ? null : raw.replace(/^\+\+\+ "?[a-z]\//, "").replace(/"$/, "");
+    }
+    else if (!inHunk && raw.startsWith("--- ")) {
+      // 見出し。何もしない
     }
     else if (raw.startsWith("@@")) {
+      inHunk = true;
       const m = raw.match(/\+(\d+)/);
       line = m ? Number(m[1]) : 0;
     }
-    else if (raw.startsWith("+") && file) {
+    else if (inHunk && raw.startsWith("+") && file) {
       entries.push({ file, line, text: raw.slice(1) });
       line++;
     }
-    else if (raw.startsWith(" ") && file) {
+    else if (inHunk && raw.startsWith(" ") && file) {
       line++;
     }
   }
@@ -81,12 +118,12 @@ export function parseAddedLines(diffText) {
 }
 
 /** 任意のテキスト(メッセージ・下書き)の全行を、追加行として扱う。 */
-export function textToEntries(text, label) {
+export function textToEntries(text: string, label: string): AddedLine[] {
   return text.split("\n").map((t, i) => ({ file: label, line: i + 1, text: t }));
 }
 
-function scan(entries, patterns) {
-  const hits = [];
+function scan(entries: AddedLine[], patterns: Pattern[]): string[] {
+  const hits: string[] = [];
   for (const { file, line, text } of entries) {
     for (const { name, re } of patterns) {
       if (re.test(text)) hits.push(`${name}: ${file}:${line}`);
@@ -95,8 +132,8 @@ function scan(entries, patterns) {
   return hits;
 }
 
-function scanDenylist(entries, denylistTerms) {
-  const hits = [];
+function scanDenylist(entries: AddedLine[], denylistTerms: string[]): string[] {
+  const hits: string[] = [];
   for (const { file, line, text } of entries) {
     const lower = text.toLowerCase();
     // 語も、それを含む行も出さない。何番目の語に当たったかだけ示す。
@@ -108,8 +145,8 @@ function scanDenylist(entries, denylistTerms) {
 }
 
 /** 差分に含まれるファイル名から、混入させるべきでないファイルを検出する(止める)。 */
-export function checkSensitiveFilenames(files) {
-  const hits = [];
+export function checkSensitiveFilenames(files: string[]): string[] {
+  const hits: string[] = [];
   for (const file of files) {
     for (const p of SENSITIVE_FILENAME_PATTERNS) {
       if (p.re.test(file) && !(p.allow && p.allow.test(file))) hits.push(`${p.name}らしきファイル: ${file}`);
@@ -119,8 +156,8 @@ export function checkSensitiveFilenames(files) {
 }
 
 /** 変更範囲の検査: 成果物ではないパスが混ざっていないか(止める)。 */
-export function checkUnexpectedPaths(files) {
-  const hits = [];
+export function checkUnexpectedPaths(files: string[]): string[] {
+  const hits: string[] = [];
   for (const file of files) {
     for (const p of UNEXPECTED_PATH_PATTERNS) {
       if (p.re.test(file)) hits.push(`${p.name}が変更に含まれている: ${file}`);
@@ -130,7 +167,11 @@ export function checkUnexpectedPaths(files) {
 }
 
 /** 追加行を検査する。blocks は止める対象、warns は人に見せる対象。 */
-export function checkEntries(entries, denylistTerms = [], { message = false } = {}) {
+export function checkEntries(
+  entries: AddedLine[],
+  denylistTerms: string[] = [],
+  { message = false }: { message?: boolean } = {},
+): CheckResult {
   const blocks = [
     ...scan(entries, SECRET_CONTENT_PATTERNS),
     ...scan(entries, ENV_INFO_PATTERNS),
@@ -141,16 +182,18 @@ export function checkEntries(entries, denylistTerms = [], { message = false } = 
   return { blocks: [...new Set(blocks)], warns: [...new Set(warns)] };
 }
 
-/** 作者のメールアドレスが、すべて GitHub の noreply アドレスか。 */
-export function checkAuthors(entries) {
-  // entries: { sha, email }
-  return entries
-    .filter(({ email }) => !NOREPLY.test(email))
-    .map(({ sha }) => `noreply ではない作者アドレス: コミット ${sha}`);
+/** 作者とコミッターのメールアドレスが、すべて GitHub の noreply アドレスか。 */
+export function checkAuthors(entries: CommitAuthor[]): string[] {
+  const hits: string[] = [];
+  for (const { sha, authorEmail, committerEmail } of entries) {
+    if (!NOREPLY.test(authorEmail)) hits.push(`noreply ではない作者アドレス: コミット ${sha}`);
+    if (!NOREPLY.test(committerEmail)) hits.push(`noreply ではないコミッターアドレス: コミット ${sha}`);
+  }
+  return hits;
 }
 
 /** 拒否リストのテキスト(1 行 1 語、# 始まりはコメント、空行は無視)を語の配列にする。 */
-export function parseDenylist(text) {
+export function parseDenylist(text: string): string[] {
   return text
     .split("\n")
     .map((l) => l.trim())

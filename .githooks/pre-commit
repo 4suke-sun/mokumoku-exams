@@ -4,4 +4,4 @@
 # 有効化: git config core.hooksPath .githooks(npm install の prepare でも設定される)
 set -euo pipefail
 
-node scripts/check-commit-secrets.mjs
+node scripts/check-commit-secrets.ts

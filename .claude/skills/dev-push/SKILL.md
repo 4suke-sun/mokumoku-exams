@@ -31,7 +31,7 @@ pre-push フックと同じ検査を、先に実行する。標準入力は `<�
 の形式。新規ブランチのリモート SHA は 40 桁の 0:
 
 ```sh
-printf 'refs/heads/%s %s refs/heads/%s %s\n' "$(git branch --show-current)" "$(git rev-parse HEAD)" "$(git branch --show-current)" 0000000000000000000000000000000000000000 | node scripts/check-push-secrets.mjs
+printf 'refs/heads/%s %s refs/heads/%s %s\n' "$(git branch --show-current)" "$(git rev-parse HEAD)" "$(git branch --show-current)" 0000000000000000000000000000000000000000 | node scripts/check-push-secrets.ts
 ```
 
 終了コードが 0 でなければ、指摘を直す。

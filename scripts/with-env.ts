@@ -4,7 +4,7 @@
  * 環境固有の値(プロファイル名・ドメイン・ホストゾーン ID など)を、コマンドラインやコードに
  * 書かずに .env に置くための入口。すでに環境変数にある値は上書きしない。
  *
- *   node scripts/with-env.mjs <コマンド> [引数...]
+ *   node scripts/with-env.ts <コマンド> [引数...]
  */
 import { spawnSync } from "node:child_process";
 
@@ -13,12 +13,12 @@ try {
 }
 catch (error) {
   // .env が無いのは正常(CI など)。それ以外(構文エラー等)は気づけるよう表に出す。
-  if (error?.code !== "ENOENT") throw error;
+  if ((error as NodeJS.ErrnoException)?.code !== "ENOENT") throw error;
 }
 
 const [command, ...args] = process.argv.slice(2);
 if (!command) {
-  process.stderr.write("使い方: node scripts/with-env.mjs <コマンド> [引数...]\n");
+  process.stderr.write("使い方: node scripts/with-env.ts <コマンド> [引数...]\n");
   process.exit(2);
 }
 

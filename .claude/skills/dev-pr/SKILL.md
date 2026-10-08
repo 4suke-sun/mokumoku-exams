@@ -6,7 +6,7 @@ description: PR・Issue の起票や編集の前に、タイトルと本文を .
 # /dev-pr — 漏えいを確認してから PR・Issue を出す
 
 PR・Issue のタイトルと本文は、リモートに残る。編集履歴も、あとから消せない。「出してから直す」は前提にしない。
-PR ができると、ブランチの全コミットが参照として保持される。フック(`scripts/check-pr-secrets.mjs`)は正規表現で
+PR ができると、ブランチの全コミットが参照として保持される。フック(`scripts/check-pr-secrets.ts`)は正規表現で
 拾えるものを止める。このスキルは、**文脈で判断するもの**を確認する(フックとの二重防御)。
 
 ## 役割の分け方
@@ -42,7 +42,7 @@ PR ができると、ブランチの全コミットが参照として保持さ�
 ## Step 2. 機械的な検査
 
 ```sh
-node scripts/check-pr-secrets.mjs <下書きファイル>
+node scripts/check-pr-secrets.ts <下書きファイル>
 ```
 
 終了コードが 0 でなければ、指摘を直す(下書きを直し、再度検査する)。
@@ -95,7 +95,7 @@ shasum -a 256 <下書きファイル>
    gh issue create --title "$(head -n 1 <下書き> | sed 's/^# //')" --body-file <(tail -n +3 <下書き>)
    ```
 
-3. `gh pr create` の前には、フック(`scripts/check-pr-secrets.mjs`)も動く。止められたら、指摘を直す
+3. `gh pr create` の前には、フック(`scripts/check-pr-secrets.ts`)も動く。止められたら、指摘を直す
 4. 作ったら、CI の結果を確認する。**最新のコミットの CI が通るまで、マージしない**
 5. マージは、このスキルの範囲外(人の指示があるときだけ行う)
 

@@ -22,4 +22,4 @@ while read -r local_ref local_sha remote_ref remote_sha; do
   fi
 done <<< "$input"
 
-printf '%s\n' "$input" | node scripts/check-push-secrets.mjs
+printf '%s\n' "$input" | node scripts/check-push-secrets.ts

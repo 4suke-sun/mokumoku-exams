@@ -1,23 +1,23 @@
 #!/usr/bin/env node
 /**
  * PR・Issue の下書きファイルを検査する。
- *   node scripts/check-pr-secrets.mjs <下書きファイル>...
+ *   node scripts/check-pr-secrets.ts <下書きファイル>...
  * 下書き(タイトルと本文)の全行を対象にする。投稿は、検査と人の確認を経た同じファイルから行う。
  */
 import { readFileSync } from "node:fs";
-import { report } from "./lib/git-check.mjs";
-import { checkEntries, textToEntries } from "./lib/pr-secrets-check.mjs";
-import { readLocalDenylist } from "./lib/local-denylist.mjs";
+import { report } from "./lib/git-check.ts";
+import { checkEntries, textToEntries } from "./lib/pr-secrets-check.ts";
+import { readLocalDenylist } from "./lib/local-denylist.ts";
 
 const files = process.argv.slice(2);
 if (files.length === 0) {
-  process.stderr.write("使い方: node scripts/check-pr-secrets.mjs <下書きファイル>...\n");
+  process.stderr.write("使い方: node scripts/check-pr-secrets.ts <下書きファイル>...\n");
   process.exit(2);
 }
 
 const denylist = readLocalDenylist();
-const blocks = [];
-const warns = [];
+const blocks: string[] = [];
+const warns: string[] = [];
 for (const file of files) {
   const result = checkEntries(textToEntries(readFileSync(file, "utf8"), file), denylist, { message: true });
   blocks.push(...result.blocks);

@@ -6,11 +6,11 @@
  * 失敗したら push を止める(このスクリプト自身のエラーでも素通りさせない)。
  */
 import { readFileSync } from "node:fs";
-import { ZERO_SHA, baseFor, checkCommits, checkEachCommit, report } from "./lib/git-check.mjs";
+import { ZERO_SHA, baseFor, checkCommits, checkEachCommit, report } from "./lib/git-check.ts";
 
 const lines = readFileSync(0, "utf8").split("\n").map((l) => l.trim()).filter(Boolean);
-const blocks = [];
-const warns = [];
+const blocks: string[] = [];
+const warns: string[] = [];
 
 try {
   for (const line of lines) {
@@ -18,7 +18,7 @@ try {
     if (!localSha || localSha === ZERO_SHA) continue; // ブランチ削除
 
     // ベースが無い(最初の push)ときは、見送らず、履歴の最初からを検査する。
-    const start = remoteSha !== ZERO_SHA ? remoteSha : baseFor(localSha);
+    const start = remoteSha && remoteSha !== ZERO_SHA ? remoteSha : baseFor(localSha);
 
     // git の実行に失敗したら、検査できていないので、止める(例外はまとめて下で扱う)。
     const diff = checkEachCommit(start, localSha);
