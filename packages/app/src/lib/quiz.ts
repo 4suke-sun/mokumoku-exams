@@ -5,6 +5,11 @@ export type Answers = Record<string, string[]>;
 
 export type Score = { total: number; correct: number; percent: number };
 
+/** 問題 ID に対する回答を返す。回答がなければ空。継承されたプロパティ(`constructor` など)は回答として扱わない。 */
+export function answerFor(answers: Answers, questionId: string): readonly string[] {
+  return Object.hasOwn(answers, questionId) ? (answers[questionId] ?? []) : [];
+}
+
 /** 選んだ選択肢が、正解の集合と一致するか。順序は問わない。 */
 export function isCorrect(question: Pick<Question, "correctAnswers">, selected: readonly string[]): boolean {
   const chosen = new Set(selected);
@@ -45,7 +50,7 @@ export function countPool(all: readonly Question[], domains: readonly string[]):
 /** 正答数 ÷ 出題数 × 100(%)。未回答は不正解として数える。 */
 export function score(questions: readonly Question[], answers: Answers): Score {
   const total = questions.length;
-  const correct = questions.filter((q) => isCorrect(q, answers[q.questionId] ?? [])).length;
+  const correct = questions.filter((q) => isCorrect(q, answerFor(answers, q.questionId))).length;
   const percent = total === 0 ? 0 : Math.round((correct / total) * 1000) / 10;
   return { total, correct, percent };
 }

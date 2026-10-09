@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 import { shuffle } from "@/lib/quiz.ts";
-import { saveSession } from "@/lib/storage.ts";
+import { browserStore, saveSession } from "@/lib/storage.ts";
 import type { PublishedExam } from "@/lib/types.ts";
 
 type PoolItem = { questionId: string; domain: string };
@@ -43,7 +43,7 @@ export function ModeSelect({ exam, pool }: Props) {
       setError("出題できる問題がありません。分野の選択を見直してください。");
       return;
     }
-    const saved = saveSession(window.localStorage, {
+    const saved = saveSession(browserStore(), {
       examCode: exam.examCode,
       questionIds,
       answers: {},

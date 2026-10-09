@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { countPool, isCorrect, passLinePercent, pickQuestions, score, shuffle, sortKeys } from "./quiz.ts";
+import { answerFor, countPool, isCorrect, passLinePercent, pickQuestions, score, shuffle, sortKeys } from "./quiz.ts";
 import type { Question } from "./types.ts";
 
 function question(id: number, domain: string, correct: string[]): Question {
@@ -41,6 +41,14 @@ describe("isCorrect", () => {
     expect(isCorrect(q, ["C", "B"])).toBe(true);
     expect(isCorrect(q, ["B"])).toBe(false);
     expect(isCorrect(q, ["A", "B", "C"])).toBe(false);
+  });
+});
+
+describe("answerFor", () => {
+  it("回答がなければ空を返し、継承されたプロパティは回答として扱わない", () => {
+    expect(answerFor({ "TEST-0001": ["A"] }, "TEST-0001")).toEqual(["A"]);
+    expect(answerFor({}, "TEST-0001")).toEqual([]);
+    expect(answerFor({}, "constructor")).toEqual([]);
   });
 });
 

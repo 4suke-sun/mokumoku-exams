@@ -6,32 +6,47 @@ import { z } from "zod";
 /** localStorage と同じ形の、最小の保存先。テストで差し替えられるようにする。 */
 export type KeyValueStore = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 
+/**
+ * ブラウザの localStorage。保存が禁止されていると、`window.localStorage` を参照した時点で例外になる。
+ * 参照を各メソッドの中で行い、この例外を、保存の処理の try で受けられるようにする。
+ */
+export function browserStore(): KeyValueStore {
+  return {
+    getItem: (key) => window.localStorage.getItem(key),
+    setItem: (key, value) => window.localStorage.setItem(key, value),
+    removeItem: (key) => window.localStorage.removeItem(key),
+  };
+}
+
 const KEY_PREFIX = "mokumoku:v1";
 /** 結果を残す件数(新しい順) */
 export const MAX_RESULTS = 10;
 
-const AnswersSchema = z.record(z.string(), z.array(z.string()));
+// 保存された値の大きさに上限を置く(壊れた値や、手で書き換えた値で、画面が重くならないようにする)
+const KEY = z.string().max(64);
+const STAMP = z.string().max(64);
+const AnswersSchema = z.record(KEY, z.array(z.string().max(8)).max(10)).refine((a) => Object.keys(a).length <= 1000);
 
 /** 出題中の状態(途中で閉じても続きから解ける) */
 export const SessionSchema = z.strictObject({
-  examCode: z.string(),
-  questionIds: z.array(z.string()).min(1),
+  examCode: KEY,
+  questionIds: z.array(KEY).min(1).max(1000),
   answers: AnswersSchema,
-  index: z.number().int().min(0),
-  startedAt: z.string(),
+  index: z.number().int().min(0).max(1000),
+  startedAt: STAMP,
 });
 export type Session = z.infer<typeof SessionSchema>;
 
 /** 採点した結果 */
 export const ResultSchema = z.strictObject({
-  examCode: z.string(),
-  questionIds: z.array(z.string()).min(1),
+  examCode: KEY,
+  questionIds: z.array(KEY).min(1).max(1000),
   answers: AnswersSchema,
-  finishedAt: z.string(),
+  finishedAt: STAMP,
 });
 export type Result = z.infer<typeof ResultSchema>;
 
-const ResultsSchema = z.array(ResultSchema);
+const ResultsSchema = z.array(ResultSchema).max(MAX_RESULTS);
 
 function sessionKey(examCode: string): string {
   return `${KEY_PREFIX}:session:${examCode}`;

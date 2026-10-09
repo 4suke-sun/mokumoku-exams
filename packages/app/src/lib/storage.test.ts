@@ -77,6 +77,21 @@ describe("session", () => {
     expect(loadSession(memoryStore({ "mokumoku:v1:session:TEST": '{"examCode":"TEST"}' }), "TEST")).toBeNull();
   });
 
+  it("大きすぎる値は、保存がないものとして扱う", () => {
+    const tooLong = { ...session, questionIds: Array.from({ length: 1001 }, (_, i) => `TEST-${i}`) };
+    const store = memoryStore({ "mokumoku:v1:session:TEST": JSON.stringify(tooLong) });
+    expect(loadSession(store, "TEST")).toBeNull();
+  });
+
+  it("__proto__ という名前のキーがあっても、Object のプロトタイプを書き換えない", () => {
+    const raw = `{"examCode":"TEST","questionIds":["TEST-0001"],"answers":{"__proto__":["A"]},"index":0,"startedAt":"x"}`;
+    const loaded = loadSession(memoryStore({ "mokumoku:v1:session:TEST": raw }), "TEST");
+    expect(({} as Record<string, unknown>).A).toBeUndefined();
+    expect(Object.getPrototypeOf({})).toBe(Object.prototype);
+    // 読めた場合も、回答の入れ物のプロトタイプは書き換わっていない
+    if (loaded) expect(Object.getPrototypeOf(loaded.answers)).toBe(Object.prototype);
+  });
+
   it("別の資格の状態が入っていたら、使わない", () => {
     const store = memoryStore({ "mokumoku:v1:session:TEST": JSON.stringify({ ...session, examCode: "OTHER" }) });
     expect(loadSession(store, "TEST")).toBeNull();
