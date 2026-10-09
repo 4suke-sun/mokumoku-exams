@@ -95,7 +95,7 @@ export function Player({ exam, questions }: Props) {
         <p className="text-sm text-muted">
           {exam.shortName} / {index + 1} / {total} 問目
         </p>
-        <progress className="h-2 w-full" value={index + 1} max={total} aria-label="進み具合" />
+        <progress className="h-2 w-full accent-primary" value={index + 1} max={total} aria-label="進み具合" />
       </div>
 
       <fieldset className="space-y-3">
