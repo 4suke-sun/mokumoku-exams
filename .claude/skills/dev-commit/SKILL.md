@@ -10,13 +10,13 @@ description: git commit の前に、ステージした差分とコミットメ�
 
 ## 役割の分け方
 
-文面を書く側と、確かめる側を、別のサブエージェントにする(Agent ツール、`subagent_type: general-purpose`)。
-どちらも、メインのセッションの文脈を引き継がない。
+文面を書く側と、確かめる側を、別のサブエージェントにする(Agent ツール)。定義は `.claude/agents/` にあり、
+どちらも、メインのセッションの文脈を引き継がない。使うモデルの理由は ADR 0003 を参照。
 
 | 役 | やること | してはいけないこと |
 |---|---|---|
-| 作成役 | 差分を読み、コミットメッセージ案を `.drafts/commit-msg.txt` に書く | `.drafts/` 以外の編集、git の書き込み、ネットワーク操作 |
-| 検査役 | 差分とメッセージ案を、`checklist.md` に沿って確認し、判定を返す | **一切の書き込み**(読み取り専用) |
+| 作成役(`commit-writer`) | 差分を読み、コミットメッセージ案を `.drafts/commit-msg.txt` に書く | `.drafts/` 以外の編集、git の書き込み、ネットワーク操作 |
+| 検査役(`inspector`、必要なら `inspector-deep`) | 差分とメッセージ案を、`checklist.md` に沿って確認し、判定を返す | **一切の書き込み**(読み取り専用) |
 | メイン | 各役を起動し、判定に応じて commit を実行する | 検査役の判定を待たずに commit |
 
 作成役と検査役は、別々に起動する。同じサブエージェントに書かせて確かめさせない。
@@ -38,7 +38,7 @@ node scripts/check-commit-secrets.ts
 
 ## Step 2. 作成役: メッセージ案を書く
 
-作成役に依頼する内容:
+作成役(`subagent_type: commit-writer`)に依頼する内容:
 
 - 作業ディレクトリ(リポジトリのルート)
 - 「`git diff --cached` を読み、[Conventional Commits](https://www.conventionalcommits.org/) 形式のコミットメッセージ案を
@@ -47,7 +47,7 @@ node scripts/check-commit-secrets.ts
 
 ## Step 3. 検査役: 確認する
 
-検査役に依頼する内容:
+検査役(`subagent_type: inspector`)に依頼する内容:
 
 - 作業ディレクトリ
 - 「`.claude/skills/dev-commit/checklist.md` を読み、その項目に沿って、`git diff --cached` の差分と
@@ -55,6 +55,10 @@ node scripts/check-commit-secrets.ts
 - 「**読み取り専用**。編集、`git add` / `commit` / `push`、ネットワーク操作はしない」
 - 「`.pr-secrets-denylist` があれば読み、その語が差分にないかも確認する。**語そのものは報告に書かない**」
 - 「報告は、チェックリストの『報告のしかた』に従う(値を引用しない。最後に `判定: OK/WARN/BLOCK`)」
+
+差分に次のパスが含まれるときは、`inspector-deep`(Sonnet)も別に起動し、`inspector` と**両方**の判定を合わせる
+(最も重い判定を採用する)。`scripts/`、`.githooks/`、`.github/workflows/`、`.claude/`。検査の仕組みそのものを変える差分は、
+取りこぼしの出方が役ごとに違うため、2 つで補い合う。
 
 差分が大きい場合は、検査役を複数に分けてよい。最も重い判定を採用する。読み切れなかったと報告されたら、
 `OK` とみなさない。
