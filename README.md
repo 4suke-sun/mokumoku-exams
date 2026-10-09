@@ -15,7 +15,11 @@ GitHub の Issue で確認できます。
 npm install   # 検査フック(.githooks)も有効になります
 npm test      # テスト(Vitest)
 npm run typecheck   # 型検査(tsc)
+npm run dev   # アプリを開発サーバーで起動(http://localhost:3000)
 ```
+
+アプリは `packages/app`(Next.js)にあります。資格と問題のデータは、リポジトリ直下の `data/` の JSON です。
+学習の記録は、ブラウザの localStorage に保存します(この段階では、ログインはありません)。
 
 環境固有の値(プロファイル名・ドメインなど)は、`.env.example` をコピーした `.env`(gitignore 済み)に書きます。
 リポジトリには、実値を書きません。
