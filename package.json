@@ -16,7 +16,9 @@
     "check:commit": "node scripts/check-commit-secrets.ts",
     "check:release-notes": "node scripts/check-release-notes.ts",
     "check:lessons": "node scripts/check-lessons.ts",
-    "validate:data": "node scripts/validate-exam-data.ts"
+    "validate:data": "node scripts/validate-exam-data.ts",
+    "build:lambda": "node scripts/build-lambda-asset.ts",
+    "synth": "npm run synth -w @mokumoku-exams/infra"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
