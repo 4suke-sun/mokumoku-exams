@@ -2,5 +2,20 @@
   "name": "@mokumoku-exams/infra",
   "version": "0.0.0",
   "private": true,
-  "type": "module"
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "synth": "node ../../scripts/with-env.ts cdkd synth",
+    "diff": "node ../../scripts/with-env.ts cdkd diff",
+    "deploy": "node ../../scripts/with-env.ts cdkd deploy",
+    "destroy": "node ../../scripts/with-env.ts cdkd destroy"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "2.273.0",
+    "constructs": "10.8.1"
+  },
+  "devDependencies": {
+    "@go-to-k/cdkd": "0.296.28"
+  }
 }
