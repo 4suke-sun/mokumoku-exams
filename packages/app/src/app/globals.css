@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+/* 色は役割で決める(docs/app/design-tone.md)。ライトとダークで同じ役割の組を持つ。 */
+:root {
+  --bg: #f7f6f3;
+  --surface: #ffffff;
+  --text: #1f2933;
+  --muted: #52606d;
+  --border: #cbd2d9;
+  --primary: #1d4ed8;
+  --on-primary: #ffffff;
+  --correct: #166534;
+  --incorrect: #b91c1c;
+  --warn: #92400e;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #12151a;
+    --surface: #1b2027;
+    --text: #e5e9ee;
+    --muted: #aab4bf;
+    --border: #3a4350;
+    --primary: #93b4ff;
+    --on-primary: #0b1220;
+    --correct: #86efac;
+    --incorrect: #fca5a5;
+    --warn: #fcd34d;
+    color-scheme: dark;
+  }
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-fg: var(--text);
+  --color-muted: var(--muted);
+  --color-line: var(--border);
+  --color-primary: var(--primary);
+  --color-on-primary: var(--on-primary);
+  --color-correct: var(--correct);
+  --color-incorrect: var(--incorrect);
+  --color-warn: var(--warn);
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}
+
+/* 動きを減らす設定のときは、演出を止める(レイヤーの外に書くので、ユーティリティより優先される) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none;
+    transition: none;
+    scroll-behavior: auto;
+  }
+}

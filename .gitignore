@@ -5,9 +5,13 @@
 .pr-secrets-denylist
 node_modules/
 .next/
+next-env.d.ts
+*.tsbuildinfo
 cdk.out/
 dist/
 coverage/
 .DS_Store
 .vscode
 .claude/settings.local.json
+# next dev が自動生成するエージェント向けの指示ファイル(このリポジトリでは使わない)
+packages/app/AGENTS.md

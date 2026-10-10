@@ -28,3 +28,4 @@
 - [0001 言語とツールの統一(TypeScript、Biome、Vitest)](./0001-language-and-tooling.md)
 - [0002 データの検証に Zod を使う](./0002-schema-validation-zod.md)
 - [0003 作成役と検査役のモデルを使い分ける](./0003-model-split-for-agents.md)
+- [0004 アプリは問題データの型を、スキーマから型だけ参照する](./0004-app-shares-data-types-by-type-import.md)
