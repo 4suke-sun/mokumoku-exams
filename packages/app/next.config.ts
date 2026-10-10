@@ -5,6 +5,8 @@ import type { NextConfig } from "next";
 const repoRoot = resolve(import.meta.dirname, "../..");
 
 const config: NextConfig = {
+  // Lambda に載せるため、実行に必要なファイルだけをまとめた出力(.next/standalone)を作る
+  output: "standalone",
   turbopack: { root: repoRoot },
   outputFileTracingRoot: repoRoot,
 };
