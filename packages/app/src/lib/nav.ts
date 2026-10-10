@@ -4,6 +4,7 @@ export type NavItem = { label: string; href: string; ready: boolean };
 export const NAV_ITEMS: NavItem[] = [
   { label: "ホーム", href: "/", ready: true },
   { label: "資格", href: "/exams", ready: true },
+  { label: "使い方", href: "/help", ready: true },
   { label: "履歴", href: "/history", ready: false },
   { label: "ブックマーク", href: "/bookmarks", ready: false },
   { label: "リリースノート", href: "/release-notes", ready: false },
