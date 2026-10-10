@@ -15,8 +15,23 @@
   color-scheme: light;
 }
 
+/* 手動の選択(data-theme)が、端末の設定より優先される。選択がなければ端末の設定に従う */
+:root[data-theme="dark"] {
+  --bg: #12151a;
+  --surface: #1b2027;
+  --text: #e5e9ee;
+  --muted: #aab4bf;
+  --border: #3a4350;
+  --primary: #93b4ff;
+  --on-primary: #0b1220;
+  --correct: #86efac;
+  --incorrect: #fca5a5;
+  --warn: #fcd34d;
+  color-scheme: dark;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme]) {
     --bg: #12151a;
     --surface: #1b2027;
     --text: #e5e9ee;
@@ -47,6 +62,20 @@
 body {
   background: var(--bg);
   color: var(--text);
+}
+
+/* 遷移中のバー。終わりが分からないので、端に近づくほど遅くなる動きにする */
+@keyframes progress {
+  from {
+    width: 0;
+  }
+  to {
+    width: 90%;
+  }
+}
+
+.progress-bar {
+  animation: progress 8s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
 }
 
 /* 動きを減らす設定のときは、演出を止める(レイヤーの外に書くので、ユーティリティより優先される) */

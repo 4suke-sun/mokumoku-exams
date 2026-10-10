@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import type { ReactNode } from "react";
+import { NavigationProgress } from "@/components/navigation-progress.tsx";
+import { SiteHeader } from "@/components/site-header.tsx";
+import { THEME_INIT_SCRIPT } from "@/lib/theme.ts";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -10,15 +12,13 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="ja">
+    <html lang="ja" suppressHydrationWarning>
+      <head>
+        <script>{THEME_INIT_SCRIPT}</script>
+      </head>
       <body className="min-h-screen bg-bg text-fg antialiased">
-        <header className="border-b border-line bg-surface">
-          <div className="mx-auto flex max-w-3xl items-center px-4 py-3">
-            <Link href="/" className="text-lg font-bold text-fg hover:underline">
-              もくもく問題集
-            </Link>
-          </div>
-        </header>
+        <NavigationProgress />
+        <SiteHeader />
         <main className="mx-auto max-w-3xl px-4 py-8">{children}</main>
         <footer className="mx-auto max-w-3xl px-4 pb-8 text-sm text-muted">
           <p>学習用の問題集です。</p>
