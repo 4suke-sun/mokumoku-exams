@@ -16,7 +16,7 @@
     "check:commit": "node scripts/check-commit-secrets.ts",
     "check:release-notes": "node scripts/check-release-notes.ts",
     "check:lessons": "node scripts/check-lessons.ts",
-    "validate:data": "node scripts/validate-exam-data.ts"
+    "validate:data": "node scripts/validate-exam-data.ts && node scripts/validate-help-data.ts"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.15",

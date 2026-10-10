@@ -59,6 +59,12 @@
   --color-warn: var(--warn);
 }
 
+/* キーボードで操作するとき、フォーカスの位置が常に見えるようにする(マウスのクリックでは出ない) */
+:focus-visible {
+  outline: 3px solid var(--primary);
+  outline-offset: 2px;
+}
+
 body {
   background: var(--bg);
   color: var(--text);
