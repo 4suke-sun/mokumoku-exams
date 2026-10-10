@@ -14,7 +14,7 @@
         { "key": "C", "text": "黄", "explanation": "黄は、止まる準備を表すため不正解です。" }
       ],
       "correctAnswers": ["B"],
-      "explanation": "信号機の青(緑)は、進んでよいことを表します。\n\nこの問題は動作確認用の架空のものです。"
+      "explanation": "## 理由\n\n信号機の**青(緑)**は、進んでよいことを表します。\n\n- 赤: 止まれ\n- 黄: 止まる準備\n- 青(緑): 進んでよい\n\nこの問題は動作確認用の架空のものです。"
     },
     {
       "questionId": "SAMPLE-0002",
@@ -40,7 +40,7 @@
       "domain": "domain1",
       "questionType": "single",
       "difficulty": "easy",
-      "questionText": "動作確認用の問題です。1 週間は何日ですか。",
+      "questionText": "動作確認用の問題です。次の設定で、1 週間は何日ですか。\n\n```\nunit = \"week\"\ndays = ?\n```\n\n`days` に入る値を選んでください。",
       "choices": [
         { "key": "A", "text": "5 日" },
         { "key": "B", "text": "7 日" },
