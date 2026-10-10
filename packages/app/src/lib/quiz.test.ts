@@ -1,5 +1,18 @@
 import { describe, expect, it } from "vitest";
-import { answerFor, countPool, isCorrect, passLinePercent, pickQuestions, score, shuffle, sortKeys } from "./quiz.ts";
+import {
+  answerFor,
+  countPool,
+  domainCounts,
+  isCorrect,
+  orderChoices,
+  passLinePercent,
+  pickQuestions,
+  score,
+  sessionProgress,
+  shuffle,
+  shuffleChoiceOrder,
+  sortKeys,
+} from "./quiz.ts";
 import type { Question } from "./types.ts";
 
 function question(id: number, domain: string, correct: string[]): Question {
@@ -108,5 +121,49 @@ describe("passLinePercent", () => {
 describe("sortKeys", () => {
   it("キーを昇順にそろえる", () => {
     expect(sortKeys(["C", "A", "B"])).toEqual(["A", "B", "C"]);
+  });
+});
+
+describe("shuffleChoiceOrder / orderChoices", () => {
+  it("シャッフルした並び_選択肢の集合は変わらず採点も変わらない", () => {
+    const order = shuffleChoiceOrder(
+      questions.map((x) => ({ questionId: x.questionId, choiceKeys: x.choices.map((c) => c.key) })),
+      () => 0,
+    );
+    const q = questions[1] as Question;
+    const ordered = orderChoices(q, order);
+    expect([...ordered.map((c) => c.key)].sort()).toEqual(["A", "B", "C"]);
+    expect(order[q.questionId]).not.toEqual(["A", "B", "C"]);
+    expect(isCorrect(q, ["B", "C"])).toBe(true);
+  });
+
+  it("並びの保存なし_元の並びで返す", () => {
+    const q = questions[0] as Question;
+    expect(orderChoices(q).map((c) => c.key)).toEqual(["A", "B", "C"]);
+  });
+
+  it("選択肢と食い違う並び_元の並びで返す", () => {
+    const q = questions[0] as Question;
+    expect(orderChoices(q, { [q.questionId]: ["C", "B", "X"] }).map((c) => c.key)).toEqual(["A", "B", "C"]);
+    expect(orderChoices(q, { [q.questionId]: ["C", "C", "B"] }).map((c) => c.key)).toEqual(["A", "B", "C"]);
+    expect(orderChoices(q, { [q.questionId]: ["C", "B"] }).map((c) => c.key)).toEqual(["A", "B", "C"]);
+  });
+
+  it("保存した並び_その順で返す", () => {
+    const q = questions[0] as Question;
+    expect(orderChoices(q, { [q.questionId]: ["C", "A", "B"] }).map((c) => c.key)).toEqual(["C", "A", "B"]);
+  });
+});
+
+describe("sessionProgress", () => {
+  it("一部だけ回答_回答済みの数と出題数を返す", () => {
+    const progress = sessionProgress({ questionIds: ["a", "b", "c"], answers: { a: ["A"], b: [] } });
+    expect(progress).toEqual({ answered: 1, total: 3 });
+  });
+});
+
+describe("domainCounts", () => {
+  it("分野ごと_問題数を数える", () => {
+    expect(domainCounts(questions)).toEqual({ domain1: 2, domain2: 2 });
   });
 });

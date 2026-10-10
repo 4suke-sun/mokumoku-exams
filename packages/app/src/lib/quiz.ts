@@ -1,5 +1,7 @@
 import type { PublishedExam, Question } from "./types.ts";
 
+type Choice = Question["choices"][number];
+
 /** 問題 ID ごとの、選んだ選択肢のキー */
 export type Answers = Record<string, string[]>;
 
@@ -63,4 +65,46 @@ export function passLinePercent(exam: Pick<PublishedExam, "passingScore" | "tota
 /** 選択肢のキーを、表示用の並び(A, B, …)にそろえる。 */
 export function sortKeys(keys: readonly string[]): string[] {
   return [...keys].sort();
+}
+
+/** 問題 ID ごとの、選択肢のキーの並び */
+export type ChoiceOrder = Record<string, string[]>;
+
+/** 各問題の選択肢の並びをシャッフルして決める。 */
+export function shuffleChoiceOrder(
+  items: readonly { questionId: string; choiceKeys: readonly string[] }[],
+  random: () => number,
+): ChoiceOrder {
+  const order: ChoiceOrder = {};
+  for (const item of items) order[item.questionId] = shuffle(item.choiceKeys, random);
+  return order;
+}
+
+/**
+ * 保存された並びで選択肢を返す。並びがない、または選択肢のキーと食い違うときは、元の並び。
+ * 食い違いは、データが更新されたあとの古い保存を想定している。
+ */
+export function orderChoices(question: Pick<Question, "questionId" | "choices">, order?: ChoiceOrder): Choice[] {
+  const keys = order && Object.hasOwn(order, question.questionId) ? order[question.questionId] : undefined;
+  if (!keys || keys.length !== question.choices.length) return question.choices;
+  const byKey = new Map(question.choices.map((c) => [c.key, c]));
+  const ordered = keys.map((k) => byKey.get(k));
+  const valid = new Set(keys).size === keys.length && ordered.every((c) => c !== undefined);
+  return valid ? (ordered as Choice[]) : question.choices;
+}
+
+/** 回答済みの問題数と、出題数 */
+export function sessionProgress(session: { questionIds: readonly string[]; answers: Answers }): {
+  answered: number;
+  total: number;
+} {
+  const answered = session.questionIds.filter((id) => answerFor(session.answers, id).length > 0).length;
+  return { answered, total: session.questionIds.length };
+}
+
+/** 分野ごとの出題できる問題数 */
+export function domainCounts(pool: readonly { domain: string }[]): Record<string, number> {
+  const counts: Record<string, number> = {};
+  for (const p of pool) counts[p.domain] = (counts[p.domain] ?? 0) + 1;
+  return counts;
 }

@@ -2,12 +2,21 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useId, useState } from "react";
-import { shuffle } from "@/lib/quiz.ts";
-import { browserStore, saveSession } from "@/lib/storage.ts";
+import { useEffect, useId, useState } from "react";
+import { domainCounts, sessionProgress, shuffle, shuffleChoiceOrder } from "@/lib/quiz.ts";
+import {
+  browserStore,
+  clearSession,
+  DEFAULT_SETTINGS,
+  loadSession,
+  loadSettings,
+  type Session,
+  saveSession,
+  saveSettings,
+} from "@/lib/storage.ts";
 import type { PublishedExam } from "@/lib/types.ts";
 
-type PoolItem = { questionId: string; domain: string };
+type PoolItem = { questionId: string; domain: string; choiceKeys: string[] };
 
 type Props = { exam: PublishedExam; pool: PoolItem[] };
 
@@ -25,6 +34,19 @@ export function ModeSelect({ exam, pool }: Props) {
   const [domains, setDomains] = useState<string[]>([]);
   const [count, setCount] = useState<number>(Math.min(5, pool.length));
   const [error, setError] = useState<string | null>(null);
+  const [shuffleChoices, setShuffleChoices] = useState(DEFAULT_SETTINGS.shuffleChoices);
+  const [resumable, setResumable] = useState<Session | null>(null);
+
+  useEffect(() => {
+    const store = browserStore();
+    setShuffleChoices(loadSettings(store).shuffleChoices);
+    const saved = loadSession(store, exam.examCode);
+    // 出題中の問題が、いまのデータにすべてあるときだけ続きから解ける
+    const ids = new Set(pool.map((p) => p.questionId));
+    setResumable(saved?.questionIds.every((id) => ids.has(id)) ? saved : null);
+  }, [exam.examCode, pool]);
+
+  const perDomain = domainCounts(pool);
 
   const available = domains.length === 0 ? pool.length : pool.filter((p) => domains.includes(p.domain)).length;
   const counts = [...COUNT_CHOICES.filter((n) => n < available), available];
@@ -32,6 +54,16 @@ export function ModeSelect({ exam, pool }: Props) {
 
   function toggleDomain(code: string) {
     setDomains((current) => (current.includes(code) ? current.filter((d) => d !== code) : [...current, code]));
+  }
+
+  function changeShuffle(next: boolean) {
+    setShuffleChoices(next);
+    saveSettings(browserStore(), { shuffleChoices: next });
+  }
+
+  function discard() {
+    clearSession(browserStore(), exam.examCode);
+    setResumable(null);
   }
 
   function start() {
@@ -49,6 +81,12 @@ export function ModeSelect({ exam, pool }: Props) {
       answers: {},
       index: 0,
       startedAt: new Date().toISOString(),
+      choiceOrder: shuffleChoices
+        ? shuffleChoiceOrder(
+            targets.filter((p) => questionIds.includes(p.questionId)),
+            Math.random,
+          )
+        : undefined,
     });
     if (!saved) {
       setError("この端末では、出題の状態を保存できません。ブラウザの設定を確認してください。");
@@ -65,6 +103,27 @@ export function ModeSelect({ exam, pool }: Props) {
         </Link>
         <h1 className="text-2xl font-bold">{exam.name}</h1>
       </div>
+
+      {resumable ? (
+        <div className="space-y-3 rounded-lg border border-primary bg-surface p-4">
+          <h2 className="text-lg font-bold">前回の続きから</h2>
+          <p className="text-sm text-muted">
+            {sessionProgress(resumable).total} 問中 {sessionProgress(resumable).answered} 問に回答しています。
+            新しく始めると、この続きは消えます。
+          </p>
+          <div className="flex gap-3">
+            <Link
+              href={`/exams/${exam.examCode}/play`}
+              className="flex-1 rounded-md bg-primary px-5 py-3 text-center font-bold text-on-primary hover:opacity-90"
+            >
+              続きから解く
+            </Link>
+            <button type="button" onClick={discard} className="rounded-md border border-line px-5 py-3 font-bold">
+              破棄する
+            </button>
+          </div>
+        </div>
+      ) : null}
 
       <div className="space-y-3">
         <h2 className="text-lg font-bold">モード</h2>
@@ -95,10 +154,26 @@ export function ModeSelect({ exam, pool }: Props) {
               checked={domains.includes(domain.code)}
               onChange={() => toggleDomain(domain.code)}
             />
-            <span>{domain.name}</span>
+            <span>
+              {domain.name}
+              <span className="ml-2 text-sm text-muted">({perDomain[domain.code] ?? 0} 問)</span>
+            </span>
           </label>
         ))}
       </fieldset>
+
+      <label className="flex items-center gap-3 rounded-md border border-line bg-surface p-3">
+        <input
+          type="checkbox"
+          className="size-5"
+          checked={shuffleChoices}
+          onChange={(event) => changeShuffle(event.target.checked)}
+        />
+        <span>
+          選択肢の並びをシャッフルする
+          <span className="block text-sm text-muted">位置で答えを覚えてしまうのを防ぎます。採点は変わりません。</span>
+        </span>
+      </label>
 
       <div className="space-y-2">
         <label htmlFor={countId} className="block text-lg font-bold">

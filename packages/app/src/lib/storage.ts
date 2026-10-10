@@ -27,6 +27,12 @@ const KEY = z.string().max(64);
 const STAMP = z.string().max(64);
 const AnswersSchema = z.record(KEY, z.array(z.string().max(8)).max(10)).refine((a) => Object.keys(a).length <= 1000);
 
+/** 問題 ID ごとの、選択肢のキーの並び(シャッフルした順を、再読み込みしても保つ) */
+const ChoiceOrderSchema = z
+  .record(KEY, z.array(z.string().max(8)).max(10))
+  .refine((o) => Object.keys(o).length <= 1000)
+  .optional();
+
 /** 出題中の状態(途中で閉じても続きから解ける) */
 export const SessionSchema = z.strictObject({
   examCode: KEY,
@@ -34,6 +40,7 @@ export const SessionSchema = z.strictObject({
   answers: AnswersSchema,
   index: z.number().int().min(0).max(1000),
   startedAt: STAMP,
+  choiceOrder: ChoiceOrderSchema,
 });
 export type Session = z.infer<typeof SessionSchema>;
 
@@ -43,6 +50,7 @@ export const ResultSchema = z.strictObject({
   questionIds: z.array(KEY).min(1).max(1000),
   answers: AnswersSchema,
   finishedAt: STAMP,
+  choiceOrder: ChoiceOrderSchema,
 });
 export type Result = z.infer<typeof ResultSchema>;
 
@@ -105,4 +113,18 @@ export function loadResults(store: KeyValueStore, examCode: string): Result[] {
 export function saveResult(store: KeyValueStore, result: Result): boolean {
   const next = [result, ...loadResults(store, result.examCode)].slice(0, MAX_RESULTS);
   return writeJson(store, resultsKey(result.examCode), next);
+}
+
+/** 利用者の設定 */
+export const SettingsSchema = z.strictObject({ shuffleChoices: z.boolean() });
+export type Settings = z.infer<typeof SettingsSchema>;
+
+export const DEFAULT_SETTINGS: Settings = { shuffleChoices: false };
+
+export function loadSettings(store: KeyValueStore): Settings {
+  return readJson(store, `${KEY_PREFIX}:settings`, SettingsSchema) ?? DEFAULT_SETTINGS;
+}
+
+export function saveSettings(store: KeyValueStore, settings: Settings): boolean {
+  return writeJson(store, `${KEY_PREFIX}:settings`, settings);
 }

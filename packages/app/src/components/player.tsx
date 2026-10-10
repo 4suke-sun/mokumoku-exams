@@ -3,7 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { EmptyState } from "@/components/empty-state.tsx";
-import { answerFor, sortKeys } from "@/lib/quiz.ts";
+import { InlineText, RichText } from "@/components/rich-text.tsx";
+import { answerFor, orderChoices, sortKeys } from "@/lib/quiz.ts";
 import { browserStore, clearSession, loadSession, type Session, saveResult, saveSession } from "@/lib/storage.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 
@@ -72,6 +73,7 @@ export function Player({ exam, questions }: Props) {
       questionIds: session.questionIds,
       answers: session.answers,
       finishedAt: new Date().toISOString(),
+      choiceOrder: session.choiceOrder,
     });
     if (!saved) {
       // 結果を残せないときは、回答を消さずに、この画面にとどまる
@@ -93,12 +95,12 @@ export function Player({ exam, questions }: Props) {
         <progress className="h-2 w-full accent-primary" value={index + 1} max={total} aria-label="進み具合" />
       </div>
 
-      <fieldset className="space-y-3">
-        <legend className="whitespace-pre-wrap text-lg font-bold leading-relaxed">{question.questionText}</legend>
+      <fieldset aria-labelledby="question-text" className="space-y-3">
+        <RichText id="question-text" text={question.questionText} className="text-lg font-bold" />
         <p className="text-sm text-muted">
           {question.questionType === "single" ? "1 つ選んでください。" : `${needed} つ選んでください。`}
         </p>
-        {question.choices.map((choice) => (
+        {orderChoices(question, session.choiceOrder).map((choice) => (
           <label
             key={choice.key}
             className={`flex items-start gap-3 rounded-md border p-3 ${
@@ -114,7 +116,7 @@ export function Player({ exam, questions }: Props) {
             />
             <span>
               <span className="font-bold">{choice.key}. </span>
-              <span className="whitespace-pre-wrap">{choice.text}</span>
+              <InlineText text={choice.text} />
             </span>
           </label>
         ))}

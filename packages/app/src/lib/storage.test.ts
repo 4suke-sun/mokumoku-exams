@@ -1,14 +1,17 @@
 import { describe, expect, it } from "vitest";
 import {
   clearSession,
+  DEFAULT_SETTINGS,
   type KeyValueStore,
   loadResults,
   loadSession,
+  loadSettings,
   MAX_RESULTS,
   type Result,
   type Session,
   saveResult,
   saveSession,
+  saveSettings,
 } from "./storage.ts";
 
 function memoryStore(initial: Record<string, string> = {}): KeyValueStore & { data: Map<string, string> } {
@@ -129,5 +132,42 @@ describe("保存先が使えないとき", () => {
     expect(saveSession(brokenStore, session)).toBe(false);
     expect(saveResult(brokenStore, result(1))).toBe(false);
     expect(() => clearSession(brokenStore, "TEST")).not.toThrow();
+  });
+});
+
+describe("設定", () => {
+  it("保存なし_既定値", () => {
+    expect(loadSettings(memoryStore())).toEqual(DEFAULT_SETTINGS);
+  });
+
+  it("保存した設定_読み出せる", () => {
+    const store = memoryStore();
+    expect(saveSettings(store, { shuffleChoices: true })).toBe(true);
+    expect(loadSettings(store)).toEqual({ shuffleChoices: true });
+  });
+
+  it("壊れた設定_既定値", () => {
+    expect(loadSettings(memoryStore({ "mokumoku:v1:settings": '{"shuffleChoices":"yes"}' }))).toEqual(DEFAULT_SETTINGS);
+  });
+
+  it("保存が禁止された環境_保存は失敗し読み出しは既定値", () => {
+    expect(saveSettings(brokenStore, { shuffleChoices: true })).toBe(false);
+    expect(loadSettings(brokenStore)).toEqual(DEFAULT_SETTINGS);
+  });
+});
+
+describe("選択肢の並びの保存", () => {
+  it("並びつきの出題中の状態_保存して読み出せる", () => {
+    const store = memoryStore();
+    const session = {
+      examCode: "TEST",
+      questionIds: ["TEST-0001"],
+      answers: {},
+      index: 0,
+      startedAt: "2026-10-10T00:00:00.000Z",
+      choiceOrder: { "TEST-0001": ["B", "A"] },
+    };
+    saveSession(store, session);
+    expect(loadSession(store, "TEST")).toEqual(session);
   });
 });

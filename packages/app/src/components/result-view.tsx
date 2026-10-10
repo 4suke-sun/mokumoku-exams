@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { EmptyState } from "@/components/empty-state.tsx";
-import { answerFor, isCorrect, passLinePercent, score } from "@/lib/quiz.ts";
+import { InlineText, RichText } from "@/components/rich-text.tsx";
+import { answerFor, isCorrect, orderChoices, passLinePercent, score } from "@/lib/quiz.ts";
 import { browserStore, loadResults, type Result } from "@/lib/storage.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 
@@ -83,18 +84,25 @@ export function ResultView({ exam, questions }: Props) {
                   {correct ? "○ 正解" : "× 不正解"}
                   <span className="ml-2 text-fg">問題 {i + 1}</span>
                 </p>
-                <p className="whitespace-pre-wrap leading-relaxed">{question.questionText}</p>
+                <RichText text={question.questionText} />
                 <ul className="space-y-1 text-sm">
-                  {question.choices.map((choice) => {
+                  {orderChoices(question, latest.choiceOrder).map((choice) => {
                     const isAnswer = question.correctAnswers.includes(choice.key);
                     const chosen = selected.includes(choice.key);
                     return (
                       <li key={choice.key} className="rounded border border-line p-2">
                         <span className="font-bold">{choice.key}. </span>
-                        <span className="whitespace-pre-wrap">{choice.text}</span>
+                        <InlineText text={choice.text} />
                         {isAnswer ? <span className="ml-2 font-bold text-correct">(正解)</span> : null}
                         {chosen ? <span className="ml-2 text-muted">(あなたの回答)</span> : null}
-                        {choice.explanation ? <p className="mt-1 text-muted">{choice.explanation}</p> : null}
+                        {choice.explanation ? (
+                          <p className="mt-1 text-muted">
+                            <span className={`font-bold ${isAnswer ? "text-correct" : "text-incorrect"}`}>
+                              {isAnswer ? "正解の理由: " : "不正解の理由: "}
+                            </span>
+                            <InlineText text={choice.explanation} />
+                          </p>
+                        ) : null}
                       </li>
                     );
                   })}
@@ -102,10 +110,11 @@ export function ResultView({ exam, questions }: Props) {
                 <p className="text-sm text-muted">
                   あなたの回答: {keysLabel(selected)} / 正解: {keysLabel(question.correctAnswers)}
                 </p>
-                <p className="whitespace-pre-wrap leading-relaxed">{question.explanation}</p>
-                {question.supplement ? (
-                  <p className="whitespace-pre-wrap text-sm text-muted">{question.supplement}</p>
-                ) : null}
+                <div className="space-y-2 border-t border-line pt-3">
+                  <h3 className="font-bold">解説</h3>
+                  <RichText text={question.explanation} />
+                </div>
+                {question.supplement ? <RichText text={question.supplement} className="text-sm text-muted" /> : null}
               </li>
             );
           })}
