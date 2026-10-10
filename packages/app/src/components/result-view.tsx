@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { EmptyState } from "@/components/empty-state.tsx";
 import { answerFor, isCorrect, passLinePercent, score } from "@/lib/quiz.ts";
 import { browserStore, loadResults, type Result } from "@/lib/storage.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
@@ -38,16 +39,11 @@ export function ResultView({ exam, questions }: Props) {
 
   if (!latest || answered.length === 0) {
     return (
-      <section className="space-y-4">
-        <h1 className="text-2xl font-bold">結果がありません</h1>
-        <p className="text-muted">問題を解くと、ここに結果が表示されます。</p>
-        <Link
-          href={`/exams/${exam.examCode}`}
-          className="inline-block rounded-md bg-primary px-5 py-3 font-bold text-on-primary hover:opacity-90"
-        >
-          モード選択へ
-        </Link>
-      </section>
+      <EmptyState
+        title="結果がありません"
+        description="問題を解くと、ここに結果が表示されます。"
+        action={{ label: "モード選択へ", href: `/exams/${exam.examCode}` }}
+      />
     );
   }
 

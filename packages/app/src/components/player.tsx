@@ -1,8 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { EmptyState } from "@/components/empty-state.tsx";
 import { answerFor, sortKeys } from "@/lib/quiz.ts";
 import { browserStore, clearSession, loadSession, type Session, saveResult, saveSession } from "@/lib/storage.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
@@ -30,16 +30,11 @@ export function Player({ exam, questions }: Props) {
 
   if (state.status === "empty") {
     return (
-      <section className="space-y-4">
-        <h1 className="text-2xl font-bold">出題する問題がありません</h1>
-        <p className="text-muted">モードを選んで、出題を始めてください。</p>
-        <Link
-          href={`/exams/${exam.examCode}`}
-          className="inline-block rounded-md bg-primary px-5 py-3 font-bold text-on-primary hover:opacity-90"
-        >
-          モード選択へ
-        </Link>
-      </section>
+      <EmptyState
+        title="出題する問題がありません"
+        description="モードを選んで、出題を始めてください。"
+        action={{ label: "モード選択へ", href: `/exams/${exam.examCode}` }}
+      />
     );
   }
 
