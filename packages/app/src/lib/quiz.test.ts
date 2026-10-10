@@ -167,3 +167,102 @@ describe("domainCounts", () => {
     expect(domainCounts(questions)).toEqual({ domain1: 2, domain2: 2 });
   });
 });
+
+// 固定の種から決まった列を返す簡易な乱数(LCG)。シャッフルの性質を、複数の並びで確かめるために使う
+function seeded(seed: number): () => number {
+  let state = seed;
+  return () => {
+    state = (state * 1664525 + 1013904223) % 4294967296;
+    return state / 4294967296;
+  };
+}
+
+describe("isCorrect の境界", () => {
+  it("同じ数でも正解と違う組み合わせ_不正解", () => {
+    expect(isCorrect(questions[1] as Question, ["A", "B"])).toBe(false);
+  });
+
+  it("同じキーを重ねて選んでも_重複は 1 つとして扱う", () => {
+    expect(isCorrect(questions[0] as Question, ["A", "A"])).toBe(true);
+    expect(isCorrect(questions[1] as Question, ["B", "B"])).toBe(false);
+  });
+});
+
+describe("shuffle の性質", () => {
+  it("どの種でも_同じ要素の並べ替えになり_元の配列は変わらない", () => {
+    const items = [1, 2, 3, 4, 5, 6];
+    for (let seed = 1; seed <= 20; seed++) {
+      const result = shuffle(items, seeded(seed));
+      expect([...result].sort()).toEqual(items);
+      expect(items).toEqual([1, 2, 3, 4, 5, 6]);
+    }
+  });
+
+  it("空と 1 つだけの配列_そのまま返す", () => {
+    expect(shuffle([], seeded(1))).toEqual([]);
+    expect(shuffle([7], seeded(1))).toEqual([7]);
+  });
+
+  it("種を変えると_並びも変わる", () => {
+    const items = [1, 2, 3, 4, 5, 6, 7, 8];
+    const orders = new Set(Array.from({ length: 10 }, (_, i) => shuffle(items, seeded(i + 1)).join(",")));
+    expect(orders.size).toBeGreaterThan(1);
+  });
+});
+
+describe("pickQuestions の境界", () => {
+  it("複数の分野を指定_その分野の問題だけから選ぶ", () => {
+    const picked = pickQuestions(questions, { count: 4, domains: ["domain1", "domain2"] }, noShuffle);
+    expect(picked).toHaveLength(4);
+  });
+
+  it("存在しない分野だけ_空になる", () => {
+    expect(pickQuestions(questions, { count: 3, domains: ["none"] }, noShuffle)).toEqual([]);
+    expect(countPool(questions, ["none"])).toBe(0);
+  });
+
+  it("選ばれた問題は_重複しない", () => {
+    const picked = pickQuestions(questions, { count: 4, domains: [] }, seeded(3));
+    expect(new Set(picked.map((q) => q.questionId)).size).toBe(4);
+  });
+
+  it("出題数と同数の問題がある_すべてを選ぶ", () => {
+    const picked = pickQuestions(questions, { count: 2, domains: ["domain1"] }, noShuffle);
+    expect(picked.map((q) => q.domain)).toEqual(["domain1", "domain1"]);
+  });
+});
+
+describe("score / passLinePercent の端", () => {
+  it("割り切れない割合_小数第 1 位に丸める", () => {
+    const three = questions.slice(0, 3);
+    expect(score(three, { [three[0]?.questionId as string]: ["A"] })).toEqual({ total: 3, correct: 1, percent: 33.3 });
+    expect(
+      score(three, { [three[0]?.questionId as string]: ["A"], [three[2]?.questionId as string]: ["C"] }).percent,
+    ).toBe(66.7);
+  });
+
+  it("全問正解と全問不正解_100% と 0%", () => {
+    const all = Object.fromEntries(questions.map((q) => [q.questionId, [...q.correctAnswers]]));
+    expect(score(questions, all).percent).toBe(100);
+    expect(score(questions, {}).percent).toBe(0);
+  });
+
+  it("出題にない問題の回答_数えない", () => {
+    expect(score([questions[0] as Question], { "OTHER-0001": ["A"] })).toEqual({ total: 1, correct: 0, percent: 0 });
+  });
+
+  it("合格ラインが割り切れない_小数第 1 位に丸める", () => {
+    expect(passLinePercent({ passingScore: 720, totalScore: 1000 })).toBe(72);
+    expect(passLinePercent({ passingScore: 2, totalScore: 3 })).toBe(66.7);
+  });
+});
+
+describe("集計の端", () => {
+  it("回答が 1 つもない_回答済みは 0", () => {
+    expect(sessionProgress({ questionIds: ["a", "b"], answers: {} })).toEqual({ answered: 0, total: 2 });
+  });
+
+  it("問題がない_分野別の数も空", () => {
+    expect(domainCounts([])).toEqual({});
+  });
+});
