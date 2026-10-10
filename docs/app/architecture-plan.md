@@ -25,7 +25,7 @@ flowchart LR
 | 認証 | Cognito UserPool のみ。セルフサインアップ禁止、管理者の招待制、管理者グループ | v0.2.0 以降 |
 | データ | 学習履歴は DynamoDB の単一テーブル。問題データは、リポジトリの静的な JSON | v0.0.3(問題データ)、v0.3.0(履歴) |
 | ホスティング | Lambda Web Adapter + CloudFront + S3 | v0.2.0 以降 |
-| インフラ(`packages/infra`) | AWS CDK(TypeScript)。デプロイは `cdkd` | v0.2.0 以降 |
+| インフラ(`packages/infra`) | AWS CDK(TypeScript)。デプロイは `cdkd`。手順は [インフラの構築とデプロイ](./infra.md) | v0.2.0 以降 |
 
 ## 主な方針
 
