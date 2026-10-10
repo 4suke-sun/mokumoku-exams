@@ -27,7 +27,11 @@ export default async function ExamPage({ params }: Props) {
     <ModeSelect
       exam={exam}
       // 選択に必要な情報だけを渡す(問題の本文や正解は、出題画面で読み込む)
-      pool={questions.map((q) => ({ questionId: q.questionId, domain: q.domain }))}
+      pool={questions.map((q) => ({
+        questionId: q.questionId,
+        domain: q.domain,
+        choiceKeys: q.choices.map((c) => c.key),
+      }))}
     />
   );
 }

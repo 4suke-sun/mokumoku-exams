@@ -1,0 +1,76 @@
+// 設問文・選択肢・解説で使える、限定した記法(docs/data-spec.md の「文字の書き方」)。
+// HTML には変換せず、構造だけを返す。画面側が React の要素として組むので、書かれた文字が HTML として解釈されることはない。
+
+export type Inline = { kind: "text"; text: string } | { kind: "strong"; text: string } | { kind: "code"; text: string };
+
+export type Block =
+  | { kind: "paragraph"; lines: Inline[][] }
+  | { kind: "heading"; inlines: Inline[] }
+  | { kind: "list"; items: Inline[][] }
+  | { kind: "code"; text: string };
+
+const INLINE = /(\*\*[^*\n]+\*\*|`[^`\n]+`)/;
+
+export function parseInline(source: string): Inline[] {
+  return source
+    .split(INLINE)
+    .filter((part) => part !== "")
+    .map((part): Inline => {
+      if (part.startsWith("**") && part.endsWith("**") && part.length > 4) {
+        return { kind: "strong", text: part.slice(2, -2) };
+      }
+      if (part.startsWith("`") && part.endsWith("`") && part.length > 2) {
+        return { kind: "code", text: part.slice(1, -1) };
+      }
+      return { kind: "text", text: part };
+    });
+}
+
+/** 空行で段落を分ける。`- ` の行は箇条書き、`## ` の行は見出し、``` で囲んだ範囲はコード。 */
+export function parseBlocks(source: string): Block[] {
+  const blocks: Block[] = [];
+  const lines = source.replace(/\r\n?/g, "\n").split("\n");
+  let paragraph: string[] = [];
+  let list: string[] = [];
+
+  const flushParagraph = () => {
+    if (paragraph.length > 0) blocks.push({ kind: "paragraph", lines: paragraph.map(parseInline) });
+    paragraph = [];
+  };
+  const flushList = () => {
+    if (list.length > 0) blocks.push({ kind: "list", items: list.map(parseInline) });
+    list = [];
+  };
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i] as string;
+    if (line.startsWith("```")) {
+      flushParagraph();
+      flushList();
+      const code: string[] = [];
+      i++;
+      // 閉じのないフェンスは、末尾までをコードとして扱う
+      while (i < lines.length && !(lines[i] as string).startsWith("```")) {
+        code.push(lines[i] as string);
+        i++;
+      }
+      blocks.push({ kind: "code", text: code.join("\n") });
+    } else if (line.trim() === "") {
+      flushParagraph();
+      flushList();
+    } else if (line.startsWith("## ")) {
+      flushParagraph();
+      flushList();
+      blocks.push({ kind: "heading", inlines: parseInline(line.slice(3)) });
+    } else if (line.startsWith("- ")) {
+      flushParagraph();
+      list.push(line.slice(2));
+    } else {
+      flushList();
+      paragraph.push(line);
+    }
+  }
+  flushParagraph();
+  flushList();
+  return blocks;
+}
