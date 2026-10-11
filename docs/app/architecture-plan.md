@@ -20,12 +20,12 @@ flowchart LR
 
 | 要素 | 役割 | 実装する版(目安) |
 | --- | --- | --- |
-| 画面(`packages/app`) | 資格の一覧、モード選択、出題、採点、結果、復習、ダッシュボードなど | v0.1.0 以降 |
-| API(`packages/app` の API ルート) | 学習履歴の保存と取得、管理者の操作 | v0.3.0 以降 |
-| 認証 | Cognito UserPool のみ。セルフサインアップ禁止、管理者の招待制、管理者グループ | v0.2.0 以降 |
-| データ | 学習履歴は DynamoDB の単一テーブル。問題データは、リポジトリの静的な JSON | v0.0.3(問題データ)、v0.3.0(履歴) |
-| ホスティング | Lambda Web Adapter + CloudFront + S3 | v0.2.0 以降 |
-| インフラ(`packages/infra`) | AWS CDK(TypeScript)。デプロイは `cdkd`。手順は [インフラの構築とデプロイ](./infra.md) | v0.2.0 以降 |
+| 画面(`packages/app`) | 資格の一覧、モード選択、出題、採点、結果、復習、ダッシュボードなど | v0.5.0 以降 |
+| API(`packages/app` の API ルート) | 学習履歴の保存と取得、管理者の操作 | v0.12.0 以降 |
+| 認証 | Cognito UserPool のみ。セルフサインアップ禁止、管理者の招待制、管理者グループ | v0.9.0 以降 |
+| データ | 学習履歴は DynamoDB の単一テーブル。問題データは、リポジトリの静的な JSON | v0.3.0(問題データ)、v0.12.0(履歴) |
+| ホスティング | Lambda Web Adapter + CloudFront + S3 | v0.9.0 以降 |
+| インフラ(`packages/infra`) | AWS CDK(TypeScript)。デプロイは `cdkd`。手順は [インフラの構築とデプロイ](./infra.md) | v0.9.0 以降 |
 
 ## 主な方針
 
