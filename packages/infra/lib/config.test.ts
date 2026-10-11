@@ -20,6 +20,17 @@ describe("loadConfig", () => {
     expect(loadConfig({ ...valid, STACK_PREFIX: "dev-a" }).stackPrefix).toBe("dev-a");
   });
 
+  it("通知先のメールを指定すると_その値を使う", () => {
+    expect(loadConfig({ ...valid, ALARM_EMAIL: "alerts@example.com" }).alarmEmail).toBe("alerts@example.com");
+    expect(loadConfig(valid).alarmEmail).toBeUndefined();
+  });
+
+  it("通知先のメールの形が不正だと_値を出さずに失敗する", () => {
+    const bad = "not-an-address";
+    expect(() => loadConfig({ ...valid, ALARM_EMAIL: bad })).toThrow(/ALARM_EMAIL/);
+    expect(() => loadConfig({ ...valid, ALARM_EMAIL: bad })).not.toThrow(new RegExp(bad));
+  });
+
   it("必須の変数がないと_変数の名前を示して失敗する", () => {
     expect(() => loadConfig({})).toThrow(/WEB_ADAPTER_LAYER_ARN.*\n.*ORIGIN_VERIFY_VALUE/);
   });

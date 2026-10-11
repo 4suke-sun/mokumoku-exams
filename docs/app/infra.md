@@ -15,13 +15,28 @@
 - `/_next/static/*` は S3 から配ります(CloudFront から S3 へは、オリジンアクセスコントロールで読みます。バケットは公開しません)。
 - それ以外は Lambda の Function URL へ渡します。Function URL は認証なし(`authType: NONE`)で、CloudFront が付ける合言葉のヘッダー(`x-origin-verify`)を、
   アプリ(`packages/app/src/proxy.ts`)が確かめます。合言葉のないリクエスト(Function URL への直接のアクセス)は、403 で断ります。
-- 独自ドメインは、まだ設定しません。CloudFront の標準のドメインで配信します。キャッシュの設定は、別の段階で整えます。
+- 独自ドメインは、まだ設定しません。CloudFront の標準のドメインで配信します。
+
+### キャッシュとセキュリティヘッダー
+
+- 動的な応答(画面と API)は、キャッシュしません。静的ファイル(`/_next/static/*`)は、ファイル名にハッシュが入るので、長くキャッシュします。
+- すべての応答に、次のヘッダーを付けます(アプリ側が同じヘッダーを付けても、CloudFront の設定を優先します)。
+  `Strict-Transport-Security`(1 年、サブドメインを含む)、`X-Content-Type-Options: nosniff`、
+  `Referrer-Policy: strict-origin-when-cross-origin`、`X-Frame-Options: DENY`。
+  `Content-Security-Policy` は、まだ付けません。
+
+### ログと監視
+
+- アプリ(Lambda)のログは、ロググループを明示して作り、30 日で消えるようにしています。
+- Lambda のエラーと実行制限(スロットリング)に、アラームがあります(5 分間に 1 回以上で鳴ります)。通知先は SNS トピックです。
+- `.env` の `ALARM_EMAIL` を渡すと、そのアドレスをトピックに購読させます。デプロイの後に届く確認のメールで、購読を承認します。
+  渡さないときは、トピックだけが作られ、アラームの状態は CloudWatch の画面で確かめます。
 
 ## この版で扱わないこと
 
 次の項目は、別の段階で扱います。
 
-- 配信のキャッシュ設定とセキュリティヘッダー、ログと監視(アラーム)
+- CloudFront の監視(CloudFront のメトリクスは別リージョンにあるため、別の段階で扱います)
 - 初回パスワード設定とパスワード再設定、管理者向けの多要素認証の検討
 - データの保護設定(バックアップ・削除保護)
 - 独自ドメイン
@@ -38,6 +53,7 @@
    | `WEB_ADAPTER_LAYER_ARN` | Lambda Web Adapter のレイヤーの ARN(バージョン付き)。デプロイ先のリージョンのものを、Lambda Web Adapter の公式の案内から調べます |
    | `ORIGIN_VERIFY_VALUE` | CloudFront とアプリの間の合言葉。32 文字以上のランダムな文字列を、自分で作ります |
    | `STACK_PREFIX` | (省略可)リソース名の先頭に付ける文字列。既定は `mokumoku-exams` |
+   | `ALARM_EMAIL` | (省略可)アラームの通知先のメールアドレス |
 
    値の形は `packages/infra/lib/config.ts` が検査します。足りない、または形が違うと、変数の名前だけを示して止まります(値は表示しません)。
 
