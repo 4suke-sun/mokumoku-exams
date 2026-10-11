@@ -104,9 +104,9 @@ describe("Player のキー操作", () => {
     await user.keyboard("b{Enter}");
 
     await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock.mock.calls[0]?.[0]).toBe("/api/history/results");
-    const sent = JSON.parse(fetchMock.mock.calls[0]?.[1].body);
+    const posts = fetchMock.mock.calls.filter(([url]) => url === "/api/history/results");
+    expect(posts).toHaveLength(1);
+    const sent = JSON.parse(posts[0]?.[1].body);
     expect(sent.examCode).toBe("TEST");
     // 利用者の識別子は送らない(サーバーがトークンから決める)
     expect(Object.keys(sent)).not.toContain("sub");
@@ -138,7 +138,7 @@ describe("Player のキー操作", () => {
     await user.keyboard("b");
     await user.click(screen.getByRole("button", { name: "採点する" }));
     await user.click(screen.getByRole("button", { name: "採点する" }));
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls.filter(([url]) => url === "/api/history/results")).toHaveLength(1);
     release({ ok: true, status: 200, json: async () => ({}) });
     await waitFor(() => expect(push).toHaveBeenCalledTimes(1));
   });

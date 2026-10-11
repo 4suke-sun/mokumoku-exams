@@ -9,7 +9,7 @@ import type { AuthProvider } from "@/lib/auth/types.ts";
 import type { TokenVerifier } from "@/lib/auth/verify.ts";
 import { MAX_RESULTS, type Result } from "@/lib/storage.ts";
 import { proxy } from "@/proxy.ts";
-import { type HistoryDeps, handleListResults, handlePostResult } from "./handlers.ts";
+import { type HistoryDeps, handleListResults, handleListReview, handlePostResult } from "./handlers.ts";
 import { createDynamoRepository, type DocumentSender } from "./repository.ts";
 import { fakeTable } from "./table-double.ts";
 
@@ -39,6 +39,9 @@ function stack(wrap: (client: DocumentSender) => DocumentSender = (client) => cl
 
 const cookieOf = (sub: string) => `mokumoku_id=token-${sub}`;
 const minute = (n: number) => new Date(Date.UTC(2026, 9, 11, 12, n)).toISOString();
+/** 保存先の項目のうち、結果の項目の数(復習プールなどの項目は数えない) */
+const resultItems = (table: ReturnType<typeof fakeTable>) =>
+  [...table.items.values()].filter((item) => String(item.SK).startsWith("RESULT#")).length;
 
 function attempt(finishedAt: string, extra: Partial<Result> = {}): Result {
   return {
@@ -102,7 +105,7 @@ describe("履歴の保存と取得の通し", () => {
     const found = await results(deps, "SAMPLE", "a");
     expect(found).toHaveLength(1);
     expect(found[0]?.answers["SAMPLE-0001"]).toEqual(["A"]);
-    expect(table.items.size).toBe(1);
+    expect(resultItems(table)).toBe(1);
   });
 
   it("上限を超えて解く_古い結果から消え_保存先の項目数も上限になる", async () => {
@@ -112,7 +115,7 @@ describe("履歴の保存と取得の通し", () => {
     expect(found).toHaveLength(MAX_RESULTS);
     expect(found[0]?.finishedAt).toBe(minute(MAX_RESULTS + 2));
     expect(found.at(-1)?.finishedAt).toBe(minute(3));
-    expect(table.items.size).toBe(MAX_RESULTS);
+    expect(resultItems(table)).toBe(MAX_RESULTS);
   });
 
   it("上限を超えたあとに古い時刻の結果を送る_新しい 10 件が残る", async () => {
@@ -198,7 +201,7 @@ describe("履歴の通しでのエラー応答", () => {
     expect(await failed.text()).not.toContain("internal detail");
     failDelete = false;
     expect((await handlePostResult(post(attempt(minute(MAX_RESULTS)), "a"), deps)).status).toBe(200);
-    expect(table.items.size).toBe(MAX_RESULTS);
+    expect(resultItems(table)).toBe(MAX_RESULTS);
     expect((await results(deps, "SAMPLE", "a"))[0]?.finishedAt).toBe(minute(MAX_RESULTS));
   });
 });
@@ -245,5 +248,53 @@ describe("入口(proxy)から API までの通し", () => {
     expect((await POST(nextPost(null, saved))).status).toBe(401);
     expect((await proxy(nextGet(null))).status).toBe(401);
     expect((await GET(nextGet(null))).status).toBe(401);
+  });
+});
+
+describe("復習プールの通し", () => {
+  const review = async (deps: HistoryDeps, sub: string) => {
+    const response = await handleListReview(
+      new Request(`${ORIGIN}/api/history/review?examCode=SAMPLE`, { headers: { cookie: cookieOf(sub) } }),
+      deps,
+    );
+    expect(response.status).toBe(200);
+    return ((await response.json()) as { questionIds: string[] }).questionIds;
+  };
+  // 問題データで決まる正解(端末から送られた正誤は使わない)
+  const questions = async () => [
+    { questionId: "SAMPLE-0001", correctAnswers: ["B"] },
+    { questionId: "SAMPLE-0002", correctAnswers: ["A", "C"] },
+  ];
+
+  it("間違えた問題と未回答の問題_復習プールに入り_正解した問題は入らない", async () => {
+    const { deps } = stack();
+    deps.questions = questions;
+    const answers = { "SAMPLE-0001": ["B"] };
+    expect((await handlePostResult(post(attempt(minute(1), { answers }), "a"), deps)).status).toBe(200);
+    expect(await review(deps, "a")).toEqual(["SAMPLE-0002"]);
+  });
+
+  it("復習プールの問題に正解する_プールから抜ける", async () => {
+    const { deps } = stack();
+    deps.questions = questions;
+    await handlePostResult(post(attempt(minute(1)), "a"), deps);
+    expect(await review(deps, "a")).toEqual(["SAMPLE-0001", "SAMPLE-0002"]);
+    const answers = { "SAMPLE-0001": ["B"], "SAMPLE-0002": ["C", "A"] };
+    await handlePostResult(post(attempt(minute(2), { answers }), "a"), deps);
+    expect(await review(deps, "a")).toEqual([]);
+  });
+
+  it("いまのデータにない問題_どちらにも入らない", async () => {
+    const { deps } = stack();
+    deps.questions = async () => [{ questionId: "SAMPLE-0002", correctAnswers: ["A"] }];
+    await handlePostResult(post(attempt(minute(1)), "a"), deps);
+    expect(await review(deps, "a")).toEqual(["SAMPLE-0002"]);
+  });
+
+  it("利用者が違う_互いの復習プールは混ざらない", async () => {
+    const { deps } = stack();
+    deps.questions = questions;
+    await handlePostResult(post(attempt(minute(1)), "a"), deps);
+    expect(await review(deps, "b")).toEqual([]);
   });
 });

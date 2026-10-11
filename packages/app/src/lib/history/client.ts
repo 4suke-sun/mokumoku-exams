@@ -33,3 +33,40 @@ export async function postServerResult(result: Result): Promise<boolean> {
     return false;
   }
 }
+
+const QuestionIdsSchema = z.object({ questionIds: z.array(z.string().max(64)).max(1000) });
+
+async function fetchQuestionIds(path: string, examCode: string): Promise<string[] | null> {
+  try {
+    const response = await fetch(`${path}?examCode=${encodeURIComponent(examCode)}`, { cache: "no-store" });
+    if (!response.ok) return null;
+    const parsed = QuestionIdsSchema.safeParse(await response.json());
+    return parsed.success ? parsed.data.questionIds : null;
+  } catch {
+    return null;
+  }
+}
+
+/** ブックマークした問題 ID。取得できなければ null。 */
+export function fetchBookmarks(examCode: string): Promise<string[] | null> {
+  return fetchQuestionIds("/api/history/bookmarks", examCode);
+}
+
+/** 復習プールの問題 ID。取得できなければ null。 */
+export function fetchReview(examCode: string): Promise<string[] | null> {
+  return fetchQuestionIds("/api/history/review", examCode);
+}
+
+/** ブックマークを付ける・外す。保存できたら true。 */
+export async function putBookmark(examCode: string, questionId: string, bookmarked: boolean): Promise<boolean> {
+  try {
+    const response = await fetch("/api/history/bookmarks", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ examCode, questionId, bookmarked }),
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { BookmarkError, BookmarkToggle, useBookmarks } from "@/components/bookmark-toggle.tsx";
 import { EmptyState } from "@/components/empty-state.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
 import { ScoreRing } from "@/components/score-ring.tsx";
@@ -32,6 +33,7 @@ export function ResultView({ exam, questions }: Props) {
   const [state, setState] = useState<State>({ status: "loading" });
   const [wrongOnly, setWrongOnly] = useState(false);
   const [migration, setMigration] = useState<"idle" | "busy" | "failed">("idle");
+  const bookmarks = useBookmarks(exam.examCode);
 
   useEffect(() => {
     let active = true;
@@ -159,14 +161,18 @@ export function ResultView({ exam, questions }: Props) {
             </button>
           ) : null}
         </div>
+        <BookmarkError bookmarks={bookmarks} />
         {wrongCount === 0 ? <p className="text-correct">すべて正解でした。見直す問題はありません。</p> : null}
         <ol className="space-y-4">
           {rows.map(({ question, number, selected, correct }) => (
             <li key={question.questionId} className="space-y-3 rounded-lg border border-line bg-surface p-4">
-              <p className={`font-bold ${correct ? "text-correct" : "text-incorrect"}`}>
-                {correct ? "○ 正解" : "× 不正解"}
-                <span className="ml-2 text-fg">問題 {number}</span>
-              </p>
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <p className={`font-bold ${correct ? "text-correct" : "text-incorrect"}`}>
+                  {correct ? "○ 正解" : "× 不正解"}
+                  <span className="ml-2 text-fg">問題 {number}</span>
+                </p>
+                <BookmarkToggle questionId={question.questionId} bookmarks={bookmarks} />
+              </div>
               <RichText text={question.questionText} />
               <ul className="space-y-1 text-sm">
                 {orderChoices(question, latest.choiceOrder).map((choice) => {

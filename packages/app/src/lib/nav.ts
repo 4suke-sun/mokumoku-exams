@@ -6,7 +6,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "資格", href: "/exams", ready: true },
   { label: "使い方", href: "/help", ready: true },
   { label: "履歴", href: "/history", ready: false },
-  { label: "ブックマーク", href: "/bookmarks", ready: false },
+  { label: "ブックマーク", href: "/bookmarks", ready: true },
   { label: "リリースノート", href: "/release-notes", ready: false },
 ];
 

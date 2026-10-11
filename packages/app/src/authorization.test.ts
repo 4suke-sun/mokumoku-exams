@@ -4,7 +4,9 @@ import { fileURLToPath } from "node:url";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import * as changePasswordRoute from "@/app/api/auth/change-password/route.ts";
+import * as bookmarksRoute from "@/app/api/history/bookmarks/route.ts";
 import * as historyRoute from "@/app/api/history/results/route.ts";
+import * as reviewRoute from "@/app/api/history/review/route.ts";
 import { FAKE_USER_EMAIL, FAKE_USER_PHRASE } from "@/lib/auth/fake.ts";
 import { isPublicPath, PUBLIC_AUTH_API_PATHS } from "@/lib/auth/guard.ts";
 import { getAuthProvider } from "@/lib/auth/index.ts";
@@ -41,8 +43,10 @@ const PUBLIC_PAGES = ["/forgot-password", "/login"];
 const PROTECTED_PAGES = [
   "/",
   "/account",
+  "/bookmarks",
   "/exams",
   "/exams/sample",
+  "/exams/sample/dashboard",
   "/exams/sample/play",
   "/exams/sample/result",
   "/help",
@@ -56,7 +60,12 @@ const PUBLIC_APIS = [
   "/api/auth/reset-password",
   "/api/auth/session",
 ];
-const PROTECTED_APIS = ["/api/auth/change-password", "/api/history/results"];
+const PROTECTED_APIS = [
+  "/api/auth/change-password",
+  "/api/history/bookmarks",
+  "/api/history/results",
+  "/api/history/review",
+];
 
 const request = (path: string, init: { cookie?: string; method?: string; body?: unknown } = {}) =>
   new NextRequest(`http://localhost${path}`, {
@@ -138,6 +147,18 @@ describe("認可: 未ログインの拒否", () => {
     expect(response.status).toBe(401);
   });
 
+  it("ブックマークと復習プールの API 本体_入口を通らなくても未ログインを断る(二重の防御)", async () => {
+    expect((await bookmarksRoute.GET(request("/api/history/bookmarks?examCode=SAMPLE"))).status).toBe(401);
+    expect((await reviewRoute.GET(request("/api/history/review?examCode=SAMPLE"))).status).toBe(401);
+    const response = await bookmarksRoute.PUT(
+      request("/api/history/bookmarks", {
+        method: "PUT",
+        body: { examCode: "SAMPLE", questionId: "SAMPLE-0001", bookmarked: true },
+      }),
+    );
+    expect(response.status).toBe(401);
+  });
+
   it("パスワード変更の API 本体_入口を通らなくても未ログインを断る(二重の防御)", async () => {
     const response = await changePasswordRoute.POST(
       request("/api/auth/change-password", {
@@ -151,6 +172,8 @@ describe("認可: 未ログインの拒否", () => {
   it("保護される API_受け付けるメソッドは宣言した分だけ(足したときは認可のテストも足す)", () => {
     const methods = (module: object) => Object.keys(module).filter((k) => /^[A-Z]+$/.test(k));
     expect(methods(historyRoute).sort()).toEqual(["GET", "POST"]);
+    expect(methods(bookmarksRoute).sort()).toEqual(["GET", "PUT"]);
+    expect(methods(reviewRoute)).toEqual(["GET"]);
     expect(methods(changePasswordRoute)).toEqual(["POST"]);
   });
 });
@@ -204,6 +227,23 @@ describe("認可: 他人のデータに触れない", () => {
     expect(((await response.json()) as { results: unknown[] }).results).toEqual([]);
   });
 
+  it("ブックマークで利用者の識別子を本文・問い合わせで渡す_拒否される", async () => {
+    const own = await cookie();
+    const change = { examCode: "SAMPLE", questionId: "SAMPLE-0001", bookmarked: true };
+    for (const key of ["sub", "userId", "PK", "SK"]) {
+      const response = await bookmarksRoute.PUT(
+        request("/api/history/bookmarks", { method: "PUT", cookie: own, body: { ...change, [key]: "other-user" } }),
+      );
+      expect(response.status, key).toBe(400);
+    }
+    for (const route of [bookmarksRoute, reviewRoute]) {
+      const response = await route.GET(
+        request("/api/history/bookmarks?examCode=SAMPLE&sub=other-user", { cookie: own }),
+      );
+      expect(response.status).toBe(400);
+    }
+  });
+
   it("資格コードにキーの区切りを入れて他の区画を読もうとする_断られる", async () => {
     const own = await cookie();
     for (const examCode of ["SAMPLE%23", "SAMPLE%23USER%23other", "%23", "USER%23other", "SAMPLE%2523", "sample"]) {
@@ -231,5 +271,23 @@ describe("認可: 他人のデータに触れない", () => {
     expect(((await mine.json()) as { results: unknown[] }).results).toEqual([saved]);
     // ログインしていない人には、何も見えない
     expect((await historyRoute.GET(request("/api/history/results?examCode=SAMPLE"))).status).toBe(401);
+  });
+
+  it("ブックマークと復習プール_自分の分だけに保存され_取得も自分の分だけ", async () => {
+    const own = await cookie();
+    const put = await bookmarksRoute.PUT(
+      request("/api/history/bookmarks", {
+        method: "PUT",
+        cookie: own,
+        body: { examCode: "SAMPLE", questionId: "SAMPLE-0002", bookmarked: true },
+      }),
+    );
+    expect(put.status).toBe(200);
+    // 不正解の結果を保存すると、その問題が復習プールに入る
+    await historyRoute.POST(request("/api/history/results", { method: "POST", cookie: own, body: result() }));
+    const bookmarks = await bookmarksRoute.GET(request("/api/history/bookmarks?examCode=SAMPLE", { cookie: own }));
+    expect(await bookmarks.json()).toEqual({ questionIds: ["SAMPLE-0002"] });
+    const review = await reviewRoute.GET(request("/api/history/review?examCode=SAMPLE", { cookie: own }));
+    expect(await review.json()).toEqual({ questionIds: ["SAMPLE-0001"] });
   });
 });

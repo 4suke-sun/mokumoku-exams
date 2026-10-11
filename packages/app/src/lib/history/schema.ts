@@ -63,3 +63,15 @@ export function apiResultSchema(nowMs: number) {
 }
 
 export const ListQuerySchema = z.strictObject({ examCode: z.string().regex(EXAM_CODE_PATTERN) });
+
+/** ブックマークの変更の本文の上限(問題 ID と資格コードだけなので、小さい) */
+export const MAX_BOOKMARK_BODY_BYTES = 1_000;
+
+/** ブックマークを付ける・外す。問題 ID は、この資格のもの。 */
+export const BookmarkChangeSchema = z
+  .strictObject({
+    examCode: z.string().regex(EXAM_CODE_PATTERN),
+    questionId: z.string().regex(QUESTION_ID_PATTERN),
+    bookmarked: z.boolean(),
+  })
+  .refine((change) => change.questionId.startsWith(`${change.examCode}-`), "資格コードと合いません。");
