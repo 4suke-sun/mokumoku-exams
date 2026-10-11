@@ -152,6 +152,75 @@ exports[`AuthStack > 合成すると_スナップショットと一致する 1`]
 }
 `;
 
+exports[`DataStack > 合成すると_スナップショットと一致する 1`] = `
+{
+  "Parameters": {
+    "BootstrapVersion": {
+      "Default": "/cdk-bootstrap/example/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+  },
+  "Resources": {
+    "HistoryTable24A0CCCB": {
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "PK",
+            "AttributeType": "S",
+          },
+          {
+            "AttributeName": "SK",
+            "AttributeType": "S",
+          },
+        ],
+        "BillingMode": "PAY_PER_REQUEST",
+        "KeySchema": [
+          {
+            "AttributeName": "PK",
+            "KeyType": "HASH",
+          },
+          {
+            "AttributeName": "SK",
+            "KeyType": "RANGE",
+          },
+        ],
+      },
+      "Type": "AWS::DynamoDB::Table",
+      "UpdateReplacePolicy": "Retain",
+    },
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
+    },
+  },
+}
+`;
+
 exports[`WebStack > 合成すると_スナップショットと一致する 1`] = `
 {
   "Outputs": {
@@ -204,6 +273,7 @@ exports[`WebStack > 合成すると_スナップショットと一致する 1`] 
     },
     "AppFunction05AF654E": {
       "DependsOn": [
+        "AppFunctionServiceRoleDefaultPolicyA9F99800",
         "AppFunctionServiceRoleC222DDCC",
       ],
       "Properties": {
@@ -219,6 +289,10 @@ exports[`WebStack > 合成すると_スナップショットと一致する 1`] 
             "AWS_LAMBDA_EXEC_WRAPPER": "/opt/bootstrap",
             "AWS_LWA_PORT": "8080",
             "COGNITO_CLIENT_ID": "client-example",
+            "COGNITO_USER_POOL_ID": "pool-example",
+            "HISTORY_TABLE_NAME": {
+              "Fn::ImportValue": "Data:ExportsOutputRefHistoryTable24A0CCCB0EA6F9C1",
+            },
             "HOSTNAME": "0.0.0.0",
             "NODE_ENV": "production",
             "ORIGIN_VERIFY_VALUE": "oooooooooooooooooooooooooooooooo",
@@ -289,6 +363,34 @@ exports[`WebStack > 合成すると_スナップショットと一致する 1`] 
         ],
       },
       "Type": "AWS::IAM::Role",
+    },
+    "AppFunctionServiceRoleDefaultPolicyA9F99800": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:PutItem",
+                "dynamodb:Query",
+                "dynamodb:DeleteItem",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::ImportValue": "Data:ExportsOutputFnGetAttHistoryTable24A0CCCBArnCEF54BD1",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "AppFunctionServiceRoleDefaultPolicyA9F99800",
+        "Roles": [
+          {
+            "Ref": "AppFunctionServiceRoleC222DDCC",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
     },
     "AppFunctioninvokefunctionB4B3DD7D": {
       "Properties": {

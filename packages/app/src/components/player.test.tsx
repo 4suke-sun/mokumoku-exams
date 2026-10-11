@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { browserStore, loadResults, saveSession } from "@/lib/storage.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 import { Player } from "./player.tsx";
@@ -40,6 +40,10 @@ beforeEach(() => {
     index: 0,
     startedAt: "2026-10-10T00:00:00.000Z",
   });
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
 });
 
 const checked = () => (screen.getAllByRole("radio") as HTMLInputElement[]).map((r) => r.checked);
@@ -84,8 +88,59 @@ describe("Player のキー操作", () => {
     await screen.findByText("問題文 2");
     await user.keyboard("b{Enter}");
 
-    expect(push).toHaveBeenCalledWith("/exams/TEST/result");
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
+    // サーバーに接続できない(このテストの既定)ときは、この端末に残す
     expect(loadResults(browserStore(), "TEST")).toHaveLength(1);
+  });
+
+  it("採点でサーバーに保存できた_端末には残さずサーバーを正として結果へ進む", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true, status: 200, json: async () => ({ status: "saved" }) });
+    vi.stubGlobal("fetch", fetchMock);
+    render(<Player exam={exam} questions={questions} />);
+    const user = userEvent.setup();
+    await screen.findByText("問題文 1");
+    await user.keyboard("a{Enter}");
+    await screen.findByText("問題文 2");
+    await user.keyboard("b{Enter}");
+
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0]?.[0]).toBe("/api/history/results");
+    const sent = JSON.parse(fetchMock.mock.calls[0]?.[1].body);
+    expect(sent.examCode).toBe("TEST");
+    // 利用者の識別子は送らない(サーバーがトークンから決める)
+    expect(Object.keys(sent)).not.toContain("sub");
+    expect(loadResults(browserStore(), "TEST")).toHaveLength(0);
+  });
+
+  it("採点でサーバーが失敗した_この端末に残して結果へ進む", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue({ ok: false, status: 503, json: async () => ({}) }));
+    render(<Player exam={exam} questions={questions} />);
+    const user = userEvent.setup();
+    await screen.findByText("問題文 1");
+    await user.keyboard("a{Enter}");
+    await screen.findByText("問題文 2");
+    await user.keyboard("b{Enter}");
+
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
+    expect(loadResults(browserStore(), "TEST")).toHaveLength(1);
+  });
+
+  it("保存の途中でもう一度採点を押した_サーバーへの保存は 1 回だけ", async () => {
+    let release: (value: unknown) => void = () => {};
+    const fetchMock = vi.fn().mockReturnValue(new Promise((resolve) => (release = resolve)));
+    vi.stubGlobal("fetch", fetchMock);
+    render(<Player exam={exam} questions={questions} />);
+    const user = userEvent.setup();
+    await screen.findByText("問題文 1");
+    await user.keyboard("a{Enter}");
+    await screen.findByText("問題文 2");
+    await user.keyboard("b");
+    await user.click(screen.getByRole("button", { name: "採点する" }));
+    await user.click(screen.getByRole("button", { name: "採点する" }));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    release({ ok: true, status: 200, json: async () => ({}) });
+    await waitFor(() => expect(push).toHaveBeenCalledTimes(1));
   });
 
   it("選択肢にないキー_何も起きない", async () => {

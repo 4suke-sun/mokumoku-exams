@@ -10,6 +10,7 @@ import {
   TEMP_PASSWORD_DAYS,
 } from "./auth-stack.ts";
 import type { InfraConfig } from "./config.ts";
+import { DataStack, HISTORY_TABLE_ACTIONS } from "./data-stack.ts";
 import { ORIGIN_VERIFY_HEADER, WebStack } from "./web-stack.ts";
 
 const config: InfraConfig = {
@@ -26,14 +27,22 @@ function authTemplate(): Template {
   return Template.fromStack(new AuthStack(new App(), "Auth", { env, synthesizer, stackPrefix: config.stackPrefix }));
 }
 
+function dataTemplate(): Template {
+  return Template.fromStack(new DataStack(new App(), "Data", { env, synthesizer }));
+}
+
 function webTemplate(alarmEmail?: string): Template {
-  const stack = new WebStack(new App(), "Web", {
+  const app = new App();
+  const data = new DataStack(app, "Data", { env, synthesizer });
+  const stack = new WebStack(app, "Web", {
     env,
     synthesizer,
     config: { ...config, alarmEmail },
     lambdaCodePath: fixture("lambda"),
     staticAssetsPath: fixture("static"),
     userPoolClientId: "client-example",
+    userPoolId: "pool-example",
+    historyTable: data.table,
   });
   return Template.fromStack(stack);
 }
@@ -104,11 +113,54 @@ describe("AuthStack のパスワードと招待", () => {
   });
 });
 
-describe("WebStack", () => {
-  it("Lambda に_Cognito のクライアント ID を渡す", () => {
-    webTemplate().hasResourceProperties("AWS::Lambda::Function", {
-      Environment: { Variables: { COGNITO_CLIENT_ID: "client-example" } },
+describe("DataStack", () => {
+  it("合成すると_スナップショットと一致する", () => {
+    expect(dataTemplate().toJSON()).toMatchSnapshot();
+  });
+
+  it("テーブルは_PK と SK を持つ単一テーブルで_使った分だけの課金になる", () => {
+    const template = dataTemplate();
+    template.resourceCountIs("AWS::DynamoDB::Table", 1);
+    template.hasResourceProperties("AWS::DynamoDB::Table", {
+      KeySchema: [
+        { AttributeName: "PK", KeyType: "HASH" },
+        { AttributeName: "SK", KeyType: "RANGE" },
+      ],
+      BillingMode: "PAY_PER_REQUEST",
     });
+  });
+
+  it("テーブルは_追加費用のかかる設定を持たず_スタックを消しても残る", () => {
+    const [table] = Object.values(dataTemplate().findResources("AWS::DynamoDB::Table"));
+    expect(table?.DeletionPolicy).toBe("Retain");
+    // 暗号化は既定(AWS 所有のキー)のまま。KMS のキーを使うと費用がかかる
+    expect(table?.Properties.SSESpecification).toBeUndefined();
+    expect(table?.Properties.PointInTimeRecoverySpecification).toBeUndefined();
+    expect(table?.Properties.GlobalSecondaryIndexes).toBeUndefined();
+  });
+});
+
+describe("WebStack", () => {
+  it("Lambda に_Cognito のクライアント ID とユーザープール ID を渡す", () => {
+    webTemplate().hasResourceProperties("AWS::Lambda::Function", {
+      Environment: { Variables: { COGNITO_CLIENT_ID: "client-example", COGNITO_USER_POOL_ID: "pool-example" } },
+    });
+  });
+
+  it("Lambda に_履歴のテーブル名を渡す", () => {
+    webTemplate().hasResourceProperties("AWS::Lambda::Function", {
+      Environment: { Variables: { HISTORY_TABLE_NAME: Match.anyValue() } },
+    });
+  });
+
+  it("Lambda は_履歴のテーブルの必要な操作だけを許され_全リソースへの権限を持たない", () => {
+    const policies = Object.values(webTemplate().findResources("AWS::IAM::Policy"));
+    const statements = policies.flatMap((policy) => policy.Properties.PolicyDocument.Statement);
+    const history = statements.filter((s) => JSON.stringify(s.Action).includes("dynamodb:"));
+    expect(history).toHaveLength(1);
+    expect([...history[0].Action].sort()).toEqual([...HISTORY_TABLE_ACTIONS].sort());
+    expect(history[0].Resource).not.toBe("*");
+    expect(JSON.stringify(history[0].Resource)).not.toContain("*");
   });
 
   it("合言葉のヘッダー名が_アプリ側と同じ名前に固定されている", () => {

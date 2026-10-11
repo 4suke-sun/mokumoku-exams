@@ -29,7 +29,7 @@ const Schemas = {
   changePassword: z.strictObject({ previousPassword: secret, proposedPassword: secret }),
 };
 
-function json(body: unknown, status = 200, cookies: string[] = []): Response {
+export function json(body: unknown, status = 200, cookies: string[] = []): Response {
   const headers = new Headers({ "content-type": "application/json", "cache-control": "no-store" });
   for (const cookie of cookies) headers.append("set-cookie", cookie);
   return new Response(JSON.stringify(body), { status, headers });
@@ -45,7 +45,7 @@ function failure(error: unknown): Response {
  * 状態を変える操作の入り口の確認。JSON だけを受け付け、ブラウザが別サイトからの送信と示したものを断る
  * (Cookie は SameSite=Lax でも守られる。これは重ねた防御)。
  */
-function guard(request: Request): Response | null {
+export function guard(request: Request): Response | null {
   if (!request.headers.get("content-type")?.toLowerCase().startsWith("application/json")) {
     return json({ error: "bad-request" }, 415);
   }

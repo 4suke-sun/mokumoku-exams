@@ -5,13 +5,19 @@ import { useEffect, useState } from "react";
 import { EmptyState } from "@/components/empty-state.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
 import { ScoreRing } from "@/components/score-ring.tsx";
+import { fetchServerResults, postServerResult } from "@/lib/history/client.ts";
+import { mergeResults, pendingMigration } from "@/lib/history/merge.ts";
 import { answerFor, isCorrect, orderChoices, passLinePercent, score } from "@/lib/quiz.ts";
-import { browserStore, loadResults, type Result } from "@/lib/storage.ts";
+import { browserStore, clearResults, loadResults, type Result } from "@/lib/storage.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 
 type Props = { exam: PublishedExam; questions: Question[] };
 
-type State = { status: "loading" } | { status: "ready"; results: Result[] };
+type State =
+  | { status: "loading" }
+  // source: 結果の取得元。server はアカウントに保存した記録、local は(サーバーに接続できないときの)この端末の記録。
+  // pending: この端末にだけ残っていて、まだアカウントに移していない記録
+  | { status: "ready"; results: Result[]; source: "server" | "local"; pending: Result[] };
 
 function formatDate(iso: string): string {
   const date = new Date(iso);
@@ -25,10 +31,40 @@ function keysLabel(keys: readonly string[]): string {
 export function ResultView({ exam, questions }: Props) {
   const [state, setState] = useState<State>({ status: "loading" });
   const [wrongOnly, setWrongOnly] = useState(false);
+  const [migration, setMigration] = useState<"idle" | "busy" | "failed">("idle");
 
   useEffect(() => {
-    setState({ status: "ready", results: loadResults(browserStore(), exam.examCode) });
+    let active = true;
+    void (async () => {
+      const local = loadResults(browserStore(), exam.examCode);
+      const server = await fetchServerResults(exam.examCode);
+      if (!active) return;
+      if (server === null) {
+        setState({ status: "ready", results: local, source: "local", pending: [] });
+        return;
+      }
+      const pending = pendingMigration(local, server);
+      setState({ status: "ready", results: mergeResults(server, pending), source: "server", pending });
+    })();
+    return () => {
+      active = false;
+    };
   }, [exam.examCode]);
+
+  /** この端末にだけある記録を、アカウントに移す。すべて移せたときだけ、端末の記録を消す。 */
+  async function migrate() {
+    if (state.status !== "ready" || migration === "busy") return;
+    setMigration("busy");
+    for (const result of state.pending) {
+      if (!(await postServerResult(result))) {
+        setMigration("failed");
+        return;
+      }
+    }
+    clearResults(browserStore(), exam.examCode);
+    setState({ ...state, pending: [] });
+    setMigration("idle");
+  }
 
   if (state.status === "loading") {
     return <p className="text-muted">読み込んでいます…</p>;
@@ -63,6 +99,32 @@ export function ResultView({ exam, questions }: Props) {
 
   return (
     <section className="space-y-8">
+      {state.source === "local" ? (
+        <p role="status" className="text-sm text-muted">
+          サーバーに接続できないため、この端末に保存した記録を表示しています。
+        </p>
+      ) : null}
+      {state.pending.length > 0 ? (
+        <div role="status" className="space-y-2 rounded-lg border border-line bg-surface p-4">
+          <p>
+            この端末にだけ残っている記録が {state.pending.length}{" "}
+            件あります。アカウントに移すと、ほかの端末からも見られます。
+          </p>
+          <button
+            type="button"
+            onClick={() => void migrate()}
+            disabled={migration === "busy"}
+            className="rounded-md border border-line bg-surface px-4 py-2 text-sm font-bold disabled:opacity-50"
+          >
+            {migration === "busy" ? "移しています…" : "アカウントに移す"}
+          </button>
+          {migration === "failed" ? (
+            <p role="alert" className="text-incorrect">
+              移せなかった記録があります。時間をおいて、もう一度お試しください。
+            </p>
+          ) : null}
+        </div>
+      ) : null}
       <div className="space-y-3">
         <h1 className="text-2xl font-bold">結果</h1>
         <p className="text-sm text-muted">

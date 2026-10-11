@@ -53,8 +53,25 @@ export function readCookies(header: string | null): { id?: string; access?: stri
 }
 
 /**
+ * リクエストの Cookie ヘッダーの、トークンの値を差し替える(更新した直後のリクエストを、後続の処理に渡すため)。
+ * ほかの Cookie はそのまま残す。リフレッシュトークンが返らなかったときは、既存のものを残す。
+ */
+export function withTokenCookies(header: string | null, tokens: Tokens): string {
+  const replaced = new Map<string, string>([
+    [COOKIE_NAMES.id, tokens.idToken],
+    [COOKIE_NAMES.access, tokens.accessToken],
+  ]);
+  if (tokens.refreshToken) replaced.set(COOKIE_NAMES.refresh, tokens.refreshToken);
+  const kept = (header ?? "")
+    .split(";")
+    .map((part) => part.trim())
+    .filter((part) => part && !replaced.has(part.slice(0, Math.max(0, part.indexOf("="))).trim()));
+  return [...kept, ...[...replaced].map(([name, value]) => `${name}=${encodeURIComponent(value)}`)].join("; ");
+}
+
+/**
  * JWT の本文(claims)を、署名を確かめずに読む。画面の表示と更新の時刻の判断にだけ使う。
- * 認可の判断には使わない(サーバー側の検証は、ログイン必須化の段階で行う)。
+ * 認可の判断には使わない(サーバー側の検証は guard.ts の `authenticate` で行う)。
  */
 export function readClaims(jwt: string): { exp?: number; email?: string } {
   try {

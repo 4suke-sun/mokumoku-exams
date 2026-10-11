@@ -1,4 +1,5 @@
 import { AuthError, type AuthProvider, type Tokens } from "./types.ts";
+import { SUB_PATTERN, type TokenVerifier } from "./verify.ts";
 
 // 手元の開発サーバー専用の、メモリ上の認証。AWS には接続しない(本番では使われない。index.ts を参照)。
 /** 手元の確認用の、架空のユーザーとテスト用のパスワード */
@@ -13,6 +14,11 @@ export const FAKE_INVITED_PHRASE = fakeValue("Invited");
 export const FAKE_RESET_CODE = ["123", "456"].join("");
 
 const EXPIRES_IN = 3600;
+
+/** 架空のユーザーごとの、決まった `sub`(英数字と `-` `_` だけ。履歴のキーに使える形) */
+export function fakeSub(email: string): string {
+  return `fake-${Buffer.from(email).toString("base64url")}`;
+}
 
 function unsignedJwt(claims: Record<string, unknown>): string {
   const part = (value: unknown) => Buffer.from(JSON.stringify(value)).toString("base64url");
@@ -32,8 +38,8 @@ export function createFakeProvider(now: () => number = Date.now): AuthProvider {
     const refreshToken = `fake-refresh-${email}-${refreshTokens.size + 1}`;
     refreshTokens.set(refreshToken, email);
     return {
-      idToken: unsignedJwt({ email, exp, token_use: "id" }),
-      accessToken: unsignedJwt({ username: email, exp, token_use: "access" }),
+      idToken: unsignedJwt({ sub: fakeSub(email), email, exp, token_use: "id" }),
+      accessToken: unsignedJwt({ sub: fakeSub(email), username: email, exp, token_use: "access" }),
       refreshToken,
       expiresIn: EXPIRES_IN,
     };
@@ -89,6 +95,29 @@ export function createFakeProvider(now: () => number = Date.now): AuthProvider {
     },
     async signOut(refreshToken) {
       refreshTokens.delete(refreshToken);
+    },
+  };
+}
+
+/**
+ * 手元の開発とテスト専用の検証。署名のないトークン(上の代替認証が発行したもの)を受け付けるため、
+ * 本番では使えない(使う側の index.ts が、本番の設定では選ばない)。
+ */
+export function createFakeVerifier(now: () => number = Date.now): TokenVerifier {
+  return {
+    async verifyIdToken(token) {
+      try {
+        const [header, payload] = token.split(".");
+        if (!header || !payload) return null;
+        if ((JSON.parse(Buffer.from(header, "base64url").toString("utf8")) as { alg?: unknown }).alg !== "none")
+          return null;
+        const claims = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as Record<string, unknown>;
+        if (claims.token_use !== "id" || typeof claims.exp !== "number" || claims.exp * 1000 <= now()) return null;
+        if (typeof claims.sub !== "string" || !SUB_PATTERN.test(claims.sub)) return null;
+        return { sub: claims.sub, email: typeof claims.email === "string" ? claims.email : undefined };
+      } catch {
+        return null;
+      }
     },
   };
 }

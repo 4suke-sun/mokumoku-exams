@@ -13,7 +13,8 @@ type Step =
   // 招待された人の初回ログイン。新しいパスワードを決める
   | { name: "new-password"; session: string; username: string };
 
-export function LoginForm() {
+/** `next`: ログインしたあとに移る場所(サーバー側で検査済みの、このサイト内の画面) */
+export function LoginForm({ next = "/" }: { next?: string }) {
   const router = useRouter();
   const { reload } = useSession();
   const [step, setStep] = useState<Step>({ name: "login" });
@@ -26,7 +27,7 @@ export function LoginForm() {
 
   async function done() {
     await reload();
-    router.push("/");
+    router.push(next);
     router.refresh();
   }
 

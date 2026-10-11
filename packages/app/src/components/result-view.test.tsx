@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { browserStore, saveResult } from "@/lib/storage.ts";
+import { browserStore, loadResults, type Result, saveResult } from "@/lib/storage.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 import { ResultView } from "./result-view.tsx";
 
@@ -88,5 +88,74 @@ describe("ResultView", () => {
     expect(screen.queryByRole("button", { name: /見直す/ })).toBeNull();
     // 3 問すべてが、一覧に並んでいる
     expect(screen.getAllByText(/^問題 \d$/)).toHaveLength(3);
+  });
+});
+
+describe("ResultView のアカウントへの保存", () => {
+  const serverResult = (finishedAt: string, answers: Record<string, string[]>): Result => ({
+    examCode: "TEST",
+    questionIds: questions.map((q) => q.questionId),
+    answers,
+    finishedAt,
+  });
+
+  /** GET はサーバーの結果を返し、POST は postOk に従う。 */
+  function stubServer(server: Result[] | null, postOk = true) {
+    const fetchMock = vi.fn(async (_url: string, init?: { method?: string }) => {
+      if (init?.method === "POST") return { ok: postOk, status: postOk ? 200 : 503, json: async () => ({}) };
+      if (server === null) return { ok: false, status: 503, json: async () => ({}) };
+      return { ok: true, status: 200, json: async () => ({ results: server }) };
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    return fetchMock;
+  }
+
+  it("サーバーに結果がある_その結果を表示し_移行の案内は出さない", async () => {
+    stubServer([
+      serverResult("2026-10-11T00:00:00.000Z", { "TEST-0001": ["A"], "TEST-0002": ["A"], "TEST-0003": ["B"] }),
+    ]);
+    render(<ResultView exam={exam} questions={questions} />);
+    expect(await screen.findByText(/3 問中 3 問が正解/)).toBeTruthy();
+    expect(screen.queryByText(/この端末にだけ残っている記録/)).toBeNull();
+    expect(screen.queryByText(/サーバーに接続できない/)).toBeNull();
+  });
+
+  it("サーバーに接続できない_この端末の記録を表示し_その旨を伝える", async () => {
+    stubServer(null);
+    saveAnswers({ "TEST-0001": ["A"] });
+    render(<ResultView exam={exam} questions={questions} />);
+    expect(await screen.findByText(/サーバーに接続できないため/)).toBeTruthy();
+    expect(screen.getByText(/3 問中 1 問が正解/)).toBeTruthy();
+  });
+
+  it("この端末にだけ記録がある_件数を案内し_移すとサーバーへ送って端末の記録を消す", async () => {
+    const fetchMock = stubServer([]);
+    saveAnswers({ "TEST-0001": ["A"] });
+    render(<ResultView exam={exam} questions={questions} />);
+    expect(await screen.findByText(/この端末にだけ残っている記録が 1 件/)).toBeTruthy();
+
+    await userEvent.setup().click(screen.getByRole("button", { name: "アカウントに移す" }));
+    await waitFor(() => expect(screen.queryByText(/この端末にだけ残っている記録/)).toBeNull());
+    const posts = fetchMock.mock.calls.filter(([, init]) => init?.method === "POST");
+    expect(posts).toHaveLength(1);
+    expect(loadResults(browserStore(), "TEST")).toHaveLength(0);
+  });
+
+  it("移すのに失敗した_端末の記録を残し_やり直せる", async () => {
+    stubServer([], false);
+    saveAnswers({ "TEST-0001": ["A"] });
+    render(<ResultView exam={exam} questions={questions} />);
+    await userEvent.setup().click(await screen.findByRole("button", { name: "アカウントに移す" }));
+    expect(await screen.findByRole("alert")).toBeTruthy();
+    expect(loadResults(browserStore(), "TEST")).toHaveLength(1);
+    expect(screen.getByRole("button", { name: "アカウントに移す" })).toBeTruthy();
+  });
+
+  it("サーバーに同じ完了時刻の記録がある_端末の記録は移行の対象にしない", async () => {
+    stubServer([serverResult("2026-10-10T00:00:00.000Z", { "TEST-0001": ["A"] })]);
+    saveAnswers({ "TEST-0001": ["A"] });
+    render(<ResultView exam={exam} questions={questions} />);
+    expect(await screen.findByText(/3 問中 1 問が正解/)).toBeTruthy();
+    expect(screen.queryByText(/この端末にだけ残っている記録/)).toBeNull();
   });
 });

@@ -1,0 +1,62 @@
+import { readCookies, sessionCookies, withTokenCookies } from "./session.ts";
+import type { AuthProvider } from "./types.ts";
+import type { TokenVerifier, VerifiedUser } from "./verify.ts";
+
+export type GuardDeps = { verifier: TokenVerifier; provider: AuthProvider; secure: boolean };
+
+export type Authenticated = {
+  user: VerifiedUser;
+  /** 更新したときだけ入る。応答に付ける Set-Cookie */
+  setCookies: string[];
+  /** 後続の処理に渡す Cookie ヘッダー(更新したときは、新しいトークンに差し替え済み) */
+  cookieHeader: string;
+};
+
+/**
+ * Cookie の ID トークンを、サーバー側で検証して利用者を得る。期限切れ(Cookie が消えた場合を含む)でも、
+ * リフレッシュトークンで更新できれば、その場で更新して通す。どちらもだめなら null。
+ */
+export async function authenticate(cookieHeader: string | null, deps: GuardDeps): Promise<Authenticated | null> {
+  const { id, refresh } = readCookies(cookieHeader);
+  if (id) {
+    const user = await deps.verifier.verifyIdToken(id);
+    if (user) return { user, setCookies: [], cookieHeader: cookieHeader ?? "" };
+  }
+  if (!refresh) return null;
+  try {
+    const tokens = await deps.provider.refresh(refresh);
+    const user = await deps.verifier.verifyIdToken(tokens.idToken);
+    if (!user) return null;
+    return {
+      user,
+      setCookies: sessionCookies(tokens, deps.secure),
+      cookieHeader: withTokenCookies(cookieHeader, tokens),
+    };
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * ログインなしで呼べる認証の API。ログイン前・ログアウト後にも呼ばれ、トークンがなくても安全に応答するものだけを、
+ * 1 つずつ列挙する(`change-password` のようにログインが必要なものは含めない。新しい API は、足さない限り保護される)。
+ */
+export const PUBLIC_AUTH_API_PATHS: ReadonlySet<string> = new Set(
+  ["login", "new-password", "forgot-password", "reset-password", "refresh", "logout", "session"].map(
+    (name) => `/api/auth/${name}`,
+  ),
+);
+
+/**
+ * ログインなしで開けるか。公開する経路は、ログインに必要な 2 つの画面、認証の API(列挙したものだけ)、
+ * Next の静的ファイル(`/_next/`)に限る。大文字小文字は区別し、末尾のスラッシュや `..`・`%`・`\` を含むものは公開しない。
+ */
+export function isPublicPath(pathname: string): boolean {
+  if (pathname.includes("..") || pathname.includes("%") || pathname.includes("\\")) return false;
+  return (
+    pathname === "/login" ||
+    pathname === "/forgot-password" ||
+    PUBLIC_AUTH_API_PATHS.has(pathname) ||
+    pathname.startsWith("/_next/")
+  );
+}
