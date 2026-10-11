@@ -12,10 +12,11 @@ const env = {
 };
 
 const app = new App();
-new AuthStack(app, `${config.stackPrefix}-auth`, { env, stackPrefix: config.stackPrefix });
+const auth = new AuthStack(app, `${config.stackPrefix}-auth`, { env, stackPrefix: config.stackPrefix });
 new WebStack(app, `${config.stackPrefix}-web`, {
   env,
   config,
   lambdaCodePath: resolve(repoRoot, "dist/lambda"),
   staticAssetsPath: resolve(repoRoot, "dist/static"),
+  userPoolClientId: auth.userPoolClient.userPoolClientId,
 });

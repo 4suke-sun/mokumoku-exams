@@ -43,4 +43,5 @@
 - [0001 テストのダミー値は、文字列の連結で組み立てる](./0001-test-dummy-values-concat.md)
 - [0002 外部から読んだ値の解析エラーを、そのまま出力しない](./0002-no-raw-error-output.md)
 - [0003 開発サーバーが自動生成するファイルは、コミット前に中身と置き場を確認する](./0003-generated-files-in-dev-server.md)
+- [0004 デプロイ前の差分の出力は、環境変数の値を伏せてから扱う](./0004-mask-diff-output.md)
 <!-- lessons:end -->

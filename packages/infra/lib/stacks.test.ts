@@ -2,7 +2,13 @@ import { fileURLToPath } from "node:url";
 import { App, DefaultStackSynthesizer } from "aws-cdk-lib";
 import { Template } from "aws-cdk-lib/assertions";
 import { describe, expect, it } from "vitest";
-import { ADMIN_GROUP_NAME, AuthStack } from "./auth-stack.ts";
+import {
+  ADMIN_GROUP_NAME,
+  AuthStack,
+  PASSWORD_MIN_LENGTH,
+  REFRESH_TOKEN_DAYS,
+  TEMP_PASSWORD_DAYS,
+} from "./auth-stack.ts";
 import type { InfraConfig } from "./config.ts";
 import { ORIGIN_VERIFY_HEADER, WebStack } from "./web-stack.ts";
 
@@ -27,6 +33,7 @@ function webTemplate(): Template {
     config,
     lambdaCodePath: fixture("lambda"),
     staticAssetsPath: fixture("static"),
+    userPoolClientId: "client-example",
   });
   return Template.fromStack(stack);
 }
@@ -58,7 +65,52 @@ describe("AuthStack", () => {
   });
 });
 
+describe("AuthStack のパスワードと招待", () => {
+  it("パスワードの規則と仮パスワードの有効期間が_アプリの案内と同じ", () => {
+    expect(PASSWORD_MIN_LENGTH).toBe(12);
+    expect(REFRESH_TOKEN_DAYS).toBe(30);
+    authTemplate().hasResourceProperties("AWS::Cognito::UserPool", {
+      Policies: {
+        PasswordPolicy: {
+          MinimumLength: PASSWORD_MIN_LENGTH,
+          RequireLowercase: true,
+          RequireUppercase: true,
+          RequireNumbers: true,
+          TemporaryPasswordValidityDays: TEMP_PASSWORD_DAYS,
+        },
+      },
+    });
+  });
+
+  it("招待メールに_ユーザー名と仮パスワードの差し込みがある", () => {
+    const [pool] = Object.values(authTemplate().findResources("AWS::Cognito::UserPool"));
+    const message = pool?.Properties.AdminCreateUserConfig.InviteMessageTemplate;
+    expect(message.EmailMessage).toContain("{username}");
+    expect(message.EmailMessage).toContain("{####}");
+    expect(message.EmailSubject).toBeTruthy();
+  });
+
+  it("再設定のメールは確認コード方式で_コードの差し込みがある", () => {
+    const [pool] = Object.values(authTemplate().findResources("AWS::Cognito::UserPool"));
+    expect(pool?.Properties.EmailVerificationMessage).toContain("{####}");
+    expect(pool?.Properties.VerificationMessageTemplate.DefaultEmailOption).toBe("CONFIRM_WITH_CODE");
+  });
+
+  it("クライアントは_メールとパスワードの認証と更新だけを許し_トークンの失効を使える", () => {
+    const [client] = Object.values(authTemplate().findResources("AWS::Cognito::UserPoolClient"));
+    expect(client?.Properties.ExplicitAuthFlows).toEqual(["ALLOW_USER_PASSWORD_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"]);
+    expect(client?.Properties.EnableTokenRevocation).toBe(true);
+    expect(client?.Properties.RefreshTokenValidity).toBe(REFRESH_TOKEN_DAYS * 24 * 60);
+  });
+});
+
 describe("WebStack", () => {
+  it("Lambda に_Cognito のクライアント ID を渡す", () => {
+    webTemplate().hasResourceProperties("AWS::Lambda::Function", {
+      Environment: { Variables: { COGNITO_CLIENT_ID: "client-example" } },
+    });
+  });
+
   it("合言葉のヘッダー名が_アプリ側と同じ名前に固定されている", () => {
     expect(ORIGIN_VERIFY_HEADER).toBe("x-origin-verify");
   });

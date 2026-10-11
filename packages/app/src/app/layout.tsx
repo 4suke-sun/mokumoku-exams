@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import { NavigationProgress } from "@/components/navigation-progress.tsx";
+import { SessionProvider } from "@/components/session-provider.tsx";
 import { SiteHeader } from "@/components/site-header.tsx";
 import { THEME_INIT_SCRIPT } from "@/lib/theme.ts";
 import "./globals.css";
@@ -23,11 +24,13 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         >
           本文へ移動
         </a>
-        <NavigationProgress />
-        <SiteHeader />
-        <main id="main" tabIndex={-1} className="mx-auto max-w-3xl px-4 py-8">
-          {children}
-        </main>
+        <SessionProvider>
+          <NavigationProgress />
+          <SiteHeader />
+          <main id="main" tabIndex={-1} className="mx-auto max-w-3xl px-4 py-8">
+            {children}
+          </main>
+        </SessionProvider>
         <footer className="mx-auto max-w-3xl px-4 pb-8 text-sm text-muted">
           <p>学習用の問題集です。</p>
         </footer>

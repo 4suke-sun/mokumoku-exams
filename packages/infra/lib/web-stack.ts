@@ -18,6 +18,8 @@ type Props = StackProps & {
   lambdaCodePath: string;
   /** 同じく、S3 に置く静的ファイルのディレクトリ */
   staticAssetsPath: string;
+  /** アプリが認証で使う Cognito のクライアント ID(AuthStack の出力) */
+  userPoolClientId: string;
 };
 
 /** ホスティング。Lambda Web Adapter 上の Next.js を CloudFront の背後に置き、静的ファイルは S3 から配る。 */
@@ -55,6 +57,7 @@ export class WebStack extends Stack {
         PORT: APP_PORT,
         HOSTNAME: "0.0.0.0",
         ORIGIN_VERIFY_VALUE: config.originVerifyValue,
+        COGNITO_CLIENT_ID: props.userPoolClientId,
       },
     });
 
