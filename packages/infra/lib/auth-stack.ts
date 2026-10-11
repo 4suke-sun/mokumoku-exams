@@ -10,6 +10,15 @@ export const PASSWORD_MIN_LENGTH = 12;
 export const REFRESH_TOKEN_DAYS = 30;
 /** 招待で発行する仮パスワードの有効日数 */
 export const TEMP_PASSWORD_DAYS = 7;
+/**
+ * アプリの管理者の画面が使う、Cognito の管理 API(一覧・招待・無効化)。最小の権限として、WebStack が Lambda に
+ * この UserPool に限って与える(packages/app の lib/auth/user-admin.ts と対応する)。
+ */
+export const USER_ADMIN_ACTIONS = [
+  "cognito-idp:ListUsers",
+  "cognito-idp:AdminCreateUser",
+  "cognito-idp:AdminDisableUser",
+];
 
 type Props = StackProps & { stackPrefix: string };
 

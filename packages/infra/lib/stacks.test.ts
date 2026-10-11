@@ -8,6 +8,7 @@ import {
   PASSWORD_MIN_LENGTH,
   REFRESH_TOKEN_DAYS,
   TEMP_PASSWORD_DAYS,
+  USER_ADMIN_ACTIONS,
 } from "./auth-stack.ts";
 import type { InfraConfig } from "./config.ts";
 import { DataStack, HISTORY_TABLE_ACTIONS, POINT_IN_TIME_RECOVERY_DAYS } from "./data-stack.ts";
@@ -21,6 +22,7 @@ const config: InfraConfig = {
 const env = { account: "123456789012", region: "us-east-1" };
 // 既定の識別子ではなく、見本と分かる値にして、スナップショットに環境の由来らしい文字列を入れない
 const synthesizer = new DefaultStackSynthesizer({ qualifier: "example" });
+const USER_POOL_ARN = "arn:aws:cognito-idp:us-east-1:123456789012:userpool/pool-example";
 const fixture = (name: string) => fileURLToPath(new URL(`./testdata/${name}`, import.meta.url));
 
 function authTemplate(): Template {
@@ -42,6 +44,7 @@ function webTemplate(alarmEmail?: string): Template {
     staticAssetsPath: fixture("static"),
     userPoolClientId: "client-example",
     userPoolId: "pool-example",
+    userPoolArn: USER_POOL_ARN,
     historyTable: data.table,
   });
   return Template.fromStack(stack);
@@ -179,6 +182,20 @@ describe("WebStack", () => {
     expect([...history[0].Action].sort()).toEqual([...HISTORY_TABLE_ACTIONS].sort());
     expect(history[0].Resource).not.toBe("*");
     expect(JSON.stringify(history[0].Resource)).not.toContain("*");
+  });
+
+  it("Lambda は_Cognito の一覧・招待・無効化だけを_そのユーザープールに限って許される", () => {
+    expect([...USER_ADMIN_ACTIONS].sort()).toEqual([
+      "cognito-idp:AdminCreateUser",
+      "cognito-idp:AdminDisableUser",
+      "cognito-idp:ListUsers",
+    ]);
+    const policies = Object.values(webTemplate().findResources("AWS::IAM::Policy"));
+    const statements = policies.flatMap((policy) => policy.Properties.PolicyDocument.Statement);
+    const cognito = statements.filter((s) => JSON.stringify(s.Action).includes("cognito-idp:"));
+    expect(cognito).toHaveLength(1);
+    expect([...cognito[0].Action].sort()).toEqual([...USER_ADMIN_ACTIONS].sort());
+    expect(cognito[0].Resource).toBe(USER_POOL_ARN);
   });
 
   it("合言葉のヘッダー名が_アプリ側と同じ名前に固定されている", () => {

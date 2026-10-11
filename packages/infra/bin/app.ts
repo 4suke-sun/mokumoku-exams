@@ -22,5 +22,6 @@ new WebStack(app, `${config.stackPrefix}-web`, {
   staticAssetsPath: resolve(repoRoot, "dist/static"),
   userPoolClientId: auth.userPoolClient.userPoolClientId,
   userPoolId: auth.userPool.userPoolId,
+  userPoolArn: auth.userPool.userPoolArn,
   historyTable: data.table,
 });

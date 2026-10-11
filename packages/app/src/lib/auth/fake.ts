@@ -1,5 +1,6 @@
 import { ADMIN_GROUP } from "./admin.ts";
 import { AuthError, type AuthProvider, type Tokens } from "./types.ts";
+import { type ManagedUser, type UserAdmin, UserAdminError } from "./user-admin.ts";
 import { SUB_PATTERN, type TokenVerifier } from "./verify.ts";
 
 // 手元の開発サーバー専用の、メモリ上の認証。AWS には接続しない(本番では使われない。index.ts を参照)。
@@ -29,27 +30,52 @@ function unsignedJwt(claims: Record<string, unknown>): string {
   return `${part({ alg: "none" })}.${part(claims)}.`;
 }
 
-export function createFakeProvider(now: () => number = Date.now): AuthProvider {
-  const passwords = new Map<string, string>([
-    [FAKE_USER_EMAIL, FAKE_USER_PHRASE],
-    [FAKE_INVITED_EMAIL, FAKE_INVITED_PHRASE],
-    [FAKE_ADMIN_EMAIL, FAKE_ADMIN_PHRASE],
+type FakeAccount = {
+  password: string;
+  groups: string[];
+  /** 招待のあと、初回ログインで新しいパスワードを決める前 */
+  pendingNewPassword: boolean;
+  enabled: boolean;
+  createdAt: number;
+};
+
+/** 代替の認証と、代替の利用者の管理が共有する、メモリ上の利用者の一覧(メールアドレスごと) */
+export type FakeDirectory = Map<string, FakeAccount>;
+
+export function createFakeDirectory(now: () => number = Date.now): FakeDirectory {
+  const account = (password: string, extra: Partial<FakeAccount> = {}): FakeAccount => ({
+    password,
+    groups: [],
+    pendingNewPassword: false,
+    enabled: true,
+    createdAt: now(),
+    ...extra,
+  });
+  return new Map([
+    [FAKE_USER_EMAIL, account(FAKE_USER_PHRASE)],
+    [FAKE_INVITED_EMAIL, account(FAKE_INVITED_PHRASE, { pendingNewPassword: true })],
+    [FAKE_ADMIN_EMAIL, account(FAKE_ADMIN_PHRASE, { groups: [ADMIN_GROUP] })],
   ]);
-  const groups = new Map<string, string[]>([[FAKE_ADMIN_EMAIL, [ADMIN_GROUP]]]);
-  const pendingNewPassword = new Set<string>([FAKE_INVITED_EMAIL]);
+}
+
+export function createFakeProvider(
+  now: () => number = Date.now,
+  directory: FakeDirectory = createFakeDirectory(now),
+): AuthProvider {
   const refreshTokens = new Map<string, string>();
 
   function issue(email: string): Tokens {
     const exp = Math.floor(now() / 1000) + EXPIRES_IN;
     const refreshToken = `fake-refresh-${email}-${refreshTokens.size + 1}`;
     refreshTokens.set(refreshToken, email);
+    const groups = directory.get(email)?.groups ?? [];
     return {
       idToken: unsignedJwt({
         sub: fakeSub(email),
         email,
         exp,
         token_use: "id",
-        ...(groups.has(email) ? { "cognito:groups": groups.get(email) } : {}),
+        ...(groups.length > 0 ? { "cognito:groups": groups } : {}),
       }),
       accessToken: unsignedJwt({ sub: fakeSub(email), username: email, exp, token_use: "access" }),
       refreshToken,
@@ -57,10 +83,16 @@ export function createFakeProvider(now: () => number = Date.now): AuthProvider {
     };
   }
 
+  /** 有効な(無効にされていない)利用者 */
+  const activeAccount = (email: string) => {
+    const account = directory.get(email);
+    return account?.enabled ? account : undefined;
+  };
+
   function emailOfAccessToken(accessToken: string): string {
     try {
       const claims = JSON.parse(Buffer.from(accessToken.split(".")[1] ?? "", "base64url").toString("utf8"));
-      if (typeof claims.username === "string" && passwords.has(claims.username)) return claims.username;
+      if (typeof claims.username === "string" && activeAccount(claims.username)) return claims.username;
     } catch {
       // 下の失敗として扱う
     }
@@ -75,38 +107,79 @@ export function createFakeProvider(now: () => number = Date.now): AuthProvider {
 
   return {
     async signIn(email, password) {
-      if (passwords.get(email) !== password) throw new AuthError("invalid-credentials");
-      if (pendingNewPassword.has(email))
+      // 無効にされた利用者も、Cognito と同じく、認証の失敗として扱う
+      const account = activeAccount(email);
+      if (account?.password !== password) throw new AuthError("invalid-credentials");
+      if (account.pendingNewPassword)
         return { kind: "new-password-required", session: `fake-session-${email}`, username: email };
       return { kind: "signed-in", tokens: issue(email) };
     },
     async completeNewPassword({ username, session, newPassword }) {
-      if (session !== `fake-session-${username}` || !pendingNewPassword.has(username))
+      const account = activeAccount(username);
+      if (session !== `fake-session-${username}` || !account?.pendingNewPassword)
         throw new AuthError("session-expired");
       checkPolicy(newPassword);
-      passwords.set(username, newPassword);
-      pendingNewPassword.delete(username);
+      account.password = newPassword;
+      account.pendingNewPassword = false;
       return issue(username);
     },
     async requestPasswordReset() {},
     async confirmPasswordReset({ email, code, newPassword }) {
-      if (code !== FAKE_RESET_CODE || !passwords.has(email)) throw new AuthError("code-invalid");
+      const account = activeAccount(email);
+      if (code !== FAKE_RESET_CODE || !account) throw new AuthError("code-invalid");
       checkPolicy(newPassword);
-      passwords.set(email, newPassword);
+      account.password = newPassword;
     },
     async refresh(refreshToken) {
       const email = refreshTokens.get(refreshToken);
-      if (!email) throw new AuthError("invalid-credentials");
+      if (!email || !activeAccount(email)) throw new AuthError("invalid-credentials");
       return { ...issue(email), refreshToken: undefined };
     },
     async changePassword({ accessToken, previousPassword, proposedPassword }) {
       const email = emailOfAccessToken(accessToken);
-      if (passwords.get(email) !== previousPassword) throw new AuthError("invalid-credentials");
+      const account = activeAccount(email);
+      if (account?.password !== previousPassword) throw new AuthError("invalid-credentials");
       checkPolicy(proposedPassword);
-      passwords.set(email, proposedPassword);
+      account.password = proposedPassword;
     },
     async signOut(refreshToken) {
       refreshTokens.delete(refreshToken);
+    },
+  };
+}
+
+/**
+ * 手元の開発とテスト専用の、利用者の管理。代替の認証と同じ一覧を操作する(本番では使われない。index.ts を参照)。
+ * 招待した利用者は、仮パスワード `FAKE_INVITED_PHRASE` でログインすると、新しいパスワードを決める入力に進む。
+ */
+export function createFakeUserAdmin(directory: FakeDirectory, now: () => number = Date.now): UserAdmin {
+  const toManaged = (email: string, account: FakeAccount): ManagedUser => ({
+    username: fakeSub(email),
+    email,
+    status: account.pendingNewPassword ? "FORCE_CHANGE_PASSWORD" : "CONFIRMED",
+    enabled: account.enabled,
+    createdAt: new Date(account.createdAt).toISOString(),
+  });
+  return {
+    async listUsers() {
+      return [...directory].map(([email, account]) => toManaged(email, account));
+    },
+    async inviteUser(email) {
+      if (directory.has(email)) throw new UserAdminError("already-exists");
+      const account: FakeAccount = {
+        password: FAKE_INVITED_PHRASE,
+        groups: [],
+        pendingNewPassword: true,
+        enabled: true,
+        createdAt: now(),
+      };
+      directory.set(email, account);
+      return toManaged(email, account);
+    },
+    async disableUser(username) {
+      const found = [...directory].find(([email]) => fakeSub(email) === username);
+      if (!found) throw new UserAdminError("not-found");
+      found[1].enabled = false;
     },
   };
 }
