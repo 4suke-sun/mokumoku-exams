@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { countUpValue } from "@/lib/count-up.ts";
+import { usePrefersReducedMotion, useVisualStyle } from "@/lib/use-visual-style.ts";
+import { effectsEnabled } from "@/lib/visual-style.ts";
 
 type Props = {
   /** 最終的に表示する割合(0〜100) */
@@ -14,19 +16,21 @@ const DURATION_MS = 1200;
 const RADIUS = 52;
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS;
 
-/** 動きを減らす設定の端末では、カウントアップせず、最終の値をすぐに表示する */
-function prefersReducedMotion(): boolean {
-  return typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-}
-
-/** 正答率の円と、0 から最終の値まで増える数値。読み上げには、最終の値だけを伝える。 */
+/**
+ * 正答率の表示。読み上げには、最終の値だけを伝える。
+ * リッチ: 円のゲージと、0 から最終の値まで増える数値。
+ * シンプル: 円を描かず、最終の値をそのまま表示する。
+ * 動きを減らす設定の端末では、スタイルにかかわらずカウントアップしない。
+ */
 export function ScoreRing({ percent, reached }: Props) {
-  // この部品は、結果の読み込みが終わった後にだけ描画される(サーバーでは描画されない)ので、ここで window を参照できる。
+  const style = useVisualStyle();
+  const animate = effectsEnabled(style, usePrefersReducedMotion());
+  // この部品は、結果の読み込みが終わった後にだけ描画される(サーバーでは描画されない)。
   // 最初の描画から 0 にしておき、最終の値が一瞬見えるちらつきを避ける
-  const [shown, setShown] = useState(() => (prefersReducedMotion() ? percent : 0));
+  const [shown, setShown] = useState(() => (animate ? 0 : percent));
 
   useEffect(() => {
-    if (prefersReducedMotion()) {
+    if (!animate) {
       setShown(percent);
       return;
     }
@@ -38,7 +42,19 @@ export function ScoreRing({ percent, reached }: Props) {
       if (value !== percent) frame = requestAnimationFrame(tick);
     });
     return () => cancelAnimationFrame(frame);
-  }, [percent]);
+  }, [percent, animate]);
+
+  if (style === "simple") {
+    return (
+      <p
+        role="img"
+        aria-label={`正答率 ${percent}%`}
+        className={`shrink-0 text-4xl font-bold ${reached ? "text-correct" : "text-warn"}`}
+      >
+        <span aria-hidden="true">{percent}%</span>
+      </p>
+    );
+  }
 
   const offset = CIRCUMFERENCE * (1 - shown / 100);
 

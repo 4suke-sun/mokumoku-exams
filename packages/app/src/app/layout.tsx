@@ -5,6 +5,7 @@ import { SessionProvider } from "@/components/session-provider.tsx";
 import { SiteHeader } from "@/components/site-header.tsx";
 import { THEME_COLOR } from "@/lib/pwa.ts";
 import { THEME_INIT_SCRIPT } from "@/lib/theme.ts";
+import { STYLE_INIT_SCRIPT } from "@/lib/visual-style.ts";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -22,6 +23,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="ja" suppressHydrationWarning>
       <head>
         <script>{THEME_INIT_SCRIPT}</script>
+        <script>{STYLE_INIT_SCRIPT}</script>
       </head>
       <body className="min-h-screen bg-bg text-fg antialiased">
         <a

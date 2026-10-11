@@ -6,6 +6,7 @@ import { useEffect, useId, useState } from "react";
 import { isActive, navItems } from "@/lib/nav.ts";
 import { AuthStatus } from "./auth-status.tsx";
 import { useSession } from "./session-provider.tsx";
+import { StyleToggle } from "./style-toggle.tsx";
 import { ThemeToggle } from "./theme-toggle.tsx";
 
 export function SiteHeader() {
@@ -37,6 +38,7 @@ export function SiteHeader() {
           <Nav pathname={pathname} />
           <AuthStatus />
           <ThemeToggle />
+          <StyleToggle />
         </div>
       </div>
       {open ? (
@@ -44,6 +46,7 @@ export function SiteHeader() {
           <Nav pathname={pathname} vertical />
           <AuthStatus />
           <ThemeToggle />
+          <StyleToggle />
         </div>
       ) : null}
     </header>
