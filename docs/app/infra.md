@@ -130,7 +130,8 @@ aws ssm put-parameter --type SecureString --name /<パラメーターの名前> 
 npm run build          # アプリをビルドする
 npm run build:lambda   # Lambda に載せるアセットを dist/ に作る(dist/lambda、dist/static、dist/push)
 npm run synth          # スタックを合成する
-npm run deploy -w @mokumoku-exams/infra
+npm run diff -w @mokumoku-exams/infra -- --all     # すべてのスタックの変わる内容を確かめる
+npm run deploy -w @mokumoku-exams/infra -- --all   # すべてのスタックをデプロイする
 ```
 
 - `npm run synth` / `deploy` / `diff` / `destroy`(`-w @mokumoku-exams/infra`)は、`.env` を読み込んでから `cdkd` を実行します。
