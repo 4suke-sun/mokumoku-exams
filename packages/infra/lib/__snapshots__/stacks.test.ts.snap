@@ -148,6 +148,36 @@ exports[`WebStack > 合成すると_スナップショットと一致する 1`] 
     },
   },
   "Resources": {
+    "AlarmTopicD01E77F9": {
+      "Type": "AWS::SNS::Topic",
+    },
+    "AppErrorsAlarm7BC037FB": {
+      "Properties": {
+        "AlarmActions": [
+          {
+            "Ref": "AlarmTopicD01E77F9",
+          },
+        ],
+        "AlarmDescription": "アプリの Lambda でエラーが出ています",
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "Dimensions": [
+          {
+            "Name": "FunctionName",
+            "Value": {
+              "Ref": "AppFunction05AF654E",
+            },
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "Errors",
+        "Namespace": "AWS/Lambda",
+        "Period": 300,
+        "Statistic": "Sum",
+        "Threshold": 1,
+        "TreatMissingData": "notBreaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
     "AppFunction05AF654E": {
       "DependsOn": [
         "AppFunctionServiceRoleC222DDCC",
@@ -175,6 +205,11 @@ exports[`WebStack > 合成すると_スナップショットと一致する 1`] 
         "Layers": [
           "arn:aws:lambda:us-east-1:123456789012:layer:LambdaAdapterLayerX86:25",
         ],
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "AppLogGroup7D8CD952",
+          },
+        },
         "MemorySize": 1024,
         "Role": {
           "Fn::GetAtt": [
@@ -257,6 +292,41 @@ exports[`WebStack > 合成すると_スナップショットと一致する 1`] 
         "Principal": "*",
       },
       "Type": "AWS::Lambda::Permission",
+    },
+    "AppLogGroup7D8CD952": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "RetentionInDays": 30,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "AppThrottlesAlarmAEA445C3": {
+      "Properties": {
+        "AlarmActions": [
+          {
+            "Ref": "AlarmTopicD01E77F9",
+          },
+        ],
+        "AlarmDescription": "アプリの Lambda が実行を制限されています",
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "Dimensions": [
+          {
+            "Name": "FunctionName",
+            "Value": {
+              "Ref": "AppFunction05AF654E",
+            },
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "Throttles",
+        "Namespace": "AWS/Lambda",
+        "Period": 300,
+        "Statistic": "Sum",
+        "Threshold": 1,
+        "TreatMissingData": "notBreaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
     },
     "AssetsBucket5CB76180": {
       "DeletionPolicy": "Delete",
@@ -710,6 +780,9 @@ exports[`WebStack > 合成すると_スナップショットと一致する 1`] 
               "CachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6",
               "Compress": true,
               "PathPattern": "/_next/static/*",
+              "ResponseHeadersPolicyId": {
+                "Ref": "SecurityHeadersE66B69D3",
+              },
               "TargetOriginId": "WebDistributionOrigin2BAFA1771",
               "ViewerProtocolPolicy": "redirect-to-https",
             },
@@ -728,6 +801,9 @@ exports[`WebStack > 合成すると_スナップショットと一致する 1`] 
             "CachePolicyId": "4135ea2d-6df8-44a3-9df3-4b5a84be39ad",
             "Compress": true,
             "OriginRequestPolicyId": "b689b0a8-53d0-40ab-baf2-68738e2966ac",
+            "ResponseHeadersPolicyId": {
+              "Ref": "SecurityHeadersE66B69D3",
+            },
             "TargetOriginId": "WebDistributionOrigin11C12BAC7",
             "ViewerProtocolPolicy": "redirect-to-https",
           },
@@ -799,6 +875,32 @@ exports[`WebStack > 合成すると_スナップショットと一致する 1`] 
         },
       },
       "Type": "AWS::CloudFront::OriginAccessControl",
+    },
+    "SecurityHeadersE66B69D3": {
+      "Properties": {
+        "ResponseHeadersPolicyConfig": {
+          "Name": "WebSecurityHeaders36D129D4",
+          "SecurityHeadersConfig": {
+            "ContentTypeOptions": {
+              "Override": true,
+            },
+            "FrameOptions": {
+              "FrameOption": "DENY",
+              "Override": true,
+            },
+            "ReferrerPolicy": {
+              "Override": true,
+              "ReferrerPolicy": "strict-origin-when-cross-origin",
+            },
+            "StrictTransportSecurity": {
+              "AccessControlMaxAgeSec": 31536000,
+              "IncludeSubdomains": true,
+              "Override": true,
+            },
+          },
+        },
+      },
+      "Type": "AWS::CloudFront::ResponseHeadersPolicy",
     },
   },
   "Rules": {
