@@ -74,3 +74,20 @@ export function parseBlocks(source: string): Block[] {
   flushList();
   return blocks;
 }
+
+// 「ラベル: 説明」の形の箇条書きの、ラベル。短い語(句読点を含まない 20 文字まで)と、半角か全角のコロンで見分ける
+const LIST_LABEL = /^([^:：。、\n]{1,20})[:：]\s*/;
+
+/**
+ * 箇条書きの 1 項目が「ラベル: 説明」の形なら、ラベルと残りに分ける(ラベルを太くして見せるため)。
+ * 先頭が強調やコードの項目と、コロンの後ろが空の項目は、分けない。
+ */
+export function splitListLabel(item: Inline[]): { label: string; rest: Inline[] } | null {
+  const [first, ...others] = item;
+  if (first?.kind !== "text") return null;
+  const match = LIST_LABEL.exec(first.text);
+  if (!match) return null;
+  const remaining = first.text.slice(match[0].length);
+  const rest: Inline[] = remaining === "" ? others : [{ kind: "text", text: remaining }, ...others];
+  return rest.length === 0 ? null : { label: match[1] as string, rest };
+}

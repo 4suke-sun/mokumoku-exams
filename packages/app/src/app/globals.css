@@ -397,6 +397,27 @@ body {
   }
 }
 
+/* ロゴの画像を載せる明るい面。ロゴの文字が濃い色なので、ダークでも明るい面に載せる */
+.brand-plate {
+  display: inline-block;
+  border-radius: var(--r-lg);
+  border: 1px solid var(--border);
+  background: #ffffff;
+  padding: 0.5rem 1rem;
+  box-shadow: var(--shadow-card);
+}
+
+/* 未読の目印(リリースノート)。色だけで伝えないよう、読み上げ用の文字を添える(components/release-seen.tsx) */
+.unread-dot {
+  display: inline-block;
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 9999px;
+  background: var(--orange);
+  box-shadow: 0 0 0 2px var(--surface);
+}
+
 /* ---- 動き。CSS だけで作り、止める一覧(この下の 2 つ)に名前を挙げる ---- */
 
 /* ページを開いたときのフェード(app/template.tsx)と、一覧の子を順に出す動き */
@@ -696,6 +717,25 @@ body {
   animation: spin 0.75s linear infinite reverse;
 }
 
+/* サイドバーの選択中の背景が、項目の間を滑って動く(components/site-nav.tsx) */
+.nav-indicator {
+  transition:
+    transform 0.32s cubic-bezier(0.3, 1.2, 0.5, 1),
+    height 0.2s ease-out;
+}
+
+/* メニューのシートが、下から出る */
+@keyframes sheet-up {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+.sheet-panel {
+  animation: sheet-up 0.24s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
 /*
  * 止める一覧(1): 動きを減らす設定のとき。スタイルにかかわらず、上の動きをすべて止め、終わりの状態だけを見せる。
  * レイヤーの外に書くので、ユーティリティと共通の部品のクラスより優先される(!important は使わない)。
@@ -718,11 +758,13 @@ body {
   .confetti-piece,
   .nav-progress-fill,
   .loading-badge,
+  .sheet-panel,
   .spinner::before,
   .spinner::after {
     animation: none;
   }
   .motion-bar,
+  .nav-indicator,
   a.card {
     transition: none;
   }
@@ -757,12 +799,13 @@ body {
   .motion-float,
   .skeleton,
   .confetti-piece,
-  .loading-badge
+  .loading-badge,
+  .sheet-panel
 ),
 :root[data-style="simple"] .motion-shine::after {
   animation: none;
 }
-:root[data-style="simple"] :is(.motion-bar, a.card) {
+:root[data-style="simple"] :is(.motion-bar, .nav-indicator, a.card) {
   transition: none;
 }
 :root[data-style="simple"] :is(a.card:hover, a.card:active) {

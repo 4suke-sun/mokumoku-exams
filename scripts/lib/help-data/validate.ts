@@ -27,11 +27,17 @@ export function validateHelpData(data: unknown, context: Context): string[] {
   if (!parsed.success) return formatIssues(HELP_FILE, parsed.error, data);
 
   const errors: string[] = [];
-  parsed.data.sections.forEach((section, i) => {
-    section.links?.forEach((link, j) => {
+  const checkLinks = (links: readonly { href: string }[] | undefined, at: string) => {
+    links?.forEach((link, j) => {
       if (link.href.startsWith("/") && !isKnownRoute(link.href, context)) {
-        errors.push(`${HELP_FILE}: sections[${i}].links[${j}].href: リンク先の画面がありません(リンク切れ)`);
+        errors.push(`${HELP_FILE}: ${at}.links[${j}].href: リンク先の画面がありません(リンク切れ)`);
       }
+    });
+  };
+  parsed.data.sections.forEach((section, i) => {
+    checkLinks(section.links, `sections[${i}]`);
+    section.items?.forEach((item, j) => {
+      checkLinks(item.links, `sections[${i}].items[${j}]`);
     });
   });
   return errors;

@@ -9,6 +9,14 @@ export type { Release };
 /** 項目の種類の表示名 */
 export const RELEASE_ITEM_LABELS: Record<string, string> = { feat: "機能", fix: "修正", docs: "文書", dev: "開発" };
 
+/** 項目の種類の色(globals.css の tone-*)。色だけに頼らず、ラベルの文字でも種類を示す */
+export const RELEASE_ITEM_TONES: Record<string, string> = {
+  feat: "tone-primary",
+  fix: "tone-orange",
+  docs: "tone-violet",
+  dev: "tone-muted",
+};
+
 /** リリースノートを、新しい版から順に返す。 */
 export function listReleases(): readonly Release[] {
   return (releaseNotesFile as { releases: Release[] }).releases;

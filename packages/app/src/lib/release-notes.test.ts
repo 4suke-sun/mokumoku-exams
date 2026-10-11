@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { listReleases, RELEASE_ITEM_LABELS } from "./release-notes.ts";
+import { listReleases, RELEASE_ITEM_LABELS, RELEASE_ITEM_TONES } from "./release-notes.ts";
 
 const parts = (version: string) => version.slice(1).split(".").map(Number);
 const newer = (a: string, b: string) => {
@@ -21,5 +21,13 @@ describe("listReleases", () => {
     for (const release of listReleases()) {
       for (const item of release.items) expect(RELEASE_ITEM_LABELS[item.type], item.type).toBeTruthy();
     }
+  });
+
+  it("どの項目の種類にも_色があり_種類ごとに違う", () => {
+    for (const release of listReleases()) {
+      for (const item of release.items) expect(RELEASE_ITEM_TONES[item.type], item.type).toMatch(/^tone-/);
+    }
+    const tones = Object.values(RELEASE_ITEM_TONES);
+    expect(new Set(tones).size).toBe(tones.length);
   });
 });

@@ -1,22 +1,33 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { NavigationProgress } from "@/components/navigation-progress.tsx";
+import { PageFooter, PageMain } from "@/components/page-main.tsx";
 import { SessionProvider } from "@/components/session-provider.tsx";
-import { SiteHeader } from "@/components/site-header.tsx";
-import { THEME_COLOR } from "@/lib/pwa.ts";
+import { SiteNav } from "@/components/site-nav.tsx";
+import { THEME_COLORS } from "@/lib/pwa.ts";
 import { THEME_INIT_SCRIPT } from "@/lib/theme.ts";
 import { STYLE_INIT_SCRIPT } from "@/lib/visual-style.ts";
 import "./globals.css";
 
+const SITE_NAME = "もくもく問題集";
+const DESCRIPTION = "クラウド資格の学習用に、問題を解き、間違いを復習できます。";
+
 export const metadata: Metadata = {
-  title: { default: "もくもく問題集", template: "%s | もくもく問題集" },
-  description: "クラウド資格の学習用に、問題を解き、間違いを復習できます。",
+  title: { default: SITE_NAME, template: `%s | ${SITE_NAME}` },
+  description: DESCRIPTION,
   // ホーム画面に追加したときのアイコンと表示(マニフェストは app/manifest.ts)
-  icons: { icon: { url: "/icons/icon.svg", type: "image/svg+xml" }, apple: "/icons/apple-touch-icon.png" },
-  appleWebApp: { capable: true, title: "もくもく問題集", statusBarStyle: "default" },
+  icons: { icon: { url: "/icons/icon-192.png", type: "image/png" }, apple: "/icons/apple-touch-icon.png" },
+  appleWebApp: { capable: true, title: SITE_NAME, statusBarStyle: "default" },
+  // 共有したときの表示は最小限にする(ログインが必要なので、URL と画像は持たない)
+  openGraph: { title: SITE_NAME, description: DESCRIPTION, siteName: SITE_NAME, locale: "ja_JP", type: "website" },
 };
 
-export const viewport: Viewport = { themeColor: THEME_COLOR };
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: THEME_COLORS.light },
+    { media: "(prefers-color-scheme: dark)", color: THEME_COLORS.dark },
+  ],
+};
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
@@ -34,14 +45,17 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         </a>
         <SessionProvider>
           <NavigationProgress />
-          <SiteHeader />
-          <main id="main" tabIndex={-1} className="mx-auto max-w-3xl px-4 py-8">
-            {children}
-          </main>
+          {/* 幅が広い画面では、左にサイドバー、右に本文を並べる。狭い画面では、上のバー、本文、下のドックの順 */}
+          <div className="lg:flex lg:items-start lg:gap-4 lg:p-4">
+            <SiteNav />
+            <div className="min-w-0 flex-1">
+              <PageMain>{children}</PageMain>
+              <PageFooter>
+                <p>学習用の問題集です。</p>
+              </PageFooter>
+            </div>
+          </div>
         </SessionProvider>
-        <footer className="mx-auto max-w-3xl px-4 pb-8 text-sm text-muted">
-          <p>学習用の問題集です。</p>
-        </footer>
       </body>
     </html>
   );

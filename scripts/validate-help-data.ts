@@ -37,7 +37,7 @@ try {
     const examCodes = (exams.exams ?? [])
       .filter((e) => e.status === "published" && typeof e.examCode === "string")
       .map((e) => e.examCode as string);
-    const routes = NAV_ITEMS.filter((item) => item.ready).map((item) => item.href);
+    const routes = NAV_ITEMS.map((item) => item.href);
     blocks.push(...validateHelpData(help, { routes, examCodes }));
   }
 } catch {

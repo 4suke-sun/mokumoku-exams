@@ -52,17 +52,19 @@ export const PUBLIC_PAGE_PATHS: ReadonlySet<string> = new Set(["/login", "/forgo
 
 /**
  * ログインなしで取れるファイル。ブラウザや検索エンジンが Cookie なしで取りに来るもの(マニフェスト、アイコン、
- * robots・sitemap、通知を受け取る Service Worker)を、1 つずつ列挙する。どれも秘密の情報を含まない。
+ * robots・sitemap、通知を受け取る Service Worker)と、ログインの画面に出すロゴを、1 つずつ列挙する。どれも秘密の情報を含まない。
  */
 export const PUBLIC_FILE_PATHS: ReadonlySet<string> = new Set([
   "/manifest.webmanifest",
   "/robots.txt",
   "/sitemap.xml",
   "/sw.js",
-  "/icons/icon.svg",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
   "/icons/apple-touch-icon.png",
+  // ログインの画面でも、サイドバーと上部のバーに出す
+  "/brand/logo-full.png",
+  "/brand/mascot.png",
 ]);
 
 /**

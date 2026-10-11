@@ -14,7 +14,19 @@ export default async function HomePage() {
 
   return (
     <section className="space-y-6">
-      <h1 className="h1">もくもく問題集</h1>
+      <h1>
+        {/* ロゴの画像は、背景が透明で、文字が濃い色なので、テーマにかかわらず明るい面に載せる */}
+        <span className="brand-plate">
+          {/* biome-ignore lint/performance/noImgElement: 小さな固定の画像なので、最適化の経路を通さずに出す */}
+          <img
+            src="/brand/logo-full.png"
+            alt="もくもく問題集"
+            width={640}
+            height={203}
+            className="h-20 w-auto sm:h-24"
+          />
+        </span>
+      </h1>
       <p className="leading-relaxed text-muted">
         クラウド資格の学習用に、問題を解き、間違いを見直せます。資格を選んで、はじめましょう。
       </p>
