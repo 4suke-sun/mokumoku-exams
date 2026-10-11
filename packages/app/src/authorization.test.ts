@@ -654,7 +654,8 @@ describe("認可: 管理者だけが開ける", () => {
   it("テスト通知の API の本体_管理者は自分にだけ送れ_管理者でない利用者・未ログインは断られる", async () => {
     // 送り先が自分の購読だけ(購読がなければ 0 件)であることを、外へ送らずに確かめる
     vi.stubEnv("VAPID_PUBLIC_KEY", "public-key-example");
-    vi.stubEnv("VAPID_PRIVATE_KEY", "private-key-example");
+    // 秘密鍵はパラメーターの名前だけ。購読がなければ、パラメーターを読まずに 0 件で終わる
+    vi.stubEnv("VAPID_PRIVATE_KEY_PARAMETER", "/example/push/vapid-private-key");
     vi.stubEnv("VAPID_SUBJECT", "mailto:admin@example.com");
     const sendTest = (cookie?: string, body: unknown = {}) =>
       pushTestRoute.POST(request("/api/push/test", { method: "POST", cookie, body }));

@@ -296,7 +296,7 @@ exports[`PushStack > 合成すると_スナップショットと一致する 1`]
               "Fn::ImportValue": "Data:ExportsOutputRefHistoryTable24A0CCCB0EA6F9C1",
             },
             "NODE_ENV": "production",
-            "VAPID_PRIVATE_KEY": "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+            "VAPID_PRIVATE_KEY_PARAMETER": "/example/push/vapid-private-key",
             "VAPID_PUBLIC_KEY": "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
             "VAPID_SUBJECT": "mailto:admin@example.com",
           },
@@ -363,6 +363,22 @@ exports[`PushStack > 合成すると_スナップショットと一致する 1`]
               "Effect": "Allow",
               "Resource": {
                 "Fn::ImportValue": "Data:ExportsOutputFnGetAttHistoryTable24A0CCCBArnCEF54BD1",
+              },
+            },
+            {
+              "Action": "ssm:GetParameter",
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition",
+                    },
+                    ":ssm:us-east-1:123456789012:parameter/example/push/vapid-private-key",
+                  ],
+                ],
               },
             },
           ],

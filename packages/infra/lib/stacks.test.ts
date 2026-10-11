@@ -12,7 +12,13 @@ import {
 } from "./auth-stack.ts";
 import type { CustomDomain, InfraConfig, PushConfig } from "./config.ts";
 import { DataStack, HISTORY_TABLE_ACTIONS, POINT_IN_TIME_RECOVERY_DAYS } from "./data-stack.ts";
-import { PUSH_HANDLER, PUSH_SCHEDULE, PUSH_SENDER_TABLE_ACTIONS, PushStack } from "./push-stack.ts";
+import {
+  PUSH_HANDLER,
+  PUSH_SCHEDULE,
+  PUSH_SENDER_TABLE_ACTIONS,
+  PushStack,
+  VAPID_PRIVATE_KEY_ACTIONS,
+} from "./push-stack.ts";
 import { ORIGIN_VERIFY_HEADER, WebStack } from "./web-stack.ts";
 
 const config: InfraConfig = {
@@ -21,8 +27,36 @@ const config: InfraConfig = {
   originVerifyValue: "o".repeat(32),
 };
 const env = { account: "123456789012", region: "us-east-1" };
-// 見本の鍵(形だけを合わせた値。実際の鍵ではない)
-const push: PushConfig = { publicKey: "P".repeat(87), privateKey: "k".repeat(43), subject: "mailto:admin@example.com" };
+// 見本の公開鍵(形だけを合わせた値。実際の鍵ではない)と、秘密鍵を置くパラメーターの名前
+const push: PushConfig = {
+  publicKey: "P".repeat(87),
+  privateKeyParameter: "/example/push/vapid-private-key",
+  subject: "mailto:admin@example.com",
+};
+// パラメーター 1 つの ARN(ワイルドカードなし)。パーティションは、合成の時点では参照のまま
+const PARAMETER_ARN = {
+  "Fn::Join": [
+    "",
+    ["arn:", { Ref: "AWS::Partition" }, ":ssm:us-east-1:123456789012:parameter/example/push/vapid-private-key"],
+  ],
+};
+
+/** テンプレートの IAM ポリシーの文の一覧 */
+function statementsOf(template: Template) {
+  return Object.values(template.findResources("AWS::IAM::Policy")).flatMap(
+    (policy) => policy.Properties.PolicyDocument.Statement,
+  );
+}
+
+/** 秘密鍵のパラメーターを読む文が、そのパラメーター 1 つだけに限られ、KMS の権限を足していないことを確かめる。 */
+function expectParameterReadOnly(template: Template): void {
+  const statements = statementsOf(template);
+  const ssm = statements.filter((s) => JSON.stringify(s.Action).includes("ssm:"));
+  expect(ssm).toHaveLength(1);
+  expect([ssm[0]?.Action].flat()).toEqual(VAPID_PRIVATE_KEY_ACTIONS);
+  expect(ssm[0]?.Resource).toEqual(PARAMETER_ARN);
+  expect(statements.filter((s) => JSON.stringify(s.Action).includes("kms:"))).toEqual([]);
+}
 // 独自ドメインの見本の値(すべてプレースホルダー)
 const domain: CustomDomain = {
   domainName: "app.example.com",
@@ -314,7 +348,7 @@ describe("WebStack", () => {
     const [plain] = Object.values(webTemplate().findResources("AWS::Lambda::Function")).filter(
       (f) => f.Properties.Handler === "run.sh",
     );
-    for (const name of ["SITE_URL", "VAPID_PUBLIC_KEY", "VAPID_PRIVATE_KEY", "VAPID_SUBJECT"]) {
+    for (const name of ["SITE_URL", "VAPID_PUBLIC_KEY", "VAPID_PRIVATE_KEY_PARAMETER", "VAPID_SUBJECT"]) {
       expect(plain?.Properties.Environment.Variables[name], name).toBeUndefined();
     }
     webTemplate(undefined, { siteUrl: "https://example.com", push }).hasResourceProperties("AWS::Lambda::Function", {
@@ -322,11 +356,22 @@ describe("WebStack", () => {
         Variables: {
           SITE_URL: "https://example.com",
           VAPID_PUBLIC_KEY: push.publicKey,
-          VAPID_PRIVATE_KEY: push.privateKey,
+          VAPID_PRIVATE_KEY_PARAMETER: push.privateKeyParameter,
           VAPID_SUBJECT: push.subject,
         },
       },
     });
+  });
+
+  it("秘密鍵は_値ではなくパラメーターの名前だけを渡し_そのパラメーター 1 つだけを読める", () => {
+    const template = webTemplate(undefined, { push });
+    const [app] = Object.values(template.findResources("AWS::Lambda::Function")).filter(
+      (f) => f.Properties.Handler === "run.sh",
+    );
+    expect(app?.Properties.Environment.Variables.VAPID_PRIVATE_KEY).toBeUndefined();
+    expectParameterReadOnly(template);
+    // 通知を設定しなければ、パラメーターを読む権限も付けない
+    expect(statementsOf(webTemplate()).filter((s) => JSON.stringify(s.Action).includes("ssm:"))).toEqual([]);
   });
 
   it("通知先のメールは_指定したときだけ購読される", () => {
@@ -412,7 +457,7 @@ describe("PushStack", () => {
           NODE_ENV: "production",
           HISTORY_TABLE_NAME: Match.anyValue(),
           VAPID_PUBLIC_KEY: push.publicKey,
-          VAPID_PRIVATE_KEY: push.privateKey,
+          VAPID_PRIVATE_KEY_PARAMETER: push.privateKeyParameter,
           VAPID_SUBJECT: push.subject,
         },
       },
@@ -420,9 +465,17 @@ describe("PushStack", () => {
     template.resourceCountIs("AWS::Lambda::Url", 0);
   });
 
+  it("送信の Lambda は_秘密鍵の値を受け取らず_そのパラメーター 1 つだけを読める", () => {
+    const template = pushTemplate();
+    const [sender] = Object.values(template.findResources("AWS::Lambda::Function")).filter(
+      (f) => f.Properties.Handler === PUSH_HANDLER,
+    );
+    expect(sender?.Properties.Environment.Variables.VAPID_PRIVATE_KEY).toBeUndefined();
+    expectParameterReadOnly(template);
+  });
+
   it("送信の Lambda は_テーブルのスキャンと削除だけを許され_全リソースへの権限を持たない", () => {
-    const policies = Object.values(pushTemplate().findResources("AWS::IAM::Policy"));
-    const statements = policies.flatMap((policy) => policy.Properties.PolicyDocument.Statement);
+    const statements = statementsOf(pushTemplate());
     const table = statements.filter((s) => JSON.stringify(s.Action).includes("dynamodb:"));
     expect(table).toHaveLength(1);
     expect([...table[0].Action].sort()).toEqual([...PUSH_SENDER_TABLE_ACTIONS].sort());

@@ -4,7 +4,7 @@ import type { TokenVerifier } from "@/lib/auth/verify.ts";
 import { handleSubscribe, handleTestNotification, handleUnsubscribe, type PushDeps } from "./handlers.ts";
 import { createMemoryPushRepository, type PushRepository } from "./repository.ts";
 import { MAX_SUBSCRIPTIONS_PER_USER } from "./schema.ts";
-import type { PushSender, PushTarget, SendOutcome } from "./send.ts";
+import { type PushSender, type PushTarget, type SendOutcome, webPushSender } from "./send.ts";
 
 const ORIGIN = "http://localhost";
 
@@ -242,5 +242,25 @@ describe("テスト通知", () => {
     const response = await handleTestNotification(test({}, { cookie: asUser("admin-a") }), deps());
     expect(response.status).toBe(503);
     expect(await response.json()).toEqual({ error: "unavailable" });
+  });
+
+  it("秘密鍵を読めない_503 を返し_原因もパラメーターの名前も応答に出さない", async () => {
+    const repository = createMemoryPushRepository();
+    await repository.putSubscription("admin-a", { endpoint: endpointOf(1), p256dh: "p", auth: "a" }, "t");
+    const parameter = "/example/push/vapid-private-key";
+    const sender = webPushSender(
+      { publicKey: "P".repeat(87), privateKeyParameter: parameter, subject: "mailto:admin@example.com" },
+      60,
+      async () => {
+        throw new Error(`AccessDenied: ${parameter}`);
+      },
+    );
+    const response = await handleTestNotification(test({}, { cookie: asUser("admin-a") }), deps(repository, sender));
+    expect(response.status).toBe(503);
+    const text = await response.text();
+    expect(JSON.parse(text)).toEqual({ error: "unavailable" });
+    expect(text).not.toContain(parameter);
+    // 送れなかった購読は、消さずに残す
+    expect(await repository.listSubscriptions("admin-a")).toHaveLength(1);
   });
 });

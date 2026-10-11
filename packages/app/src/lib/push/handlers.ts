@@ -15,7 +15,7 @@ import { type PushSender, sendToAll, TEST_MESSAGE } from "./send.ts";
 export type PushDeps = {
   auth: GuardDeps;
   repository: PushRepository;
-  /** VAPID の鍵が設定されていなければ null(テスト通知は 503) */
+  /** VAPID の設定がなければ null(テスト通知は 503。秘密鍵を読めないときも 503) */
   sender: PushSender | null;
   now?: () => number;
 };

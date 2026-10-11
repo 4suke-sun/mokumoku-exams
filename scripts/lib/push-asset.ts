@@ -6,7 +6,7 @@ import { dirname, join, relative, sep } from "node:path";
 export const PUSH_ENTRY = "packages/app/src/lib/push/daily.ts";
 
 /** 入り口から読み込むパッケージ。それぞれの依存も、たどって載せる。 */
-export const PUSH_PACKAGES = ["web-push", "@aws-sdk/client-dynamodb", "@aws-sdk/lib-dynamodb"];
+export const PUSH_PACKAGES = ["web-push", "@aws-sdk/client-dynamodb", "@aws-sdk/lib-dynamodb", "@aws-sdk/client-ssm"];
 
 /**
  * 入り口と、そこから相対で読み込むファイルを、型を除いた JavaScript(ES モジュール)にする。型の検査は `npm run typecheck` で行う。
