@@ -2,6 +2,7 @@ import { CfnOutput, Duration, RemovalPolicy, Stack, type StackProps } from "aws-
 import * as cognito from "aws-cdk-lib/aws-cognito";
 import type { Construct } from "constructs";
 
+/** 管理者のグループ。packages/app の lib/auth/admin.ts の ADMIN_GROUP と同じ(両方のテストで値を固定している) */
 export const ADMIN_GROUP_NAME = "admins";
 /** packages/app の lib/auth/password.ts と同じ(両方のテストで値を固定している) */
 export const PASSWORD_MIN_LENGTH = 12;

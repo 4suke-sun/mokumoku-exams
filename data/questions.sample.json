@@ -81,6 +81,38 @@
       ],
       "correctAnswers": ["A", "C"],
       "explanation": "振り返りでは、うまくいった点と、次に改善する点を確認します。"
+    },
+    {
+      "questionId": "SAMPLE-0006",
+      "examCode": "SAMPLE",
+      "domain": "domain1",
+      "questionType": "free-text",
+      "difficulty": "easy",
+      "questionText": "動作確認用の自由記述の問題です。信号機の赤と青(緑)が、それぞれ何を表すかを、文章で説明してください。",
+      "rubric": {
+        "criteria": [
+          { "name": "赤の意味", "keywords": ["止まれ", "止まる", "停止"], "points": 50 },
+          { "name": "青(緑)の意味", "keywords": ["進んでよい", "進んでもよい", "進め", "進行"], "points": 50 }
+        ],
+        "passingPoints": 100
+      },
+      "explanation": "赤は**止まれ**、青(緑)は**進んでよい**ことを表します。\n\n解答の例: 赤は止まれ、青(緑)は進んでよいことを表します。\n\nこの問題は動作確認用の架空のものです。"
+    },
+    {
+      "questionId": "SAMPLE-0007",
+      "examCode": "SAMPLE",
+      "domain": "domain2",
+      "questionType": "free-text",
+      "difficulty": "medium",
+      "questionText": "動作確認用の自由記述の問題です。振り返りで確認することを、文章で説明してください。",
+      "rubric": {
+        "criteria": [
+          { "name": "うまくいった点", "keywords": ["うまくいった", "良かった", "よかった"], "points": 50 },
+          { "name": "次に改善する点", "keywords": ["改善", "見直す"], "points": 50 }
+        ],
+        "passingPoints": 50
+      },
+      "explanation": "振り返りでは、うまくいった点と、次に改善する点を確認します。この問題は、どちらか 1 つの観点を満たせば正解です。\n\n解答の例: うまくいった点と、次に改善する点を確認します。\n\nこの問題は動作確認用の架空のものです。"
     }
   ]
 }

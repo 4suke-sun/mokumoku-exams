@@ -45,7 +45,11 @@ export default async function StudyUnitPage({ params }: Props) {
   const toItems = (ids: readonly string[]) =>
     ids.flatMap((id) => {
       const question = byId.get(id);
-      return question ? [{ questionId: id, choiceKeys: question.choices.map((c) => c.key) }] : [];
+      if (!question) return [];
+      // 自由記述は選択肢がない
+      return [
+        { questionId: id, choiceKeys: question.questionType === "free-text" ? [] : question.choices.map((c) => c.key) },
+      ];
     });
   const items = toItems(unit.questionIds);
   const stages = unit.stages

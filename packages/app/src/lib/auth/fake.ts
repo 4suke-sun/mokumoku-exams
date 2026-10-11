@@ -1,3 +1,4 @@
+import { ADMIN_GROUP } from "./admin.ts";
 import { AuthError, type AuthProvider, type Tokens } from "./types.ts";
 import { SUB_PATTERN, type TokenVerifier } from "./verify.ts";
 
@@ -10,6 +11,9 @@ export const FAKE_USER_PHRASE = fakeValue("Learner");
 /** 初回ログインで新しいパスワードを決める、架空の招待済みユーザー */
 export const FAKE_INVITED_EMAIL = "invited@example.com";
 export const FAKE_INVITED_PHRASE = fakeValue("Invited");
+/** 管理者のグループに入っている、架空のユーザー */
+export const FAKE_ADMIN_EMAIL = "admin@example.com";
+export const FAKE_ADMIN_PHRASE = fakeValue("Admin");
 /** パスワード再設定で受け付ける、架空の確認コード */
 export const FAKE_RESET_CODE = ["123", "456"].join("");
 
@@ -29,7 +33,9 @@ export function createFakeProvider(now: () => number = Date.now): AuthProvider {
   const passwords = new Map<string, string>([
     [FAKE_USER_EMAIL, FAKE_USER_PHRASE],
     [FAKE_INVITED_EMAIL, FAKE_INVITED_PHRASE],
+    [FAKE_ADMIN_EMAIL, FAKE_ADMIN_PHRASE],
   ]);
+  const groups = new Map<string, string[]>([[FAKE_ADMIN_EMAIL, [ADMIN_GROUP]]]);
   const pendingNewPassword = new Set<string>([FAKE_INVITED_EMAIL]);
   const refreshTokens = new Map<string, string>();
 
@@ -38,7 +44,13 @@ export function createFakeProvider(now: () => number = Date.now): AuthProvider {
     const refreshToken = `fake-refresh-${email}-${refreshTokens.size + 1}`;
     refreshTokens.set(refreshToken, email);
     return {
-      idToken: unsignedJwt({ sub: fakeSub(email), email, exp, token_use: "id" }),
+      idToken: unsignedJwt({
+        sub: fakeSub(email),
+        email,
+        exp,
+        token_use: "id",
+        ...(groups.has(email) ? { "cognito:groups": groups.get(email) } : {}),
+      }),
       accessToken: unsignedJwt({ sub: fakeSub(email), username: email, exp, token_use: "access" }),
       refreshToken,
       expiresIn: EXPIRES_IN,
@@ -114,7 +126,12 @@ export function createFakeVerifier(now: () => number = Date.now): TokenVerifier 
         const claims = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")) as Record<string, unknown>;
         if (claims.token_use !== "id" || typeof claims.exp !== "number" || claims.exp * 1000 <= now()) return null;
         if (typeof claims.sub !== "string" || !SUB_PATTERN.test(claims.sub)) return null;
-        return { sub: claims.sub, email: typeof claims.email === "string" ? claims.email : undefined };
+        const groups = claims["cognito:groups"];
+        return {
+          sub: claims.sub,
+          email: typeof claims.email === "string" ? claims.email : undefined,
+          groups: Array.isArray(groups) ? groups.filter((g): g is string => typeof g === "string") : [],
+        };
       } catch {
         return null;
       }

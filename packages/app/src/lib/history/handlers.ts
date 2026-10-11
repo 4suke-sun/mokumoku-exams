@@ -1,8 +1,7 @@
 import { authenticate, type GuardDeps } from "@/lib/auth/guard.ts";
 import { guard, json } from "@/lib/auth/handlers.ts";
-import { answerFor, isCorrect } from "@/lib/quiz.ts";
+import { type GradableQuestion, isQuestionCorrect } from "@/lib/quiz.ts";
 import type { Result } from "@/lib/storage.ts";
-import type { Question } from "@/lib/types.ts";
 import { examQuestions } from "./questions.ts";
 import type { DayTally, HistoryRepository, ReviewChange } from "./repository.ts";
 import {
@@ -15,10 +14,8 @@ import {
   MAX_GOAL_BODY_BYTES,
 } from "./schema.ts";
 
-/** 採点に使う、問題の正解。公開中の資格でなければ null。 */
-export type QuestionSource = (
-  examCode: string,
-) => Promise<readonly Pick<Question, "questionId" | "correctAnswers">[] | null>;
+/** 採点に使う、問題の正解と採点基準。公開中の資格でなければ null。 */
+export type QuestionSource = (examCode: string) => Promise<readonly GradableQuestion[] | null>;
 
 export type HistoryDeps = {
   auth: GuardDeps;
@@ -79,18 +76,16 @@ async function readJsonBody(
 
 /**
  * 結果を、サーバーの問題データで採点し直して、復習プールの変更にする(端末から送られた正誤は使わない)。
+ * 判定は、画面の採点と同じ関数(自由記述は採点基準の判定)。
  * 未回答は不正解として数える。いまのデータにない問題は、どちらにも入れない。
  */
-export function reviewChangeOf(
-  result: Result,
-  questions: readonly Pick<Question, "questionId" | "correctAnswers">[],
-): ReviewChange {
+export function reviewChangeOf(result: Result, questions: readonly GradableQuestion[]): ReviewChange {
   const byId = new Map(questions.map((q) => [q.questionId, q]));
   const change = { wrong: [] as string[], correct: [] as string[], at: result.finishedAt };
   for (const id of result.questionIds) {
     const question = byId.get(id);
     if (!question) continue;
-    (isCorrect(question, answerFor(result.answers, id)) ? change.correct : change.wrong).push(id);
+    (isQuestionCorrect(question, result.answers, result.textAnswers) ? change.correct : change.wrong).push(id);
   }
   return change;
 }

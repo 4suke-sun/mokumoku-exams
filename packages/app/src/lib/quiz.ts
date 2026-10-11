@@ -1,10 +1,19 @@
+import { judgeFreeText } from "./free-text.ts";
 import type { Session } from "./storage.ts";
-import type { PublishedExam, Question } from "./types.ts";
+import type { ChoiceQuestion, FreeTextQuestion, PublishedExam, Question } from "./types.ts";
 
-type Choice = Question["choices"][number];
+type Choice = ChoiceQuestion["choices"][number];
 
 /** 問題 ID ごとの、選んだ選択肢のキー */
 export type Answers = Record<string, string[]>;
+
+/** 問題 ID ごとの、自由記述の回答の文章 */
+export type TextAnswers = Record<string, string>;
+
+/** 採点に使う、問題の情報(択一・複数選択は正解、自由記述は採点基準) */
+export type GradableQuestion =
+  | Pick<ChoiceQuestion, "questionId" | "questionType" | "correctAnswers">
+  | Pick<FreeTextQuestion, "questionId" | "questionType" | "rubric">;
 
 export type Score = { total: number; correct: number; percent: number };
 
@@ -13,10 +22,30 @@ export function answerFor(answers: Answers, questionId: string): readonly string
   return Object.hasOwn(answers, questionId) ? (answers[questionId] ?? []) : [];
 }
 
+/** 問題 ID に対する自由記述の回答を返す。回答がなければ空の文字列。 */
+export function textAnswerFor(textAnswers: TextAnswers | undefined, questionId: string): string {
+  return textAnswers && Object.hasOwn(textAnswers, questionId) ? (textAnswers[questionId] ?? "") : "";
+}
+
 /** 選んだ選択肢が、正解の集合と一致するか。順序は問わない。 */
-export function isCorrect(question: Pick<Question, "correctAnswers">, selected: readonly string[]): boolean {
+export function isCorrect(question: Pick<ChoiceQuestion, "correctAnswers">, selected: readonly string[]): boolean {
   const chosen = new Set(selected);
   return chosen.size === question.correctAnswers.length && question.correctAnswers.every((key) => chosen.has(key));
+}
+
+/**
+ * 問題の正誤。択一・複数選択は、選んだ選択肢が正解と一致するか。自由記述は、採点基準の判定で合格点以上か。
+ * 未回答は不正解。画面の採点とサーバーの採点し直しの両方で、この関数を使う。
+ */
+export function isQuestionCorrect(
+  question: GradableQuestion,
+  answers: Answers,
+  textAnswers: TextAnswers | undefined,
+): boolean {
+  if (question.questionType === "free-text") {
+    return judgeFreeText(question.rubric, textAnswerFor(textAnswers, question.questionId)).passed;
+  }
+  return isCorrect(question, answerFor(answers, question.questionId));
 }
 
 /** Fisher-Yates。`random` は 0 以上 1 未満の値を返す関数(テストで固定できるように外から渡す)。 */
@@ -51,9 +80,9 @@ export function countPool(all: readonly Question[], domains: readonly string[]):
 }
 
 /** 正答数 ÷ 出題数 × 100(%)。未回答は不正解として数える。 */
-export function score(questions: readonly Question[], answers: Answers): Score {
+export function score(questions: readonly GradableQuestion[], answers: Answers, textAnswers?: TextAnswers): Score {
   const total = questions.length;
-  const correct = questions.filter((q) => isCorrect(q, answerFor(answers, q.questionId))).length;
+  const correct = questions.filter((q) => isQuestionCorrect(q, answers, textAnswers)).length;
   const percent = total === 0 ? 0 : Math.round((correct / total) * 1000) / 10;
   return { total, correct, percent };
 }
@@ -106,7 +135,7 @@ export function newSession(
  * 保存された並びで選択肢を返す。並びがない、または選択肢のキーと食い違うときは、元の並び。
  * 食い違いは、データが更新されたあとの古い保存を想定している。
  */
-export function orderChoices(question: Pick<Question, "questionId" | "choices">, order?: ChoiceOrder): Choice[] {
+export function orderChoices(question: Pick<ChoiceQuestion, "questionId" | "choices">, order?: ChoiceOrder): Choice[] {
   const keys = order && Object.hasOwn(order, question.questionId) ? order[question.questionId] : undefined;
   if (!keys || keys.length !== question.choices.length) return question.choices;
   const byKey = new Map(question.choices.map((c) => [c.key, c]));
@@ -115,13 +144,24 @@ export function orderChoices(question: Pick<Question, "questionId" | "choices">,
   return valid ? (ordered as Choice[]) : question.choices;
 }
 
-/** 回答済みの問題数と、出題数 */
-export function sessionProgress(session: { questionIds: readonly string[]; answers: Answers }): {
+/** 回答済みの問題数と、出題数。自由記述は、空白でない文章があれば回答済み。 */
+export function sessionProgress(session: {
+  questionIds: readonly string[];
+  answers: Answers;
+  textAnswers?: TextAnswers;
+}): {
   answered: number;
   total: number;
 } {
-  const answered = session.questionIds.filter((id) => answerFor(session.answers, id).length > 0).length;
+  const answered = session.questionIds.filter(
+    (id) => answerFor(session.answers, id).length > 0 || hasText(textAnswerFor(session.textAnswers, id)),
+  ).length;
   return { answered, total: session.questionIds.length };
+}
+
+/** 空白だけではない文章か(自由記述の回答があるか) */
+export function hasText(value: string): boolean {
+  return /\S/.test(value);
 }
 
 /** 分野ごとの出題できる問題数 */

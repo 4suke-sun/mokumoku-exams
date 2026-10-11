@@ -152,6 +152,7 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
           examCode: item.examCode,
           questionIds: item.questionIds,
           answers: item.answers,
+          textAnswers: item.textAnswers,
           finishedAt: item.finishedAt,
           choiceOrder: item.choiceOrder,
         });

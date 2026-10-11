@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { ResultSchema } from "@/lib/storage.ts";
+import { MAX_TEXT_ANSWER_LENGTH, ResultSchema } from "@/lib/storage.ts";
 import { isValidDate } from "@/lib/study-days.ts";
 
 /** 資格コード(data/exams.json と同じ形)。DynamoDB のキーに使うため、区切りの `#` などを含められない。 */
@@ -29,7 +29,8 @@ const questionKey = z.string().max(64);
  * - 資格コードは決まった形。完了時刻はミリ秒つきの ISO 8601(ソートキーに使うため、文字の並びが時刻の並びと一致する形)で、
  *   下限と、サーバーの時刻から先への幅の中にある。
  * - 問題 ID は `<資格コード>-<4 桁>` の形で、重複せず、この資格のもの。
- * - 回答と選択肢の並びは、出題した問題についてのものだけで、選択肢のキーは重複しない。
+ * - 回答・自由記述の回答・選択肢の並びは、出題した問題についてのものだけで、選択肢のキーは重複しない。
+ *   自由記述の回答は、`MAX_TEXT_ANSWER_LENGTH` 文字まで。
  * 利用者の識別子(`sub`)は、ここに含められない(未知の項目として断る)。
  * 検査の指摘に、入力の値は含めない(場所と種類だけ)。
  */
@@ -46,6 +47,7 @@ export function apiResultSchema(nowMs: number) {
       .max(500)
       .refine(unique, "問題 ID に重複があります。"),
     answers: z.record(questionKey, choiceKeys),
+    textAnswers: z.record(questionKey, z.string().max(MAX_TEXT_ANSWER_LENGTH)).optional(),
     choiceOrder: z.record(questionKey, choiceKeys).optional(),
   }).superRefine((result, ctx) => {
     const asked = new Set(result.questionIds);
@@ -55,7 +57,7 @@ export function apiResultSchema(nowMs: number) {
         ctx.addIssue({ code: "custom", path: ["questionIds", index], message: "資格コードと合いません。" });
       }
     });
-    for (const field of ["answers", "choiceOrder"] as const) {
+    for (const field of ["answers", "textAnswers", "choiceOrder"] as const) {
       for (const id of Object.keys(result[field] ?? {})) {
         if (!asked.has(id)) ctx.addIssue({ code: "custom", path: [field], message: "出題にない問題です。" });
       }

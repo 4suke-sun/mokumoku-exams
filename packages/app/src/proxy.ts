@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { isAdmin, isAdminPath } from "@/lib/auth/admin.ts";
 import { guardDeps } from "@/lib/auth/deps.ts";
 import { authenticate, isPublicPath } from "@/lib/auth/guard.ts";
 import { isOriginVerified, ORIGIN_VERIFY_HEADER } from "@/lib/origin-verify.ts";
@@ -10,6 +11,8 @@ const NO_STORE = { "cache-control": "no-store" };
  * 1. CloudFront を通らないアクセス(Function URL への直接のアクセス)を、すべての経路で断る。
  * 2. ログインなしで開けるページ以外は、サーバー側で ID トークンを検証し、未ログインなら断る
  *    (画面はログイン画面へ、API は 401)。
+ * 3. 管理者の経路(`/admin`、`/api/admin` 以下)は、検証した ID トークンの `cognito:groups` に管理者のグループが
+ *    なければ断る(画面はホームへ、API は 403)。
  */
 export async function proxy(request: NextRequest) {
   if (
@@ -41,6 +44,14 @@ export async function proxy(request: NextRequest) {
     const login = new URL("/login", request.url);
     login.searchParams.set("next", `${pathname}${search}`);
     return NextResponse.redirect(login, { status: 307, headers: NO_STORE });
+  }
+
+  if (isAdminPath(pathname) && !isAdmin(auth.user)) {
+    const denied = pathname.startsWith("/api/")
+      ? NextResponse.json({ error: "forbidden" }, { status: 403, headers: NO_STORE })
+      : NextResponse.redirect(new URL("/", request.url), { status: 307, headers: NO_STORE });
+    for (const cookie of auth.setCookies) denied.headers.append("set-cookie", cookie);
+    return denied;
   }
 
   if (auth.setCookies.length === 0) return NextResponse.next();

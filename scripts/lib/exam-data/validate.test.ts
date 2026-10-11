@@ -45,6 +45,23 @@ const question = (n: number, overrides: Record<string, unknown> = {}) => ({
   ...overrides,
 });
 
+const freeText = (n: number, overrides: Record<string, unknown> = {}) => ({
+  questionId: `SAMPLE-${String(n).padStart(4, "0")}`,
+  examCode: "SAMPLE",
+  domain: "domain2",
+  questionType: "free-text",
+  questionText: `記述の設問 ${n}`,
+  rubric: {
+    criteria: [
+      { name: "観点 1", keywords: ["キーワード 1"], points: 60 },
+      { name: "観点 2", keywords: ["キーワード 2", "言い換え 2"], points: 40 },
+    ],
+    passingPoints: 60,
+  },
+  explanation: "解説",
+  ...overrides,
+});
+
 const questionsFile = (questions: unknown[] = [question(1), question(2)]) => ({ examCode: "SAMPLE", questions });
 const exams = (list: unknown[] = [published()]) => ({ exams: list });
 const files = (data: unknown = questionsFile()) => [{ name: "questions.sample.json", data }];
@@ -140,6 +157,26 @@ describe("問題のスキーマ", () => {
     expect(messages(question(1, { questionText: "  " }))).not.toEqual([]);
   });
 
+  it("自由記述の問題を通す_選択式の問題と同じファイルに混ぜられる", () => {
+    expect(QuestionsFileSchema.safeParse(questionsFile([question(1), freeText(2)])).success).toBe(true);
+  });
+
+  it("自由記述の問題_採点基準がない・選択肢や正解を持つ・観点の形が違うときは止める", () => {
+    const { rubric: _omit, ...withoutRubric } = freeText(1);
+    expect(messages(withoutRubric)).not.toEqual([]);
+    expect(messages(freeText(1, { choices: [{ key: "A", text: "a" }] }))).not.toEqual([]);
+    expect(messages(freeText(1, { correctAnswers: ["A"] }))).not.toEqual([]);
+    const badCriterion = { criteria: [{ name: "観点", keywords: ["a"], points: 0 }], passingPoints: 1 };
+    expect(messages(freeText(1, { rubric: badCriterion }))).not.toEqual([]);
+    const blankKeyword = { criteria: [{ name: "観点", keywords: [" "], points: 1 }], passingPoints: 1 };
+    expect(messages(freeText(1, { rubric: blankKeyword }))).not.toEqual([]);
+  });
+
+  it("選択式の問題に採点基準を付ける・未知の問題の種類_止める", () => {
+    expect(messages(question(1, { rubric: freeText(1).rubric }))).not.toEqual([]);
+    expect(messages(question(1, { questionType: "essay" }))).not.toEqual([]);
+  });
+
   it("ファイル内の ID の重複・同じ設問文・資格コードの不一致を止める", () => {
     const m = (qs: unknown[]) => {
       const r = QuestionsFileSchema.safeParse(questionsFile(qs));
@@ -189,7 +226,15 @@ describe("validateDataSet(ファイルをまたぐ検査)", () => {
 
   it("問題数が本番モードの出題数に足りないとき", () => {
     const errors = validateDataSet(exams([published({ officialQuestionCount: 3 })]), files());
-    expect(errors).toEqual(["questions.sample.json: 問題数が、本番モードの出題数(officialQuestionCount)に足りません"]);
+    expect(errors).toEqual([
+      "questions.sample.json: 選択式の問題数が、本番モードの出題数(officialQuestionCount)に足りません",
+    ]);
+  });
+
+  it("本番モードの出題数_自由記述の問題は数えない", () => {
+    const data = questionsFile([question(1), question(2), freeText(3)]);
+    expect(validateDataSet(exams([published({ officialQuestionCount: 2 })]), files(data))).toEqual([]);
+    expect(validateDataSet(exams([published({ officialQuestionCount: 3 })]), files(data))).toHaveLength(1);
   });
 
   it("ファイル名が不正・ファイル名のコードと examCode が違うとき", () => {

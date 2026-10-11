@@ -3,8 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useState } from "react";
-import { isActive, NAV_ITEMS } from "@/lib/nav.ts";
+import { isActive, navItems } from "@/lib/nav.ts";
 import { AuthStatus } from "./auth-status.tsx";
+import { useSession } from "./session-provider.tsx";
 import { ThemeToggle } from "./theme-toggle.tsx";
 
 export function SiteHeader() {
@@ -50,10 +51,12 @@ export function SiteHeader() {
 }
 
 function Nav({ pathname, vertical = false }: { pathname: string; vertical?: boolean }) {
+  const { state } = useSession();
+  const items = navItems(state.status === "signed-in" && state.isAdmin);
   return (
     <nav aria-label="主要メニュー">
       <ul className={vertical ? "space-y-2" : "flex items-center gap-4"}>
-        {NAV_ITEMS.map((item) => {
+        {items.map((item) => {
           const active = isActive(pathname, item.href);
           return (
             <li key={item.href}>

@@ -1,4 +1,4 @@
-import { answerFor, isCorrect, passLinePercent, score } from "./quiz.ts";
+import { isQuestionCorrect, passLinePercent, score } from "./quiz.ts";
 import type { Result } from "./storage.ts";
 import type { PublishedExam, Question } from "./types.ts";
 
@@ -50,7 +50,7 @@ export function summarize(
     const asked = result.questionIds.map((id) => byId.get(id)).filter((q): q is Question => q !== undefined);
     if (asked.length === 0) continue;
     for (const q of asked) seen.add(q.questionId);
-    const { total, correct, percent } = score(asked, result.answers);
+    const { total, correct, percent } = score(asked, result.answers, result.textAnswers);
     recent.push({ finishedAt: result.finishedAt, total, correct, percent });
   }
   const answered = recent.reduce((sum, r) => sum + r.total, 0);
@@ -89,7 +89,7 @@ export function domainBreakdown(results: readonly Result[], questions: readonly 
       if (!question) continue;
       const own = tally.get(question.domain) ?? { answered: 0, correct: 0 };
       own.answered++;
-      if (isCorrect(question, answerFor(result.answers, id))) own.correct++;
+      if (isQuestionCorrect(question, result.answers, result.textAnswers)) own.correct++;
       tally.set(question.domain, own);
     }
   }

@@ -96,20 +96,26 @@ const ReferenceSchema = z.strictObject({
   url: z.string().regex(/^https?:\/\/\S+$/, "http(s) で始まる URL ではありません"),
 });
 
-export const QuestionSchema = z
+/** 問題の種類によらない項目 */
+const questionBase = {
+  questionId: z.string().regex(/^[A-Z][A-Z0-9]{1,15}-\d{4}$/),
+  examCode: z.string().regex(EXAM_CODE),
+  domain: z.string().regex(DOMAIN_CODE),
+  difficulty: z.enum(["easy", "medium", "hard"]).optional(),
+  questionText: text,
+  explanation: text,
+  supplement: text.optional(),
+  references: z.array(ReferenceSchema).optional(),
+  tags: z.array(text).optional(),
+};
+
+/** 択一・複数選択の問題 */
+export const ChoiceQuestionSchema = z
   .strictObject({
-    questionId: z.string().regex(/^[A-Z][A-Z0-9]{1,15}-\d{4}$/),
-    examCode: z.string().regex(EXAM_CODE),
-    domain: z.string().regex(DOMAIN_CODE),
+    ...questionBase,
     questionType: z.enum(["single", "multiple"]),
-    difficulty: z.enum(["easy", "medium", "hard"]).optional(),
-    questionText: text,
     choices: z.array(ChoiceSchema).min(2).max(10),
     correctAnswers: z.array(z.string()).min(1),
-    explanation: text,
-    supplement: text.optional(),
-    references: z.array(ReferenceSchema).optional(),
-    tags: z.array(text).optional(),
   })
   .superRefine((q, ctx) => {
     const keys = q.choices.map((c) => c.key);
@@ -132,6 +138,28 @@ export const QuestionSchema = z
       ctx.addIssue({ code: "custom", path: ["choices"], message: "同じ文言の選択肢があります" });
     }
   });
+
+/** 採点基準の観点。キーワードのどれかを回答が含めば、観点を満たし、配点を得る。 */
+const CriterionSchema = z.strictObject({
+  name: text,
+  keywords: z.array(text),
+  points: z.int().positive(),
+});
+
+/** 自由記述の採点基準。満たした観点の配点の合計が、合格点以上なら正解。 */
+export const RubricSchema = z.strictObject({
+  criteria: z.array(CriterionSchema),
+  passingPoints: z.int().positive(),
+});
+
+/** 自由記述の問題。選択肢はなく、文章で答える。 */
+export const FreeTextQuestionSchema = z.strictObject({
+  ...questionBase,
+  questionType: z.literal("free-text"),
+  rubric: RubricSchema,
+});
+
+export const QuestionSchema = z.discriminatedUnion("questionType", [ChoiceQuestionSchema, FreeTextQuestionSchema]);
 
 export const QuestionsFileSchema = z
   .strictObject({
@@ -172,4 +200,7 @@ export type Exam = z.infer<typeof ExamSchema>;
 export type PublishedExam = z.infer<typeof PublishedExamSchema>;
 export type ExamsFile = z.infer<typeof ExamsFileSchema>;
 export type Question = z.infer<typeof QuestionSchema>;
+export type ChoiceQuestion = z.infer<typeof ChoiceQuestionSchema>;
+export type FreeTextQuestion = z.infer<typeof FreeTextQuestionSchema>;
+export type Rubric = z.infer<typeof RubricSchema>;
 export type QuestionsFile = z.infer<typeof QuestionsFileSchema>;

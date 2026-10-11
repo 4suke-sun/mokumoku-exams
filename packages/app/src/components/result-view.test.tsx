@@ -210,3 +210,52 @@ describe("ResultView のアカウントへの保存", () => {
     expect(screen.queryByText(/この端末にだけ残っている記録/)).toBeNull();
   });
 });
+
+describe("ResultView の自由記述", () => {
+  const freeText = {
+    questionId: "TEST-0004",
+    examCode: "TEST",
+    domain: "domain1",
+    questionType: "free-text",
+    questionText: "記述の問題文",
+    rubric: {
+      criteria: [
+        { name: "保存の観点", keywords: ["保存"], points: 60 },
+        { name: "場所の観点", keywords: ["S3"], points: 40 },
+      ],
+      passingPoints: 60,
+    },
+    explanation: "記述の解説",
+  } as Question;
+
+  it("満たした観点と点数_回答と得点を表示し_合格点以上なら正解として数える", async () => {
+    saveResult(browserStore(), {
+      examCode: "TEST",
+      questionIds: ["TEST-0004"],
+      answers: {},
+      textAnswers: { "TEST-0004": "ファイルを保存する" },
+      finishedAt: "2026-10-10T00:00:00.000Z",
+    });
+    render(<ResultView exam={exam} questions={[freeText]} />);
+    expect(await screen.findByRole("img", { name: "正答率 100%" })).toBeTruthy();
+    expect(screen.getByText("ファイルを保存する")).toBeTruthy();
+    expect(screen.getByText("○ 満たしている")).toBeTruthy();
+    expect(screen.getByText("× 満たしていない")).toBeTruthy();
+    expect(screen.getByText("60 / 60 点")).toBeTruthy();
+    expect(screen.getByText("0 / 40 点")).toBeTruthy();
+    expect(screen.getByText("得点: 60 / 100 点(合格点 60 点)")).toBeTruthy();
+  });
+
+  it("回答がない_未回答として表示し_不正解として数える", async () => {
+    saveResult(browserStore(), {
+      examCode: "TEST",
+      questionIds: ["TEST-0004"],
+      answers: {},
+      finishedAt: "2026-10-10T00:00:00.000Z",
+    });
+    render(<ResultView exam={exam} questions={[freeText]} />);
+    expect(await screen.findByRole("img", { name: "正答率 0%" })).toBeTruthy();
+    expect(screen.getByText("未回答")).toBeTruthy();
+    expect(screen.getByText("× 不正解")).toBeTruthy();
+  });
+});

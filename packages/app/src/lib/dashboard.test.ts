@@ -159,4 +159,23 @@ describe("分野別の正答率", () => {
     const results = [result(1, { "SAMPLE-0099": ["A"], "SAMPLE-0005": ["B"] })];
     expect(domainBreakdown(results, mixed)).toEqual([{ domain: "domain3", answered: 1, correct: 0, percent: 0 }]);
   });
+
+  it("自由記述の問題_採点基準の判定で正解に数える", () => {
+    const freeText = {
+      questionId: "SAMPLE-0009",
+      examCode: "SAMPLE",
+      domain: "domain2",
+      questionType: "free-text",
+      questionText: "記述",
+      rubric: { criteria: [{ name: "観点", keywords: ["止まれ"], points: 10 }], passingPoints: 10 },
+      explanation: "解説",
+    } as Question;
+    const written = (minute: number, text: string): Result => ({
+      ...result(minute, {}, ["SAMPLE-0009"]),
+      textAnswers: { "SAMPLE-0009": text },
+    });
+    expect(domainBreakdown([written(2, "赤は止まれ"), written(1, "赤は進め")], [freeText])).toEqual([
+      { domain: "domain2", answered: 2, correct: 1, percent: 50 },
+    ]);
+  });
 });

@@ -1,15 +1,18 @@
 import { readdirSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
+import { headers } from "next/headers";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import AdminLayout from "@/app/admin/layout.tsx";
 import * as changePasswordRoute from "@/app/api/auth/change-password/route.ts";
 import * as bookmarksRoute from "@/app/api/history/bookmarks/route.ts";
 import * as daysRoute from "@/app/api/history/days/route.ts";
 import * as goalRoute from "@/app/api/history/goal/route.ts";
 import * as historyRoute from "@/app/api/history/results/route.ts";
 import * as reviewRoute from "@/app/api/history/review/route.ts";
-import { FAKE_USER_EMAIL, FAKE_USER_PHRASE } from "@/lib/auth/fake.ts";
+import { isAdminPath } from "@/lib/auth/admin.ts";
+import { FAKE_ADMIN_EMAIL, FAKE_ADMIN_PHRASE, FAKE_USER_EMAIL, FAKE_USER_PHRASE } from "@/lib/auth/fake.ts";
 import { isPublicPath, PUBLIC_AUTH_API_PATHS } from "@/lib/auth/guard.ts";
 import { getAuthProvider } from "@/lib/auth/index.ts";
 import { withTokenCookies } from "@/lib/auth/session.ts";
@@ -19,6 +22,9 @@ import { proxy } from "./proxy.ts";
 // 認可の網羅テスト。「ログインなしで開けるもの」と「ログインが要るもの」を、一覧として固定する。
 // 新しい画面や API を足したときは、この一覧に足すまでテストが落ちる(保護するかどうかを、意識して決めるため)。
 // 一覧に載せない限り、新しい経路は保護される(proxy は許可リスト方式)。
+
+// 管理者の画面のレイアウトが読む、リクエストのヘッダー(テストごとに Cookie を差し替える)
+vi.mock("next/headers", () => ({ headers: vi.fn() }));
 
 const APP_DIR = join(dirname(fileURLToPath(import.meta.url)), "app");
 
@@ -45,6 +51,7 @@ const PUBLIC_PAGES = ["/forgot-password", "/login"];
 const PROTECTED_PAGES = [
   "/",
   "/account",
+  "/admin",
   "/bookmarks",
   "/exams",
   "/exams/sample",
@@ -55,6 +62,8 @@ const PROTECTED_PAGES = [
   "/exams/sample/study/sample",
   "/help",
 ];
+/** 保護される画面のうち、管理者だけが開けるもの */
+const ADMIN_PAGES = ["/admin"];
 const PUBLIC_APIS = [
   "/api/auth/forgot-password",
   "/api/auth/login",
@@ -97,6 +106,12 @@ describe("経路の一覧", () => {
     const open = allPaths.filter((path) => isPublicPath(path)).sort();
     expect(open).toEqual([...PUBLIC_PAGES, ...PUBLIC_APIS].sort());
     expect(new Set(PUBLIC_AUTH_API_PATHS)).toEqual(new Set(PUBLIC_APIS));
+  });
+
+  it("管理者の経路_一覧に挙げた画面だけで_ほかの画面と API は含まない", () => {
+    const allPaths = [...routesOf("page.tsx"), ...routesOf("route.ts")];
+    expect(allPaths.filter((path) => isAdminPath(path)).sort()).toEqual(ADMIN_PAGES);
+    for (const path of ADMIN_PAGES) expect(PROTECTED_PAGES).toContain(path);
   });
 
   it("保護される API_公開の一覧に似た経路でも_公開にならない", () => {
@@ -340,5 +355,84 @@ describe("認可: 他人のデータに触れない", () => {
     // ログインしていない人には、何も見えない
     expect((await goalRoute.GET(request("/api/history/goal?examCode=SAMPLE"))).status).toBe(401);
     expect((await daysRoute.GET(request("/api/history/days?examCode=SAMPLE"))).status).toBe(401);
+  });
+});
+
+describe("認可: 管理者だけが開ける", () => {
+  beforeEach(() => {
+    vi.stubEnv("AUTH_FAKE", "1");
+  });
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.mocked(headers).mockReset();
+  });
+
+  async function cookieOf(email: string, phrase: string): Promise<string> {
+    const signedIn = await getAuthProvider().signIn(email, phrase);
+    if (signedIn.kind !== "signed-in") throw new Error("unexpected");
+    return withTokenCookies(null, signedIn.tokens);
+  }
+  const learner = () => cookieOf(FAKE_USER_EMAIL, FAKE_USER_PHRASE);
+  const admin = () => cookieOf(FAKE_ADMIN_EMAIL, FAKE_ADMIN_PHRASE);
+  const passed = (response: Response) => response.status === 200 && response.headers.get("x-middleware-next") === "1";
+
+  it("管理者_入口(proxy)を通る", async () => {
+    const cookie = await admin();
+    for (const path of [...ADMIN_PAGES, "/admin/users"]) {
+      expect(passed(await proxy(request(path, { cookie }))), path).toBe(true);
+    }
+  });
+
+  it("管理者でない利用者_管理者の画面はホームへ移し_管理者の API は 403 で断る", async () => {
+    const cookie = await learner();
+    for (const path of [...ADMIN_PAGES, "/admin/users"]) {
+      const response = await proxy(request(path, { cookie }));
+      expect(response.status, path).toBe(307);
+      expect(new URL(response.headers.get("location") ?? "").pathname).toBe("/");
+    }
+    for (const method of ["GET", "POST", "PUT", "PATCH", "DELETE"]) {
+      const response = await proxy(request("/api/admin/users", { cookie, method }));
+      expect(response.status, method).toBe(403);
+      expect(await response.json()).toEqual({ error: "forbidden" });
+    }
+  });
+
+  it("管理者でない利用者_経路の書き方を変えても通らない", async () => {
+    const cookie = await learner();
+    for (const path of ["/Admin", "/%61dmin", "//admin", "/admin%2Fusers", "/api//admin/users", "/API/admin/users"]) {
+      expect(passed(await proxy(request(path, { cookie }))), path).toBe(false);
+    }
+  });
+
+  it("管理者でない利用者が_管理者だと申告する_問い合わせ・ヘッダー・Cookie のどれも使われない", async () => {
+    const own = await learner();
+    const claims = [
+      request("/admin?admin=1&groups=admins&cognito:groups=admins", { cookie: own }),
+      new NextRequest("http://localhost/admin", {
+        headers: { cookie: own, "x-admin": "1", "x-user-groups": "admins", "x-amzn-oidc-groups": "admins" },
+      }),
+      request("/admin", { cookie: `${own}; cognito:groups=admins; groups=admins; isAdmin=true` }),
+    ];
+    for (const claim of claims) expect(passed(await proxy(claim))).toBe(false);
+  });
+
+  it("管理者の画面の本体(レイアウト)_入口を通らなくても_管理者でなければホームへ移す(二重の防御)", async () => {
+    const render = async (cookie: string | null) => {
+      vi.mocked(headers).mockResolvedValue(new Headers(cookie ? { cookie } : {}) as never);
+      return AdminLayout({ children: "管理者の画面" });
+    };
+    await expect(render(null)).rejects.toThrow("NEXT_REDIRECT");
+    await expect(render("mokumoku_id=forged")).rejects.toThrow("NEXT_REDIRECT");
+    await expect(render(await learner())).rejects.toThrow("NEXT_REDIRECT");
+    expect(await render(await admin())).toBe("管理者の画面");
+  });
+
+  it("管理者の画面の本体(レイアウト)_認証の設定がない_管理者として扱わない(通す側には倒さない)", async () => {
+    const cookie = await admin();
+    vi.stubEnv("AUTH_FAKE", "");
+    vi.stubEnv("COGNITO_CLIENT_ID", "");
+    vi.stubEnv("COGNITO_USER_POOL_ID", "");
+    vi.mocked(headers).mockResolvedValue(new Headers({ cookie }) as never);
+    await expect(AdminLayout({ children: "管理者の画面" })).rejects.toThrow("NEXT_REDIRECT");
   });
 });

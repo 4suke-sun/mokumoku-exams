@@ -117,7 +117,7 @@ export function validateDataSet(exams: unknown | null, questionFiles: DataFile[]
 /** 1 つの資格の問題を、資格マスタと照合する(分野の存在、本番モードの出題数)。 */
 function checkAgainstExam(
   file: string,
-  questions: { questionId: string; domain: string }[],
+  questions: { questionId: string; domain: string; questionType: string }[],
   exam: PublishedExam,
 ): string[] {
   const errors: string[] = [];
@@ -127,8 +127,10 @@ function checkAgainstExam(
       errors.push(`${file}: questions[${i}](${q.questionId}).domain: 資格マスタにない分野です`);
     }
   });
-  if (questions.length < exam.officialQuestionCount) {
-    errors.push(`${file}: 問題数が、本番モードの出題数(officialQuestionCount)に足りません`);
+  // 本番モードは、選択式の問題だけから出題する(自由記述は含めない)
+  const choiceCount = questions.filter((q) => q.questionType !== "free-text").length;
+  if (choiceCount < exam.officialQuestionCount) {
+    errors.push(`${file}: 選択式の問題数が、本番モードの出題数(officialQuestionCount)に足りません`);
   }
   return errors;
 }

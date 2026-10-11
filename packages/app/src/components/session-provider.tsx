@@ -8,7 +8,8 @@ import { refreshDelayMs } from "@/lib/auth/refresh.ts";
 export type SessionState =
   | { status: "loading" }
   | { status: "signed-out" }
-  | { status: "signed-in"; email: string | null; expiresAt: number | null };
+  // isAdmin: 管理者のナビゲーションを出すかどうか(表示のためだけ。認可はサーバーが行う)
+  | { status: "signed-in"; email: string | null; expiresAt: number | null; isAdmin: boolean };
 
 type Value = { state: SessionState; reload: () => Promise<void>; signOut: () => Promise<void> };
 
@@ -34,7 +35,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
     if (info === null) return;
     if (info.signedIn) {
       wasSignedIn.current = true;
-      setState({ status: "signed-in", email: info.email, expiresAt: info.expiresAt });
+      setState({ status: "signed-in", email: info.email, expiresAt: info.expiresAt, isAdmin: info.isAdmin === true });
     } else {
       setState({ status: "signed-out" });
       if (wasSignedIn.current) {
