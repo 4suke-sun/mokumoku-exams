@@ -24,6 +24,13 @@ describe("NAV_ITEMS", () => {
     expect(NAV_ITEMS.find((item) => item.href === "/help")).toMatchObject({ label: "使い方", ready: true });
   });
 
+  it("リリースノートのページ_押せる状態で並んでいる", () => {
+    expect(NAV_ITEMS.find((item) => item.href === "/release-notes")).toMatchObject({
+      label: "リリースノート",
+      ready: true,
+    });
+  });
+
   it("リンク先が重複しない", () => {
     const hrefs = NAV_ITEMS.map((item) => item.href);
     expect(new Set(hrefs).size).toBe(hrefs.length);

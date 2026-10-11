@@ -1,0 +1,9 @@
+import type { MetadataRoute } from "next";
+import { sitemapOf, siteUrl } from "@/lib/site.ts";
+
+// 公開の URL(SITE_URL)を、ビルドのときではなく、実行の環境から読む
+export const dynamic = "force-dynamic";
+
+export default function sitemap(): MetadataRoute.Sitemap {
+  return sitemapOf(siteUrl());
+}

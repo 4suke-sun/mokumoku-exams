@@ -19,8 +19,9 @@ type Options = {
 /**
  * アプリのビルド成果物から、Lambda に載せるディレクトリ(lambda)と、S3 に置く静的ファイルのディレクトリ(static)を作る。
  *
- * - lambda: `.next/standalone` と、起動用の `run.sh`(Lambda Web Adapter が起動する)
- * - static: `/_next/static/*` と `public/*` の配信元(CloudFront が S3 から配る)
+ * - lambda: `.next/standalone` と、起動用の `run.sh`(Lambda Web Adapter が起動する)。`public/*` も入れ、Next のサーバーが配る
+ *   (マニフェストのアイコンや Service Worker。CloudFront は `/_next/static/*` 以外を Lambda へ渡す)
+ * - static: `/_next/static/*` の配信元(CloudFront が S3 から配る)
  */
 export function buildLambdaAsset({ appDir, outDir }: Options): { lambdaDir: string; staticDir: string } {
   const standalone = join(appDir, ".next", "standalone");
@@ -40,7 +41,7 @@ export function buildLambdaAsset({ appDir, outDir }: Options): { lambdaDir: stri
   mkdirSync(join(staticDir, "_next"), { recursive: true });
   cpSync(nextStatic, join(staticDir, "_next", "static"), { recursive: true });
   const publicDir = join(appDir, "public");
-  if (existsSync(publicDir)) cpSync(publicDir, staticDir, { recursive: true });
+  if (existsSync(publicDir)) cpSync(publicDir, join(lambdaDir, APP_DIR_IN_STANDALONE, "public"), { recursive: true });
 
   return { lambdaDir, staticDir };
 }

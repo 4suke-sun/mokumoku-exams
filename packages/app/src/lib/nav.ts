@@ -7,7 +7,7 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "使い方", href: "/help", ready: true },
   { label: "履歴", href: "/history", ready: false },
   { label: "ブックマーク", href: "/bookmarks", ready: true },
-  { label: "リリースノート", href: "/release-notes", ready: false },
+  { label: "リリースノート", href: "/release-notes", ready: true },
 ];
 
 /** 管理者にだけ出す項目(使い方のページからは、リンクしない) */

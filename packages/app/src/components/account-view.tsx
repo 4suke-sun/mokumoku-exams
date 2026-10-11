@@ -6,10 +6,12 @@ import { postJson } from "@/lib/auth/client.ts";
 import { PASSWORD_RULE_TEXT, passwordProblem } from "@/lib/auth/password.ts";
 import { browserStore, DEFAULT_SETTINGS, loadSettings, saveSettings } from "@/lib/storage.ts";
 import { Field, FormError, SubmitButton } from "./form-parts.tsx";
+import { PushSettings } from "./push-settings.tsx";
 import { useSession } from "./session-provider.tsx";
 import { ThemeToggle } from "./theme-toggle.tsx";
 
-export function AccountView() {
+/** `pushPublicKey` は、通知の購読に使う VAPID の公開鍵。設定されていなければ null。 */
+export function AccountView({ pushPublicKey = null }: { pushPublicKey?: string | null }) {
   const { state, reload } = useSession();
   const [previous, setPrevious] = useState("");
   const [proposed, setProposed] = useState("");
@@ -131,6 +133,8 @@ export function AccountView() {
           選択肢の並びをシャッフルする
         </label>
       </div>
+
+      <PushSettings publicKey={pushPublicKey} canSendTest={state.isAdmin} />
     </section>
   );
 }

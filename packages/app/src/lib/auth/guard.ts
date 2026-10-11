@@ -47,16 +47,34 @@ export const PUBLIC_AUTH_API_PATHS: ReadonlySet<string> = new Set(
   ),
 );
 
+/** ログインなしで開ける画面。sitemap に載せるのも、この画面だけ。 */
+export const PUBLIC_PAGE_PATHS: ReadonlySet<string> = new Set(["/login", "/forgot-password"]);
+
+/**
+ * ログインなしで取れるファイル。ブラウザや検索エンジンが Cookie なしで取りに来るもの(マニフェスト、アイコン、
+ * robots・sitemap、通知を受け取る Service Worker)を、1 つずつ列挙する。どれも秘密の情報を含まない。
+ */
+export const PUBLIC_FILE_PATHS: ReadonlySet<string> = new Set([
+  "/manifest.webmanifest",
+  "/robots.txt",
+  "/sitemap.xml",
+  "/sw.js",
+  "/icons/icon.svg",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+  "/icons/apple-touch-icon.png",
+]);
+
 /**
  * ログインなしで開けるか。公開する経路は、ログインに必要な 2 つの画面、認証の API(列挙したものだけ)、
- * Next の静的ファイル(`/_next/`)に限る。大文字小文字は区別し、末尾のスラッシュや `..`・`%`・`\` を含むものは公開しない。
+ * 列挙したファイル、Next の静的ファイル(`/_next/`)に限る。大文字小文字は区別し、末尾のスラッシュや `..`・`%`・`\` を含むものは公開しない。
  */
 export function isPublicPath(pathname: string): boolean {
   if (pathname.includes("..") || pathname.includes("%") || pathname.includes("\\")) return false;
   return (
-    pathname === "/login" ||
-    pathname === "/forgot-password" ||
+    PUBLIC_PAGE_PATHS.has(pathname) ||
     PUBLIC_AUTH_API_PATHS.has(pathname) ||
+    PUBLIC_FILE_PATHS.has(pathname) ||
     pathname.startsWith("/_next/")
   );
 }

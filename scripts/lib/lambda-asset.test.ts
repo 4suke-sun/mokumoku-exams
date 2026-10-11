@@ -39,11 +39,13 @@ describe("buildLambdaAsset", () => {
     expect(existsSync(join(staticDir, "_next/static/chunks/a.js"))).toBe(true);
   });
 
-  it("public がある_静的ファイルの直下に置く", () => {
+  it("public がある_Lambda のアプリの下に置き_Next のサーバーが配る", () => {
     fakeBuild();
-    write(join(appDir, "public/robots.txt"), "User-agent: *");
-    const { staticDir } = buildLambdaAsset({ appDir, outDir });
-    expect(existsSync(join(staticDir, "robots.txt"))).toBe(true);
+    write(join(appDir, "public/sw.js"), "// worker");
+    const { lambdaDir, staticDir } = buildLambdaAsset({ appDir, outDir });
+    expect(existsSync(join(lambdaDir, "packages/app/public/sw.js"))).toBe(true);
+    // CloudFront は /_next/static/* だけを S3 から配るので、S3 には置かない
+    expect(existsSync(join(staticDir, "sw.js"))).toBe(false);
   });
 
   it("2 回実行する_前回の出力を残さない", () => {

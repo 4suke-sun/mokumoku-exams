@@ -1,4 +1,4 @@
-import { DeleteCommand, GetCommand, PutCommand, QueryCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { DeleteCommand, GetCommand, PutCommand, QueryCommand, ScanCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import type { DocumentSender } from "./repository.ts";
 
 /**
@@ -24,8 +24,9 @@ function applyUpdate(
   }
 }
 
-/** DynamoDB の Put / Get / Update / Query / Delete だけを、メモリ上で真似る。送られた命令も記録する。 */
-export function fakeTable() {
+/** DynamoDB の Put / Get / Update / Query / Delete / Scan だけを、メモリ上で真似る。送られた命令も記録する。 */
+/** `scanPageSize` は、スキャンの 1 回で読む数(本物の 1MB ごとのページ分けの代わり)。 */
+export function fakeTable(options: { scanPageSize?: number } = {}) {
   const items = new Map<string, Record<string, unknown>>();
   const sent: unknown[] = [];
   const client: DocumentSender = {
@@ -67,6 +68,21 @@ export function fakeTable() {
         if (command.input.ScanIndexForward === false) found = found.reverse();
         if (command.input.Limit) found = found.slice(0, command.input.Limit);
         return { Items: found };
+      }
+      if (command instanceof ScanCommand) {
+        // SK の接頭辞での絞り込みと、ページ分けだけを真似る(1 回で読む数は、絞り込みの前に数える)
+        const values = command.input.ExpressionAttributeValues as Record<string, string>;
+        const all = [...items.values()].sort((a, b) => `${a.PK}|${a.SK}`.localeCompare(`${b.PK}|${b.SK}`));
+        const start = command.input.ExclusiveStartKey as Record<string, string> | undefined;
+        const from = start ? all.findIndex((i) => i.PK === start.PK && i.SK === start.SK) + 1 : 0;
+        const size = command.input.Limit ?? options.scanPageSize;
+        const page = size ? all.slice(from, from + size) : all.slice(from);
+        const last = page.at(-1);
+        const more = last !== undefined && from + page.length < all.length;
+        return {
+          Items: page.filter((i) => String(i.SK).startsWith(values[":prefix"] as string)),
+          ...(more ? { LastEvaluatedKey: { PK: last.PK, SK: last.SK } } : {}),
+        };
       }
       throw new Error("unexpected command");
     },
