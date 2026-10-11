@@ -14,6 +14,7 @@ beforeEach(() => {
 afterEach(() => {
   vi.useRealTimers();
   vi.unstubAllGlobals();
+  document.documentElement.removeAttribute("data-style");
 });
 
 describe("ScoreRing", () => {
@@ -45,5 +46,14 @@ describe("ScoreRing", () => {
       vi.advanceTimersByTime(2000);
     });
     expect(container.textContent).toBe("80%");
+  });
+
+  it("シンプル_円を描かず_最初から最終の値を表示する", () => {
+    mockMotionPreference(false);
+    document.documentElement.setAttribute("data-style", "simple");
+    const { container } = render(<ScoreRing percent={80} reached />);
+    expect(container.textContent).toBe("80%");
+    expect(container.querySelector("svg")).toBeNull();
+    expect(screen.getByRole("img", { name: "正答率 80%" })).toBeTruthy();
   });
 });

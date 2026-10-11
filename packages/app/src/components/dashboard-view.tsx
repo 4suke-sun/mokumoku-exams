@@ -5,6 +5,7 @@ import { useEffect, useId, useState } from "react";
 import { EmptyState } from "@/components/empty-state.tsx";
 import { ScoreRing } from "@/components/score-ring.tsx";
 import { type DashboardSummary, type DomainStat, domainBreakdown, summarize } from "@/lib/dashboard.ts";
+import { domainColorClasses } from "@/lib/domain-color.ts";
 import {
   fetchBookmarks,
   fetchDays,
@@ -356,22 +357,25 @@ function DomainList({ exam, domains }: { exam: PublishedExam; domains: DomainSta
       <h2 className="text-lg font-bold">分野別の正答率</h2>
       <p className="text-sm text-muted">直近の結果から、正答率の低い分野を先に並べます。</p>
       <ul className="space-y-1 text-sm">
-        {listed.map((stat) => (
-          <li
-            key={stat.domain}
-            className="flex flex-wrap items-center justify-between gap-2 rounded border border-line bg-surface p-2"
-          >
-            <span>{names.get(stat.domain)}</span>
-            <span className="flex items-center gap-3">
-              <span>
-                {stat.correct} / {stat.answered} 問({stat.percent}%)
+        {listed.map((stat) => {
+          const color = domainColorClasses(exam.domains, stat.domain);
+          return (
+            <li
+              key={stat.domain}
+              className={`flex flex-wrap items-center justify-between gap-2 rounded border border-l-4 border-line bg-surface p-2 ${color?.border ?? ""}`}
+            >
+              <span className={`font-bold ${color?.text ?? ""}`}>{names.get(stat.domain)}</span>
+              <span className="flex items-center gap-3">
+                <span>
+                  {stat.correct} / {stat.answered} 問({stat.percent}%)
+                </span>
+                <Link href={domainSelectHref(exam.examCode, stat.domain)} className="text-primary hover:underline">
+                  この分野を解く
+                </Link>
               </span>
-              <Link href={domainSelectHref(exam.examCode, stat.domain)} className="text-primary hover:underline">
-                この分野を解く
-              </Link>
-            </span>
-          </li>
-        ))}
+            </li>
+          );
+        })}
       </ul>
     </div>
   );

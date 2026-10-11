@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { BookmarkError, BookmarkToggle, useBookmarks } from "@/components/bookmark-toggle.tsx";
+import { Confetti } from "@/components/confetti.tsx";
 import { EmptyState } from "@/components/empty-state.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
 import { ScoreRing } from "@/components/score-ring.tsx";
@@ -184,6 +185,7 @@ export function ResultView({ exam, questions }: Props) {
         <p className="text-sm text-muted">
           {exam.name} / {formatDate(latest.finishedAt)}
         </p>
+        <Confetti reached={reached} />
         <div className="flex flex-col items-center gap-5 rounded-lg border border-line bg-surface p-5 sm:flex-row">
           <ScoreRing percent={result.percent} reached={reached} />
           <div>

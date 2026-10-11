@@ -12,6 +12,13 @@
   --correct: #166534;
   --incorrect: #b91c1c;
   --warn: #92400e;
+  /* 分野の色(lib/domain-color.ts)。文字の色に使えるよう、背景と面の両方に 4.5:1 以上 */
+  --domain-1: #0f766e;
+  --domain-2: #7e22ce;
+  --domain-3: #9a3412;
+  --domain-4: #be185d;
+  --domain-5: #0369a1;
+  --domain-6: #4338ca;
   color-scheme: light;
 }
 
@@ -27,6 +34,12 @@
   --correct: #86efac;
   --incorrect: #fca5a5;
   --warn: #fcd34d;
+  --domain-1: #5eead4;
+  --domain-2: #d8b4fe;
+  --domain-3: #fdba74;
+  --domain-4: #f9a8d4;
+  --domain-5: #7dd3fc;
+  --domain-6: #a5b4fc;
   color-scheme: dark;
 }
 
@@ -42,6 +55,12 @@
     --correct: #86efac;
     --incorrect: #fca5a5;
     --warn: #fcd34d;
+    --domain-1: #5eead4;
+    --domain-2: #d8b4fe;
+    --domain-3: #fdba74;
+    --domain-4: #f9a8d4;
+    --domain-5: #7dd3fc;
+    --domain-6: #a5b4fc;
     color-scheme: dark;
   }
 }
@@ -57,6 +76,12 @@
   --color-correct: var(--correct);
   --color-incorrect: var(--incorrect);
   --color-warn: var(--warn);
+  --color-domain-1: var(--domain-1);
+  --color-domain-2: var(--domain-2);
+  --color-domain-3: var(--domain-3);
+  --color-domain-4: var(--domain-4);
+  --color-domain-5: var(--domain-5);
+  --color-domain-6: var(--domain-6);
 }
 
 /* キーボードで操作するとき、フォーカスの位置が常に見えるようにする(マウスのクリックでは出ない) */
@@ -82,6 +107,43 @@ body {
 
 .progress-bar {
   animation: progress 8s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+}
+
+/* 紙吹雪(components/confetti.tsx)。上から下へ、回りながら落ちる */
+@keyframes confetti-fall {
+  from {
+    transform: translateY(-10vh) rotate(0deg);
+  }
+  to {
+    transform: translateY(110vh) rotate(var(--confetti-rotate, 360deg));
+  }
+}
+
+.confetti-piece {
+  position: absolute;
+  top: 0;
+  width: 8px;
+  height: 12px;
+  border-radius: 2px;
+  transform: translateY(-10vh);
+  animation-name: confetti-fall;
+  animation-timing-function: cubic-bezier(0.3, 0.6, 0.6, 1);
+  animation-fill-mode: both;
+}
+
+/* 画面スタイルがシンプルのとき: 角の丸みを抑え、動きを止める(演出の有無は、部品の側でも判定する) */
+:root[data-style="simple"] {
+  --radius: 0.125rem;
+  --radius-sm: 0.125rem;
+  --radius-md: 0.125rem;
+  --radius-lg: 0.125rem;
+}
+
+:root[data-style="simple"] *,
+:root[data-style="simple"] *::before,
+:root[data-style="simple"] *::after {
+  animation: none;
+  transition: none;
 }
 
 /* 動きを減らす設定のときは、演出を止める(レイヤーの外に書くので、ユーティリティより優先される) */

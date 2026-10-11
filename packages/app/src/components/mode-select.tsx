@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useState } from "react";
+import { domainColorClasses } from "@/lib/domain-color.ts";
 import { fetchBookmarks, fetchReview } from "@/lib/history/client.ts";
 import { domainCounts, newSession, requestedDomains, sessionProgress, shuffle } from "@/lib/quiz.ts";
 import {
@@ -236,20 +237,26 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
       <fieldset className="space-y-2">
         <legend className="text-lg font-bold">分野</legend>
         <p className="text-sm text-muted">選ばないときは、すべての分野から出題します。</p>
-        {exam.domains.map((domain) => (
-          <label key={domain.code} className="flex items-center gap-3 rounded-md border border-line bg-surface p-3">
-            <input
-              type="checkbox"
-              className="size-5"
-              checked={domains.includes(domain.code)}
-              onChange={() => toggleDomain(domain.code)}
-            />
-            <span>
-              {domain.name}
-              <span className="ml-2 text-sm text-muted">({perDomain[domain.code] ?? 0} 問)</span>
-            </span>
-          </label>
-        ))}
+        {exam.domains.map((domain) => {
+          const color = domainColorClasses(exam.domains, domain.code);
+          return (
+            <label
+              key={domain.code}
+              className={`flex items-center gap-3 rounded-md border border-l-4 border-line bg-surface p-3 ${color?.border ?? ""}`}
+            >
+              <input
+                type="checkbox"
+                className="size-5"
+                checked={domains.includes(domain.code)}
+                onChange={() => toggleDomain(domain.code)}
+              />
+              <span>
+                <span className={`font-bold ${color?.text ?? ""}`}>{domain.name}</span>
+                <span className="ml-2 text-sm text-muted">({perDomain[domain.code] ?? 0} 問)</span>
+              </span>
+            </label>
+          );
+        })}
       </fieldset>
 
       <label className="flex items-center gap-3 rounded-md border border-line bg-surface p-3">
