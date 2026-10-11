@@ -1,11 +1,16 @@
 import { describe, expect, it } from "vitest";
 import {
+  ALLOWED_REFERENCE_HOSTS,
   CRITERION_NAME_MAX,
+  containsUrl,
   ExamsFileSchema,
   KEYWORD_MAX,
   normalizeKeyword,
   normalizeText,
   QuestionsFileSchema,
+  REFERENCE_TITLE_MAX,
+  REFERENCES_MAX,
+  referenceUrlProblem,
 } from "./schema.ts";
 import { validateDataSet } from "./validate.ts";
 
@@ -104,6 +109,18 @@ describe("資格マスタのスキーマ", () => {
     expect(messages(published({ domains: dup }))).toContain("分野のコードが重複しています");
   });
 
+  it("資格マスタの表示名・分野名・添える文言の URL を止める", () => {
+    const url = "https://example.com/";
+    const invalid = [
+      published({ name: `資格 ${url}` }),
+      published({ domains: [{ code: "domain1", name: `分野 ${url}`, weight: 1 }] }),
+      comingSoon({ note: `近日公開 ${url}` }),
+    ];
+    for (const exam of invalid) {
+      expect(ExamsFileSchema.safeParse(exams([exam])).success).toBe(false);
+    }
+  });
+
   it("資格のコードの重複を止める", () => {
     const r = ExamsFileSchema.safeParse(exams([published(), published()]));
     expect(r.success).toBe(false);
@@ -162,6 +179,95 @@ describe("問題のスキーマ", () => {
     expect(messages(question(1, { extra: 1 }))).not.toEqual([]);
     expect(messages(question(1, { references: [{ title: "t", url: "ftp://example.com" }] }))).not.toEqual([]);
     expect(messages(question(1, { questionText: "  " }))).not.toEqual([]);
+  });
+
+  it("本文(設問文・選択肢・解説・補足・観点名)の URL を止める_出典の URL は通す", () => {
+    const url = "https://example.com/";
+    for (const over of [
+      { questionText: `設問 ${url}` },
+      { explanation: "解説 http://example.com" },
+      { supplement: "補足 www.example.com" },
+      {
+        choices: [
+          { key: "A", text: "選択肢 A" },
+          { key: "B", text: `選択肢 B ${url}` },
+        ],
+      },
+      {
+        choices: [
+          { key: "A", text: "選択肢 A", explanation: `解説 ${url}` },
+          { key: "B", text: "選択肢 B" },
+        ],
+      },
+    ]) {
+      expect(messages(question(1, over)), Object.keys(over)[0]).toContain("本文に URL が含まれています");
+    }
+    const rubric = { criteria: [{ name: `観点 ${url}`, keywords: ["k"], points: 1 }], passingPoints: 1 };
+    expect(messages(freeText(1, { rubric }))).toContain("本文に URL が含まれています");
+    expect(messages(question(1, { references: [{ title: "出典", url: "https://docs.aws.amazon.com/" }] }))).toEqual([]);
+    expect(containsUrl("HTTPS://EXAMPLE.COM")).toBe(true);
+    expect(containsUrl("URL を書かない")).toBe(false);
+  });
+
+  it("出典_許したドメインの https の URL を通す。題は任意", () => {
+    const references = ALLOWED_REFERENCE_HOSTS.map((host, i) =>
+      i === 0 ? { url: `https://${host}/path?q=1#top` } : { title: `出典 ${i}`, url: `https://${host}/` },
+    );
+    expect(messages(question(1, { references }))).toEqual([]);
+  });
+
+  it("出典_一覧にないドメイン・http・ユーザー情報やポート付き・URL の形でないものを止める", () => {
+    const cases: [string, string][] = [
+      ["https://learning.example.com/aws/course", "出典に許していないドメインの URL です"],
+      ["https://docs.aws.amazon.com.example.com/", "出典に許していないドメインの URL です"],
+      ["https://sub.docs.aws.amazon.com/", "出典に許していないドメインの URL です"],
+      ["http://docs.aws.amazon.com/", "https で始まる URL ではありません"],
+      ["https://user:pass@docs.aws.amazon.com/", "ユーザー情報付きの URL です"],
+      ["https://user@docs.aws.amazon.com/", "ユーザー情報付きの URL です"],
+      ["https://docs.aws.amazon.com:8443/", "ポート付きの URL です"],
+      ["https://docs.aws.amazon.com/ path", "https で始まる URL ではありません"],
+      ["ftp://docs.aws.amazon.com/", "https で始まる URL ではありません"],
+    ];
+    for (const [url, kind] of cases) {
+      expect(messages(question(1, { references: [{ url }] })), url).toEqual([kind]);
+    }
+    expect(referenceUrlProblem("https://aws.amazon.com/")).toBeNull();
+  });
+
+  it("出典_ホスト名の書き方のゆれ_URL として読んだあとのホスト名とポートで判定する", () => {
+    // 末尾のドット付きのホスト名は、完全一致にならないので止める
+    expect(referenceUrlProblem("https://docs.aws.amazon.com./x")).toBe("出典に許していないドメインの URL です");
+    // ホスト名の大文字は、URL として読むと小文字になるので、許すドメインと同じに扱う
+    expect(referenceUrlProblem("https://DOCS.AWS.AMAZON.COM/x")).toBeNull();
+    // https の既定のポート(443)は、URL として読むとポートなしになるので、ポート付きとして扱わない
+    expect(referenceUrlProblem("https://docs.aws.amazon.com:443/x")).toBeNull();
+  });
+
+  it("出典_空の一覧・多すぎる・重複・題が長すぎる・未知の項目を止める", () => {
+    const ref = (n: number) => ({ url: `https://docs.aws.amazon.com/${n}` });
+    expect(messages(question(1, { references: [] }))).not.toEqual([]);
+    const many = Array.from({ length: REFERENCES_MAX + 1 }, (_, i) => ref(i));
+    expect(messages(question(1, { references: many }))).not.toEqual([]);
+    expect(messages(question(1, { references: [ref(1), ref(1)] }))).toEqual(["出典の URL が重複しています"]);
+    const longTitle = { ...ref(1), title: "a".repeat(REFERENCE_TITLE_MAX + 1) };
+    expect(messages(question(1, { references: [longTitle] }))).not.toEqual([]);
+    expect(messages(question(1, { references: [{ ...ref(1), lang: "en" }] }))).not.toEqual([]);
+  });
+
+  it("出典の誤りの報告に、URL の値を載せない", () => {
+    const marker = "learning.example.com";
+    const q = question(1, { references: [{ url: `https://${marker}/x` }, { url: `http://${marker}/y` }] });
+    const errors = validateDataSet(exams(), files(questionsFile([q, question(2)])));
+    expect(errors).toEqual([
+      "questions.sample.json: questions[0].references[0].url(SAMPLE-0001): 出典に許していないドメインの URL です",
+      "questions.sample.json: questions[0].references[1].url(SAMPLE-0001): https で始まる URL ではありません",
+    ]);
+    expect(errors.join("\n")).not.toContain(marker);
+  });
+
+  it("タグの URL を止める", () => {
+    expect(messages(question(1, { tags: ["タグ"] }))).toEqual([]);
+    expect(messages(question(1, { tags: ["タグ https://example.com/"] }))).toEqual(["本文に URL が含まれています"]);
   });
 
   it("自由記述の問題を通す_選択式の問題と同じファイルに混ぜられる", () => {

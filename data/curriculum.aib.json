@@ -1,0 +1,596 @@
+{
+  "examCode": "AIB",
+  "units": [
+    {
+      "id": "domain1-1-1",
+      "title": "AI・機械学習・生成 AI の関係",
+      "order": 1,
+      "summary": [
+        "**AI ⊃ 機械学習 ⊃ 深層学習**という入れ子の関係になっている",
+        "生成 AI は、深層学習を使って**新しいコンテンツを作り出す**技術",
+        "「AI と機械学習と生成 AI は並列の独立した技術」という説明は**誤り**"
+      ],
+      "sections": [
+        {
+          "id": "lesson",
+          "title": "解説",
+          "body": "AI・機械学習・生成 AI の関係と、それぞれの違いを理解します。\n\nAI(人工知能)は、人間のような問題解決や判断をコンピューターに行わせる技術全体を指す、**最も広い言葉**です。機械学習は、その AI の一分野で、あらかじめ細かい手順を書く代わりに、**大量のデータからパターンを学んで判断**するという特徴があります。深層学習はさらにその中の一分野で、生成 AI は、この深層学習を使い、**新しいコンテンツを作り出す技術**です。\n\n## 押さえどころ\n\n- AI ⊃ 機械学習 ⊃ 深層学習(生成 AI はその応用)という**包含関係**を覚える",
+          "references": [
+            {
+              "title": "第 1 分野: AI の基礎とリテラシー（AWS Certified AI Business Strategist 試験ガイド）",
+              "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain1.html"
+            },
+            {
+              "title": "機械学習とは何ですか?",
+              "url": "https://aws.amazon.com/jp/what-is/machine-learning/"
+            },
+            {
+              "title": "生成 AI とは何ですか?",
+              "url": "https://aws.amazon.com/jp/what-is/generative-ai/"
+            }
+          ]
+        }
+      ],
+      "questionIds": ["AIB-0011", "AIB-0012", "AIB-0051", "AIB-0013", "AIB-0014", "AIB-0015", "AIB-0068", "AIB-0075"]
+    },
+    {
+      "id": "domain1-1-2",
+      "title": "ルールベースの自動化を選ぶべきときと、AI を使うべきとき",
+      "order": 2,
+      "summary": [
+        "条件が明文化されていて、同じ入力に常に同じ結果を求める → **ルールベースの自動化**",
+        "基準を明文化できない、例外が多い、傾向を学びたい → **AI・機械学習**",
+        "予算と期間が限られるときは、まず「**ルールで書き切れるか**」を確認する"
+      ],
+      "sections": [
+        {
+          "id": "lesson",
+          "title": "解説",
+          "body": "ルールベースの自動化と AI のどちらを使うべきかを判断します。\n\n業務の条件がすでに社内規程などで明文化されていて、**同じ入力に対して常に同じ結果**になることが求められる場合は、ルールベースの自動化のほうが適しています。判断の基準をそのままプログラムの条件分岐として書き下せるため、開発や運用の費用も抑えられます。一方で、判断の基準を明文化できない、例外が多い、過去のデータから傾向を読み取りたいといった場合は、AI や機械学習が向いています。\n\n## 押さえどころ\n\n- **同じ入力に常に同じ結果が必要**な業務は、AI ではなくルールベースの自動化を優先する",
+          "references": [
+            {
+              "title": "第 1 分野: AI の基礎とリテラシー（AWS Certified AI Business Strategist 試験ガイド）",
+              "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain1.html"
+            },
+            {
+              "title": "MLCOST02-BP01: Evaluate whether ML is the right solution（AWS Well-Architected Machine Learning Lens）",
+              "url": "https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/mlcost02-bp01.html"
+            }
+          ]
+        }
+      ],
+      "questionIds": [
+        "AIB-0001",
+        "AIB-0052",
+        "AIB-0067",
+        "AIB-0070",
+        "AIB-0002",
+        "AIB-0003",
+        "AIB-0058",
+        "AIB-0061",
+        "AIB-0065",
+        "AIB-0076",
+        "AIB-0084",
+        "AIB-0059",
+        "AIB-0073",
+        "AIB-0077",
+        "AIB-0083",
+        "AIB-0086"
+      ]
+    },
+    {
+      "id": "domain1-1-3",
+      "title": "生成 AI の概念と手法の使い分け",
+      "order": 3,
+      "summary": [
+        "指示の工夫(**プロンプトエンジニアリング**)は、モデルを変えずに試せる",
+        "長い文書は、**コンテキストウィンドウ**を超えると後半が回答に反映されない",
+        "事実の根拠には**RAG**、言い回しや文体には**ファインチューニング**が向く"
+      ],
+      "sections": [
+        {
+          "id": "lesson",
+          "title": "解説",
+          "body": "プロンプトエンジニアリング、コンテキストウィンドウ、RAG・ファインチューニングの使い分けを理解します。\n\n生成 AI の出力を安定させたり改善したりする方法はいくつかあります。指示の与え方を工夫する**プロンプトエンジニアリング**は、モデルを変えずに試せる最も手軽な方法です。長い文書を渡すと、モデルが一度に扱える範囲(**コンテキストウィンドウ**)を超えて、後半の内容が回答に反映されないことがあります。事実に基づいた回答が必要なときは、社内文書を検索して根拠にする**検索拡張生成(RAG)**が向いており、言い回しや文体を覚えさせたいときは**ファインチューニング**が向いています。両者は目的が異なるため、根拠が必要な場面でファインチューニングだけに頼っても、もっともらしいが根拠のない出力(ハルシネーション)は防げません。\n\n## 押さえどころ\n\n- 根拠が必要な場面では、**ファインチューニングだけに頼らずRAGを使う**",
+          "references": [
+            {
+              "title": "第 1 分野: AI の基礎とリテラシー（AWS Certified AI Business Strategist 試験ガイド）",
+              "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain1.html"
+            },
+            {
+              "title": "生成 AI とは何ですか?",
+              "url": "https://aws.amazon.com/jp/what-is/generative-ai/"
+            }
+          ]
+        }
+      ],
+      "questionIds": [
+        "AIB-0016",
+        "AIB-0017",
+        "AIB-0018",
+        "AIB-0053",
+        "AIB-0054",
+        "AIB-0055",
+        "AIB-0056",
+        "AIB-0060",
+        "AIB-0062",
+        "AIB-0063",
+        "AIB-0066",
+        "AIB-0069",
+        "AIB-0071",
+        "AIB-0072",
+        "AIB-0074",
+        "AIB-0078",
+        "AIB-0079",
+        "AIB-0080",
+        "AIB-0081",
+        "AIB-0082",
+        "AIB-0085",
+        "AIB-0019",
+        "AIB-0057",
+        "AIB-0064"
+      ]
+    },
+    {
+      "id": "domain2-2-1",
+      "title": "ビジネス目標に沿ったユースケースの選び方",
+      "order": 4,
+      "summary": [
+        "**ビジネス価値の大きさ**と**実現のしやすさ**の両方で優先順位をつける",
+        "始めた取り組みも、**拡大・一時停止・終了**を定期的に判断する",
+        "自社で作るか(ビルド)外部を使うか(バイ)は、予算・期限・規制要件で選ぶ"
+      ],
+      "sections": [
+        {
+          "id": "lesson",
+          "title": "解説",
+          "body": "AI活用の候補をどう選び、優先順位をつけるかを学びます。\n\nAI活用の候補は複数挙がることが多く、どれから着手するかを一つの基準だけで決めるのは危険です。**ビジネス価値の大きさ**と**実現のしやすさ(データの整備状況など)**の両方を見て、最初の一件を選びます。すでに始めている取り組みについても、**拡大・一時停止・終了**のいずれかを定期的に判断し、成果が乏しいものに予算を使い続けないようにします。また、自社で作る(ビルド)か外部サービスを使う(バイ)かは、予算や期限、必要な機能、規制対応の要件などを踏まえて評価します。\n\n## 押さえどころ\n\n- 最初の一件は、ビジネス価値だけでなく**実現のしやすさ**も見て選ぶ",
+          "references": [
+            {
+              "title": "AWS Certified AI Business Strategist 試験ガイド コンテンツ分野 2: AI 戦略とビジネス価値の創造",
+              "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.html"
+            },
+            {
+              "title": "MLCOST02-BP01: Evaluate whether ML is the right solution（AWS Well-Architected Machine Learning Lens）",
+              "url": "https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/mlcost02-bp01.html"
+            },
+            {
+              "title": "AWS Marketplace とは",
+              "url": "https://docs.aws.amazon.com/ja_jp/marketplace/latest/buyerguide/what-is-marketplace.html"
+            }
+          ]
+        }
+      ],
+      "questionIds": [
+        "AIB-0004",
+        "AIB-0110",
+        "AIB-0115",
+        "AIB-0005",
+        "AIB-0020",
+        "AIB-0021",
+        "AIB-0022",
+        "AIB-0087",
+        "AIB-0090",
+        "AIB-0091",
+        "AIB-0093",
+        "AIB-0094",
+        "AIB-0096",
+        "AIB-0099",
+        "AIB-0100",
+        "AIB-0101",
+        "AIB-0103",
+        "AIB-0105",
+        "AIB-0109",
+        "AIB-0112",
+        "AIB-0116",
+        "AIB-0118",
+        "AIB-0119",
+        "AIB-0120",
+        "AIB-0123",
+        "AIB-0128",
+        "AIB-0006",
+        "AIB-0089",
+        "AIB-0095",
+        "AIB-0098",
+        "AIB-0104",
+        "AIB-0107",
+        "AIB-0111",
+        "AIB-0122"
+      ]
+    },
+    {
+      "id": "domain2-2-2",
+      "title": "AI のビジネス価値を測る",
+      "order": 5,
+      "summary": [
+        "KPIには**目に見える利益**と**目に見えにくい利益**がある",
+        "導入前の**ベースライン測定**が無いと、効果を数字で示せない",
+        "最終的な成果を待たずに確認できる**先行指標**も設定する"
+      ],
+      "sections": [
+        {
+          "id": "lesson",
+          "title": "解説",
+          "body": "KPI設定、導入前のベースライン測定、投資対効果(ROI)の示し方を理解します。\n\nAI の効果を測る指標(KPI)には、コスト削減や収益増加のような**目に見える利益**と、顧客満足度や従業員の生産性のような**目に見えにくい利益**の両方があります。効果を正しく示すには、導入**前に**今の時間・費用・品質を測っておく**ベースライン**が欠かせません。また、成果が出るまで時間がかかる施策では、最終的な数字を待たずに途中経過を確認できる**先行指標**を合わせて設定します。料金体系(利用量に応じた課金など)を理解しておくことも、費用を見積もり、無駄な支出を抑えるうえで重要です。\n\n## 押さえどころ\n\n- 導入前の**ベースライン測定**が、効果を正しく示す出発点になる",
+          "references": [
+            {
+              "title": "コンテンツ分野 2: AI 戦略とビジネス価値の創造 - AWS Certified AI Business Strategist (AIB-C01) 試験ガイド",
+              "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.html"
+            },
+            {
+              "title": "Amazon Bedrock の料金",
+              "url": "https://aws.amazon.com/jp/bedrock/pricing/"
+            },
+            {
+              "title": "AWS Cost Explorer の概要",
+              "url": "https://docs.aws.amazon.com/ja_jp/cost-management/latest/userguide/ce-what-is.html"
+            }
+          ]
+        }
+      ],
+      "questionIds": [
+        "AIB-0023",
+        "AIB-0024",
+        "AIB-0121",
+        "AIB-0127",
+        "AIB-0025",
+        "AIB-0026",
+        "AIB-0088",
+        "AIB-0092",
+        "AIB-0097",
+        "AIB-0102",
+        "AIB-0106",
+        "AIB-0108",
+        "AIB-0113",
+        "AIB-0114",
+        "AIB-0124",
+        "AIB-0125",
+        "AIB-0117",
+        "AIB-0126"
+      ]
+    },
+    {
+      "id": "domain2-2-3",
+      "title": "AI で競争優位性を築く",
+      "order": 6,
+      "summary": [
+        "価格や速度だけの優位性は、競合の追随で**薄れやすい**",
+        "自社の**データ**や**業務ノウハウ**を活かした仕組みは模倣されにくい",
+        "投資の規模は、業界の成熟度と自社の競争環境を踏まえて判断する"
+      ],
+      "sections": [
+        {
+          "id": "lesson",
+          "title": "解説",
+          "body": "AI活用を一時的な優位ではなく、持続的な競争力につなげる考え方を学びます。\n\n競合が同じような AI の仕組みを導入すると、価格や応答速度だけの優位性はすぐに**薄れます**。持続的な競争優位につながるのは、自社にしかない**データ**や、長年の**業務ノウハウ**を活かした仕組みです。投資の規模を決めるときも、業界内でどこまで AI 活用が広がっているか(成熟度)と、自社の競争環境を踏まえて判断します。\n\n## 押さえどころ\n\n- 持続的な競争優位は、自社にしかない**データ・業務ノウハウ**から生まれる",
+          "references": [
+            {
+              "title": "コンテンツ分野 2: AI 戦略とビジネス価値の創造 - AWS Certified AI Business Strategist (AIB-C01) 試験ガイド",
+              "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.html"
+            },
+            {
+              "title": "クラウドを活用したデジタルトランスフォーメーションによるビジネス成果の加速 - AWS クラウド導入フレームワークの概要",
+              "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/overview-aws-cloud-adoption-framework/accelerating-business-outcomes.html"
+            },
+            {
+              "title": "ビジネスのパースペクティブ: 戦略と成果 - AWS クラウド導入フレームワークの概要",
+              "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/overview-aws-cloud-adoption-framework/business-perspective.html"
+            }
+          ]
+        }
+      ],
+      "questionIds": ["AIB-0027", "AIB-0028", "AIB-0029", "AIB-0030"]
+    },
+    {
+      "id": "domain3-3-1",
+      "title": "責任ある AI の原則(ディメンション)",
+      "order": 7,
+      "summary": [
+        "公平性・**説明可能性**・プライバシー・安全性・**透明性**・堅牢性の 6 つのディメンション",
+        "説明可能性 = 個々の判定について、**なぜその結果になったかを後から示せること**",
+        "原則が対立する場面では**トレードオフを踏まえて**判断し、**人による確認**を組み込む"
+      ],
+      "sections": [
+        {
+          "id": "lesson",
+          "title": "解説",
+          "body": "透明性と説明可能性の違いなど、責任あるAIの原則を理解します。\n\n責任ある AI には、公平性、説明可能性、プライバシー、安全性、透明性、堅牢性といった複数のディメンションがあります。このうち**説明可能性**と**透明性**は混同されやすい言葉です。透明性は、AI を使っていること自体や、その仕組みの概要を**開示すること**を指します。これに対して説明可能性は、個々の判定について、**なぜその結果になったのかを後から人に示せること**を指します。ビジネス上の目標とこれらの原則が対立する場面では**トレードオフを踏まえて**判断し、誤った出力をそのまま使わないよう**人による確認**を組み込みます。\n\n## 押さえどころ\n\n- 個々の判定結果の理由を示す要件には、透明性ではなく**説明可能性**が直接対応する",
+          "references": [
+            {
+              "title": "第 3 分野: AI ガバナンスと責任ある AI リーダーシップ（AWS Certified AI Business Strategist 試験ガイド）",
+              "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain3.html"
+            },
+            {
+              "title": "責任ある AI（AWS）",
+              "url": "https://aws.amazon.com/jp/ai/responsible-ai/"
+            },
+            {
+              "title": "Design principles - Responsible AI Lens - AWS Well-Architected Framework",
+              "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/design-principles.html"
+            }
+          ]
+        }
+      ],
+      "questionIds": [
+        "AIB-0008",
+        "AIB-0037",
+        "AIB-0031",
+        "AIB-0131",
+        "AIB-0133",
+        "AIB-0138",
+        "AIB-0143",
+        "AIB-0147",
+        "AIB-0165",
+        "AIB-0032",
+        "AIB-0134"
+      ]
+    },
+    {
+      "id": "domain3-3-2",
+      "title": "AI ガバナンス構造と規制コンプライアンス",
+      "order": 8,
+      "summary": [
+        "誤りが起きたとき、誰が**是正を判断**し、どこへ報告するかを事前に決める",
+        "部門横断で明確な**説明責任**を持つガバナンス体制を整える",
+        "統制の体制が限られるときは、**リスクの大きさで優先順位**をつける"
+      ],
+      "sections": [
+        {
+          "id": "lesson",
+          "title": "解説",
+          "body": "誰が何を判断し、どう規制に対応するかというガバナンスの整え方を学びます。\n\nAI の判定に誤りが見つかったとき、**誰が是正を判断し、どこへ報告するか**が決まっていないと対応が遅れます。部門を横断した明確な**説明責任**を持つガバナンス体制を整えることが必要です。規制の対象となる業務では、監査や顧客に説明できる状態を保つための**規制コンプライアンス**への対応も欠かせません。取り組みの数が多く統制の体制が限られる場合は、**リスクの大きさで優先順位をつけて**統制を適用します。\n\n## 押さえどころ\n\n- ガバナンス体制の要は、**誰が何に責任を持つか**を先に決めておくこと",
+          "references": [
+            {
+              "title": "第 3 分野: AI ガバナンスと責任ある AI リーダーシップ（AWS Certified AI Business Strategist 試験ガイド）",
+              "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain3.html"
+            },
+            {
+              "title": "ガバナンスのパースペクティブ: リスクの管理と最大化 - AWS クラウド導入フレームワークの概要",
+              "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/overview-aws-cloud-adoption-framework/governance-perspective.html"
+            },
+            {
+              "title": "NIST AI Risk Management Framework",
+              "url": "https://www.nist.gov/itl/ai-risk-management-framework"
+            }
+          ]
+        }
+      ],
+      "questionIds": [
+        "AIB-0033",
+        "AIB-0135",
+        "AIB-0034",
+        "AIB-0035",
+        "AIB-0036",
+        "AIB-0129",
+        "AIB-0130",
+        "AIB-0137",
+        "AIB-0139",
+        "AIB-0141",
+        "AIB-0145",
+        "AIB-0148",
+        "AIB-0150",
+        "AIB-0164",
+        "AIB-0166",
+        "AIB-0132",
+        "AIB-0142",
+        "AIB-0149"
+      ]
+    },
+    {
+      "id": "domain3-3-3",
+      "title": "エンタープライズ AI のリスクと軽減策",
+      "order": 9,
+      "summary": [
+        "本番運用中も、**バイアスドリフト**を継続的に見張る",
+        "**ハルシネーション**(もっともらしいが根拠のない出力)への備えが必要",
+        "**ガードレール**などで、有害な出力や知的財産の懸念を抑える"
+      ],
+      "sections": [
+        {
+          "id": "lesson",
+          "title": "解説",
+          "body": "本番運用で起こるリスク(バイアス・ハルシネーションなど)への対応を理解します。\n\n本番環境で動く AI システムは、導入して終わりではありません。**継続的なモニタリング**が必要で、バイアスは学習データだけでなく運用中にも生じうるため、**バイアスドリフト**を見張り続けます。生成 AI の**ハルシネーション**(もっともらしいが根拠のない出力)や、有害なコンテンツ、知的財産の懸念にも備え、**ガードレール**のような仕組みで出力を制御します。問題が起きたときに素早く気づき、記録に残せる体制を整えておくことが重要です。\n\n## 押さえどころ\n\n- 本番の AI リスク対応は、導入後も続く**継続的なモニタリング**が前提になる",
+          "references": [
+            {
+              "title": "第 3 分野: AI ガバナンスと責任ある AI リーダーシップ（AWS Certified AI Business Strategist 試験ガイド）",
+              "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain3.html"
+            },
+            {
+              "title": "Amazon Bedrock Guardrails（Amazon Bedrock ユーザーガイド）",
+              "url": "https://docs.aws.amazon.com/ja_jp/bedrock/latest/userguide/guardrails.html"
+            },
+            {
+              "title": "AWS Service Terms（第 50 条 生成 AI サービス）",
+              "url": "https://aws.amazon.com/service-terms/"
+            }
+          ]
+        }
+      ],
+      "questionIds": [
+        "AIB-0038",
+        "AIB-0007",
+        "AIB-0039",
+        "AIB-0040",
+        "AIB-0136",
+        "AIB-0140",
+        "AIB-0144",
+        "AIB-0146",
+        "AIB-0161",
+        "AIB-0163",
+        "AIB-0162"
+      ]
+    },
+    {
+      "id": "domain4-4-1",
+      "title": "ビジネス準備状況と成熟度の評価",
+      "order": 10,
+      "summary": [
+        "**準備状況**は、技術インフラだけでなく経営層の合意やデータの質も含めて見る",
+        "**成熟度モデル**で、自社が実験・部門展開・全社規模のどの段階かを把握する",
+        "段階に応じて、**投資すべき対象**の優先順位が変わる"
+      ],
+      "sections": [
+        {
+          "id": "lesson",
+          "title": "解説",
+          "body": "AI導入の準備が整っているかと、自社の成熟度の見きわめ方を学びます。\n\nAI を導入するための**準備状況**は、技術インフラだけでは測れません。経営層の合意形成、データの品質、現場の受け止め方、ガバナンス体制など、複数の観点から評価する必要があります。**成熟度モデル**を使うと、自社が実験段階にあるのか、部門展開の段階にあるのか、全社規模の段階にあるのかを把握できます。成熟度の段階に応じて、**どこに投資すべきか**の優先順位も変わります。\n\n## 押さえどころ\n\n- 成熟度の段階を把握することが、次に何へ投資すべきかの判断材料になる",
+          "references": [
+            {
+              "title": "第 4 分野: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション（AWS Certified AI Business Strategist 試験ガイド）",
+              "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
+            },
+            {
+              "title": "生成 AI 成熟度モデル",
+              "url": "https://docs.aws.amazon.com/ja_jp/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/introduction.html"
+            },
+            {
+              "title": "成熟度レベルの概要",
+              "url": "https://docs.aws.amazon.com/ja_jp/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html"
+            }
+          ]
+        }
+      ],
+      "questionIds": [
+        "AIB-0041",
+        "AIB-0159",
+        "AIB-0042",
+        "AIB-0043",
+        "AIB-0044",
+        "AIB-0158",
+        "AIB-0167",
+        "AIB-0169",
+        "AIB-0171",
+        "AIB-0170"
+      ]
+    },
+    {
+      "id": "domain4-4-2",
+      "title": "AI のデータとインフラを整える",
+      "order": 11,
+      "summary": [
+        "部門ごとのデータ管理は、**データサイロ**として取り組みの妨げになる",
+        "誰がデータの正しさに責任を持つか(**データ所有権**)を明確にする",
+        "部門を越えた**データ共有の枠組み**を組織として定めておく"
+      ],
+      "sections": [
+        {
+          "id": "lesson",
+          "title": "解説",
+          "body": "データがサイロ化する問題と、データ・インフラの整え方を理解します。\n\nAI の精度は、元になるデータの質に大きく左右されます。部門ごとに別々のシステムでデータを管理していると、同じ項目でも定義や更新頻度が**食い違い**、**データサイロ**が取り組みの妨げになります。誰がデータの正しさに責任を持つか(**データ所有権**)や、部門を越えたデータ共有の枠組みを、組織としてあらかじめ定めておくことが必要です。あわせて、AI の施策を支えるインフラの要件も確認します。\n\n## 押さえどころ\n\n- データサイロの解消と**データ所有権**の明確化が、データ整備の出発点になる",
+          "references": [
+            {
+              "title": "第 4 分野: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション（AWS Certified AI Business Strategist 試験ガイド）",
+              "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
+            },
+            {
+              "title": "生成 AI 導入の道のり - 生成 AI のデータに関する考慮事項",
+              "url": "https://docs.aws.amazon.com/ja_jp/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/journey.html"
+            },
+            {
+              "title": "ガバナンスパースペクティブ: クラウドでの組織の管理 - AWS クラウド導入フレームワークの概要",
+              "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/overview-aws-cloud-adoption-framework/governance-perspective.html"
+            }
+          ]
+        }
+      ],
+      "questionIds": ["AIB-0009", "AIB-0010", "AIB-0168", "AIB-0174", "AIB-0175", "AIB-0176", "AIB-0173"]
+    },
+    {
+      "id": "domain4-4-3",
+      "title": "全社変革とワークフォースの能力づくり",
+      "order": 12,
+      "summary": [
+        "リスク回避・変化への抵抗が、代表的な**文化的な壁**",
+        "個人が責任を問われる不安には、**経営幹部の支援**のもとで責任の範囲を明確にする",
+        "定型作業から**人による確認や協働**へ、役割を実践を通じて移していく"
+      ],
+      "sections": [
+        {
+          "id": "lesson",
+          "title": "解説",
+          "body": "文化的な壁への対応と、AIを使いこなす人材を育てる進め方を学びます。\n\nAI の導入を全社に広げようとすると、リスクを避けたい気持ちや、これまでのやり方を変えることへの抵抗といった**文化的な壁**が現れます。とくに、誤った出力をそのまま使って問題が起きたときに**個人が責任を問われるのではないかという不安**は、利用が広がらない大きな原因になります。この種の不安には、研修を増やすだけでは対処できず、**経営幹部の支援**のもとで責任の範囲を明確にし、透明性の高いコミュニケーションを行うことが必要です。あわせて、部門を横断したチームをつくり、定型作業から**人による確認や協働**へ役割を移していく、実践を通じた学びの機会を用意します。\n\n## 押さえどころ\n\n- 文化的な壁への対応は、技術研修ではなく**リーダーシップによる明確化とコミュニケーション**",
+          "references": [
+            {
+              "title": "第 4 分野: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション（AWS Certified AI Business Strategist 試験ガイド）",
+              "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
+            },
+            {
+              "title": "人員のパースペクティブ - AWS クラウド導入フレームワークの概要",
+              "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/overview-aws-cloud-adoption-framework/people-perspective.html"
+            }
+          ]
+        }
+      ],
+      "questionIds": [
+        "AIB-0045",
+        "AIB-0046",
+        "AIB-0047",
+        "AIB-0151",
+        "AIB-0152",
+        "AIB-0153",
+        "AIB-0157",
+        "AIB-0172",
+        "AIB-0177",
+        "AIB-0178",
+        "AIB-0179",
+        "AIB-0180",
+        "AIB-0181",
+        "AIB-0182",
+        "AIB-0192",
+        "AIB-0193",
+        "AIB-0194",
+        "AIB-0197",
+        "AIB-0183"
+      ]
+    },
+    {
+      "id": "domain4-4-4",
+      "title": "パイロットから全社規模へのスケーリング",
+      "order": 13,
+      "summary": [
+        "構想→実験→起動→スケーリングを**反復的に**進める",
+        "**AI センターオブエクセレンス(COE)**が、重複や品質のばらつきを防ぐ",
+        "本番環境へ移す際は、**事業継続性**や運用体制も確認する"
+      ],
+      "sections": [
+        {
+          "id": "lesson",
+          "title": "解説",
+          "body": "小さく始めた取り組みを、全社規模に広げる進め方を学びます。\n\nAI の取り組みは、構想→実験→起動→スケーリングという段階を**反復的に**進めるのが基本です。短期間で成果を示せる小さな範囲から始め、そこで得た学びを次の展開に活かします。取り組みの数が増えてくると、**AI センターオブエクセレンス(COE)**のような部門横断の支援組織が、重複や品質のばらつきを防ぐ役割を果たします。実験段階から本番環境へ移す際は、**事業継続性**や運用体制も含めて確認し、継続的なフィードバックの仕組みで進捗と成果を追い続けます。\n\n## 押さえどころ\n\n- 全社スケールの鍵は、小さな成果を**反復的に**積み重ねること",
+          "references": [
+            {
+              "title": "第 4 分野: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション（AWS Certified AI Business Strategist 試験ガイド）",
+              "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
+            },
+            {
+              "title": "クラウドトランスフォーメーションジャーニー - AWS クラウド導入フレームワークの概要",
+              "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/overview-aws-cloud-adoption-framework/your-cloud-transformation-journey.html"
+            }
+          ]
+        }
+      ],
+      "questionIds": [
+        "AIB-0050",
+        "AIB-0048",
+        "AIB-0049",
+        "AIB-0155",
+        "AIB-0156",
+        "AIB-0160",
+        "AIB-0184",
+        "AIB-0185",
+        "AIB-0186",
+        "AIB-0187",
+        "AIB-0188",
+        "AIB-0189",
+        "AIB-0191",
+        "AIB-0196",
+        "AIB-0198",
+        "AIB-0199",
+        "AIB-0154",
+        "AIB-0190",
+        "AIB-0195",
+        "AIB-0200"
+      ]
+    }
+  ]
+}

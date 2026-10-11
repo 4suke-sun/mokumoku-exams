@@ -86,6 +86,36 @@ describe("validateCurriculumData", () => {
     );
   });
 
+  it("題・本文・要約・図の文字の URL_場所と種類だけを報告する", () => {
+    const url = "https://example.com/";
+    const cases: [unknown, string][] = [
+      [curriculum([unit({ title: `単元 ${url}` })]), "units[0].title"],
+      [curriculum([unit({ summary: [`要点 ${url}`] })]), "units[0].summary[0]"],
+      [curriculum([unit({ sections: [section({ title: "www.example.com" })] })]), "units[0].sections[0].title"],
+      [curriculum([unit({ sections: [section({ body: "本文 http://example.com" })] })]), "units[0].sections[0].body"],
+    ];
+    for (const [data, path] of cases) {
+      expect(validateCurriculumData(files(data), context)).toEqual([
+        `curriculum.sample.json: ${path}: 本文に URL が含まれています`,
+      ]);
+    }
+    expect(validateCurriculumData(withDiagram({ title: `図 ${url}` }), context)).toHaveLength(1);
+  });
+
+  it("節の出典_許したドメインは通し、一覧にないドメイン・http は場所と種類だけを報告する", () => {
+    const ok = [{ title: "出典", url: "https://docs.aws.amazon.com/" }, { url: "https://www.nist.gov/" }];
+    expect(
+      validateCurriculumData(files(curriculum([unit({ sections: [section({ references: ok })] })])), context),
+    ).toEqual([]);
+    const bad = [{ url: "https://learning.example.com/" }, { url: "http://aws.amazon.com/" }];
+    expect(
+      validateCurriculumData(files(curriculum([unit({ sections: [section({ references: bad })] })])), context),
+    ).toEqual([
+      "curriculum.sample.json: units[0].sections[0].references[0].url: 出典に許していないドメインの URL です",
+      "curriculum.sample.json: units[0].sections[0].references[1].url: https で始まる URL ではありません",
+    ]);
+  });
+
   it("ID の形・順番の値が正しくない_指摘する", () => {
     for (const id of ["Unit", "1unit", "unit_one", "a".repeat(33)]) {
       expect(validateCurriculumData(files(curriculum([unit({ id })])), context), id).toHaveLength(1);

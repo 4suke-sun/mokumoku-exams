@@ -24,6 +24,25 @@
       "name": "サンプル資格 2(動作確認用)",
       "shortName": "サンプル 2",
       "note": "近日公開予定です。"
+    },
+    {
+      "examCode": "AIB",
+      "status": "published",
+      "vendor": "AWS",
+      "edition": "C01",
+      "name": "AWS Certified AI Business Strategist",
+      "shortName": "AI Business Strategist",
+      "category": "Business",
+      "passingScore": 700,
+      "totalScore": 1000,
+      "officialQuestionCount": 85,
+      "officialTimeMinutes": 170,
+      "domains": [
+        { "code": "domain1", "name": "AI の基礎とリテラシー", "weight": 0.24 },
+        { "code": "domain2", "name": "AI 戦略とビジネス価値の創造", "weight": 0.28 },
+        { "code": "domain3", "name": "AI ガバナンスと責任ある AI リーダーシップ", "weight": 0.24 },
+        { "code": "domain4", "name": "ビジネス準備状況、リーダーシップ、AI トランスフォーメーション", "weight": 0.24 }
+      ]
     }
   ]
 }

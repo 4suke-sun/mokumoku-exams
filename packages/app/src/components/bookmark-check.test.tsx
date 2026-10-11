@@ -112,6 +112,18 @@ describe("直前チェック", () => {
     expect(screen.getByText("解説 3")).toBeTruthy();
   });
 
+  it("出典のある問題_めくると解説と一緒に出典のリンクを出す", async () => {
+    stubBookmarks(["TEST-0001"]);
+    const withReference = { ...question(1, "A"), references: [{ url: "https://www.nist.gov/itl" }] } as Question;
+    render(<BookmarkCheck exam={exam} questions={[withReference]} />);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole("button", { name: "カード" }));
+    expect(screen.queryByRole("link", { name: /www\.nist\.gov/ })).toBeNull();
+    await user.click(screen.getByRole("button", { name: "めくって正解を見る" }));
+    const link = screen.getByRole("link", { name: "www.nist.gov(外部サイト)" });
+    expect(link.getAttribute("rel")).toBe("noopener noreferrer");
+  });
+
   it("ブックマークがない_案内を出し_形式の切り替えは出さない", async () => {
     stubBookmarks([]);
     render(<BookmarkCheck exam={exam} questions={questions} />);

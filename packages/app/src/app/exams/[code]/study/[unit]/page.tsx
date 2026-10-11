@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { DiagramView } from "@/components/diagram.tsx";
+import { ReferenceList } from "@/components/reference-list.tsx";
 import { RichText } from "@/components/rich-text.tsx";
 import { StudyStart } from "@/components/study-start.tsx";
 import { UnitSummary } from "@/components/unit-summary.tsx";
@@ -80,6 +81,7 @@ export default async function StudyUnitPage({ params }: Props) {
           </h2>
           <RichText text={section.body} />
           {section.diagram ? <DiagramView diagram={section.diagram} id={`${section.id}-diagram`} /> : null}
+          <ReferenceList references={section.references} />
         </section>
       ))}
 
