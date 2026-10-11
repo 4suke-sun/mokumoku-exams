@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { ExamsFileSchema, normalizeText, QuestionsFileSchema } from "./schema.ts";
+import {
+  CRITERION_NAME_MAX,
+  ExamsFileSchema,
+  KEYWORD_MAX,
+  normalizeKeyword,
+  normalizeText,
+  QuestionsFileSchema,
+} from "./schema.ts";
 import { validateDataSet } from "./validate.ts";
 
 const published = (overrides: Record<string, unknown> = {}) => ({
@@ -170,6 +177,81 @@ describe("問題のスキーマ", () => {
     expect(messages(freeText(1, { rubric: badCriterion }))).not.toEqual([]);
     const blankKeyword = { criteria: [{ name: "観点", keywords: [" "], points: 1 }], passingPoints: 1 };
     expect(messages(freeText(1, { rubric: blankKeyword }))).not.toEqual([]);
+  });
+
+  describe("採点基準(rubric)", () => {
+    const criterion = (overrides: Record<string, unknown> = {}) => ({
+      name: "観点",
+      keywords: ["キーワード"],
+      points: 50,
+      ...overrides,
+    });
+    const rubric = (criteria: unknown[], passingPoints = 50) => ({ criteria, passingPoints });
+    /** 自由記述の問題を 1 問だけ持つファイルを検査し、場所と種類の報告を返す */
+    const report = (r: unknown) =>
+      validateDataSet(exams(), files(questionsFile([question(1), question(2), freeText(3, { rubric: r })])));
+    const at = (place: string, kind: string) =>
+      `questions.sample.json: questions[2].rubric${place}(SAMPLE-0003): ${kind}`;
+
+    it("正しい採点基準を通す_合格点が配点の合計ちょうどでもよい", () => {
+      expect(report(rubric([criterion({ name: "観点 1" }), criterion({ name: "観点 2" })], 100))).toEqual([]);
+    });
+
+    it("観点が空の配列_止める", () => {
+      // 配点の合計が 0 になるので、合格点の規則にもかかる
+      expect(report(rubric([]))).toContain(at(".criteria", "少なすぎる(短い・小さい)値です"));
+    });
+
+    it("キーワードが空の配列_止める", () => {
+      expect(report(rubric([criterion({ keywords: [] })]))).toEqual([
+        at(".criteria[0].keywords", "少なすぎる(短い・小さい)値です"),
+      ]);
+    });
+
+    it("合格点が配点の合計より大きい_止める", () => {
+      const r = rubric([criterion({ name: "観点 1", points: 30 }), criterion({ name: "観点 2", points: 20 })], 51);
+      expect(report(r)).toEqual([at(".passingPoints", "合格点が配点の合計を超えています")]);
+    });
+
+    it("観点名の重複(空白と全角・半角の違いを除く)_止める", () => {
+      expect(report(rubric([criterion({ name: "観点 1" }), criterion({ name: "観点 1" })]))).toEqual([
+        at(".criteria", "観点名が重複しています"),
+      ]);
+      expect(report(rubric([criterion({ name: "観点 １" }), criterion({ name: "観点  1" })]))).toEqual([
+        at(".criteria", "観点名が重複しています"),
+      ]);
+    });
+
+    it("観点名・キーワードが上限の文字数を超える_止める。上限ちょうどは通す", () => {
+      const ok = rubric([criterion({ name: "名".repeat(CRITERION_NAME_MAX), keywords: ["語".repeat(KEYWORD_MAX)] })]);
+      expect(report(ok)).toEqual([]);
+      expect(report(rubric([criterion({ name: "名".repeat(CRITERION_NAME_MAX + 1) })]))).toEqual([
+        at(".criteria[0].name", "多すぎる(長い・大きい)値です"),
+      ]);
+      expect(report(rubric([criterion({ keywords: ["a", "語".repeat(KEYWORD_MAX + 1)] })]))).toEqual([
+        at(".criteria[0].keywords[1]", "多すぎる(長い・大きい)値です"),
+      ]);
+    });
+
+    it("全角半角・大文字小文字・空白をならすと空になるキーワード_止める", () => {
+      for (const blank of ["", " ", "　", " \t\n　"]) {
+        expect(report(rubric([criterion({ keywords: ["a", blank] })]))).toEqual([
+          at(".criteria[0].keywords[1]", "ならすと空になるキーワードです"),
+        ]);
+      }
+      expect(normalizeKeyword(" Ａ b　C ")).toBe("abc");
+    });
+
+    it("報告に、観点名やキーワードの値を載せない", () => {
+      const marker = "目印XYZ";
+      const r = rubric(
+        [criterion({ name: marker.repeat(10), keywords: [marker.repeat(10)] }), criterion({ name: marker.repeat(10) })],
+        999,
+      );
+      const errors = report(r);
+      expect(errors.length).toBeGreaterThan(0);
+      expect(errors.join("\n")).not.toContain(marker);
+    });
   });
 
   it("選択式の問題に採点基準を付ける・未知の問題の種類_止める", () => {

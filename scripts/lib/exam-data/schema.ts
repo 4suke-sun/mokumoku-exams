@@ -139,18 +139,48 @@ export const ChoiceQuestionSchema = z
     }
   });
 
+/** 観点名・キーワードの文字数の上限 */
+export const CRITERION_NAME_MAX = 40;
+export const KEYWORD_MAX = 40;
+
+/**
+ * キーワードとの照合のために、全角・半角、大文字・小文字の違いをならし、空白を除く。
+ * 判定(packages/app/src/lib/free-text.ts の normalizeForMatch)と同じならし方にする。
+ */
+export function normalizeKeyword(value: string): string {
+  return value.normalize("NFKC").toLowerCase().replace(/\s+/g, "");
+}
+
+/** キーワード。ならすと空になるものは、どの回答にも含まれず判定に使えないので、止める。 */
+const KeywordSchema = z
+  .string()
+  .max(KEYWORD_MAX)
+  .refine((value) => normalizeKeyword(value) !== "", "ならすと空になるキーワードです");
+
 /** 採点基準の観点。キーワードのどれかを回答が含めば、観点を満たし、配点を得る。 */
 const CriterionSchema = z.strictObject({
-  name: text,
-  keywords: z.array(text),
+  name: text.max(CRITERION_NAME_MAX),
+  keywords: z.array(KeywordSchema).min(1),
   points: z.int().positive(),
 });
 
 /** 自由記述の採点基準。満たした観点の配点の合計が、合格点以上なら正解。 */
-export const RubricSchema = z.strictObject({
-  criteria: z.array(CriterionSchema),
-  passingPoints: z.int().positive(),
-});
+export const RubricSchema = z
+  .strictObject({
+    criteria: z.array(CriterionSchema).min(1),
+    passingPoints: z.int().positive(),
+  })
+  .superRefine((rubric, ctx) => {
+    const total = rubric.criteria.reduce((sum, c) => sum + c.points, 0);
+    if (rubric.passingPoints > total) {
+      ctx.addIssue({ code: "custom", path: ["passingPoints"], message: "合格点が配点の合計を超えています" });
+    }
+    // 画面で観点名をキーに使うため、空白と全角・半角の違いをならしても重複しないようにする
+    const names = rubric.criteria.map((c) => normalizeText(c.name));
+    if (new Set(names).size !== names.length) {
+      ctx.addIssue({ code: "custom", path: ["criteria"], message: "観点名が重複しています" });
+    }
+  });
 
 /** 自由記述の問題。選択肢はなく、文章で答える。 */
 export const FreeTextQuestionSchema = z.strictObject({
