@@ -151,7 +151,7 @@ describe("Player のキー操作", () => {
     expect(checked()).toEqual([false, false, false]);
   });
 
-  it("選択肢の並びをシャッフルしている_案内は小さいキーから大きいキーの範囲になる", async () => {
+  it("選択肢の並びをシャッフルしても_記号は上から_A_B_C_と振り_キーは画面の記号で選ぶ", async () => {
     saveSession(browserStore(), {
       examCode: "TEST",
       questionIds: questions.map((q) => q.questionId),
@@ -162,10 +162,13 @@ describe("Player のキー操作", () => {
     });
     render(<Player exam={exam} questions={questions} />);
     expect(await screen.findByText(/キー操作: A〜C で選ぶ/)).toBeTruthy();
-    // 画面の並びは C, A, B だが、キーは元のまま選べる
+    // 元のキーで C, A, B の順に並ぶが、画面の記号は上から A, B, C になる
+    const labels = screen.getAllByRole("radio").map((radio) => radio.closest("label")?.textContent?.slice(0, 2));
+    expect(labels).toEqual(["A.", "B.", "C."]);
+    // A を押すと、画面の 1 番目(元のキーは C)が選ばれる
     const user = userEvent.setup();
     await user.keyboard("a");
-    expect(checked()).toEqual([false, true, false]);
+    expect(checked()).toEqual([true, false, false]);
   });
 
   it("画面に_キー操作の案内を表示する", async () => {

@@ -11,7 +11,17 @@ import { ScoreRing } from "@/components/score-ring.tsx";
 import { judgeFreeText } from "@/lib/free-text.ts";
 import { fetchServerResults, postServerResult } from "@/lib/history/client.ts";
 import { mergeResults, pendingMigration } from "@/lib/history/merge.ts";
-import { answerFor, isQuestionCorrect, orderChoices, passLinePercent, score, textAnswerFor } from "@/lib/quiz.ts";
+import {
+  answerFor,
+  displayLabels,
+  isQuestionCorrect,
+  labelKeys,
+  orderChoices,
+  passLinePercent,
+  relabelText,
+  score,
+  textAnswerFor,
+} from "@/lib/quiz.ts";
 import { recentOutcomes } from "@/lib/recent-outcomes.ts";
 import {
   browserStore,
@@ -239,11 +249,7 @@ export function ResultView({ exam, questions }: Props) {
                   choiceOrder={latest.choiceOrder}
                 />
               )}
-              <div className="space-y-2 border-t border-line pt-3">
-                <h3 className="font-bold">解説</h3>
-                <RichText text={question.explanation} />
-              </div>
-              {question.supplement ? <RichText text={question.supplement} className="text-sm text-muted" /> : null}
+              <Explanation question={question} choiceOrder={latest.choiceOrder} />
               <ReferenceList references={question.references} />
             </li>
           ))}
@@ -298,15 +304,17 @@ function ChoiceDetail({
   selected: readonly string[];
   choiceOrder: Result["choiceOrder"];
 }) {
+  const choices = orderChoices(question, choiceOrder);
+  const labels = displayLabels(choices);
   return (
     <>
       <ul className="space-y-1 text-sm">
-        {orderChoices(question, choiceOrder).map((choice) => {
+        {choices.map((choice) => {
           const isAnswer = question.correctAnswers.includes(choice.key);
           const chosen = selected.includes(choice.key);
           return (
             <li key={choice.key} className="rounded border border-line p-2">
-              <span className="font-bold">{choice.key}. </span>
+              <span className="font-bold">{labels.get(choice.key)}. </span>
               <InlineText text={choice.text} />
               {isAnswer ? <span className="ml-2 font-bold text-correct">(正解)</span> : null}
               {chosen ? <span className="ml-2 text-muted">(あなたの回答)</span> : null}
@@ -315,7 +323,7 @@ function ChoiceDetail({
                   <span className={`font-bold ${isAnswer ? "text-correct" : "text-incorrect"}`}>
                     {isAnswer ? "正解の理由: " : "不正解の理由: "}
                   </span>
-                  <InlineText text={choice.explanation} />
+                  <InlineText text={relabelText(choice.explanation, labels)} />
                 </p>
               ) : null}
             </li>
@@ -323,8 +331,28 @@ function ChoiceDetail({
         })}
       </ul>
       <p className="text-sm text-muted">
-        あなたの回答: {keysLabel(selected)} / 正解: {keysLabel(question.correctAnswers)}
+        あなたの回答: {keysLabel(labelKeys(selected, labels))} / 正解:{" "}
+        {keysLabel(labelKeys(question.correctAnswers, labels))}
       </p>
+    </>
+  );
+}
+
+/** 解説と補足。選択肢を記号で指している箇所は、画面の記号(並べた順に A から振ったもの)に置き換える */
+function Explanation({ question, choiceOrder }: { question: Question; choiceOrder: Result["choiceOrder"] }) {
+  const labels =
+    question.questionType === "free-text"
+      ? new Map<string, string>()
+      : displayLabels(orderChoices(question, choiceOrder));
+  return (
+    <>
+      <div className="space-y-2 border-t border-line pt-3">
+        <h3 className="font-bold">解説</h3>
+        <RichText text={relabelText(question.explanation, labels)} />
+      </div>
+      {question.supplement ? (
+        <RichText text={relabelText(question.supplement, labels)} className="text-sm text-muted" />
+      ) : null}
     </>
   );
 }

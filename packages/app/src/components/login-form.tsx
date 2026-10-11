@@ -1,12 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
 import { postJson } from "@/lib/auth/client.ts";
+import { navigateWithReload } from "@/lib/auth/navigate.ts";
 import { PASSWORD_RULE_TEXT, passwordProblem } from "@/lib/auth/password.ts";
 import { Field, FormError, SubmitButton } from "./form-parts.tsx";
-import { useSession } from "./session-provider.tsx";
 
 type Step =
   | { name: "login" }
@@ -15,8 +14,6 @@ type Step =
 
 /** `next`: ログインしたあとに移る場所(サーバー側で検査済みの、このサイト内の画面) */
 export function LoginForm({ next = "/" }: { next?: string }) {
-  const router = useRouter();
-  const { reload } = useSession();
   const [step, setStep] = useState<Step>({ name: "login" });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -25,10 +22,10 @@ export function LoginForm({ next = "/" }: { next?: string }) {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
 
-  async function done() {
-    await reload();
-    router.push(next);
-    router.refresh();
+  function done() {
+    // ページごと読み込み直し、ログインの状態を最初から読み直す。読み込みが終わるまで、送信のボタンは押せないままにする
+    setBusy(true);
+    navigateWithReload(next);
   }
 
   async function submitLogin(event: FormEvent) {
@@ -47,7 +44,7 @@ export function LoginForm({ next = "/" }: { next?: string }) {
       });
       return;
     }
-    await done();
+    done();
   }
 
   async function submitNewPassword(event: FormEvent) {
@@ -69,7 +66,7 @@ export function LoginForm({ next = "/" }: { next?: string }) {
       if (result.status === 401) setStep({ name: "login" });
       return setError(result.message);
     }
-    await done();
+    done();
   }
 
   if (step.name === "new-password") {
