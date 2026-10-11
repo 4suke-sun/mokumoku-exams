@@ -83,3 +83,37 @@ describe("ModeSelect の本番モード", () => {
     expect(loadSession(browserStore(), "TEST")).toBeNull();
   });
 });
+
+describe("ModeSelect の解答の表示", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    push.mockClear();
+  });
+
+  it("既定はまとめて最後に_1 問ごとを選ぶと出題の状態に含め_次の既定として覚える", async () => {
+    const { unmount } = render(<ModeSelect exam={exam} pool={pool} />);
+    const user = userEvent.setup();
+    const end = await screen.findByRole("radio", { name: /まとめて最後に/ });
+    expect((end as HTMLInputElement).checked).toBe(true);
+
+    await user.click(screen.getByRole("radio", { name: /1 問ごと/ }));
+    await user.click(screen.getByRole("button", { name: "出題を始める" }));
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/play"));
+    expect(loadSession(browserStore(), "TEST")?.reveal).toBe("each");
+    unmount();
+
+    render(<ModeSelect exam={exam} pool={pool} />);
+    await waitFor(() =>
+      expect((screen.getByRole("radio", { name: /1 問ごと/ }) as HTMLInputElement).checked).toBe(true),
+    );
+  });
+
+  it("本番モード_1 問ごとを選んでいても_まとめて最後に採点する", async () => {
+    render(<ModeSelect exam={exam} pool={pool} />);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole("radio", { name: /1 問ごと/ }));
+    await user.click(screen.getByRole("button", { name: /本番モードを始める/ }));
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/play"));
+    expect(loadSession(browserStore(), "TEST")?.reveal).toBeUndefined();
+  });
+});

@@ -60,21 +60,27 @@ export function useBookmarks(examCode: string): Bookmarks {
 
 type Props = { questionId: string; bookmarks: Bookmarks };
 
-/** 問題ごとのブックマークの切り替え。ブックマークを読み込めないときは、押せなくする。 */
+/**
+ * 問題ごとのブックマークの切り替え。付いている間は「ブックマーク中」と出す(★ の形と文言で、色だけに頼らない)。
+ * この画面で付けたときだけ、★ が回る(動きを減らす設定とシンプル表示では止まる)。ブックマークを読み込めないときは、押せなくする。
+ */
 export function BookmarkToggle({ questionId, bookmarks }: Props) {
   const on = bookmarks.ids?.has(questionId) ?? false;
+  const spin = on && bookmarks.touched.has(questionId);
   return (
     <button
       type="button"
       aria-pressed={on}
       disabled={bookmarks.ids === null}
       onClick={() => void bookmarks.toggle(questionId)}
-      className={`rounded-md border px-3 py-1 text-sm font-bold disabled:opacity-50 ${
-        on ? "border-primary text-primary" : "border-line"
+      className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-sm font-bold disabled:opacity-50 ${
+        on ? "border-orange bg-orange-soft text-orange" : "border-line"
       }`}
     >
-      <span aria-hidden="true">{on ? "★ " : "☆ "}</span>
-      {on ? "ブックマーク済み" : "ブックマーク"}
+      <span key={on ? "on" : "off"} aria-hidden="true" className={spin ? "motion-star" : undefined}>
+        {on ? "★" : "☆"}
+      </span>
+      {on ? "ブックマーク中" : "ブックマーク"}
     </button>
   );
 }

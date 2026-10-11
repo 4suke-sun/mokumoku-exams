@@ -1,14 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { BookmarkError, BookmarkToggle, useBookmarks } from "@/components/bookmark-toggle.tsx";
+import { ChoiceReview } from "@/components/choice-review.tsx";
 import { Confetti } from "@/components/confetti.tsx";
 import { EmptyState } from "@/components/empty-state.tsx";
+import { ExplanationView } from "@/components/explanation-view.tsx";
 import { Notice } from "@/components/notice.tsx";
 import { ResultSkeleton } from "@/components/page-skeletons.tsx";
+import { QuestionChips } from "@/components/question-chips.tsx";
 import { ReferenceList } from "@/components/reference-list.tsx";
-import { InlineText, RichText } from "@/components/rich-text.tsx";
+import { RichText } from "@/components/rich-text.tsx";
 import { ScoreRing } from "@/components/score-ring.tsx";
 import { judgeFreeText } from "@/lib/free-text.ts";
 import { fetchServerResults, postServerResult } from "@/lib/history/client.ts";
@@ -18,9 +22,9 @@ import {
   displayLabels,
   isQuestionCorrect,
   labelKeys,
+  newSession,
   orderChoices,
   passLinePercent,
-  relabelText,
   score,
   textAnswerFor,
 } from "@/lib/quiz.ts";
@@ -29,9 +33,11 @@ import {
   browserStore,
   clearResults,
   loadResults,
+  loadSettings,
   loadStageProgress,
   type Result,
   type StageCheck,
+  saveSession,
 } from "@/lib/storage.ts";
 import { STAGE_PASS_PERCENT } from "@/lib/study-stages.ts";
 import type { ChoiceQuestion, FreeTextQuestion, PublishedExam, Question } from "@/lib/types.ts";
@@ -51,6 +57,12 @@ function formatDate(iso: string): string {
 
 function keysLabel(keys: readonly string[]): string {
   return keys.length === 0 ? "未回答" : keys.join("、");
+}
+
+/** 回答時間の表示(秒。1 分以上は分と秒) */
+export function formatAnswerTime(ms: number): string {
+  const seconds = Math.round(ms / 1000);
+  return seconds < 60 ? `${seconds} 秒` : `${Math.floor(seconds / 60)} 分 ${seconds % 60} 秒`;
 }
 
 /** 問題ごとの直近の正誤(新しい順)。 */
@@ -74,7 +86,9 @@ function RecentOutcomeMarks({ outcomes }: { outcomes: readonly boolean[] }) {
 }
 
 export function ResultView({ exam, questions }: Props) {
+  const router = useRouter();
   const [state, setState] = useState<State>({ status: "loading" });
+  const [retryError, setRetryError] = useState<string | null>(null);
   const [wrongOnly, setWrongOnly] = useState(false);
   const [migration, setMigration] = useState<"idle" | "busy" | "failed">("idle");
   const [stageCheck, setStageCheck] = useState<StageCheck | null>(null);
@@ -137,11 +151,37 @@ export function ResultView({ exam, questions }: Props) {
   }
 
   const result = score(answered, latest.answers, latest.textAnswers);
-  const allRows = answered.map((question, i) => ({
-    question,
-    number: i + 1,
-    correct: isQuestionCorrect(question, latest.answers, latest.textAnswers),
-  }));
+  // 結果の問題の並びの位置(回答時間・印は、この位置の配列)
+  const positions = new Map(latest.questionIds.map((id, i) => [id, i]));
+  const allRows = answered.map((question, i) => {
+    const at = positions.get(question.questionId) ?? -1;
+    return {
+      question,
+      number: i + 1,
+      correct: isQuestionCorrect(question, latest.answers, latest.textAnswers),
+      unsure: latest.unsure?.[at] === true,
+      flagged: latest.flagged?.[at] === true,
+      timeMs: latest.timesMs?.[at],
+    };
+  });
+  // 解き直しの対象: 間違えた問題と、自信なしの印を付けた問題(出題した順)
+  const retryRows = allRows.filter((row) => !row.correct || row.unsure);
+
+  /** 間違えた問題(と自信なし)だけで、新しい出題を始める。結果は、通常の結果として保存される */
+  function retry() {
+    const store = browserStore();
+    const { shuffleChoices, reveal } = loadSettings(store);
+    const items = retryRows.map(({ question }) => ({
+      questionId: question.questionId,
+      choiceKeys: question.questionType === "free-text" ? [] : question.choices.map((c) => c.key),
+    }));
+    const session = newSession(exam.examCode, items, { shuffleChoices }, Math.random, new Date());
+    if (!saveSession(store, reveal === "each" ? { ...session, reveal } : session)) {
+      setRetryError("この端末では、出題の状態を保存できません。ブラウザの設定を確認してください。");
+      return;
+    }
+    router.push(`/exams/${exam.examCode}/play`);
+  }
   const wrongCount = allRows.filter((row) => !row.correct).length;
   // 保存した結果(最大 10 回)から、問題ごとの直近の正誤を出す(新しく保存はしない)
   const outcomes = recentOutcomes(state.results, questions);
@@ -232,7 +272,7 @@ export function ResultView({ exam, questions }: Props) {
         <BookmarkError bookmarks={bookmarks} />
         {wrongCount === 0 ? <p className="text-correct">すべて正解でした。見直す問題はありません。</p> : null}
         <ol className="motion-stagger space-y-4">
-          {rows.map(({ question, number, correct }) => (
+          {rows.map(({ question, number, correct, unsure, flagged, timeMs }) => (
             <li key={question.questionId} className="card space-y-3 p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className={`font-bold ${correct ? "text-correct" : "text-incorrect"}`}>
@@ -242,6 +282,14 @@ export function ResultView({ exam, questions }: Props) {
                   <span className="ml-2 text-fg">問題 {number}</span>
                 </p>
                 <BookmarkToggle questionId={question.questionId} bookmarks={bookmarks} />
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <QuestionChips domains={exam.domains} question={question} />
+                {unsure ? <span className="chip tone-warn">自信なし</span> : null}
+                {flagged ? <span className="chip tone-orange">見直し</span> : null}
+                {timeMs !== undefined ? (
+                  <span className="text-sm text-muted">回答時間 {formatAnswerTime(timeMs)}</span>
+                ) : null}
               </div>
               <RecentOutcomeMarks outcomes={outcomes.get(question.questionId) ?? []} />
               <RichText text={question.questionText} />
@@ -254,7 +302,10 @@ export function ResultView({ exam, questions }: Props) {
                   choiceOrder={latest.choiceOrder}
                 />
               )}
-              <Explanation question={question} choiceOrder={latest.choiceOrder} />
+              <div className="space-y-2 border-t border-line pt-3">
+                <h3 className="font-bold">解説</h3>
+                <ExplanationView question={question} choiceOrder={latest.choiceOrder} headingLevel={4} />
+              </div>
               <ReferenceList references={question.references} />
             </li>
           ))}
@@ -284,12 +335,27 @@ export function ResultView({ exam, questions }: Props) {
         </div>
       ) : null}
 
+      <div className="space-y-3">
+        {retryRows.length > 0 ? (
+          <button
+            type="button"
+            onClick={retry}
+            className="w-full rounded-md bg-primary px-5 py-3 font-bold text-on-primary hover:opacity-90"
+          >
+            {`間違えた問題${retryRows.some((row) => row.unsure) ? "と自信なしの問題" : ""}だけで解き直す(${retryRows.length} 問)`}
+          </button>
+        ) : null}
+        {retryError ? <Notice kind="error">{retryError}</Notice> : null}
+      </div>
+
       <div className="flex gap-3">
         <Link
           href={`/exams/${exam.examCode}`}
-          className="flex-1 rounded-md bg-primary px-5 py-3 text-center font-bold text-on-primary hover:opacity-90"
+          className={`flex-1 rounded-md px-5 py-3 text-center font-bold ${
+            retryRows.length > 0 ? "border border-line bg-surface" : "bg-primary text-on-primary hover:opacity-90"
+          }`}
         >
-          もう一度解く
+          別の問題でもう一度
         </Link>
         <Link href="/exams" className="rounded-md border border-line bg-surface px-5 py-3 font-bold">
           資格の一覧へ
@@ -309,55 +375,14 @@ function ChoiceDetail({
   selected: readonly string[];
   choiceOrder: Result["choiceOrder"];
 }) {
-  const choices = orderChoices(question, choiceOrder);
-  const labels = displayLabels(choices);
+  const labels = displayLabels(orderChoices(question, choiceOrder));
   return (
     <>
-      <ul className="space-y-1 text-sm">
-        {choices.map((choice) => {
-          const isAnswer = question.correctAnswers.includes(choice.key);
-          const chosen = selected.includes(choice.key);
-          return (
-            <li key={choice.key} className="rounded border border-line p-2">
-              <span className="font-bold">{labels.get(choice.key)}. </span>
-              <InlineText text={choice.text} />
-              {isAnswer ? <span className="ml-2 font-bold text-correct">(正解)</span> : null}
-              {chosen ? <span className="ml-2 text-muted">(あなたの回答)</span> : null}
-              {choice.explanation ? (
-                <p className="mt-1 text-muted">
-                  <span className={`font-bold ${isAnswer ? "text-correct" : "text-incorrect"}`}>
-                    {isAnswer ? "正解の理由: " : "不正解の理由: "}
-                  </span>
-                  <InlineText text={relabelText(choice.explanation, labels)} />
-                </p>
-              ) : null}
-            </li>
-          );
-        })}
-      </ul>
+      <ChoiceReview question={question} selected={selected} choiceOrder={choiceOrder} />
       <p className="text-sm text-muted">
         あなたの回答: {keysLabel(labelKeys(selected, labels))} / 正解:{" "}
         {keysLabel(labelKeys(question.correctAnswers, labels))}
       </p>
-    </>
-  );
-}
-
-/** 解説と補足。選択肢を記号で指している箇所は、画面の記号(並べた順に A から振ったもの)に置き換える */
-function Explanation({ question, choiceOrder }: { question: Question; choiceOrder: Result["choiceOrder"] }) {
-  const labels =
-    question.questionType === "free-text"
-      ? new Map<string, string>()
-      : displayLabels(orderChoices(question, choiceOrder));
-  return (
-    <>
-      <div className="space-y-2 border-t border-line pt-3">
-        <h3 className="font-bold">解説</h3>
-        <RichText text={relabelText(question.explanation, labels)} />
-      </div>
-      {question.supplement ? (
-        <RichText text={relabelText(question.supplement, labels)} className="text-sm text-muted" />
-      ) : null}
     </>
   );
 }

@@ -379,6 +379,105 @@ body {
     color: var(--on-primary);
   }
 
+  /* 選択肢の記号の丸いチップ。回答後は、正解を緑、自分の誤答を赤で塗る(色だけに頼らず、タグの文字を添える) */
+  .choice-chip {
+    display: inline-grid;
+    flex: none;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 9999px;
+    font-size: 0.875rem;
+    font-weight: 700;
+    background: var(--soft);
+    color: var(--primary);
+  }
+  .choice-chip-selected {
+    background: var(--primary);
+    color: var(--on-primary);
+  }
+  .choice-chip-correct {
+    background: var(--correct);
+    color: var(--surface);
+  }
+  .choice-chip-wrong {
+    background: var(--incorrect);
+    color: var(--surface);
+  }
+
+  /* 解説のカード。--tone(tone-*)で、種類ごとの色にする */
+  .exp-card {
+    border: 1px solid color-mix(in srgb, var(--tone, var(--muted)) 28%, transparent);
+    border-left: 4px solid var(--tone, var(--muted));
+    border-radius: var(--r-md);
+    background: color-mix(in srgb, var(--tone, var(--muted)) 7%, var(--surface));
+    padding: 0.75rem 1rem;
+  }
+  .exp-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+    color: color-mix(in srgb, var(--tone, var(--muted)) 80%, var(--text));
+  }
+  .exp-item {
+    border: 1px solid color-mix(in srgb, var(--tone, var(--muted)) 20%, transparent);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+    padding: 0.5rem 0.75rem;
+  }
+
+  /* 本番モードの残り時間のピル。残りわずかでは赤にし、文言も変える */
+  .timer-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: 1px solid var(--border);
+    border-radius: 9999px;
+    background: var(--surface);
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+    font-weight: 700;
+  }
+  .timer-pill-low {
+    border-color: var(--incorrect);
+    background: var(--incorrect-bg);
+    color: var(--incorrect);
+  }
+
+  /* 問題一覧のマス。回答済みは塗り、今の問題は枠、見直しの印は点で示す */
+  .q-cell {
+    position: relative;
+    display: grid;
+    place-items: center;
+    height: 2.25rem;
+    border: 1px solid var(--border);
+    border-radius: var(--r-sm);
+    background: var(--surface);
+    font-size: 0.875rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .q-cell-answered {
+    border-color: var(--primary);
+    background: var(--soft);
+    color: var(--primary);
+    font-weight: 700;
+  }
+  .q-cell-current {
+    outline: 2px solid var(--primary);
+    outline-offset: 1px;
+  }
+  .q-cell-flag::after {
+    content: "";
+    position: absolute;
+    top: 0.2rem;
+    right: 0.2rem;
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 9999px;
+    background: var(--orange);
+  }
+
   /* 見出し。ページの題は .h1、区切りの題は .h2、カードの中の題は .h3 */
   .h1 {
     font-size: 1.5rem;
@@ -416,6 +515,26 @@ body {
   border-radius: 9999px;
   background: var(--orange);
   box-shadow: 0 0 0 2px var(--surface);
+}
+
+/* シンプル表示の解説: 面の色と枠をやめ、左の線と見出しだけにする */
+:root[data-style="simple"] .exp-card {
+  border: 0;
+  border-left: 3px solid var(--border);
+  border-radius: 0;
+  background: none;
+  padding: 0 0 0 0.75rem;
+}
+:root[data-style="simple"] .exp-head {
+  color: var(--text);
+}
+:root[data-style="simple"] .exp-icon {
+  display: none;
+}
+:root[data-style="simple"] .exp-item {
+  border: 0;
+  background: none;
+  padding: 0;
 }
 
 /* ---- 動き。CSS だけで作り、止める一覧(この下の 2 つ)に名前を挙げる ---- */
@@ -597,6 +716,24 @@ body {
   animation: float 3s ease-in-out infinite;
 }
 
+/* ブックマークを付けたときに、★ が回る */
+@keyframes star-spin {
+  0% {
+    transform: scale(1) rotate(0);
+  }
+  50% {
+    transform: scale(1.4) rotate(144deg);
+  }
+  100% {
+    transform: scale(1) rotate(360deg);
+  }
+}
+
+.motion-star {
+  display: inline-block;
+  animation: star-spin 0.5s ease-out;
+}
+
 /* 紙吹雪(components/confetti.tsx)。上から下へ、回りながら落ちる */
 @keyframes confetti-fall {
   from {
@@ -752,6 +889,7 @@ body {
   .motion-correct,
   .motion-wrong,
   .motion-stamp,
+  .motion-star,
   .motion-shine::after,
   .motion-float,
   .skeleton,
@@ -796,6 +934,7 @@ body {
   .motion-correct,
   .motion-wrong,
   .motion-stamp,
+  .motion-star,
   .motion-float,
   .skeleton,
   .confetti-piece,

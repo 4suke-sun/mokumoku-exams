@@ -3,7 +3,7 @@ import { createFakeProvider, createFakeVerifier, FAKE_USER_EMAIL, FAKE_USER_PHRA
 import { withTokenCookies } from "@/lib/auth/session.ts";
 import type { AuthProvider } from "@/lib/auth/types.ts";
 import type { TokenVerifier } from "@/lib/auth/verify.ts";
-import { MAX_RESULTS, type Result } from "@/lib/storage.ts";
+import { MAX_ANSWER_TIME_MS, MAX_RESULTS, type Result } from "@/lib/storage.ts";
 import {
   type HistoryDeps,
   handleGetGoal,
@@ -239,6 +239,13 @@ describe("履歴 API の入力の検証", () => {
     ["回答が配列の外", { answers: [] }],
     ["完了時刻が文字列でない", { finishedAt: 20261011 }],
     ["資格コードが文字列でない", { examCode: 1 }],
+    ["回答時間の数が問題の数と合わない", { timesMs: [1000, 2000] }],
+    ["回答時間が上限を超える", { timesMs: [MAX_ANSWER_TIME_MS + 1] }],
+    ["回答時間が負", { timesMs: [-1] }],
+    ["回答時間が整数でない", { timesMs: [1.5] }],
+    ["自信なしの数が問題の数と合わない", { unsure: [] }],
+    ["自信なしが真偽値でない", { unsure: ["yes"] }],
+    ["見直しの数が問題の数と合わない", { flagged: [true, false] }],
   ])("%s_400 で断り_何も保存しない", async (_name, overrides) => {
     const repository = createMemoryRepository();
     const response = await handlePostResult(post(body(overrides), { cookie }), deps(repository));
@@ -290,6 +297,22 @@ describe("履歴 API の入力の検証", () => {
     });
     expect((await handlePostResult(post(withText, { cookie }), deps(repository))).status).toBe(200);
     expect(await repository.listResults("a", "SAMPLE")).toEqual([withText]);
+  });
+
+  it("回答時間・自信なし・見直し_問題の数と同じ長さなら受け付け_取得で同じ内容が返る", async () => {
+    const repository = createMemoryRepository();
+    const marked = body({
+      questionIds: ["SAMPLE-0001", "SAMPLE-0002"],
+      timesMs: [12_000, MAX_ANSWER_TIME_MS],
+      unsure: [true, false],
+      flagged: [false, true],
+    });
+    expect((await handlePostResult(post(marked, { cookie }), deps(repository))).status).toBe(200);
+    expect(await repository.listResults("a", "SAMPLE")).toEqual([marked]);
+  });
+
+  it("回答時間・自信なし・見直しのない古い形_受け付ける", async () => {
+    expect((await handlePostResult(post(body(), { cookie }), deps())).status).toBe(200);
   });
 
   it("未回答の問題がある_回答がなくても受け付ける", async () => {
@@ -482,7 +505,31 @@ describe("採点し直して復習プールの変更にする", () => {
       at: "2026-10-11T12:00:00.000Z",
     });
     // 学習量は、データにある問題だけを数える
-    expect(tallyOf(reviewChangeOf(result, questions))).toEqual({ answered: 3, correct: 1 });
+    expect(tallyOf(result, questions)).toEqual({ answered: 3, correct: 1 });
+  });
+
+  const marked = (over: Partial<Result>): Result => ({
+    examCode: "SAMPLE",
+    questionIds: ["SAMPLE-0001", "SAMPLE-0002", "SAMPLE-0003"],
+    answers: { "SAMPLE-0001": ["B"], "SAMPLE-0002": ["A"] },
+    finishedAt: "2026-10-11T12:00:00.000Z",
+    ...over,
+  });
+
+  it("自信なしの印_正解でも復習に残し_学習量の正答数には数える", () => {
+    const result = marked({ unsure: [true, false, false] });
+    expect(reviewChangeOf(result, questions)).toEqual({
+      wrong: ["SAMPLE-0001", "SAMPLE-0002", "SAMPLE-0003"],
+      correct: [],
+      at: "2026-10-11T12:00:00.000Z",
+    });
+    expect(tallyOf(result, questions)).toEqual({ answered: 3, correct: 1 });
+  });
+
+  it("見直しの印_採点と復習に影響しない", () => {
+    expect(reviewChangeOf(marked({ flagged: [true, true, true] }), questions)).toEqual(
+      reviewChangeOf(marked({}), questions),
+    );
   });
 
   it("自由記述の問題_採点基準の判定で正誤を決める(端末の正誤は使わない)", () => {

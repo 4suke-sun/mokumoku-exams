@@ -104,7 +104,7 @@ describe("ブックマークの切り替え", () => {
   it("保存に失敗する_元の表示に戻し_知らせる", async () => {
     stubServer({ bookmarks: ["TEST-0001"], putOk: false });
     render(<Toggle />);
-    const button = await screen.findByRole("button", { name: /ブックマーク済み/ });
+    const button = await screen.findByRole("button", { name: /ブックマーク中/ });
     await userEvent.setup().click(button);
     expect(await screen.findByRole("alert")).toBeTruthy();
     expect(button.getAttribute("aria-pressed")).toBe("true");

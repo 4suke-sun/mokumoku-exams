@@ -21,6 +21,7 @@ import {
   DEFAULT_SETTINGS,
   loadSession,
   loadSettings,
+  type Reveal,
   type Session,
   saveSession,
   saveSettings,
@@ -37,6 +38,16 @@ type Props = {
 };
 
 const COUNT_CHOICES = [5, 10, 20, 50];
+
+/** 解答の表示のしかた(本番モードは、本番と同じく、まとめて最後に) */
+const REVEALS: { id: Reveal; name: string; description: string }[] = [
+  { id: "end", name: "まとめて最後に", description: "すべて解いてから採点し、結果の画面で正解と解説を見ます。" },
+  {
+    id: "each",
+    name: "1 問ごと",
+    description: "「回答する」を押すと、その問題の正誤と解説を出します。回答したあとは、選択を変えられません。",
+  },
+];
 
 /** 出題の対象。復習プールとブックマークは、アカウントに保存したもの。 */
 type Target = "all" | "review" | "bookmarks";
@@ -84,6 +95,7 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
   const [count, setCount] = useState<number>(Math.min(5, pool.length));
   const [error, setError] = useState<string | null>(null);
   const [shuffleChoices, setShuffleChoices] = useState(DEFAULT_SETTINGS.shuffleChoices);
+  const [reveal, setReveal] = useState<Reveal>("end");
   const [resumable, setResumable] = useState<Session | null>(null);
   const [target, setTarget] = useState<Target>("all");
   // 取得できなかったときは null(その対象は選べない)
@@ -94,7 +106,9 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
 
   useEffect(() => {
     const store = browserStore();
-    setShuffleChoices(loadSettings(store).shuffleChoices);
+    const settings = loadSettings(store);
+    setShuffleChoices(settings.shuffleChoices);
+    setReveal(settings.reveal ?? "end");
     const saved = loadSession(store, exam.examCode);
     // 出題中の問題が、いまのデータにすべてあるときだけ続きから解ける
     const ids = new Set(pool.map((p) => p.questionId));
@@ -140,7 +154,12 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
 
   function changeShuffle(next: boolean) {
     setShuffleChoices(next);
-    saveSettings(browserStore(), { shuffleChoices: next });
+    saveSettings(browserStore(), { shuffleChoices: next, reveal });
+  }
+
+  function changeReveal(next: Reveal) {
+    setReveal(next);
+    saveSettings(browserStore(), { shuffleChoices, reveal: next });
   }
 
   function discard() {
@@ -173,7 +192,8 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
       setError("出題できる問題がありません。出題の対象と分野の選択を見直してください。");
       return;
     }
-    begin(newSession(exam.examCode, picked, { shuffleChoices }, Math.random, new Date()));
+    const session = newSession(exam.examCode, picked, { shuffleChoices }, Math.random, new Date());
+    begin(reveal === "each" ? { ...session, reveal } : session);
   }
 
   return (
@@ -309,6 +329,26 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
           <span className="block text-sm text-muted">位置で答えを覚えてしまうのを防ぎます。採点は変わりません。</span>
         </span>
       </label>
+
+      <fieldset className="space-y-2">
+        <legend className="text-lg font-bold">解答の表示</legend>
+        {REVEALS.map((item) => (
+          <label key={item.id} className="flex items-start gap-3 rounded-md border border-line bg-surface p-3">
+            <input
+              type="radio"
+              name="reveal"
+              className="mt-1 size-5"
+              checked={reveal === item.id}
+              onChange={() => changeReveal(item.id)}
+            />
+            <span>
+              {item.name}
+              <span className="block text-sm text-muted">{item.description}</span>
+            </span>
+          </label>
+        ))}
+        <p className="text-sm text-muted">本番モードは、本番と同じく、まとめて最後に採点します。</p>
+      </fieldset>
 
       <div className="space-y-2">
         <label htmlFor={countId} className="block text-lg font-bold">

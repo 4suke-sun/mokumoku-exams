@@ -155,6 +155,9 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
           textAnswers: item.textAnswers,
           finishedAt: item.finishedAt,
           choiceOrder: item.choiceOrder,
+          timesMs: item.timesMs,
+          unsure: item.unsure,
+          flagged: item.flagged,
         });
         if (parsed.success) results.push(parsed.data);
       }
