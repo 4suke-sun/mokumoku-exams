@@ -1,12 +1,24 @@
 import Link from "next/link";
+import { ResumeCards } from "@/components/resume-cards.tsx";
+import { listPublishedExams, loadQuestions } from "@/lib/exam-data.ts";
 
-export default function HomePage() {
+export default async function HomePage() {
+  // 続きから解けるかの判定に必要な情報だけを渡す(問題の本文や正解は、出題画面で読み込む)
+  const exams = await Promise.all(
+    listPublishedExams().map(async (exam) => ({
+      examCode: exam.examCode,
+      name: exam.name,
+      questionIds: (await loadQuestions(exam)).map((q) => q.questionId),
+    })),
+  );
+
   return (
     <section className="space-y-6">
       <h1 className="text-2xl font-bold">もくもく問題集</h1>
       <p className="leading-relaxed text-muted">
         クラウド資格の学習用に、問題を解き、間違いを見直せます。資格を選んで、はじめましょう。
       </p>
+      <ResumeCards exams={exams} />
       <Link
         href="/exams"
         className="inline-block rounded-md bg-primary px-5 py-3 font-bold text-on-primary hover:opacity-90"
