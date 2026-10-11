@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useState } from "react";
 import { fetchBookmarks, fetchReview } from "@/lib/history/client.ts";
-import { domainCounts, sessionProgress, shuffle, shuffleChoiceOrder } from "@/lib/quiz.ts";
+import { domainCounts, requestedDomains, sessionProgress, shuffle, shuffleChoiceOrder } from "@/lib/quiz.ts";
 import {
   browserStore,
   clearSession,
@@ -61,6 +61,16 @@ export function ModeSelect({ exam, pool }: Props) {
     const ids = new Set(pool.map((p) => p.questionId));
     setResumable(saved?.questionIds.every((id) => ids.has(id)) ? saved : null);
   }, [exam.examCode, pool]);
+
+  // 学習の状況の「この分野を解く」から来たときは、その分野を選んでおく(`?domain=`)
+  useEffect(() => {
+    setDomains(
+      requestedDomains(
+        window.location.search,
+        exam.domains.map((d) => d.code),
+      ),
+    );
+  }, [exam.domains]);
 
   useEffect(() => {
     let active = true;

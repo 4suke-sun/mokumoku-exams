@@ -3,7 +3,13 @@ import * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import type { Construct } from "constructs";
 
 /** アプリが履歴の保存に使う操作。テーブルへの最小の権限として、WebStack が Lambda に与える。 */
-export const HISTORY_TABLE_ACTIONS = ["dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:Query", "dynamodb:DeleteItem"];
+export const HISTORY_TABLE_ACTIONS = [
+  "dynamodb:GetItem",
+  "dynamodb:PutItem",
+  "dynamodb:UpdateItem",
+  "dynamodb:Query",
+  "dynamodb:DeleteItem",
+];
 
 /** 時点復旧で戻せる期間(日)。DynamoDB の最大(35 日)。料金は保存量に応じて決まるので、期間を短くしても変わらない。 */
 export const POINT_IN_TIME_RECOVERY_DAYS = 35;

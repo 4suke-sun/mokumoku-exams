@@ -6,11 +6,15 @@ import type { TokenVerifier } from "@/lib/auth/verify.ts";
 import { MAX_RESULTS, type Result } from "@/lib/storage.ts";
 import {
   type HistoryDeps,
+  handleGetGoal,
   handleListBookmarks,
+  handleListDays,
   handleListResults,
   handlePostResult,
   handlePutBookmark,
+  handlePutGoal,
   reviewChangeOf,
+  tallyOf,
 } from "./handlers.ts";
 import { createMemoryRepository, type HistoryRepository } from "./repository.ts";
 
@@ -333,6 +337,15 @@ const failing: HistoryRepository = {
   async updateReview() {
     throw new Error("unavailable");
   },
+  async listDays() {
+    throw new Error("unavailable");
+  },
+  async getGoal() {
+    throw new Error("unavailable");
+  },
+  async setGoal() {
+    throw new Error("unavailable");
+  },
 };
 
 describe("履歴の保存先の失敗", () => {
@@ -453,5 +466,159 @@ describe("採点し直して復習プールの変更にする", () => {
       correct: ["SAMPLE-0001"],
       at: "2026-10-11T12:00:00.000Z",
     });
+    // 学習量は、データにある問題だけを数える
+    expect(tallyOf(reviewChangeOf(result, questions))).toEqual({ answered: 3, correct: 1 });
+  });
+});
+
+describe("日ごとの学習量の API", () => {
+  const questions = async (examCode: string) =>
+    examCode === "SAMPLE"
+      ? [
+          { questionId: "SAMPLE-0001", correctAnswers: ["A"] },
+          { questionId: "SAMPLE-0002", correctAnswers: ["B"] },
+        ]
+      : null;
+  const withQuestions = (repository: HistoryRepository = createMemoryRepository()): HistoryDeps => ({
+    ...deps(repository),
+    questions,
+  });
+  const days = async (d: HistoryDeps, sub: string, query = "examCode=SAMPLE") => {
+    const response = await handleListDays(
+      new Request(`${ORIGIN}/api/history/days?${query}`, { headers: { cookie: asUser(sub) } }),
+      d,
+    );
+    expect(response.status).toBe(200);
+    return ((await response.json()) as { days: unknown[] }).days;
+  };
+
+  it("結果を保存する_完了した日(日本時間)に_採点し直した問題数と正解数が足される", async () => {
+    const d = withQuestions();
+    const two = { questionIds: ["SAMPLE-0001", "SAMPLE-0002"], answers: { "SAMPLE-0001": ["A"] } };
+    // 日本時間の 10/11 21:00 と、10/12 0:00(UTC では 10/11 15:00)
+    await handlePostResult(post(body({ ...two, finishedAt: "2026-10-11T12:00:00.000Z" }), { cookie: asUser("a") }), d);
+    await handlePostResult(post(body({ finishedAt: "2026-10-11T14:59:59.999Z" }), { cookie: asUser("a") }), d);
+    await handlePostResult(post(body({ finishedAt: "2026-10-11T15:00:00.000Z" }), { cookie: asUser("a") }), d);
+    expect(await days(d, "a")).toEqual([
+      { date: "2026-10-11", answered: 3, correct: 2 },
+      { date: "2026-10-12", answered: 1, correct: 1 },
+    ]);
+  });
+
+  it("同じ結果を送り直す_二重に数えない", async () => {
+    const d = withQuestions();
+    for (let i = 0; i < 3; i++) await handlePostResult(post(body(), { cookie: asUser("a") }), d);
+    expect(await days(d, "a")).toEqual([{ date: "2026-10-11", answered: 1, correct: 1 }]);
+  });
+
+  it("いまのデータにない問題だけの結果と_公開中でない資格の結果_数えない", async () => {
+    const d = withQuestions();
+    const missing = body({ questionIds: ["SAMPLE-0099"], answers: {} });
+    expect((await handlePostResult(post(missing, { cookie: asUser("a") }), d)).status).toBe(200);
+    const other = body({ examCode: "OTHER", questionIds: ["OTHER-0001"], answers: {} });
+    expect((await handlePostResult(post(other, { cookie: asUser("a") }), d)).status).toBe(200);
+    expect(await days(d, "a")).toEqual([]);
+    expect(await days(d, "a", "examCode=OTHER")).toEqual([]);
+  });
+
+  it("別の利用者_他人の学習量は見えない", async () => {
+    const d = withQuestions();
+    await handlePostResult(post(body(), { cookie: asUser("a") }), d);
+    expect(await days(d, "b")).toEqual([]);
+  });
+
+  it("未ログイン・問い合わせが正しくない・保存先の失敗_それぞれの種類で断る", async () => {
+    const list = (query: string, headers: Record<string, string>, d: HistoryDeps) =>
+      handleListDays(new Request(`${ORIGIN}/api/history/days?${query}`, { headers }), d);
+    expect((await list("examCode=SAMPLE", {}, withQuestions())).status).toBe(401);
+    for (const query of ["", "examCode=sample", "examCode=SAMPLE&sub=b", "examCode=SAMPLE&examCode=SAMPLE"]) {
+      expect((await list(query, { cookie: asUser("a") }, withQuestions())).status, query).toBe(400);
+    }
+    const failed = await list("examCode=SAMPLE", { cookie: asUser("a") }, withQuestions(failing));
+    expect(failed.status).toBe(503);
+    expect(await failed.json()).toEqual({ error: "unavailable" });
+  });
+});
+
+describe("目標日の API", () => {
+  const questions = async (examCode: string) =>
+    examCode === "SAMPLE" ? [{ questionId: "SAMPLE-0001", correctAnswers: ["A"] }] : null;
+  const withQuestions = (repository: HistoryRepository = createMemoryRepository()): HistoryDeps => ({
+    ...deps(repository),
+    questions,
+  });
+  const put = (value: unknown, headers: Record<string, string> = {}, raw?: string) =>
+    new Request(`${ORIGIN}/api/history/goal`, {
+      method: "PUT",
+      headers: { "content-type": "application/json", ...headers },
+      body: raw ?? JSON.stringify(value),
+    });
+  const read = (d: HistoryDeps, sub: string | null, query = "examCode=SAMPLE") =>
+    handleGetGoal(
+      new Request(`${ORIGIN}/api/history/goal?${query}`, { headers: sub ? { cookie: asUser(sub) } : {} }),
+      d,
+    );
+
+  it("決めて取得し_消す_自分の分だけに反映される", async () => {
+    const d = withQuestions();
+    expect(await (await read(d, "a")).json()).toEqual({ date: null });
+    const saved = await handlePutGoal(put({ examCode: "SAMPLE", date: "2026-12-20" }, { cookie: asUser("a") }), d);
+    expect(saved.status).toBe(200);
+    expect(await (await read(d, "a")).json()).toEqual({ date: "2026-12-20" });
+    expect(await (await read(d, "b")).json()).toEqual({ date: null });
+    await handlePutGoal(put({ examCode: "SAMPLE", date: null }, { cookie: asUser("a") }), d);
+    expect(await (await read(d, "a")).json()).toEqual({ date: null });
+  });
+
+  it("本文が正しくない_400 を返し_保存しない", async () => {
+    const d = withQuestions();
+    const cases: unknown[] = [
+      { examCode: "SAMPLE", date: "2026-02-30" },
+      { examCode: "SAMPLE", date: "2026/12/20" },
+      { examCode: "SAMPLE", date: "2026-12-20T00:00:00.000Z" },
+      { examCode: "SAMPLE", date: "" },
+      { examCode: "SAMPLE", date: "2019-12-31" },
+      { examCode: "SAMPLE", date: "2100-01-01" },
+      { examCode: "SAMPLE", date: 20261220 },
+      { examCode: "SAMPLE" },
+      { examCode: "OTHER", date: "2026-12-20" }, // 公開中でない資格
+      { examCode: "sample", date: "2026-12-20" },
+      { examCode: "SAMPLE", date: "2026-12-20", sub: "other-user" },
+      [],
+      null,
+    ];
+    for (const value of cases) {
+      const response = await handlePutGoal(put(value, { cookie: asUser("a") }), d);
+      expect(response.status, JSON.stringify(value)).toBe(400);
+      expect(await response.json()).toEqual({ error: "bad-request" });
+    }
+    expect(await (await read(d, "a")).json()).toEqual({ date: null });
+  });
+
+  it("範囲の端の日付_受け付ける", async () => {
+    const d = withQuestions();
+    for (const date of ["2020-01-01", "2099-12-31", "2028-02-29"]) {
+      expect((await handlePutGoal(put({ examCode: "SAMPLE", date }, { cookie: asUser("a") }), d)).status, date).toBe(
+        200,
+      );
+    }
+  });
+
+  it("未ログイン・別サイト・JSON でない・大きすぎる・保存先の失敗_それぞれの種類で断る", async () => {
+    const d = withQuestions();
+    const goal = { examCode: "SAMPLE", date: "2026-12-20" };
+    expect((await handlePutGoal(put(goal), d)).status).toBe(401);
+    expect((await read(d, null)).status).toBe(401);
+    expect((await handlePutGoal(put(goal, { cookie: asUser("a"), "sec-fetch-site": "cross-site" }), d)).status).toBe(
+      403,
+    );
+    expect((await handlePutGoal(put(goal, { cookie: asUser("a"), "content-type": "text/plain" }), d)).status).toBe(415);
+    expect(
+      (await handlePutGoal(put(null, { cookie: asUser("a") }, JSON.stringify({ pad: "x".repeat(2000) })), d)).status,
+    ).toBe(413);
+    expect((await handlePutGoal(put(null, { cookie: asUser("a") }, "{"), d)).status).toBe(400);
+    for (const query of ["", "examCode=SAMPLE&sub=b"]) expect((await read(d, "a", query)).status, query).toBe(400);
+    expect((await handlePutGoal(put(goal, { cookie: asUser("a") }), withQuestions(failing))).status).toBe(503);
+    expect((await read(withQuestions(failing), "a")).status).toBe(503);
   });
 });

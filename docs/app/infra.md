@@ -12,7 +12,7 @@
 | `<接頭辞>-web` | Lambda(Next.js + Lambda Web Adapter)、Function URL、CloudFront、静的ファイル用の S3 |
 
 `<接頭辞>-web` の Lambda には、`COGNITO_USER_POOL_ID`(ID トークンの検証)と `HISTORY_TABLE_NAME`(履歴のテーブル)が渡されます。
-履歴のテーブルに許す操作は、`GetItem`・`PutItem`・`Query`・`DeleteItem` だけです(テーブル 1 つに限り、スキャンやテーブルの管理はできません)。
+履歴のテーブルに許す操作は、`GetItem`・`PutItem`・`UpdateItem`・`Query`・`DeleteItem` だけです(テーブル 1 つに限り、スキャンやテーブルの管理はできません)。
 デプロイの順は、auth → data → web です(`cdkd deploy --all` が依存から決めます)。
 
 配信の流れは、[アーキテクチャの計画](./architecture-plan.md) のとおりです。

@@ -1,4 +1,4 @@
-import { passLinePercent, score } from "./quiz.ts";
+import { answerFor, isCorrect, passLinePercent, score } from "./quiz.ts";
 import type { Result } from "./storage.ts";
 import type { PublishedExam, Question } from "./types.ts";
 
@@ -71,4 +71,34 @@ export function summarize(
         ? null
         : { averagePercent, passLine, reached: averagePercent >= passLine, basedOn: recent.length },
   };
+}
+
+/** 分野ごとの正答 */
+export type DomainStat = { domain: string; answered: number; correct: number; percent: number };
+
+/**
+ * 保存した結果から、分野ごとの正答率を出し、低い順に並べる(弱い分野が先)。正答率が同じなら、解いた数の多い順、分野コードの順。
+ * いまのデータにない問題は数えない。1 問も解いていない分野は含めない。未回答は不正解として数える。
+ */
+export function domainBreakdown(results: readonly Result[], questions: readonly Question[]): DomainStat[] {
+  const byId = new Map(questions.map((q) => [q.questionId, q]));
+  const tally = new Map<string, { answered: number; correct: number }>();
+  for (const result of results) {
+    for (const id of result.questionIds) {
+      const question = byId.get(id);
+      if (!question) continue;
+      const own = tally.get(question.domain) ?? { answered: 0, correct: 0 };
+      own.answered++;
+      if (isCorrect(question, answerFor(result.answers, id))) own.correct++;
+      tally.set(question.domain, own);
+    }
+  }
+  return [...tally.entries()]
+    .map(([domain, { answered, correct }]) => ({
+      domain,
+      answered,
+      correct,
+      percent: round1((correct / answered) * 100),
+    }))
+    .sort((a, b) => a.percent - b.percent || b.answered - a.answered || (a.domain < b.domain ? -1 : 1));
 }

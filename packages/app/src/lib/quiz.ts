@@ -108,3 +108,14 @@ export function domainCounts(pool: readonly { domain: string }[]): Record<string
   for (const p of pool) counts[p.domain] = (counts[p.domain] ?? 0) + 1;
   return counts;
 }
+
+/** 分野を選んだ状態でモード選択を開く経路(学習の状況の、分野別の弱点から進む)。 */
+export function domainSelectHref(examCode: string, domain: string): string {
+  return `/exams/${examCode}?domain=${encodeURIComponent(domain)}`;
+}
+
+/** モード選択の問い合わせ(`?domain=`)で指定された分野。資格の分野でなければ、何も選ばない。 */
+export function requestedDomains(search: string, codes: readonly string[]): string[] {
+  const domain = new URLSearchParams(search).get("domain");
+  return domain !== null && codes.includes(domain) ? [domain] : [];
+}

@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { ResultSchema } from "@/lib/storage.ts";
+import { isValidDate } from "@/lib/study-days.ts";
 
 /** 資格コード(data/exams.json と同じ形)。DynamoDB のキーに使うため、区切りの `#` などを含められない。 */
 export const EXAM_CODE_PATTERN = /^[A-Z][A-Z0-9]{1,15}$/;
@@ -75,3 +76,22 @@ export const BookmarkChangeSchema = z
     bookmarked: z.boolean(),
   })
   .refine((change) => change.questionId.startsWith(`${change.examCode}-`), "資格コードと合いません。");
+
+/** 目標日の変更の本文の上限(資格コードと日付だけなので、小さい) */
+export const MAX_GOAL_BODY_BYTES = 1_000;
+
+/** 目標日として受け付ける範囲 */
+export const EARLIEST_GOAL_DATE = "2020-01-01";
+export const LATEST_GOAL_DATE = "2099-12-31";
+
+/** 目標日を決める・消す。日付は実在する `YYYY-MM-DD` で、範囲の中。null で消す。 */
+export const GoalChangeSchema = z.strictObject({
+  examCode: z.string().regex(EXAM_CODE_PATTERN),
+  date: z
+    .string()
+    .refine(
+      (date) => isValidDate(date) && date >= EARLIEST_GOAL_DATE && date <= LATEST_GOAL_DATE,
+      "日付が正しくありません。",
+    )
+    .nullable(),
+});

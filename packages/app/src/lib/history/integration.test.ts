@@ -9,7 +9,7 @@ import type { AuthProvider } from "@/lib/auth/types.ts";
 import type { TokenVerifier } from "@/lib/auth/verify.ts";
 import { MAX_RESULTS, type Result } from "@/lib/storage.ts";
 import { proxy } from "@/proxy.ts";
-import { type HistoryDeps, handleListResults, handleListReview, handlePostResult } from "./handlers.ts";
+import { type HistoryDeps, handleListDays, handleListResults, handleListReview, handlePostResult } from "./handlers.ts";
 import { createDynamoRepository, type DocumentSender } from "./repository.ts";
 import { fakeTable } from "./table-double.ts";
 
@@ -203,6 +203,31 @@ describe("履歴の通しでのエラー応答", () => {
     expect((await handlePostResult(post(attempt(minute(MAX_RESULTS)), "a"), deps)).status).toBe(200);
     expect(resultItems(table)).toBe(MAX_RESULTS);
     expect((await results(deps, "SAMPLE", "a"))[0]?.finishedAt).toBe(minute(MAX_RESULTS));
+  });
+
+  it("古い結果の切り詰めが失敗して送り直す_日ごとの学習量は一度だけ数える", async () => {
+    let failDelete = true;
+    const { deps, table } = stack((client) => ({
+      async send(command) {
+        if (command instanceof DeleteCommand && failDelete) throw new Error("internal detail");
+        return client.send(command);
+      },
+    }));
+    deps.questions = async () => [
+      { questionId: "SAMPLE-0001", correctAnswers: ["A"] },
+      { questionId: "SAMPLE-0002", correctAnswers: ["B", "C"] },
+    ];
+    for (let n = 0; n < MAX_RESULTS; n++) await handlePostResult(post(attempt(minute(n)), "a"), deps);
+    expect((await handlePostResult(post(attempt(minute(MAX_RESULTS)), "a"), deps)).status).toBe(503);
+    failDelete = false;
+    expect((await handlePostResult(post(attempt(minute(MAX_RESULTS)), "a"), deps)).status).toBe(200);
+    const response = await handleListDays(
+      new Request(`${ORIGIN}/api/history/days?examCode=SAMPLE`, { headers: { cookie: cookieOf("a") } }),
+      deps,
+    );
+    const answered = (MAX_RESULTS + 1) * 2;
+    expect(await response.json()).toEqual({ days: [{ date: "2026-10-11", answered, correct: answered }] });
+    expect(table.items.get("USER#a|DAY#SAMPLE#2026-10-11")?.answered).toBe(answered);
   });
 });
 

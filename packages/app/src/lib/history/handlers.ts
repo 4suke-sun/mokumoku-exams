@@ -4,13 +4,15 @@ import { answerFor, isCorrect } from "@/lib/quiz.ts";
 import type { Result } from "@/lib/storage.ts";
 import type { Question } from "@/lib/types.ts";
 import { examQuestions } from "./questions.ts";
-import type { HistoryRepository, ReviewChange } from "./repository.ts";
+import type { DayTally, HistoryRepository, ReviewChange } from "./repository.ts";
 import {
   apiResultSchema,
   BookmarkChangeSchema,
+  GoalChangeSchema,
   ListQuerySchema,
   MAX_BODY_BYTES,
   MAX_BOOKMARK_BODY_BYTES,
+  MAX_GOAL_BODY_BYTES,
 } from "./schema.ts";
 
 /** 採点に使う、問題の正解。公開中の資格でなければ null。 */
@@ -93,6 +95,11 @@ export function reviewChangeOf(
   return change;
 }
 
+/** 採点し直した結果の学習量。いまのデータにない問題は数えない。 */
+export function tallyOf(change: ReviewChange): DayTally {
+  return { answered: change.wrong.length + change.correct.length, correct: change.correct.length };
+}
+
 /** 自分の結果を、資格ごとに新しい順で返す。 */
 export async function handleListResults(request: Request, deps: HistoryDeps): Promise<Response> {
   const auth = await authorize(request, deps);
@@ -109,7 +116,8 @@ export async function handleListResults(request: Request, deps: HistoryDeps): Pr
 
 /**
  * 自分の結果を保存する。同じ資格・同じ完了時刻の結果は上書きなので、繰り返しても重複しない。
- * あわせて、復習プールを更新する(送り直しても、同じ変更になる)。
+ * あわせて、日ごとの学習量(結果が新しいときだけ足す)と、復習プール(送り直しても、同じ変更になる)を更新する。
+ * 公開中でない資格の結果は、保存だけする。
  */
 export async function handlePostResult(request: Request, deps: HistoryDeps): Promise<Response> {
   const rejected = guard(request);
@@ -124,28 +132,28 @@ export async function handlePostResult(request: Request, deps: HistoryDeps): Pro
   const result = parsed.data;
 
   try {
-    await deps.repository.putResult(auth.user.sub, result);
     const questions = await (deps.questions ?? examQuestions)(result.examCode);
-    if (questions)
-      await deps.repository.updateReview(auth.user.sub, result.examCode, reviewChangeOf(result, questions));
+    const change = questions ? reviewChangeOf(result, questions) : null;
+    await deps.repository.putResult(auth.user.sub, result, change ? tallyOf(change) : undefined);
+    if (change) await deps.repository.updateReview(auth.user.sub, result.examCode, change);
     return json({ status: "saved" }, 200, auth.setCookies);
   } catch {
     return fail("unavailable", 503);
   }
 }
 
-/** 問題 ID の一覧を返す、GET の共通の形(ブックマーク、復習プール)。 */
-async function listQuestionIds(
+/** 資格コードの問い合わせを受ける GET の共通の形。 */
+async function listByExam(
   request: Request,
   deps: HistoryDeps,
-  load: (sub: string, examCode: string) => Promise<string[]>,
+  load: (sub: string, examCode: string) => Promise<unknown>,
 ): Promise<Response> {
   const auth = await authorize(request, deps);
   if (!auth) return fail("unauthorized", 401);
   const query = parseQuery(request);
   if (!query) return fail("bad-request", 400, auth.setCookies);
   try {
-    return json({ questionIds: await load(auth.user.sub, query.examCode) }, 200, auth.setCookies);
+    return json(await load(auth.user.sub, query.examCode), 200, auth.setCookies);
   } catch {
     return fail("unavailable", 503);
   }
@@ -153,12 +161,16 @@ async function listQuestionIds(
 
 /** 自分のブックマークを返す。 */
 export function handleListBookmarks(request: Request, deps: HistoryDeps): Promise<Response> {
-  return listQuestionIds(request, deps, (sub, examCode) => deps.repository.listBookmarks(sub, examCode));
+  return listByExam(request, deps, async (sub, examCode) => ({
+    questionIds: await deps.repository.listBookmarks(sub, examCode),
+  }));
 }
 
 /** 自分の復習プールを返す。 */
 export function handleListReview(request: Request, deps: HistoryDeps): Promise<Response> {
-  return listQuestionIds(request, deps, (sub, examCode) => deps.repository.listReview(sub, examCode));
+  return listByExam(request, deps, async (sub, examCode) => ({
+    questionIds: await deps.repository.listReview(sub, examCode),
+  }));
 }
 
 /** ブックマークを付ける・外す。問題は、公開中の資格の、いまのデータにあるものだけ。 */
@@ -178,6 +190,38 @@ export async function handlePutBookmark(request: Request, deps: HistoryDeps): Pr
     const questions = await (deps.questions ?? examQuestions)(change.examCode);
     if (!questions?.some((q) => q.questionId === change.questionId)) return fail("bad-request", 400, auth.setCookies);
     await deps.repository.setBookmark(auth.user.sub, change.examCode, change.questionId, change.bookmarked);
+    return json({ status: "saved" }, 200, auth.setCookies);
+  } catch {
+    return fail("unavailable", 503);
+  }
+}
+
+/** 自分の日ごとの学習量を、日付の順に返す。 */
+export function handleListDays(request: Request, deps: HistoryDeps): Promise<Response> {
+  return listByExam(request, deps, async (sub, examCode) => ({ days: await deps.repository.listDays(sub, examCode) }));
+}
+
+/** 自分の目標日を返す。決めていなければ null。 */
+export function handleGetGoal(request: Request, deps: HistoryDeps): Promise<Response> {
+  return listByExam(request, deps, async (sub, examCode) => ({ date: await deps.repository.getGoal(sub, examCode) }));
+}
+
+/** 目標日を決める・消す。資格は、公開中のものだけ。 */
+export async function handlePutGoal(request: Request, deps: HistoryDeps): Promise<Response> {
+  const rejected = guard(request);
+  if (rejected) return rejected;
+  const auth = await authorize(request, deps);
+  if (!auth) return fail("unauthorized", 401);
+
+  const read = await readJsonBody(request, MAX_GOAL_BODY_BYTES, auth.setCookies);
+  if (read instanceof Response) return read;
+  const parsed = GoalChangeSchema.safeParse(read.body);
+  if (!parsed.success) return fail("bad-request", 400, auth.setCookies);
+  const change = parsed.data;
+
+  try {
+    if (!(await (deps.questions ?? examQuestions)(change.examCode))) return fail("bad-request", 400, auth.setCookies);
+    await deps.repository.setGoal(auth.user.sub, change.examCode, change.date);
     return json({ status: "saved" }, 200, auth.setCookies);
   } catch {
     return fail("unavailable", 503);
