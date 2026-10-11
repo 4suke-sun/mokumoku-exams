@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useState } from "react";
 import { isActive, NAV_ITEMS } from "@/lib/nav.ts";
+import { AuthStatus } from "./auth-status.tsx";
 import { ThemeToggle } from "./theme-toggle.tsx";
 
 export function SiteHeader() {
@@ -33,12 +34,14 @@ export function SiteHeader() {
         </button>
         <div className="hidden items-center gap-4 md:flex">
           <Nav pathname={pathname} />
+          <AuthStatus />
           <ThemeToggle />
         </div>
       </div>
       {open ? (
         <div id={menuId} className="space-y-3 border-t border-line px-4 py-3 md:hidden">
           <Nav pathname={pathname} vertical />
+          <AuthStatus />
           <ThemeToggle />
         </div>
       ) : null}

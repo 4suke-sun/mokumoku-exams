@@ -7,7 +7,7 @@
 
 | スタック | 内容 |
 | --- | --- |
-| `<接頭辞>-auth` | Cognito UserPool。セルフサインアップ禁止、管理者の招待制、管理者グループ(`admins`)。Identity Pool は作りません |
+| `<接頭辞>-auth` | Cognito UserPool。セルフサインアップ禁止、管理者の招待制、管理者グループ(`admins`)。招待メールと再設定の確認コードの文面、パスワードの規則を持ちます。Identity Pool は作りません。画面と API は [認証の仕組み](./auth.md) |
 | `<接頭辞>-web` | Lambda(Next.js + Lambda Web Adapter)、Function URL、CloudFront、静的ファイル用の S3 |
 
 配信の流れは、[アーキテクチャの計画](./architecture-plan.md) のとおりです。
@@ -37,7 +37,7 @@
 次の項目は、別の段階で扱います。
 
 - CloudFront の監視(CloudFront のメトリクスは別リージョンにあるため、別の段階で扱います)
-- 初回パスワード設定とパスワード再設定、管理者向けの多要素認証の検討
+- 管理者向けの多要素認証の検討
 - データの保護設定(バックアップ・削除保護)
 - 独自ドメイン
 

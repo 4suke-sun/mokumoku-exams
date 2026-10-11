@@ -45,12 +45,26 @@ exports[`AuthStack > 合成すると_スナップショットと一致する 1`]
         },
         "AdminCreateUserConfig": {
           "AllowAdminCreateUserOnly": true,
+          "InviteMessageTemplate": {
+            "EmailMessage": "もくもく問題集に招待されました。
+
+ログイン用のメールアドレス: {username}
+仮のパスワード: {####}
+
+仮のパスワードの有効期限は 7 日間です。ログイン画面で入力すると、これから使うパスワードを決められます。
+心当たりがない場合は、このメールを破棄してください。",
+            "EmailSubject": "【もくもく問題集】招待のお知らせ",
+          },
         },
         "AutoVerifiedAttributes": [
           "email",
         ],
-        "EmailVerificationMessage": "The verification code to your new account is {####}",
-        "EmailVerificationSubject": "Verify your new account",
+        "EmailVerificationMessage": "パスワードの再設定を受け付けました。
+
+確認コード: {####}
+
+確認コードの有効期限は 1 時間です。心当たりがない場合は、このメールを破棄してください(パスワードは変わりません)。",
+        "EmailVerificationSubject": "【もくもく問題集】パスワード再設定の確認コード",
         "Policies": {
           "PasswordPolicy": {
             "MinimumLength": 12,
@@ -58,6 +72,7 @@ exports[`AuthStack > 合成すると_スナップショットと一致する 1`]
             "RequireNumbers": true,
             "RequireSymbols": false,
             "RequireUppercase": true,
+            "TemporaryPasswordValidityDays": 7,
           },
         },
         "SmsVerificationMessage": "The verification code to your new account is {####}",
@@ -70,8 +85,12 @@ exports[`AuthStack > 合成すると_スナップショットと一致する 1`]
         },
         "VerificationMessageTemplate": {
           "DefaultEmailOption": "CONFIRM_WITH_CODE",
-          "EmailMessage": "The verification code to your new account is {####}",
-          "EmailSubject": "Verify your new account",
+          "EmailMessage": "パスワードの再設定を受け付けました。
+
+確認コード: {####}
+
+確認コードの有効期限は 1 時間です。心当たりがない場合は、このメールを破棄してください(パスワードは変わりません)。",
+          "EmailSubject": "【もくもく問題集】パスワード再設定の確認コード",
           "SmsMessage": "The verification code to your new account is {####}",
         },
       },
@@ -82,15 +101,20 @@ exports[`AuthStack > 合成すると_スナップショットと一致する 1`]
       "Properties": {
         "AllowedOAuthFlowsUserPoolClient": false,
         "ClientName": "test-web",
+        "EnableTokenRevocation": true,
         "ExplicitAuthFlows": [
-          "ALLOW_USER_SRP_AUTH",
+          "ALLOW_USER_PASSWORD_AUTH",
           "ALLOW_REFRESH_TOKEN_AUTH",
         ],
         "GenerateSecret": false,
         "PreventUserExistenceErrors": "ENABLED",
+        "RefreshTokenValidity": 43200,
         "SupportedIdentityProviders": [
           "COGNITO",
         ],
+        "TokenValidityUnits": {
+          "RefreshToken": "minutes",
+        },
         "UserPoolId": {
           "Ref": "UserPool6BA7E5F2",
         },
@@ -194,6 +218,7 @@ exports[`WebStack > 合成すると_スナップショットと一致する 1`] 
           "Variables": {
             "AWS_LAMBDA_EXEC_WRAPPER": "/opt/bootstrap",
             "AWS_LWA_PORT": "8080",
+            "COGNITO_CLIENT_ID": "client-example",
             "HOSTNAME": "0.0.0.0",
             "NODE_ENV": "production",
             "ORIGIN_VERIFY_VALUE": "oooooooooooooooooooooooooooooooo",
