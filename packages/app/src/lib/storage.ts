@@ -33,6 +33,14 @@ const ChoiceOrderSchema = z
   .refine((o) => Object.keys(o).length <= 1000)
   .optional();
 
+/** 段階の順番(カリキュラムの段階の順番と同じ範囲) */
+const STAGE_ORDER = z.int().min(1).max(100);
+/** 単元の ID(カリキュラムの単元の ID と同じ形。画面の URL の一部になる) */
+const UNIT_ID = z.string().regex(/^[a-z][a-z0-9-]{0,31}$/);
+
+/** 段階学習の段階(単元の ID と、段階の順番) */
+const StageRefSchema = z.strictObject({ unitId: UNIT_ID, order: STAGE_ORDER });
+
 /** 出題中の状態(途中で閉じても続きから解ける) */
 export const SessionSchema = z.strictObject({
   examCode: KEY,
@@ -41,6 +49,8 @@ export const SessionSchema = z.strictObject({
   index: z.number().int().min(0).max(1000),
   startedAt: STAMP,
   choiceOrder: ChoiceOrderSchema,
+  /** 段階の確認問題として始めた出題のときだけ。採点すると、その段階の到達の状態を更新する */
+  stage: StageRefSchema.optional(),
 });
 export type Session = z.infer<typeof SessionSchema>;
 
@@ -136,4 +146,49 @@ export function loadSettings(store: KeyValueStore): Settings {
 
 export function saveSettings(store: KeyValueStore, settings: Settings): boolean {
   return writeJson(store, `${KEY_PREFIX}:settings`, settings);
+}
+
+/** 段階の確認問題を採点した記録 */
+const StageCheckSchema = z.strictObject({
+  unitId: UNIT_ID,
+  order: STAGE_ORDER,
+  percent: z.number().min(0).max(100),
+  passed: z.boolean(),
+  finishedAt: STAMP,
+});
+export type StageCheck = z.infer<typeof StageCheckSchema>;
+
+/** 段階学習の到達の状態(資格ごと)。端末の中だけに残る */
+export const StageProgressSchema = z.strictObject({
+  examCode: KEY,
+  /** 単元の ID ごとの、合格した段階の順番(小さい順) */
+  passed: z.record(UNIT_ID, z.array(STAGE_ORDER).max(100)).refine((p) => Object.keys(p).length <= 1000),
+  /** 直近に採点した段階の確認(結果の画面で、合否を伝える) */
+  last: StageCheckSchema.optional(),
+});
+export type StageProgress = z.infer<typeof StageProgressSchema>;
+
+function stagesKey(examCode: string): string {
+  return `${KEY_PREFIX}:stages:${examCode}`;
+}
+
+/** 段階の到達の状態を返す。保存されていない・壊れているときは、どの段階にも合格していない状態。 */
+export function loadStageProgress(store: KeyValueStore, examCode: string): StageProgress {
+  const progress = readJson(store, stagesKey(examCode), StageProgressSchema);
+  return progress && progress.examCode === examCode ? progress : { examCode, passed: {} };
+}
+
+/** 単元の、合格した段階の順番 */
+export function passedStages(progress: StageProgress, unitId: string): number[] {
+  return Object.hasOwn(progress.passed, unitId) ? (progress.passed[unitId] ?? []) : [];
+}
+
+/** 段階の確認の採点を記録する。合格なら、その段階を合格済みにする(一度合格した段階は、不合格でも戻さない)。 */
+export function saveStageCheck(store: KeyValueStore, examCode: string, check: StageCheck): boolean {
+  const progress = loadStageProgress(store, examCode);
+  const current = passedStages(progress, check.unitId);
+  const orders =
+    check.passed && !current.includes(check.order) ? [...current, check.order].sort((a, b) => a - b) : current;
+  const next: StageProgress = { examCode, passed: { ...progress.passed, [check.unitId]: orders }, last: check };
+  return writeJson(store, stagesKey(examCode), next);
 }

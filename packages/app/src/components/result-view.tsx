@@ -10,7 +10,15 @@ import { fetchServerResults, postServerResult } from "@/lib/history/client.ts";
 import { mergeResults, pendingMigration } from "@/lib/history/merge.ts";
 import { answerFor, isCorrect, orderChoices, passLinePercent, score } from "@/lib/quiz.ts";
 import { recentOutcomes } from "@/lib/recent-outcomes.ts";
-import { browserStore, clearResults, loadResults, type Result } from "@/lib/storage.ts";
+import {
+  browserStore,
+  clearResults,
+  loadResults,
+  loadStageProgress,
+  type Result,
+  type StageCheck,
+} from "@/lib/storage.ts";
+import { STAGE_PASS_PERCENT } from "@/lib/study-stages.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 
 type Props = { exam: PublishedExam; questions: Question[] };
@@ -54,12 +62,14 @@ export function ResultView({ exam, questions }: Props) {
   const [state, setState] = useState<State>({ status: "loading" });
   const [wrongOnly, setWrongOnly] = useState(false);
   const [migration, setMigration] = useState<"idle" | "busy" | "failed">("idle");
+  const [stageCheck, setStageCheck] = useState<StageCheck | null>(null);
   const bookmarks = useBookmarks(exam.examCode);
 
   useEffect(() => {
     let active = true;
     void (async () => {
       const local = loadResults(browserStore(), exam.examCode);
+      setStageCheck(loadStageProgress(browserStore(), exam.examCode).last ?? null);
       const server = await fetchServerResults(exam.examCode);
       if (!active) return;
       if (server === null) {
@@ -121,6 +131,8 @@ export function ResultView({ exam, questions }: Props) {
   const rows = wrongOnly ? allRows.filter((row) => !row.correct) : allRows;
   const passLine = passLinePercent(exam);
   const reached = result.percent >= passLine;
+  // 直近の結果が段階の確認問題のときだけ、段階の合否を伝える
+  const stage = stageCheck && stageCheck.finishedAt === latest.finishedAt ? stageCheck : null;
 
   return (
     <section className="space-y-8">
@@ -148,6 +160,21 @@ export function ResultView({ exam, questions }: Props) {
               移せなかった記録があります。時間をおいて、もう一度お試しください。
             </p>
           ) : null}
+        </div>
+      ) : null}
+      {stage ? (
+        <div role="status" className="space-y-2 rounded-lg border border-line bg-surface p-4">
+          <p className={`font-bold ${stage.passed ? "text-correct" : "text-warn"}`}>
+            {stage.passed
+              ? `段階の確認問題に合格しました(正答率 ${stage.percent}%)。単元の画面で、次の段階を確かめられます。`
+              : `段階の確認問題は、正答率 ${STAGE_PASS_PERCENT}% 以上で合格です(今回は ${stage.percent}%)。単元を読み直して、もう一度挑戦しましょう。`}
+          </p>
+          <Link
+            href={`/exams/${exam.examCode}/study/${stage.unitId}`}
+            className="inline-block text-sm text-primary hover:underline"
+          >
+            単元へ戻る
+          </Link>
         </div>
       ) : null}
       <div className="space-y-3">

@@ -2,7 +2,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { browserStore, loadResults, type Result, saveResult } from "@/lib/storage.ts";
+import { browserStore, loadResults, type Result, type StageCheck, saveResult, saveStageCheck } from "@/lib/storage.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 import { ResultView } from "./result-view.tsx";
 
@@ -105,6 +105,40 @@ describe("ResultView", () => {
     expect(Array.from(first.querySelectorAll("li")).map((li) => li.textContent)).toEqual(["○正解", "×不正解"]);
     // 1 回だけ解いた問題は、その 1 回だけ
     expect(screen.getAllByRole("list", { name: "直近 1 回の正誤(新しい順)" })).toHaveLength(2);
+  });
+});
+
+describe("ResultView の段階の確認問題", () => {
+  const check = (over: Partial<StageCheck> = {}): StageCheck => ({
+    unitId: "basics",
+    order: 1,
+    percent: 100,
+    passed: true,
+    finishedAt: "2026-10-10T00:00:00.000Z",
+    ...over,
+  });
+
+  it("直近の結果が段階の確認で合格_合格を伝え_単元へ戻れる", async () => {
+    saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["A"], "TEST-0003": ["B"] });
+    saveStageCheck(browserStore(), "TEST", check());
+    render(<ResultView exam={exam} questions={questions} />);
+    expect(await screen.findByText(/段階の確認問題に合格しました\(正答率 100%\)/)).toBeTruthy();
+    expect(screen.getByRole("link", { name: "単元へ戻る" }).getAttribute("href")).toBe("/exams/TEST/study/basics");
+  });
+
+  it("直近の結果が段階の確認で不合格_合格の基準と今回の正答率を伝える", async () => {
+    saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["B"], "TEST-0003": ["A"] });
+    saveStageCheck(browserStore(), "TEST", check({ percent: 33.3, passed: false }));
+    render(<ResultView exam={exam} questions={questions} />);
+    expect(await screen.findByText(/正答率 80% 以上で合格です\(今回は 33.3%\)/)).toBeTruthy();
+  });
+
+  it("段階の確認の記録が直近の結果のものではない_段階の合否を出さない", async () => {
+    saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["A"], "TEST-0003": ["B"] });
+    saveStageCheck(browserStore(), "TEST", check({ finishedAt: "2026-10-09T00:00:00.000Z" }));
+    render(<ResultView exam={exam} questions={questions} />);
+    await screen.findByText("すべて正解でした。見直す問題はありません。");
+    expect(screen.queryByText(/段階の確認問題/)).toBeNull();
   });
 });
 

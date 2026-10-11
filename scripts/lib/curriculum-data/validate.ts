@@ -44,6 +44,13 @@ export function validateCurriculumData(files: DataFile[], { questionIds }: Conte
           errors.push(`${file.name}: units[${i}].questionIds[${j}]: 問題データにない問題です`);
         }
       });
+      unit.stages?.forEach((stage, k) => {
+        stage.questionIds.forEach((id, j) => {
+          if (!known.has(id)) {
+            errors.push(`${file.name}: units[${i}].stages[${k}].questionIds[${j}]: 問題データにない問題です`);
+          }
+        });
+      });
     });
   }
   return errors;

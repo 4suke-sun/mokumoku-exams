@@ -178,6 +178,67 @@ describe("validateCurriculumData", () => {
     ).toHaveLength(1);
   });
 
+  it("要約と段階のある単元_指摘なし", () => {
+    const data = curriculum([
+      unit({
+        summary: ["要点の 1 つ目", "**要点**の 2 つ目"],
+        stages: [
+          { order: 2, questionIds: ["SAMPLE-0002", "SAMPLE-0003"] },
+          { order: 1, questionIds: ["SAMPLE-0001"] },
+        ],
+      }),
+    ]);
+    expect(validateCurriculumData(files(data), context)).toEqual([]);
+  });
+
+  it("要約が空・空白だけ・長すぎる・多すぎる_指摘する", () => {
+    for (const summary of [[], ["  "], ["あ".repeat(201)], Array.from({ length: 11 }, () => "要点"), "要点"]) {
+      expect(validateCurriculumData(files(curriculum([unit({ summary })])), context)).toHaveLength(1);
+    }
+  });
+
+  it("段階の確認問題が問題データにない・別の資格・重複_場所と種類だけを報告する", () => {
+    const missing = validateCurriculumData(
+      files(curriculum([unit({ stages: [{ order: 1, questionIds: ["SAMPLE-0099"] }] })])),
+      context,
+    );
+    expect(missing).toEqual(["curriculum.sample.json: units[0].stages[0].questionIds[0]: 問題データにない問題です"]);
+
+    const other = validateCurriculumData(
+      files(curriculum([unit({ stages: [{ order: 1, questionIds: ["OTHER-0001"] }] })])),
+      context,
+    );
+    expect(other).toEqual([
+      "curriculum.sample.json: units[0].stages[0].questionIds[0]: 問題の ID の接頭辞が資格コードと一致しません",
+    ]);
+
+    const dup = validateCurriculumData(
+      files(curriculum([unit({ stages: [{ order: 1, questionIds: ["SAMPLE-0001", "SAMPLE-0001"] }] })])),
+      context,
+    );
+    expect(dup).toEqual(["curriculum.sample.json: units[0].stages[0].questionIds[1]: 問題の ID が重複しています"]);
+  });
+
+  it("段階の順番の重複・値の誤り・空の段階・未知の項目_指摘する", () => {
+    const stage = (over: Record<string, unknown> = {}) => ({ order: 1, questionIds: ["SAMPLE-0001"], ...over });
+    expect(validateCurriculumData(files(curriculum([unit({ stages: [stage(), stage()] })])), context)).toEqual([
+      "curriculum.sample.json: units[0].stages[1].order: 段階の順番が重複しています",
+    ]);
+    for (const order of [0, 101, 1.5, "1"]) {
+      expect(
+        validateCurriculumData(files(curriculum([unit({ stages: [stage({ order })] })])), context),
+        String(order),
+      ).toHaveLength(1);
+    }
+    expect(validateCurriculumData(files(curriculum([unit({ stages: [] })])), context)).toHaveLength(1);
+    expect(
+      validateCurriculumData(files(curriculum([unit({ stages: [stage({ questionIds: [] })] })])), context),
+    ).toHaveLength(1);
+    expect(validateCurriculumData(files(curriculum([unit({ stages: [stage({ extra: 1 })] })])), context)).toHaveLength(
+      1,
+    );
+  });
+
   it("報告に入力の値を含めない", () => {
     const marker = "目印XYZ";
     const marked = diagram({ edges: [{ from: marker, to: "a" }] });
@@ -186,6 +247,8 @@ describe("validateCurriculumData", () => {
         title: 1,
         sections: [section({ id: marker }), section({ id: "two", diagram: marked })],
         questionIds: [marker],
+        summary: [1, marker.repeat(100)],
+        stages: [{ order: marker, questionIds: [marker] }],
       }),
     ]);
     const errors = validateCurriculumData(files(data), context);

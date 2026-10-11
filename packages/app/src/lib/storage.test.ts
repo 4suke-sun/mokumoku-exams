@@ -6,12 +6,16 @@ import {
   loadResults,
   loadSession,
   loadSettings,
+  loadStageProgress,
   MAX_RESULTS,
+  passedStages,
   type Result,
   type Session,
+  type StageCheck,
   saveResult,
   saveSession,
   saveSettings,
+  saveStageCheck,
 } from "./storage.ts";
 
 function memoryStore(initial: Record<string, string> = {}): KeyValueStore & { data: Map<string, string> } {
@@ -169,5 +173,67 @@ describe("選択肢の並びの保存", () => {
     };
     saveSession(store, session);
     expect(loadSession(store, "TEST")).toEqual(session);
+  });
+});
+
+describe("段階学習の到達の状態", () => {
+  const check = (over: Partial<StageCheck> = {}): StageCheck => ({
+    unitId: "basics",
+    order: 1,
+    percent: 100,
+    passed: true,
+    finishedAt: "2026-10-10T00:00:00.000Z",
+    ...over,
+  });
+
+  it("段階の確認つきの出題中の状態_保存して読み出せる", () => {
+    const store = memoryStore();
+    const staged = { ...session, stage: { unitId: "basics", order: 2 } };
+    saveSession(store, staged);
+    expect(loadSession(store, "TEST")).toEqual(staged);
+  });
+
+  it("保存されていない_どの段階にも合格していない", () => {
+    const progress = loadStageProgress(memoryStore(), "TEST");
+    expect(progress).toEqual({ examCode: "TEST", passed: {} });
+    expect(passedStages(progress, "basics")).toEqual([]);
+    expect(passedStages(progress, "constructor")).toEqual([]);
+  });
+
+  it("合格_その段階を合格済みにし_直近の確認として残す", () => {
+    const store = memoryStore();
+    expect(saveStageCheck(store, "TEST", check({ order: 2 }))).toBe(true);
+    expect(saveStageCheck(store, "TEST", check({ order: 1 }))).toBe(true);
+    const progress = loadStageProgress(store, "TEST");
+    expect(passedStages(progress, "basics")).toEqual([1, 2]);
+    expect(progress.last).toEqual(check({ order: 1 }));
+  });
+
+  it("不合格_合格済みにしない_一度合格した段階は戻さない", () => {
+    const store = memoryStore();
+    saveStageCheck(store, "TEST", check({ percent: 50, passed: false }));
+    expect(passedStages(loadStageProgress(store, "TEST"), "basics")).toEqual([]);
+    saveStageCheck(store, "TEST", check());
+    saveStageCheck(store, "TEST", check({ percent: 0, passed: false, finishedAt: "2026-10-10T00:01:00.000Z" }));
+    const progress = loadStageProgress(store, "TEST");
+    expect(passedStages(progress, "basics")).toEqual([1]);
+    expect(progress.last?.passed).toBe(false);
+  });
+
+  it("壊れた値・別の資格の値_保存されていないものとして扱う", () => {
+    const key = "mokumoku:v1:stages:TEST";
+    for (const raw of [
+      "{",
+      '{"examCode":"TEST","passed":{"basics":[0]}}',
+      '{"examCode":"TEST","passed":{"Bad_ID":[1]}}',
+      '{"examCode":"OTHER","passed":{}}',
+    ]) {
+      expect(loadStageProgress(memoryStore({ [key]: raw }), "TEST")).toEqual({ examCode: "TEST", passed: {} });
+    }
+  });
+
+  it("保存が禁止された環境_保存は失敗し読み出しは空", () => {
+    expect(saveStageCheck(brokenStore, "TEST", check())).toBe(false);
+    expect(loadStageProgress(brokenStore, "TEST")).toEqual({ examCode: "TEST", passed: {} });
   });
 });
