@@ -81,6 +81,11 @@ describe("isPublicPath", () => {
     "/api/auth/logout",
     "/api/auth/session",
     "/_next/static/chunks/a.js",
+    "/manifest.webmanifest",
+    "/robots.txt",
+    "/sitemap.xml",
+    "/sw.js",
+    "/icons/icon-192.png",
   ])("ログインなしで開ける_%s", (path) => {
     expect(isPublicPath(path)).toBe(true);
   });
@@ -98,6 +103,10 @@ describe("isPublicPath", () => {
     "/api/auth",
     "/loginx",
     "/api/authx",
+    "/release-notes",
+    "/api/push/subscription",
+    "/api/push/test",
+    "/icons/unknown.png",
   ])("ログインが必要_%s", (path) => {
     expect(isPublicPath(path)).toBe(false);
   });
@@ -116,6 +125,8 @@ describe("isPublicPath", () => {
     ["接頭辞だけ似ている", "/_nextx/a"],
     ["公開の API に拡張子を付ける", "/api/auth/login.json"],
     ["公開の API の後ろに続ける", "/api/auth/login/extra"],
+    ["公開のファイルの末尾にスラッシュを付ける", "/sw.js/"],
+    ["公開のファイルから親をたどる", "/icons/../api/push/test"],
   ])("公開を広げられない_%s", (_name, path) => {
     expect(isPublicPath(path)).toBe(false);
   });

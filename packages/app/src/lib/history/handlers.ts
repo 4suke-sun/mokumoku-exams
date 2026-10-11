@@ -32,13 +32,13 @@ export type HistoryDeps = {
  */
 export type HistoryError = "bad-request" | "unauthorized" | "too-large" | "unavailable";
 
-const fail = (error: HistoryError, status: number, cookies: string[] = []) => json({ error }, status, cookies);
+export const fail = (error: HistoryError, status: number, cookies: string[] = []) => json({ error }, status, cookies);
 
 /**
  * ログイン中の利用者を、サーバー側で検証して得る。利用者の識別子(`sub`)は、ここで得たものだけを使う
  * (リクエストの本文・パラメーターからは受け取らない)。
  */
-async function authorize(request: Request, deps: HistoryDeps) {
+export async function authorize(request: Request, deps: { auth: GuardDeps }) {
   try {
     return await authenticate(request.headers.get("cookie"), deps.auth);
   } catch {
@@ -58,7 +58,7 @@ function parseQuery(request: Request) {
  * 本文を、大きさを確かめてから JSON として読む。大きさは、読み込む前に申告で、読み込んだあとに実際の大きさで確かめる。
  * 断るときは、その応答を返す。
  */
-async function readJsonBody(
+export async function readJsonBody(
   request: Request,
   maxBytes: number,
   setCookies: string[],

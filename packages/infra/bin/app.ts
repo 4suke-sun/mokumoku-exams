@@ -3,6 +3,7 @@ import { App } from "aws-cdk-lib";
 import { AuthStack } from "../lib/auth-stack.ts";
 import { loadConfig } from "../lib/config.ts";
 import { DataStack } from "../lib/data-stack.ts";
+import { PushStack } from "../lib/push-stack.ts";
 import { WebStack } from "../lib/web-stack.ts";
 
 const config = loadConfig(process.env);
@@ -25,3 +26,13 @@ new WebStack(app, `${config.stackPrefix}-web`, {
   userPoolArn: auth.userPool.userPoolArn,
   historyTable: data.table,
 });
+// 通知の鍵(VAPID_*)を設定したときだけ、毎日の送信の仕組みを作る
+if (config.push) {
+  new PushStack(app, `${config.stackPrefix}-push`, {
+    env,
+    config,
+    push: config.push,
+    pushCodePath: resolve(repoRoot, "dist/push"),
+    historyTable: data.table,
+  });
+}

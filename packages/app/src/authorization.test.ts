@@ -1,4 +1,4 @@
-import { readdirSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
 import { dirname, join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import { headers } from "next/headers";
@@ -13,6 +13,8 @@ import * as daysRoute from "@/app/api/history/days/route.ts";
 import * as goalRoute from "@/app/api/history/goal/route.ts";
 import * as historyRoute from "@/app/api/history/results/route.ts";
 import * as reviewRoute from "@/app/api/history/review/route.ts";
+import * as pushSubscriptionRoute from "@/app/api/push/subscription/route.ts";
+import * as pushTestRoute from "@/app/api/push/test/route.ts";
 import type { AuditEntry } from "@/lib/admin/audit.ts";
 import { isAdminPath } from "@/lib/auth/admin.ts";
 import {
@@ -23,10 +25,11 @@ import {
   FAKE_USER_PHRASE,
   fakeSub,
 } from "@/lib/auth/fake.ts";
-import { isPublicPath, PUBLIC_AUTH_API_PATHS } from "@/lib/auth/guard.ts";
+import { isPublicPath, PUBLIC_AUTH_API_PATHS, PUBLIC_FILE_PATHS, PUBLIC_PAGE_PATHS } from "@/lib/auth/guard.ts";
 import { getAuthProvider, getUserAdmin } from "@/lib/auth/index.ts";
 import { withTokenCookies } from "@/lib/auth/session.ts";
 import { SUB_PATTERN } from "@/lib/auth/verify.ts";
+import { getPushRepository } from "@/lib/push/repository.ts";
 import { proxy } from "./proxy.ts";
 
 // 認可の網羅テスト。「ログインなしで開けるもの」と「ログインが要るもの」を、一覧として固定する。
@@ -37,6 +40,7 @@ import { proxy } from "./proxy.ts";
 vi.mock("next/headers", () => ({ headers: vi.fn() }));
 
 const APP_DIR = join(dirname(fileURLToPath(import.meta.url)), "app");
+const PUBLIC_DIR = join(dirname(fileURLToPath(import.meta.url)), "..", "public");
 
 /** ディレクトリを辿り、指定した名前のファイルがある経路(URL のパス)を返す。`[code]` のような動的な部分は例の値にする。 */
 function routesOf(fileName: string): string[] {
@@ -57,6 +61,28 @@ function routesOf(fileName: string): string[] {
   return found.sort();
 }
 
+/** Next のメタデータの経路(app 直下のファイル名と、配る経路)。 */
+const METADATA_ROUTES: Record<string, string> = {
+  "robots.ts": "/robots.txt",
+  "sitemap.ts": "/sitemap.xml",
+  "manifest.ts": "/manifest.webmanifest",
+};
+
+/** ログインなしで取りに来られるファイルの経路(public/ のファイルと、メタデータの経路)。 */
+function filesOf(): string[] {
+  const found = Object.entries(METADATA_ROUTES)
+    .filter(([file]) => existsSync(join(APP_DIR, file)))
+    .map(([, path]) => path);
+  const walk = (dir: string) => {
+    for (const entry of readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isDirectory()) walk(join(dir, entry.name));
+      else found.push(`/${relative(PUBLIC_DIR, join(dir, entry.name)).split(sep).join("/")}`);
+    }
+  };
+  if (existsSync(PUBLIC_DIR)) walk(PUBLIC_DIR);
+  return found.sort();
+}
+
 const PUBLIC_PAGES = ["/forgot-password", "/login"];
 const PROTECTED_PAGES = [
   "/",
@@ -71,6 +97,7 @@ const PROTECTED_PAGES = [
   "/exams/sample/study",
   "/exams/sample/study/sample",
   "/help",
+  "/release-notes",
 ];
 /** 保護される画面のうち、管理者だけが開けるもの */
 const ADMIN_PAGES = ["/admin"];
@@ -94,6 +121,18 @@ const PROTECTED_APIS = [
   "/api/history/goal",
   "/api/history/results",
   "/api/history/review",
+  "/api/push/subscription",
+  "/api/push/test",
+];
+const PUBLIC_FILES = [
+  "/icons/apple-touch-icon.png",
+  "/icons/icon-192.png",
+  "/icons/icon-512.png",
+  "/icons/icon.svg",
+  "/manifest.webmanifest",
+  "/robots.txt",
+  "/sitemap.xml",
+  "/sw.js",
 ];
 
 const request = (path: string, init: { cookie?: string; method?: string; body?: unknown } = {}) =>
@@ -120,6 +159,27 @@ describe("経路の一覧", () => {
     const open = allPaths.filter((path) => isPublicPath(path)).sort();
     expect(open).toEqual([...PUBLIC_PAGES, ...PUBLIC_APIS].sort());
     expect(new Set(PUBLIC_AUTH_API_PATHS)).toEqual(new Set(PUBLIC_APIS));
+    expect(new Set(PUBLIC_PAGE_PATHS)).toEqual(new Set(PUBLIC_PAGES));
+  });
+
+  it("ログインなしで取れるファイル_一覧と過不足なく一致する(新しいファイルは一覧に足すまで落ちる)", () => {
+    expect(filesOf()).toEqual(PUBLIC_FILES);
+    expect(new Set(PUBLIC_FILE_PATHS)).toEqual(new Set(PUBLIC_FILES));
+    for (const path of PUBLIC_FILES) expect(isPublicPath(path), path).toBe(true);
+  });
+
+  it("公開のファイルに似た経路_公開にならない", () => {
+    for (const path of [
+      "/sw.js/",
+      "/SW.JS",
+      "/icons",
+      "/icons/",
+      "/icons/other.png",
+      "/robots.txt/x",
+      "/manifest.json",
+    ]) {
+      expect(isPublicPath(path), path).toBe(false);
+    }
   });
 
   it("管理者の経路_一覧に挙げた画面と API だけで_ほかの画面と API は含まない", () => {
@@ -158,6 +218,14 @@ describe("認可: 未ログインの拒否", () => {
       const response = await proxy(request(path));
       expect(response.status, path).toBe(307);
       expect(new URL(response.headers.get("location") ?? "").pathname).toBe("/login");
+    }
+  });
+
+  it("公開のファイル_未ログインでも入口(proxy)を通る", async () => {
+    for (const path of PUBLIC_FILES) {
+      const response = await proxy(request(path));
+      expect(response.headers.get("location"), path).toBeNull();
+      expect(response.status, path).toBe(200);
     }
   });
 
@@ -204,6 +272,20 @@ describe("認可: 未ログインの拒否", () => {
     expect(response.status).toBe(401);
   });
 
+  it("通知の API 本体_入口を通らなくても未ログインを断る(二重の防御)", async () => {
+    const subscription = {
+      endpoint: "https://fcm.googleapis.com/fcm/send/device-1",
+      keys: { p256dh: "B".repeat(87), auth: "a".repeat(22) },
+    };
+    const path = "/api/push/subscription";
+    expect((await pushSubscriptionRoute.PUT(request(path, { method: "PUT", body: subscription }))).status).toBe(401);
+    const unsubscribe = { endpoint: subscription.endpoint };
+    expect((await pushSubscriptionRoute.DELETE(request(path, { method: "DELETE", body: unsubscribe }))).status).toBe(
+      401,
+    );
+    expect((await pushTestRoute.POST(request("/api/push/test", { method: "POST", body: {} }))).status).toBe(401);
+  });
+
   it("パスワード変更の API 本体_入口を通らなくても未ログインを断る(二重の防御)", async () => {
     const response = await changePasswordRoute.POST(
       request("/api/auth/change-password", {
@@ -224,6 +306,8 @@ describe("認可: 未ログインの拒否", () => {
     expect(methods(changePasswordRoute)).toEqual(["POST"]);
     expect(methods(adminUsersRoute).sort()).toEqual(["GET", "POST"]);
     expect(methods(adminDisableRoute)).toEqual(["POST"]);
+    expect(methods(pushSubscriptionRoute).sort()).toEqual(["DELETE", "PUT"]);
+    expect(methods(pushTestRoute)).toEqual(["POST"]);
   });
 });
 
@@ -231,6 +315,7 @@ describe("認可: 他人のデータに触れない", () => {
   beforeEach(() => {
     vi.stubEnv("AUTH_FAKE", "1");
     delete (globalThis as { __mokumokuFakeHistory?: unknown }).__mokumokuFakeHistory;
+    delete (globalThis as { __mokumokuFakePush?: unknown }).__mokumokuFakePush;
   });
   afterEach(() => {
     vi.unstubAllEnvs();
@@ -373,6 +458,46 @@ describe("認可: 他人のデータに触れない", () => {
     expect((await goalRoute.GET(request("/api/history/goal?examCode=SAMPLE"))).status).toBe(401);
     expect((await daysRoute.GET(request("/api/history/days?examCode=SAMPLE"))).status).toBe(401);
   });
+
+  it("通知の購読で利用者の識別子を本文で渡す_拒否され_自分の区画にだけ保存される", async () => {
+    const own = await cookie();
+    const subscription = {
+      endpoint: "https://fcm.googleapis.com/fcm/send/device-1",
+      keys: { p256dh: "B".repeat(87), auth: "a".repeat(22) },
+    };
+    const path = "/api/push/subscription";
+    for (const key of ["sub", "userId", "PK", "SK"]) {
+      const response = await pushSubscriptionRoute.PUT(
+        request(path, { method: "PUT", cookie: own, body: { ...subscription, [key]: "other-user" } }),
+      );
+      expect(response.status, key).toBe(400);
+    }
+    const unsubscribe = { endpoint: subscription.endpoint, sub: "other-user" };
+    expect(
+      (await pushSubscriptionRoute.DELETE(request(path, { method: "DELETE", cookie: own, body: unsubscribe }))).status,
+    ).toBe(400);
+    // テスト通知は管理者だけ。管理者でない利用者は、本文を読む前に断る
+    expect(
+      (
+        await pushTestRoute.POST(
+          request("/api/push/test", { method: "POST", cookie: own, body: { sub: "other-user" } }),
+        )
+      ).status,
+    ).toBe(403);
+    expect(await getPushRepository().listSubscriptions("other-user")).toEqual([]);
+
+    expect(
+      (await pushSubscriptionRoute.PUT(request(path, { method: "PUT", cookie: own, body: subscription }))).status,
+    ).toBe(200);
+    // ほかの人の区画に同じ endpoint があっても、自分の解除では消えない
+    const repository = getPushRepository();
+    await repository.putSubscription("other-user", { endpoint: subscription.endpoint, p256dh: "p", auth: "a" }, "t");
+    const response = await pushSubscriptionRoute.DELETE(
+      request(path, { method: "DELETE", cookie: own, body: { endpoint: subscription.endpoint } }),
+    );
+    expect(response.status).toBe(200);
+    expect(await repository.listSubscriptions("other-user")).toHaveLength(1);
+  });
 });
 
 type FakeState = { __mokumokuFakeAuth?: unknown; __mokumokuFakeAudit?: { entries: AuditEntry[] } };
@@ -383,6 +508,7 @@ describe("認可: 管理者だけが開ける", () => {
     // 招待・無効化で変わる代替の利用者の一覧と、操作の記録を、テストごとに作り直す
     delete (globalThis as FakeState).__mokumokuFakeAuth;
     delete (globalThis as FakeState).__mokumokuFakeAudit;
+    delete (globalThis as { __mokumokuFakePush?: unknown }).__mokumokuFakePush;
   });
   afterEach(() => {
     vi.unstubAllEnvs();
@@ -523,5 +649,34 @@ describe("認可: 管理者だけが開ける", () => {
     expect(await self.json()).toEqual({ error: "self-disable" });
     expect((await listedUsers()).find((u) => u.email === FAKE_ADMIN_EMAIL)?.enabled).toBe(true);
     expect(auditEntries()).toHaveLength(1);
+  });
+
+  it("テスト通知の API の本体_管理者は自分にだけ送れ_管理者でない利用者・未ログインは断られる", async () => {
+    // 送り先が自分の購読だけ(購読がなければ 0 件)であることを、外へ送らずに確かめる
+    vi.stubEnv("VAPID_PUBLIC_KEY", "public-key-example");
+    vi.stubEnv("VAPID_PRIVATE_KEY", "private-key-example");
+    vi.stubEnv("VAPID_SUBJECT", "mailto:admin@example.com");
+    const sendTest = (cookie?: string, body: unknown = {}) =>
+      pushTestRoute.POST(request("/api/push/test", { method: "POST", cookie, body }));
+    const repository = getPushRepository();
+    const target = { endpoint: "https://fcm.googleapis.com/fcm/send/device-1", p256dh: "p", auth: "a" };
+    await repository.putSubscription(fakeSub(FAKE_USER_EMAIL), target, "t");
+
+    const own = await learner();
+    const forbidden = await sendTest(own);
+    expect(forbidden.status).toBe(403);
+    expect(await forbidden.json()).toEqual({ error: "forbidden" });
+    expect((await sendTest()).status).toBe(401);
+    expect((await sendTest("mokumoku_id=forged; mokumoku_access=forged")).status).toBe(401);
+    // 管理者でない利用者が、管理者だと申告しても通らない
+    expect((await sendTest(`${own}; cognito:groups=admins; isAdmin=true`, {})).status).toBe(403);
+
+    const cookie = await admin();
+    const sent = await sendTest(cookie);
+    expect(sent.status).toBe(200);
+    expect(await sent.json()).toEqual({ sent: 0 });
+    // 送り先を本文で指定することはできない
+    expect((await sendTest(cookie, { sub: fakeSub(FAKE_USER_EMAIL) })).status).toBe(400);
+    expect(await repository.listSubscriptions(fakeSub(FAKE_USER_EMAIL))).toHaveLength(1);
   });
 });

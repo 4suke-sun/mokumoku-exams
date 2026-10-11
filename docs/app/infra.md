@@ -10,15 +10,26 @@
 | `<接頭辞>-auth` | Cognito UserPool。セルフサインアップ禁止、管理者の招待制、管理者グループ(`admins`)。招待メールと再設定の確認コードの文面、パスワードの規則を持ちます。Identity Pool は作りません。画面と API は [認証の仕組み](./auth.md) |
 | `<接頭辞>-data` | DynamoDB の単一テーブル(学習の履歴)。使った分だけの課金で、暗号化は既定(AWS 所有のキー)。スタックを消してもテーブルは残り、削除保護と時点復旧(過去 35 日)が有効です。設計は [データの設計](./data.md) |
 | `<接頭辞>-web` | Lambda(Next.js + Lambda Web Adapter)、Function URL、CloudFront、静的ファイル用の S3 |
+| `<接頭辞>-push` | (通知の鍵を設定したときだけ)毎日の通知を送る Lambda と、そのスケジュール(EventBridge のルール) |
 
 `<接頭辞>-web` の Lambda には、`COGNITO_USER_POOL_ID`(ID トークンの検証)と `HISTORY_TABLE_NAME`(履歴のテーブル)が渡されます。
+設定したときだけ、`SITE_URL`(sitemap の絶対 URL)と、`VAPID_PUBLIC_KEY`・`VAPID_PRIVATE_KEY`・`VAPID_SUBJECT`(通知の購読とテスト通知)も渡されます。
 履歴のテーブルに許す操作は、`GetItem`・`PutItem`・`UpdateItem`・`Query`・`DeleteItem` だけです(テーブル 1 つに限り、スキャンやテーブルの管理はできません)。管理者の操作の記録も、このテーブルに置きます。
 Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCreateUser`・`AdminDisableUser` だけです(`<接頭辞>-auth` の UserPool 1 つに限ります)。
-デプロイの順は、auth → data → web です(`cdkd deploy --all` が依存から決めます)。
+デプロイの順は、auth → data → web で、push は data のあとです(`cdkd deploy --all` が依存から決めます)。
+
+### 通知の送信(`<接頭辞>-push`)
+
+- 毎日 11:00(UTC。日本時間の 20:00)に、EventBridge のルールが送信の Lambda を動かします。失敗しても送り直しません(同じ日に 2 回届かないように)。
+- 送信の Lambda は、購読しているすべての端末に、学習のリマインドを送ります。購読の扱いは [データの設計](./data.md) の「通知の購読」です。
+- 送信の Lambda に許すのは、履歴のテーブルの `Scan` と `DeleteItem` だけです(利用者をまたいで購読を集め、無効になった購読を消すため)。Function URL はなく、外からは呼べません。
+- ログは 30 日で消えます。記録するのは、送れた数・失敗の数・消した数だけです。
+- 鍵(`VAPID_*`)を設定しないときは、このスタックを作りません。アカウントの画面では「この環境では、通知を設定できません」と表示します。
 
 配信の流れは、[アーキテクチャの計画](./architecture-plan.md) のとおりです。
 
 - `/_next/static/*` は S3 から配ります(CloudFront から S3 へは、オリジンアクセスコントロールで読みます。バケットは公開しません)。
+- `packages/app/public/` のファイル(アイコンと、通知を受け取る Service Worker)は、Lambda に載せ、Next のサーバーが配ります。
 - それ以外は Lambda の Function URL へ渡します。Function URL は認証なし(`authType: NONE`)で、CloudFront が付ける合言葉のヘッダー(`x-origin-verify`)を、
   アプリ(`packages/app/src/proxy.ts`)が確かめます。合言葉のないリクエスト(Function URL への直接のアクセス)は、403 で断ります。
 - 独自ドメインは、まだ設定しません。CloudFront の標準のドメインで配信します。
@@ -43,6 +54,7 @@ Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCre
 次の項目は、別の段階で扱います。
 
 - CloudFront の監視(CloudFront のメトリクスは別リージョンにあるため、別の段階で扱います)
+- 通知の送信の Lambda のアラーム(失敗はログと Lambda のメトリクスで確かめます)
 - 管理者向けの多要素認証の検討
 - 独自ドメイン
 
@@ -59,6 +71,14 @@ Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCre
    | `ORIGIN_VERIFY_VALUE` | CloudFront とアプリの間の合言葉。32 文字以上のランダムな文字列を、自分で作ります |
    | `STACK_PREFIX` | (省略可)リソース名の先頭に付ける文字列。既定は `mokumoku-exams` |
    | `ALARM_EMAIL` | (省略可)アラームの通知先のメールアドレス |
+   | `SITE_URL` | (省略可)公開の URL の起点(`https://example.com` の形。末尾のスラッシュなし)。sitemap と robots の絶対 URL に使います。渡さないときは、sitemap は空です |
+   | `VAPID_PUBLIC_KEY` | (省略可)プッシュ通知の VAPID の公開鍵。下の 2 つとそろえて渡します |
+   | `VAPID_PRIVATE_KEY` | (省略可)VAPID の秘密鍵 |
+   | `VAPID_SUBJECT` | (省略可)送信者の連絡先(`mailto:` か `https://` で始まる)。プッシュサービスが、問題があったときの連絡に使います |
+
+   VAPID の鍵は、`npx web-push generate-vapid-keys` で作ります(表示された 2 つの値を `.env` に書きます)。秘密鍵は、ほかに書き写しません。
+   鍵を作り直すと、それまでの購読には送れなくなります(利用者が、アカウントの画面で購読し直します)。
+   `SITE_URL` には、初回のデプロイのあとに出力される CloudFront のドメイン(`DistributionDomainName`)を `https://` に続けて書き、もう一度デプロイします。
 
    値の形は `packages/infra/lib/config.ts` が検査します。足りない、または形が違うと、変数の名前だけを示して止まります(値は表示しません)。
 
@@ -68,7 +88,7 @@ Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCre
 
 ```sh
 npm run build          # アプリをビルドする
-npm run build:lambda   # Lambda に載せるアセットを dist/ に作る(dist/lambda と dist/static)
+npm run build:lambda   # Lambda に載せるアセットを dist/ に作る(dist/lambda、dist/static、dist/push)
 npm run synth          # スタックを合成する
 npm run deploy -w @mokumoku-exams/infra
 ```
@@ -81,4 +101,7 @@ npm run deploy -w @mokumoku-exams/infra
 
 - AWS の値(アカウント ID、ARN、ドメイン、ID)は、コードにもドキュメントにも書きません。例を書くときは、`123456789012` や `example.com` を使います。
 - 合言葉の値は、Lambda の環境変数と CloudFront のオリジンのヘッダーに入ります。値を変えるときは、`.env` を直して再デプロイします。
+- VAPID の秘密鍵も、Lambda(アプリと送信)の環境変数に入ります。値を変えるときは、`.env` を直して再デプロイします。
+- `dist/push` は、`packages/app/src/lib/push/daily.ts` から相対で読み込むファイルを JavaScript にしたものと、使うパッケージ(`web-push` と AWS SDK)です。
+  このディレクトリのファイルは、`@/` の別名を使いません(使うと `npm run build:lambda` が失敗します)。
 - スタックの変更後は、`packages/infra` のスナップショットを更新します(`npx vitest run -u -w @mokumoku-exams/infra`)。差分が意図したものか、確かめてから更新します。

@@ -10,8 +10,9 @@ import {
   TEMP_PASSWORD_DAYS,
   USER_ADMIN_ACTIONS,
 } from "./auth-stack.ts";
-import type { InfraConfig } from "./config.ts";
+import type { InfraConfig, PushConfig } from "./config.ts";
 import { DataStack, HISTORY_TABLE_ACTIONS, POINT_IN_TIME_RECOVERY_DAYS } from "./data-stack.ts";
+import { PUSH_HANDLER, PUSH_SCHEDULE, PUSH_SENDER_TABLE_ACTIONS, PushStack } from "./push-stack.ts";
 import { ORIGIN_VERIFY_HEADER, WebStack } from "./web-stack.ts";
 
 const config: InfraConfig = {
@@ -20,6 +21,8 @@ const config: InfraConfig = {
   originVerifyValue: "o".repeat(32),
 };
 const env = { account: "123456789012", region: "us-east-1" };
+// 見本の鍵(形だけを合わせた値。実際の鍵ではない)
+const push: PushConfig = { publicKey: "P".repeat(87), privateKey: "k".repeat(43), subject: "mailto:admin@example.com" };
 // 既定の識別子ではなく、見本と分かる値にして、スナップショットに環境の由来らしい文字列を入れない
 const synthesizer = new DefaultStackSynthesizer({ qualifier: "example" });
 const USER_POOL_ARN = "arn:aws:cognito-idp:us-east-1:123456789012:userpool/pool-example";
@@ -33,18 +36,32 @@ function dataTemplate(): Template {
   return Template.fromStack(new DataStack(new App(), "Data", { env, synthesizer }));
 }
 
-function webTemplate(alarmEmail?: string): Template {
+function webTemplate(alarmEmail?: string, extra: Partial<InfraConfig> = {}): Template {
   const app = new App();
   const data = new DataStack(app, "Data", { env, synthesizer });
   const stack = new WebStack(app, "Web", {
     env,
     synthesizer,
-    config: { ...config, alarmEmail },
+    config: { ...config, alarmEmail, ...extra },
     lambdaCodePath: fixture("lambda"),
     staticAssetsPath: fixture("static"),
     userPoolClientId: "client-example",
     userPoolId: "pool-example",
     userPoolArn: USER_POOL_ARN,
+    historyTable: data.table,
+  });
+  return Template.fromStack(stack);
+}
+
+function pushTemplate(): Template {
+  const app = new App();
+  const data = new DataStack(app, "Data", { env, synthesizer });
+  const stack = new PushStack(app, "Push", {
+    env,
+    synthesizer,
+    config: { ...config, push },
+    push,
+    pushCodePath: fixture("push"),
     historyTable: data.table,
   });
   return Template.fromStack(stack);
@@ -287,11 +304,88 @@ describe("WebStack", () => {
     }
   });
 
+  it("公開の URL と通知の鍵は_設定したときだけ Lambda に渡す", () => {
+    const [plain] = Object.values(webTemplate().findResources("AWS::Lambda::Function")).filter(
+      (f) => f.Properties.Handler === "run.sh",
+    );
+    for (const name of ["SITE_URL", "VAPID_PUBLIC_KEY", "VAPID_PRIVATE_KEY", "VAPID_SUBJECT"]) {
+      expect(plain?.Properties.Environment.Variables[name], name).toBeUndefined();
+    }
+    webTemplate(undefined, { siteUrl: "https://example.com", push }).hasResourceProperties("AWS::Lambda::Function", {
+      Environment: {
+        Variables: {
+          SITE_URL: "https://example.com",
+          VAPID_PUBLIC_KEY: push.publicKey,
+          VAPID_PRIVATE_KEY: push.privateKey,
+          VAPID_SUBJECT: push.subject,
+        },
+      },
+    });
+  });
+
   it("通知先のメールは_指定したときだけ購読される", () => {
     webTemplate().resourceCountIs("AWS::SNS::Subscription", 0);
     webTemplate("alerts@example.com").hasResourceProperties("AWS::SNS::Subscription", {
       Protocol: "email",
       Endpoint: "alerts@example.com",
     });
+  });
+});
+
+describe("PushStack", () => {
+  it("合成すると_スナップショットと一致する", () => {
+    expect(pushTemplate().toJSON()).toMatchSnapshot();
+  });
+
+  it("送信の Lambda は_毎日決まった時刻に動き_失敗しても送り直さない", () => {
+    expect(PUSH_SCHEDULE).toEqual({ minute: "0", hour: "11" });
+    const template = pushTemplate();
+    template.resourceCountIs("AWS::Events::Rule", 1);
+    template.hasResourceProperties("AWS::Events::Rule", {
+      ScheduleExpression: "cron(0 11 * * ? *)",
+      State: "ENABLED",
+      Targets: [
+        {
+          Arn: { "Fn::GetAtt": [Match.stringLikeRegexp("SenderFunction"), "Arn"] },
+          RetryPolicy: { MaximumRetryAttempts: 0 },
+        },
+      ],
+    });
+    template.hasResourceProperties("AWS::Lambda::Permission", {
+      Action: "lambda:InvokeFunction",
+      Principal: "events.amazonaws.com",
+    });
+  });
+
+  it("送信の Lambda は_鍵とテーブル名を受け取り_外から呼べる URL を持たない", () => {
+    const template = pushTemplate();
+    template.hasResourceProperties("AWS::Lambda::Function", {
+      Handler: PUSH_HANDLER,
+      Runtime: "nodejs22.x",
+      Environment: {
+        Variables: {
+          NODE_ENV: "production",
+          HISTORY_TABLE_NAME: Match.anyValue(),
+          VAPID_PUBLIC_KEY: push.publicKey,
+          VAPID_PRIVATE_KEY: push.privateKey,
+          VAPID_SUBJECT: push.subject,
+        },
+      },
+    });
+    template.resourceCountIs("AWS::Lambda::Url", 0);
+  });
+
+  it("送信の Lambda は_テーブルのスキャンと削除だけを許され_全リソースへの権限を持たない", () => {
+    const policies = Object.values(pushTemplate().findResources("AWS::IAM::Policy"));
+    const statements = policies.flatMap((policy) => policy.Properties.PolicyDocument.Statement);
+    const table = statements.filter((s) => JSON.stringify(s.Action).includes("dynamodb:"));
+    expect(table).toHaveLength(1);
+    expect([...table[0].Action].sort()).toEqual([...PUSH_SENDER_TABLE_ACTIONS].sort());
+    expect(JSON.stringify(table[0].Resource)).not.toContain("*");
+    expect(statements.filter((s) => s.Resource === "*")).toEqual([]);
+  });
+
+  it("送信の Lambda のログに_保持期間がある", () => {
+    pushTemplate().hasResourceProperties("AWS::Logs::LogGroup", { RetentionInDays: 30 });
   });
 });

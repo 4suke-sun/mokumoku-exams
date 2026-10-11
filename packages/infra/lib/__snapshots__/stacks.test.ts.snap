@@ -226,6 +226,196 @@ exports[`DataStack > 合成すると_スナップショットと一致する 1`]
 }
 `;
 
+exports[`PushStack > 合成すると_スナップショットと一致する 1`] = `
+{
+  "Parameters": {
+    "BootstrapVersion": {
+      "Default": "/cdk-bootstrap/example/version",
+      "Description": "Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]",
+      "Type": "AWS::SSM::Parameter::Value<String>",
+    },
+  },
+  "Resources": {
+    "DailySchedule68BF5767": {
+      "Properties": {
+        "Description": "毎日、プッシュ通知のリマインドを送る",
+        "ScheduleExpression": "cron(0 11 * * ? *)",
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "SenderFunction5DD1AB71",
+                "Arn",
+              ],
+            },
+            "Id": "Target0",
+            "RetryPolicy": {
+              "MaximumRetryAttempts": 0,
+            },
+          },
+        ],
+      },
+      "Type": "AWS::Events::Rule",
+    },
+    "DailyScheduleAllowEventRulePushSenderFunctionEC1D58B38FF23785": {
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "SenderFunction5DD1AB71",
+            "Arn",
+          ],
+        },
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "DailySchedule68BF5767",
+            "Arn",
+          ],
+        },
+      },
+      "Type": "AWS::Lambda::Permission",
+    },
+    "SenderFunction5DD1AB71": {
+      "DependsOn": [
+        "SenderFunctionServiceRoleDefaultPolicy06C14206",
+        "SenderFunctionServiceRoleCA9393B1",
+      ],
+      "Properties": {
+        "Architectures": [
+          "x86_64",
+        ],
+        "Code": {
+          "S3Bucket": "cdk-example-assets-123456789012-us-east-1",
+          "S3Key": "3f6910d5d8dc64cb75773beeb600893a2dea82aeabba3b95deacb2446ad8ad3d.zip",
+        },
+        "Environment": {
+          "Variables": {
+            "HISTORY_TABLE_NAME": {
+              "Fn::ImportValue": "Data:ExportsOutputRefHistoryTable24A0CCCB0EA6F9C1",
+            },
+            "NODE_ENV": "production",
+            "VAPID_PRIVATE_KEY": "kkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkkk",
+            "VAPID_PUBLIC_KEY": "PPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPPP",
+            "VAPID_SUBJECT": "mailto:admin@example.com",
+          },
+        },
+        "FunctionName": "test-push-sender",
+        "Handler": "daily.handler",
+        "LoggingConfig": {
+          "LogGroup": {
+            "Ref": "SenderLogGroupBB09CDE2",
+          },
+        },
+        "MemorySize": 256,
+        "Role": {
+          "Fn::GetAtt": [
+            "SenderFunctionServiceRoleCA9393B1",
+            "Arn",
+          ],
+        },
+        "Runtime": "nodejs22.x",
+        "Timeout": 60,
+      },
+      "Type": "AWS::Lambda::Function",
+    },
+    "SenderFunctionServiceRoleCA9393B1": {
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "lambda.amazonaws.com",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "ManagedPolicyArns": [
+          {
+            "Fn::Join": [
+              "",
+              [
+                "arn:",
+                {
+                  "Ref": "AWS::Partition",
+                },
+                ":iam::aws:policy/service-role/AWSLambdaBasicExecutionRole",
+              ],
+            ],
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Role",
+    },
+    "SenderFunctionServiceRoleDefaultPolicy06C14206": {
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:Scan",
+                "dynamodb:DeleteItem",
+              ],
+              "Effect": "Allow",
+              "Resource": {
+                "Fn::ImportValue": "Data:ExportsOutputFnGetAttHistoryTable24A0CCCBArnCEF54BD1",
+              },
+            },
+          ],
+          "Version": "2012-10-17",
+        },
+        "PolicyName": "SenderFunctionServiceRoleDefaultPolicy06C14206",
+        "Roles": [
+          {
+            "Ref": "SenderFunctionServiceRoleCA9393B1",
+          },
+        ],
+      },
+      "Type": "AWS::IAM::Policy",
+    },
+    "SenderLogGroupBB09CDE2": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "RetentionInDays": 30,
+      },
+      "Type": "AWS::Logs::LogGroup",
+      "UpdateReplacePolicy": "Delete",
+    },
+  },
+  "Rules": {
+    "CheckBootstrapVersion": {
+      "Assertions": [
+        {
+          "Assert": {
+            "Fn::Not": [
+              {
+                "Fn::Contains": [
+                  [
+                    "1",
+                    "2",
+                    "3",
+                    "4",
+                    "5",
+                  ],
+                  {
+                    "Ref": "BootstrapVersion",
+                  },
+                ],
+              },
+            ],
+          },
+          "AssertDescription": "CDK bootstrap stack version 6 required. Please run 'cdk bootstrap' with a recent version of the CDK CLI.",
+        },
+      ],
+    },
+  },
+}
+`;
+
 exports[`WebStack > 合成すると_スナップショットと一致する 1`] = `
 {
   "Outputs": {
