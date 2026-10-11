@@ -115,6 +115,15 @@ export function saveResult(store: KeyValueStore, result: Result): boolean {
   return writeJson(store, resultsKey(result.examCode), next);
 }
 
+/** 端末に保存した結果を、資格ごとに消す(アカウントへ移したあとなど)。 */
+export function clearResults(store: KeyValueStore, examCode: string): void {
+  try {
+    store.removeItem(resultsKey(examCode));
+  } catch {
+    // 消せなくても、次の取得で重複が除かれる
+  }
+}
+
 /** 利用者の設定 */
 export const SettingsSchema = z.strictObject({ shuffleChoices: z.boolean() });
 export type Settings = z.infer<typeof SettingsSchema>;

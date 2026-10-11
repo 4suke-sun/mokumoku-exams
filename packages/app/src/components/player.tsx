@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { EmptyState } from "@/components/empty-state.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
+import { postServerResult } from "@/lib/history/client.ts";
 import { type QuizKeyAction, quizKeyAction } from "@/lib/keyboard.ts";
 import { answerFor, orderChoices, sortKeys } from "@/lib/quiz.ts";
 import { browserStore, clearSession, loadSession, type Session, saveResult, saveSession } from "@/lib/storage.ts";
@@ -22,6 +23,7 @@ export function Player({ exam, questions }: Props) {
   const choiceKeysRef = useRef<readonly string[]>([]);
   const questionRef = useRef<HTMLFieldSetElement>(null);
   const shownIndex = useRef<number | null>(null);
+  const finishing = useRef(false);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -102,21 +104,29 @@ export function Player({ exam, questions }: Props) {
     update({ ...session, index: index + delta });
   }
 
-  function finish() {
-    const saved = saveResult(browserStore(), {
-      examCode: exam.examCode,
-      questionIds: session.questionIds,
-      answers: session.answers,
-      finishedAt: new Date().toISOString(),
-      choiceOrder: session.choiceOrder,
-    });
-    if (!saved) {
-      // 結果を残せないときは、回答を消さずに、この画面にとどまる
-      setSaveFailed(true);
-      return;
+  async function finish() {
+    if (finishing.current) return;
+    finishing.current = true;
+    try {
+      const result = {
+        examCode: exam.examCode,
+        questionIds: session.questionIds,
+        answers: session.answers,
+        finishedAt: new Date().toISOString(),
+        choiceOrder: session.choiceOrder,
+      };
+      // アカウントに保存できたら、サーバーを正とする。保存できないとき(通信の失敗など)は、この端末に残して、あとで移せるようにする
+      const posted = await postServerResult(result);
+      if (!posted && !saveResult(browserStore(), result)) {
+        // 結果を残せないときは、回答を消さずに、この画面にとどまる
+        setSaveFailed(true);
+        return;
+      }
+      clearSession(browserStore(), exam.examCode);
+      router.push(`/exams/${exam.examCode}/result`);
+    } finally {
+      finishing.current = false;
     }
-    clearSession(browserStore(), exam.examCode);
-    router.push(`/exams/${exam.examCode}/result`);
   }
 
   const inputType = question.questionType === "single" ? "radio" : "checkbox";
@@ -132,7 +142,7 @@ export function Player({ exam, questions }: Props) {
     else if (action.type === "previous") {
       if (index > 0) move(-1);
     } else if (canAdvance) {
-      if (isLast) finish();
+      if (isLast) void finish();
       else move(1);
     }
   };
@@ -195,7 +205,7 @@ export function Player({ exam, questions }: Props) {
         {isLast ? (
           <button
             type="button"
-            onClick={finish}
+            onClick={() => void finish()}
             disabled={selected.length === 0}
             className="flex-1 rounded-md bg-primary px-5 py-3 font-bold text-on-primary hover:opacity-90 disabled:opacity-50"
           >

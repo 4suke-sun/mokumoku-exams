@@ -8,7 +8,12 @@
 | スタック | 内容 |
 | --- | --- |
 | `<接頭辞>-auth` | Cognito UserPool。セルフサインアップ禁止、管理者の招待制、管理者グループ(`admins`)。招待メールと再設定の確認コードの文面、パスワードの規則を持ちます。Identity Pool は作りません。画面と API は [認証の仕組み](./auth.md) |
+| `<接頭辞>-data` | DynamoDB の単一テーブル(学習の履歴)。使った分だけの課金で、暗号化は既定(AWS 所有のキー)。スタックを消してもテーブルは残ります。設計は [データの設計](./data.md) |
 | `<接頭辞>-web` | Lambda(Next.js + Lambda Web Adapter)、Function URL、CloudFront、静的ファイル用の S3 |
+
+`<接頭辞>-web` の Lambda には、`COGNITO_USER_POOL_ID`(ID トークンの検証)と `HISTORY_TABLE_NAME`(履歴のテーブル)が渡されます。
+履歴のテーブルに許す操作は、`GetItem`・`PutItem`・`Query`・`DeleteItem` だけです(テーブル 1 つに限り、スキャンやテーブルの管理はできません)。
+デプロイの順は、auth → data → web です(`cdkd deploy --all` が依存から決めます)。
 
 配信の流れは、[アーキテクチャの計画](./architecture-plan.md) のとおりです。
 
@@ -38,7 +43,7 @@
 
 - CloudFront の監視(CloudFront のメトリクスは別リージョンにあるため、別の段階で扱います)
 - 管理者向けの多要素認証の検討
-- データの保護設定(バックアップ・削除保護)
+- データの保護設定(バックアップ・削除保護)。いまのテーブルは、バックアップを取らず、削除保護もありません(スタックを消しても残るだけです)
 - 独自ドメイン
 
 ## 準備

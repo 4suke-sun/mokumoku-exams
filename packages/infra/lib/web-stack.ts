@@ -3,6 +3,8 @@ import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
 import * as origins from "aws-cdk-lib/aws-cloudfront-origins";
 import * as cloudwatch from "aws-cdk-lib/aws-cloudwatch";
 import * as cloudwatchActions from "aws-cdk-lib/aws-cloudwatch-actions";
+import type * as dynamodb from "aws-cdk-lib/aws-dynamodb";
+import * as iam from "aws-cdk-lib/aws-iam";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as logs from "aws-cdk-lib/aws-logs";
 import * as s3 from "aws-cdk-lib/aws-s3";
@@ -11,6 +13,7 @@ import * as sns from "aws-cdk-lib/aws-sns";
 import * as subscriptions from "aws-cdk-lib/aws-sns-subscriptions";
 import type { Construct } from "constructs";
 import type { InfraConfig } from "./config.ts";
+import { HISTORY_TABLE_ACTIONS } from "./data-stack.ts";
 
 /** アプリがオリジンの合言葉を確かめるヘッダー名(packages/app/src/lib/origin-verify.ts と同じ) */
 export const ORIGIN_VERIFY_HEADER = "x-origin-verify";
@@ -29,6 +32,10 @@ type Props = StackProps & {
   staticAssetsPath: string;
   /** アプリが認証で使う Cognito のクライアント ID(AuthStack の出力) */
   userPoolClientId: string;
+  /** アプリが ID トークンの検証で使う Cognito のユーザープール ID(AuthStack の出力) */
+  userPoolId: string;
+  /** 履歴を置くテーブル(DataStack の出力) */
+  historyTable: dynamodb.ITable;
 };
 
 /** ホスティング。Lambda Web Adapter 上の Next.js を CloudFront の背後に置き、静的ファイルは S3 から配る。 */
@@ -73,8 +80,14 @@ export class WebStack extends Stack {
         HOSTNAME: "0.0.0.0",
         ORIGIN_VERIFY_VALUE: config.originVerifyValue,
         COGNITO_CLIENT_ID: props.userPoolClientId,
+        COGNITO_USER_POOL_ID: props.userPoolId,
+        HISTORY_TABLE_NAME: props.historyTable.tableName,
       },
     });
+    // 履歴のテーブルに対して、必要な操作だけを許す(スキャンやテーブルの管理はできない)
+    appFunction.addToRolePolicy(
+      new iam.PolicyStatement({ actions: HISTORY_TABLE_ACTIONS, resources: [props.historyTable.tableArn] }),
+    );
 
     // Function URL は認証なし。CloudFront が付ける合言葉のヘッダーを、アプリが確かめて、直接のアクセスを断る
     const functionUrl = appFunction.addFunctionUrl({ authType: lambda.FunctionUrlAuthType.NONE });
