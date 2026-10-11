@@ -78,23 +78,42 @@ export function BookmarkCheck({ exam, questions }: Props) {
   );
 }
 
-/** 問題文と選択肢。`revealed` のときは、正解の印と解説も出す。 */
+/**
+ * 問題文と選択肢。`revealed` のときは、正解の印と解説も出す。
+ * 自由記述は選択肢がないので、`revealed` のときに採点の観点を出す。
+ */
 function QuestionFace({ question, revealed }: { question: Question; revealed: boolean }) {
   return (
     <>
       <RichText text={question.questionText} />
-      <ul className="space-y-1 text-sm">
-        {question.choices.map((choice) => {
-          const isAnswer = revealed && question.correctAnswers.includes(choice.key);
-          return (
-            <li key={choice.key} className="rounded border border-line p-2">
-              <span className="font-bold">{choice.key}. </span>
-              <InlineText text={choice.text} />
-              {isAnswer ? <span className="ml-2 font-bold text-correct">(正解)</span> : null}
-            </li>
-          );
-        })}
-      </ul>
+      {question.questionType === "free-text" ? (
+        revealed ? (
+          <div className="space-y-1 text-sm">
+            <h3 className="font-bold">採点の観点(合格点 {question.rubric.passingPoints} 点)</h3>
+            <ul className="space-y-1">
+              {question.rubric.criteria.map((criterion) => (
+                <li key={criterion.name} className="flex justify-between gap-3 rounded border border-line p-2">
+                  <span>{criterion.name}</span>
+                  <span>{criterion.points} 点</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null
+      ) : (
+        <ul className="space-y-1 text-sm">
+          {question.choices.map((choice) => {
+            const isAnswer = revealed && question.correctAnswers.includes(choice.key);
+            return (
+              <li key={choice.key} className="rounded border border-line p-2">
+                <span className="font-bold">{choice.key}. </span>
+                <InlineText text={choice.text} />
+                {isAnswer ? <span className="ml-2 font-bold text-correct">(正解)</span> : null}
+              </li>
+            );
+          })}
+        </ul>
+      )}
       {revealed ? (
         <div className="space-y-2 border-t border-line pt-3">
           <h3 className="font-bold">解説</h3>

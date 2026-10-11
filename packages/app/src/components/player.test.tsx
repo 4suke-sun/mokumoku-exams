@@ -218,3 +218,63 @@ describe("Player の段階の確認問題", () => {
     expect(loadStageProgress(browserStore(), "TEST")).toEqual({ examCode: "TEST", passed: {} });
   });
 });
+
+describe("Player の自由記述", () => {
+  const freeText = {
+    questionId: "TEST-0003",
+    examCode: "TEST",
+    domain: "domain1",
+    questionType: "free-text",
+    questionText: "記述の問題文",
+    rubric: { criteria: [{ name: "観点", keywords: ["保存"], points: 10 }], passingPoints: 10 },
+    explanation: "解説",
+  } as Question;
+  const mixed = [question(1, "A"), freeText];
+
+  beforeEach(() => {
+    saveSession(browserStore(), {
+      examCode: "TEST",
+      questionIds: mixed.map((q) => q.questionId),
+      answers: { "TEST-0001": ["A"] },
+      index: 1,
+      startedAt: "2026-10-10T00:00:00.000Z",
+    });
+  });
+
+  it("入力欄に書くまで採点できず_入力中のキーは操作にならない_書いた内容を結果に残す", async () => {
+    render(<Player exam={exam} questions={mixed} />);
+    const user = userEvent.setup();
+    const input = await screen.findByRole("textbox", { name: "回答" });
+    const grade = screen.getByRole("button", { name: "採点する" }) as HTMLButtonElement;
+    expect(grade.disabled).toBe(true);
+
+    await user.type(input, "  ");
+    expect(grade.disabled).toBe(true);
+    // 入力欄の中の P と Enter は、前へ戻る・採点の操作にならず、文字として入る
+    await user.type(input, "Pで保存{Enter}");
+    expect(screen.getByText("記述の問題文")).toBeTruthy();
+    expect(push).not.toHaveBeenCalled();
+    expect(grade.disabled).toBe(false);
+
+    await user.click(grade);
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
+    expect(loadResults(browserStore(), "TEST")[0]?.textAnswers).toEqual({ "TEST-0003": "  Pで保存\n" });
+  });
+
+  it("段階の確認問題_自由記述は採点基準の判定で正答率に数える", async () => {
+    saveSession(browserStore(), {
+      examCode: "TEST",
+      questionIds: mixed.map((q) => q.questionId),
+      answers: { "TEST-0001": ["A"] },
+      index: 1,
+      startedAt: "2026-10-10T00:00:00.000Z",
+      stage: { unitId: "basics", order: 1 },
+    });
+    render(<Player exam={exam} questions={mixed} />);
+    const user = userEvent.setup();
+    await user.type(await screen.findByRole("textbox", { name: "回答" }), "設定を保存する");
+    await user.click(screen.getByRole("button", { name: "採点する" }));
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
+    expect(loadStageProgress(browserStore(), "TEST").last).toMatchObject({ percent: 100, passed: true });
+  });
+});

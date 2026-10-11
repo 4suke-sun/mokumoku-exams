@@ -27,6 +27,10 @@ describe("quizKeyAction", () => {
     expect(press("p")).toEqual({ type: "previous" });
   });
 
+  it("文章の入力欄の中_どのキーも入力にまかせる(自由記述)", () => {
+    for (const key of ["a", "N", "p", "Enter"]) expect(press(key, { targetTag: "TEXTAREA" }), key).toBeNull();
+  });
+
   it("ボタンやリンクの上の Enter_その要素の操作にまかせる", () => {
     expect(press("Enter", { targetTag: "BUTTON" })).toBeNull();
     expect(press("Enter", { targetTag: "a" })).toBeNull();

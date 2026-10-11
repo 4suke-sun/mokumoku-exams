@@ -20,7 +20,10 @@ export async function postJson(path: string, body: unknown): Promise<PostResult>
   }
 }
 
-export type SessionInfo = { signedIn: false } | { signedIn: true; email: string | null; expiresAt: number | null };
+/** ログイン状態。`isAdmin` は、管理者のナビゲーションを出すかどうかの表示のためだけに使う(認可はサーバーが行う)。 */
+export type SessionInfo =
+  | { signedIn: false }
+  | { signedIn: true; email: string | null; expiresAt: number | null; isAdmin?: boolean };
 
 export async function fetchSession(): Promise<SessionInfo | null> {
   try {

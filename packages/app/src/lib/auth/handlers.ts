@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ADMIN_GROUP } from "./admin.ts";
 import { clearedCookies, isExpired, readClaims, readCookies, sessionCookies } from "./session.ts";
 import { AuthError, type AuthErrorCode, type AuthProvider, type Tokens } from "./types.ts";
 
@@ -133,15 +134,22 @@ async function activeTokens(request: Request, deps: Deps): Promise<Active | null
   }
 }
 
-/** 現在のログイン状態。期限切れでも更新できればログイン中として返す。更新できなければ Cookie を破棄する。 */
+/**
+ * 現在のログイン状態。期限切れでも更新できればログイン中として返す。更新できなければ Cookie を破棄する。
+ * `isAdmin` は、ナビゲーションの表示のためだけの値。管理者の経路の認可は、proxy と管理者の画面が、検証したトークンで行う。
+ */
 export async function handleSession(request: Request, deps: Deps): Promise<Response> {
   const active = await activeTokens(request, deps);
   if (!active) {
     const hadCookie = Object.values(readCookies(request.headers.get("cookie"))).some(Boolean);
     return json({ signedIn: false }, 200, hadCookie ? clearedCookies(deps.secure) : []);
   }
-  const { exp, email: address } = readClaims(active.tokens.idToken);
-  return json({ signedIn: true, email: address ?? null, expiresAt: exp ?? null }, 200, active.cookies);
+  const { exp, email: address, groups } = readClaims(active.tokens.idToken);
+  return json(
+    { signedIn: true, email: address ?? null, expiresAt: exp ?? null, isAdmin: groups?.includes(ADMIN_GROUP) ?? false },
+    200,
+    active.cookies,
+  );
 }
 
 /** 期限の前の更新。ログイン中でなければ 401 にして Cookie を破棄する。 */

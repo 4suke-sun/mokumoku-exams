@@ -10,6 +10,14 @@ export const NAV_ITEMS: NavItem[] = [
   { label: "リリースノート", href: "/release-notes", ready: false },
 ];
 
+/** 管理者にだけ出す項目(使い方のページからは、リンクしない) */
+export const ADMIN_NAV_ITEM: NavItem = { label: "管理", href: "/admin", ready: true };
+
+/** ナビゲーションに並べる項目。管理者の項目は、管理者にだけ足す(表示だけで、開けるかどうかはサーバーが決める)。 */
+export function navItems(isAdmin: boolean): NavItem[] {
+  return isAdmin ? [...NAV_ITEMS, ADMIN_NAV_ITEM] : NAV_ITEMS;
+}
+
 /** ホームは完全一致、ほかは配下のページでも現在地とみなす。 */
 export function isActive(pathname: string, href: string): boolean {
   if (href === "/") return pathname === "/";

@@ -6,9 +6,10 @@ import { BookmarkError, BookmarkToggle, useBookmarks } from "@/components/bookma
 import { EmptyState } from "@/components/empty-state.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
 import { ScoreRing } from "@/components/score-ring.tsx";
+import { judgeFreeText } from "@/lib/free-text.ts";
 import { fetchServerResults, postServerResult } from "@/lib/history/client.ts";
 import { mergeResults, pendingMigration } from "@/lib/history/merge.ts";
-import { answerFor, isCorrect, orderChoices, passLinePercent, score } from "@/lib/quiz.ts";
+import { answerFor, isQuestionCorrect, orderChoices, passLinePercent, score, textAnswerFor } from "@/lib/quiz.ts";
 import { recentOutcomes } from "@/lib/recent-outcomes.ts";
 import {
   browserStore,
@@ -19,7 +20,7 @@ import {
   type StageCheck,
 } from "@/lib/storage.ts";
 import { STAGE_PASS_PERCENT } from "@/lib/study-stages.ts";
-import type { PublishedExam, Question } from "@/lib/types.ts";
+import type { ChoiceQuestion, FreeTextQuestion, PublishedExam, Question } from "@/lib/types.ts";
 
 type Props = { exam: PublishedExam; questions: Question[] };
 
@@ -119,11 +120,12 @@ export function ResultView({ exam, questions }: Props) {
     );
   }
 
-  const result = score(answered, latest.answers);
-  const allRows = answered.map((question, i) => {
-    const selected = answerFor(latest.answers, question.questionId);
-    return { question, number: i + 1, selected, correct: isCorrect(question, selected) };
-  });
+  const result = score(answered, latest.answers, latest.textAnswers);
+  const allRows = answered.map((question, i) => ({
+    question,
+    number: i + 1,
+    correct: isQuestionCorrect(question, latest.answers, latest.textAnswers),
+  }));
   const wrongCount = allRows.filter((row) => !row.correct).length;
   // 保存した結果(最大 10 回)から、問題ごとの直近の正誤を出す(新しく保存はしない)
   const outcomes = recentOutcomes(state.results, questions);
@@ -214,7 +216,7 @@ export function ResultView({ exam, questions }: Props) {
         <BookmarkError bookmarks={bookmarks} />
         {wrongCount === 0 ? <p className="text-correct">すべて正解でした。見直す問題はありません。</p> : null}
         <ol className="space-y-4">
-          {rows.map(({ question, number, selected, correct }) => (
+          {rows.map(({ question, number, correct }) => (
             <li key={question.questionId} className="space-y-3 rounded-lg border border-line bg-surface p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className={`font-bold ${correct ? "text-correct" : "text-incorrect"}`}>
@@ -225,31 +227,15 @@ export function ResultView({ exam, questions }: Props) {
               </div>
               <RecentOutcomeMarks outcomes={outcomes.get(question.questionId) ?? []} />
               <RichText text={question.questionText} />
-              <ul className="space-y-1 text-sm">
-                {orderChoices(question, latest.choiceOrder).map((choice) => {
-                  const isAnswer = question.correctAnswers.includes(choice.key);
-                  const chosen = selected.includes(choice.key);
-                  return (
-                    <li key={choice.key} className="rounded border border-line p-2">
-                      <span className="font-bold">{choice.key}. </span>
-                      <InlineText text={choice.text} />
-                      {isAnswer ? <span className="ml-2 font-bold text-correct">(正解)</span> : null}
-                      {chosen ? <span className="ml-2 text-muted">(あなたの回答)</span> : null}
-                      {choice.explanation ? (
-                        <p className="mt-1 text-muted">
-                          <span className={`font-bold ${isAnswer ? "text-correct" : "text-incorrect"}`}>
-                            {isAnswer ? "正解の理由: " : "不正解の理由: "}
-                          </span>
-                          <InlineText text={choice.explanation} />
-                        </p>
-                      ) : null}
-                    </li>
-                  );
-                })}
-              </ul>
-              <p className="text-sm text-muted">
-                あなたの回答: {keysLabel(selected)} / 正解: {keysLabel(question.correctAnswers)}
-              </p>
+              {question.questionType === "free-text" ? (
+                <FreeTextDetail question={question} answer={textAnswerFor(latest.textAnswers, question.questionId)} />
+              ) : (
+                <ChoiceDetail
+                  question={question}
+                  selected={answerFor(latest.answers, question.questionId)}
+                  choiceOrder={latest.choiceOrder}
+                />
+              )}
               <div className="space-y-2 border-t border-line pt-3">
                 <h3 className="font-bold">解説</h3>
                 <RichText text={question.explanation} />
@@ -268,6 +254,7 @@ export function ResultView({ exam, questions }: Props) {
               const pastScore = score(
                 past.questionIds.map((id) => byId.get(id)).filter((q): q is Question => q !== undefined),
                 past.answers,
+                past.textAnswers,
               );
               return (
                 <li key={past.finishedAt} className="flex justify-between rounded border border-line bg-surface p-2">
@@ -294,5 +281,78 @@ export function ResultView({ exam, questions }: Props) {
         </Link>
       </div>
     </section>
+  );
+}
+
+/** 択一・複数選択の問題の、選択肢ごとの正誤と回答 */
+function ChoiceDetail({
+  question,
+  selected,
+  choiceOrder,
+}: {
+  question: ChoiceQuestion;
+  selected: readonly string[];
+  choiceOrder: Result["choiceOrder"];
+}) {
+  return (
+    <>
+      <ul className="space-y-1 text-sm">
+        {orderChoices(question, choiceOrder).map((choice) => {
+          const isAnswer = question.correctAnswers.includes(choice.key);
+          const chosen = selected.includes(choice.key);
+          return (
+            <li key={choice.key} className="rounded border border-line p-2">
+              <span className="font-bold">{choice.key}. </span>
+              <InlineText text={choice.text} />
+              {isAnswer ? <span className="ml-2 font-bold text-correct">(正解)</span> : null}
+              {chosen ? <span className="ml-2 text-muted">(あなたの回答)</span> : null}
+              {choice.explanation ? (
+                <p className="mt-1 text-muted">
+                  <span className={`font-bold ${isAnswer ? "text-correct" : "text-incorrect"}`}>
+                    {isAnswer ? "正解の理由: " : "不正解の理由: "}
+                  </span>
+                  <InlineText text={choice.explanation} />
+                </p>
+              ) : null}
+            </li>
+          );
+        })}
+      </ul>
+      <p className="text-sm text-muted">
+        あなたの回答: {keysLabel(selected)} / 正解: {keysLabel(question.correctAnswers)}
+      </p>
+    </>
+  );
+}
+
+/** 自由記述の問題の、回答と、観点ごとの判定と点数 */
+function FreeTextDetail({ question, answer }: { question: FreeTextQuestion; answer: string }) {
+  const judgement = judgeFreeText(question.rubric, answer);
+  return (
+    <div className="space-y-3 text-sm">
+      <div className="space-y-1">
+        <h3 className="font-bold">あなたの回答</h3>
+        <p className="whitespace-pre-wrap rounded border border-line p-2">{answer.trim() === "" ? "未回答" : answer}</p>
+      </div>
+      <div className="space-y-1">
+        <h3 className="font-bold">観点ごとの判定</h3>
+        <ul className="space-y-1">
+          {judgement.criteria.map((criterion) => (
+            <li key={criterion.name} className="flex justify-between gap-3 rounded border border-line p-2">
+              <span className={criterion.met ? "text-correct" : "text-incorrect"}>
+                {criterion.met ? "○ 満たしている" : "× 満たしていない"}
+                <span className="ml-2 text-fg">{criterion.name}</span>
+              </span>
+              <span>
+                {criterion.met ? criterion.points : 0} / {criterion.points} 点
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <p className="text-muted">
+        得点: {judgement.earned} / {judgement.total} 点(合格点 {judgement.passingPoints} 点)
+      </p>
+    </div>
   );
 }

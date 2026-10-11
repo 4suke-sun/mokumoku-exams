@@ -27,6 +27,15 @@ const KEY = z.string().max(64);
 const STAMP = z.string().max(64);
 const AnswersSchema = z.record(KEY, z.array(z.string().max(8)).max(10)).refine((a) => Object.keys(a).length <= 1000);
 
+/** 自由記述の回答の長さの上限(文字数。入力欄、端末の保存、サーバーの検査で共通) */
+export const MAX_TEXT_ANSWER_LENGTH = 1000;
+
+/** 問題 ID ごとの、自由記述の回答の文章 */
+const TextAnswersSchema = z
+  .record(KEY, z.string().max(MAX_TEXT_ANSWER_LENGTH))
+  .refine((a) => Object.keys(a).length <= 1000)
+  .optional();
+
 /** 問題 ID ごとの、選択肢のキーの並び(シャッフルした順を、再読み込みしても保つ) */
 const ChoiceOrderSchema = z
   .record(KEY, z.array(z.string().max(8)).max(10))
@@ -46,6 +55,7 @@ export const SessionSchema = z.strictObject({
   examCode: KEY,
   questionIds: z.array(KEY).min(1).max(1000),
   answers: AnswersSchema,
+  textAnswers: TextAnswersSchema,
   index: z.number().int().min(0).max(1000),
   startedAt: STAMP,
   choiceOrder: ChoiceOrderSchema,
@@ -59,6 +69,7 @@ export const ResultSchema = z.strictObject({
   examCode: KEY,
   questionIds: z.array(KEY).min(1).max(1000),
   answers: AnswersSchema,
+  textAnswers: TextAnswersSchema,
   finishedAt: STAMP,
   choiceOrder: ChoiceOrderSchema,
 });

@@ -73,7 +73,7 @@ export function withTokenCookies(header: string | null, tokens: Tokens): string 
  * JWT の本文(claims)を、署名を確かめずに読む。画面の表示と更新の時刻の判断にだけ使う。
  * 認可の判断には使わない(サーバー側の検証は guard.ts の `authenticate` で行う)。
  */
-export function readClaims(jwt: string): { exp?: number; email?: string } {
+export function readClaims(jwt: string): { exp?: number; email?: string; groups?: string[] } {
   try {
     const payload = jwt.split(".")[1];
     if (!payload) return {};
@@ -81,6 +81,9 @@ export function readClaims(jwt: string): { exp?: number; email?: string } {
     return {
       exp: typeof claims.exp === "number" ? claims.exp : undefined,
       email: typeof claims.email === "string" ? claims.email : undefined,
+      groups: Array.isArray(claims["cognito:groups"])
+        ? claims["cognito:groups"].filter((g): g is string => typeof g === "string")
+        : undefined,
     };
   } catch {
     return {};

@@ -59,6 +59,8 @@ describe("AuthStack", () => {
   });
 
   it("管理者グループがある_Identity Pool はない", () => {
+    // グループ名は、アプリの管理者の判定(packages/app の ADMIN_GROUP)と同じ値。両方のテストで値を固定している
+    expect(ADMIN_GROUP_NAME).toBe("admins");
     const template = authTemplate();
     template.hasResourceProperties("AWS::Cognito::UserPoolGroup", { GroupName: ADMIN_GROUP_NAME });
     template.resourceCountIs("AWS::Cognito::IdentityPool", 0);

@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
   createFakeProvider,
+  FAKE_ADMIN_EMAIL,
+  FAKE_ADMIN_PHRASE,
   FAKE_INVITED_EMAIL,
   FAKE_INVITED_PHRASE,
   FAKE_RESET_CODE,
@@ -178,7 +180,14 @@ describe("ログアウトとセッション", () => {
     const d = deps();
     const cookie = cookieHeader(await login(d));
     const body = await (await handleSession(new Request("https://example.com/api", { headers: { cookie } }), d)).json();
-    expect(body).toMatchObject({ signedIn: true, email: FAKE_USER_EMAIL });
+    expect(body).toMatchObject({ signedIn: true, email: FAKE_USER_EMAIL, isAdmin: false });
+  });
+
+  it("管理者のグループに入っている_表示のための isAdmin を true で返す", async () => {
+    const d = deps();
+    const cookie = cookieHeader(await handleLogin(post({ email: FAKE_ADMIN_EMAIL, password: FAKE_ADMIN_PHRASE }), d));
+    const body = await (await handleSession(new Request("https://example.com/api", { headers: { cookie } }), d)).json();
+    expect(body).toMatchObject({ signedIn: true, email: FAKE_ADMIN_EMAIL, isAdmin: true });
   });
 
   it("Cookie がないとき_ログインしていないと返し_Cookie には触れない", async () => {

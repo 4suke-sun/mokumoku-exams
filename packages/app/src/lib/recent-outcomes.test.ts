@@ -65,4 +65,22 @@ describe("問題ごとの直近の正誤", () => {
     const outcomes = recentOutcomes([result(1, { "SAMPLE-0001": ["A"] }, ["SAMPLE-0001", "SAMPLE-0001"])], questions);
     expect(outcomes.get("SAMPLE-0001")).toEqual([true]);
   });
+
+  it("自由記述の問題_採点基準の判定で正誤を決める", () => {
+    const freeText = {
+      questionId: "SAMPLE-0009",
+      examCode: "SAMPLE",
+      domain: "domain2",
+      questionType: "free-text",
+      questionText: "記述",
+      rubric: { criteria: [{ name: "観点", keywords: ["止まれ"], points: 10 }], passingPoints: 10 },
+      explanation: "解説",
+    } as Question;
+    const written = (minute: number, text: string): Result => ({
+      ...result(minute, {}, ["SAMPLE-0009"]),
+      textAnswers: { "SAMPLE-0009": text },
+    });
+    const outcomes = recentOutcomes([written(2, "赤は止まれ"), written(1, "赤は進め")], [freeText]);
+    expect(outcomes.get("SAMPLE-0009")).toEqual([true, false]);
+  });
 });

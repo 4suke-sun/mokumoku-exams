@@ -25,7 +25,7 @@ const NOW = Date.parse("2026-10-12T00:00:00.000Z");
 /** トークンの文字列から利用者を決める検証(署名の検証そのものは verify.test.ts で確かめる) */
 const verifier: TokenVerifier = {
   async verifyIdToken(token) {
-    return token.startsWith("token-") ? { sub: token.slice("token-".length) } : null;
+    return token.startsWith("token-") ? { sub: token.slice("token-".length), groups: [] } : null;
   },
 };
 const noRefresh = {
@@ -233,6 +233,9 @@ describe("履歴 API の入力の検証", () => {
     ["出題にない問題の選択肢の並びがある", { choiceOrder: { "SAMPLE-0009": ["A", "B"] } }],
     ["選択肢の並びにキーの重なりがある", { choiceOrder: { "SAMPLE-0001": ["A", "A"] } }],
     ["回答が配列でない", { answers: { "SAMPLE-0001": "A" } }],
+    ["出題にない問題への自由記述の回答がある", { textAnswers: { "SAMPLE-0009": "回答" } }],
+    ["自由記述の回答が長すぎる", { textAnswers: { "SAMPLE-0001": "あ".repeat(1001) } }],
+    ["自由記述の回答が文字列でない", { textAnswers: { "SAMPLE-0001": ["A"] } }],
     ["回答が配列の外", { answers: [] }],
     ["完了時刻が文字列でない", { finishedAt: 20261011 }],
     ["資格コードが文字列でない", { examCode: 1 }],
@@ -277,6 +280,16 @@ describe("履歴 API の入力の検証", () => {
       choiceOrder: { "SAMPLE-0001": ["C", "B", "A"], "SAMPLE-0002": ["D", "A"] },
     });
     expect((await handlePostResult(post(valid, { cookie }), deps())).status).toBe(200);
+  });
+
+  it("自由記述の回答_上限の長さまで受け付け_取得で同じ内容が返る", async () => {
+    const repository = createMemoryRepository();
+    const withText = body({
+      questionIds: ["SAMPLE-0001", "SAMPLE-0006"],
+      textAnswers: { "SAMPLE-0006": "あ".repeat(1000) },
+    });
+    expect((await handlePostResult(post(withText, { cookie }), deps(repository))).status).toBe(200);
+    expect(await repository.listResults("a", "SAMPLE")).toEqual([withText]);
   });
 
   it("未回答の問題がある_回答がなくても受け付ける", async () => {
@@ -360,7 +373,9 @@ describe("履歴の保存先の失敗", () => {
 
 describe("ブックマークの API", () => {
   const questions = async (examCode: string) =>
-    examCode === "SAMPLE" ? [{ questionId: "SAMPLE-0001", correctAnswers: ["B"] }] : null;
+    examCode === "SAMPLE"
+      ? [{ questionId: "SAMPLE-0001", questionType: "single" as const, correctAnswers: ["B"] }]
+      : null;
   const withQuestions = (repository: HistoryRepository = createMemoryRepository()): HistoryDeps => ({
     ...deps(repository),
     questions,
@@ -449,9 +464,9 @@ describe("ブックマークの API", () => {
 
 describe("採点し直して復習プールの変更にする", () => {
   const questions = [
-    { questionId: "SAMPLE-0001", correctAnswers: ["B"] },
-    { questionId: "SAMPLE-0002", correctAnswers: ["A", "C"] },
-    { questionId: "SAMPLE-0003", correctAnswers: ["A"] },
+    { questionId: "SAMPLE-0001", questionType: "single" as const, correctAnswers: ["B"] },
+    { questionId: "SAMPLE-0002", questionType: "multiple" as const, correctAnswers: ["A", "C"] },
+    { questionId: "SAMPLE-0003", questionType: "single" as const, correctAnswers: ["A"] },
   ];
 
   it("正解は外し_不正解と未回答は入れ_データにない問題は無視する", () => {
@@ -469,14 +484,31 @@ describe("採点し直して復習プールの変更にする", () => {
     // 学習量は、データにある問題だけを数える
     expect(tallyOf(reviewChangeOf(result, questions))).toEqual({ answered: 3, correct: 1 });
   });
+
+  it("自由記述の問題_採点基準の判定で正誤を決める(端末の正誤は使わない)", () => {
+    const freeText = {
+      questionId: "SAMPLE-0006",
+      questionType: "free-text" as const,
+      rubric: { criteria: [{ name: "観点", keywords: ["止まれ"], points: 10 }], passingPoints: 10 },
+    };
+    const result = (text: string): Result => ({
+      examCode: "SAMPLE",
+      questionIds: ["SAMPLE-0006"],
+      answers: {},
+      textAnswers: { "SAMPLE-0006": text },
+      finishedAt: "2026-10-11T12:00:00.000Z",
+    });
+    expect(reviewChangeOf(result("赤は止まれ"), [freeText])).toMatchObject({ wrong: [], correct: ["SAMPLE-0006"] });
+    expect(reviewChangeOf(result("赤は進め"), [freeText])).toMatchObject({ wrong: ["SAMPLE-0006"], correct: [] });
+  });
 });
 
 describe("日ごとの学習量の API", () => {
   const questions = async (examCode: string) =>
     examCode === "SAMPLE"
       ? [
-          { questionId: "SAMPLE-0001", correctAnswers: ["A"] },
-          { questionId: "SAMPLE-0002", correctAnswers: ["B"] },
+          { questionId: "SAMPLE-0001", questionType: "single" as const, correctAnswers: ["A"] },
+          { questionId: "SAMPLE-0002", questionType: "single" as const, correctAnswers: ["B"] },
         ]
       : null;
   const withQuestions = (repository: HistoryRepository = createMemoryRepository()): HistoryDeps => ({
@@ -503,6 +535,24 @@ describe("日ごとの学習量の API", () => {
       { date: "2026-10-11", answered: 3, correct: 2 },
       { date: "2026-10-12", answered: 1, correct: 1 },
     ]);
+  });
+
+  it("自由記述の問題_採点基準の判定で正解数を数える", async () => {
+    const d: HistoryDeps = {
+      ...deps(createMemoryRepository()),
+      questions: async () => [
+        {
+          questionId: "SAMPLE-0006",
+          questionType: "free-text" as const,
+          rubric: { criteria: [{ name: "観点", keywords: ["止まれ"], points: 10 }], passingPoints: 10 },
+        },
+      ],
+    };
+    const written = (text: string, finishedAt: string) =>
+      body({ questionIds: ["SAMPLE-0006"], answers: {}, textAnswers: { "SAMPLE-0006": text }, finishedAt });
+    await handlePostResult(post(written("赤は止まれ", "2026-10-11T12:00:00.000Z"), { cookie: asUser("a") }), d);
+    await handlePostResult(post(written("赤は進め", "2026-10-11T12:01:00.000Z"), { cookie: asUser("a") }), d);
+    expect(await days(d, "a")).toEqual([{ date: "2026-10-11", answered: 2, correct: 1 }]);
   });
 
   it("同じ結果を送り直す_二重に数えない", async () => {
@@ -542,7 +592,9 @@ describe("日ごとの学習量の API", () => {
 
 describe("目標日の API", () => {
   const questions = async (examCode: string) =>
-    examCode === "SAMPLE" ? [{ questionId: "SAMPLE-0001", correctAnswers: ["A"] }] : null;
+    examCode === "SAMPLE"
+      ? [{ questionId: "SAMPLE-0001", questionType: "single" as const, correctAnswers: ["A"] }]
+      : null;
   const withQuestions = (repository: HistoryRepository = createMemoryRepository()): HistoryDeps => ({
     ...deps(repository),
     questions,

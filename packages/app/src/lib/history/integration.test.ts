@@ -21,7 +21,7 @@ const NOW = Date.parse("2026-10-12T00:00:00.000Z");
 
 const verifier: TokenVerifier = {
   async verifyIdToken(token) {
-    return token.startsWith("token-") ? { sub: token.slice("token-".length) } : null;
+    return token.startsWith("token-") ? { sub: token.slice("token-".length), groups: [] } : null;
   },
 };
 const noRefresh = {
@@ -214,8 +214,8 @@ describe("履歴の通しでのエラー応答", () => {
       },
     }));
     deps.questions = async () => [
-      { questionId: "SAMPLE-0001", correctAnswers: ["A"] },
-      { questionId: "SAMPLE-0002", correctAnswers: ["B", "C"] },
+      { questionId: "SAMPLE-0001", questionType: "single" as const, correctAnswers: ["A"] },
+      { questionId: "SAMPLE-0002", questionType: "multiple" as const, correctAnswers: ["B", "C"] },
     ];
     for (let n = 0; n < MAX_RESULTS; n++) await handlePostResult(post(attempt(minute(n)), "a"), deps);
     expect((await handlePostResult(post(attempt(minute(MAX_RESULTS)), "a"), deps)).status).toBe(503);
@@ -287,8 +287,8 @@ describe("復習プールの通し", () => {
   };
   // 問題データで決まる正解(端末から送られた正誤は使わない)
   const questions = async () => [
-    { questionId: "SAMPLE-0001", correctAnswers: ["B"] },
-    { questionId: "SAMPLE-0002", correctAnswers: ["A", "C"] },
+    { questionId: "SAMPLE-0001", questionType: "single" as const, correctAnswers: ["B"] },
+    { questionId: "SAMPLE-0002", questionType: "multiple" as const, correctAnswers: ["A", "C"] },
   ];
 
   it("間違えた問題と未回答の問題_復習プールに入り_正解した問題は入らない", async () => {
@@ -311,7 +311,9 @@ describe("復習プールの通し", () => {
 
   it("いまのデータにない問題_どちらにも入らない", async () => {
     const { deps } = stack();
-    deps.questions = async () => [{ questionId: "SAMPLE-0002", correctAnswers: ["A"] }];
+    deps.questions = async () => [
+      { questionId: "SAMPLE-0002", questionType: "single" as const, correctAnswers: ["A"] },
+    ];
     await handlePostResult(post(attempt(minute(1)), "a"), deps);
     expect(await review(deps, "a")).toEqual(["SAMPLE-0002"]);
   });

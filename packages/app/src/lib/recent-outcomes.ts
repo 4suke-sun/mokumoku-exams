@@ -1,4 +1,4 @@
-import { answerFor, isCorrect } from "./quiz.ts";
+import { isQuestionCorrect } from "./quiz.ts";
 import type { Result } from "./storage.ts";
 import type { Question } from "./types.ts";
 
@@ -7,7 +7,7 @@ export const RECENT_OUTCOMES = 5;
 
 /**
  * 保存した結果(新しい順)から、問題ごとの直近の正誤(true が正解)を、新しい順に最大 `limit` 回まで返す。
- * 正誤は、いまの問題データで採点し直す。未回答は不正解。いまのデータにない問題は含めない。
+ * 正誤は、いまの問題データで採点し直す(自由記述は採点基準の判定)。未回答は不正解。いまのデータにない問題は含めない。
  */
 export function recentOutcomes(
   results: readonly Result[],
@@ -23,7 +23,7 @@ export function recentOutcomes(
       if (!question) continue;
       const list = outcomes.get(id) ?? [];
       if (list.length >= limit) continue;
-      list.push(isCorrect(question, answerFor(result.answers, id)));
+      list.push(isQuestionCorrect(question, result.answers, result.textAnswers));
       outcomes.set(id, list);
     }
   }

@@ -47,7 +47,27 @@ describe("ID トークンの検証", () => {
     expect(await verifier.verifyIdToken(makeToken(primary, "k1"))).toEqual({
       sub: "user-a",
       email: "learner@example.com",
+      groups: [],
     });
+  });
+
+  it("グループに入っている利用者_署名を確かめたトークンの cognito:groups を返す", async () => {
+    const { verifier } = verifierWith([primary]);
+    const token = makeToken(primary, "k1", { "cognito:groups": ["admins", "other"] });
+    expect((await verifier.verifyIdToken(token))?.groups).toEqual(["admins", "other"]);
+  });
+
+  it("本文を書き換えて管理者のグループを足したトークン_署名が合わず拒否する", async () => {
+    const { verifier } = verifierWith([primary]);
+    const [header, , signature] = makeToken(primary, "k1").split(".");
+    const claims = { sub: "user-a", iss: issuer, aud: clientId, token_use: "id", exp: Math.floor(NOW / 1000) + 3600 };
+    const forged = `${header}.${part({ ...claims, "cognito:groups": ["admins"] })}.${signature}`;
+    expect(await verifier.verifyIdToken(forged)).toBeNull();
+  });
+
+  it("cognito:groups が配列でない_拒否する(通す側には倒さない)", async () => {
+    const { verifier } = verifierWith([primary]);
+    expect(await verifier.verifyIdToken(makeToken(primary, "k1", { "cognito:groups": "admins" }))).toBeNull();
   });
 
   it("本文を書き換えたトークン_署名が合わず拒否する", async () => {

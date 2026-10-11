@@ -20,11 +20,13 @@ const PREVIOUS_KEYS = new Set(["p", "P"]);
  * - Enter または N で次へ(最後の問題では採点)、P で前へ
  * - 修飾キー(Ctrl、Cmd、Alt)つきは、ブラウザや支援技術の操作なので扱わない
  * - ボタンやリンクにフォーカスがあるときの Enter は、そのボタンやリンクの操作にまかせる
+ * - 文章の入力欄(自由記述)にフォーカスがあるときは、どのキーも入力にまかせる
  *
  * 矢印キーは、ラジオボタンの標準の動き(選択の移動)にまかせるため、使わない。
  */
 export function quizKeyAction(info: KeyInfo, choiceKeys: readonly string[]): QuizKeyAction | null {
   if (info.ctrlKey || info.metaKey || info.altKey) return null;
+  if (info.targetTag.toLowerCase() === "textarea") return null;
 
   if (info.key === "Enter") {
     const tag = info.targetTag.toLowerCase();

@@ -7,11 +7,12 @@ import { EmptyState } from "@/components/empty-state.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
 import { postServerResult } from "@/lib/history/client.ts";
 import { type QuizKeyAction, quizKeyAction } from "@/lib/keyboard.ts";
-import { answerFor, orderChoices, score, sortKeys } from "@/lib/quiz.ts";
+import { answerFor, hasText, orderChoices, score, sortKeys, textAnswerFor } from "@/lib/quiz.ts";
 import {
   browserStore,
   clearSession,
   loadSession,
+  MAX_TEXT_ANSWER_LENGTH,
   type Session,
   saveResult,
   saveSession,
@@ -93,8 +94,9 @@ export function Player({ exam, questions }: Props) {
   const index = Math.min(session.index, total - 1);
   const question = byId.get(session.questionIds[index] as string) as Question;
   const selected = answerFor(session.answers, question.questionId);
+  const text = textAnswerFor(session.textAnswers, question.questionId);
   const isLast = index === total - 1;
-  const needed = question.correctAnswers.length;
+  const isFreeText = question.questionType === "free-text";
 
   function update(next: Session) {
     setSaveFailed(!saveSession(browserStore(), next));
@@ -102,6 +104,7 @@ export function Player({ exam, questions }: Props) {
   }
 
   function choose(key: string) {
+    if (question.questionType === "free-text") return;
     const next =
       question.questionType === "single"
         ? [key]
@@ -109,6 +112,10 @@ export function Player({ exam, questions }: Props) {
           ? selected.filter((k) => k !== key)
           : sortKeys([...selected, key]);
     update({ ...session, answers: { ...session.answers, [question.questionId]: next } });
+  }
+
+  function write(value: string) {
+    update({ ...session, textAnswers: { ...session.textAnswers, [question.questionId]: value } });
   }
 
   function move(delta: number) {
@@ -123,6 +130,7 @@ export function Player({ exam, questions }: Props) {
         examCode: exam.examCode,
         questionIds: session.questionIds,
         answers: session.answers,
+        textAnswers: session.textAnswers,
         finishedAt: new Date().toISOString(),
         choiceOrder: session.choiceOrder,
       };
@@ -136,7 +144,7 @@ export function Player({ exam, questions }: Props) {
       if (session.stage) {
         // 段階の確認問題: 正答率で合否を決め、到達の状態を端末に残す(残せなくても、結果は保存済みなので先へ進む)
         const answered = session.questionIds.flatMap((id) => byId.get(id) ?? []);
-        const { percent } = score(answered, session.answers);
+        const { percent } = score(answered, session.answers, session.textAnswers);
         saveStageCheck(browserStore(), exam.examCode, {
           ...session.stage,
           percent,
@@ -151,9 +159,8 @@ export function Player({ exam, questions }: Props) {
     }
   }
 
-  const inputType = question.questionType === "single" ? "radio" : "checkbox";
-  const choices = orderChoices(question, session.choiceOrder);
-  const canAdvance = selected.length > 0;
+  const choices = isFreeText ? [] : orderChoices(question, session.choiceOrder);
+  const canAdvance = isFreeText ? hasText(text) : selected.length > 0;
 
   choiceKeysRef.current = choices.map((c) => c.key);
   const sortedKeys = sortKeys(choiceKeysRef.current);
@@ -184,33 +191,53 @@ export function Player({ exam, questions }: Props) {
 
       <fieldset ref={questionRef} tabIndex={-1} aria-labelledby="question-text" className="space-y-3">
         <RichText id="question-text" text={question.questionText} className="text-lg font-bold" />
-        <p className="text-sm text-muted">
-          {question.questionType === "single" ? "1 つ選んでください。" : `${needed} つ選んでください。`}
-        </p>
-        {choices.map((choice) => (
-          <label
-            key={choice.key}
-            className={`flex items-start gap-3 rounded-md border p-3 ${
-              selected.includes(choice.key) ? "border-primary bg-surface" : "border-line bg-surface"
-            } has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary`}
-          >
-            <input
-              type={inputType}
-              name={question.questionId}
-              className="mt-1 size-5"
-              checked={selected.includes(choice.key)}
-              onChange={() => choose(choice.key)}
+        {question.questionType === "free-text" ? (
+          <>
+            <p className="text-sm text-muted">文章で答えてください({MAX_TEXT_ANSWER_LENGTH} 文字まで)。</p>
+            <textarea
+              key={question.questionId}
+              aria-label="回答"
+              className="min-h-40 w-full rounded-md border border-line bg-surface p-3"
+              maxLength={MAX_TEXT_ANSWER_LENGTH}
+              value={text}
+              onChange={(event) => write(event.target.value)}
             />
-            <span>
-              <span className="font-bold">{choice.key}. </span>
-              <InlineText text={choice.text} />
-            </span>
-          </label>
-        ))}
+          </>
+        ) : (
+          <>
+            <p className="text-sm text-muted">
+              {question.questionType === "single"
+                ? "1 つ選んでください。"
+                : `${question.correctAnswers.length} つ選んでください。`}
+            </p>
+            {choices.map((choice) => (
+              <label
+                key={choice.key}
+                className={`flex items-start gap-3 rounded-md border p-3 ${
+                  selected.includes(choice.key) ? "border-primary bg-surface" : "border-line bg-surface"
+                } has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary`}
+              >
+                <input
+                  type={question.questionType === "single" ? "radio" : "checkbox"}
+                  name={question.questionId}
+                  className="mt-1 size-5"
+                  checked={selected.includes(choice.key)}
+                  onChange={() => choose(choice.key)}
+                />
+                <span>
+                  <span className="font-bold">{choice.key}. </span>
+                  <InlineText text={choice.text} />
+                </span>
+              </label>
+            ))}
+          </>
+        )}
       </fieldset>
 
       <p className="text-sm text-muted">
-        キー操作: {choiceKeysHint} で選ぶ / Enter か N で{isLast ? "採点" : "次へ"} / P で前へ
+        {isFreeText
+          ? `キー操作: 入力欄の外で、Enter か N で${isLast ? "採点" : "次へ"} / P で前へ`
+          : `キー操作: ${choiceKeysHint} で選ぶ / Enter か N で${isLast ? "採点" : "次へ"} / P で前へ`}
       </p>
 
       {saveFailed ? (
@@ -232,7 +259,7 @@ export function Player({ exam, questions }: Props) {
           <button
             type="button"
             onClick={() => void finish()}
-            disabled={selected.length === 0}
+            disabled={!canAdvance}
             className="flex-1 rounded-md bg-primary px-5 py-3 font-bold text-on-primary hover:opacity-90 disabled:opacity-50"
           >
             採点する
@@ -241,7 +268,7 @@ export function Player({ exam, questions }: Props) {
           <button
             type="button"
             onClick={() => move(1)}
-            disabled={selected.length === 0}
+            disabled={!canAdvance}
             className="flex-1 rounded-md bg-primary px-5 py-3 font-bold text-on-primary hover:opacity-90 disabled:opacity-50"
           >
             次の問題へ

@@ -1,8 +1,11 @@
 import { createPublicKey, type KeyObject, verify } from "node:crypto";
 import { z } from "zod";
 
-/** サーバー側で検証済みの利用者。認可の判断は、この `sub` だけで行う(クライアントから受け取った値は使わない)。 */
-export type VerifiedUser = { sub: string; email?: string };
+/**
+ * サーバー側で検証済みの利用者。認可の判断は、この `sub` と `groups` だけで行う(クライアントから受け取った値は使わない)。
+ * `groups` は、ID トークンの `cognito:groups`(Cognito のグループ。所属がなければ空)。
+ */
+export type VerifiedUser = { sub: string; email?: string; groups: readonly string[] };
 
 /** ID トークンの検証の境界。本番は Cognito の公開鍵、手元の開発とテストでは差し替える。 */
 export interface TokenVerifier {
@@ -33,6 +36,7 @@ const ClaimsSchema = z.object({
   exp: z.number(),
   sub: z.string().regex(SUB_PATTERN),
   email: z.string().max(254).optional(),
+  "cognito:groups": z.array(z.string().max(128)).max(100).optional(),
 });
 
 type Options = {
@@ -111,7 +115,7 @@ export function createCognitoVerifier(options: Options): TokenVerifier {
         const { iss, aud, token_use, exp, sub, email } = claims.data;
         if (iss !== issuer || aud !== options.clientId || token_use !== "id") return null;
         if (exp * 1000 <= now()) return null;
-        return { sub, email };
+        return { sub, email, groups: claims.data["cognito:groups"] ?? [] };
       } catch {
         return null;
       }

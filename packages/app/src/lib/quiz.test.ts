@@ -5,6 +5,7 @@ import {
   domainCounts,
   domainSelectHref,
   isCorrect,
+  isQuestionCorrect,
   newSession,
   orderChoices,
   passLinePercent,
@@ -15,10 +16,11 @@ import {
   shuffle,
   shuffleChoiceOrder,
   sortKeys,
+  textAnswerFor,
 } from "./quiz.ts";
-import type { Question } from "./types.ts";
+import type { ChoiceQuestion, FreeTextQuestion } from "./types.ts";
 
-function question(id: number, domain: string, correct: string[]): Question {
+function question(id: number, domain: string, correct: string[]): ChoiceQuestion {
   return {
     questionId: `TEST-${String(id).padStart(4, "0")}`,
     examCode: "TEST",
@@ -47,13 +49,13 @@ const noShuffle = () => 0.999999;
 
 describe("isCorrect", () => {
   it("択一は、正解の 1 つだけを選んだときに正解", () => {
-    expect(isCorrect(questions[0] as Question, ["A"])).toBe(true);
-    expect(isCorrect(questions[0] as Question, ["B"])).toBe(false);
-    expect(isCorrect(questions[0] as Question, [])).toBe(false);
+    expect(isCorrect(questions[0] as ChoiceQuestion, ["A"])).toBe(true);
+    expect(isCorrect(questions[0] as ChoiceQuestion, ["B"])).toBe(false);
+    expect(isCorrect(questions[0] as ChoiceQuestion, [])).toBe(false);
   });
 
   it("複数選択は、順序によらず、すべて選んだときだけ正解", () => {
-    const q = questions[1] as Question;
+    const q = questions[1] as ChoiceQuestion;
     expect(isCorrect(q, ["C", "B"])).toBe(true);
     expect(isCorrect(q, ["B"])).toBe(false);
     expect(isCorrect(q, ["A", "B", "C"])).toBe(false);
@@ -114,6 +116,48 @@ describe("score", () => {
   });
 });
 
+describe("自由記述の採点", () => {
+  const freeText: FreeTextQuestion = {
+    questionId: "TEST-0009",
+    examCode: "TEST",
+    domain: "domain1",
+    questionType: "free-text",
+    questionText: "記述の問題",
+    rubric: { criteria: [{ name: "観点", keywords: ["保存"], points: 10 }], passingPoints: 10 },
+    explanation: "解説",
+  };
+
+  it("採点基準の判定で合格点以上_正解。選択肢の回答は見ない", () => {
+    expect(isQuestionCorrect(freeText, {}, { "TEST-0009": "保存する" })).toBe(true);
+    expect(isQuestionCorrect(freeText, { "TEST-0009": ["A"] }, { "TEST-0009": "読む" })).toBe(false);
+    expect(isQuestionCorrect(freeText, {}, undefined)).toBe(false);
+  });
+
+  it("選択式と自由記述が混ざった出題_両方を正答数に数える", () => {
+    const mixed = [questions[0] as ChoiceQuestion, freeText];
+    expect(score(mixed, { "TEST-0001": ["A"] }, { "TEST-0009": "保存" })).toEqual({
+      total: 2,
+      correct: 2,
+      percent: 100,
+    });
+    expect(score(mixed, { "TEST-0001": ["A"] })).toEqual({ total: 2, correct: 1, percent: 50 });
+  });
+
+  it("自由記述の回答_空白だけは未回答として数える", () => {
+    const progress = sessionProgress({
+      questionIds: ["a", "b", "c"],
+      answers: {},
+      textAnswers: { a: "回答", b: "  " },
+    });
+    expect(progress).toEqual({ answered: 1, total: 3 });
+  });
+
+  it("継承されたプロパティ_自由記述の回答として扱わない", () => {
+    expect(textAnswerFor({}, "constructor")).toBe("");
+    expect(textAnswerFor(undefined, "a")).toBe("");
+  });
+});
+
 describe("passLinePercent", () => {
   it("合格点を満点で割った割合を返す", () => {
     expect(passLinePercent({ passingScore: 70, totalScore: 100 })).toBe(70);
@@ -133,7 +177,7 @@ describe("shuffleChoiceOrder / orderChoices", () => {
       questions.map((x) => ({ questionId: x.questionId, choiceKeys: x.choices.map((c) => c.key) })),
       () => 0,
     );
-    const q = questions[1] as Question;
+    const q = questions[1] as ChoiceQuestion;
     const ordered = orderChoices(q, order);
     expect([...ordered.map((c) => c.key)].sort()).toEqual(["A", "B", "C"]);
     expect(order[q.questionId]).not.toEqual(["A", "B", "C"]);
@@ -141,19 +185,19 @@ describe("shuffleChoiceOrder / orderChoices", () => {
   });
 
   it("並びの保存なし_元の並びで返す", () => {
-    const q = questions[0] as Question;
+    const q = questions[0] as ChoiceQuestion;
     expect(orderChoices(q).map((c) => c.key)).toEqual(["A", "B", "C"]);
   });
 
   it("選択肢と食い違う並び_元の並びで返す", () => {
-    const q = questions[0] as Question;
+    const q = questions[0] as ChoiceQuestion;
     expect(orderChoices(q, { [q.questionId]: ["C", "B", "X"] }).map((c) => c.key)).toEqual(["A", "B", "C"]);
     expect(orderChoices(q, { [q.questionId]: ["C", "C", "B"] }).map((c) => c.key)).toEqual(["A", "B", "C"]);
     expect(orderChoices(q, { [q.questionId]: ["C", "B"] }).map((c) => c.key)).toEqual(["A", "B", "C"]);
   });
 
   it("保存した並び_その順で返す", () => {
-    const q = questions[0] as Question;
+    const q = questions[0] as ChoiceQuestion;
     expect(orderChoices(q, { [q.questionId]: ["C", "A", "B"] }).map((c) => c.key)).toEqual(["C", "A", "B"]);
   });
 });
@@ -198,12 +242,12 @@ function seeded(seed: number): () => number {
 
 describe("isCorrect の境界", () => {
   it("同じ数でも正解と違う組み合わせ_不正解", () => {
-    expect(isCorrect(questions[1] as Question, ["A", "B"])).toBe(false);
+    expect(isCorrect(questions[1] as ChoiceQuestion, ["A", "B"])).toBe(false);
   });
 
   it("同じキーを重ねて選んでも_重複は 1 つとして扱う", () => {
-    expect(isCorrect(questions[0] as Question, ["A", "A"])).toBe(true);
-    expect(isCorrect(questions[1] as Question, ["B", "B"])).toBe(false);
+    expect(isCorrect(questions[0] as ChoiceQuestion, ["A", "A"])).toBe(true);
+    expect(isCorrect(questions[1] as ChoiceQuestion, ["B", "B"])).toBe(false);
   });
 });
 
@@ -267,7 +311,11 @@ describe("score / passLinePercent の端", () => {
   });
 
   it("出題にない問題の回答_数えない", () => {
-    expect(score([questions[0] as Question], { "OTHER-0001": ["A"] })).toEqual({ total: 1, correct: 0, percent: 0 });
+    expect(score([questions[0] as ChoiceQuestion], { "OTHER-0001": ["A"] })).toEqual({
+      total: 1,
+      correct: 0,
+      percent: 0,
+    });
   });
 
   it("合格ラインが割り切れない_小数第 1 位に丸める", () => {
