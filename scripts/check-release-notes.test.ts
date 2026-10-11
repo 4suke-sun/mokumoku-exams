@@ -11,8 +11,8 @@ function run(...args: string[]) {
 
 describe("check-release-notes(引数)", () => {
   it("引数の綴りを誤ったときは、成功にしない", () => {
-    expect(run("--tga", "v0.0.1").status).not.toBe(0);
-    expect(run("v0.0.1").status).not.toBe(0);
+    expect(run("--tga", "v0.1.0").status).not.toBe(0);
+    expect(run("v0.1.0").status).not.toBe(0);
   });
 
   it("--tag に値が無いときは、成功にしない", () => {
@@ -26,6 +26,6 @@ describe("check-release-notes(引数)", () => {
   });
 
   it("エントリのあるタグを指定したときは、成功にする", () => {
-    expect(run("--tag", "v0.0.1").status, run("--tag", "v0.0.1").stderr).toBe(0);
+    expect(run("--tag", "v0.1.0").status, run("--tag", "v0.1.0").stderr).toBe(0);
   });
 });
