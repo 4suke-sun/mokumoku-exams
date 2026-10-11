@@ -5,6 +5,7 @@
 
 スキーマの正本は `scripts/lib/exam-data/schema.ts`(Zod)で、この文書は、その意味を説明します。
 検査は `npm run validate:data` で行います(CI でも実行します)。
+資格を追加する順番とファイルの置き場所は、[資格を追加する手順](./adding-an-exam.md) にまとめています。
 
 ## 1. ファイル
 
@@ -38,8 +39,8 @@
       "category": "Foundational",     // 自由な文字列(区分)
       "passingScore": 70,             // 合格点
       "totalScore": 100,              // 満点(合格点 ≤ 満点)
-      "officialQuestionCount": 5,     // 本番モードの出題数
-      "officialTimeMinutes": 10,      // 本番モードの制限時間(分)
+      "officialQuestionCount": 5,     // 本番モードの出題数(選択式のすべての問題から、ランダムにこの数を選ぶ。自由記述は出題しない)
+      "officialTimeMinutes": 10,      // 本番モードの制限時間(分)。過ぎると、そこまでの回答で採点する
       "domains": [
         { "code": "domain1", "name": "基礎の用語", "weight": 0.6 },
         { "code": "domain2", "name": "考え方", "weight": 0.4 }

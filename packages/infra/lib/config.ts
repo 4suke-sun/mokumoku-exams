@@ -10,6 +10,9 @@ export const OPTIONAL_VARIABLES = [
   "VAPID_PUBLIC_KEY",
   "VAPID_PRIVATE_KEY",
   "VAPID_SUBJECT",
+  "DOMAIN_NAME",
+  "CERTIFICATE_ARN",
+  "HOSTED_ZONE_ID",
 ] as const;
 
 /** プッシュ通知の鍵と連絡先。3 つそろえて設定する(どれかだけは不可)。 */
@@ -31,6 +34,17 @@ export type InfraConfig = {
   siteUrl?: string;
   /** プッシュ通知の VAPID の鍵と連絡先。なければ、通知の送信の仕組み(PushStack)を作らない */
   push?: PushConfig;
+  /** 独自ドメイン。なければ、CloudFront の既定のドメインで配信する */
+  customDomain?: CustomDomain;
+};
+
+export type CustomDomain = {
+  /** 配信に使うドメイン名 */
+  domainName: string;
+  /** ドメイン名の証明書(ACM)の ARN。CloudFront の都合で、us-east-1 のもの */
+  certificateArn: string;
+  /** Route 53 のホストゾーンの ID。あれば、ドメイン名から CloudFront へのレコードを作る(なければ、DNS は自分で設定する) */
+  hostedZoneId?: string;
 };
 
 export type PushConfig = { publicKey: string; privateKey: string; subject: string };
@@ -47,6 +61,10 @@ const SITE_URL = /^https:\/\/[A-Za-z0-9.-]+(:\d{1,5})?$/;
 const VAPID_PUBLIC_KEY = /^[A-Za-z0-9_-]{87}$/;
 const VAPID_PRIVATE_KEY = /^[A-Za-z0-9_-]{43}$/;
 const VAPID_SUBJECT = /^(mailto:[^\s@]+@[^\s@]+\.[^\s@]+|https:\/\/\S+)$/;
+const DOMAIN_NAME = /^(?=.{1,253}$)([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/;
+// CloudFront に付ける証明書は、us-east-1 に置く必要がある
+const CERTIFICATE_ARN = /^arn:aws:acm:us-east-1:\d{12}:certificate\/[0-9a-f-]{36}$/;
+const HOSTED_ZONE_ID = /^Z[A-Z0-9]{1,31}$/;
 
 /**
  * 環境変数からインフラの設定を作る。
@@ -102,6 +120,8 @@ export function loadConfig(env: Env): InfraConfig {
       problems.push("VAPID_SUBJECT は、mailto: か https:// で始まる連絡先にしてください");
   }
 
+  const customDomain = loadCustomDomain(env, problems);
+
   if (problems.length > 0) {
     throw new Error(`.env の設定に問題があります:\n- ${problems.join("\n- ")}`);
   }
@@ -112,5 +132,32 @@ export function loadConfig(env: Env): InfraConfig {
     alarmEmail,
     ...(siteUrl ? { siteUrl } : {}),
     ...(push ? { push } : {}),
+    ...(customDomain ? { customDomain } : {}),
   };
+}
+
+/** 独自ドメインの設定。ドメイン名と証明書はそろえて渡す。ホストゾーンは、ドメイン名があるときだけ使う。 */
+function loadCustomDomain(env: Env, problems: string[]): CustomDomain | undefined {
+  const domainName = env.DOMAIN_NAME || undefined;
+  const certificateArn = env.CERTIFICATE_ARN || undefined;
+  const hostedZoneId = env.HOSTED_ZONE_ID || undefined;
+
+  if (!domainName) {
+    if (certificateArn || hostedZoneId) {
+      problems.push("CERTIFICATE_ARN と HOSTED_ZONE_ID は、DOMAIN_NAME と一緒に設定してください");
+    }
+    return undefined;
+  }
+  if (!DOMAIN_NAME.test(domainName)) {
+    problems.push("DOMAIN_NAME は、小文字のドメイン名(例: app.example.com)にしてください");
+  }
+  if (!certificateArn) {
+    problems.push("DOMAIN_NAME を設定したときは、CERTIFICATE_ARN も設定してください");
+  } else if (!CERTIFICATE_ARN.test(certificateArn)) {
+    problems.push("CERTIFICATE_ARN は、us-east-1 の ACM の証明書の ARN にしてください");
+  }
+  if (hostedZoneId && !HOSTED_ZONE_ID.test(hostedZoneId)) {
+    problems.push("HOSTED_ZONE_ID は、Route 53 のホストゾーンの ID にしてください");
+  }
+  return { domainName, certificateArn: certificateArn ?? "", hostedZoneId };
 }

@@ -5,7 +5,15 @@ import { useRouter } from "next/navigation";
 import { useEffect, useId, useState } from "react";
 import { domainColorClasses } from "@/lib/domain-color.ts";
 import { fetchBookmarks, fetchReview } from "@/lib/history/client.ts";
-import { domainCounts, newSession, requestedDomains, sessionProgress, shuffle } from "@/lib/quiz.ts";
+import {
+  domainCounts,
+  isOfficialTarget,
+  newOfficialSession,
+  newSession,
+  requestedDomains,
+  sessionProgress,
+  shuffle,
+} from "@/lib/quiz.ts";
 import {
   browserStore,
   clearSession,
@@ -16,9 +24,9 @@ import {
   saveSession,
   saveSettings,
 } from "@/lib/storage.ts";
-import type { PublishedExam } from "@/lib/types.ts";
+import type { PublishedExam, Question } from "@/lib/types.ts";
 
-type PoolItem = { questionId: string; domain: string; choiceKeys: string[] };
+type PoolItem = { questionId: string; domain: string; questionType: Question["questionType"]; choiceKeys: string[] };
 
 type Props = {
   exam: PublishedExam;
@@ -38,18 +46,32 @@ const TARGETS: { id: Target; name: string; description: string }[] = [
   { id: "bookmarks", name: "ブックマーク", description: "ブックマークした問題から出題します。" },
 ];
 
-type Mode = { id: string; name: string; description: string; enabled: boolean; href?: string };
+type Mode = {
+  id: string;
+  name: string;
+  description: string;
+  enabled: boolean;
+  href?: string;
+  /** 押すと、そのモードで出題を始める */
+  onStart?: () => void;
+};
 
-function modesFor(examCode: string, studyAvailable: boolean): Mode[] {
+function modesFor(exam: PublishedExam, studyAvailable: boolean, startOfficial: () => void): Mode[] {
   return [
     { id: "normal", name: "通常出題", description: "分野と問題数を選んで、1 問ずつ解きます。", enabled: true },
-    { id: "official", name: "本番モード", description: "本番と同じ問題数と制限時間で解きます。", enabled: false },
+    {
+      id: "official",
+      name: "本番モード",
+      description: `本番と同じ ${exam.officialQuestionCount} 問を、制限時間 ${exam.officialTimeMinutes} 分で解きます。選択式のすべての問題から出題し、時間切れで自動的に採点します。`,
+      enabled: true,
+      onStart: startOfficial,
+    },
     {
       id: "study",
       name: "学習モード",
       description: "単元ごとに読んでから解きます。",
       enabled: studyAvailable,
-      href: `/exams/${examCode}/study`,
+      href: `/exams/${exam.examCode}/study`,
     },
   ];
 }
@@ -125,6 +147,24 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
     setResumable(null);
   }
 
+  /** 出題の状態を保存して、出題の画面へ進む。保存できなければ、その旨を示してとどまる。 */
+  function begin(session: Session) {
+    if (!saveSession(browserStore(), session)) {
+      setError("この端末では、出題の状態を保存できません。ブラウザの設定を確認してください。");
+      return;
+    }
+    router.push(`/exams/${exam.examCode}/play`);
+  }
+
+  // 本番モードは、出題の対象と分野の選択によらず、資格の選択式のすべての問題から出題する(自由記述は含めない)
+  function startOfficial() {
+    if (!pool.some(isOfficialTarget)) {
+      setError("出題できる問題がありません。");
+      return;
+    }
+    begin(newOfficialSession(exam, pool, { shuffleChoices }, Math.random, new Date()));
+  }
+
   function start() {
     const targets = domains.length === 0 ? targeted : targeted.filter((p) => domains.includes(p.domain));
     const picked = shuffle(targets, Math.random).slice(0, effectiveCount);
@@ -132,15 +172,7 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
       setError("出題できる問題がありません。出題の対象と分野の選択を見直してください。");
       return;
     }
-    const saved = saveSession(
-      browserStore(),
-      newSession(exam.examCode, picked, { shuffleChoices }, Math.random, new Date()),
-    );
-    if (!saved) {
-      setError("この端末では、出題の状態を保存できません。ブラウザの設定を確認してください。");
-      return;
-    }
-    router.push(`/exams/${exam.examCode}/play`);
+    begin(newSession(exam.examCode, picked, { shuffleChoices }, Math.random, new Date()));
   }
 
   return (
@@ -184,7 +216,7 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
       <div className="space-y-3">
         <h2 className="text-lg font-bold">モード</h2>
         <ul className="space-y-2">
-          {modesFor(exam.examCode, studyAvailable).map((mode) => (
+          {modesFor(exam, studyAvailable, startOfficial).map((mode) => (
             <li
               key={mode.id}
               className={`rounded-lg border p-4 ${mode.enabled ? "border-primary bg-surface" : "border-dashed border-line"}`}
@@ -193,6 +225,14 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
                 <Link href={mode.href} className="block font-bold text-primary hover:underline">
                   {mode.name}
                 </Link>
+              ) : mode.enabled && mode.onStart ? (
+                <button
+                  type="button"
+                  onClick={mode.onStart}
+                  className="block text-left font-bold text-primary hover:underline"
+                >
+                  {mode.name}を始める
+                </button>
               ) : (
                 <span className={`block font-bold ${mode.enabled ? "" : "text-muted"}`}>{mode.name}</span>
               )}

@@ -7,7 +7,16 @@ import { EmptyState } from "@/components/empty-state.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
 import { postServerResult } from "@/lib/history/client.ts";
 import { type QuizKeyAction, quizKeyAction } from "@/lib/keyboard.ts";
-import { answerFor, hasText, orderChoices, score, sortKeys, textAnswerFor } from "@/lib/quiz.ts";
+import {
+  answerFor,
+  formatRemaining,
+  hasText,
+  orderChoices,
+  remainingMs,
+  score,
+  sortKeys,
+  textAnswerFor,
+} from "@/lib/quiz.ts";
 import {
   browserStore,
   clearSession,
@@ -21,11 +30,20 @@ import {
 import { isStagePassed } from "@/lib/study-stages.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 
-type Props = { exam: PublishedExam; questions: Question[] };
+type Props = {
+  exam: PublishedExam;
+  questions: Question[];
+  /** いまの時刻を返す。本番モードの残り時間に使う(テストで固定できるように外から渡す) */
+  clock?: () => Date;
+};
+
+const systemClock = () => new Date();
+/** 本番モードの残り時間を数え直す間隔(ミリ秒) */
+const TICK_MS = 1000;
 
 type State = { status: "loading" } | { status: "empty" } | { status: "ready"; session: Session };
 
-export function Player({ exam, questions }: Props) {
+export function Player({ exam, questions, clock = systemClock }: Props) {
   const router = useRouter();
   const [state, setState] = useState<State>({ status: "loading" });
   const [saveFailed, setSaveFailed] = useState(false);
@@ -36,6 +54,10 @@ export function Player({ exam, questions }: Props) {
   const shownIndex = useRef<number | null>(null);
   const finishing = useRef(false);
   const bookmarks = useBookmarks(exam.examCode);
+  // 時間切れの自動の採点は、描画のたびに作り直す最新の処理を呼ぶ。1 回だけ試みる
+  const finishRef = useRef<() => Promise<void>>(async () => {});
+  const autoFinished = useRef(false);
+  const [now, setNow] = useState(clock);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -65,6 +87,21 @@ export function Player({ exam, questions }: Props) {
     const usable = session?.questionIds.every((id) => ids.has(id)) === true;
     setState(usable && session ? { status: "ready", session } : { status: "empty" });
   }, [exam.examCode, questions]);
+
+  // 本番モードは、締め切りまでの残り時間を数える。締め切りは出題の状態にあるので、再読み込みしても保たれる
+  const deadline = state.status === "ready" ? state.session.deadline : undefined;
+  useEffect(() => {
+    if (deadline === undefined) return;
+    setNow(clock());
+    const timer = setInterval(() => setNow(clock()), TICK_MS);
+    return () => clearInterval(timer);
+  }, [deadline, clock]);
+  const timeUp = deadline !== undefined && remainingMs(deadline, now) === 0;
+  useEffect(() => {
+    if (!timeUp || autoFinished.current) return;
+    autoFinished.current = true;
+    void finishRef.current();
+  }, [timeUp]);
 
   const currentIndex = state.status === "ready" ? state.session.index : null;
   useEffect(() => {
@@ -97,6 +134,8 @@ export function Player({ exam, questions }: Props) {
   const text = textAnswerFor(session.textAnswers, question.questionId);
   const isLast = index === total - 1;
   const isFreeText = question.questionType === "free-text";
+  // 時間切れのあとは、どの問題からでも採点へ進む
+  const finishable = isLast || timeUp;
 
   function update(next: Session) {
     setSaveFailed(!saveSession(browserStore(), next));
@@ -131,7 +170,7 @@ export function Player({ exam, questions }: Props) {
         questionIds: session.questionIds,
         answers: session.answers,
         textAnswers: session.textAnswers,
-        finishedAt: new Date().toISOString(),
+        finishedAt: clock().toISOString(),
         choiceOrder: session.choiceOrder,
       };
       // アカウントに保存できたら、サーバーを正とする。保存できないとき(通信の失敗など)は、この端末に残して、あとで移せるようにする
@@ -159,8 +198,11 @@ export function Player({ exam, questions }: Props) {
     }
   }
 
+  finishRef.current = finish;
+
   const choices = isFreeText ? [] : orderChoices(question, session.choiceOrder);
-  const canAdvance = isFreeText ? hasText(text) : selected.length > 0;
+  // 時間切れのあとは、回答がなくても採点できる(自動の採点で保存できなかったときの、やり直し)
+  const canAdvance = (isFreeText ? hasText(text) : selected.length > 0) || timeUp;
 
   choiceKeysRef.current = choices.map((c) => c.key);
   const sortedKeys = sortKeys(choiceKeysRef.current);
@@ -171,7 +213,7 @@ export function Player({ exam, questions }: Props) {
     else if (action.type === "previous") {
       if (index > 0) move(-1);
     } else if (canAdvance) {
-      if (isLast) void finish();
+      if (finishable) void finish();
       else move(1);
     }
   };
@@ -179,9 +221,16 @@ export function Player({ exam, questions }: Props) {
   return (
     <section className="space-y-6">
       <div className="space-y-2">
-        <p className="text-sm text-muted" aria-live="polite">
-          {exam.shortName} / {index + 1} / {total} 問目
-        </p>
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <p className="text-sm text-muted" aria-live="polite">
+            {exam.shortName} / {index + 1} / {total} 問目
+          </p>
+          {deadline !== undefined ? (
+            <p className="text-sm font-bold">
+              本番モード / 残り <span className="tabular-nums">{formatRemaining(remainingMs(deadline, now))}</span>
+            </p>
+          ) : null}
+        </div>
         <progress className="h-2 w-full accent-primary" value={index + 1} max={total} aria-label="進み具合" />
         <div className="flex justify-end">
           <BookmarkToggle questionId={question.questionId} bookmarks={bookmarks} />
@@ -236,9 +285,15 @@ export function Player({ exam, questions }: Props) {
 
       <p className="text-sm text-muted">
         {isFreeText
-          ? `キー操作: 入力欄の外で、Enter か N で${isLast ? "採点" : "次へ"} / P で前へ`
-          : `キー操作: ${choiceKeysHint} で選ぶ / Enter か N で${isLast ? "採点" : "次へ"} / P で前へ`}
+          ? `キー操作: 入力欄の外で、Enter か N で${finishable ? "採点" : "次へ"} / P で前へ`
+          : `キー操作: ${choiceKeysHint} で選ぶ / Enter か N で${finishable ? "採点" : "次へ"} / P で前へ`}
       </p>
+
+      {timeUp ? (
+        <p role="alert" className="font-bold">
+          時間切れです。ここまでの回答で採点します。
+        </p>
+      ) : null}
 
       {saveFailed ? (
         <p role="alert" className="text-incorrect">
@@ -255,7 +310,7 @@ export function Player({ exam, questions }: Props) {
         >
           前の問題へ
         </button>
-        {isLast ? (
+        {finishable ? (
           <button
             type="button"
             onClick={() => void finish()}

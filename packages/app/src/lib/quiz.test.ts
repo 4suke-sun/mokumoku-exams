@@ -4,12 +4,16 @@ import {
   countPool,
   domainCounts,
   domainSelectHref,
+  formatRemaining,
   isCorrect,
+  isOfficialTarget,
   isQuestionCorrect,
+  newOfficialSession,
   newSession,
   orderChoices,
   passLinePercent,
   pickQuestions,
+  remainingMs,
   requestedDomains,
   score,
   sessionProgress,
@@ -356,5 +360,71 @@ describe("newSession", () => {
     const session = newSession("SAMPLE", items, { shuffleChoices: true }, () => 0, now);
     expect(Object.keys(session.choiceOrder ?? {}).sort()).toEqual(["Q-1", "Q-2"]);
     expect([...(session.choiceOrder?.["Q-2"] ?? [])].sort()).toEqual(["A", "B", "C"]);
+  });
+});
+
+describe("本番モード", () => {
+  const exam = { examCode: "TEST", officialQuestionCount: 3, officialTimeMinutes: 10 };
+  const items = ["1", "2", "3", "4", "5"].map((n) => ({
+    questionId: `TEST-000${n}`,
+    questionType: "single" as const,
+    choiceKeys: ["A", "B"],
+  }));
+  const start = new Date("2026-10-10T00:00:00.000Z");
+
+  it("本番の問題数を重複なく選び_開始の時刻から制限時間後を締め切りにする", () => {
+    const session = newOfficialSession(exam, items, { shuffleChoices: false }, seeded(1), start);
+    expect(session.questionIds).toHaveLength(3);
+    expect(new Set(session.questionIds).size).toBe(3);
+    expect(session.startedAt).toBe("2026-10-10T00:00:00.000Z");
+    expect(session.deadline).toBe("2026-10-10T00:10:00.000Z");
+    expect(session.choiceOrder).toBeUndefined();
+  });
+
+  it("自由記述を含む問題データ_選択式の問題だけから出題する", () => {
+    const freeText = ["6", "7", "8"].map((n) => ({
+      questionId: `TEST-000${n}`,
+      questionType: "free-text" as const,
+      choiceKeys: [],
+    }));
+    const multiple = { questionId: "TEST-0009", questionType: "multiple" as const, choiceKeys: ["A", "B", "C"] };
+    // 選択式は 2 問だけ。本番の問題数(3)に足りなくても、自由記述で埋めない
+    const mixed = [freeText[0], items[0], freeText[1], multiple, freeText[2]].filter((i) => i !== undefined);
+    for (let seed = 1; seed <= 20; seed++) {
+      const session = newOfficialSession(exam, mixed, { shuffleChoices: false }, seeded(seed), start);
+      expect([...session.questionIds].sort()).toEqual(["TEST-0001", "TEST-0009"]);
+    }
+  });
+
+  it("選択式かどうか_択一と複数選択だけが本番モードの対象", () => {
+    expect(isOfficialTarget({ questionType: "single" })).toBe(true);
+    expect(isOfficialTarget({ questionType: "multiple" })).toBe(true);
+    expect(isOfficialTarget({ questionType: "free-text" })).toBe(false);
+  });
+
+  it("問題が本番の問題数より少ない_ある分だけを出題する", () => {
+    const session = newOfficialSession(exam, items.slice(0, 2), { shuffleChoices: true }, seeded(2), start);
+    expect(session.questionIds).toHaveLength(2);
+    expect(Object.keys(session.choiceOrder ?? {})).toHaveLength(2);
+  });
+
+  it("残り時間_締め切りまでの差で_過ぎたら 0", () => {
+    const deadline = "2026-10-10T00:10:00.000Z";
+    expect(remainingMs(deadline, start)).toBe(600_000);
+    expect(remainingMs(deadline, new Date("2026-10-10T00:09:59.500Z"))).toBe(500);
+    expect(remainingMs(deadline, new Date("2026-10-10T00:10:00.000Z"))).toBe(0);
+    expect(remainingMs(deadline, new Date("2026-10-10T00:11:00.000Z"))).toBe(0);
+  });
+
+  it("締め切りの値が読めない_時間切れとして扱う", () => {
+    expect(remainingMs("not-a-date", start)).toBe(0);
+  });
+
+  it("残り時間の表示_分と秒で_1 秒未満は切り上げる", () => {
+    expect(formatRemaining(600_000)).toBe("10:00");
+    expect(formatRemaining(61_000)).toBe("1:01");
+    expect(formatRemaining(500)).toBe("0:01");
+    expect(formatRemaining(0)).toBe("0:00");
+    expect(formatRemaining(-5)).toBe("0:00");
   });
 });

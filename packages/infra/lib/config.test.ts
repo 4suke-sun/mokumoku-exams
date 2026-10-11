@@ -88,6 +88,57 @@ describe("loadConfig", () => {
   });
 });
 
+describe("loadConfig の独自ドメイン", () => {
+  const domain = {
+    DOMAIN_NAME: "app.example.com",
+    CERTIFICATE_ARN: "arn:aws:acm:us-east-1:123456789012:certificate/00000000-0000-0000-0000-000000000000",
+    HOSTED_ZONE_ID: "Z0000000000EXAMPLE",
+  };
+
+  it("指定しない_独自ドメインはない", () => {
+    expect(loadConfig(valid).customDomain).toBeUndefined();
+  });
+
+  it("ドメイン名と証明書とホストゾーン_その値を使う", () => {
+    expect(loadConfig({ ...valid, ...domain }).customDomain).toEqual({
+      domainName: domain.DOMAIN_NAME,
+      certificateArn: domain.CERTIFICATE_ARN,
+      hostedZoneId: domain.HOSTED_ZONE_ID,
+    });
+  });
+
+  it("ホストゾーンは省略できる", () => {
+    const config = loadConfig({ ...valid, ...domain, HOSTED_ZONE_ID: "" });
+    expect(config.customDomain?.domainName).toBe(domain.DOMAIN_NAME);
+    expect(config.customDomain?.hostedZoneId).toBeUndefined();
+  });
+
+  it("ドメイン名だけ_証明書がないと失敗する", () => {
+    expect(() => loadConfig({ ...valid, DOMAIN_NAME: domain.DOMAIN_NAME })).toThrow(/CERTIFICATE_ARN/);
+  });
+
+  it("ドメイン名がないのに証明書やホストゾーンがある_失敗する", () => {
+    expect(() => loadConfig({ ...valid, CERTIFICATE_ARN: domain.CERTIFICATE_ARN })).toThrow(/DOMAIN_NAME/);
+    expect(() => loadConfig({ ...valid, HOSTED_ZONE_ID: domain.HOSTED_ZONE_ID })).toThrow(/DOMAIN_NAME/);
+  });
+
+  it("形が不正な値_失敗し_値そのものはメッセージに出さない", () => {
+    const badDomain = "Not A Domain";
+    const otherRegion = domain.CERTIFICATE_ARN.replace("us-east-1", "ap-northeast-1");
+    const badZone = "zone-bad";
+    try {
+      loadConfig({ ...valid, DOMAIN_NAME: badDomain, CERTIFICATE_ARN: otherRegion, HOSTED_ZONE_ID: badZone });
+      expect.unreachable();
+    } catch (error) {
+      const message = (error as Error).message;
+      expect(message).toContain("DOMAIN_NAME");
+      expect(message).toContain("CERTIFICATE_ARN");
+      expect(message).toContain("HOSTED_ZONE_ID");
+      for (const value of [badDomain, otherRegion, badZone]) expect(message).not.toContain(value);
+    }
+  });
+});
+
 describe(".env.example", () => {
   it("設定の変数の一覧と_一致している", () => {
     const text = readFileSync(new URL("../../../.env.example", import.meta.url), "utf8");

@@ -132,6 +132,45 @@ export function newSession(
 }
 
 /**
+ * 本番モードの出題の対象か。選択式(択一・複数選択)の問題だけで、自由記述は含めない。
+ * データの検査も、本番の出題数を選択式の問題だけで数える。
+ */
+export function isOfficialTarget(item: { questionType: Question["questionType"] }): boolean {
+  return item.questionType === "single" || item.questionType === "multiple";
+}
+
+/**
+ * 本番モードの出題を始めるときの状態を作る。`items` のうち選択式の問題から、資格の本番の問題数をランダムに選び、
+ * 開始の時刻から本番の制限時間後を締め切りにする。問題が足りないときは、ある分だけを出題する。
+ */
+export function newOfficialSession(
+  exam: Pick<PublishedExam, "examCode" | "officialQuestionCount" | "officialTimeMinutes">,
+  items: readonly { questionId: string; questionType: Question["questionType"]; choiceKeys: readonly string[] }[],
+  options: { shuffleChoices: boolean },
+  random: () => number,
+  now: Date,
+): Session {
+  const picked = shuffle(items.filter(isOfficialTarget), random).slice(0, exam.officialQuestionCount);
+  const session = newSession(exam.examCode, picked, options, random, now);
+  const deadline = new Date(now.getTime() + exam.officialTimeMinutes * 60_000);
+  return { ...session, deadline: deadline.toISOString() };
+}
+
+/** 締め切りまでの残り時間(ミリ秒)。過ぎていれば 0。締め切りの値が読めないときも 0(時間切れとして扱う)。 */
+export function remainingMs(deadline: string, now: Date): number {
+  const end = Date.parse(deadline);
+  if (Number.isNaN(end)) return 0;
+  return Math.max(0, end - now.getTime());
+}
+
+/** 残り時間を「分:秒」で表す。1 秒未満は切り上げる(0 秒の表示は、時間切れのときだけにする)。 */
+export function formatRemaining(ms: number): string {
+  const seconds = Math.ceil(Math.max(0, ms) / 1000);
+  const minutes = Math.floor(seconds / 60);
+  return `${minutes}:${String(seconds % 60).padStart(2, "0")}`;
+}
+
+/**
  * 保存された並びで選択肢を返す。並びがない、または選択肢のキーと食い違うときは、元の並び。
  * 食い違いは、データが更新されたあとの古い保存を想定している。
  */

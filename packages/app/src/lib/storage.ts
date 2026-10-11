@@ -61,6 +61,8 @@ export const SessionSchema = z.strictObject({
   choiceOrder: ChoiceOrderSchema,
   /** 段階の確認問題として始めた出題のときだけ。採点すると、その段階の到達の状態を更新する */
   stage: StageRefSchema.optional(),
+  /** 本番モードの締め切り(ISO 8601)。再読み込みしても残り時間を保つ。通常の出題では持たない */
+  deadline: STAMP.optional(),
 });
 export type Session = z.infer<typeof SessionSchema>;
 

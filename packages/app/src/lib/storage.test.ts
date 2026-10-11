@@ -68,6 +68,13 @@ describe("session", () => {
     expect(loadSession(store, "TEST")).toEqual(session);
   });
 
+  it("本番モードの締め切り_保存して読み出せる", () => {
+    const store = memoryStore();
+    const official = { ...session, deadline: "2026-01-01T00:10:00.000Z" };
+    saveSession(store, official);
+    expect(loadSession(store, "TEST")?.deadline).toBe("2026-01-01T00:10:00.000Z");
+  });
+
   it("保存がなければ null", () => {
     expect(loadSession(memoryStore(), "TEST")).toBeNull();
   });
