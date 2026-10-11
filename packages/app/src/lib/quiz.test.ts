@@ -5,6 +5,7 @@ import {
   domainCounts,
   domainSelectHref,
   isCorrect,
+  newSession,
   orderChoices,
   passLinePercent,
   pickQuestions,
@@ -282,5 +283,30 @@ describe("集計の端", () => {
 
   it("問題がない_分野別の数も空", () => {
     expect(domainCounts([])).toEqual({});
+  });
+});
+
+describe("newSession", () => {
+  const items = [
+    { questionId: "Q-2", choiceKeys: ["A", "B", "C"] },
+    { questionId: "Q-1", choiceKeys: ["A", "B"] },
+  ];
+  const now = new Date(Date.UTC(2026, 9, 11, 0, 0));
+
+  it("渡した順に出題し_回答なし・最初の問題から始める", () => {
+    expect(newSession("SAMPLE", items, { shuffleChoices: false }, Math.random, now)).toEqual({
+      examCode: "SAMPLE",
+      questionIds: ["Q-2", "Q-1"],
+      answers: {},
+      index: 0,
+      startedAt: "2026-10-11T00:00:00.000Z",
+      choiceOrder: undefined,
+    });
+  });
+
+  it("選択肢をシャッフルする_問題ごとに並びを決める", () => {
+    const session = newSession("SAMPLE", items, { shuffleChoices: true }, () => 0, now);
+    expect(Object.keys(session.choiceOrder ?? {}).sort()).toEqual(["Q-1", "Q-2"]);
+    expect([...(session.choiceOrder?.["Q-2"] ?? [])].sort()).toEqual(["A", "B", "C"]);
   });
 });

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ModeSelect } from "@/components/mode-select.tsx";
+import { loadCurriculum } from "@/lib/curriculum-data.ts";
 import { findPublishedExam, listPublishedExams, loadQuestions } from "@/lib/exam-data.ts";
 
 type Props = { params: Promise<{ code: string }> };
@@ -21,7 +22,7 @@ export default async function ExamPage({ params }: Props) {
   const { code } = await params;
   const exam = findPublishedExam(code);
   if (!exam) notFound();
-  const questions = await loadQuestions(exam);
+  const [questions, units] = await Promise.all([loadQuestions(exam), loadCurriculum(exam)]);
 
   return (
     <ModeSelect
@@ -32,6 +33,7 @@ export default async function ExamPage({ params }: Props) {
         domain: q.domain,
         choiceKeys: q.choices.map((c) => c.key),
       }))}
+      studyAvailable={units !== null}
     />
   );
 }

@@ -1,0 +1,27 @@
+import type { CurriculumFile, CurriculumUnit } from "../../../../scripts/lib/curriculum-data/schema.ts";
+import type { PublishedExam } from "./types.ts";
+
+// リポジトリ直下の data/ のカリキュラム(静的な JSON)を読む。形と問題 ID は `npm run validate:data` が検査している。
+// 型だけを参照し、検査の処理は読み込まない(ADR 0004 と同じ方針)。サーバー側(ビルド時を含む)だけで使う。
+
+export type { CurriculumUnit };
+
+/** 単元を、順番(`order`)の小さい順に並べる。 */
+export function sortUnits(units: readonly CurriculumUnit[]): CurriculumUnit[] {
+  return [...units].sort((a, b) => a.order - b.order);
+}
+
+/**
+ * 公開中の資格のカリキュラムの単元を、順番に並べて返す。ファイル名は `curriculum.<資格コードの英小文字>.json`。
+ * カリキュラムは任意で、ファイルのない資格は null(学習モードを使えない)。
+ */
+export async function loadCurriculum(exam: PublishedExam): Promise<CurriculumUnit[] | null> {
+  try {
+    const file = (await import(`../../../../data/curriculum.${exam.examCode.toLowerCase()}.json`)) as {
+      default: CurriculumFile;
+    };
+    return sortUnits(file.default.units);
+  } catch {
+    return null;
+  }
+}

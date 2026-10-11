@@ -89,6 +89,23 @@ describe("ResultView", () => {
     // 3 問すべてが、一覧に並んでいる
     expect(screen.getAllByText(/^問題 \d$/)).toHaveLength(3);
   });
+
+  it("保存した結果が複数ある_問題ごとに直近の正誤を新しい順に表示する", async () => {
+    saveResult(browserStore(), {
+      examCode: "TEST",
+      questionIds: ["TEST-0001"],
+      answers: { "TEST-0001": ["B"] },
+      finishedAt: "2026-10-09T00:00:00.000Z",
+    });
+    // 新しい結果(1 問目は正解、2 問目は不正解)
+    saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["B"], "TEST-0003": ["B"] });
+    render(<ResultView exam={exam} questions={questions} />);
+
+    const first = await screen.findByRole("list", { name: "直近 2 回の正誤(新しい順)" });
+    expect(Array.from(first.querySelectorAll("li")).map((li) => li.textContent)).toEqual(["○正解", "×不正解"]);
+    // 1 回だけ解いた問題は、その 1 回だけ
+    expect(screen.getAllByRole("list", { name: "直近 1 回の正誤(新しい順)" })).toHaveLength(2);
+  });
 });
 
 describe("ResultView のアカウントへの保存", () => {

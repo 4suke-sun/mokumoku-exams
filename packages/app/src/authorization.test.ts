@@ -51,6 +51,8 @@ const PROTECTED_PAGES = [
   "/exams/sample/dashboard",
   "/exams/sample/play",
   "/exams/sample/result",
+  "/exams/sample/study",
+  "/exams/sample/study/sample",
   "/help",
 ];
 const PUBLIC_APIS = [
