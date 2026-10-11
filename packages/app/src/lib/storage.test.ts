@@ -7,6 +7,7 @@ import {
   loadSession,
   loadSettings,
   loadStageProgress,
+  MAX_ANSWER_TIME_MS,
   MAX_RESULTS,
   passedStages,
   type Result,
@@ -75,6 +76,25 @@ describe("session", () => {
     expect(loadSession(store, "TEST")?.deadline).toBe("2026-01-01T00:10:00.000Z");
   });
 
+  it("解答の表示のしかたと、問題ごとの記録_保存して読み出せる", () => {
+    const store = memoryStore();
+    const marked: Session = {
+      ...session,
+      reveal: "each",
+      checked: [true, false],
+      timesMs: [3000, 0],
+      unsure: [false, true],
+      flagged: [true, false],
+    };
+    saveSession(store, marked);
+    expect(loadSession(store, "TEST")).toEqual(marked);
+  });
+
+  it("問題ごとの記録の数が問題の数と合わない_保存がないものとして扱う", () => {
+    const raw = JSON.stringify({ ...session, checked: [true] });
+    expect(loadSession(memoryStore({ "mokumoku:v1:session:TEST": raw }), "TEST")).toBeNull();
+  });
+
   it("保存がなければ null", () => {
     expect(loadSession(memoryStore(), "TEST")).toBeNull();
   });
@@ -133,6 +153,24 @@ describe("results", () => {
 
   it("壊れた値は、空の一覧として扱う", () => {
     expect(loadResults(memoryStore({ "mokumoku:v1:results:TEST": "[1,2]" }), "TEST")).toEqual([]);
+  });
+
+  it("回答時間・自信なし・見直しを持つ結果_そのまま読み直せる_持たない古い結果も読める", () => {
+    const store = memoryStore();
+    const marked = { ...result(1), timesMs: [4200], unsure: [true], flagged: [false] };
+    saveResult(store, result(0));
+    saveResult(store, marked);
+    expect(loadResults(store, "TEST")).toEqual([marked, result(0)]);
+  });
+
+  it.each([
+    ["回答時間の数が問題の数と合わない", { timesMs: [1, 2] }],
+    ["回答時間が上限を超える", { timesMs: [MAX_ANSWER_TIME_MS + 1] }],
+    ["自信なしの数が問題の数と合わない", { unsure: [] }],
+    ["見直しが真偽値でない", { flagged: [1] }],
+  ])("%s_壊れた値として扱う", (_name, over) => {
+    const raw = JSON.stringify([{ ...result(1), ...over }]);
+    expect(loadResults(memoryStore({ "mokumoku:v1:results:TEST": raw }), "TEST")).toEqual([]);
   });
 });
 

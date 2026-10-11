@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { MAX_TEXT_ANSWER_LENGTH, ResultSchema } from "@/lib/storage.ts";
+import { checkPerQuestionLengths, MAX_TEXT_ANSWER_LENGTH, ResultBaseSchema } from "@/lib/storage.ts";
 import { isValidDate } from "@/lib/study-days.ts";
 
 /** 資格コード(data/exams.json と同じ形)。DynamoDB のキーに使うため、区切りの `#` などを含められない。 */
@@ -31,12 +31,13 @@ const questionKey = z.string().max(64);
  * - 問題 ID は `<資格コード>-<4 桁>` の形で、重複せず、この資格のもの。
  * - 回答・自由記述の回答・選択肢の並びは、出題した問題についてのものだけで、選択肢のキーは重複しない。
  *   自由記述の回答は、`MAX_TEXT_ANSWER_LENGTH` 文字まで。
+ * - 問題ごとの回答時間・自信なし・見直しは任意で、持つときは、出題した問題の数と同じ長さ。
  * 利用者の識別子(`sub`)は、ここに含められない(未知の項目として断る)。
  * 検査の指摘に、入力の値は含めない(場所と種類だけ)。
  */
 export function apiResultSchema(nowMs: number) {
   const latest = nowMs + CLOCK_SKEW_MS;
-  return ResultSchema.extend({
+  return ResultBaseSchema.extend({
     examCode: z.string().regex(EXAM_CODE_PATTERN),
     finishedAt: z.iso
       .datetime({ precision: 3 })
@@ -50,6 +51,7 @@ export function apiResultSchema(nowMs: number) {
     textAnswers: z.record(questionKey, z.string().max(MAX_TEXT_ANSWER_LENGTH)).optional(),
     choiceOrder: z.record(questionKey, choiceKeys).optional(),
   }).superRefine((result, ctx) => {
+    checkPerQuestionLengths(result, ctx);
     const asked = new Set(result.questionIds);
     const prefix = `${result.examCode}-`;
     result.questionIds.forEach((id, index) => {

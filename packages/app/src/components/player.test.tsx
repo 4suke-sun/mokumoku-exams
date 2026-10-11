@@ -2,7 +2,7 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { browserStore, loadResults, loadStageProgress, passedStages, saveSession } from "@/lib/storage.ts";
+import { browserStore, loadResults, loadSession, loadStageProgress, passedStages, saveSession } from "@/lib/storage.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 import { Player } from "./player.tsx";
 
@@ -244,20 +244,22 @@ describe("Player の自由記述", () => {
     });
   });
 
-  it("入力欄に書くまで採点できず_入力中のキーは操作にならない_書いた内容を結果に残す", async () => {
+  it("書く前に採点を押すと_未回答の確認を出し_入力中のキーは操作にならない_書いた内容を結果に残す", async () => {
     render(<Player exam={exam} questions={mixed} />);
     const user = userEvent.setup();
     const input = await screen.findByRole("textbox", { name: "回答" });
-    const grade = screen.getByRole("button", { name: "採点する" }) as HTMLButtonElement;
-    expect(grade.disabled).toBe(true);
+    const grade = screen.getByRole("button", { name: "採点する" });
 
+    // 空白だけは未回答なので、採点の前に確認を出し、まだ採点しない
     await user.type(input, "  ");
-    expect(grade.disabled).toBe(true);
+    await user.click(grade);
+    expect((await screen.findByRole("alert")).textContent).toContain("未回答が 1 問あります");
+    expect(push).not.toHaveBeenCalled();
+
     // 入力欄の中の P と Enter は、前へ戻る・採点の操作にならず、文字として入る
     await user.type(input, "Pで保存{Enter}");
     expect(screen.getByText("記述の問題文")).toBeTruthy();
     expect(push).not.toHaveBeenCalled();
-    expect(grade.disabled).toBe(false);
 
     await user.click(grade);
     await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
@@ -348,6 +350,15 @@ describe("Player の本番モード", () => {
     expect(loadResults(browserStore(), "TEST")).toHaveLength(1);
   });
 
+  it("残り 5 分以下_残りわずかと示す", async () => {
+    current = start + 4 * 60_000;
+    render(<Player exam={exam} questions={questions} clock={clock} />);
+    expect(await screen.findByText("6:00")).toBeTruthy();
+    expect(screen.queryByText(/残りわずか/)).toBeNull();
+    advance(60_000);
+    expect(screen.getByText(/残りわずか/)).toBeTruthy();
+  });
+
   it("通常の出題_残り時間を表示しない", async () => {
     saveSession(browserStore(), {
       examCode: "TEST",
@@ -359,5 +370,116 @@ describe("Player の本番モード", () => {
     render(<Player exam={exam} questions={questions} clock={clock} />);
     await screen.findByText("問題文 1");
     expect(screen.queryByText(/本番モード/)).toBeNull();
+  });
+});
+
+describe("Player の 1 問ごとの解答の表示", () => {
+  beforeEach(() => {
+    saveSession(browserStore(), {
+      examCode: "TEST",
+      questionIds: questions.map((q) => q.questionId),
+      answers: {},
+      index: 0,
+      startedAt: "2026-10-10T00:00:00.000Z",
+      reveal: "each",
+    });
+  });
+
+  it("Enter で回答し_正誤のバナーへフォーカスを移し_選択を変えられず_Enter で次へ", async () => {
+    render(<Player exam={exam} questions={questions} />);
+    const user = userEvent.setup();
+    await screen.findByText("問題文 1");
+
+    // 回答する前の Enter は、選んでいなければ何もしない
+    await user.keyboard("{Enter}");
+    expect(screen.queryByText(/正解です|不正解です/)).toBeNull();
+
+    await user.keyboard("2{Enter}");
+    const verdict = await screen.findByText(/× 不正解です。正解は A です/);
+    expect(document.activeElement).toBe(verdict.closest("[tabindex]"));
+    expect(screen.queryAllByRole("radio")).toHaveLength(0);
+    expect(screen.getByText("あなたの回答")).toBeTruthy();
+
+    // 回答したあとの選択のキーは無効
+    await user.keyboard("a");
+    expect(loadSession(browserStore(), "TEST")?.answers).toEqual({ "TEST-0001": ["B"] });
+    expect(loadSession(browserStore(), "TEST")?.checked).toEqual([true, false]);
+
+    await user.keyboard("{Enter}");
+    expect(await screen.findByText("問題文 2")).toBeTruthy();
+  });
+
+  it("再開したとき_回答済みの問題は_回答後の表示で出す", async () => {
+    saveSession(browserStore(), {
+      examCode: "TEST",
+      questionIds: questions.map((q) => q.questionId),
+      answers: { "TEST-0001": ["A"] },
+      index: 0,
+      startedAt: "2026-10-10T00:00:00.000Z",
+      reveal: "each",
+      checked: [true, false],
+    });
+    render(<Player exam={exam} questions={questions} />);
+    expect(await screen.findByText("○ 正解です")).toBeTruthy();
+    expect(screen.queryAllByRole("radio")).toHaveLength(0);
+  });
+});
+
+describe("Player の印と問題一覧", () => {
+  it("N で回答せずに飛ばし_問題一覧から移れ_未回答のまま採点すると確認を出す", async () => {
+    render(<Player exam={exam} questions={questions} />);
+    const user = userEvent.setup();
+    await screen.findByText("問題文 1");
+
+    await user.keyboard("n");
+    expect(await screen.findByText("問題文 2")).toBeTruthy();
+    await user.click(screen.getByRole("button", { name: "問題 1(未回答)" }));
+    expect(await screen.findByText("問題文 1")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "問題 1(未回答)" }).getAttribute("aria-current")).toBe("step");
+
+    await user.keyboard("a");
+    expect(screen.getByRole("button", { name: "問題 1(回答済み)" })).toBeTruthy();
+    await user.click(screen.getByRole("button", { name: "問題 2(未回答)" }));
+    await user.click(await screen.findByRole("button", { name: "採点する" }));
+    expect((await screen.findByRole("alert")).textContent).toContain("未回答が 1 問あります");
+    expect(push).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole("button", { name: "このまま採点する" }));
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
+  });
+
+  it("自信なしと見直しの印_途中保存と結果に残す_回答時間も結果に残す", async () => {
+    render(<Player exam={exam} questions={questions} />);
+    const user = userEvent.setup();
+    await screen.findByText("問題文 1");
+
+    await user.click(screen.getByRole("button", { name: "自信なし" }));
+    await user.click(screen.getByRole("button", { name: "見直し" }));
+    expect(screen.getByRole("button", { name: "自信なし" }).getAttribute("aria-pressed")).toBe("true");
+    const saved = loadSession(browserStore(), "TEST");
+    expect(saved?.unsure).toEqual([true, false]);
+    expect(saved?.flagged).toEqual([true, false]);
+    expect(screen.getByRole("button", { name: "問題 1(未回答、見直し)" })).toBeTruthy();
+
+    // ボタンの上の Enter はボタンの操作になるので、フォーカスを外してから、キーで答える
+    act(() => (document.activeElement as HTMLElement | null)?.blur());
+    await user.keyboard("a{Enter}");
+    await screen.findByText("問題文 2");
+    await user.keyboard("b{Enter}");
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
+    const [result] = loadResults(browserStore(), "TEST");
+    expect(result?.unsure).toEqual([true, false]);
+    expect(result?.flagged).toEqual([true, false]);
+    expect(result?.timesMs).toHaveLength(2);
+  });
+
+  it("中断する_モード選択へ戻り_途中の状態は残る", async () => {
+    render(<Player exam={exam} questions={questions} />);
+    const user = userEvent.setup();
+    await screen.findByText("問題文 1");
+    await user.keyboard("a");
+    await user.click(screen.getByRole("button", { name: /中断する/ }));
+    expect(push).toHaveBeenCalledWith("/exams/TEST");
+    expect(loadSession(browserStore(), "TEST")?.answers).toEqual({ "TEST-0001": ["A"] });
   });
 });

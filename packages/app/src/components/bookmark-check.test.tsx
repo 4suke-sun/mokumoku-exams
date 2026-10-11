@@ -71,11 +71,11 @@ describe("直前チェック", () => {
     expect(screen.getByText("1 / 2 問目")).toBeTruthy();
     expect(screen.getByText("問題文 1")).toBeTruthy();
     expect(screen.queryByText("問題文 3")).toBeNull();
-    expect(screen.queryByText("(正解)")).toBeNull();
+    expect(screen.queryByText("正解")).toBeNull();
     expect(screen.queryByText("解説 1")).toBeNull();
 
     await user.click(screen.getByRole("button", { name: "めくって正解を見る" }));
-    expect(screen.getByText("(正解)")).toBeTruthy();
+    expect(screen.getByText("正解")).toBeTruthy();
     expect(screen.getByText("解説 1")).toBeTruthy();
 
     await user.click(screen.getByRole("button", { name: "問題に戻す" }));

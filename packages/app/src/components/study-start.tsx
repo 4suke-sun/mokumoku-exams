@@ -60,9 +60,11 @@ export function StudyStart({ examCode, items, stages }: Props) {
       return;
     }
     const store = browserStore();
-    const { shuffleChoices } = loadSettings(store);
+    // 解答の表示のしかたは、モード選択で最後に選んだもの(学習モードでも、1 問ごとに確かめられる)
+    const { shuffleChoices, reveal } = loadSettings(store);
     const session = newSession(examCode, questions, { shuffleChoices }, Math.random, new Date());
-    if (!saveSession(store, stage ? { ...session, stage } : session)) {
+    const withReveal = reveal === "each" ? { ...session, reveal } : session;
+    if (!saveSession(store, stage ? { ...withReveal, stage } : withReveal)) {
       setError("この端末では、出題の状態を保存できません。ブラウザの設定を確認してください。");
       return;
     }

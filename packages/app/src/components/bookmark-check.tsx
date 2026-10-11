@@ -3,6 +3,9 @@
 import Link from "next/link";
 import { useState } from "react";
 import { BookmarkError, type Bookmarks, BookmarkToggle, useBookmarks } from "@/components/bookmark-toggle.tsx";
+import { ChoiceChip, ChoiceReview } from "@/components/choice-review.tsx";
+import { ExplanationView } from "@/components/explanation-view.tsx";
+import { QuestionChips } from "@/components/question-chips.tsx";
 import { ReferenceList } from "@/components/reference-list.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
 import type { PublishedExam, Question } from "@/lib/types.ts";
@@ -66,12 +69,12 @@ export function BookmarkCheck({ exam, questions }: Props) {
                   <div className="flex justify-end">
                     <BookmarkToggle questionId={question.questionId} bookmarks={bookmarks} />
                   </div>
-                  <QuestionFace question={question} revealed />
+                  <QuestionFace question={question} revealed domains={exam.domains} />
                 </li>
               ))}
             </ol>
           ) : (
-            <FlashCards questions={shown} bookmarks={bookmarks} />
+            <FlashCards questions={shown} bookmarks={bookmarks} domains={exam.domains} />
           )}
         </>
       )}
@@ -83,9 +86,18 @@ export function BookmarkCheck({ exam, questions }: Props) {
  * 問題文と選択肢。`revealed` のときは、正解の印と解説も出す。
  * 自由記述は選択肢がないので、`revealed` のときに採点の観点を出す。
  */
-function QuestionFace({ question, revealed }: { question: Question; revealed: boolean }) {
+function QuestionFace({
+  question,
+  revealed,
+  domains,
+}: {
+  question: Question;
+  revealed: boolean;
+  domains: PublishedExam["domains"];
+}) {
   return (
     <>
+      <QuestionChips domains={domains} question={question} />
       <RichText text={question.questionText} />
       {question.questionType === "free-text" ? (
         revealed ? (
@@ -101,27 +113,26 @@ function QuestionFace({ question, revealed }: { question: Question; revealed: bo
             </ul>
           </div>
         ) : null
+      ) : revealed ? (
+        <div className="motion-correct">
+          <ChoiceReview question={question} />
+        </div>
       ) : (
-        <ul className="space-y-1 text-sm">
-          {question.choices.map((choice) => {
-            const isAnswer = revealed && question.correctAnswers.includes(choice.key);
-            return (
-              <li
-                key={choice.key}
-                className={`rounded border p-2 ${isAnswer ? "motion-correct border-correct bg-correct-bg" : "border-line"}`}
-              >
-                <span className="font-bold">{choice.key}. </span>
+        <ul className="space-y-2 text-sm">
+          {question.choices.map((choice) => (
+            <li key={choice.key} className="flex items-start gap-3 rounded-md border border-line p-3">
+              <ChoiceChip label={choice.key} />
+              <span className="pt-0.5">
                 <InlineText text={choice.text} />
-                {isAnswer ? <span className="ml-2 font-bold text-correct">(正解)</span> : null}
-              </li>
-            );
-          })}
+              </span>
+            </li>
+          ))}
         </ul>
       )}
       {revealed ? (
         <div className="space-y-2 border-t border-line pt-3">
           <h3 className="font-bold">解説</h3>
-          <RichText text={question.explanation} />
+          <ExplanationView question={question} headingLevel={4} />
           <ReferenceList references={question.references} />
         </div>
       ) : null}
@@ -130,7 +141,15 @@ function QuestionFace({ question, revealed }: { question: Question; revealed: bo
 }
 
 /** 1 問ずつのカード。表に問題、めくると正解と解説。前へ・次へで移ると、表に戻る。 */
-function FlashCards({ questions, bookmarks }: { questions: Question[]; bookmarks: Bookmarks }) {
+function FlashCards({
+  questions,
+  bookmarks,
+  domains,
+}: {
+  questions: Question[];
+  bookmarks: Bookmarks;
+  domains: PublishedExam["domains"];
+}) {
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
   // 見ている間に一覧から減ることはないが、念のため範囲に収める
@@ -151,7 +170,7 @@ function FlashCards({ questions, bookmarks }: { questions: Question[]; bookmarks
         </p>
         <BookmarkToggle questionId={question.questionId} bookmarks={bookmarks} />
       </div>
-      <QuestionFace question={question} revealed={revealed} />
+      <QuestionFace question={question} revealed={revealed} domains={domains} />
       <button
         type="button"
         onClick={() => setRevealed((r) => !r)}

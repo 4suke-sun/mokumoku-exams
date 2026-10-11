@@ -77,21 +77,25 @@ export async function readJsonBody(
 /**
  * 結果を、サーバーの問題データで採点し直して、復習プールの変更にする(端末から送られた正誤は使わない)。
  * 判定は、画面の採点と同じ関数(自由記述は採点基準の判定)。
- * 未回答は不正解として数える。いまのデータにない問題は、どちらにも入れない。
+ * 未回答は不正解として数える。自信なしの印を付けた問題は、正解でも復習に残す(`wrong` に入れる)。
+ * いまのデータにない問題は、どちらにも入れない。
  */
 export function reviewChangeOf(result: Result, questions: readonly GradableQuestion[]): ReviewChange {
   const byId = new Map(questions.map((q) => [q.questionId, q]));
   const change = { wrong: [] as string[], correct: [] as string[], at: result.finishedAt };
-  for (const id of result.questionIds) {
+  result.questionIds.forEach((id, index) => {
     const question = byId.get(id);
-    if (!question) continue;
-    (isQuestionCorrect(question, result.answers, result.textAnswers) ? change.correct : change.wrong).push(id);
-  }
+    if (!question) return;
+    const correct = isQuestionCorrect(question, result.answers, result.textAnswers);
+    const unsure = result.unsure?.[index] === true;
+    (correct && !unsure ? change.correct : change.wrong).push(id);
+  });
   return change;
 }
 
-/** 採点し直した結果の学習量。いまのデータにない問題は数えない。 */
-export function tallyOf(change: ReviewChange): DayTally {
+/** 採点し直した結果の学習量(正答数は、自信なしの印によらず、正誤で数える)。いまのデータにない問題は数えない。 */
+export function tallyOf(result: Result, questions: readonly GradableQuestion[]): DayTally {
+  const change = reviewChangeOf({ ...result, unsure: undefined }, questions);
   return { answered: change.wrong.length + change.correct.length, correct: change.correct.length };
 }
 
@@ -129,7 +133,7 @@ export async function handlePostResult(request: Request, deps: HistoryDeps): Pro
   try {
     const questions = await (deps.questions ?? examQuestions)(result.examCode);
     const change = questions ? reviewChangeOf(result, questions) : null;
-    await deps.repository.putResult(auth.user.sub, result, change ? tallyOf(change) : undefined);
+    await deps.repository.putResult(auth.user.sub, result, questions ? tallyOf(result, questions) : undefined);
     if (change) await deps.repository.updateReview(auth.user.sub, result.examCode, change);
     return json({ status: "saved" }, 200, auth.setCookies);
   } catch {

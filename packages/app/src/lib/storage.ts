@@ -50,31 +50,78 @@ const UNIT_ID = z.string().regex(/^[a-z][a-z0-9-]{0,31}$/);
 /** 段階学習の段階(単元の ID と、段階の順番) */
 const StageRefSchema = z.strictObject({ unitId: UNIT_ID, order: STAGE_ORDER });
 
+/** 1 問の回答時間の上限(ミリ秒)。これより長い値は、壊れた値として扱う */
+export const MAX_ANSWER_TIME_MS = 24 * 60 * 60 * 1000;
+
+/** 問題ごとの記録(出題した問題の並びと同じ長さの配列)。回答時間・自信なし・見直し */
+const TimesSchema = z.array(z.int().min(0).max(MAX_ANSWER_TIME_MS)).max(1000).optional();
+const MarksSchema = z.array(z.boolean()).max(1000).optional();
+
+/** 問題ごとの記録の項目。どれも任意で、持つときは、出題した問題の数と同じ長さにする */
+export const PER_QUESTION_FIELDS = ["timesMs", "unsure", "flagged"] as const;
+
+/** 問題ごとの記録の配列が、出題した問題の数と同じ長さか。違えば、その項目を指摘する */
+export function checkPerQuestionLengths(
+  value: { questionIds: readonly string[] } & Partial<Record<string, unknown>>,
+  ctx: z.RefinementCtx,
+  fields: readonly string[] = PER_QUESTION_FIELDS,
+): void {
+  for (const field of fields) {
+    const list = value[field];
+    if (Array.isArray(list) && list.length !== value.questionIds.length) {
+      ctx.addIssue({ code: "custom", path: [field], message: "問題の数と合いません。" });
+    }
+  }
+}
+
+/** 解答の表示のしかた。end はまとめて最後に(既定)、each は 1 問ごと */
+export const REVEAL_CHOICES = ["end", "each"] as const;
+export type Reveal = (typeof REVEAL_CHOICES)[number];
+
 /** 出題中の状態(途中で閉じても続きから解ける) */
-export const SessionSchema = z.strictObject({
-  examCode: KEY,
-  questionIds: z.array(KEY).min(1).max(1000),
-  answers: AnswersSchema,
-  textAnswers: TextAnswersSchema,
-  index: z.number().int().min(0).max(1000),
-  startedAt: STAMP,
-  choiceOrder: ChoiceOrderSchema,
-  /** 段階の確認問題として始めた出題のときだけ。採点すると、その段階の到達の状態を更新する */
-  stage: StageRefSchema.optional(),
-  /** 本番モードの締め切り(ISO 8601)。再読み込みしても残り時間を保つ。通常の出題では持たない */
-  deadline: STAMP.optional(),
-});
+export const SessionSchema = z
+  .strictObject({
+    examCode: KEY,
+    questionIds: z.array(KEY).min(1).max(1000),
+    answers: AnswersSchema,
+    textAnswers: TextAnswersSchema,
+    index: z.number().int().min(0).max(1000),
+    startedAt: STAMP,
+    choiceOrder: ChoiceOrderSchema,
+    /** 段階の確認問題として始めた出題のときだけ。採点すると、その段階の到達の状態を更新する */
+    stage: StageRefSchema.optional(),
+    /** 本番モードの締め切り(ISO 8601)。再読み込みしても残り時間を保つ。通常の出題では持たない */
+    deadline: STAMP.optional(),
+    /** 解答の表示のしかた。持たないときは、まとめて最後に */
+    reveal: z.enum(REVEAL_CHOICES).optional(),
+    /** 1 問ごとの表示で「回答する」を押した問題(押したあとは、選択を変えられない) */
+    checked: MarksSchema,
+    /** 問題ごとの回答時間(ミリ秒)。タブが隠れている間は数えない */
+    timesMs: TimesSchema,
+    /** 自信なしの印。正解しても、復習に残す */
+    unsure: MarksSchema,
+    /** 見直しの印。印だけで、採点には影響しない */
+    flagged: MarksSchema,
+  })
+  .superRefine((session, ctx) => checkPerQuestionLengths(session, ctx, [...PER_QUESTION_FIELDS, "checked"]));
 export type Session = z.infer<typeof SessionSchema>;
 
-/** 採点した結果 */
-export const ResultSchema = z.strictObject({
+/** 採点した結果の項目(サーバーの検査は、これに条件を足す) */
+export const ResultBaseSchema = z.strictObject({
   examCode: KEY,
   questionIds: z.array(KEY).min(1).max(1000),
   answers: AnswersSchema,
   textAnswers: TextAnswersSchema,
   finishedAt: STAMP,
   choiceOrder: ChoiceOrderSchema,
+  /** 問題ごとの回答時間・自信なし・見直し。古い結果は持たない */
+  timesMs: TimesSchema,
+  unsure: MarksSchema,
+  flagged: MarksSchema,
 });
+
+/** 採点した結果 */
+export const ResultSchema = ResultBaseSchema.superRefine((result, ctx) => checkPerQuestionLengths(result, ctx));
 export type Result = z.infer<typeof ResultSchema>;
 
 const ResultsSchema = z.array(ResultSchema).max(MAX_RESULTS);
@@ -147,8 +194,11 @@ export function clearResults(store: KeyValueStore, examCode: string): void {
   }
 }
 
-/** 利用者の設定 */
-export const SettingsSchema = z.strictObject({ shuffleChoices: z.boolean() });
+/** 利用者の設定。解答の表示のしかたは、次の出題の既定になる */
+export const SettingsSchema = z.strictObject({
+  shuffleChoices: z.boolean(),
+  reveal: z.enum(REVEAL_CHOICES).optional(),
+});
 export type Settings = z.infer<typeof SettingsSchema>;
 
 export const DEFAULT_SETTINGS: Settings = { shuffleChoices: false };

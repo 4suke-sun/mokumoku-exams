@@ -2,9 +2,20 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { browserStore, loadResults, type Result, type StageCheck, saveResult, saveStageCheck } from "@/lib/storage.ts";
+import {
+  browserStore,
+  loadResults,
+  loadSession,
+  type Result,
+  type StageCheck,
+  saveResult,
+  saveStageCheck,
+} from "@/lib/storage.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 import { ResultView } from "./result-view.tsx";
+
+const push = vi.fn();
+vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
 
 const exam = {
   examCode: "TEST",
@@ -34,6 +45,7 @@ const questions = [question(1, "A"), question(2, "A"), question(3, "B")];
 
 beforeEach(() => {
   localStorage.clear();
+  push.mockClear();
   // 動きを減らす設定にして、カウントアップを待たずに最終の値を見る
   vi.stubGlobal("matchMedia", (query: string) => ({ matches: query.includes("reduce"), media: query }));
 });
@@ -289,5 +301,45 @@ describe("ResultView の自由記述", () => {
     expect(await screen.findByRole("img", { name: "正答率 0%" })).toBeTruthy();
     expect(screen.getByText("未回答")).toBeTruthy();
     expect(screen.getByText("× 不正解")).toBeTruthy();
+  });
+});
+
+describe("ResultView の解き直し", () => {
+  it("間違えた問題だけで_新しい出題を始める", async () => {
+    saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["B"], "TEST-0003": ["A"] });
+    render(<ResultView exam={exam} questions={questions} />);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole("button", { name: "間違えた問題だけで解き直す(2 問)" }));
+    expect(push).toHaveBeenCalledWith("/exams/TEST/play");
+    const session = loadSession(browserStore(), "TEST");
+    expect(session?.questionIds).toEqual(["TEST-0002", "TEST-0003"]);
+    expect(session?.answers).toEqual({});
+  });
+
+  it("自信なしの問題_正解でも解き直しに含める", async () => {
+    saveResult(browserStore(), {
+      examCode: "TEST",
+      questionIds: questions.map((q) => q.questionId),
+      answers: { "TEST-0001": ["A"], "TEST-0002": ["A"], "TEST-0003": ["A"] },
+      finishedAt: "2026-10-10T00:00:00.000Z",
+      unsure: [true, false, false],
+      flagged: [false, true, false],
+      timesMs: [65_000, 4_000, 0],
+    });
+    render(<ResultView exam={exam} questions={questions} />);
+    const user = userEvent.setup();
+    expect(await screen.findByText("自信なし")).toBeTruthy();
+    expect(screen.getByText("見直し")).toBeTruthy();
+    expect(screen.getByText("回答時間 1 分 5 秒")).toBeTruthy();
+    await user.click(screen.getByRole("button", { name: "間違えた問題と自信なしの問題だけで解き直す(2 問)" }));
+    expect(loadSession(browserStore(), "TEST")?.questionIds).toEqual(["TEST-0001", "TEST-0003"]);
+  });
+
+  it("間違いがない_解き直しのボタンを出さず_別の問題でもう一度はモード選択へ", async () => {
+    saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["A"], "TEST-0003": ["B"] });
+    render(<ResultView exam={exam} questions={questions} />);
+    expect(await screen.findByText("すべて正解でした。見直す問題はありません。")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /解き直す/ })).toBeNull();
+    expect(screen.getByRole("link", { name: "別の問題でもう一度" }).getAttribute("href")).toBe("/exams/TEST");
   });
 });
