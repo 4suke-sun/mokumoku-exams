@@ -1,9 +1,30 @@
 import { authenticate, type GuardDeps } from "@/lib/auth/guard.ts";
 import { guard, json } from "@/lib/auth/handlers.ts";
-import type { HistoryRepository } from "./repository.ts";
-import { apiResultSchema, ListQuerySchema, MAX_BODY_BYTES } from "./schema.ts";
+import { answerFor, isCorrect } from "@/lib/quiz.ts";
+import type { Result } from "@/lib/storage.ts";
+import type { Question } from "@/lib/types.ts";
+import { examQuestions } from "./questions.ts";
+import type { HistoryRepository, ReviewChange } from "./repository.ts";
+import {
+  apiResultSchema,
+  BookmarkChangeSchema,
+  ListQuerySchema,
+  MAX_BODY_BYTES,
+  MAX_BOOKMARK_BODY_BYTES,
+} from "./schema.ts";
 
-export type HistoryDeps = { auth: GuardDeps; repository: HistoryRepository; now?: () => number };
+/** 採点に使う、問題の正解。公開中の資格でなければ null。 */
+export type QuestionSource = (
+  examCode: string,
+) => Promise<readonly Pick<Question, "questionId" | "correctAnswers">[] | null>;
+
+export type HistoryDeps = {
+  auth: GuardDeps;
+  repository: HistoryRepository;
+  now?: () => number;
+  /** 既定は data/ の問題データ */
+  questions?: QuestionSource;
+};
 
 /**
  * エラー応答の形は `{ "error": "<種類>" }` だけ。原因・内部の情報・入力の値は返さない。
@@ -34,6 +55,44 @@ function parseQuery(request: Request) {
   return parsed.success ? parsed.data : null;
 }
 
+/**
+ * 本文を、大きさを確かめてから JSON として読む。大きさは、読み込む前に申告で、読み込んだあとに実際の大きさで確かめる。
+ * 断るときは、その応答を返す。
+ */
+async function readJsonBody(
+  request: Request,
+  maxBytes: number,
+  setCookies: string[],
+): Promise<{ body: unknown } | Response> {
+  const declared = Number(request.headers.get("content-length") ?? 0);
+  if (declared > maxBytes) return fail("too-large", 413, setCookies);
+  const text = await request.text().catch(() => "");
+  if (new TextEncoder().encode(text).length > maxBytes) return fail("too-large", 413, setCookies);
+  try {
+    return { body: JSON.parse(text) };
+  } catch {
+    return fail("bad-request", 400, setCookies);
+  }
+}
+
+/**
+ * 結果を、サーバーの問題データで採点し直して、復習プールの変更にする(端末から送られた正誤は使わない)。
+ * 未回答は不正解として数える。いまのデータにない問題は、どちらにも入れない。
+ */
+export function reviewChangeOf(
+  result: Result,
+  questions: readonly Pick<Question, "questionId" | "correctAnswers">[],
+): ReviewChange {
+  const byId = new Map(questions.map((q) => [q.questionId, q]));
+  const change = { wrong: [] as string[], correct: [] as string[], at: result.finishedAt };
+  for (const id of result.questionIds) {
+    const question = byId.get(id);
+    if (!question) continue;
+    (isCorrect(question, answerFor(result.answers, id)) ? change.correct : change.wrong).push(id);
+  }
+  return change;
+}
+
 /** 自分の結果を、資格ごとに新しい順で返す。 */
 export async function handleListResults(request: Request, deps: HistoryDeps): Promise<Response> {
   const auth = await authorize(request, deps);
@@ -48,29 +107,77 @@ export async function handleListResults(request: Request, deps: HistoryDeps): Pr
   }
 }
 
-/** 自分の結果を保存する。同じ資格・同じ完了時刻の結果は上書きなので、繰り返しても重複しない。 */
+/**
+ * 自分の結果を保存する。同じ資格・同じ完了時刻の結果は上書きなので、繰り返しても重複しない。
+ * あわせて、復習プールを更新する(送り直しても、同じ変更になる)。
+ */
 export async function handlePostResult(request: Request, deps: HistoryDeps): Promise<Response> {
   const rejected = guard(request);
   if (rejected) return rejected;
   const auth = await authorize(request, deps);
   if (!auth) return fail("unauthorized", 401);
 
-  // 大きさは、読み込む前に申告で、読み込んだあとに実際の大きさで確かめる
-  const declared = Number(request.headers.get("content-length") ?? 0);
-  if (declared > MAX_BODY_BYTES) return fail("too-large", 413, auth.setCookies);
-  const text = await request.text().catch(() => "");
-  if (new TextEncoder().encode(text).length > MAX_BODY_BYTES) return fail("too-large", 413, auth.setCookies);
-  let body: unknown;
-  try {
-    body = JSON.parse(text);
-  } catch {
-    return fail("bad-request", 400, auth.setCookies);
-  }
-  const parsed = apiResultSchema((deps.now ?? Date.now)()).safeParse(body);
+  const read = await readJsonBody(request, MAX_BODY_BYTES, auth.setCookies);
+  if (read instanceof Response) return read;
+  const parsed = apiResultSchema((deps.now ?? Date.now)()).safeParse(read.body);
   if (!parsed.success) return fail("bad-request", 400, auth.setCookies);
+  const result = parsed.data;
 
   try {
-    await deps.repository.putResult(auth.user.sub, parsed.data);
+    await deps.repository.putResult(auth.user.sub, result);
+    const questions = await (deps.questions ?? examQuestions)(result.examCode);
+    if (questions)
+      await deps.repository.updateReview(auth.user.sub, result.examCode, reviewChangeOf(result, questions));
+    return json({ status: "saved" }, 200, auth.setCookies);
+  } catch {
+    return fail("unavailable", 503);
+  }
+}
+
+/** 問題 ID の一覧を返す、GET の共通の形(ブックマーク、復習プール)。 */
+async function listQuestionIds(
+  request: Request,
+  deps: HistoryDeps,
+  load: (sub: string, examCode: string) => Promise<string[]>,
+): Promise<Response> {
+  const auth = await authorize(request, deps);
+  if (!auth) return fail("unauthorized", 401);
+  const query = parseQuery(request);
+  if (!query) return fail("bad-request", 400, auth.setCookies);
+  try {
+    return json({ questionIds: await load(auth.user.sub, query.examCode) }, 200, auth.setCookies);
+  } catch {
+    return fail("unavailable", 503);
+  }
+}
+
+/** 自分のブックマークを返す。 */
+export function handleListBookmarks(request: Request, deps: HistoryDeps): Promise<Response> {
+  return listQuestionIds(request, deps, (sub, examCode) => deps.repository.listBookmarks(sub, examCode));
+}
+
+/** 自分の復習プールを返す。 */
+export function handleListReview(request: Request, deps: HistoryDeps): Promise<Response> {
+  return listQuestionIds(request, deps, (sub, examCode) => deps.repository.listReview(sub, examCode));
+}
+
+/** ブックマークを付ける・外す。問題は、公開中の資格の、いまのデータにあるものだけ。 */
+export async function handlePutBookmark(request: Request, deps: HistoryDeps): Promise<Response> {
+  const rejected = guard(request);
+  if (rejected) return rejected;
+  const auth = await authorize(request, deps);
+  if (!auth) return fail("unauthorized", 401);
+
+  const read = await readJsonBody(request, MAX_BOOKMARK_BODY_BYTES, auth.setCookies);
+  if (read instanceof Response) return read;
+  const parsed = BookmarkChangeSchema.safeParse(read.body);
+  if (!parsed.success) return fail("bad-request", 400, auth.setCookies);
+  const change = parsed.data;
+
+  try {
+    const questions = await (deps.questions ?? examQuestions)(change.examCode);
+    if (!questions?.some((q) => q.questionId === change.questionId)) return fail("bad-request", 400, auth.setCookies);
+    await deps.repository.setBookmark(auth.user.sub, change.examCode, change.questionId, change.bookmarked);
     return json({ status: "saved" }, 200, auth.setCookies);
   } catch {
     return fail("unavailable", 503);

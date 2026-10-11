@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { BookmarkError, BookmarkToggle, useBookmarks } from "@/components/bookmark-toggle.tsx";
 import { EmptyState } from "@/components/empty-state.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
 import { postServerResult } from "@/lib/history/client.ts";
@@ -24,6 +25,7 @@ export function Player({ exam, questions }: Props) {
   const questionRef = useRef<HTMLFieldSetElement>(null);
   const shownIndex = useRef<number | null>(null);
   const finishing = useRef(false);
+  const bookmarks = useBookmarks(exam.examCode);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -154,6 +156,10 @@ export function Player({ exam, questions }: Props) {
           {exam.shortName} / {index + 1} / {total} 問目
         </p>
         <progress className="h-2 w-full accent-primary" value={index + 1} max={total} aria-label="進み具合" />
+        <div className="flex justify-end">
+          <BookmarkToggle questionId={question.questionId} bookmarks={bookmarks} />
+        </div>
+        <BookmarkError bookmarks={bookmarks} />
       </div>
 
       <fieldset ref={questionRef} tabIndex={-1} aria-labelledby="question-text" className="space-y-3">

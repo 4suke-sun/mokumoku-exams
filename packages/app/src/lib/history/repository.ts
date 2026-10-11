@@ -1,6 +1,7 @@
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { DeleteCommand, DynamoDBDocumentClient, PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import { MAX_RESULTS, type Result, ResultSchema } from "@/lib/storage.ts";
+import { QUESTION_ID_PATTERN } from "./schema.ts";
 
 /** 履歴の保存先。利用者の識別子(`sub`)は、検証済みのものだけを渡す。 */
 export interface HistoryRepository {
@@ -8,13 +9,35 @@ export interface HistoryRepository {
   putResult(sub: string, result: Result): Promise<void>;
   /** 資格の結果を新しい順に返す。 */
   listResults(sub: string, examCode: string): Promise<Result[]>;
+  /** ブックマークした問題 ID を、ID の順に返す。 */
+  listBookmarks(sub: string, examCode: string): Promise<string[]>;
+  /** ブックマークを付ける・外す(同じ操作を繰り返しても、結果は変わらない)。 */
+  setBookmark(sub: string, examCode: string, questionId: string, bookmarked: boolean): Promise<void>;
+  /** 復習プールの問題 ID を、ID の順に返す。 */
+  listReview(sub: string, examCode: string): Promise<string[]>;
+  /** 採点の結果で復習プールを更新する。間違えた問題を入れ、正解した問題を外す。 */
+  updateReview(sub: string, examCode: string, change: ReviewChange): Promise<void>;
 }
+
+/** 復習プールの更新。`at` は、もとにした結果の完了時刻。 */
+export type ReviewChange = { wrong: readonly string[]; correct: readonly string[]; at: string };
 
 /** DynamoDB のキー。単一テーブルで、PK=USER#{sub}、SK で種別を分ける。 */
 export const userKey = (sub: string) => `USER#${sub}`;
 export const resultKeyPrefix = (examCode: string) => `RESULT#${examCode}#`;
 export const resultKey = (result: Pick<Result, "examCode" | "finishedAt">) =>
   `${resultKeyPrefix(result.examCode)}${result.finishedAt}`;
+export const bookmarkKeyPrefix = (examCode: string) => `BOOKMARK#${examCode}#`;
+export const reviewKeyPrefix = (examCode: string) => `REVIEW#${examCode}#`;
+
+/** 1 回の更新で、同時に送る書き込みの数(問題が多い結果でも、待ち時間を抑える) */
+const WRITE_CONCURRENCY = 10;
+
+async function inChunks<T>(items: readonly T[], run: (item: T) => Promise<unknown>): Promise<void> {
+  for (let i = 0; i < items.length; i += WRITE_CONCURRENCY) {
+    await Promise.all(items.slice(i, i + WRITE_CONCURRENCY).map(run));
+  }
+}
 
 /** DynamoDB のドキュメントクライアントの、使う操作だけ(テストで差し替える) */
 export type DocumentSender = { send(command: unknown): Promise<unknown> };
@@ -24,18 +47,27 @@ type QueryOutput = { Items?: Record<string, unknown>[] };
 export function createDynamoRepository(options: { tableName: string; client: DocumentSender }): HistoryRepository {
   const { tableName, client } = options;
 
-  const query = (sub: string, examCode: string, extra: { limit?: number; keysOnly?: boolean }) =>
+  const query = (sub: string, prefix: string, extra: { limit?: number; keysOnly?: boolean; newestFirst?: boolean }) =>
     client.send(
       new QueryCommand({
         TableName: tableName,
         KeyConditionExpression: "PK = :pk AND begins_with(SK, :prefix)",
-        ExpressionAttributeValues: { ":pk": userKey(sub), ":prefix": resultKeyPrefix(examCode) },
-        // 完了時刻の新しい順
-        ScanIndexForward: false,
+        ExpressionAttributeValues: { ":pk": userKey(sub), ":prefix": prefix },
+        ...(extra.newestFirst ? { ScanIndexForward: false } : {}),
         ...(extra.limit ? { Limit: extra.limit } : {}),
         ...(extra.keysOnly ? { ProjectionExpression: "SK" } : {}),
       }),
     ) as Promise<QueryOutput>;
+
+  /** SK の接頭辞のあとに続く問題 ID を取り出す(問題 ID の形のものだけ)。 */
+  const questionIdsOf = async (sub: string, prefix: string) => {
+    const { Items = [] } = await query(sub, prefix, { keysOnly: true });
+    return Items.map((item) => String(item.SK).slice(prefix.length)).filter((id) => QUESTION_ID_PATTERN.test(id));
+  };
+  const put = (sub: string, sk: string, attributes: Record<string, unknown>) =>
+    client.send(new PutCommand({ TableName: tableName, Item: { PK: userKey(sub), SK: sk, ...attributes } }));
+  const remove = (sub: string, sk: string) =>
+    client.send(new DeleteCommand({ TableName: tableName, Key: { PK: userKey(sub), SK: sk } }));
 
   return {
     async putResult(sub, result) {
@@ -46,14 +78,13 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
         }),
       );
       // 古いものを切り詰める(1 資格あたり高々 MAX_RESULTS + 数件なので、1 回の問い合わせで足りる)
-      const { Items = [] } = await query(sub, result.examCode, { keysOnly: true });
-      for (const item of Items.slice(MAX_RESULTS)) {
-        await client.send(new DeleteCommand({ TableName: tableName, Key: { PK: userKey(sub), SK: item.SK } }));
-      }
+      const { Items = [] } = await query(sub, resultKeyPrefix(result.examCode), { keysOnly: true, newestFirst: true });
+      for (const item of Items.slice(MAX_RESULTS)) await remove(sub, String(item.SK));
     },
 
     async listResults(sub, examCode) {
-      const { Items = [] } = await query(sub, examCode, { limit: MAX_RESULTS });
+      // 完了時刻の新しい順
+      const { Items = [] } = await query(sub, resultKeyPrefix(examCode), { limit: MAX_RESULTS, newestFirst: true });
       const results: Result[] = [];
       for (const item of Items) {
         // 保存した項目から、結果の部分だけを取り出して検査する(壊れた項目は、ないものとして扱う)
@@ -68,12 +99,40 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
       }
       return results;
     },
+
+    listBookmarks: (sub, examCode) => questionIdsOf(sub, bookmarkKeyPrefix(examCode)),
+
+    async setBookmark(sub, examCode, questionId, bookmarked) {
+      const sk = `${bookmarkKeyPrefix(examCode)}${questionId}`;
+      if (bookmarked) await put(sub, sk, { type: "bookmark", examCode, questionId });
+      else await remove(sub, sk);
+    },
+
+    listReview: (sub, examCode) => questionIdsOf(sub, reviewKeyPrefix(examCode)),
+
+    async updateReview(sub, examCode, change) {
+      const prefix = reviewKeyPrefix(examCode);
+      await inChunks(change.wrong, (id) =>
+        put(sub, `${prefix}${id}`, { type: "review", examCode, questionId: id, wrongAt: change.at }),
+      );
+      // 入っていない問題の削除は、何もしない操作になる(問い合わせて確かめる必要はない)
+      await inChunks(change.correct, (id) => remove(sub, `${prefix}${id}`));
+    },
   };
 }
 
 /** 手元の開発とテスト用の、メモリ上の保存先。 */
 export function createMemoryRepository(): HistoryRepository {
   const store = new Map<string, Map<string, Result>>();
+  // 利用者と資格ごとの、問題 ID の集合
+  const bookmarks = new Map<string, Set<string>>();
+  const review = new Map<string, Set<string>>();
+  const setOf = (sets: Map<string, Set<string>>, sub: string, examCode: string) => {
+    const key = `${userKey(sub)}|${examCode}`;
+    const found = sets.get(key) ?? new Set<string>();
+    sets.set(key, found);
+    return found;
+  };
   const sorted = (sub: string, examCode: string) =>
     [...(store.get(userKey(sub))?.values() ?? [])]
       .filter((r) => r.examCode === examCode)
@@ -87,6 +146,22 @@ export function createMemoryRepository(): HistoryRepository {
     },
     async listResults(sub, examCode) {
       return sorted(sub, examCode).slice(0, MAX_RESULTS);
+    },
+    async listBookmarks(sub, examCode) {
+      return [...setOf(bookmarks, sub, examCode)].sort();
+    },
+    async setBookmark(sub, examCode, questionId, bookmarked) {
+      const own = setOf(bookmarks, sub, examCode);
+      if (bookmarked) own.add(questionId);
+      else own.delete(questionId);
+    },
+    async listReview(sub, examCode) {
+      return [...setOf(review, sub, examCode)].sort();
+    },
+    async updateReview(sub, examCode, change) {
+      const own = setOf(review, sub, examCode);
+      for (const id of change.wrong) own.add(id);
+      for (const id of change.correct) own.delete(id);
     },
   };
 }

@@ -90,6 +90,61 @@ describe("DynamoDB の履歴", () => {
   });
 });
 
+describe("DynamoDB のブックマークと復習プール", () => {
+  it("ブックマーク_SK は資格と問題 ID で_自分の資格の分だけを返す", async () => {
+    const { items, client } = fakeTable();
+    const repository = createDynamoRepository({ tableName: "table-example", client });
+    await repository.setBookmark("user-a", "SAMPLE", "SAMPLE-0002", true);
+    await repository.setBookmark("user-a", "SAMPLE", "SAMPLE-0001", true);
+    await repository.setBookmark("user-a", "SAMPLE2", "SAMPLE2-0001", true);
+    await repository.setBookmark("user-b", "SAMPLE", "SAMPLE-0003", true);
+    expect([...items.values()].map((i) => `${i.PK} ${i.SK}`)).toContain("USER#user-a BOOKMARK#SAMPLE#SAMPLE-0002");
+    expect(await repository.listBookmarks("user-a", "SAMPLE")).toEqual(["SAMPLE-0001", "SAMPLE-0002"]);
+    await repository.setBookmark("user-a", "SAMPLE", "SAMPLE-0001", false);
+    expect(await repository.listBookmarks("user-a", "SAMPLE")).toEqual(["SAMPLE-0002"]);
+  });
+
+  it("復習プール_間違えた問題を入れ_正解した問題を外し_結果の項目とは混ざらない", async () => {
+    const { items, client } = fakeTable();
+    const repository = createDynamoRepository({ tableName: "table-example", client });
+    await repository.putResult("user-a", result("SAMPLE", 1));
+    const at = "2026-10-11T12:00:00.000Z";
+    await repository.updateReview("user-a", "SAMPLE", { wrong: ["SAMPLE-0001", "SAMPLE-0002"], correct: [], at });
+    await repository.updateReview("user-a", "SAMPLE", { wrong: [], correct: ["SAMPLE-0001", "SAMPLE-0003"], at });
+    expect(await repository.listReview("user-a", "SAMPLE")).toEqual(["SAMPLE-0002"]);
+    expect(await repository.listReview("user-b", "SAMPLE")).toEqual([]);
+    expect(items.get("USER#user-a|REVIEW#SAMPLE#SAMPLE-0002")?.wrongAt).toBe(at);
+    expect(await repository.listResults("user-a", "SAMPLE")).toHaveLength(1);
+  });
+
+  it("壊れた SK_問題 ID の形でないものは返さない", async () => {
+    const { items, client } = fakeTable();
+    const repository = createDynamoRepository({ tableName: "table-example", client });
+    items.set("x", { PK: "USER#user-a", SK: "BOOKMARK#SAMPLE#broken" });
+    expect(await repository.listBookmarks("user-a", "SAMPLE")).toEqual([]);
+  });
+
+  it("問題の多い結果_同時に送る書き込みは 10 件まで", async () => {
+    let inFlight = 0;
+    let peak = 0;
+    const { client } = fakeTable();
+    const slow = {
+      async send(command: unknown) {
+        inFlight++;
+        peak = Math.max(peak, inFlight);
+        await new Promise((resolve) => setTimeout(resolve, 1));
+        inFlight--;
+        return client.send(command);
+      },
+    };
+    const repository = createDynamoRepository({ tableName: "table-example", client: slow });
+    const ids = Array.from({ length: 35 }, (_, i) => `SAMPLE-${String(i + 1).padStart(4, "0")}`);
+    await repository.updateReview("user-a", "SAMPLE", { wrong: ids, correct: [], at: "2026-10-11T12:00:00.000Z" });
+    expect(peak).toBe(10);
+    expect(await repository.listReview("user-a", "SAMPLE")).toHaveLength(35);
+  });
+});
+
 describe("メモリ上の履歴", () => {
   it("利用者ごとに分かれ_上限を超えると古いものを捨てる", async () => {
     const repository = createMemoryRepository();

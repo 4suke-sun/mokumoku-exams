@@ -4,7 +4,14 @@ import { withTokenCookies } from "@/lib/auth/session.ts";
 import type { AuthProvider } from "@/lib/auth/types.ts";
 import type { TokenVerifier } from "@/lib/auth/verify.ts";
 import { MAX_RESULTS, type Result } from "@/lib/storage.ts";
-import { type HistoryDeps, handleListResults, handlePostResult } from "./handlers.ts";
+import {
+  type HistoryDeps,
+  handleListBookmarks,
+  handleListResults,
+  handlePostResult,
+  handlePutBookmark,
+  reviewChangeOf,
+} from "./handlers.ts";
 import { createMemoryRepository, type HistoryRepository } from "./repository.ts";
 
 const ORIGIN = "http://localhost";
@@ -307,21 +314,144 @@ describe("履歴 API の入力の検証", () => {
   });
 });
 
-describe("履歴の保存先の失敗", () => {
-  const failing: HistoryRepository = {
-    async putResult() {
-      throw new Error("unavailable");
-    },
-    async listResults() {
-      throw new Error("unavailable");
-    },
-  };
+const failing: HistoryRepository = {
+  async putResult() {
+    throw new Error("unavailable");
+  },
+  async listResults() {
+    throw new Error("unavailable");
+  },
+  async listBookmarks() {
+    throw new Error("unavailable");
+  },
+  async setBookmark() {
+    throw new Error("unavailable");
+  },
+  async listReview() {
+    throw new Error("unavailable");
+  },
+  async updateReview() {
+    throw new Error("unavailable");
+  },
+};
 
+describe("履歴の保存先の失敗", () => {
   it("保存先が失敗する_原因を返さず 503 にする", async () => {
     const saved = await handlePostResult(post(body(), { cookie: asUser("a") }), deps(failing));
     expect(saved.status).toBe(503);
     expect(await saved.json()).toEqual({ error: "unavailable" });
     const listed = await handleListResults(get("examCode=SAMPLE", { cookie: asUser("a") }), deps(failing));
     expect(listed.status).toBe(503);
+  });
+});
+
+describe("ブックマークの API", () => {
+  const questions = async (examCode: string) =>
+    examCode === "SAMPLE" ? [{ questionId: "SAMPLE-0001", correctAnswers: ["B"] }] : null;
+  const withQuestions = (repository: HistoryRepository = createMemoryRepository()): HistoryDeps => ({
+    ...deps(repository),
+    questions,
+  });
+  const change = (value: Record<string, unknown> = {}) => ({
+    examCode: "SAMPLE",
+    questionId: "SAMPLE-0001",
+    bookmarked: true,
+    ...value,
+  });
+  const put = (value: unknown, headers: Record<string, string> = {}, raw?: string) =>
+    new Request(`${ORIGIN}/api/history/bookmarks`, {
+      method: "PUT",
+      headers: { "content-type": "application/json", ...headers },
+      body: raw ?? JSON.stringify(value),
+    });
+  const list = (query: string, headers: Record<string, string> = {}) =>
+    handleListBookmarks(new Request(`${ORIGIN}/api/history/bookmarks?${query}`, { headers }), current);
+  let current: HistoryDeps;
+
+  it("付けて外す_一覧に反映され_繰り返しても結果は変わらない", async () => {
+    current = withQuestions();
+    for (let i = 0; i < 2; i++) {
+      expect((await handlePutBookmark(put(change(), { cookie: asUser("a") }), current)).status).toBe(200);
+    }
+    expect(await (await list("examCode=SAMPLE", { cookie: asUser("a") })).json()).toEqual({
+      questionIds: ["SAMPLE-0001"],
+    });
+    // 他人には見えない
+    expect(await (await list("examCode=SAMPLE", { cookie: asUser("b") })).json()).toEqual({ questionIds: [] });
+    await handlePutBookmark(put(change({ bookmarked: false }), { cookie: asUser("a") }), current);
+    expect(await (await list("examCode=SAMPLE", { cookie: asUser("a") })).json()).toEqual({ questionIds: [] });
+  });
+
+  it("本文が正しくない_400 を返し_保存しない", async () => {
+    current = withQuestions();
+    const cases: unknown[] = [
+      change({ questionId: "SAMPLE-9999" }), // データにない問題
+      change({ questionId: "OTHER-0001" }), // 資格と合わない
+      change({ examCode: "SAMPLE2", questionId: "SAMPLE2-0001" }), // 公開中でない資格
+      change({ questionId: "SAMPLE#0001" }),
+      change({ bookmarked: "yes" }),
+      change({ sub: "other-user" }),
+      { examCode: "SAMPLE", questionId: "SAMPLE-0001" },
+      [],
+      null,
+    ];
+    for (const value of cases) {
+      const response = await handlePutBookmark(put(value, { cookie: asUser("a") }), current);
+      expect(response.status, JSON.stringify(value)).toBe(400);
+      expect(await response.json()).toEqual({ error: "bad-request" });
+    }
+    expect(await (await list("examCode=SAMPLE", { cookie: asUser("a") })).json()).toEqual({ questionIds: [] });
+  });
+
+  it("未ログイン・別サイト・JSON でない・大きすぎる_それぞれの種類で断る", async () => {
+    current = withQuestions();
+    expect((await handlePutBookmark(put(change()), current)).status).toBe(401);
+    expect(
+      (await handlePutBookmark(put(change(), { cookie: asUser("a"), "sec-fetch-site": "cross-site" }), current)).status,
+    ).toBe(403);
+    expect(
+      (await handlePutBookmark(put(change(), { cookie: asUser("a"), "content-type": "text/plain" }), current)).status,
+    ).toBe(415);
+    expect(
+      (await handlePutBookmark(put(null, { cookie: asUser("a") }, JSON.stringify({ pad: "x".repeat(2000) })), current))
+        .status,
+    ).toBe(413);
+    expect((await handlePutBookmark(put(null, { cookie: asUser("a") }, "{"), current)).status).toBe(400);
+  });
+
+  it("問い合わせが正しくない_400 を返す", async () => {
+    current = withQuestions();
+    for (const query of ["", "examCode=sample", "examCode=SAMPLE&examCode=SAMPLE", "examCode=SAMPLE&sub=b"]) {
+      expect((await list(query, { cookie: asUser("a") })).status, query).toBe(400);
+    }
+    expect((await list("examCode=SAMPLE")).status).toBe(401);
+  });
+
+  it("保存先が失敗する_原因を返さず 503 にする", async () => {
+    current = withQuestions(failing);
+    expect((await handlePutBookmark(put(change(), { cookie: asUser("a") }), current)).status).toBe(503);
+    expect((await list("examCode=SAMPLE", { cookie: asUser("a") })).status).toBe(503);
+  });
+});
+
+describe("採点し直して復習プールの変更にする", () => {
+  const questions = [
+    { questionId: "SAMPLE-0001", correctAnswers: ["B"] },
+    { questionId: "SAMPLE-0002", correctAnswers: ["A", "C"] },
+    { questionId: "SAMPLE-0003", correctAnswers: ["A"] },
+  ];
+
+  it("正解は外し_不正解と未回答は入れ_データにない問題は無視する", () => {
+    const result: Result = {
+      examCode: "SAMPLE",
+      questionIds: ["SAMPLE-0001", "SAMPLE-0002", "SAMPLE-0003", "SAMPLE-0099"],
+      answers: { "SAMPLE-0001": ["B"], "SAMPLE-0002": ["A"], "SAMPLE-0099": ["A"] },
+      finishedAt: "2026-10-11T12:00:00.000Z",
+    };
+    expect(reviewChangeOf(result, questions)).toEqual({
+      wrong: ["SAMPLE-0002", "SAMPLE-0003"],
+      correct: ["SAMPLE-0001"],
+      at: "2026-10-11T12:00:00.000Z",
+    });
   });
 });

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useState } from "react";
+import { fetchBookmarks, fetchReview } from "@/lib/history/client.ts";
 import { domainCounts, sessionProgress, shuffle, shuffleChoiceOrder } from "@/lib/quiz.ts";
 import {
   browserStore,
@@ -22,6 +23,15 @@ type Props = { exam: PublishedExam; pool: PoolItem[] };
 
 const COUNT_CHOICES = [5, 10, 20, 50];
 
+/** 出題の対象。復習プールとブックマークは、アカウントに保存したもの。 */
+type Target = "all" | "review" | "bookmarks";
+
+const TARGETS: { id: Target; name: string; description: string }[] = [
+  { id: "all", name: "すべての問題", description: "資格のすべての問題から出題します。" },
+  { id: "review", name: "復習プール", description: "間違えた問題から出題します。正解すると、プールから外れます。" },
+  { id: "bookmarks", name: "ブックマーク", description: "ブックマークした問題から出題します。" },
+];
+
 const MODES = [
   { id: "normal", name: "通常出題", description: "分野と問題数を選んで、1 問ずつ解きます。", enabled: true },
   { id: "official", name: "本番モード", description: "本番と同じ問題数と制限時間で解きます。", enabled: false },
@@ -36,6 +46,12 @@ export function ModeSelect({ exam, pool }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [shuffleChoices, setShuffleChoices] = useState(DEFAULT_SETTINGS.shuffleChoices);
   const [resumable, setResumable] = useState<Session | null>(null);
+  const [target, setTarget] = useState<Target>("all");
+  // 取得できなかったときは null(その対象は選べない)
+  const [lists, setLists] = useState<Record<Exclude<Target, "all">, string[] | null>>({
+    review: null,
+    bookmarks: null,
+  });
 
   useEffect(() => {
     const store = browserStore();
@@ -46,9 +62,26 @@ export function ModeSelect({ exam, pool }: Props) {
     setResumable(saved?.questionIds.every((id) => ids.has(id)) ? saved : null);
   }, [exam.examCode, pool]);
 
-  const perDomain = domainCounts(pool);
+  useEffect(() => {
+    let active = true;
+    void Promise.all([fetchReview(exam.examCode), fetchBookmarks(exam.examCode)]).then(([review, bookmarks]) => {
+      if (active) setLists({ review, bookmarks });
+    });
+    return () => {
+      active = false;
+    };
+  }, [exam.examCode]);
 
-  const available = domains.length === 0 ? pool.length : pool.filter((p) => domains.includes(p.domain)).length;
+  // 対象で絞ってから、分野で絞る(いまのデータにない問題 ID は、ここで落ちる)
+  const inTarget = (id: Target) => {
+    if (id === "all") return pool;
+    const ids = new Set(lists[id] ?? []);
+    return pool.filter((p) => ids.has(p.questionId));
+  };
+  const targeted = inTarget(target);
+  const perDomain = domainCounts(targeted);
+
+  const available = domains.length === 0 ? targeted.length : targeted.filter((p) => domains.includes(p.domain)).length;
   const counts = [...COUNT_CHOICES.filter((n) => n < available), available];
   const effectiveCount = Math.min(count, available);
 
@@ -67,12 +100,12 @@ export function ModeSelect({ exam, pool }: Props) {
   }
 
   function start() {
-    const targets = domains.length === 0 ? pool : pool.filter((p) => domains.includes(p.domain));
+    const targets = domains.length === 0 ? targeted : targeted.filter((p) => domains.includes(p.domain));
     const questionIds = shuffle(targets, Math.random)
       .slice(0, effectiveCount)
       .map((p) => p.questionId);
     if (questionIds.length === 0) {
-      setError("出題できる問題がありません。分野の選択を見直してください。");
+      setError("出題できる問題がありません。出題の対象と分野の選択を見直してください。");
       return;
     }
     const saved = saveSession(browserStore(), {
@@ -102,6 +135,14 @@ export function ModeSelect({ exam, pool }: Props) {
           資格の一覧へ戻る
         </Link>
         <h1 className="text-2xl font-bold">{exam.name}</h1>
+        <div className="flex flex-wrap gap-4 pt-1 text-sm">
+          <Link href={`/exams/${exam.examCode}/dashboard`} className="text-primary hover:underline">
+            学習の状況を見る
+          </Link>
+          <Link href="/bookmarks" className="text-primary hover:underline">
+            直前チェック(ブックマーク)
+          </Link>
+        </div>
       </div>
 
       {resumable ? (
@@ -142,6 +183,35 @@ export function ModeSelect({ exam, pool }: Props) {
           ))}
         </ul>
       </div>
+
+      <fieldset className="space-y-2">
+        <legend className="text-lg font-bold">出題の対象</legend>
+        {TARGETS.map((item) => {
+          const unavailable = item.id !== "all" && lists[item.id] === null;
+          return (
+            <label
+              key={item.id}
+              className={`flex items-start gap-3 rounded-md border border-line bg-surface p-3 ${unavailable ? "opacity-50" : ""}`}
+            >
+              <input
+                type="radio"
+                name="target"
+                className="mt-1 size-5"
+                checked={target === item.id}
+                disabled={unavailable}
+                onChange={() => setTarget(item.id)}
+              />
+              <span>
+                {item.name}
+                <span className="ml-2 text-sm text-muted">({inTarget(item.id).length} 問)</span>
+                <span className="block text-sm text-muted">
+                  {unavailable ? "アカウントから読み込めないため、いまは選べません。" : item.description}
+                </span>
+              </span>
+            </label>
+          );
+        })}
+      </fieldset>
 
       <fieldset className="space-y-2">
         <legend className="text-lg font-bold">分野</legend>
@@ -192,6 +262,8 @@ export function ModeSelect({ exam, pool }: Props) {
           ))}
         </select>
       </div>
+
+      {available === 0 ? <p className="text-sm text-muted">選んだ条件に合う問題がありません。</p> : null}
 
       {error ? (
         <p role="alert" className="text-incorrect">
