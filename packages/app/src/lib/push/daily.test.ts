@@ -1,9 +1,10 @@
 import { DeleteCommand, type ScanCommand } from "@aws-sdk/lib-dynamodb";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { fakeTable } from "@/lib/history/table-double.ts";
-import { runDaily, scanSubscriptions } from "./daily.ts";
+import { runDaily, runDailyAndLog, scanSubscriptions } from "./daily.ts";
 import { pushKey } from "./endpoint.ts";
-import { DAILY_MESSAGE, type PushSender, type SendOutcome } from "./send.ts";
+import { DAILY_MESSAGE, type PushSender, type SendOutcome, webPushSender } from "./send.ts";
+import { VapidKeyUnavailableError } from "./vapid.ts";
 
 const endpointOf = (n: number) => `https://fcm.googleapis.com/fcm/send/device-${n}`;
 
@@ -97,5 +98,34 @@ describe("毎日の通知", () => {
     expect(scan?.input.FilterExpression).toBe("begins_with(#sk, :prefix)");
     expect(scan?.input.ExpressionAttributeValues).toEqual({ ":prefix": "PUSH#" });
     expect(scan?.input.ProjectionExpression).toBe("#pk, #sk, #endpoint, #p256dh, #auth");
+  });
+
+  it("結果のログは_数だけを記録する", async () => {
+    const { items, client } = fakeTable();
+    seed(items, "user-a", 1);
+    const log = vi.fn();
+    await runDailyAndLog({ client, tableName: "table-example", send: sender().send }, log);
+    expect(log.mock.calls).toEqual([[JSON.stringify({ message: "daily push", sent: 1, failed: 0, gone: 0 })]]);
+  });
+
+  it("秘密鍵を読めない_数ではなく種類だけを記録して失敗にし_購読を消さない", async () => {
+    const { items, client } = fakeTable();
+    seed(items, "user-a", 1);
+    const parameter = "/example/push/vapid-private-key";
+    const send = webPushSender(
+      { publicKey: "P".repeat(87), privateKeyParameter: parameter, subject: "mailto:admin@example.com" },
+      60,
+      async () => {
+        throw new Error(`AccessDenied: ${parameter}`);
+      },
+    );
+    const log = vi.fn();
+    const failure = await runDailyAndLog({ client, tableName: "table-example", send }, log).catch(
+      (error: unknown) => error,
+    );
+    expect(failure).toBeInstanceOf(VapidKeyUnavailableError);
+    expect((failure as Error).message).not.toContain(parameter);
+    expect(log.mock.calls).toEqual([[JSON.stringify({ message: "daily push", error: "vapid-key-unavailable" })]]);
+    expect(items.size).toBe(1);
   });
 });

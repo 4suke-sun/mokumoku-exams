@@ -1,4 +1,5 @@
 import webpush from "web-push";
+import { loadVapidPrivateKey, VapidKeyUnavailableError, type VapidSettings } from "./vapid.ts";
 
 // 送信の処理。アプリのテスト通知の API と、毎日の送信の Lambda(daily.ts)が共通で使う。
 // Lambda にも載せるため、`@/` を使わない(endpoint.ts を参照)。
@@ -8,9 +9,6 @@ export type PushTarget = { endpoint: string; p256dh: string; auth: string };
 
 /** 通知の中身。`url` は、通知を押したときに開く、このサイトの画面。 */
 export type PushMessage = { title: string; body: string; url: string };
-
-/** VAPID の鍵と連絡先。値は .env から渡し、リポジトリには書かない。 */
-export type VapidConfig = { publicKey: string; privateKey: string; subject: string };
 
 /** 1 件の結果。`gone` は、購読が無効になった(プッシュサービスが 404 か 410 を返した)。 */
 export type SendOutcome = "sent" | "gone" | "failed";
@@ -39,21 +37,32 @@ export const TEST_TTL_SECONDS = 10 * 60;
 /** 同時に送る数 */
 const SEND_CONCURRENCY = 10;
 
-/** 環境変数から VAPID の設定を読む。3 つそろっていなければ null(通知を送らない)。 */
-export function readVapid(env: Record<string, string | undefined>): VapidConfig | null {
-  const { VAPID_PUBLIC_KEY: publicKey, VAPID_PRIVATE_KEY: privateKey, VAPID_SUBJECT: subject } = env;
-  if (!publicKey || !privateKey || !subject) return null;
-  return { publicKey, privateKey, subject };
-}
-
-/** web-push で送る。失敗の原因(応答の本文など)は返さず、種類だけにする。 */
-export function webPushSender(vapid: VapidConfig, ttlSeconds: number): PushSender {
+/**
+ * web-push で送る。失敗の原因(応答の本文など)は返さず、種類だけにする。
+ * 秘密鍵は、最初に送るときに読む(送り先がなければ読まない)。読めなければ `VapidKeyUnavailableError` を投げ、
+ * 送信の全体を失敗にする(1 件ごとの失敗には数えない)。
+ */
+export function webPushSender(
+  vapid: VapidSettings,
+  ttlSeconds: number,
+  loadPrivateKey: (name: string) => Promise<string> = loadVapidPrivateKey,
+): PushSender {
   return async (target, payload) => {
+    let privateKey: string;
+    try {
+      privateKey = await loadPrivateKey(vapid.privateKeyParameter);
+    } catch {
+      throw new VapidKeyUnavailableError();
+    }
     try {
       await webpush.sendNotification(
         { endpoint: target.endpoint, keys: { p256dh: target.p256dh, auth: target.auth } },
         payload,
-        { vapidDetails: vapid, TTL: ttlSeconds, timeout: 10_000 },
+        {
+          vapidDetails: { subject: vapid.subject, publicKey: vapid.publicKey, privateKey },
+          TTL: ttlSeconds,
+          timeout: 10_000,
+        },
       );
       return "sent";
     } catch (error) {

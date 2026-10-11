@@ -39,31 +39,60 @@ describe("loadConfig", () => {
     }
   });
 
-  it("通知の鍵を 3 つそろえて指定すると_その値を使い_なければ通知を作らない", () => {
+  it("通知の設定を 3 つそろえて指定すると_その値を使い_なければ通知を作らない", () => {
     const vapid = {
       VAPID_PUBLIC_KEY: "P".repeat(87),
-      VAPID_PRIVATE_KEY: "k".repeat(43),
+      VAPID_PRIVATE_KEY_PARAMETER: "/example/push/vapid-private-key",
       VAPID_SUBJECT: "mailto:admin@example.com",
     };
     expect(loadConfig({ ...valid, ...vapid }).push).toEqual({
       publicKey: vapid.VAPID_PUBLIC_KEY,
-      privateKey: vapid.VAPID_PRIVATE_KEY,
+      privateKeyParameter: vapid.VAPID_PRIVATE_KEY_PARAMETER,
       subject: vapid.VAPID_SUBJECT,
     });
     expect(loadConfig(valid).push).toBeUndefined();
   });
 
-  it("通知の鍵が一部だけ・形が違う_値を出さずに失敗する", () => {
+  it("秘密鍵の値そのものは_設定に取り込まない", () => {
+    const vapid = {
+      VAPID_PUBLIC_KEY: "P".repeat(87),
+      VAPID_PRIVATE_KEY_PARAMETER: "/example/push/vapid-private-key",
+      VAPID_SUBJECT: "mailto:admin@example.com",
+    };
+    const secret = "k".repeat(43);
+    // 以前の変数が残っていても、値は設定のどこにも入らない
+    expect(JSON.stringify(loadConfig({ ...valid, ...vapid, VAPID_PRIVATE_KEY: secret }))).not.toContain(secret);
+    // 秘密鍵の値だけでは、通知の仕組みを作らない(名前がそろわない)
+    expect(() =>
+      loadConfig({
+        ...valid,
+        VAPID_PUBLIC_KEY: vapid.VAPID_PUBLIC_KEY,
+        VAPID_PRIVATE_KEY: secret,
+        VAPID_SUBJECT: vapid.VAPID_SUBJECT,
+      }),
+    ).toThrow(/3 つそろえて/);
+  });
+
+  it("秘密鍵のパラメーターの名前は_/ で始まる階層の名前に限る", () => {
+    const base = { VAPID_PUBLIC_KEY: "P".repeat(87), VAPID_SUBJECT: "mailto:admin@example.com" };
+    for (const bad of ["vapid-private-key", "/", "/example/*", "/example//key", "/example/key/"]) {
+      expect(() => loadConfig({ ...valid, ...base, VAPID_PRIVATE_KEY_PARAMETER: bad }), bad).toThrow(
+        /VAPID_PRIVATE_KEY_PARAMETER/,
+      );
+    }
+  });
+
+  it("通知の設定が一部だけ・形が違う_値を出さずに失敗する", () => {
     expect(() => loadConfig({ ...valid, VAPID_PUBLIC_KEY: "P".repeat(87) })).toThrow(/3 つそろえて/);
-    const secret = "s".repeat(42);
-    const bad = { VAPID_PUBLIC_KEY: "short", VAPID_PRIVATE_KEY: secret, VAPID_SUBJECT: "admin@example.com" };
+    const marker = "marker-parameter-name";
+    const bad = { VAPID_PUBLIC_KEY: "short", VAPID_PRIVATE_KEY_PARAMETER: marker, VAPID_SUBJECT: "admin@example.com" };
     try {
       loadConfig({ ...valid, ...bad });
       expect.unreachable();
     } catch (error) {
       const message = (error as Error).message;
       for (const name of Object.keys(bad)) expect(message).toContain(name);
-      expect(message).not.toContain(secret);
+      expect(message).not.toContain(marker);
       expect(message).not.toContain("short");
     }
   });

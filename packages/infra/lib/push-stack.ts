@@ -14,6 +14,33 @@ import type { InfraConfig, PushConfig } from "./config.ts";
  */
 export const PUSH_SENDER_TABLE_ACTIONS = ["dynamodb:Scan", "dynamodb:DeleteItem"];
 
+/**
+ * 秘密鍵のパラメーターに許す操作。読み出しだけ。
+ * 復号には `aws/ssm`(AWS 管理の鍵)を使う前提で、その鍵のポリシーが、アカウント内から Systems Manager を経た復号を許す。
+ * このため `kms:Decrypt` は付けない(自分で管理する鍵で暗号化したときは、別に許す必要がある。docs/app/infra.md)。
+ */
+export const VAPID_PRIVATE_KEY_ACTIONS = ["ssm:GetParameter"];
+
+/** Lambda に渡す、通知の設定。秘密鍵は値ではなく、パラメーターの名前だけを渡す。 */
+export function vapidEnvironment(push: PushConfig): Record<string, string> {
+  return {
+    VAPID_PUBLIC_KEY: push.publicKey,
+    VAPID_PRIVATE_KEY_PARAMETER: push.privateKeyParameter,
+    VAPID_SUBJECT: push.subject,
+  };
+}
+
+/** 秘密鍵のパラメーター 1 つだけを、Lambda に読ませる。 */
+export function grantReadVapidPrivateKey(fn: lambda.Function, push: PushConfig): void {
+  // 名前は `/` で始まる(config.ts で確かめる)。ARN は `...:parameter/<名前の先頭の / を除いたもの>`
+  const parameterArn = Stack.of(fn).formatArn({
+    service: "ssm",
+    resource: "parameter",
+    resourceName: push.privateKeyParameter.slice(1),
+  });
+  fn.addToRolePolicy(new iam.PolicyStatement({ actions: VAPID_PRIVATE_KEY_ACTIONS, resources: [parameterArn] }));
+}
+
 /** 毎日の送信の時刻(UTC)。日本時間の 20:00 */
 export const PUSH_SCHEDULE = { minute: "0", hour: "11" };
 
@@ -53,14 +80,14 @@ export class PushStack extends Stack {
       environment: {
         NODE_ENV: "production",
         HISTORY_TABLE_NAME: props.historyTable.tableName,
-        VAPID_PUBLIC_KEY: push.publicKey,
-        VAPID_PRIVATE_KEY: push.privateKey,
-        VAPID_SUBJECT: push.subject,
+        ...vapidEnvironment(push),
       },
     });
     this.senderFunction.addToRolePolicy(
       new iam.PolicyStatement({ actions: PUSH_SENDER_TABLE_ACTIONS, resources: [props.historyTable.tableArn] }),
     );
+
+    grantReadVapidPrivateKey(this.senderFunction, push);
 
     new events.Rule(this, "DailySchedule", {
       description: "毎日、プッシュ通知のリマインドを送る",

@@ -1,5 +1,7 @@
-import { describe, expect, it } from "vitest";
-import { DAILY_MESSAGE, type PushTarget, readVapid, sendToAll } from "./send.ts";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import webpush from "web-push";
+import { DAILY_MESSAGE, type PushTarget, sendToAll, webPushSender } from "./send.ts";
+import { VapidKeyUnavailableError } from "./vapid.ts";
 
 const target = (n: number): PushTarget => ({
   endpoint: `https://fcm.googleapis.com/fcm/send/${n}`,
@@ -28,11 +30,52 @@ describe("sendToAll", () => {
   });
 });
 
-describe("readVapid", () => {
-  it("3 つそろっているときだけ_設定を返す", () => {
-    const env = { VAPID_PUBLIC_KEY: "public", VAPID_PRIVATE_KEY: "private", VAPID_SUBJECT: "mailto:admin@example.com" };
-    expect(readVapid(env)).toEqual({ publicKey: "public", privateKey: "private", subject: "mailto:admin@example.com" });
-    expect(readVapid({ ...env, VAPID_PRIVATE_KEY: "" })).toBeNull();
-    expect(readVapid({})).toBeNull();
+describe("webPushSender", () => {
+  const vapid = {
+    publicKey: "P".repeat(87),
+    privateKeyParameter: "/example/push/vapid-private-key",
+    subject: "mailto:admin@example.com",
+  };
+  // 見本の秘密鍵(実際の鍵ではない)
+  const privateKey = "k".repeat(43);
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+  });
+
+  it("送り先がない_秘密鍵を読まない", async () => {
+    const load = vi.fn(async () => privateKey);
+    expect(await sendToAll([], DAILY_MESSAGE, webPushSender(vapid, 60, load))).toEqual({
+      sent: 0,
+      failed: 0,
+      gone: [],
+    });
+    expect(load).not.toHaveBeenCalled();
+  });
+
+  it("パラメーターの名前で秘密鍵を読み_公開鍵と連絡先と合わせて送る", async () => {
+    const send = vi.spyOn(webpush, "sendNotification").mockResolvedValue({ statusCode: 201, body: "", headers: {} });
+    const load = vi.fn(async () => privateKey);
+    const summary = await sendToAll([target(1), target(2)], DAILY_MESSAGE, webPushSender(vapid, 60, load));
+    expect(summary.sent).toBe(2);
+    expect(load).toHaveBeenCalledWith(vapid.privateKeyParameter);
+    expect(send.mock.calls[0]?.[2]?.vapidDetails).toEqual({
+      subject: vapid.subject,
+      publicKey: vapid.publicKey,
+      privateKey,
+    });
+  });
+
+  it("秘密鍵を読めない_1 件の失敗ではなく_送信の全体を失敗にし_原因を持ち出さない", async () => {
+    const send = vi.spyOn(webpush, "sendNotification");
+    const cause = `AccessDenied: ${vapid.privateKeyParameter}`;
+    const sender = webPushSender(vapid, 60, async () => {
+      throw new Error(cause);
+    });
+    const failure = await sendToAll([target(1)], DAILY_MESSAGE, sender).catch((error: unknown) => error);
+    expect(failure).toBeInstanceOf(VapidKeyUnavailableError);
+    expect(String((failure as Error).message)).not.toContain(cause);
+    expect((failure as Error).cause).toBeUndefined();
+    expect(send).not.toHaveBeenCalled();
   });
 });

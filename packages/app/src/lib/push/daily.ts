@@ -6,11 +6,10 @@ import {
   DAILY_TTL_SECONDS,
   type PushSender,
   type PushTarget,
-  readVapid,
-  type SendSummary,
   sendToAll,
   webPushSender,
 } from "./send.ts";
+import { readVapid, VapidKeyUnavailableError } from "./vapid.ts";
 
 // 毎日のスケジュールで動く Lambda(packages/infra の PushStack)。購読しているすべての端末に、リマインドを送る。
 // Lambda にも載せるため、`@/` を使わない(endpoint.ts を参照)。
@@ -71,7 +70,7 @@ export async function runDaily(deps: {
   client: DocumentSender;
   tableName: string;
   send: PushSender;
-}): Promise<Omit<SendSummary, "gone"> & { gone: number }> {
+}): Promise<DailyResult> {
   const targets = await scanSubscriptions(deps.client, deps.tableName);
   const summary = await sendToAll(targets, DAILY_MESSAGE, deps.send);
   for (const target of summary.gone as StoredTarget[]) {
@@ -88,15 +87,34 @@ export async function runDaily(deps: {
   return { sent: summary.sent, failed: summary.failed, gone: summary.gone.length };
 }
 
+type DailyResult = { sent: number; failed: number; gone: number };
+
+/**
+ * 毎日の通知を送り、結果をログに記録する。記録するのは数だけ(endpoint は個人に紐づくため、ログに出さない)。
+ * 秘密鍵を読めないときは、数ではなく、その種類だけを記録して失敗にする(値も原因も出さない)。
+ */
+export async function runDailyAndLog(
+  deps: Parameters<typeof runDaily>[0],
+  log: (line: string) => void = (line) => console.log(line),
+): Promise<DailyResult> {
+  let result: DailyResult;
+  try {
+    result = await runDaily(deps);
+  } catch (error) {
+    if (!(error instanceof VapidKeyUnavailableError)) throw error;
+    log(JSON.stringify({ message: "daily push", error: "vapid-key-unavailable" }));
+    throw new VapidKeyUnavailableError();
+  }
+  log(JSON.stringify({ message: "daily push", ...result }));
+  return result;
+}
+
 /** Lambda の入り口。設定がなければ失敗にする(アラームやログで気付けるように)。 */
-export async function handler(): Promise<{ sent: number; failed: number; gone: number }> {
+export async function handler(): Promise<DailyResult> {
   const vapid = readVapid(process.env);
   const { HISTORY_TABLE_NAME: tableName, AWS_REGION: region } = process.env;
   if (!vapid || !tableName || !region)
     throw new Error("通知の設定(VAPID_* / HISTORY_TABLE_NAME / AWS_REGION)がありません。");
   const client = DynamoDBDocumentClient.from(new DynamoDBClient({ region }));
-  const result = await runDaily({ client, tableName, send: webPushSender(vapid, DAILY_TTL_SECONDS) });
-  // 数だけを記録する(endpoint は個人に紐づくため、ログに出さない)
-  console.log(JSON.stringify({ message: "daily push", ...result }));
-  return result;
+  return runDailyAndLog({ client, tableName, send: webPushSender(vapid, DAILY_TTL_SECONDS) });
 }

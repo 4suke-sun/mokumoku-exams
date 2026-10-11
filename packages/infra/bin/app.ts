@@ -26,7 +26,7 @@ new WebStack(app, `${config.stackPrefix}-web`, {
   userPoolArn: auth.userPool.userPoolArn,
   historyTable: data.table,
 });
-// 通知の鍵(VAPID_*)を設定したときだけ、毎日の送信の仕組みを作る
+// 通知の設定(VAPID_*)をそろえたときだけ、毎日の送信の仕組みを作る
 if (config.push) {
   new PushStack(app, `${config.stackPrefix}-push`, {
     env,

@@ -18,6 +18,7 @@ import type { Construct } from "constructs";
 import { USER_ADMIN_ACTIONS } from "./auth-stack.ts";
 import type { InfraConfig } from "./config.ts";
 import { HISTORY_TABLE_ACTIONS } from "./data-stack.ts";
+import { grantReadVapidPrivateKey, vapidEnvironment } from "./push-stack.ts";
 
 /** アプリがオリジンの合言葉を確かめるヘッダー名(packages/app/src/lib/origin-verify.ts と同じ) */
 export const ORIGIN_VERIFY_HEADER = "x-origin-verify";
@@ -90,13 +91,7 @@ export class WebStack extends Stack {
         HISTORY_TABLE_NAME: props.historyTable.tableName,
         // 設定したときだけ渡す。sitemap の絶対 URL と、通知(購読の公開鍵と、テスト通知の送信)に使う
         ...(config.siteUrl ? { SITE_URL: config.siteUrl } : {}),
-        ...(config.push
-          ? {
-              VAPID_PUBLIC_KEY: config.push.publicKey,
-              VAPID_PRIVATE_KEY: config.push.privateKey,
-              VAPID_SUBJECT: config.push.subject,
-            }
-          : {}),
+        ...(config.push ? vapidEnvironment(config.push) : {}),
       },
     });
     // 履歴のテーブルに対して、必要な操作だけを許す(スキャンやテーブルの管理はできない)
@@ -107,6 +102,9 @@ export class WebStack extends Stack {
     appFunction.addToRolePolicy(
       new iam.PolicyStatement({ actions: USER_ADMIN_ACTIONS, resources: [props.userPoolArn] }),
     );
+
+    // テスト通知の送信に使う秘密鍵は、そのパラメーター 1 つだけを読める
+    if (config.push) grantReadVapidPrivateKey(appFunction, config.push);
 
     // Function URL は認証なし。CloudFront が付ける合言葉のヘッダーを、アプリが確かめて、直接のアクセスを断る
     const functionUrl = appFunction.addFunctionUrl({ authType: lambda.FunctionUrlAuthType.NONE });
