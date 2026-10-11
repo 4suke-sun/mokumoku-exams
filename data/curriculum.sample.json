@@ -32,7 +32,24 @@
         {
           "id": "plan",
           "title": "順序立てて進める",
-          "body": "動作確認用の架空の教材です。\n\n## 最初に行うこと\n\n物事を進めるときは、まず**目的**をはっきりさせます。目的が決まると、やることの順番を決めやすくなります。"
+          "body": "動作確認用の架空の教材です。\n\n## 最初に行うこと\n\n物事を進めるときは、まず**目的**をはっきりさせます。目的が決まると、やることの順番を決めやすくなります。",
+          "diagram": {
+            "title": "物事を進める流れ(動作確認用の架空の図)",
+            "nodes": [
+              { "id": "goal", "label": "目的を決める" },
+              { "id": "steps", "label": "手順を並べる" },
+              { "id": "tools", "label": "必要な物をそろえる" },
+              { "id": "do", "label": "進める" },
+              { "id": "review", "label": "振り返る" }
+            ],
+            "edges": [
+              { "from": "goal", "to": "steps", "label": "先に" },
+              { "from": "goal", "to": "tools", "label": "あわせて" },
+              { "from": "steps", "to": "do" },
+              { "from": "tools", "to": "do" },
+              { "from": "do", "to": "review", "label": "終わったら" }
+            ]
+          }
         },
         {
           "id": "retrospective",

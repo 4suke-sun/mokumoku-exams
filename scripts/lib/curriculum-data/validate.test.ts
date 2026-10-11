@@ -17,6 +17,22 @@ const unit = (over: Record<string, unknown> = {}) => ({
   questionIds: ["SAMPLE-0001"],
   ...over,
 });
+const diagram = (over: Record<string, unknown> = {}) => ({
+  title: "流れ",
+  nodes: [
+    { id: "a", label: "始め" },
+    { id: "b", label: "途中" },
+    { id: "c", label: "終わり" },
+  ],
+  edges: [
+    { from: "a", to: "b", label: "次に" },
+    { from: "b", to: "c" },
+    { from: "a", to: "c" },
+  ],
+  ...over,
+});
+const withDiagram = (over: Record<string, unknown> = {}) =>
+  files(curriculum([unit({ sections: [section({ diagram: diagram(over) })] })]));
 const curriculum = (units: unknown[] = [unit()], examCode = "SAMPLE") => ({ examCode, units });
 const files = (data: unknown = curriculum(), name = "curriculum.sample.json") => [{ name, data }];
 
@@ -95,9 +111,83 @@ describe("validateCurriculumData", () => {
     ]);
   });
 
+  it("節の図解_正しい図は指摘なし(図は任意)", () => {
+    expect(validateCurriculumData(withDiagram(), context)).toEqual([]);
+  });
+
+  it("図解の箱の ID の重複・図にない箱への矢印_場所と種類だけを報告する", () => {
+    const nodes = [
+      { id: "a", label: "始め" },
+      { id: "a", label: "重複" },
+    ];
+    expect(validateCurriculumData(withDiagram({ nodes, edges: [{ from: "a", to: "a" }] }), context)).toEqual([
+      "curriculum.sample.json: units[0].sections[0].diagram.nodes[1].id: 図の箱の ID が重複しています",
+      "curriculum.sample.json: units[0].sections[0].diagram.edges[0]: 自分自身への矢印は置けません",
+    ]);
+    expect(validateCurriculumData(withDiagram({ edges: [{ from: "a", to: "x" }] }), context)).toEqual([
+      "curriculum.sample.json: units[0].sections[0].diagram.edges[0].to: 図にない箱を指しています",
+    ]);
+  });
+
+  it("図解の同じ向きの矢印の重複・閉路_指摘する", () => {
+    const dup = [
+      { from: "a", to: "b" },
+      { from: "a", to: "b", label: "重複" },
+    ];
+    expect(validateCurriculumData(withDiagram({ edges: dup }), context)).toEqual([
+      "curriculum.sample.json: units[0].sections[0].diagram.edges[1]: 同じ向きの矢印が重複しています",
+    ]);
+    const cycle = [
+      { from: "a", to: "b" },
+      { from: "b", to: "c" },
+      { from: "c", to: "a" },
+    ];
+    expect(validateCurriculumData(withDiagram({ edges: cycle }), context)).toEqual([
+      "curriculum.sample.json: units[0].sections[0].diagram.edges: 矢印が一周して戻る形(閉路)になっています",
+    ]);
+    // 逆向きの 2 本も閉路
+    const back = [
+      { from: "a", to: "b" },
+      { from: "b", to: "a" },
+    ];
+    expect(validateCurriculumData(withDiagram({ edges: back }), context)).toHaveLength(1);
+  });
+
+  it("図解の必須の項目がない・空・長すぎる・未知の項目_指摘する", () => {
+    expect(validateCurriculumData(withDiagram({ title: " " }), context)).toHaveLength(1);
+    expect(validateCurriculumData(withDiagram({ nodes: [{ id: "a", label: "始め" }] }), context)).not.toEqual([]);
+    expect(validateCurriculumData(withDiagram({ edges: [] }), context)).toHaveLength(1);
+    expect(validateCurriculumData(withDiagram({ extra: 1 }), context)).toHaveLength(1);
+    const longLabel = [{ from: "a", to: "b", label: "あ".repeat(13) }];
+    expect(validateCurriculumData(withDiagram({ edges: longLabel }), context)).toHaveLength(1);
+    const nodes = (first: Record<string, unknown>) => [
+      { id: "a", label: "始め", ...first },
+      { id: "b", label: "途中" },
+    ];
+    expect(
+      validateCurriculumData(withDiagram({ nodes: nodes({ id: "A" }), edges: [{ from: "b", to: "a" }] }), context),
+    ).toEqual([
+      "curriculum.sample.json: units[0].sections[0].diagram.nodes[0].id: 形式が違います",
+      "curriculum.sample.json: units[0].sections[0].diagram.edges[0].to: 図にない箱を指しています",
+    ]);
+    expect(
+      validateCurriculumData(
+        withDiagram({ nodes: nodes({ label: "あ".repeat(21) }), edges: [{ from: "a", to: "b" }] }),
+        context,
+      ),
+    ).toHaveLength(1);
+  });
+
   it("報告に入力の値を含めない", () => {
     const marker = "目印XYZ";
-    const data = curriculum([unit({ title: 1, sections: [section({ id: marker })], questionIds: [marker] })]);
+    const marked = diagram({ edges: [{ from: marker, to: "a" }] });
+    const data = curriculum([
+      unit({
+        title: 1,
+        sections: [section({ id: marker }), section({ id: "two", diagram: marked })],
+        questionIds: [marker],
+      }),
+    ]);
     const errors = validateCurriculumData(files(data), context);
     expect(errors.length).toBeGreaterThan(0);
     expect(errors.join("\n")).not.toContain(marker);

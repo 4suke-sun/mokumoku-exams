@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { DiagramView } from "@/components/diagram.tsx";
 import { RichText } from "@/components/rich-text.tsx";
 import { StudyStart } from "@/components/study-start.tsx";
 import { loadCurriculum } from "@/lib/curriculum-data.ts";
@@ -66,6 +67,7 @@ export default async function StudyUnitPage({ params }: Props) {
             {section.title}
           </h2>
           <RichText text={section.body} />
+          {section.diagram ? <DiagramView diagram={section.diagram} id={`${section.id}-diagram`} /> : null}
         </section>
       ))}
 
