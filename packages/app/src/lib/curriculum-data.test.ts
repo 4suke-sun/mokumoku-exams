@@ -16,6 +16,11 @@ describe("カリキュラムの読み込み", () => {
     expect(sortUnits([unit("c", 3), unit("a", 1), unit("b", 2)]).map((u) => u.id)).toEqual(["a", "b", "c"]);
   });
 
+  it("段階_単元の中で順番の小さい順に並べる", () => {
+    const stages = [3, 1, 2].map((order) => ({ order, questionIds: ["SAMPLE-0001"] }));
+    expect(sortUnits([{ ...unit("a", 1), stages }])[0]?.stages?.map((s) => s.order)).toEqual([1, 2, 3]);
+  });
+
   it("サンプル資格_カリキュラムの単元を返す", async () => {
     const exam = findPublishedExam("SAMPLE");
     if (!exam) throw new Error("サンプル資格がありません");

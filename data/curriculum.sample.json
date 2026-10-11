@@ -5,6 +5,11 @@
       "id": "basics",
       "title": "身の回りの基礎の用語",
       "order": 1,
+      "summary": [
+        "信号機の青(緑)は、進んでよいことを表す",
+        "りんごやみかんは**果物**、にんじんやキャベツは**野菜**",
+        "1 週間は 7 日(`days = 7`)"
+      ],
       "sections": [
         {
           "id": "signal",
@@ -22,12 +27,17 @@
           "body": "1 週間は 7 日です。設定のファイルでは、次のように書くことがあります。\n\n```\nunit = \"week\"\ndays = 7\n```\n\n`days` のような値の名前は、意味が伝わるものにします。"
         }
       ],
-      "questionIds": ["SAMPLE-0001", "SAMPLE-0002", "SAMPLE-0003"]
+      "questionIds": ["SAMPLE-0001", "SAMPLE-0002", "SAMPLE-0003"],
+      "stages": [
+        { "order": 1, "questionIds": ["SAMPLE-0001"] },
+        { "order": 2, "questionIds": ["SAMPLE-0002", "SAMPLE-0003"] }
+      ]
     },
     {
       "id": "thinking",
       "title": "物事の進め方",
       "order": 2,
+      "summary": ["最初に**目的**をはっきりさせる", "振り返りでは、うまくいったことと次に変えることを確かめる"],
       "sections": [
         {
           "id": "plan",
@@ -57,7 +67,8 @@
           "body": "終わったあとは、次の 2 つを確かめます。\n\n- うまくいったこと\n- 次に変えること\n\n振り返りの結果は、次の計画に生かします。"
         }
       ],
-      "questionIds": ["SAMPLE-0004", "SAMPLE-0005"]
+      "questionIds": ["SAMPLE-0004", "SAMPLE-0005"],
+      "stages": [{ "order": 1, "questionIds": ["SAMPLE-0004"] }, { "order": 2, "questionIds": ["SAMPLE-0005"] }]
     }
   ]
 }

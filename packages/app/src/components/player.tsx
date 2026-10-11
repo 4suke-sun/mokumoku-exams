@@ -7,8 +7,17 @@ import { EmptyState } from "@/components/empty-state.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
 import { postServerResult } from "@/lib/history/client.ts";
 import { type QuizKeyAction, quizKeyAction } from "@/lib/keyboard.ts";
-import { answerFor, orderChoices, sortKeys } from "@/lib/quiz.ts";
-import { browserStore, clearSession, loadSession, type Session, saveResult, saveSession } from "@/lib/storage.ts";
+import { answerFor, orderChoices, score, sortKeys } from "@/lib/quiz.ts";
+import {
+  browserStore,
+  clearSession,
+  loadSession,
+  type Session,
+  saveResult,
+  saveSession,
+  saveStageCheck,
+} from "@/lib/storage.ts";
+import { isStagePassed } from "@/lib/study-stages.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 
 type Props = { exam: PublishedExam; questions: Question[] };
@@ -123,6 +132,17 @@ export function Player({ exam, questions }: Props) {
         // 結果を残せないときは、回答を消さずに、この画面にとどまる
         setSaveFailed(true);
         return;
+      }
+      if (session.stage) {
+        // 段階の確認問題: 正答率で合否を決め、到達の状態を端末に残す(残せなくても、結果は保存済みなので先へ進む)
+        const answered = session.questionIds.flatMap((id) => byId.get(id) ?? []);
+        const { percent } = score(answered, session.answers);
+        saveStageCheck(browserStore(), exam.examCode, {
+          ...session.stage,
+          percent,
+          passed: isStagePassed(percent),
+          finishedAt: result.finishedAt,
+        });
       }
       clearSession(browserStore(), exam.examCode);
       router.push(`/exams/${exam.examCode}/result`);

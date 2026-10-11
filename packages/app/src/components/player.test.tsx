@@ -2,7 +2,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { browserStore, loadResults, saveSession } from "@/lib/storage.ts";
+import { browserStore, loadResults, loadStageProgress, passedStages, saveSession } from "@/lib/storage.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 import { Player } from "./player.tsx";
 
@@ -171,5 +171,50 @@ describe("Player のキー操作", () => {
   it("画面に_キー操作の案内を表示する", async () => {
     render(<Player exam={exam} questions={questions} />);
     expect(await screen.findByText(/キー操作: A〜C で選ぶ/)).toBeTruthy();
+  });
+});
+
+describe("Player の段階の確認問題", () => {
+  function startStage() {
+    saveSession(browserStore(), {
+      examCode: "TEST",
+      questionIds: questions.map((q) => q.questionId),
+      answers: {},
+      index: 0,
+      startedAt: "2026-10-10T00:00:00.000Z",
+      stage: { unitId: "basics", order: 2 },
+    });
+  }
+
+  async function answer(keys: [string, string]) {
+    render(<Player exam={exam} questions={questions} />);
+    const user = userEvent.setup();
+    await screen.findByText("問題文 1");
+    await user.keyboard(`${keys[0]}{Enter}`);
+    await screen.findByText("問題文 2");
+    await user.keyboard(`${keys[1]}{Enter}`);
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
+  }
+
+  it("正答率が 80% 以上_その段階を合格済みにする", async () => {
+    startStage();
+    await answer(["a", "b"]);
+    const progress = loadStageProgress(browserStore(), "TEST");
+    expect(passedStages(progress, "basics")).toEqual([2]);
+    expect(progress.last).toMatchObject({ unitId: "basics", order: 2, percent: 100, passed: true });
+    expect(progress.last?.finishedAt).toBe(loadResults(browserStore(), "TEST")[0]?.finishedAt);
+  });
+
+  it("正答率が 80% 未満_合格済みにしない", async () => {
+    startStage();
+    await answer(["a", "a"]);
+    const progress = loadStageProgress(browserStore(), "TEST");
+    expect(passedStages(progress, "basics")).toEqual([]);
+    expect(progress.last).toMatchObject({ percent: 50, passed: false });
+  });
+
+  it("段階の確認ではない出題_到達の状態を変えない", async () => {
+    await answer(["a", "b"]);
+    expect(loadStageProgress(browserStore(), "TEST")).toEqual({ examCode: "TEST", passed: {} });
   });
 });

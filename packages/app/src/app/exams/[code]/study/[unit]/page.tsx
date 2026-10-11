@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { DiagramView } from "@/components/diagram.tsx";
 import { RichText } from "@/components/rich-text.tsx";
 import { StudyStart } from "@/components/study-start.tsx";
+import { UnitSummary } from "@/components/unit-summary.tsx";
 import { loadCurriculum } from "@/lib/curriculum-data.ts";
 import { findPublishedExam, listPublishedExams, loadQuestions } from "@/lib/exam-data.ts";
 import type { PublishedExam } from "@/lib/types.ts";
@@ -41,10 +42,15 @@ export default async function StudyUnitPage({ params }: Props) {
 
   // 出題に必要な情報だけを渡す。いまの問題データにない問題は除く(検査で落ちるため、通常は起きない)
   const byId = new Map(questions.map((q) => [q.questionId, q]));
-  const items = unit.questionIds.flatMap((id) => {
-    const question = byId.get(id);
-    return question ? [{ questionId: id, choiceKeys: question.choices.map((c) => c.key) }] : [];
-  });
+  const toItems = (ids: readonly string[]) =>
+    ids.flatMap((id) => {
+      const question = byId.get(id);
+      return question ? [{ questionId: id, choiceKeys: question.choices.map((c) => c.key) }] : [];
+    });
+  const items = toItems(unit.questionIds);
+  const stages = unit.stages
+    ? { unitId: unit.id, list: unit.stages.map((stage) => ({ order: stage.order, items: toItems(stage.questionIds) })) }
+    : undefined;
 
   return (
     <article className="space-y-8">
@@ -55,6 +61,8 @@ export default async function StudyUnitPage({ params }: Props) {
         <h1 className="text-2xl font-bold">{unit.title}</h1>
         <p className="text-sm text-muted">{exam.name}</p>
       </div>
+
+      <UnitSummary summary={unit.summary} />
 
       {unit.sections.map((section) => (
         <section
@@ -71,7 +79,7 @@ export default async function StudyUnitPage({ params }: Props) {
         </section>
       ))}
 
-      <StudyStart examCode={exam.examCode} items={items} />
+      <StudyStart examCode={exam.examCode} items={items} stages={stages} />
     </article>
   );
 }

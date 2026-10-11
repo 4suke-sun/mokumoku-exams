@@ -99,16 +99,27 @@ export const CurriculumSectionSchema = z.strictObject({
   diagram: DiagramSchema.optional(),
 });
 
-/** 単元: 順に読む節と、関連する問題。 */
+/** 段階: 単元の中で順に積み上げる区切り。確認問題に合格すると、次の段階へ進める。 */
+export const CurriculumStageSchema = z.strictObject({
+  /** 段階の順番。小さい順に進む */
+  order: z.int().positive().max(100),
+  /** 段階の確認問題(この順に出題する) */
+  questionIds: z.array(z.string().regex(QUESTION_ID)).min(1).max(100),
+});
+
+/** 単元: 順に読む節と、関連する問題。要約と段階は任意。 */
 export const CurriculumUnitSchema = z
   .strictObject({
     id: z.string().regex(ID, ID_MESSAGE),
     title: text.max(80),
     /** 表示の順番。小さい順に並べる */
     order: z.int().positive(),
+    /** 単元の要約(短い箇条書き。1 項目が 1 行) */
+    summary: z.array(text.max(200)).min(1).max(10).optional(),
     sections: z.array(CurriculumSectionSchema).min(1).max(50),
     /** 「この単元の問題を解く」で出題する問題 */
     questionIds: z.array(z.string().regex(QUESTION_ID)).min(1).max(500),
+    stages: z.array(CurriculumStageSchema).min(1).max(20).optional(),
   })
   .superRefine((unit, ctx) => {
     const sections = new Set<string>();
@@ -124,6 +135,24 @@ export const CurriculumUnitSchema = z
         ctx.addIssue({ code: "custom", path: ["questionIds", i], message: "問題の ID が重複しています" });
       }
       questions.add(id);
+    });
+    const stageOrders = new Set<number>();
+    unit.stages?.forEach((stage, i) => {
+      if (stageOrders.has(stage.order)) {
+        ctx.addIssue({ code: "custom", path: ["stages", i, "order"], message: "段階の順番が重複しています" });
+      }
+      stageOrders.add(stage.order);
+      const stageQuestions = new Set<string>();
+      stage.questionIds.forEach((id, j) => {
+        if (stageQuestions.has(id)) {
+          ctx.addIssue({
+            code: "custom",
+            path: ["stages", i, "questionIds", j],
+            message: "問題の ID が重複しています",
+          });
+        }
+        stageQuestions.add(id);
+      });
     });
   });
 
@@ -153,10 +182,22 @@ export const CurriculumFileSchema = z
           });
         }
       });
+      unit.stages?.forEach((stage, k) => {
+        stage.questionIds.forEach((id, j) => {
+          if (!id.startsWith(`${file.examCode}-`)) {
+            ctx.addIssue({
+              code: "custom",
+              path: ["units", i, "stages", k, "questionIds", j],
+              message: "問題の ID の接頭辞が資格コードと一致しません",
+            });
+          }
+        });
+      });
     });
   });
 
 export type Diagram = z.infer<typeof DiagramSchema>;
 export type CurriculumSection = z.infer<typeof CurriculumSectionSchema>;
+export type CurriculumStage = z.infer<typeof CurriculumStageSchema>;
 export type CurriculumUnit = z.infer<typeof CurriculumUnitSchema>;
 export type CurriculumFile = z.infer<typeof CurriculumFileSchema>;
