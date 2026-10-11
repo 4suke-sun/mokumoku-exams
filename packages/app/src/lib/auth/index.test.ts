@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { FAKE_USER_PHRASE } from "./fake.ts";
-import { getAuthProvider, getTokenVerifier } from "./index.ts";
+import { FAKE_INVITED_PHRASE, FAKE_USER_PHRASE } from "./fake.ts";
+import { getAuthProvider, getTokenVerifier, getUserAdmin } from "./index.ts";
 
 describe("getAuthProvider", () => {
   it("本番の設定では_AUTH_FAKE があっても代替を使わず_設定が足りなければ失敗する", () => {
@@ -39,5 +39,32 @@ describe("getTokenVerifier", () => {
     });
     const unsigned = `${Buffer.from('{"alg":"none"}').toString("base64url")}.${Buffer.from('{"sub":"a"}').toString("base64url")}.`;
     expect(await verifier.verifyIdToken(unsigned)).toBeNull();
+  });
+});
+
+describe("getUserAdmin", () => {
+  it("本番の設定では_AUTH_FAKE があっても代替を使わず_設定が足りなければ失敗する", () => {
+    expect(() => getUserAdmin({ NODE_ENV: "production", AUTH_FAKE: "1" })).toThrow();
+  });
+
+  it("設定が揃っていれば_Cognito の実装を返す", () => {
+    expect(
+      getUserAdmin({ NODE_ENV: "production", COGNITO_USER_POOL_ID: "us-east-1_Example", AWS_REGION: "us-east-1" }),
+    ).toBeDefined();
+  });
+
+  it("手元の開発で AUTH_FAKE=1 のとき_代替の認証と同じ利用者の一覧を操作する", async () => {
+    const env = { NODE_ENV: "development", AUTH_FAKE: "1" } as const;
+    const users = getUserAdmin(env);
+    const email = "index-invited@example.com";
+    const invited = await users.inviteUser(email);
+    // 招待した利用者は、仮パスワードでログインすると、新しいパスワードを決める入力に進む
+    expect(await getAuthProvider(env).signIn(email, FAKE_INVITED_PHRASE)).toMatchObject({
+      kind: "new-password-required",
+    });
+    await users.disableUser(invited.username);
+    await expect(getAuthProvider(env).signIn(email, FAKE_INVITED_PHRASE)).rejects.toMatchObject({
+      code: "invalid-credentials",
+    });
   });
 });

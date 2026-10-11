@@ -386,6 +386,15 @@ exports[`WebStack > 合成すると_スナップショットと一致する 1`] 
                 "Fn::ImportValue": "Data:ExportsOutputFnGetAttHistoryTable24A0CCCBArnCEF54BD1",
               },
             },
+            {
+              "Action": [
+                "cognito-idp:ListUsers",
+                "cognito-idp:AdminCreateUser",
+                "cognito-idp:AdminDisableUser",
+              ],
+              "Effect": "Allow",
+              "Resource": "arn:aws:cognito-idp:us-east-1:123456789012:userpool/pool-example",
+            },
           ],
           "Version": "2012-10-17",
         },

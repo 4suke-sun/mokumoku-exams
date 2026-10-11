@@ -5,16 +5,26 @@ import { headers } from "next/headers";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import AdminLayout from "@/app/admin/layout.tsx";
+import * as adminDisableRoute from "@/app/api/admin/users/disable/route.ts";
+import * as adminUsersRoute from "@/app/api/admin/users/route.ts";
 import * as changePasswordRoute from "@/app/api/auth/change-password/route.ts";
 import * as bookmarksRoute from "@/app/api/history/bookmarks/route.ts";
 import * as daysRoute from "@/app/api/history/days/route.ts";
 import * as goalRoute from "@/app/api/history/goal/route.ts";
 import * as historyRoute from "@/app/api/history/results/route.ts";
 import * as reviewRoute from "@/app/api/history/review/route.ts";
+import type { AuditEntry } from "@/lib/admin/audit.ts";
 import { isAdminPath } from "@/lib/auth/admin.ts";
-import { FAKE_ADMIN_EMAIL, FAKE_ADMIN_PHRASE, FAKE_USER_EMAIL, FAKE_USER_PHRASE } from "@/lib/auth/fake.ts";
+import {
+  FAKE_ADMIN_EMAIL,
+  FAKE_ADMIN_PHRASE,
+  FAKE_INVITED_EMAIL,
+  FAKE_USER_EMAIL,
+  FAKE_USER_PHRASE,
+  fakeSub,
+} from "@/lib/auth/fake.ts";
 import { isPublicPath, PUBLIC_AUTH_API_PATHS } from "@/lib/auth/guard.ts";
-import { getAuthProvider } from "@/lib/auth/index.ts";
+import { getAuthProvider, getUserAdmin } from "@/lib/auth/index.ts";
 import { withTokenCookies } from "@/lib/auth/session.ts";
 import { SUB_PATTERN } from "@/lib/auth/verify.ts";
 import { proxy } from "./proxy.ts";
@@ -64,6 +74,8 @@ const PROTECTED_PAGES = [
 ];
 /** 保護される画面のうち、管理者だけが開けるもの */
 const ADMIN_PAGES = ["/admin"];
+/** 保護される API のうち、管理者だけが呼べるもの */
+const ADMIN_APIS = ["/api/admin/users", "/api/admin/users/disable"];
 const PUBLIC_APIS = [
   "/api/auth/forgot-password",
   "/api/auth/login",
@@ -74,6 +86,8 @@ const PUBLIC_APIS = [
   "/api/auth/session",
 ];
 const PROTECTED_APIS = [
+  "/api/admin/users",
+  "/api/admin/users/disable",
   "/api/auth/change-password",
   "/api/history/bookmarks",
   "/api/history/days",
@@ -108,10 +122,11 @@ describe("経路の一覧", () => {
     expect(new Set(PUBLIC_AUTH_API_PATHS)).toEqual(new Set(PUBLIC_APIS));
   });
 
-  it("管理者の経路_一覧に挙げた画面だけで_ほかの画面と API は含まない", () => {
+  it("管理者の経路_一覧に挙げた画面と API だけで_ほかの画面と API は含まない", () => {
     const allPaths = [...routesOf("page.tsx"), ...routesOf("route.ts")];
-    expect(allPaths.filter((path) => isAdminPath(path)).sort()).toEqual(ADMIN_PAGES);
+    expect(allPaths.filter((path) => isAdminPath(path)).sort()).toEqual([...ADMIN_PAGES, ...ADMIN_APIS].sort());
     for (const path of ADMIN_PAGES) expect(PROTECTED_PAGES).toContain(path);
+    for (const path of ADMIN_APIS) expect(PROTECTED_APIS).toContain(path);
   });
 
   it("保護される API_公開の一覧に似た経路でも_公開にならない", () => {
@@ -207,6 +222,8 @@ describe("認可: 未ログインの拒否", () => {
     expect(methods(daysRoute)).toEqual(["GET"]);
     expect(methods(goalRoute).sort()).toEqual(["GET", "PUT"]);
     expect(methods(changePasswordRoute)).toEqual(["POST"]);
+    expect(methods(adminUsersRoute).sort()).toEqual(["GET", "POST"]);
+    expect(methods(adminDisableRoute)).toEqual(["POST"]);
   });
 });
 
@@ -358,9 +375,14 @@ describe("認可: 他人のデータに触れない", () => {
   });
 });
 
+type FakeState = { __mokumokuFakeAuth?: unknown; __mokumokuFakeAudit?: { entries: AuditEntry[] } };
+
 describe("認可: 管理者だけが開ける", () => {
   beforeEach(() => {
     vi.stubEnv("AUTH_FAKE", "1");
+    // 招待・無効化で変わる代替の利用者の一覧と、操作の記録を、テストごとに作り直す
+    delete (globalThis as FakeState).__mokumokuFakeAuth;
+    delete (globalThis as FakeState).__mokumokuFakeAudit;
   });
   afterEach(() => {
     vi.unstubAllEnvs();
@@ -434,5 +456,72 @@ describe("認可: 管理者だけが開ける", () => {
     vi.stubEnv("COGNITO_USER_POOL_ID", "");
     vi.mocked(headers).mockResolvedValue(new Headers({ cookie }) as never);
     await expect(AdminLayout({ children: "管理者の画面" })).rejects.toThrow("NEXT_REDIRECT");
+  });
+  const auditEntries = () => (globalThis as FakeState).__mokumokuFakeAudit?.entries ?? [];
+  const listedUsers = () => getUserAdmin().listUsers();
+  const invite = (cookie: string | undefined, body: unknown) =>
+    adminUsersRoute.POST(request("/api/admin/users", { method: "POST", cookie, body }));
+  const disable = (cookie: string | undefined, body: unknown) =>
+    adminDisableRoute.POST(request("/api/admin/users/disable", { method: "POST", cookie, body }));
+
+  it("管理者の API の本体_入口を通らなくても_未ログイン・管理者でない利用者を断り_何も変えない(二重の防御)", async () => {
+    const target = fakeSub(FAKE_INVITED_EMAIL);
+    for (const cookie of [undefined, "mokumoku_id=forged; mokumoku_access=forged", await learner()]) {
+      const label = cookie ? cookie.slice(0, 12) : "none";
+      expect((await adminUsersRoute.GET(request("/api/admin/users", { cookie }))).status, label).toBe(403);
+      expect((await invite(cookie, { email: "someone@example.com" })).status, label).toBe(403);
+      expect((await disable(cookie, { username: target })).status, label).toBe(403);
+    }
+    const users = await listedUsers();
+    expect(users.map((u) => u.email)).not.toContain("someone@example.com");
+    expect(users.find((u) => u.username === target)?.enabled).toBe(true);
+    expect(auditEntries()).toEqual([]);
+  });
+
+  it("管理者の API_管理者は一覧・招待・無効化ができ_操作の記録に検証した管理者の sub が残る", async () => {
+    const cookie = await admin();
+    const listed = await adminUsersRoute.GET(request("/api/admin/users", { cookie }));
+    expect(listed.status).toBe(200);
+    const { users } = (await listed.json()) as { users: { email: string; self: boolean }[] };
+    expect(users.find((u) => u.email === FAKE_ADMIN_EMAIL)?.self).toBe(true);
+
+    expect((await invite(cookie, { email: "someone@example.com" })).status).toBe(200);
+    // 招待した利用者は、初回ログインで新しいパスワードを決める入力に進む
+    expect((await listedUsers()).find((u) => u.email === "someone@example.com")?.status).toBe("FORCE_CHANGE_PASSWORD");
+
+    const target = fakeSub(FAKE_USER_EMAIL);
+    expect((await disable(cookie, { username: target })).status).toBe(200);
+    await expect(getAuthProvider().signIn(FAKE_USER_EMAIL, FAKE_USER_PHRASE)).rejects.toMatchObject({
+      code: "invalid-credentials",
+    });
+    expect(auditEntries()).toEqual([
+      { at: expect.any(String), actor: fakeSub(FAKE_ADMIN_EMAIL), target, action: "disable-user" },
+    ]);
+  });
+
+  it("管理者の API_利用者の識別子をリクエストから受け取らない_自分自身は無効にできない", async () => {
+    const cookie = await admin();
+    for (const key of ["sub", "userId", "actor", "PK"]) {
+      const response = await adminUsersRoute.GET(request(`/api/admin/users?${key}=other-user`, { cookie }));
+      expect(response.status, key).toBe(400);
+      expect((await invite(cookie, { email: "someone@example.com", [key]: "other-user" })).status, key).toBe(400);
+      expect((await disable(cookie, { username: fakeSub(FAKE_USER_EMAIL), [key]: "other-user" })).status, key).toBe(
+        400,
+      );
+    }
+    // ヘッダーで別の管理者を名乗っても、記録には検証した管理者の sub が入る
+    const withHeaders = new NextRequest("http://localhost/api/admin/users/disable", {
+      method: "POST",
+      headers: { cookie, "content-type": "application/json", "x-user-id": "other-user", "x-amzn-oidc-subject": "x" },
+      body: JSON.stringify({ username: fakeSub(FAKE_USER_EMAIL) }),
+    });
+    expect((await adminDisableRoute.POST(withHeaders)).status).toBe(200);
+    expect(auditEntries().map((e) => e.actor)).toEqual([fakeSub(FAKE_ADMIN_EMAIL)]);
+
+    const self = await disable(cookie, { username: fakeSub(FAKE_ADMIN_EMAIL) });
+    expect(self.status).toBe(400);
+    expect(await self.json()).toEqual({ error: "self-disable" });
+    expect((await listedUsers()).find((u) => u.email === FAKE_ADMIN_EMAIL)?.enabled).toBe(true);
+    expect(auditEntries()).toHaveLength(1);
   });
 });

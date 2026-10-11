@@ -12,6 +12,7 @@ import * as s3deploy from "aws-cdk-lib/aws-s3-deployment";
 import * as sns from "aws-cdk-lib/aws-sns";
 import * as subscriptions from "aws-cdk-lib/aws-sns-subscriptions";
 import type { Construct } from "constructs";
+import { USER_ADMIN_ACTIONS } from "./auth-stack.ts";
 import type { InfraConfig } from "./config.ts";
 import { HISTORY_TABLE_ACTIONS } from "./data-stack.ts";
 
@@ -34,6 +35,8 @@ type Props = StackProps & {
   userPoolClientId: string;
   /** アプリが ID トークンの検証で使う Cognito のユーザープール ID(AuthStack の出力) */
   userPoolId: string;
+  /** 管理者の画面が管理 API を呼ぶ、Cognito のユーザープールの ARN(AuthStack の出力。権限の対象を限る) */
+  userPoolArn: string;
   /** 履歴を置くテーブル(DataStack の出力) */
   historyTable: dynamodb.ITable;
 };
@@ -87,6 +90,10 @@ export class WebStack extends Stack {
     // 履歴のテーブルに対して、必要な操作だけを許す(スキャンやテーブルの管理はできない)
     appFunction.addToRolePolicy(
       new iam.PolicyStatement({ actions: HISTORY_TABLE_ACTIONS, resources: [props.historyTable.tableArn] }),
+    );
+    // 管理者の画面の、利用者の一覧・招待・無効化だけを、このユーザープールに限って許す
+    appFunction.addToRolePolicy(
+      new iam.PolicyStatement({ actions: USER_ADMIN_ACTIONS, resources: [props.userPoolArn] }),
     );
 
     // Function URL は認証なし。CloudFront が付ける合言葉のヘッダーを、アプリが確かめて、直接のアクセスを断る
