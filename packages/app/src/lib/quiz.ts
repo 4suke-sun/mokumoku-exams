@@ -1,3 +1,4 @@
+import type { Session } from "./storage.ts";
 import type { PublishedExam, Question } from "./types.ts";
 
 type Choice = Question["choices"][number];
@@ -78,6 +79,27 @@ export function shuffleChoiceOrder(
   const order: ChoiceOrder = {};
   for (const item of items) order[item.questionId] = shuffle(item.choiceKeys, random);
   return order;
+}
+
+/**
+ * 出題を始めるときの状態を作る。問題は `items` の順に出題する。
+ * `shuffleChoices` のときは、各問題の選択肢の並びをシャッフルして決める。
+ */
+export function newSession(
+  examCode: string,
+  items: readonly { questionId: string; choiceKeys: readonly string[] }[],
+  options: { shuffleChoices: boolean },
+  random: () => number,
+  now: Date,
+): Session {
+  return {
+    examCode,
+    questionIds: items.map((item) => item.questionId),
+    answers: {},
+    index: 0,
+    startedAt: now.toISOString(),
+    choiceOrder: options.shuffleChoices ? shuffleChoiceOrder(items, random) : undefined,
+  };
 }
 
 /**

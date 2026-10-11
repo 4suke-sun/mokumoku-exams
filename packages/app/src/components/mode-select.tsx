@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useState } from "react";
 import { fetchBookmarks, fetchReview } from "@/lib/history/client.ts";
-import { domainCounts, requestedDomains, sessionProgress, shuffle, shuffleChoiceOrder } from "@/lib/quiz.ts";
+import { domainCounts, newSession, requestedDomains, sessionProgress, shuffle } from "@/lib/quiz.ts";
 import {
   browserStore,
   clearSession,
@@ -19,7 +19,12 @@ import type { PublishedExam } from "@/lib/types.ts";
 
 type PoolItem = { questionId: string; domain: string; choiceKeys: string[] };
 
-type Props = { exam: PublishedExam; pool: PoolItem[] };
+type Props = {
+  exam: PublishedExam;
+  pool: PoolItem[];
+  /** カリキュラムがあり、学習モードを使えるか */
+  studyAvailable?: boolean;
+};
 
 const COUNT_CHOICES = [5, 10, 20, 50];
 
@@ -32,13 +37,23 @@ const TARGETS: { id: Target; name: string; description: string }[] = [
   { id: "bookmarks", name: "ブックマーク", description: "ブックマークした問題から出題します。" },
 ];
 
-const MODES = [
-  { id: "normal", name: "通常出題", description: "分野と問題数を選んで、1 問ずつ解きます。", enabled: true },
-  { id: "official", name: "本番モード", description: "本番と同じ問題数と制限時間で解きます。", enabled: false },
-  { id: "study", name: "学習モード", description: "単元ごとに読んでから解きます。", enabled: false },
-];
+type Mode = { id: string; name: string; description: string; enabled: boolean; href?: string };
 
-export function ModeSelect({ exam, pool }: Props) {
+function modesFor(examCode: string, studyAvailable: boolean): Mode[] {
+  return [
+    { id: "normal", name: "通常出題", description: "分野と問題数を選んで、1 問ずつ解きます。", enabled: true },
+    { id: "official", name: "本番モード", description: "本番と同じ問題数と制限時間で解きます。", enabled: false },
+    {
+      id: "study",
+      name: "学習モード",
+      description: "単元ごとに読んでから解きます。",
+      enabled: studyAvailable,
+      href: `/exams/${examCode}/study`,
+    },
+  ];
+}
+
+export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
   const router = useRouter();
   const countId = useId();
   const [domains, setDomains] = useState<string[]>([]);
@@ -111,26 +126,15 @@ export function ModeSelect({ exam, pool }: Props) {
 
   function start() {
     const targets = domains.length === 0 ? targeted : targeted.filter((p) => domains.includes(p.domain));
-    const questionIds = shuffle(targets, Math.random)
-      .slice(0, effectiveCount)
-      .map((p) => p.questionId);
-    if (questionIds.length === 0) {
+    const picked = shuffle(targets, Math.random).slice(0, effectiveCount);
+    if (picked.length === 0) {
       setError("出題できる問題がありません。出題の対象と分野の選択を見直してください。");
       return;
     }
-    const saved = saveSession(browserStore(), {
-      examCode: exam.examCode,
-      questionIds,
-      answers: {},
-      index: 0,
-      startedAt: new Date().toISOString(),
-      choiceOrder: shuffleChoices
-        ? shuffleChoiceOrder(
-            targets.filter((p) => questionIds.includes(p.questionId)),
-            Math.random,
-          )
-        : undefined,
-    });
+    const saved = saveSession(
+      browserStore(),
+      newSession(exam.examCode, picked, { shuffleChoices }, Math.random, new Date()),
+    );
     if (!saved) {
       setError("この端末では、出題の状態を保存できません。ブラウザの設定を確認してください。");
       return;
@@ -179,12 +183,18 @@ export function ModeSelect({ exam, pool }: Props) {
       <div className="space-y-3">
         <h2 className="text-lg font-bold">モード</h2>
         <ul className="space-y-2">
-          {MODES.map((mode) => (
+          {modesFor(exam.examCode, studyAvailable).map((mode) => (
             <li
               key={mode.id}
               className={`rounded-lg border p-4 ${mode.enabled ? "border-primary bg-surface" : "border-dashed border-line"}`}
             >
-              <span className={`block font-bold ${mode.enabled ? "" : "text-muted"}`}>{mode.name}</span>
+              {mode.enabled && mode.href ? (
+                <Link href={mode.href} className="block font-bold text-primary hover:underline">
+                  {mode.name}
+                </Link>
+              ) : (
+                <span className={`block font-bold ${mode.enabled ? "" : "text-muted"}`}>{mode.name}</span>
+              )}
               <span className="block text-sm text-muted">
                 {mode.description}
                 {mode.enabled ? "" : "(準備中です)"}

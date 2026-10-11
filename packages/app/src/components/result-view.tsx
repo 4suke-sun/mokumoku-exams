@@ -9,6 +9,7 @@ import { ScoreRing } from "@/components/score-ring.tsx";
 import { fetchServerResults, postServerResult } from "@/lib/history/client.ts";
 import { mergeResults, pendingMigration } from "@/lib/history/merge.ts";
 import { answerFor, isCorrect, orderChoices, passLinePercent, score } from "@/lib/quiz.ts";
+import { recentOutcomes } from "@/lib/recent-outcomes.ts";
 import { browserStore, clearResults, loadResults, type Result } from "@/lib/storage.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 
@@ -27,6 +28,26 @@ function formatDate(iso: string): string {
 
 function keysLabel(keys: readonly string[]): string {
   return keys.length === 0 ? "未回答" : keys.join("、");
+}
+
+/** 問題ごとの直近の正誤(新しい順)。 */
+function RecentOutcomeMarks({ outcomes }: { outcomes: readonly boolean[] }) {
+  if (outcomes.length === 0) return null;
+  const label = `直近 ${outcomes.length} 回の正誤(新しい順)`;
+  return (
+    <div className="flex flex-wrap items-center gap-2 text-sm">
+      <span className="text-muted">{label}</span>
+      <ol aria-label={label} className="flex gap-1">
+        {outcomes.map((ok, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: 並びは新しい順で固定
+          <li key={i} className={`font-bold ${ok ? "text-correct" : "text-incorrect"}`}>
+            <span aria-hidden="true">{ok ? "○" : "×"}</span>
+            <span className="sr-only">{ok ? "正解" : "不正解"}</span>
+          </li>
+        ))}
+      </ol>
+    </div>
+  );
 }
 
 export function ResultView({ exam, questions }: Props) {
@@ -94,6 +115,8 @@ export function ResultView({ exam, questions }: Props) {
     return { question, number: i + 1, selected, correct: isCorrect(question, selected) };
   });
   const wrongCount = allRows.filter((row) => !row.correct).length;
+  // 保存した結果(最大 10 回)から、問題ごとの直近の正誤を出す(新しく保存はしない)
+  const outcomes = recentOutcomes(state.results, questions);
   // 見直すときも、元の問題番号を保つ(「問題 3」は、結果の中の 3 問目のまま)
   const rows = wrongOnly ? allRows.filter((row) => !row.correct) : allRows;
   const passLine = passLinePercent(exam);
@@ -173,6 +196,7 @@ export function ResultView({ exam, questions }: Props) {
                 </p>
                 <BookmarkToggle questionId={question.questionId} bookmarks={bookmarks} />
               </div>
+              <RecentOutcomeMarks outcomes={outcomes.get(question.questionId) ?? []} />
               <RichText text={question.questionText} />
               <ul className="space-y-1 text-sm">
                 {orderChoices(question, latest.choiceOrder).map((choice) => {
