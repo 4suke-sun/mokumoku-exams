@@ -3,10 +3,12 @@ import {
   answerFor,
   countPool,
   domainCounts,
+  domainSelectHref,
   isCorrect,
   orderChoices,
   passLinePercent,
   pickQuestions,
+  requestedDomains,
   score,
   sessionProgress,
   shuffle,
@@ -165,6 +167,22 @@ describe("sessionProgress", () => {
 describe("domainCounts", () => {
   it("分野ごと_問題数を数える", () => {
     expect(domainCounts(questions)).toEqual({ domain1: 2, domain2: 2 });
+  });
+});
+
+describe("分野を選んだ状態のモード選択", () => {
+  const codes = ["domain1", "domain2"];
+
+  it("経路の分野_資格の分野なら選び_読み戻すと同じ分野になる", () => {
+    const href = domainSelectHref("SAMPLE", "domain2");
+    expect(href).toBe("/exams/SAMPLE?domain=domain2");
+    expect(requestedDomains(new URL(href, "http://localhost").search, codes)).toEqual(["domain2"]);
+  });
+
+  it("指定がない・資格の分野でない_何も選ばない", () => {
+    for (const search of ["", "?domain=", "?domain=domain9", "?other=domain1", "?domain=DOMAIN1"]) {
+      expect(requestedDomains(search, codes), search).toEqual([]);
+    }
   });
 });
 

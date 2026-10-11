@@ -5,6 +5,8 @@ import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import * as changePasswordRoute from "@/app/api/auth/change-password/route.ts";
 import * as bookmarksRoute from "@/app/api/history/bookmarks/route.ts";
+import * as daysRoute from "@/app/api/history/days/route.ts";
+import * as goalRoute from "@/app/api/history/goal/route.ts";
 import * as historyRoute from "@/app/api/history/results/route.ts";
 import * as reviewRoute from "@/app/api/history/review/route.ts";
 import { FAKE_USER_EMAIL, FAKE_USER_PHRASE } from "@/lib/auth/fake.ts";
@@ -63,6 +65,8 @@ const PUBLIC_APIS = [
 const PROTECTED_APIS = [
   "/api/auth/change-password",
   "/api/history/bookmarks",
+  "/api/history/days",
+  "/api/history/goal",
   "/api/history/results",
   "/api/history/review",
 ];
@@ -159,6 +163,15 @@ describe("認可: 未ログインの拒否", () => {
     expect(response.status).toBe(401);
   });
 
+  it("日ごとの学習量と目標日の API 本体_入口を通らなくても未ログインを断る(二重の防御)", async () => {
+    expect((await daysRoute.GET(request("/api/history/days?examCode=SAMPLE"))).status).toBe(401);
+    expect((await goalRoute.GET(request("/api/history/goal?examCode=SAMPLE"))).status).toBe(401);
+    const response = await goalRoute.PUT(
+      request("/api/history/goal", { method: "PUT", body: { examCode: "SAMPLE", date: "2026-12-20" } }),
+    );
+    expect(response.status).toBe(401);
+  });
+
   it("パスワード変更の API 本体_入口を通らなくても未ログインを断る(二重の防御)", async () => {
     const response = await changePasswordRoute.POST(
       request("/api/auth/change-password", {
@@ -174,6 +187,8 @@ describe("認可: 未ログインの拒否", () => {
     expect(methods(historyRoute).sort()).toEqual(["GET", "POST"]);
     expect(methods(bookmarksRoute).sort()).toEqual(["GET", "PUT"]);
     expect(methods(reviewRoute)).toEqual(["GET"]);
+    expect(methods(daysRoute)).toEqual(["GET"]);
+    expect(methods(goalRoute).sort()).toEqual(["GET", "PUT"]);
     expect(methods(changePasswordRoute)).toEqual(["POST"]);
   });
 });
@@ -244,6 +259,24 @@ describe("認可: 他人のデータに触れない", () => {
     }
   });
 
+  it("目標日と日ごとの学習量で利用者の識別子を本文・問い合わせで渡す_拒否される", async () => {
+    const own = await cookie();
+    const change = { examCode: "SAMPLE", date: "2026-12-20" };
+    for (const key of ["sub", "userId", "PK", "SK"]) {
+      const response = await goalRoute.PUT(
+        request("/api/history/goal", { method: "PUT", cookie: own, body: { ...change, [key]: "other-user" } }),
+      );
+      expect(response.status, key).toBe(400);
+    }
+    for (const [route, path] of [
+      [goalRoute, "/api/history/goal"],
+      [daysRoute, "/api/history/days"],
+    ] as const) {
+      const response = await route.GET(request(`${path}?examCode=SAMPLE&sub=other-user`, { cookie: own }));
+      expect(response.status, path).toBe(400);
+    }
+  });
+
   it("資格コードにキーの区切りを入れて他の区画を読もうとする_断られる", async () => {
     const own = await cookie();
     for (const examCode of ["SAMPLE%23", "SAMPLE%23USER%23other", "%23", "USER%23other", "SAMPLE%2523", "sample"]) {
@@ -289,5 +322,21 @@ describe("認可: 他人のデータに触れない", () => {
     expect(await bookmarks.json()).toEqual({ questionIds: ["SAMPLE-0002"] });
     const review = await reviewRoute.GET(request("/api/history/review?examCode=SAMPLE", { cookie: own }));
     expect(await review.json()).toEqual({ questionIds: ["SAMPLE-0001"] });
+  });
+
+  it("目標日と日ごとの学習量_自分の分だけに保存され_取得も自分の分だけ", async () => {
+    const own = await cookie();
+    const put = await goalRoute.PUT(
+      request("/api/history/goal", { method: "PUT", cookie: own, body: { examCode: "SAMPLE", date: "2026-12-20" } }),
+    );
+    expect(put.status).toBe(200);
+    await historyRoute.POST(request("/api/history/results", { method: "POST", cookie: own, body: result() }));
+    const goal = await goalRoute.GET(request("/api/history/goal?examCode=SAMPLE", { cookie: own }));
+    expect(await goal.json()).toEqual({ date: "2026-12-20" });
+    const days = await daysRoute.GET(request("/api/history/days?examCode=SAMPLE", { cookie: own }));
+    expect(((await days.json()) as { days: { answered: number }[] }).days.map((d) => d.answered)).toEqual([1]);
+    // ログインしていない人には、何も見えない
+    expect((await goalRoute.GET(request("/api/history/goal?examCode=SAMPLE"))).status).toBe(401);
+    expect((await daysRoute.GET(request("/api/history/days?examCode=SAMPLE"))).status).toBe(401);
   });
 });

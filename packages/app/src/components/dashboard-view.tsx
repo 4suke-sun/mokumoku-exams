@@ -1,13 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { EmptyState } from "@/components/empty-state.tsx";
 import { ScoreRing } from "@/components/score-ring.tsx";
-import { type DashboardSummary, summarize } from "@/lib/dashboard.ts";
-import { fetchBookmarks, fetchReview, fetchServerResults } from "@/lib/history/client.ts";
+import { type DashboardSummary, type DomainStat, domainBreakdown, summarize } from "@/lib/dashboard.ts";
+import {
+  fetchBookmarks,
+  fetchDays,
+  fetchGoal,
+  fetchReview,
+  fetchServerResults,
+  putGoal,
+} from "@/lib/history/client.ts";
 import { mergeResults, pendingMigration } from "@/lib/history/merge.ts";
+import { EARLIEST_GOAL_DATE, LATEST_GOAL_DATE } from "@/lib/history/schema.ts";
+import { domainSelectHref } from "@/lib/quiz.ts";
 import { browserStore, loadResults, MAX_RESULTS } from "@/lib/storage.ts";
+import { daysBetween, heatLevel, heatmapWeeks, jstDate, type StudyDay, streakDays } from "@/lib/study-days.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 
 type Props = { exam: PublishedExam; questions: Question[] };
@@ -18,10 +28,20 @@ type State =
   | {
       status: "ready";
       summary: DashboardSummary;
+      domains: DomainStat[];
       source: "server" | "local";
       review: number | null;
       bookmarks: number | null;
+      // 取得できなかったときは null
+      days: StudyDay[] | null;
+      goal: { date: string | null } | null;
+      /** 日本時間の今日 */
+      today: string;
     };
+
+/** ヒートマップの濃さごとの色(0 は学習なし) */
+const HEAT_CLASSES = ["bg-line", "bg-primary/25", "bg-primary/50", "bg-primary/75", "bg-primary"];
+const HEATMAP_WEEKS = 12;
 
 function formatDate(iso: string): string {
   const date = new Date(iso);
@@ -35,10 +55,12 @@ export function DashboardView({ exam, questions }: Props) {
   useEffect(() => {
     let active = true;
     void (async () => {
-      const [server, review, bookmarks] = await Promise.all([
+      const [server, review, bookmarks, days, goal] = await Promise.all([
         fetchServerResults(exam.examCode),
         fetchReview(exam.examCode),
         fetchBookmarks(exam.examCode),
+        fetchDays(exam.examCode),
+        fetchGoal(exam.examCode),
       ]);
       if (!active) return;
       const local = loadResults(browserStore(), exam.examCode);
@@ -49,9 +71,13 @@ export function DashboardView({ exam, questions }: Props) {
       setState({
         status: "ready",
         summary: summarize(results, questions, exam),
+        domains: domainBreakdown(results, questions),
         source: server === null ? "local" : "server",
         review: count(review),
         bookmarks: count(bookmarks),
+        days,
+        goal,
+        today: jstDate(Date.now()),
       });
     })();
     return () => {
@@ -74,10 +100,13 @@ export function DashboardView({ exam, questions }: Props) {
     </div>
   );
 
+  const goalPanel = <GoalPanel examCode={exam.examCode} goal={state.goal} today={state.today} />;
+
   if (summary.attempts === 0) {
     return (
       <section className="space-y-8">
         {header}
+        {goalPanel}
         <EmptyState
           title="まだ結果がありません"
           description="問題を解くと、正答率や合格予測がここに表示されます。"
@@ -104,6 +133,8 @@ export function DashboardView({ exam, questions }: Props) {
         </p>
       ) : null}
 
+      {goalPanel}
+
       {prediction ? (
         <div className="space-y-3">
           <h2 className="text-lg font-bold">合格予測</h2>
@@ -124,6 +155,10 @@ export function DashboardView({ exam, questions }: Props) {
           </div>
         </div>
       ) : null}
+
+      <StudyDays days={state.days} today={state.today} />
+
+      <DomainList exam={exam} domains={state.domains} />
 
       <div className="space-y-3">
         <h2 className="text-lg font-bold">学習量と正答率</h2>
@@ -165,5 +200,179 @@ export function DashboardView({ exam, questions }: Props) {
         <p className="text-sm text-muted">復習プールやブックマークの問題は、モード選択の「出題の対象」で選べます。</p>
       </div>
     </section>
+  );
+}
+
+/** 目標日の入力と、残り日数。 */
+function GoalPanel({
+  examCode,
+  goal,
+  today,
+}: {
+  examCode: string;
+  goal: { date: string | null } | null;
+  today: string;
+}) {
+  const inputId = useId();
+  const [saved, setSaved] = useState<string | null>(goal?.date ?? null);
+  const [draft, setDraft] = useState(goal?.date ?? "");
+  const [message, setMessage] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function save(next: string | null) {
+    setBusy(true);
+    const ok = await putGoal(examCode, next);
+    setBusy(false);
+    if (ok) {
+      setSaved(next);
+      setDraft(next ?? "");
+    }
+    setMessage(
+      ok
+        ? next
+          ? "目標日を保存しました。"
+          : "目標日を消しました。"
+        : "保存できませんでした。時間をおいて、やり直してください。",
+    );
+  }
+
+  const remaining = saved ? daysBetween(today, saved) : null;
+  const countdown =
+    remaining === null
+      ? "目標日は、まだ決めていません。"
+      : remaining > 0
+        ? `目標日(${saved})まで、あと ${remaining} 日です。`
+        : remaining === 0
+          ? `今日が目標日(${saved})です。`
+          : `目標日(${saved})を ${-remaining} 日過ぎています。`;
+
+  return (
+    <div className="space-y-3">
+      <h2 className="text-lg font-bold">目標日</h2>
+      {goal === null ? (
+        <p className="text-sm text-muted">アカウントから読み込めないため、いまは目標日を表示・設定できません。</p>
+      ) : (
+        <div className="space-y-3 rounded-lg border border-line bg-surface p-4">
+          <p className="font-bold">{countdown}</p>
+          <div className="flex flex-wrap items-end gap-3">
+            <div className="space-y-1">
+              <label htmlFor={inputId} className="block text-sm text-muted">
+                受験する日(目標日)
+              </label>
+              <input
+                id={inputId}
+                type="date"
+                min={EARLIEST_GOAL_DATE}
+                max={LATEST_GOAL_DATE}
+                value={draft}
+                onChange={(event) => setDraft(event.target.value)}
+                className="rounded-md border border-line bg-bg px-3 py-2"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => void save(draft)}
+              disabled={busy || draft === "" || draft === saved}
+              className="rounded-md bg-primary px-4 py-2 font-bold text-on-primary hover:opacity-90 disabled:opacity-50"
+            >
+              保存する
+            </button>
+            {saved ? (
+              <button
+                type="button"
+                onClick={() => void save(null)}
+                disabled={busy}
+                className="rounded-md border border-line px-4 py-2 font-bold disabled:opacity-50"
+              >
+                消す
+              </button>
+            ) : null}
+          </div>
+          {message ? (
+            <p role="status" className="text-sm text-muted">
+              {message}
+            </p>
+          ) : null}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** 日ごとの学習量(連続日数と、直近 12 週のヒートマップ)。 */
+function StudyDays({ days, today }: { days: StudyDay[] | null; today: string }) {
+  if (days === null) {
+    return (
+      <div className="space-y-2">
+        <h2 className="text-lg font-bold">日ごとの学習量</h2>
+        <p className="text-sm text-muted">アカウントから読み込めないため、いまは表示できません。</p>
+      </div>
+    );
+  }
+  const weeks = heatmapWeeks(days, today, HEATMAP_WEEKS);
+  const studied = weeks.flat().filter((cell) => (cell.answered ?? 0) > 0).length;
+  return (
+    <div className="space-y-3">
+      <h2 className="text-lg font-bold">日ごとの学習量</h2>
+      <p className="font-bold">連続 {streakDays(days, today)} 日</p>
+      <div className="space-y-2 rounded-lg border border-line bg-surface p-4">
+        <div
+          role="img"
+          aria-label={`直近 ${HEATMAP_WEEKS} 週のうち、学習した日は ${studied} 日です。`}
+          className="flex gap-1"
+        >
+          {weeks.map((week) => (
+            <div key={week[0]?.date} className="flex flex-col gap-1">
+              {week.map((cell) =>
+                cell.answered === null ? (
+                  <span key={cell.date} className="size-4" />
+                ) : (
+                  <span
+                    key={cell.date}
+                    title={`${cell.date}: ${cell.answered} 問`}
+                    className={`size-4 rounded-sm ${HEAT_CLASSES[heatLevel(cell.answered)]}`}
+                  />
+                ),
+              )}
+            </div>
+          ))}
+        </div>
+        <p className="text-sm text-muted">
+          直近 {HEATMAP_WEEKS} 週(列が週で、上が日曜)。色が濃いほど、その日に多く解いています。
+          アカウントに保存した結果を、完了した日(日本時間)で数えます。
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/** 分野別の正答率(低い順)と、その分野だけを選んだモード選択への導線。 */
+function DomainList({ exam, domains }: { exam: PublishedExam; domains: DomainStat[] }) {
+  const names = new Map(exam.domains.map((d) => [d.code, d.name]));
+  const listed = domains.filter((d) => names.has(d.domain));
+  if (listed.length === 0) return null;
+  return (
+    <div className="space-y-2">
+      <h2 className="text-lg font-bold">分野別の正答率</h2>
+      <p className="text-sm text-muted">直近の結果から、正答率の低い分野を先に並べます。</p>
+      <ul className="space-y-1 text-sm">
+        {listed.map((stat) => (
+          <li
+            key={stat.domain}
+            className="flex flex-wrap items-center justify-between gap-2 rounded border border-line bg-surface p-2"
+          >
+            <span>{names.get(stat.domain)}</span>
+            <span className="flex items-center gap-3">
+              <span>
+                {stat.correct} / {stat.answered} 問({stat.percent}%)
+              </span>
+              <Link href={domainSelectHref(exam.examCode, stat.domain)} className="text-primary hover:underline">
+                この分野を解く
+              </Link>
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }

@@ -145,6 +145,89 @@ describe("DynamoDB のブックマークと復習プール", () => {
   });
 });
 
+describe("DynamoDB の日ごとの学習量と目標日", () => {
+  it("新しい結果_完了した日(日本時間)の項目に足し_同じ結果の送り直しでは足さない", async () => {
+    const { items, client } = fakeTable();
+    const repository = createDynamoRepository({ tableName: "table-example", client });
+    const late = result("SAMPLE", 0, { finishedAt: "2026-10-11T15:00:00.000Z" });
+    await repository.putResult("user-a", late, { answered: 2, correct: 1 });
+    await repository.putResult("user-a", late, { answered: 2, correct: 1 });
+    await repository.putResult("user-a", result("SAMPLE", 5, { finishedAt: "2026-10-12T01:00:00.000Z" }), {
+      answered: 3,
+      correct: 3,
+    });
+    expect(items.get("USER#user-a|DAY#SAMPLE#2026-10-12")).toMatchObject({
+      type: "day",
+      examCode: "SAMPLE",
+      date: "2026-10-12",
+      answered: 5,
+      correct: 4,
+    });
+    expect(await repository.listDays("user-a", "SAMPLE")).toEqual([{ date: "2026-10-12", answered: 5, correct: 4 }]);
+    expect(await repository.listDays("user-b", "SAMPLE")).toEqual([]);
+  });
+
+  it("学習量を渡さない・解いた問題が 0_日ごとの項目を作らない", async () => {
+    const { items, client } = fakeTable();
+    const repository = createDynamoRepository({ tableName: "table-example", client });
+    await repository.putResult("user-a", result("SAMPLE", 1));
+    await repository.putResult("user-a", result("SAMPLE", 2), { answered: 0, correct: 0 });
+    expect([...items.keys()].some((key) => key.includes("DAY#"))).toBe(false);
+  });
+
+  it("日ごとの学習量_日付の順に返し_資格が前方一致する別の資格や壊れた項目は混ざらない", async () => {
+    const { items, client } = fakeTable();
+    const repository = createDynamoRepository({ tableName: "table-example", client });
+    const at = (iso: string) => result("SAMPLE", 0, { finishedAt: iso });
+    await repository.putResult("user-a", at("2026-10-12T01:00:00.000Z"), { answered: 1, correct: 0 });
+    await repository.putResult("user-a", at("2026-10-01T01:00:00.000Z"), { answered: 2, correct: 2 });
+    await repository.putResult("user-a", result("SAMPLE1", 0), { answered: 4, correct: 4 });
+    items.set("broken-1", { PK: "USER#user-a", SK: "DAY#SAMPLE#2026-02-30", answered: 1, correct: 0 });
+    items.set("broken-2", { PK: "USER#user-a", SK: "DAY#SAMPLE#2026-10-05", answered: 1, correct: 2 });
+    items.set("broken-3", { PK: "USER#user-a", SK: "DAY#SAMPLE#2026-10-06", answered: "1", correct: 0 });
+    expect(await repository.listDays("user-a", "SAMPLE")).toEqual([
+      { date: "2026-10-01", answered: 2, correct: 2 },
+      { date: "2026-10-12", answered: 1, correct: 0 },
+    ]);
+  });
+
+  it("目標日_SK は資格ごとに 1 つで_上書きでき_消せる", async () => {
+    const { items, client } = fakeTable();
+    const repository = createDynamoRepository({ tableName: "table-example", client });
+    expect(await repository.getGoal("user-a", "SAMPLE")).toBeNull();
+    await repository.setGoal("user-a", "SAMPLE", "2026-12-01");
+    await repository.setGoal("user-a", "SAMPLE", "2026-12-20");
+    expect(items.get("USER#user-a|GOAL#SAMPLE")).toMatchObject({
+      type: "goal",
+      examCode: "SAMPLE",
+      date: "2026-12-20",
+    });
+    expect(await repository.getGoal("user-a", "SAMPLE")).toBe("2026-12-20");
+    expect(await repository.getGoal("user-b", "SAMPLE")).toBeNull();
+    await repository.setGoal("user-a", "SAMPLE", null);
+    expect(await repository.getGoal("user-a", "SAMPLE")).toBeNull();
+  });
+
+  it("壊れた目標日_ないものとして扱う", async () => {
+    const { items, client } = fakeTable();
+    const repository = createDynamoRepository({ tableName: "table-example", client });
+    items.set("USER#user-a|GOAL#SAMPLE", { PK: "USER#user-a", SK: "GOAL#SAMPLE", date: "someday" });
+    expect(await repository.getGoal("user-a", "SAMPLE")).toBeNull();
+  });
+
+  it("使う操作は_保存・取得・更新・問い合わせ・削除だけで_スキャンは使わない", async () => {
+    const { sent, client } = fakeTable();
+    const repository = createDynamoRepository({ tableName: "table-example", client });
+    await repository.putResult("user-a", result("SAMPLE", 1), { answered: 1, correct: 1 });
+    await repository.listDays("user-a", "SAMPLE");
+    await repository.setGoal("user-a", "SAMPLE", "2026-12-20");
+    await repository.getGoal("user-a", "SAMPLE");
+    await repository.setGoal("user-a", "SAMPLE", null);
+    const names = new Set(sent.map((c) => (c as { constructor: { name: string } }).constructor.name));
+    expect([...names].sort()).toEqual(["DeleteCommand", "GetCommand", "PutCommand", "QueryCommand", "UpdateCommand"]);
+  });
+});
+
 describe("メモリ上の履歴", () => {
   it("利用者ごとに分かれ_上限を超えると古いものを捨てる", async () => {
     const repository = createMemoryRepository();
@@ -153,6 +236,24 @@ describe("メモリ上の履歴", () => {
     await repository.putResult("user-b", result("SAMPLE", 0));
     expect(await repository.listResults("user-a", "SAMPLE")).toHaveLength(MAX_RESULTS);
     expect(await repository.listResults("user-b", "SAMPLE")).toHaveLength(1);
+  });
+
+  it("日ごとの学習量と目標日_DynamoDB の実装と同じに振る舞う", async () => {
+    const repository = createMemoryRepository();
+    const late = result("SAMPLE", 0, { finishedAt: "2026-10-11T15:00:00.000Z" });
+    await repository.putResult("user-a", late, { answered: 2, correct: 1 });
+    await repository.putResult("user-a", late, { answered: 2, correct: 1 });
+    await repository.putResult("user-a", result("SAMPLE", 1), { answered: 1, correct: 1 });
+    expect(await repository.listDays("user-a", "SAMPLE")).toEqual([
+      { date: "2026-10-11", answered: 1, correct: 1 },
+      { date: "2026-10-12", answered: 2, correct: 1 },
+    ]);
+    expect(await repository.listDays("user-b", "SAMPLE")).toEqual([]);
+    await repository.setGoal("user-a", "SAMPLE", "2026-12-20");
+    expect(await repository.getGoal("user-a", "SAMPLE")).toBe("2026-12-20");
+    expect(await repository.getGoal("user-b", "SAMPLE")).toBeNull();
+    await repository.setGoal("user-a", "SAMPLE", null);
+    expect(await repository.getGoal("user-a", "SAMPLE")).toBeNull();
   });
 });
 
