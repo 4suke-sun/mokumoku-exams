@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { browserStore, loadResults, loadStageProgress, passedStages, saveSession } from "@/lib/storage.ts";
@@ -276,5 +276,85 @@ describe("Player の自由記述", () => {
     await user.click(screen.getByRole("button", { name: "採点する" }));
     await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
     expect(loadStageProgress(browserStore(), "TEST").last).toMatchObject({ percent: 100, passed: true });
+  });
+});
+
+describe("Player の本番モード", () => {
+  const start = Date.parse("2026-10-10T00:00:00.000Z");
+  let current = start;
+  const clock = () => new Date(current);
+
+  beforeEach(() => {
+    current = start;
+    // 残り時間を数え直すタイマーを差し替える。画面の待ち合わせ(waitFor)も setInterval を使うので、実時間でも進める
+    vi.useFakeTimers({ toFake: ["setInterval", "clearInterval"], shouldAdvanceTime: true });
+    saveSession(browserStore(), {
+      examCode: "TEST",
+      questionIds: questions.map((q) => q.questionId),
+      answers: {},
+      index: 0,
+      startedAt: "2026-10-10T00:00:00.000Z",
+      deadline: "2026-10-10T00:10:00.000Z",
+    });
+  });
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  /** 時計を進め、残り時間を数え直させる */
+  function advance(ms: number) {
+    current += ms;
+    act(() => {
+      vi.advanceTimersByTime(1000);
+    });
+  }
+
+  it("残り時間を表示し_時計が進むと減る", async () => {
+    render(<Player exam={exam} questions={questions} clock={clock} />);
+    expect(await screen.findByText("10:00")).toBeTruthy();
+    advance(61_000);
+    expect(screen.getByText("8:59")).toBeTruthy();
+  });
+
+  it("再読み込みしても_締め切りから残り時間を数える", async () => {
+    current = start + 4 * 60_000;
+    render(<Player exam={exam} questions={questions} clock={clock} />);
+    expect(await screen.findByText("6:00")).toBeTruthy();
+  });
+
+  it("時間切れ_ここまでの回答で自動的に採点し_通常と同じ結果を残す", async () => {
+    render(<Player exam={exam} questions={questions} clock={clock} />);
+    const user = userEvent.setup();
+    await screen.findByText("問題文 1");
+    await user.keyboard("a");
+    advance(10 * 60_000);
+
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
+    const [saved] = loadResults(browserStore(), "TEST");
+    expect(saved?.answers).toEqual({ "TEST-0001": ["A"] });
+    expect(saved?.questionIds).toEqual(questions.map((q) => q.questionId));
+    expect(saved).not.toHaveProperty("deadline");
+  });
+
+  it("締め切りを過ぎてから開いた_すぐに採点する", async () => {
+    current = start + 11 * 60_000;
+    render(<Player exam={exam} questions={questions} clock={clock} />);
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
+    expect(push).toHaveBeenCalledTimes(1);
+    expect(loadResults(browserStore(), "TEST")).toHaveLength(1);
+  });
+
+  it("通常の出題_残り時間を表示しない", async () => {
+    saveSession(browserStore(), {
+      examCode: "TEST",
+      questionIds: questions.map((q) => q.questionId),
+      answers: {},
+      index: 0,
+      startedAt: "2026-10-10T00:00:00.000Z",
+    });
+    render(<Player exam={exam} questions={questions} clock={clock} />);
+    await screen.findByText("問題文 1");
+    expect(screen.queryByText(/本番モード/)).toBeNull();
   });
 });

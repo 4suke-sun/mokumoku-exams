@@ -32,7 +32,7 @@ Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCre
 - `packages/app/public/` のファイル(アイコンと、通知を受け取る Service Worker)は、Lambda に載せ、Next のサーバーが配ります。
 - それ以外は Lambda の Function URL へ渡します。Function URL は認証なし(`authType: NONE`)で、CloudFront が付ける合言葉のヘッダー(`x-origin-verify`)を、
   アプリ(`packages/app/src/proxy.ts`)が確かめます。合言葉のないリクエスト(Function URL への直接のアクセス)は、403 で断ります。
-- 独自ドメインは、まだ設定しません。CloudFront の標準のドメインで配信します。
+- 独自ドメインは任意です。`.env` に値がなければ、CloudFront の標準のドメインで配信します(「独自ドメイン」)。
 
 ### キャッシュとセキュリティヘッダー
 
@@ -49,6 +49,26 @@ Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCre
 - `.env` の `ALARM_EMAIL` を渡すと、そのアドレスをトピックに購読させます。デプロイの後に届く確認のメールで、購読を承認します。
   渡さないときは、トピックだけが作られ、アラームの状態は CloudWatch の画面で確かめます。
 
+### 独自ドメイン
+
+`.env` に `DOMAIN_NAME` と `CERTIFICATE_ARN` を渡すと、CloudFront にそのドメイン名と証明書を付けます。値がなければ、何も変わりません。
+
+1. 使うドメイン名(例: `app.example.com`)の証明書を、ACM で **us-east-1** に発行します(CloudFront は us-east-1 の証明書だけを使えます)。
+   スタックのデプロイ先のリージョンが違っても、証明書は us-east-1 に置きます。
+2. `.env` に、次を書きます。
+
+   | 変数 | 内容 |
+   | --- | --- |
+   | `DOMAIN_NAME` | 配信に使うドメイン名(例: `app.example.com`) |
+   | `CERTIFICATE_ARN` | 1 の証明書の ARN(`arn:aws:acm:us-east-1:<アカウント ID>:certificate/<証明書の ID>`) |
+   | `HOSTED_ZONE_ID` | (省略可)ドメイン名を置く Route 53 のホストゾーンの ID |
+
+3. デプロイします。`HOSTED_ZONE_ID` を渡したときは、ドメイン名から CloudFront への A と AAAA のレコード(エイリアス)も作ります。
+   渡さないときは、DNS の CNAME などで、ドメイン名を CloudFront のドメイン(出力の `DistributionDomainName`)へ向けます。
+
+- `DOMAIN_NAME` と `CERTIFICATE_ARN` は、そろえて渡します。片方だけ、またはドメイン名なしでホストゾーンだけを渡すと、合成の前に止まります。
+- 独自ドメインを付けても、CloudFront の標準のドメインでも、そのままアクセスできます。
+
 ## この版で扱わないこと
 
 次の項目は、別の段階で扱います。
@@ -56,7 +76,6 @@ Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCre
 - CloudFront の監視(CloudFront のメトリクスは別リージョンにあるため、別の段階で扱います)
 - 通知の送信の Lambda のアラーム(失敗はログと Lambda のメトリクスで確かめます)
 - 管理者向けの多要素認証の検討
-- 独自ドメイン
 
 ## 準備
 
@@ -75,10 +94,11 @@ Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCre
    | `VAPID_PUBLIC_KEY` | (省略可)プッシュ通知の VAPID の公開鍵。下の 2 つとそろえて渡します |
    | `VAPID_PRIVATE_KEY` | (省略可)VAPID の秘密鍵 |
    | `VAPID_SUBJECT` | (省略可)送信者の連絡先(`mailto:` か `https://` で始まる)。プッシュサービスが、問題があったときの連絡に使います |
+   | `DOMAIN_NAME`、`CERTIFICATE_ARN`、`HOSTED_ZONE_ID` | (省略可)独自ドメイン。「独自ドメイン」を参照 |
 
    VAPID の鍵は、`npx web-push generate-vapid-keys` で作ります(表示された 2 つの値を `.env` に書きます)。秘密鍵は、ほかに書き写しません。
    鍵を作り直すと、それまでの購読には送れなくなります(利用者が、アカウントの画面で購読し直します)。
-   `SITE_URL` には、初回のデプロイのあとに出力される CloudFront のドメイン(`DistributionDomainName`)を `https://` に続けて書き、もう一度デプロイします。
+   `SITE_URL` には、初回のデプロイのあとに出力される CloudFront のドメイン(`DistributionDomainName`)を `https://` に続けて書き、もう一度デプロイします。独自ドメインを使うときは、`DOMAIN_NAME` のドメインを書きます。
 
    値の形は `packages/infra/lib/config.ts` が検査します。足りない、または形が違うと、変数の名前だけを示して止まります(値は表示しません)。
 

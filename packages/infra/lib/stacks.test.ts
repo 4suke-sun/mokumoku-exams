@@ -10,7 +10,7 @@ import {
   TEMP_PASSWORD_DAYS,
   USER_ADMIN_ACTIONS,
 } from "./auth-stack.ts";
-import type { InfraConfig, PushConfig } from "./config.ts";
+import type { CustomDomain, InfraConfig, PushConfig } from "./config.ts";
 import { DataStack, HISTORY_TABLE_ACTIONS, POINT_IN_TIME_RECOVERY_DAYS } from "./data-stack.ts";
 import { PUSH_HANDLER, PUSH_SCHEDULE, PUSH_SENDER_TABLE_ACTIONS, PushStack } from "./push-stack.ts";
 import { ORIGIN_VERIFY_HEADER, WebStack } from "./web-stack.ts";
@@ -23,6 +23,12 @@ const config: InfraConfig = {
 const env = { account: "123456789012", region: "us-east-1" };
 // 見本の鍵(形だけを合わせた値。実際の鍵ではない)
 const push: PushConfig = { publicKey: "P".repeat(87), privateKey: "k".repeat(43), subject: "mailto:admin@example.com" };
+// 独自ドメインの見本の値(すべてプレースホルダー)
+const domain: CustomDomain = {
+  domainName: "app.example.com",
+  certificateArn: "arn:aws:acm:us-east-1:123456789012:certificate/00000000-0000-0000-0000-000000000000",
+  hostedZoneId: "Z0000000000EXAMPLE",
+};
 // 既定の識別子ではなく、見本と分かる値にして、スナップショットに環境の由来らしい文字列を入れない
 const synthesizer = new DefaultStackSynthesizer({ qualifier: "example" });
 const USER_POOL_ARN = "arn:aws:cognito-idp:us-east-1:123456789012:userpool/pool-example";
@@ -329,6 +335,45 @@ describe("WebStack", () => {
       Protocol: "email",
       Endpoint: "alerts@example.com",
     });
+  });
+
+  it("独自ドメインがない_CloudFront の既定のドメインで配信し_DNS のレコードを作らない", () => {
+    const template = webTemplate();
+    const [distribution] = Object.values(template.findResources("AWS::CloudFront::Distribution"));
+    expect(distribution?.Properties.DistributionConfig.Aliases).toBeUndefined();
+    expect(distribution?.Properties.DistributionConfig.ViewerCertificate).toBeUndefined();
+    template.resourceCountIs("AWS::Route53::RecordSet", 0);
+  });
+
+  it("独自ドメインがある_CloudFront にドメイン名と証明書を付ける", () => {
+    const template = webTemplate(undefined, {
+      customDomain: { domainName: domain.domainName, certificateArn: domain.certificateArn },
+    });
+    template.hasResourceProperties("AWS::CloudFront::Distribution", {
+      DistributionConfig: {
+        Aliases: [domain.domainName],
+        ViewerCertificate: {
+          AcmCertificateArn: domain.certificateArn,
+          SslSupportMethod: "sni-only",
+          MinimumProtocolVersion: "TLSv1.2_2021",
+        },
+      },
+    });
+    // ホストゾーンがないときは、DNS は自分で設定する
+    template.resourceCountIs("AWS::Route53::RecordSet", 0);
+  });
+
+  it("ホストゾーンもある_ドメイン名から CloudFront への IPv4 と IPv6 のレコードを作る", () => {
+    const template = webTemplate(undefined, { customDomain: domain });
+    template.resourceCountIs("AWS::Route53::RecordSet", 2);
+    for (const type of ["A", "AAAA"]) {
+      template.hasResourceProperties("AWS::Route53::RecordSet", {
+        Name: `${domain.domainName}.`,
+        Type: type,
+        HostedZoneId: domain.hostedZoneId,
+        AliasTarget: { DNSName: { "Fn::GetAtt": [Match.stringLikeRegexp("Distribution"), "DomainName"] } },
+      });
+    }
   });
 });
 

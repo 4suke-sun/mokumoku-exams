@@ -37,7 +37,12 @@ function question(id: number, correct: string): Question {
 }
 
 const questions = [question(1, "A"), question(2, "A"), question(3, "B")];
-const pool = questions.map((q) => ({ questionId: q.questionId, domain: q.domain, choiceKeys: ["A", "B"] }));
+const pool = questions.map((q) => ({
+  questionId: q.questionId,
+  domain: q.domain,
+  questionType: q.questionType,
+  choiceKeys: ["A", "B"],
+}));
 
 type Server = { bookmarks?: string[] | null; review?: string[] | null; results?: unknown[] | null; putOk?: boolean };
 

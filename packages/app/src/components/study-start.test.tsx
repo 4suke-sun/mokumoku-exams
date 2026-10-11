@@ -123,7 +123,9 @@ describe("モード選択の学習モード", () => {
     totalScore: 1000,
     domains: [{ code: "domain1", name: "分野 1", weight: 1 }],
   } as Parameters<typeof ModeSelect>[0]["exam"];
-  const pool = [{ questionId: "TEST-0001", domain: "domain1", choiceKeys: ["A", "B"] }];
+  const pool = [
+    { questionId: "TEST-0001", domain: "domain1", questionType: "single" as const, choiceKeys: ["A", "B"] },
+  ];
 
   beforeEach(() => {
     vi.stubGlobal(

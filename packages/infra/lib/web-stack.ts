@@ -1,4 +1,5 @@
 import { CfnOutput, Duration, RemovalPolicy, Stack, type StackProps } from "aws-cdk-lib";
+import * as acm from "aws-cdk-lib/aws-certificatemanager";
 import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
 import * as origins from "aws-cdk-lib/aws-cloudfront-origins";
 import * as cloudwatch from "aws-cdk-lib/aws-cloudwatch";
@@ -7,6 +8,8 @@ import type * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as logs from "aws-cdk-lib/aws-logs";
+import * as route53 from "aws-cdk-lib/aws-route53";
+import * as route53Targets from "aws-cdk-lib/aws-route53-targets";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import * as s3deploy from "aws-cdk-lib/aws-s3-deployment";
 import * as sns from "aws-cdk-lib/aws-sns";
@@ -126,8 +129,18 @@ export class WebStack extends Stack {
       },
     });
 
+    // 独自ドメインは、値が渡されたときだけ付ける。なければ、CloudFront の既定のドメインで配信する
+    const { customDomain } = config;
+    const domain = customDomain
+      ? {
+          domainNames: [customDomain.domainName],
+          certificate: acm.Certificate.fromCertificateArn(this, "Certificate", customDomain.certificateArn),
+        }
+      : {};
+
     this.distribution = new cloudfront.Distribution(this, "Distribution", {
       comment: `${config.stackPrefix} web`,
+      ...domain,
       defaultBehavior: {
         origin: dynamicOrigin,
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
@@ -150,6 +163,16 @@ export class WebStack extends Stack {
       minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
       httpVersion: cloudfront.HttpVersion.HTTP2_AND_3,
     });
+
+    // ホストゾーンが渡されたときは、ドメイン名から CloudFront へのレコード(IPv4 と IPv6)を作る
+    if (customDomain?.hostedZoneId) {
+      const zone = route53.HostedZone.fromHostedZoneId(this, "HostedZone", customDomain.hostedZoneId);
+      // 末尾に「.」を付けた完全な名前にして、ゾーンの名前がなくてもレコード名を決められるようにする
+      const recordName = `${customDomain.domainName}.`;
+      const target = route53.RecordTarget.fromAlias(new route53Targets.CloudFrontTarget(this.distribution));
+      new route53.ARecord(this, "AliasRecord", { zone, recordName, target });
+      new route53.AaaaRecord(this, "AliasRecordIpv6", { zone, recordName, target });
+    }
 
     new s3deploy.BucketDeployment(this, "DeployStaticAssets", {
       sources: [s3deploy.Source.asset(props.staticAssetsPath)],
