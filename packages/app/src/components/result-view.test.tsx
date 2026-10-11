@@ -90,6 +90,25 @@ describe("ResultView", () => {
     expect(screen.getAllByText(/^問題 \d$/)).toHaveLength(3);
   });
 
+  it("選択肢をシャッフルした結果_記号を上から振り直し_解説の記号と回答の表示もそれに合わせる", async () => {
+    const shuffled = {
+      ...question(1, "A"),
+      explanation: "## 正解がAである理由は\n選択肢Bは誤り。",
+    } as Question;
+    saveResult(browserStore(), {
+      examCode: "TEST",
+      questionIds: [shuffled.questionId],
+      answers: { [shuffled.questionId]: ["B"] },
+      choiceOrder: { [shuffled.questionId]: ["B", "A"] },
+      finishedAt: "2026-10-10T00:00:00.000Z",
+    });
+    render(<ResultView exam={exam} questions={[shuffled]} />);
+    // 元のキーで B, A の順に並ぶので、画面では B が「A.」、A が「B.」になる
+    expect(await screen.findByText("正解がBである理由は")).toBeTruthy();
+    expect(screen.getByText("選択肢Aは誤り。")).toBeTruthy();
+    expect(screen.getByText("あなたの回答: A / 正解: B")).toBeTruthy();
+  });
+
   it("出典のある問題_解説のあとに出典のリンクを出す", async () => {
     const withReference = {
       ...question(1, "A"),

@@ -2,17 +2,21 @@ import { describe, expect, it } from "vitest";
 import {
   answerFor,
   countPool,
+  displayLabels,
   domainCounts,
   domainSelectHref,
   formatRemaining,
   isCorrect,
   isOfficialTarget,
   isQuestionCorrect,
+  keyForLabel,
+  labelKeys,
   newOfficialSession,
   newSession,
   orderChoices,
   passLinePercent,
   pickQuestions,
+  relabelText,
   remainingMs,
   requestedDomains,
   score,
@@ -426,5 +430,42 @@ describe("本番モード", () => {
     expect(formatRemaining(500)).toBe("0:01");
     expect(formatRemaining(0)).toBe("0:00");
     expect(formatRemaining(-5)).toBe("0:00");
+  });
+});
+
+describe("表示用の記号", () => {
+  // シャッフルで C, A, B の順に並んだ選択肢
+  const labels = displayLabels([{ key: "C" }, { key: "A" }, { key: "B" }]);
+
+  it("並べた順に_上から_A_B_C_を振る", () => {
+    expect([...labels]).toEqual([
+      ["C", "A"],
+      ["A", "B"],
+      ["B", "C"],
+    ]);
+  });
+
+  it("押された記号から_元のキーを引ける", () => {
+    expect(keyForLabel(labels, "A")).toBe("C");
+    expect(keyForLabel(labels, "Z")).toBeUndefined();
+  });
+
+  it("元のキーの並びを_表示用の記号にして記号の順に並べる", () => {
+    expect(labelKeys(["A", "C"], labels)).toEqual(["A", "B"]);
+  });
+
+  it("解説の中の選択肢の記号を_表示用の記号に置き換える", () => {
+    expect(relabelText("## 正解がAである理由は\n選択肢Cは誤り。B と（A）も参照。", labels)).toBe(
+      "## 正解がBである理由は\n選択肢Aは誤り。C と（B）も参照。",
+    );
+  });
+
+  it("英数字につながる大文字と_選択肢にない記号は_置き換えない", () => {
+    expect(relabelText("AI と Amazon S3、トップP", labels)).toBe("AI と Amazon S3、トップP");
+  });
+
+  it("並びが元のままなら_文章を変えない", () => {
+    const same = displayLabels([{ key: "A" }, { key: "B" }]);
+    expect(relabelText("選択肢Bは正しい", same)).toBe("選択肢Bは正しい");
   });
 });

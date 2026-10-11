@@ -183,6 +183,34 @@ export function orderChoices(question: Pick<ChoiceQuestion, "questionId" | "choi
   return valid ? (ordered as Choice[]) : question.choices;
 }
 
+/**
+ * 表示用の記号。並べた順に、上から A, B, C, … を振る。元のキーから表示用の記号への対応を返す。
+ * 正誤の判定と保存は元のキーで行い、表示だけをこの記号にする(シャッフルしても、記号は上から順に並ぶ)。
+ */
+export function displayLabels(choices: readonly Pick<Choice, "key">[]): Map<string, string> {
+  return new Map(choices.map((choice, index) => [choice.key, String.fromCharCode(65 + index)]));
+}
+
+/** 表示用の記号から、元のキーへの対応(キー操作で、押された記号を元のキーに戻す) */
+export function keyForLabel(labels: ReadonlyMap<string, string>, label: string): string | undefined {
+  for (const [key, shown] of labels) if (shown === label) return key;
+  return undefined;
+}
+
+/** 元のキーの並びを、表示用の記号にして、記号の順に並べる */
+export function labelKeys(keys: readonly string[], labels: ReadonlyMap<string, string>): string[] {
+  return sortKeys(keys.map((key) => labels.get(key) ?? key));
+}
+
+/**
+ * 解説などの文章で、選択肢を記号で指している箇所(「選択肢B」「正解がBである」「（A）」など)を、表示用の記号に置き換える。
+ * 前後が英数字につながる大文字(「AI」「S3」など)は、選択肢の記号ではないので置き換えない。並びが元のままなら、文章を変えない。
+ */
+export function relabelText(text: string, labels: ReadonlyMap<string, string>): string {
+  if ([...labels].every(([key, shown]) => key === shown)) return text;
+  return text.replace(/(?<![A-Za-z0-9])[A-Z](?![A-Za-z0-9])/g, (letter) => labels.get(letter) ?? letter);
+}
+
 /** 回答済みの問題数と、出題数。自由記述は、空白でない文章があれば回答済み。 */
 export function sessionProgress(session: {
   questionIds: readonly string[];

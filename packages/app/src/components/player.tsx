@@ -9,8 +9,10 @@ import { postServerResult } from "@/lib/history/client.ts";
 import { type QuizKeyAction, quizKeyAction } from "@/lib/keyboard.ts";
 import {
   answerFor,
+  displayLabels,
   formatRemaining,
   hasText,
+  keyForLabel,
   orderChoices,
   remainingMs,
   score,
@@ -204,13 +206,16 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
   // 時間切れのあとは、回答がなくても採点できる(自動の採点で保存できなかったときの、やり直し)
   const canAdvance = (isFreeText ? hasText(text) : selected.length > 0) || timeUp;
 
-  choiceKeysRef.current = choices.map((c) => c.key);
-  const sortedKeys = sortKeys(choiceKeysRef.current);
-  // 並びをシャッフルしていても、案内は小さいキーから大きいキーまでの範囲にする
-  const choiceKeysHint = sortedKeys.length > 1 ? `${sortedKeys[0]}〜${sortedKeys.at(-1)}` : "";
+  // 画面の記号は、並べた順に A から振る。キー操作も、画面の記号で受ける
+  const labels = displayLabels(choices);
+  choiceKeysRef.current = [...labels.values()];
+  const choiceKeysHint =
+    choiceKeysRef.current.length > 1 ? `${choiceKeysRef.current[0]}〜${choiceKeysRef.current.at(-1)}` : "";
   keyHandler.current = (action) => {
-    if (action.type === "choose") choose(action.key);
-    else if (action.type === "previous") {
+    if (action.type === "choose") {
+      const key = keyForLabel(labels, action.key);
+      if (key !== undefined) choose(key);
+    } else if (action.type === "previous") {
       if (index > 0) move(-1);
     } else if (canAdvance) {
       if (finishable) void finish();
@@ -274,7 +279,7 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
                   onChange={() => choose(choice.key)}
                 />
                 <span>
-                  <span className="font-bold">{choice.key}. </span>
+                  <span className="font-bold">{labels.get(choice.key)}. </span>
                   <InlineText text={choice.text} />
                 </span>
               </label>
