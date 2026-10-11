@@ -15,11 +15,88 @@ const QUESTION_ID = /^[A-Z][A-Z0-9]{1,15}-\d{4}$/;
 const ID = /^[a-z][a-z0-9-]{0,31}$/;
 const ID_MESSAGE = "ID は英小文字・数字・ハイフンで、英字から始めます";
 
-/** 節: 単元の本文の 1 区切り。 */
+/** 図の箱(ノード)。ID は辺の from / to で参照する */
+export const DiagramNodeSchema = z.strictObject({
+  id: z.string().regex(ID, ID_MESSAGE),
+  label: text.max(20),
+});
+
+/** 図の矢印(辺)。from の箱から to の箱へ向かう。ラベルは任意 */
+export const DiagramEdgeSchema = z.strictObject({
+  from: z.string().regex(ID, ID_MESSAGE),
+  to: z.string().regex(ID, ID_MESSAGE),
+  label: text.max(12).optional(),
+});
+
+/**
+ * 図解: 箱と矢印の図。箱は、矢印の向きに沿って上から下へ段に並べて描く(packages/app/src/lib/diagram-layout.ts)。
+ * 段に並べられるよう、矢印が一周して戻る形(閉路)と、自分自身への矢印は置けない。
+ */
+export const DiagramSchema = z
+  .strictObject({
+    /** 図の題。画面の見出しと、読み上げの名前になる */
+    title: text.max(80),
+    nodes: z.array(DiagramNodeSchema).min(2).max(20),
+    edges: z.array(DiagramEdgeSchema).min(1).max(40),
+  })
+  .superRefine((diagram, ctx) => {
+    // 参照の誤りがあるときは、閉路の検査を省く(誤りの報告を重ねない)
+    let valid = true;
+    const nodes = new Set<string>();
+    diagram.nodes.forEach((node, i) => {
+      if (nodes.has(node.id)) {
+        valid = false;
+        ctx.addIssue({ code: "custom", path: ["nodes", i, "id"], message: "図の箱の ID が重複しています" });
+      }
+      nodes.add(node.id);
+    });
+    const pairs = new Set<string>();
+    diagram.edges.forEach((edge, i) => {
+      for (const end of ["from", "to"] as const) {
+        if (!nodes.has(edge[end])) {
+          valid = false;
+          ctx.addIssue({ code: "custom", path: ["edges", i, end], message: "図にない箱を指しています" });
+        }
+      }
+      if (edge.from === edge.to) {
+        valid = false;
+        ctx.addIssue({ code: "custom", path: ["edges", i], message: "自分自身への矢印は置けません" });
+      }
+      const pair = `${edge.from}>${edge.to}`;
+      if (pairs.has(pair)) {
+        ctx.addIssue({ code: "custom", path: ["edges", i], message: "同じ向きの矢印が重複しています" });
+      }
+      pairs.add(pair);
+    });
+    if (valid && hasCycle(diagram.nodes, diagram.edges)) {
+      ctx.addIssue({ code: "custom", path: ["edges"], message: "矢印が一周して戻る形(閉路)になっています" });
+    }
+  });
+
+/** 矢印をたどって元の箱に戻れる形があるか(入ってくる矢印のない箱から順に取り除き、残りがあれば閉路) */
+function hasCycle(nodes: readonly { id: string }[], edges: readonly { from: string; to: string }[]): boolean {
+  const indegree = new Map(nodes.map((node) => [node.id, 0]));
+  for (const edge of edges) indegree.set(edge.to, (indegree.get(edge.to) ?? 0) + 1);
+  const queue = nodes.filter((node) => indegree.get(node.id) === 0).map((node) => node.id);
+  let removed = 0;
+  for (let id = queue.shift(); id !== undefined; id = queue.shift()) {
+    removed += 1;
+    for (const edge of edges) {
+      if (edge.from !== id) continue;
+      const rest = (indegree.get(edge.to) ?? 0) - 1;
+      indegree.set(edge.to, rest);
+      if (rest === 0) queue.push(edge.to);
+    }
+  }
+  return removed < indegree.size;
+}
+
+/** 節: 単元の本文の 1 区切り。図解は任意で、本文のあとに描く */
 export const CurriculumSectionSchema = z.strictObject({
   id: z.string().regex(ID, ID_MESSAGE),
   title: text.max(80),
   body: text.max(10000),
+  diagram: DiagramSchema.optional(),
 });
 
 /** 単元: 順に読む節と、関連する問題。 */
@@ -79,6 +156,7 @@ export const CurriculumFileSchema = z
     });
   });
 
+export type Diagram = z.infer<typeof DiagramSchema>;
 export type CurriculumSection = z.infer<typeof CurriculumSectionSchema>;
 export type CurriculumUnit = z.infer<typeof CurriculumUnitSchema>;
 export type CurriculumFile = z.infer<typeof CurriculumFileSchema>;
