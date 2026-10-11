@@ -10,7 +10,7 @@ import {
   TEMP_PASSWORD_DAYS,
 } from "./auth-stack.ts";
 import type { InfraConfig } from "./config.ts";
-import { DataStack, HISTORY_TABLE_ACTIONS } from "./data-stack.ts";
+import { DataStack, HISTORY_TABLE_ACTIONS, POINT_IN_TIME_RECOVERY_DAYS } from "./data-stack.ts";
 import { ORIGIN_VERIFY_HEADER, WebStack } from "./web-stack.ts";
 
 const config: InfraConfig = {
@@ -133,10 +133,26 @@ describe("DataStack", () => {
   it("テーブルは_追加費用のかかる設定を持たず_スタックを消しても残る", () => {
     const [table] = Object.values(dataTemplate().findResources("AWS::DynamoDB::Table"));
     expect(table?.DeletionPolicy).toBe("Retain");
+    expect(table?.UpdateReplacePolicy).toBe("Retain");
     // 暗号化は既定(AWS 所有のキー)のまま。KMS のキーを使うと費用がかかる
     expect(table?.Properties.SSESpecification).toBeUndefined();
-    expect(table?.Properties.PointInTimeRecoverySpecification).toBeUndefined();
     expect(table?.Properties.GlobalSecondaryIndexes).toBeUndefined();
+    expect(table?.Properties.StreamSpecification).toBeUndefined();
+    expect(table?.Properties.ReplicaSpecification).toBeUndefined();
+  });
+
+  it("テーブルは_時点復旧が有効で_戻せる期間が最大になっている", () => {
+    dataTemplate().hasResourceProperties("AWS::DynamoDB::Table", {
+      PointInTimeRecoverySpecification: {
+        PointInTimeRecoveryEnabled: true,
+        RecoveryPeriodInDays: POINT_IN_TIME_RECOVERY_DAYS,
+      },
+    });
+    expect(POINT_IN_TIME_RECOVERY_DAYS).toBe(35);
+  });
+
+  it("テーブルは_削除保護が有効になっている", () => {
+    dataTemplate().hasResourceProperties("AWS::DynamoDB::Table", { DeletionProtectionEnabled: true });
   });
 });
 

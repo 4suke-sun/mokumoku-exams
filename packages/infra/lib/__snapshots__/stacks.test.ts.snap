@@ -176,6 +176,7 @@ exports[`DataStack > 合成すると_スナップショットと一致する 1`]
           },
         ],
         "BillingMode": "PAY_PER_REQUEST",
+        "DeletionProtectionEnabled": true,
         "KeySchema": [
           {
             "AttributeName": "PK",
@@ -186,6 +187,10 @@ exports[`DataStack > 合成すると_スナップショットと一致する 1`]
             "KeyType": "RANGE",
           },
         ],
+        "PointInTimeRecoverySpecification": {
+          "PointInTimeRecoveryEnabled": true,
+          "RecoveryPeriodInDays": 35,
+        },
       },
       "Type": "AWS::DynamoDB::Table",
       "UpdateReplacePolicy": "Retain",
