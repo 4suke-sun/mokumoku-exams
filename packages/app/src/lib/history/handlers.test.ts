@@ -8,6 +8,8 @@ import { type HistoryDeps, handleListResults, handlePostResult } from "./handler
 import { createMemoryRepository, type HistoryRepository } from "./repository.ts";
 
 const ORIGIN = "http://localhost";
+/** 完了時刻の範囲の検査を、時計に頼らず確かめるための「いま」 */
+const NOW = Date.parse("2026-10-12T00:00:00.000Z");
 
 /** トークンの文字列から利用者を決める検証(署名の検証そのものは verify.test.ts で確かめる) */
 const verifier: TokenVerifier = {
@@ -22,14 +24,14 @@ const noRefresh = {
 } as unknown as AuthProvider;
 
 function deps(repository: HistoryRepository = createMemoryRepository()): HistoryDeps {
-  return { auth: { verifier, provider: noRefresh, secure: false }, repository };
+  return { auth: { verifier, provider: noRefresh, secure: false }, repository, now: () => NOW };
 }
 
 const asUser = (sub: string) => `mokumoku_id=token-${sub}`;
-const body = (result: Partial<Result> & Record<string, unknown> = {}) => ({
+const body = (result: Record<string, unknown> = {}) => ({
   examCode: "SAMPLE",
-  questionIds: ["Q-0001"],
-  answers: { "Q-0001": ["A"] },
+  questionIds: ["SAMPLE-0001"],
+  answers: { "SAMPLE-0001": ["A"] },
   finishedAt: "2026-10-11T12:00:00.000Z",
   ...result,
 });
@@ -169,7 +171,10 @@ describe("履歴 API の入力", () => {
 
   it("本文が大きすぎる_413 で断り_保存しない", async () => {
     const repository = createMemoryRepository();
-    const big = body({ answers: { "Q-0001": ["A"] }, questionIds: Array.from({ length: 500 }, () => "Q".repeat(64)) });
+    const big = body({
+      answers: { "SAMPLE-0001": ["A"] },
+      questionIds: Array.from({ length: 500 }, () => "Q".repeat(64)),
+    });
     const response = await handlePostResult(
       post(big, { cookie }, JSON.stringify(big).padEnd(200_000, " ")),
       deps(repository),
@@ -194,6 +199,111 @@ describe("履歴 API の入力", () => {
 
   it("資格コードのない問い合わせ_400 で断る", async () => {
     expect((await handleListResults(get("", { cookie }), deps())).status).toBe(400);
+  });
+
+  it("同じ名前の問い合わせが重なる_どちらを使うか曖昧なので 400 で断る", async () => {
+    expect((await handleListResults(get("examCode=SAMPLE&examCode=OTHER", { cookie }), deps())).status).toBe(400);
+  });
+});
+
+describe("履歴 API の入力の検証", () => {
+  const cookie = asUser("a");
+  const hour = 60 * 60 * 1000;
+
+  it.each([
+    ["問題 ID が資格コードと合わない", { questionIds: ["OTHER-0001"], answers: {} }],
+    ["問題 ID が決まった形でない", { questionIds: ["q1"], answers: {} }],
+    ["問題 ID が重なる", { questionIds: ["SAMPLE-0001", "SAMPLE-0001"], answers: {} }],
+    ["出題にない問題への回答がある", { answers: { "SAMPLE-0009": ["A"] } }],
+    ["選択肢のキーが A から J の外", { answers: { "SAMPLE-0001": ["K"] } }],
+    ["選択肢のキーが小文字", { answers: { "SAMPLE-0001": ["a"] } }],
+    ["選択肢のキーが重なる", { answers: { "SAMPLE-0001": ["A", "A"] } }],
+    ["選択肢のキーが 11 個以上", { answers: { "SAMPLE-0001": Array.from({ length: 11 }, () => "A") } }],
+    ["出題にない問題の選択肢の並びがある", { choiceOrder: { "SAMPLE-0009": ["A", "B"] } }],
+    ["選択肢の並びにキーの重なりがある", { choiceOrder: { "SAMPLE-0001": ["A", "A"] } }],
+    ["回答が配列でない", { answers: { "SAMPLE-0001": "A" } }],
+    ["回答が配列の外", { answers: [] }],
+    ["完了時刻が文字列でない", { finishedAt: 20261011 }],
+    ["資格コードが文字列でない", { examCode: 1 }],
+  ])("%s_400 で断り_何も保存しない", async (_name, overrides) => {
+    const repository = createMemoryRepository();
+    const response = await handlePostResult(post(body(overrides), { cookie }), deps(repository));
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ error: "bad-request" });
+    expect(await repository.listResults("a", "SAMPLE")).toEqual([]);
+  });
+
+  it("完了時刻が時計のずれの幅を超えて先_400 で断る", async () => {
+    const tooLate = new Date(NOW + 25 * hour).toISOString();
+    expect((await handlePostResult(post(body({ finishedAt: tooLate }), { cookie }), deps())).status).toBe(400);
+  });
+
+  it("完了時刻が時計のずれの幅の中_受け付ける", async () => {
+    const soon = new Date(NOW + 23 * hour).toISOString();
+    expect((await handlePostResult(post(body({ finishedAt: soon }), { cookie }), deps())).status).toBe(200);
+  });
+
+  it("完了時刻が下限より前_400 で断る", async () => {
+    const old = "2019-12-31T23:59:59.999Z";
+    expect((await handlePostResult(post(body({ finishedAt: old }), { cookie }), deps())).status).toBe(400);
+  });
+
+  it("完了時刻がちょうど下限_受け付ける", async () => {
+    const earliest = "2020-01-01T00:00:00.000Z";
+    expect((await handlePostResult(post(body({ finishedAt: earliest }), { cookie }), deps())).status).toBe(200);
+  });
+
+  it("時計を渡さない_実際の現在の時刻で範囲を確かめる", async () => {
+    const d: HistoryDeps = { auth: deps().auth, repository: createMemoryRepository() };
+    const justNow = new Date().toISOString();
+    expect((await handlePostResult(post(body({ finishedAt: justNow }), { cookie }), d)).status).toBe(200);
+  });
+
+  it("選択肢の並びと回答が正しい形_受け付ける", async () => {
+    const valid = body({
+      questionIds: ["SAMPLE-0001", "SAMPLE-0002"],
+      answers: { "SAMPLE-0001": ["A", "C"] },
+      choiceOrder: { "SAMPLE-0001": ["C", "B", "A"], "SAMPLE-0002": ["D", "A"] },
+    });
+    expect((await handlePostResult(post(valid, { cookie }), deps())).status).toBe(200);
+  });
+
+  it("未回答の問題がある_回答がなくても受け付ける", async () => {
+    const unanswered = body({ questionIds: ["SAMPLE-0001", "SAMPLE-0002"], answers: {} });
+    expect((await handlePostResult(post(unanswered, { cookie }), deps())).status).toBe(200);
+  });
+
+  it("入力が正しくない_応答に入力の値を含めない", async () => {
+    const marker = "marker-value-that-must-not-echo";
+    const response = await handlePostResult(post(body({ examCode: marker }), { cookie }), deps());
+    expect(response.status).toBe(400);
+    expect(await response.text()).not.toContain(marker);
+    const listed = await handleListResults(get(`examCode=${marker}`, { cookie }), deps());
+    expect(listed.status).toBe(400);
+    expect(await listed.text()).not.toContain(marker);
+  });
+
+  it("申告された大きさが上限を超える_読み込まずに 413 で断る", async () => {
+    const repository = createMemoryRepository();
+    const request = post(body(), { cookie, "content-length": "200000" });
+    const response = await handlePostResult(request, deps(repository));
+    expect(response.status).toBe(413);
+    expect(await response.json()).toEqual({ error: "too-large" });
+  });
+
+  it("エラーの応答_種類だけを持ち_保存しない形で返る", async () => {
+    const cases: Array<[Response, number, string]> = [
+      [await handlePostResult(post(body()), deps()), 401, "unauthorized"],
+      [await handleListResults(get("examCode=SAMPLE"), deps()), 401, "unauthorized"],
+      [await handlePostResult(post(body({ extra: 1 }), { cookie }), deps()), 400, "bad-request"],
+      [await handleListResults(get("", { cookie }), deps()), 400, "bad-request"],
+    ];
+    for (const [response, status, error] of cases) {
+      expect(response.status).toBe(status);
+      expect(await response.json()).toEqual({ error });
+      expect(response.headers.get("cache-control")).toBe("no-store");
+      expect(response.headers.get("content-type")).toContain("application/json");
+    }
   });
 });
 

@@ -32,6 +32,7 @@
 
 - **ログインなしで開ける経路**: `/login`、`/forgot-password`、`/_next/*`、認証の API のうち列挙した 7 つ(`login`・`new-password`・`forgot-password`・`reset-password`・`refresh`・`logout`・`session`)だけです。
   ほかは、すべて検証が通らないと開けません(`/api/auth/change-password` や、資格の一覧・ヘルプも同じです)。列挙は完全一致で、大文字小文字、末尾のスラッシュ、`..`・`%`・`\` を含むものでは広げられません。新しい認証の API は、列挙に足さない限り保護されます。
+  画面と API の経路の一覧は `packages/app/src/authorization.test.ts` に固定してあり、新しい画面や API を足すと、一覧に足すまでテストが落ちます(公開するか、保護するかを、意識して決めるためです)。
 - **未ログインのとき**: 画面は `/login?next=<元の場所>` へ移します。API は `401` を返します。`next` は、このサイト内の画面だけを受け付けます(`lib/auth/redirect.ts`)。
 - **検証の内容**(`lib/auth/verify.ts`): 署名(RS256、Cognito の公開鍵)、発行元(`iss`)、クライアント(`aud`)、用途(`token_use=id`)、有効期限(`exp`)、`sub` の形。
   どれか 1 つでも合わなければ拒否します。公開鍵は Cognito の JWKS から取り、メモリに 1 時間保ちます。取得できないときも、拒否します(通す側には倒しません)。
