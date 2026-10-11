@@ -3,7 +3,7 @@ export const TOOL_VARIABLES = ["AWS_PROFILE", "AWS_REGION"] as const;
 /** 値が必須の変数 */
 export const REQUIRED_VARIABLES = ["WEB_ADAPTER_LAYER_ARN", "ORIGIN_VERIFY_VALUE"] as const;
 /** 省略できる変数 */
-export const OPTIONAL_VARIABLES = ["STACK_PREFIX"] as const;
+export const OPTIONAL_VARIABLES = ["STACK_PREFIX", "ALARM_EMAIL"] as const;
 
 /** .env.example に載せる変数の全体。載せる変数と、ここの一覧が食い違わないことをテストで確かめる。 */
 export const ENV_VARIABLES = [...TOOL_VARIABLES, ...REQUIRED_VARIABLES, ...OPTIONAL_VARIABLES] as const;
@@ -15,6 +15,8 @@ export type InfraConfig = {
   webAdapterLayerArn: string;
   /** CloudFront がオリジンへ付ける合言葉。アプリが、この値のないリクエストを断る */
   originVerifyValue: string;
+  /** アラームの通知先のメールアドレス。なければ、通知先は作らない(アラームの状態は画面で確かめる) */
+  alarmEmail?: string;
 };
 
 export type Env = Record<string, string | undefined>;
@@ -23,6 +25,7 @@ const DEFAULT_STACK_PREFIX = "mokumoku-exams";
 const STACK_PREFIX = /^[A-Za-z][A-Za-z0-9-]{0,30}$/;
 const LAYER_ARN = /^arn:aws:lambda:[a-z0-9-]+:\d{12}:layer:[A-Za-z0-9_-]+:\d+$/;
 const MIN_ORIGIN_VERIFY_LENGTH = 32;
+const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
  * 環境変数からインフラの設定を作る。
@@ -49,8 +52,13 @@ export function loadConfig(env: Env): InfraConfig {
     problems.push(`ORIGIN_VERIFY_VALUE は ${MIN_ORIGIN_VERIFY_LENGTH} 文字以上にしてください`);
   }
 
+  const alarmEmail = env.ALARM_EMAIL || undefined;
+  if (alarmEmail && !EMAIL.test(alarmEmail)) {
+    problems.push("ALARM_EMAIL は、メールアドレスの形にしてください");
+  }
+
   if (problems.length > 0) {
     throw new Error(`.env の設定に問題があります:\n- ${problems.join("\n- ")}`);
   }
-  return { stackPrefix, webAdapterLayerArn, originVerifyValue };
+  return { stackPrefix, webAdapterLayerArn, originVerifyValue, alarmEmail };
 }

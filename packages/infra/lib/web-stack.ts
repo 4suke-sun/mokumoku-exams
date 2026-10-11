@@ -1,9 +1,14 @@
 import { CfnOutput, Duration, RemovalPolicy, Stack, type StackProps } from "aws-cdk-lib";
 import * as cloudfront from "aws-cdk-lib/aws-cloudfront";
 import * as origins from "aws-cdk-lib/aws-cloudfront-origins";
+import * as cloudwatch from "aws-cdk-lib/aws-cloudwatch";
+import * as cloudwatchActions from "aws-cdk-lib/aws-cloudwatch-actions";
 import * as lambda from "aws-cdk-lib/aws-lambda";
+import * as logs from "aws-cdk-lib/aws-logs";
 import * as s3 from "aws-cdk-lib/aws-s3";
 import * as s3deploy from "aws-cdk-lib/aws-s3-deployment";
+import * as sns from "aws-cdk-lib/aws-sns";
+import * as subscriptions from "aws-cdk-lib/aws-sns-subscriptions";
 import type { Construct } from "constructs";
 import type { InfraConfig } from "./config.ts";
 
@@ -11,6 +16,10 @@ import type { InfraConfig } from "./config.ts";
 export const ORIGIN_VERIFY_HEADER = "x-origin-verify";
 /** Lambda 上でアプリが待ち受けるポート */
 const APP_PORT = "8080";
+/** アプリのログを残す期間 */
+const LOG_RETENTION = logs.RetentionDays.ONE_MONTH;
+/** HSTS の有効期間(1 年) */
+const HSTS_MAX_AGE = Duration.days(365);
 
 type Props = StackProps & {
   config: InfraConfig;
@@ -39,8 +48,14 @@ export class WebStack extends Stack {
     });
 
     const webAdapter = lambda.LayerVersion.fromLayerVersionArn(this, "WebAdapterLayer", config.webAdapterLayerArn);
+    // ログのグループを自前で作り、保持期間を決める(任せると無期限に溜まる)
+    const appLogGroup = new logs.LogGroup(this, "AppLogGroup", {
+      retention: LOG_RETENTION,
+      removalPolicy: RemovalPolicy.DESTROY,
+    });
     const appFunction = new lambda.Function(this, "AppFunction", {
       functionName: `${config.stackPrefix}-app`,
+      logGroup: appLogGroup,
       runtime: lambda.Runtime.NODEJS_22_X,
       architecture: lambda.Architecture.X86_64,
       // Lambda Web Adapter が、run.sh の起動したサーバーへリクエストを渡す
@@ -69,14 +84,28 @@ export class WebStack extends Stack {
     });
     const staticOrigin = origins.S3BucketOrigin.withOriginAccessControl(assetsBucket);
 
+    // すべての応答に付けるセキュリティヘッダー。アプリ側が同じヘッダーを付けても、こちらを優先する
+    const securityHeaders = new cloudfront.ResponseHeadersPolicy(this, "SecurityHeaders", {
+      securityHeadersBehavior: {
+        strictTransportSecurity: { accessControlMaxAge: HSTS_MAX_AGE, includeSubdomains: true, override: true },
+        contentTypeOptions: { override: true },
+        referrerPolicy: {
+          referrerPolicy: cloudfront.HeadersReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN,
+          override: true,
+        },
+        frameOptions: { frameOption: cloudfront.HeadersFrameOption.DENY, override: true },
+      },
+    });
+
     this.distribution = new cloudfront.Distribution(this, "Distribution", {
       comment: `${config.stackPrefix} web`,
       defaultBehavior: {
         origin: dynamicOrigin,
         viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
         allowedMethods: cloudfront.AllowedMethods.ALLOW_ALL,
-        // キャッシュの設定は、別の段階で整える
+        // 動的な応答(画面と API)はキャッシュしない
         cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
+        responseHeadersPolicy: securityHeaders,
         originRequestPolicy: cloudfront.OriginRequestPolicy.ALL_VIEWER_EXCEPT_HOST_HEADER,
       },
       additionalBehaviors: {
@@ -84,7 +113,9 @@ export class WebStack extends Stack {
           origin: staticOrigin,
           viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
           allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD,
+          // ファイル名にハッシュが入る静的ファイルは、長くキャッシュする
           cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
+          responseHeadersPolicy: securityHeaders,
         },
       },
       minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
@@ -97,6 +128,28 @@ export class WebStack extends Stack {
       distribution: this.distribution,
       distributionPaths: ["/_next/static/*"],
     });
+
+    // 通知先(SNS トピック)。メールの購読は、アドレスが渡されたときだけ作る
+    const alarmTopic = new sns.Topic(this, "AlarmTopic");
+    if (config.alarmEmail) alarmTopic.addSubscription(new subscriptions.EmailSubscription(config.alarmEmail));
+
+    const alarms = [
+      new cloudwatch.Alarm(this, "AppErrorsAlarm", {
+        alarmDescription: "アプリの Lambda でエラーが出ています",
+        metric: appFunction.metricErrors({ period: Duration.minutes(5), statistic: "Sum" }),
+        threshold: 1,
+        evaluationPeriods: 1,
+        treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
+      }),
+      new cloudwatch.Alarm(this, "AppThrottlesAlarm", {
+        alarmDescription: "アプリの Lambda が実行を制限されています",
+        metric: appFunction.metricThrottles({ period: Duration.minutes(5), statistic: "Sum" }),
+        threshold: 1,
+        evaluationPeriods: 1,
+        treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
+      }),
+    ];
+    for (const alarm of alarms) alarm.addAlarmAction(new cloudwatchActions.SnsAction(alarmTopic));
 
     new CfnOutput(this, "DistributionDomainName", { value: this.distribution.distributionDomainName });
   }

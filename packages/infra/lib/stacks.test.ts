@@ -1,6 +1,6 @@
 import { fileURLToPath } from "node:url";
 import { App, DefaultStackSynthesizer } from "aws-cdk-lib";
-import { Template } from "aws-cdk-lib/assertions";
+import { Match, Template } from "aws-cdk-lib/assertions";
 import { describe, expect, it } from "vitest";
 import {
   ADMIN_GROUP_NAME,
@@ -26,11 +26,11 @@ function authTemplate(): Template {
   return Template.fromStack(new AuthStack(new App(), "Auth", { env, synthesizer, stackPrefix: config.stackPrefix }));
 }
 
-function webTemplate(): Template {
+function webTemplate(alarmEmail?: string): Template {
   const stack = new WebStack(new App(), "Web", {
     env,
     synthesizer,
-    config,
+    config: { ...config, alarmEmail },
     lambdaCodePath: fixture("lambda"),
     staticAssetsPath: fixture("static"),
     userPoolClientId: "client-example",
@@ -152,6 +152,59 @@ describe("WebStack", () => {
     });
     template.hasResourceProperties("AWS::CloudFront::Distribution", {
       DistributionConfig: { CacheBehaviors: [{ PathPattern: "/_next/static/*" }] },
+    });
+  });
+
+  it("セキュリティヘッダーが_動的な応答と静的ファイルの両方に付く", () => {
+    const template = webTemplate();
+    template.hasResourceProperties("AWS::CloudFront::ResponseHeadersPolicy", {
+      ResponseHeadersPolicyConfig: {
+        SecurityHeadersConfig: {
+          StrictTransportSecurity: { AccessControlMaxAgeSec: 31536000, IncludeSubdomains: true, Override: true },
+          ContentTypeOptions: { Override: true },
+          ReferrerPolicy: { ReferrerPolicy: "strict-origin-when-cross-origin", Override: true },
+          FrameOptions: { FrameOption: "DENY", Override: true },
+        },
+      },
+    });
+    const [distribution] = Object.values(template.findResources("AWS::CloudFront::Distribution"));
+    const config = distribution?.Properties.DistributionConfig;
+    expect(config.DefaultCacheBehavior.ResponseHeadersPolicyId).toBeDefined();
+    expect(config.CacheBehaviors[0].ResponseHeadersPolicyId).toEqual(
+      config.DefaultCacheBehavior.ResponseHeadersPolicyId,
+    );
+  });
+
+  it("動的な応答はキャッシュされず_静的ファイルはキャッシュされる", () => {
+    const template = webTemplate();
+    const [distribution] = Object.values(template.findResources("AWS::CloudFront::Distribution"));
+    const config = distribution?.Properties.DistributionConfig;
+    // マネージドのキャッシュポリシー: CachingDisabled / CachingOptimized
+    expect(config.DefaultCacheBehavior.CachePolicyId).toBe("4135ea2d-6df8-44a3-9df3-4b5a84be39ad");
+    expect(config.CacheBehaviors[0].CachePolicyId).toBe("658327ea-f89d-4fab-a63d-7e88639e58f6");
+  });
+
+  it("アプリのログに_保持期間がある", () => {
+    webTemplate().hasResourceProperties("AWS::Logs::LogGroup", { RetentionInDays: 30 });
+  });
+
+  it("エラーと実行制限のアラームが_通知先のトピックにつながる", () => {
+    const template = webTemplate();
+    template.resourceCountIs("AWS::CloudWatch::Alarm", 2);
+    for (const metricName of ["Errors", "Throttles"]) {
+      template.hasResourceProperties("AWS::CloudWatch::Alarm", {
+        MetricName: metricName,
+        Namespace: "AWS/Lambda",
+        AlarmActions: [{ Ref: Match.stringLikeRegexp("AlarmTopic") }],
+      });
+    }
+  });
+
+  it("通知先のメールは_指定したときだけ購読される", () => {
+    webTemplate().resourceCountIs("AWS::SNS::Subscription", 0);
+    webTemplate("alerts@example.com").hasResourceProperties("AWS::SNS::Subscription", {
+      Protocol: "email",
+      Endpoint: "alerts@example.com",
     });
   });
 });
