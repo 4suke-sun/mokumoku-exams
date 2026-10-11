@@ -82,7 +82,7 @@ export function PushSettings({ publicKey, canSendTest = false }: { publicKey: st
 
   return (
     <div className="space-y-3">
-      <h2 className="text-lg font-bold">通知</h2>
+      <h2 className="h2">通知</h2>
       <p className="text-sm text-muted">学習のリマインドを、毎日 1 回、この端末に通知します。</p>
       {status === "loading" ? <p className="text-muted">確かめています…</p> : null}
       {status === "unavailable" ? <p className="text-muted">この環境では、通知を設定できません。</p> : null}

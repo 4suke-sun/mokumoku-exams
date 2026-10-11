@@ -72,7 +72,7 @@ export function LoginForm({ next = "/" }: { next?: string }) {
   if (step.name === "new-password") {
     return (
       <form onSubmit={submitNewPassword} className="space-y-5" noValidate>
-        <h1 className="text-2xl font-bold">パスワードを決める</h1>
+        <h1 className="h1">パスワードを決める</h1>
         <p className="text-muted">はじめてのログインです。これから使うパスワードを決めてください。</p>
         <Field
           id="new-password"
@@ -99,7 +99,7 @@ export function LoginForm({ next = "/" }: { next?: string }) {
 
   return (
     <form onSubmit={submitLogin} className="space-y-5">
-      <h1 className="text-2xl font-bold">ログイン</h1>
+      <h1 className="h1">ログイン</h1>
       <p className="text-muted">招待されたメールアドレスで、ログインしてください。</p>
       <Field id="email" label="メールアドレス" type="email" value={email} onChange={setEmail} autoComplete="username" />
       <Field

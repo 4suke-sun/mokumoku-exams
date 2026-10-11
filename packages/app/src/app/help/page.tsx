@@ -24,7 +24,7 @@ export default function HelpPage() {
 
   return (
     <article className="space-y-8">
-      <h1 className="text-2xl font-bold">使い方</h1>
+      <h1 className="h1">使い方</h1>
 
       <nav aria-label="使い方の目次">
         <ol className="list-decimal space-y-1 pl-6">

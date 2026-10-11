@@ -4,6 +4,7 @@ import { type FormEvent, useCallback, useEffect, useState } from "react";
 import { createdLabel, disableUser, fetchUsers, inviteUser, statusLabel } from "@/lib/admin/client.ts";
 import type { AdminUserRow } from "@/lib/admin/handlers.ts";
 import { Field, FormError, SubmitButton } from "./form-parts.tsx";
+import { Notice } from "./notice.tsx";
 
 type ListState =
   | { status: "loading" }
@@ -62,12 +63,12 @@ export function AdminView() {
   return (
     <section className="space-y-8">
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold">管理</h1>
+        <h1 className="h1">管理</h1>
         <p className="text-sm text-muted">この画面は、管理者のグループに入っているアカウントだけが開けます。</p>
       </div>
 
       <form onSubmit={submitInvite} className="max-w-md space-y-5" noValidate>
-        <h2 className="text-lg font-bold">ユーザーを招待する</h2>
+        <h2 className="h2">ユーザーを招待する</h2>
         <Field
           id="invite-email"
           label="メールアドレス"
@@ -79,29 +80,20 @@ export function AdminView() {
         />
         <FormError message={inviteError} />
         {invited ? (
-          <p role="status" className="text-correct">
+          <Notice kind="success">
             {invited} を招待しました。仮のパスワードでログインすると、新しいパスワードを決める画面に進みます。
-          </p>
+          </Notice>
         ) : null}
         <SubmitButton busy={inviting}>招待する</SubmitButton>
       </form>
 
       <div className="space-y-3">
-        <h2 className="text-lg font-bold">ユーザーの一覧</h2>
-        {disableMessage ? (
-          <p
-            role={disableMessage.ok ? "status" : "alert"}
-            className={disableMessage.ok ? "text-correct" : "text-incorrect"}
-          >
-            {disableMessage.text}
-          </p>
-        ) : null}
+        <h2 className="h2">ユーザーの一覧</h2>
+        {disableMessage ? <Notice kind={disableMessage.ok ? "success" : "error"}>{disableMessage.text}</Notice> : null}
         {list.status === "loading" ? <p className="text-muted">読み込んでいます…</p> : null}
         {list.status === "error" ? (
           <div className="space-y-2">
-            <p role="alert" className="text-incorrect">
-              {list.message}
-            </p>
+            <Notice kind="error">{list.message}</Notice>
             <button type="button" className={secondaryButton} onClick={() => void load()}>
               読み直す
             </button>

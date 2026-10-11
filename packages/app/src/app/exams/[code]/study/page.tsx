@@ -35,17 +35,14 @@ export default async function StudyPage({ params }: Props) {
         <Link href={`/exams/${exam.examCode}`} className="text-sm text-primary hover:underline">
           モード選択へ戻る
         </Link>
-        <h1 className="text-2xl font-bold">学習モード</h1>
+        <h1 className="h1">学習モード</h1>
         <p className="text-sm text-muted">{exam.name}。単元を読んでから、その単元の問題を解きます。</p>
       </div>
 
       <ol className="space-y-2">
         {units.map((unit, i) => (
           <li key={unit.id}>
-            <Link
-              href={`/exams/${exam.examCode}/study/${unit.id}`}
-              className="block rounded-lg border border-line bg-surface p-4 hover:border-primary"
-            >
+            <Link href={`/exams/${exam.examCode}/study/${unit.id}`} className="card p-4">
               <span className="block font-bold text-primary">
                 {i + 1}. {unit.title}
               </span>

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Notice } from "./notice.tsx";
 
 const inputClass = "w-full rounded-md border border-line bg-surface px-3 py-2";
 
@@ -39,11 +40,7 @@ export function Field(props: {
 }
 
 export function FormError({ message }: { message: string | null }) {
-  return message ? (
-    <p role="alert" className="text-incorrect">
-      {message}
-    </p>
-  ) : null;
+  return message ? <Notice kind="error">{message}</Notice> : null;
 }
 
 export function SubmitButton({ busy, children }: { busy: boolean; children: ReactNode }) {

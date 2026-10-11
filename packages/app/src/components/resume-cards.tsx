@@ -32,12 +32,12 @@ export function ResumeCards({ exams }: Props) {
 
   return (
     <div className="space-y-3">
-      <h2 className="text-lg font-bold">前回の続き</h2>
+      <h2 className="h2">前回の続き</h2>
       <ul className="space-y-3">
         {items.map(({ exam, session }) => {
           const { answered, total } = sessionProgress(session);
           return (
-            <li key={exam.examCode} className="space-y-3 rounded-lg border border-primary bg-surface p-4">
+            <li key={exam.examCode} className="card border-primary space-y-3 p-4">
               <div className="space-y-1">
                 <p className="font-bold">{exam.name}</p>
                 <p className="text-sm text-muted">

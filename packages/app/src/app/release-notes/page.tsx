@@ -8,7 +8,7 @@ export default function ReleaseNotesPage() {
 
   return (
     <article className="space-y-8">
-      <h1 className="text-2xl font-bold">リリースノート</h1>
+      <h1 className="h1">リリースノート</h1>
       <p className="text-muted">版ごとの変更の内容です。新しい版から順に並んでいます。</p>
 
       {releases.map((release) => (

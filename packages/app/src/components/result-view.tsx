@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import { BookmarkError, BookmarkToggle, useBookmarks } from "@/components/bookmark-toggle.tsx";
 import { Confetti } from "@/components/confetti.tsx";
 import { EmptyState } from "@/components/empty-state.tsx";
+import { Notice } from "@/components/notice.tsx";
+import { ResultSkeleton } from "@/components/page-skeletons.tsx";
 import { ReferenceList } from "@/components/reference-list.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
 import { ScoreRing } from "@/components/score-ring.tsx";
@@ -113,7 +115,7 @@ export function ResultView({ exam, questions }: Props) {
   }
 
   if (state.status === "loading") {
-    return <p className="text-muted">読み込んでいます…</p>;
+    return <ResultSkeleton />;
   }
 
   const [latest, ...previous] = state.results;
@@ -125,6 +127,8 @@ export function ResultView({ exam, questions }: Props) {
   if (!latest || answered.length === 0) {
     return (
       <EmptyState
+        icon="📝"
+        headingLevel={1}
         title="結果がありません"
         description="問題を解くと、ここに結果が表示されます。"
         action={{ label: "モード選択へ", href: `/exams/${exam.examCode}` }}
@@ -145,6 +149,7 @@ export function ResultView({ exam, questions }: Props) {
   const rows = wrongOnly ? allRows.filter((row) => !row.correct) : allRows;
   const passLine = passLinePercent(exam);
   const reached = result.percent >= passLine;
+  const perfect = result.total > 0 && result.correct === result.total;
   // 直近の結果が段階の確認問題のときだけ、段階の合否を伝える
   const stage = stageCheck && stageCheck.finishedAt === latest.finishedAt ? stageCheck : null;
 
@@ -156,7 +161,7 @@ export function ResultView({ exam, questions }: Props) {
         </p>
       ) : null}
       {state.pending.length > 0 ? (
-        <div role="status" className="space-y-2 rounded-lg border border-line bg-surface p-4">
+        <div role="status" className="card space-y-2 p-4">
           <p>
             この端末にだけ残っている記録が {state.pending.length}{" "}
             件あります。アカウントに移すと、ほかの端末からも見られます。
@@ -170,14 +175,12 @@ export function ResultView({ exam, questions }: Props) {
             {migration === "busy" ? "移しています…" : "アカウントに移す"}
           </button>
           {migration === "failed" ? (
-            <p role="alert" className="text-incorrect">
-              移せなかった記録があります。時間をおいて、もう一度お試しください。
-            </p>
+            <Notice kind="error">移せなかった記録があります。時間をおいて、もう一度お試しください。</Notice>
           ) : null}
         </div>
       ) : null}
       {stage ? (
-        <div role="status" className="space-y-2 rounded-lg border border-line bg-surface p-4">
+        <div role="status" className="card space-y-2 p-4">
           <p className={`font-bold ${stage.passed ? "text-correct" : "text-warn"}`}>
             {stage.passed
               ? `段階の確認問題に合格しました(正答率 ${stage.percent}%)。単元の画面で、次の段階を確かめられます。`
@@ -192,12 +195,12 @@ export function ResultView({ exam, questions }: Props) {
         </div>
       ) : null}
       <div className="space-y-3">
-        <h1 className="text-2xl font-bold">結果</h1>
+        <h1 className="h1">結果</h1>
         <p className="text-sm text-muted">
           {exam.name} / {formatDate(latest.finishedAt)}
         </p>
-        <Confetti reached={reached} />
-        <div className="flex flex-col items-center gap-5 rounded-lg border border-line bg-surface p-5 sm:flex-row">
+        <Confetti reached={reached} perfect={perfect} />
+        <div className={`card flex flex-col items-center gap-5 p-5 sm:flex-row ${perfect ? "motion-shine" : ""}`}>
           <ScoreRing percent={result.percent} reached={reached} />
           <div>
             <p>
@@ -214,7 +217,7 @@ export function ResultView({ exam, questions }: Props) {
 
       <div className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="text-lg font-bold">問題ごとの結果</h2>
+          <h2 className="h2">問題ごとの結果</h2>
           {wrongCount > 0 ? (
             <button
               type="button"
@@ -228,12 +231,14 @@ export function ResultView({ exam, questions }: Props) {
         </div>
         <BookmarkError bookmarks={bookmarks} />
         {wrongCount === 0 ? <p className="text-correct">すべて正解でした。見直す問題はありません。</p> : null}
-        <ol className="space-y-4">
+        <ol className="motion-stagger space-y-4">
           {rows.map(({ question, number, correct }) => (
-            <li key={question.questionId} className="space-y-3 rounded-lg border border-line bg-surface p-4">
+            <li key={question.questionId} className="card space-y-3 p-4">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <p className={`font-bold ${correct ? "text-correct" : "text-incorrect"}`}>
-                  {correct ? "○ 正解" : "× 不正解"}
+                  <span className={correct ? "motion-stamp" : "motion-wrong inline-block"}>
+                    {correct ? "○ 正解" : "× 不正解"}
+                  </span>
                   <span className="ml-2 text-fg">問題 {number}</span>
                 </p>
                 <BookmarkToggle questionId={question.questionId} bookmarks={bookmarks} />
@@ -258,7 +263,7 @@ export function ResultView({ exam, questions }: Props) {
 
       {previous.length > 0 ? (
         <div className="space-y-2">
-          <h2 className="text-lg font-bold">これまでの結果</h2>
+          <h2 className="h2">これまでの結果</h2>
           <ul className="space-y-1 text-sm">
             {previous.map((past) => {
               const pastScore = score(

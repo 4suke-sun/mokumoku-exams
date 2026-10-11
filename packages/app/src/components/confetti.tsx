@@ -1,7 +1,7 @@
 "use client";
 
 import { type CSSProperties, useEffect, useState } from "react";
-import { CONFETTI_COUNT, CONFETTI_TOTAL_MS, confettiPieces } from "@/lib/confetti.ts";
+import { CONFETTI_COUNT, CONFETTI_PERFECT_COUNT, CONFETTI_TOTAL_MS, confettiPieces } from "@/lib/confetti.ts";
 import { usePrefersReducedMotion, useVisualStyle } from "@/lib/use-visual-style.ts";
 import { shouldShowConfetti } from "@/lib/visual-style.ts";
 
@@ -18,15 +18,20 @@ const COLORS = [
 type Props = {
   /** 合格ラインに届いたか。届いたときだけ出す */
   reached: boolean;
+  /** 満点か。満点のときは、量を増やす */
+  perfect?: boolean;
 };
 
 /**
  * 合格ラインに届いた結果で、1 度だけ降らせる紙吹雪。飾りなので、読み上げの対象にせず、操作も妨げない。
  * リッチのときだけ出す。端末の「動きを減らす」設定が有効なときは、スタイルにかかわらず出さない。
+ * 落ちる動きは CSS(globals.css の .confetti-piece)が持ち、ここでは出すかどうかと、片の配置だけを決める。
  */
-export function Confetti({ reached }: Props) {
+export function Confetti({ reached, perfect = false }: Props) {
   const show = shouldShowConfetti(useVisualStyle(), usePrefersReducedMotion(), reached);
-  const [pieces] = useState(() => confettiPieces(CONFETTI_COUNT, COLORS.length, Math.random));
+  const [pieces] = useState(() =>
+    confettiPieces(perfect ? CONFETTI_PERFECT_COUNT : CONFETTI_COUNT, COLORS.length, Math.random),
+  );
   const [done, setDone] = useState(false);
 
   useEffect(() => {

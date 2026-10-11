@@ -29,7 +29,7 @@ export function AccountView({ pushPublicKey = null }: { pushPublicKey?: string |
   if (state.status === "signed-out") {
     return (
       <section className="space-y-4">
-        <h1 className="text-2xl font-bold">アカウント</h1>
+        <h1 className="h1">アカウント</h1>
         <p className="text-muted">アカウントを見るには、ログインしてください。</p>
         <Link
           href="/login"
@@ -73,15 +73,15 @@ export function AccountView({ pushPublicKey = null }: { pushPublicKey?: string |
 
   return (
     <section className="space-y-8">
-      <h1 className="text-2xl font-bold">アカウント</h1>
+      <h1 className="h1">アカウント</h1>
 
       <div className="space-y-1">
-        <h2 className="text-lg font-bold">ログイン中のメールアドレス</h2>
+        <h2 className="h2">ログイン中のメールアドレス</h2>
         <p>{state.email ?? "(取得できませんでした)"}</p>
       </div>
 
       <form onSubmit={submit} className="max-w-md space-y-5" noValidate>
-        <h2 className="text-lg font-bold">パスワードの変更</h2>
+        <h2 className="h2">パスワードの変更</h2>
         <Field
           id="previous-password"
           label="いまのパスワード"
@@ -117,7 +117,7 @@ export function AccountView({ pushPublicKey = null }: { pushPublicKey?: string |
       </form>
 
       <div className="space-y-3">
-        <h2 className="text-lg font-bold">表示と出題の設定</h2>
+        <h2 className="h2">表示と出題の設定</h2>
         <p className="text-sm text-muted">この端末のブラウザに保存されます。</p>
         <div className="flex items-center gap-3">
           <span>表示テーマ</span>

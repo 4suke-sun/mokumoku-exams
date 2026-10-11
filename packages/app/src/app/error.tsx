@@ -6,7 +6,7 @@ import Link from "next/link";
 export default function ErrorPage({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
     <section className="space-y-4">
-      <h1 className="text-2xl font-bold">問題が起きました</h1>
+      <h1 className="h1">問題が起きました</h1>
       <p className="text-muted">表示中にエラーが起きました。もう一度試すか、トップへ戻ってください。</p>
       <div className="flex gap-3">
         <button

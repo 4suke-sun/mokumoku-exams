@@ -27,7 +27,7 @@ export function BookmarkCheck({ exam, questions }: Props) {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-lg font-bold">{exam.name}</h2>
+        <h2 className="h2">{exam.name}</h2>
         <Link href={`/exams/${exam.examCode}`} className="text-sm text-primary hover:underline">
           ブックマークした問題だけを解く
         </Link>
@@ -62,7 +62,7 @@ export function BookmarkCheck({ exam, questions }: Props) {
           {view === "list" ? (
             <ol className="space-y-4">
               {shown.map((question) => (
-                <li key={question.questionId} className="space-y-3 rounded-lg border border-line bg-surface p-4">
+                <li key={question.questionId} className="card space-y-3 p-4">
                   <div className="flex justify-end">
                     <BookmarkToggle questionId={question.questionId} bookmarks={bookmarks} />
                   </div>
@@ -106,7 +106,10 @@ function QuestionFace({ question, revealed }: { question: Question; revealed: bo
           {question.choices.map((choice) => {
             const isAnswer = revealed && question.correctAnswers.includes(choice.key);
             return (
-              <li key={choice.key} className="rounded border border-line p-2">
+              <li
+                key={choice.key}
+                className={`rounded border p-2 ${isAnswer ? "motion-correct border-correct bg-correct-bg" : "border-line"}`}
+              >
                 <span className="font-bold">{choice.key}. </span>
                 <InlineText text={choice.text} />
                 {isAnswer ? <span className="ml-2 font-bold text-correct">(正解)</span> : null}
@@ -141,7 +144,7 @@ function FlashCards({ questions, bookmarks }: { questions: Question[]; bookmarks
   }
 
   return (
-    <div className="space-y-3 rounded-lg border border-line bg-surface p-4">
+    <div className="card space-y-3 p-4">
       <div className="flex items-center justify-between gap-3">
         <p className="text-sm text-muted">
           {current + 1} / {questions.length} 問目
