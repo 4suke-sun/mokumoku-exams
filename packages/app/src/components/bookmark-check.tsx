@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { BookmarkError, type Bookmarks, BookmarkToggle, useBookmarks } from "@/components/bookmark-toggle.tsx";
+import { ReferenceList } from "@/components/reference-list.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 
@@ -118,6 +119,7 @@ function QuestionFace({ question, revealed }: { question: Question; revealed: bo
         <div className="space-y-2 border-t border-line pt-3">
           <h3 className="font-bold">解説</h3>
           <RichText text={question.explanation} />
+          <ReferenceList references={question.references} />
         </div>
       ) : null}
     </>

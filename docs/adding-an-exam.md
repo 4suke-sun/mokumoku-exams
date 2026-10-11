@@ -11,6 +11,7 @@
 | 公開の状態(`status`) | 問題がそろうまでは `coming-soon`(一覧に「近日公開」と出すだけ)。出題できるようになったら `published` |
 | 分野(`domains`) | `domain1`〜`domainN` のコードと表示名、公式の配点の重み(合計 1) |
 | 本番モードの値 | `officialQuestionCount`(出題数)と `officialTimeMinutes`(制限時間の分)。公式の試験に合わせます |
+| 出典のドメイン | 出典(`references`)に使う、その資格のベンダーの公式ドキュメントのホスト名。ほかの学習サイトや講座のサービスなどは使いません |
 
 ## 2. ファイルの命名と配置
 
@@ -28,14 +29,16 @@
 ## 3. 手順
 
 1. **近日公開として載せる**(任意)。`data/exams.json` の `exams` に、`examCode`・`status: "coming-soon"`・`vendor`・`name`・`shortName`(と任意の `note`)だけの 1 件を足します。
-2. **問題を書く**。`data/questions.<コード>.json` を作り、[問題データの仕様](./data-spec.md) の「3. 問題」の形で書きます。
+2. **出典のドメインを足す**(出典を付けるとき)。`scripts/lib/exam-data/schema.ts` の `ALLOWED_REFERENCE_HOSTS` に、その資格のベンダーの公式ドキュメントのホスト名(完全一致)を足し、仕様の「3.1 出典」の表にも足します。すでにあれば、足しません。
+3. **問題を書く**。`data/questions.<コード>.json` を作り、[問題データの仕様](./data-spec.md) の「3. 問題」の形で書きます。
    選択式(択一・複数選択)の問題数は、本番モードの出題数(`officialQuestionCount`)以上にします(自由記述は数えません)。
-3. **公開にする**。資格マスタの 1 件を `status: "published"` にし、`edition`・`category`・`passingScore`・`totalScore`・
+   出典の URL は `references` に書き、本文には書きません。
+4. **公開にする**。資格マスタの 1 件を `status: "published"` にし、`edition`・`category`・`passingScore`・`totalScore`・
    `officialQuestionCount`・`officialTimeMinutes`・`domains` を足します。
-4. **カリキュラムを書く**(任意)。`data/curriculum.<コード>.json` を、仕様の「11. カリキュラムのデータ」の形で作ります。
-5. **検査する**。次の「4. 検査」を通します。
-6. **画面で確かめる**。`npm run dev` で、資格の一覧、モード選択、通常出題と本番モード、結果の画面を開きます。
-7. **リリースノートに書く**。`data/release-notes.json` の、その版のエントリに、加えた資格を書きます。
+5. **カリキュラムを書く**(任意)。`data/curriculum.<コード>.json` を、仕様の「11. カリキュラムのデータ」の形で作ります。
+6. **検査する**。次の「4. 検査」を通します。
+7. **画面で確かめる**。`npm run dev` で、資格の一覧、モード選択、通常出題と本番モード、結果の画面を開きます。
+8. **リリースノートに書く**。`data/release-notes.json` の、その版のエントリに、加えた資格を書きます。
 
 ## 4. 検査
 
@@ -52,6 +55,8 @@ npm test
 - 問題の分野のコードが、資格マスタの分野にない
 - 選択式の問題数が、本番モードの出題数より少ない
 - 問題の ID の重複、接頭辞の誤り、正解のキーの誤り
+- 問題・カリキュラム・資格マスタの本文に、URL(`http://`・`https://`・`www.`)がある
+- 出典の URL が `https` でない、ユーザー情報やポートを持つ、許すドメインの一覧にない
 
 報告には、ファイル名・項目の位置・問題の ID と規則の種類だけが出ます(本文は出ません)。
 

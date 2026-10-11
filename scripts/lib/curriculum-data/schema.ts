@@ -6,8 +6,10 @@
  * 検査メッセージに入力の値を含めない(場所と種類だけ)。custom のメッセージは、固定の文言にする。
  */
 import { z } from "zod";
+import { prose, ReferencesSchema } from "../exam-data/schema.ts";
 
-const text = z.string().regex(/\S/, "空白だけの文字列です");
+/** 本文(題・本文・要約・図の文字)は、問題データと同じく、空白だけではなく URL を含まない文字列にする */
+const text = prose;
 
 const EXAM_CODE = /^[A-Z][A-Z0-9]{1,15}$/;
 const QUESTION_ID = /^[A-Z][A-Z0-9]{1,15}-\d{4}$/;
@@ -91,12 +93,14 @@ function hasCycle(nodes: readonly { id: string }[], edges: readonly { from: stri
   return removed < indegree.size;
 }
 
-/** 節: 単元の本文の 1 区切り。図解は任意で、本文のあとに描く */
+/** 節: 単元の本文の 1 区切り。図解と出典は任意で、本文のあとに出す */
 export const CurriculumSectionSchema = z.strictObject({
   id: z.string().regex(ID, ID_MESSAGE),
   title: text.max(80),
   body: text.max(10000),
   diagram: DiagramSchema.optional(),
+  /** 節の出典(公式ドキュメント)。形と規則は問題の references と同じ */
+  references: ReferencesSchema.optional(),
 });
 
 /** 段階: 単元の中で順に積み上げる区切り。確認問題に合格すると、次の段階へ進める。 */

@@ -85,7 +85,7 @@
       "correctAnswers": ["B"],         // 常に配列。択一でも 1 要素の配列
       "explanation": "総合解説",
       "supplement": "補足(任意)",
-      "references": [{ "title": "参考資料", "url": "https://example.com/" }],  // 任意
+      "references": [{ "title": "出典の題(任意)", "url": "https://docs.aws.amazon.com/" }],  // 任意。公式ドキュメントだけ(「3.1 出典」)
       "tags": ["任意のタグ"]            // 任意
     }
   ]
@@ -94,11 +94,33 @@
 
 | 必須 | 任意 |
 | --- | --- |
-| `questionId`、`examCode`、`domain`、`questionType`、`questionText`、`choices`(各 `key`・`text`)、`correctAnswers`、`explanation` | `difficulty`、`choices[].explanation`、`supplement`、`references`、`tags` |
+| `questionId`、`examCode`、`domain`、`questionType`、`questionText`、`choices`(各 `key`・`text`)、`correctAnswers`、`explanation` | `difficulty`、`choices[].explanation`、`supplement`、`references`(「3.1 出典」)、`tags` |
 
 - 選択肢は 2〜10 個です。
 - 項目の名前の綴りを誤ると(未知の項目)、検査が失敗します。
 - 自由記述の問題は、`choices` と `correctAnswers` の代わりに `rubric`(採点基準)を持ちます(「8. 自由記述」)。
+
+### 3.1 出典 `references`
+
+問題の根拠にした資料です。結果の画面と直前チェックで、解説のあとにリンクとして出します(新しいタブで開きます)。
+**出典は、資格のベンダーなどの公式ドキュメントだけ**にします。ほかの学習サイトや講座のサービスなどは書きません。
+
+| 項目 | 型 | 必須 | 規則 |
+| --- | --- | --- | --- |
+| `references` | 配列 | 任意 | 1〜10 件。同じ `url` は重ねない |
+| `references[].title` | 文字列 | 任意 | 資料の題。空白だけは不可。200 文字以内。URL を含めない。ないときは、画面に URL のホスト名を出す |
+| `references[].url` | 文字列 | 必須 | 2000 文字以内。`https://` で始まり、ユーザー情報(`user@` など)とポートを持たず、ホスト名が「許すドメイン」の一覧にある |
+
+**許すドメイン**は、`scripts/lib/exam-data/schema.ts` の `ALLOWED_REFERENCE_HOSTS` の 1 か所で定めます。ホスト名の完全一致で比べます(サブドメインも、別に足さない限り許しません)。
+
+| ホスト名 | 内容 |
+| --- | --- |
+| `docs.aws.amazon.com` | AWS の公式ドキュメント |
+| `aws.amazon.com` | AWS の公式サイト |
+| `www.nist.gov` | NIST の公式サイト |
+
+資格を足すときに、その資格のベンダーの公式ドキュメントのドメインを、一覧に足します([資格を追加する手順](./adding-an-exam.md))。
+出典の URL は `references` にだけ書き、設問文や解説などの本文には書きません(「4. 機械検査する規則」の 20)。
 
 ## 4. 機械検査する規則
 
@@ -110,7 +132,7 @@
 2. `correctAnswers` は空でなく、重複せず、すべて `choices[].key` の中にある。
 3. `questionType` は正解の数と一致する(1 つなら `single`、2 つ以上なら `multiple`)。
 4. 同じ文言の選択肢がない(空白と全角・半角の違いをならして比べる)。
-5. `references[].url` は、`http://` か `https://` で始まる。
+5. `references[].url` は、`https://` で始まり、ユーザー情報とポートを持たず、ホスト名が許すドメインの一覧にある(「3.1 出典」)。`references` は 1〜10 件で、同じ URL は重ねない。
 6. 自由記述の `rubric.criteria` は 1 つ以上。各観点の `keywords` も 1 つ以上。
 7. 自由記述の `rubric.passingPoints` は、配点(`criteria[].points`)の合計以下。
 8. 自由記述の観点名(`criteria[].name`)は重複しない(空白と全角・半角の違いをならして比べる)。結果の画面で、観点名を観点の識別に使うためです。
@@ -136,6 +158,10 @@
 
 18. `examCode` は重複しない。
 19. 合格点は満点以下。分野のコードは重複せず、重みの合計は 1(許容誤差 0.005)。
+
+**本文**
+
+20. 本文に、URL(`http://`・`https://`・`www.` を含む文字列。大文字・小文字は区別しない)を書かない。対象は、問題の設問文・選択肢・選択肢ごとの解説・総合解説・補足・自由記述の観点名・出典の題・タグ(`tags`)と、資格マスタの文字の項目(提供元、資格名、略称、版、区分、分野名、近日公開の文言)、カリキュラムの題・本文・要約・図の文字(「11. カリキュラムのデータ」)。出典の URL は、問題と節の `references` にだけ置く(「3.1 出典」)。
 
 ## 5. 採点の考え方
 
@@ -208,8 +234,10 @@
 ## 9. サンプルデータ
 
 `data/` の `SAMPLE`(公開中)と `SAMPLE2`(近日公開)は、動作確認用の架空の資格です。実在の試験の問題は含みません。
-`SAMPLE` のカリキュラム(`curriculum.sample.json`)も、動作確認用の架空の教材です。
-実データを追加するときは、そのつど、扱いを決めます。
+`SAMPLE` のカリキュラム(`curriculum.sample.json`)も、動作確認用の架空の教材です。架空の資格なので、出典(`references`)は付けません。テストと動作確認に使うため、実在の資格を加えても残します。
+
+実在の資格(`AIB` など)の問題とカリキュラムは、同じ形で、資格ごとのファイル(`questions.<コード>.json`、`curriculum.<コード>.json`)に置きます。
+資格ごとの扱いは、加えるときに、そのつど決めます。どの資格でも、本文に URL は書きません(「4. 機械検査する規則」の 20)。
 
 ## 10. 使い方ページのデータ `help.json`
 
@@ -281,6 +309,7 @@
 | `units[].sections[].title` | 文字列 | 必須 | 空白だけは不可。80 文字以内 |
 | `units[].sections[].body` | 文字列 | 必須 | 空白だけは不可。10000 文字以内 |
 | `units[].sections[].diagram` | オブジェクト | 任意 | 節の図解。本文のあとに描く。形は下の「図解」 |
+| `units[].sections[].references` | 配列 | 任意 | 節の出典。本文(と図解)のあとにリンクとして出す。形と規則は問題の `references` と同じ(「3.1 出典」) |
 | `units[].questionIds` | 配列 | 必須 | 1〜500 件。「この単元の問題を解く」で、この順に出題する。単元の中で重複不可 |
 | `units[].stages` | 配列 | 任意 | 段階学習の段階。1〜20 件。`order` の小さい順に進む |
 | `units[].stages[].order` | 整数 | 必須 | 1〜100。単元の中で重複不可 |
@@ -292,6 +321,7 @@
 - 1 つの問題を、複数の単元に関連づけてかまいません。
 - 項目の名前の綴りを誤ると(未知の項目)、検査が失敗します。
 - 近日公開の資格や、資格マスタにない資格のカリキュラムは置けません。
+- 単元・節・図の題、節の本文、要約、図の箱と矢印の文字に、URL は書けません(「4. 機械検査する規則」の 20)。
 
 ### 図解 `diagram`
 

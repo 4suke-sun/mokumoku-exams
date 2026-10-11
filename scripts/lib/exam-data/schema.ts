@@ -10,6 +10,17 @@ import { z } from "zod";
 /** 空白だけではない文字列。 */
 const text = z.string().regex(/\S/, "空白だけの文字列です");
 
+/** 本文の中の URL(`http://`・`https://`・`www.`)。出典の URL は、本文ではなく `references` に置く。 */
+const URL_IN_TEXT = /https?:\/\/|www\./i;
+
+/** 本文に URL を含むか。 */
+export function containsUrl(value: string): boolean {
+  return URL_IN_TEXT.test(value);
+}
+
+/** 本文: 空白だけではなく、URL を含まない文字列。 */
+export const prose = text.refine((value) => !containsUrl(value), "本文に URL が含まれています");
+
 const EXAM_CODE = /^[A-Z][A-Z0-9]{1,15}$/;
 const DOMAIN_CODE = /^domain\d{1,2}$/;
 
@@ -22,15 +33,15 @@ export function normalizeText(value: string): string {
 
 export const DomainSchema = z.strictObject({
   code: z.string().regex(DOMAIN_CODE),
-  name: text,
+  name: prose,
   weight: z.number().min(0).max(1),
 });
 
 const examBase = {
   examCode: z.string().regex(EXAM_CODE),
-  vendor: text,
-  name: text,
-  shortName: text,
+  vendor: prose,
+  name: prose,
+  shortName: prose,
 };
 
 /** 公開中の資格: 出題に必要な情報がすべてそろっている。 */
@@ -38,8 +49,8 @@ export const PublishedExamSchema = z
   .strictObject({
     ...examBase,
     status: z.literal("published"),
-    edition: text,
-    category: text,
+    edition: prose,
+    category: prose,
     passingScore: z.number().positive(),
     totalScore: z.number().positive(),
     officialQuestionCount: z.int().positive(),
@@ -68,7 +79,7 @@ export const PublishedExamSchema = z
 export const ComingSoonExamSchema = z.strictObject({
   ...examBase,
   status: z.literal("coming-soon"),
-  note: text.optional(),
+  note: prose.optional(),
 });
 
 export const ExamSchema = z.discriminatedUnion("status", [PublishedExamSchema, ComingSoonExamSchema]);
@@ -87,14 +98,65 @@ export const ExamsFileSchema = z.strictObject({ exams: z.array(ExamSchema).min(1
 
 const ChoiceSchema = z.strictObject({
   key: z.string().regex(/^[A-Z]$/),
-  text,
-  explanation: text.optional(),
+  text: prose,
+  explanation: prose.optional(),
 });
 
-const ReferenceSchema = z.strictObject({
-  title: text,
-  url: z.string().regex(/^https?:\/\/\S+$/, "http(s) で始まる URL ではありません"),
+/**
+ * 出典に使えるホスト名(完全一致)。公式ドキュメントだけを許す。
+ * 資格を足すときは、そのベンダーの公式ドキュメントのホスト名を、ここに足す(docs/adding-an-exam.md)。
+ */
+export const ALLOWED_REFERENCE_HOSTS: readonly string[] = ["docs.aws.amazon.com", "aws.amazon.com", "www.nist.gov"];
+
+/** 出典の題・URL の長さと、1 か所あたりの出典の数の上限 */
+export const REFERENCE_TITLE_MAX = 200;
+export const REFERENCE_URL_MAX = 2000;
+export const REFERENCES_MAX = 10;
+
+/**
+ * 出典の URL の誤りの種類を返す(問題がなければ null)。返すのは固定の文言で、URL の値は含めない。
+ * https で、ユーザー情報とポートを持たず、ホスト名が ALLOWED_REFERENCE_HOSTS にある URL だけを許す。
+ */
+export function referenceUrlProblem(value: string): string | null {
+  if (!/^https:\/\/\S+$/.test(value)) return "https で始まる URL ではありません";
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    return "URL の形ではありません";
+  }
+  if (url.username !== "" || url.password !== "") return "ユーザー情報付きの URL です";
+  if (url.port !== "") return "ポート付きの URL です";
+  if (!ALLOWED_REFERENCE_HOSTS.includes(url.hostname)) return "出典に許していないドメインの URL です";
+  return null;
+}
+
+/** 出典: 公式ドキュメントへのリンク。題は任意(ないときは、画面にホスト名を出す)。 */
+export const ReferenceSchema = z.strictObject({
+  title: prose.max(REFERENCE_TITLE_MAX).optional(),
+  url: z
+    .string()
+    .max(REFERENCE_URL_MAX)
+    .superRefine((value, ctx) => {
+      const problem = referenceUrlProblem(value);
+      if (problem) ctx.addIssue({ code: "custom", message: problem });
+    }),
 });
+
+/** 出典の一覧: 1〜REFERENCES_MAX 件。同じ URL は重ねない。 */
+export const ReferencesSchema = z
+  .array(ReferenceSchema)
+  .min(1)
+  .max(REFERENCES_MAX)
+  .superRefine((references, ctx) => {
+    const seen = new Set<string>();
+    references.forEach((reference, i) => {
+      if (seen.has(reference.url)) {
+        ctx.addIssue({ code: "custom", path: [i, "url"], message: "出典の URL が重複しています" });
+      }
+      seen.add(reference.url);
+    });
+  });
 
 /** 問題の種類によらない項目 */
 const questionBase = {
@@ -102,11 +164,11 @@ const questionBase = {
   examCode: z.string().regex(EXAM_CODE),
   domain: z.string().regex(DOMAIN_CODE),
   difficulty: z.enum(["easy", "medium", "hard"]).optional(),
-  questionText: text,
-  explanation: text,
-  supplement: text.optional(),
-  references: z.array(ReferenceSchema).optional(),
-  tags: z.array(text).optional(),
+  questionText: prose,
+  explanation: prose,
+  supplement: prose.optional(),
+  references: ReferencesSchema.optional(),
+  tags: z.array(prose).optional(),
 };
 
 /** 択一・複数選択の問題 */
@@ -159,7 +221,7 @@ const KeywordSchema = z
 
 /** 採点基準の観点。キーワードのどれかを回答が含めば、観点を満たし、配点を得る。 */
 const CriterionSchema = z.strictObject({
-  name: text.max(CRITERION_NAME_MAX),
+  name: prose.max(CRITERION_NAME_MAX),
   keywords: z.array(KeywordSchema).min(1),
   points: z.int().positive(),
 });
@@ -226,6 +288,7 @@ export const QuestionsFileSchema = z
     });
   });
 
+export type Reference = z.infer<typeof ReferenceSchema>;
 export type Exam = z.infer<typeof ExamSchema>;
 export type PublishedExam = z.infer<typeof PublishedExamSchema>;
 export type ExamsFile = z.infer<typeof ExamsFileSchema>;

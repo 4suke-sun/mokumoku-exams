@@ -10,6 +10,7 @@ export type {
   PublishedExam,
   Question,
   QuestionsFile,
+  Reference,
   Rubric,
 } from "../../../../scripts/lib/exam-data/schema.ts";
 

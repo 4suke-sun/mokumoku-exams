@@ -90,6 +90,19 @@ describe("ResultView", () => {
     expect(screen.getAllByText(/^問題 \d$/)).toHaveLength(3);
   });
 
+  it("出典のある問題_解説のあとに出典のリンクを出す", async () => {
+    const withReference = {
+      ...question(1, "A"),
+      references: [{ title: "公式の資料", url: "https://docs.aws.amazon.com/guide" }],
+    } as Question;
+    saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["A"], "TEST-0003": ["B"] });
+    render(<ResultView exam={exam} questions={[withReference, question(2, "A"), question(3, "B")]} />);
+    const link = await screen.findByRole("link", { name: "公式の資料(外部サイト)" });
+    expect(link.getAttribute("href")).toBe("https://docs.aws.amazon.com/guide");
+    expect(link.getAttribute("target")).toBe("_blank");
+    expect(screen.getAllByRole("heading", { name: "出典" })).toHaveLength(1);
+  });
+
   it("保存した結果が複数ある_問題ごとに直近の正誤を新しい順に表示する", async () => {
     saveResult(browserStore(), {
       examCode: "TEST",

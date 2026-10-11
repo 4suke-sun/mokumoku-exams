@@ -63,8 +63,7 @@
         { "key": "C", "text": "手順をすべて省く" }
       ],
       "correctAnswers": ["A"],
-      "explanation": "何のために行うのかを先に決めると、あとの手順を選びやすくなります。",
-      "references": [{ "title": "サンプルの参考資料", "url": "https://example.com/sample" }]
+      "explanation": "何のために行うのかを先に決めると、あとの手順を選びやすくなります。"
     },
     {
       "questionId": "SAMPLE-0005",

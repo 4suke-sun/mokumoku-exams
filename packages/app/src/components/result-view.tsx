@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { BookmarkError, BookmarkToggle, useBookmarks } from "@/components/bookmark-toggle.tsx";
 import { Confetti } from "@/components/confetti.tsx";
 import { EmptyState } from "@/components/empty-state.tsx";
+import { ReferenceList } from "@/components/reference-list.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
 import { ScoreRing } from "@/components/score-ring.tsx";
 import { judgeFreeText } from "@/lib/free-text.ts";
@@ -243,6 +244,7 @@ export function ResultView({ exam, questions }: Props) {
                 <RichText text={question.explanation} />
               </div>
               {question.supplement ? <RichText text={question.supplement} className="text-sm text-muted" /> : null}
+              <ReferenceList references={question.references} />
             </li>
           ))}
         </ol>
