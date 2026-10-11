@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { act, render } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { CONFETTI_TOTAL_MS } from "@/lib/confetti.ts";
+import { CONFETTI_COUNT, CONFETTI_PERFECT_COUNT, CONFETTI_TOTAL_MS } from "@/lib/confetti.ts";
 import { Confetti } from "./confetti.tsx";
 
 function mockMotionPreference(reduce: boolean) {
@@ -36,6 +36,16 @@ describe("Confetti", () => {
       vi.advanceTimersByTime(CONFETTI_TOTAL_MS);
     });
     expect(container.querySelector("[data-confetti]")).toBeNull();
+  });
+
+  it("満点_量を増やす", () => {
+    mockMotionPreference(false);
+    setStyle("rich");
+    const normal = render(<Confetti reached />);
+    expect(normal.container.querySelector("[data-confetti]")?.children.length).toBe(CONFETTI_COUNT);
+    normal.unmount();
+    const perfect = render(<Confetti reached perfect />);
+    expect(perfect.container.querySelector("[data-confetti]")?.children.length).toBe(CONFETTI_PERFECT_COUNT);
   });
 
   it("動きを減らす設定_リッチでも出さない", () => {

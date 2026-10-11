@@ -63,7 +63,7 @@ export default async function StudyUnitPage({ params }: Props) {
         <Link href={`/exams/${exam.examCode}/study`} className="text-sm text-primary hover:underline">
           単元の一覧へ戻る
         </Link>
-        <h1 className="text-2xl font-bold">{unit.title}</h1>
+        <h1 className="h1">{unit.title}</h1>
         <p className="text-sm text-muted">{exam.name}</p>
       </div>
 
@@ -74,7 +74,7 @@ export default async function StudyUnitPage({ params }: Props) {
           key={section.id}
           id={section.id}
           aria-labelledby={`${section.id}-title`}
-          className="space-y-3 rounded-lg border border-line bg-surface p-4"
+          className="card space-y-3 p-4"
         >
           <h2 id={`${section.id}-title`} className="text-xl font-bold">
             {section.title}

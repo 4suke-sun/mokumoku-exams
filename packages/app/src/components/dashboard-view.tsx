@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useId, useState } from "react";
 import { EmptyState } from "@/components/empty-state.tsx";
+import { DashboardSkeleton } from "@/components/page-skeletons.tsx";
 import { ScoreRing } from "@/components/score-ring.tsx";
 import { type DashboardSummary, type DomainStat, domainBreakdown, summarize } from "@/lib/dashboard.ts";
 import { domainColorClasses } from "@/lib/domain-color.ts";
@@ -87,7 +88,7 @@ export function DashboardView({ exam, questions }: Props) {
   }, [exam, questions]);
 
   if (state.status === "loading") {
-    return <p className="text-muted">読み込んでいます…</p>;
+    return <DashboardSkeleton />;
   }
 
   const { summary, source } = state;
@@ -96,7 +97,7 @@ export function DashboardView({ exam, questions }: Props) {
       <Link href={`/exams/${exam.examCode}`} className="text-sm text-primary hover:underline">
         モード選択へ戻る
       </Link>
-      <h1 className="text-2xl font-bold">学習の状況</h1>
+      <h1 className="h1">学習の状況</h1>
       <p className="text-sm text-muted">{exam.name}</p>
     </div>
   );
@@ -109,6 +110,7 @@ export function DashboardView({ exam, questions }: Props) {
         {header}
         {goalPanel}
         <EmptyState
+          icon="📊"
           title="まだ結果がありません"
           description="問題を解くと、正答率や合格予測がここに表示されます。"
           action={{ label: "モード選択へ", href: `/exams/${exam.examCode}` }}
@@ -138,8 +140,8 @@ export function DashboardView({ exam, questions }: Props) {
 
       {prediction ? (
         <div className="space-y-3">
-          <h2 className="text-lg font-bold">合格予測</h2>
-          <div className="flex flex-col items-center gap-5 rounded-lg border border-line bg-surface p-5 sm:flex-row">
+          <h2 className="h2">合格予測</h2>
+          <div className="card flex flex-col items-center gap-5 p-5 sm:flex-row">
             <ScoreRing percent={prediction.averagePercent} reached={prediction.reached} />
             <div className="space-y-2">
               <p className={`font-bold ${prediction.reached ? "text-correct" : "text-warn"}`}>
@@ -162,10 +164,10 @@ export function DashboardView({ exam, questions }: Props) {
       <DomainList exam={exam} domains={state.domains} />
 
       <div className="space-y-3">
-        <h2 className="text-lg font-bold">学習量と正答率</h2>
-        <dl className="grid grid-cols-2 gap-3">
+        <h2 className="h2">学習量と正答率</h2>
+        <dl className="motion-stagger grid grid-cols-2 gap-3">
           {stats.map((stat) => (
-            <div key={stat.label} className="rounded-lg border border-line bg-surface p-3">
+            <div key={stat.label} className="card p-3">
               <dt className="text-sm text-muted">{stat.label}</dt>
               <dd className="text-xl font-bold">{stat.value}</dd>
             </div>
@@ -174,7 +176,7 @@ export function DashboardView({ exam, questions }: Props) {
       </div>
 
       <div className="space-y-2">
-        <h2 className="text-lg font-bold">直近の結果</h2>
+        <h2 className="h2">直近の結果</h2>
         <ul className="space-y-1 text-sm">
           {summary.recent.map((attempt) => (
             <li key={attempt.finishedAt} className="flex justify-between rounded border border-line bg-surface p-2">
@@ -188,7 +190,7 @@ export function DashboardView({ exam, questions }: Props) {
       </div>
 
       <div className="space-y-2">
-        <h2 className="text-lg font-bold">見直す問題</h2>
+        <h2 className="h2">見直す問題</h2>
         <ul className="space-y-1 text-sm">
           <li>復習プール: {state.review === null ? "読み込めませんでした" : `${state.review} 問`}</li>
           <li>
@@ -249,11 +251,11 @@ function GoalPanel({
 
   return (
     <div className="space-y-3">
-      <h2 className="text-lg font-bold">目標日</h2>
+      <h2 className="h2">目標日</h2>
       {goal === null ? (
         <p className="text-sm text-muted">アカウントから読み込めないため、いまは目標日を表示・設定できません。</p>
       ) : (
-        <div className="space-y-3 rounded-lg border border-line bg-surface p-4">
+        <div className="card space-y-3 p-4">
           <p className="font-bold">{countdown}</p>
           <div className="flex flex-wrap items-end gap-3">
             <div className="space-y-1">
@@ -305,7 +307,7 @@ function StudyDays({ days, today }: { days: StudyDay[] | null; today: string }) 
   if (days === null) {
     return (
       <div className="space-y-2">
-        <h2 className="text-lg font-bold">日ごとの学習量</h2>
+        <h2 className="h2">日ごとの学習量</h2>
         <p className="text-sm text-muted">アカウントから読み込めないため、いまは表示できません。</p>
       </div>
     );
@@ -314,9 +316,9 @@ function StudyDays({ days, today }: { days: StudyDay[] | null; today: string }) 
   const studied = weeks.flat().filter((cell) => (cell.answered ?? 0) > 0).length;
   return (
     <div className="space-y-3">
-      <h2 className="text-lg font-bold">日ごとの学習量</h2>
+      <h2 className="h2">日ごとの学習量</h2>
       <p className="font-bold">連続 {streakDays(days, today)} 日</p>
-      <div className="space-y-2 rounded-lg border border-line bg-surface p-4">
+      <div className="card space-y-2 p-4">
         <div
           role="img"
           aria-label={`直近 ${HEATMAP_WEEKS} 週のうち、学習した日は ${studied} 日です。`}
@@ -354,7 +356,7 @@ function DomainList({ exam, domains }: { exam: PublishedExam; domains: DomainSta
   if (listed.length === 0) return null;
   return (
     <div className="space-y-2">
-      <h2 className="text-lg font-bold">分野別の正答率</h2>
+      <h2 className="h2">分野別の正答率</h2>
       <p className="text-sm text-muted">直近の結果から、正答率の低い分野を先に並べます。</p>
       <ul className="space-y-1 text-sm">
         {listed.map((stat) => {

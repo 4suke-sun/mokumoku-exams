@@ -5,7 +5,7 @@ export function UnitSummary({ summary }: { summary?: readonly string[] }) {
   if (!summary || summary.length === 0) return null;
   return (
     // 節の ID(英小文字・数字・ハイフン)と重ならないよう、下線を含む ID にする
-    <section aria-labelledby="study_summary-title" className="space-y-2 rounded-lg border border-line bg-surface p-4">
+    <section aria-labelledby="study_summary-title" className="card space-y-2 p-4">
       <h2 id="study_summary-title" className="text-xl font-bold">
         この単元の要点
       </h2>

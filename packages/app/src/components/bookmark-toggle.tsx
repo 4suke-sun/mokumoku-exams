@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { fetchBookmarks, putBookmark } from "@/lib/history/client.ts";
+import { Notice } from "./notice.tsx";
 
 export type Bookmarks = {
   /** ブックマークした問題 ID。読み込み中、または取得できなかったときは null */
@@ -81,8 +82,8 @@ export function BookmarkToggle({ questionId, bookmarks }: Props) {
 /** ブックマークを保存できなかったときの知らせ */
 export function BookmarkError({ bookmarks }: { bookmarks: Bookmarks }) {
   return bookmarks.failed ? (
-    <p role="alert" className="text-sm text-incorrect">
+    <Notice kind="error" className="text-sm">
       ブックマークを保存できませんでした。時間をおいて、もう一度お試しください。
-    </p>
+    </Notice>
   ) : null;
 }

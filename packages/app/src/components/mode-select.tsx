@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useState } from "react";
+import { Notice } from "@/components/notice.tsx";
 import { domainColorClasses } from "@/lib/domain-color.ts";
 import { fetchBookmarks, fetchReview } from "@/lib/history/client.ts";
 import {
@@ -181,7 +182,7 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
         <Link href="/exams" className="text-sm text-primary hover:underline">
           資格の一覧へ戻る
         </Link>
-        <h1 className="text-2xl font-bold">{exam.name}</h1>
+        <h1 className="h1">{exam.name}</h1>
         <div className="flex flex-wrap gap-4 pt-1 text-sm">
           <Link href={`/exams/${exam.examCode}/dashboard`} className="text-primary hover:underline">
             学習の状況を見る
@@ -193,8 +194,8 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
       </div>
 
       {resumable ? (
-        <div className="space-y-3 rounded-lg border border-primary bg-surface p-4">
-          <h2 className="text-lg font-bold">前回の続きから</h2>
+        <div className="card border-primary space-y-3 p-4">
+          <h2 className="h2">前回の続きから</h2>
           <p className="text-sm text-muted">
             {sessionProgress(resumable).total} 問中 {sessionProgress(resumable).answered} 問に回答しています。
             新しく始めると、この続きは消えます。
@@ -214,13 +215,10 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
       ) : null}
 
       <div className="space-y-3">
-        <h2 className="text-lg font-bold">モード</h2>
+        <h2 className="h2">モード</h2>
         <ul className="space-y-2">
           {modesFor(exam, studyAvailable, startOfficial).map((mode) => (
-            <li
-              key={mode.id}
-              className={`rounded-lg border p-4 ${mode.enabled ? "border-primary bg-surface" : "border-dashed border-line"}`}
-            >
+            <li key={mode.id} className={`p-4 ${mode.enabled ? "card border-primary" : "card-dashed"}`}>
               {mode.enabled && mode.href ? (
                 <Link href={mode.href} className="block font-bold text-primary hover:underline">
                   {mode.name}
@@ -332,11 +330,7 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
 
       {available === 0 ? <p className="text-sm text-muted">選んだ条件に合う問題がありません。</p> : null}
 
-      {error ? (
-        <p role="alert" className="text-incorrect">
-          {error}
-        </p>
-      ) : null}
+      {error ? <Notice kind="error">{error}</Notice> : null}
 
       <button
         type="button"

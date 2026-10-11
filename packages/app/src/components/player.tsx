@@ -4,6 +4,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { BookmarkError, BookmarkToggle, useBookmarks } from "@/components/bookmark-toggle.tsx";
 import { EmptyState } from "@/components/empty-state.tsx";
+import { Notice } from "@/components/notice.tsx";
+import { PlaySkeleton } from "@/components/page-skeletons.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
 import { postServerResult } from "@/lib/history/client.ts";
 import { type QuizKeyAction, quizKeyAction } from "@/lib/keyboard.ts";
@@ -60,6 +62,8 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
   const finishRef = useRef<() => Promise<void>>(async () => {});
   const autoFinished = useRef(false);
   const [now, setNow] = useState(clock);
+  // 問題カードのスライドの向き(最初の表示では動かさない)
+  const [direction, setDirection] = useState<"next" | "prev" | null>(null);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -114,12 +118,14 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
   }, [currentIndex]);
 
   if (state.status === "loading") {
-    return <p className="text-muted">読み込んでいます…</p>;
+    return <PlaySkeleton />;
   }
 
   if (state.status === "empty") {
     return (
       <EmptyState
+        icon="📝"
+        headingLevel={1}
         title="出題する問題がありません"
         description="モードを選んで、出題を始めてください。"
         action={{ label: "モード選択へ", href: `/exams/${exam.examCode}` }}
@@ -160,6 +166,7 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
   }
 
   function move(delta: number) {
+    setDirection(delta > 0 ? "next" : "prev");
     update({ ...session, index: index + delta });
   }
 
@@ -236,14 +243,33 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
             </p>
           ) : null}
         </div>
-        <progress className="h-2 w-full accent-primary" value={index + 1} max={total} aria-label="進み具合" />
+        <div
+          role="progressbar"
+          aria-label="進み具合"
+          aria-valuemin={0}
+          aria-valuemax={total}
+          aria-valuenow={index + 1}
+          aria-valuetext={`${index + 1} / ${total} 問目`}
+          className="h-2 w-full overflow-hidden rounded-full bg-line"
+        >
+          <div
+            className="motion-bar bg-accent-gradient h-full rounded-full"
+            style={{ width: `${((index + 1) / total) * 100}%` }}
+          />
+        </div>
         <div className="flex justify-end">
           <BookmarkToggle questionId={question.questionId} bookmarks={bookmarks} />
         </div>
         <BookmarkError bookmarks={bookmarks} />
       </div>
 
-      <fieldset ref={questionRef} tabIndex={-1} aria-labelledby="question-text" className="space-y-3">
+      <fieldset
+        key={question.questionId}
+        ref={questionRef}
+        tabIndex={-1}
+        aria-labelledby="question-text"
+        className={`space-y-3 ${direction === "next" ? "motion-slide-next" : direction === "prev" ? "motion-slide-prev" : ""}`}
+      >
         <RichText id="question-text" text={question.questionText} className="text-lg font-bold" />
         {question.questionType === "free-text" ? (
           <>
@@ -268,7 +294,7 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
               <label
                 key={choice.key}
                 className={`flex items-start gap-3 rounded-md border p-3 ${
-                  selected.includes(choice.key) ? "border-primary bg-surface" : "border-line bg-surface"
+                  selected.includes(choice.key) ? "motion-select border-primary bg-soft" : "border-line bg-surface"
                 } has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary`}
               >
                 <input
@@ -301,9 +327,7 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
       ) : null}
 
       {saveFailed ? (
-        <p role="alert" className="text-incorrect">
-          この端末では、回答を保存できません。ブラウザの設定を確認してください。
-        </p>
+        <Notice kind="error">この端末では、回答を保存できません。ブラウザの設定を確認してください。</Notice>
       ) : null}
 
       <div className="flex gap-3">

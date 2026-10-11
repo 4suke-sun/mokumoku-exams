@@ -43,7 +43,7 @@ export function ForgotPasswordForm() {
   if (step === "done") {
     return (
       <section className="space-y-4">
-        <h1 className="text-2xl font-bold">パスワードを変更しました</h1>
+        <h1 className="h1">パスワードを変更しました</h1>
         <p className="text-muted">新しいパスワードで、ログインしてください。</p>
         <Link
           href="/login"
@@ -58,7 +58,7 @@ export function ForgotPasswordForm() {
   if (step === "reset") {
     return (
       <form onSubmit={submitReset} className="space-y-5" noValidate>
-        <h1 className="text-2xl font-bold">新しいパスワードを決める</h1>
+        <h1 className="h1">新しいパスワードを決める</h1>
         <p className="text-muted">
           登録されているメールアドレスなら、確認コードを送りました。届いたコードと、新しいパスワードを入力してください。
         </p>
@@ -95,7 +95,7 @@ export function ForgotPasswordForm() {
 
   return (
     <form onSubmit={submitRequest} className="space-y-5">
-      <h1 className="text-2xl font-bold">パスワードの再設定</h1>
+      <h1 className="h1">パスワードの再設定</h1>
       <p className="text-muted">登録したメールアドレスに、確認コードを送ります。</p>
       <Field id="email" label="メールアドレス" type="email" value={email} onChange={setEmail} autoComplete="username" />
       <FormError message={error} />

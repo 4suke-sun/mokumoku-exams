@@ -13,6 +13,8 @@ export type ConfettiPiece = {
 };
 
 export const CONFETTI_COUNT = 40;
+/** 満点のときは、量を増やす */
+export const CONFETTI_PERFECT_COUNT = 80;
 /** 最後の 1 片が落ちきる時間の上限。これを過ぎたら、紙吹雪を片付ける */
 export const CONFETTI_TOTAL_MS = 3200;
 

@@ -12,7 +12,7 @@ export default async function BookmarksPage() {
   return (
     <section className="space-y-8">
       <div className="space-y-1">
-        <h1 className="text-2xl font-bold">直前チェック</h1>
+        <h1 className="h1">直前チェック</h1>
         <p className="text-sm text-muted">ブックマークした問題を、正解と解説つきで見直します。</p>
       </div>
       {exams.map(({ exam, questions }) => (

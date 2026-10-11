@@ -7,7 +7,7 @@ export default function GlobalError({ reset }: { error: Error & { digest?: strin
   return (
     <html lang="ja">
       <body className="min-h-screen bg-bg p-8 text-fg">
-        <h1 className="text-2xl font-bold">問題が起きました</h1>
+        <h1 className="h1">問題が起きました</h1>
         <p className="my-4 text-muted">画面を表示できませんでした。もう一度試してください。</p>
         <button
           type="button"

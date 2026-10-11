@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Notice } from "@/components/notice.tsx";
 import { newSession } from "@/lib/quiz.ts";
 import {
   browserStore,
@@ -75,16 +76,9 @@ export function StudyStart({ examCode, items, stages }: Props) {
       {hasSession ? (
         <p className="text-sm text-muted">出題の途中の状態があります。新しく始めると、その続きは消えます。</p>
       ) : null}
-      {error ? (
-        <p role="alert" className="text-incorrect">
-          {error}
-        </p>
-      ) : null}
+      {error ? <Notice kind="error">{error}</Notice> : null}
       {stages && stages.list.length > 0 ? (
-        <section
-          aria-labelledby="study_stages-title"
-          className="space-y-3 rounded-lg border border-line bg-surface p-4"
-        >
+        <section aria-labelledby="study_stages-title" className="card space-y-3 p-4">
           {/* 節の ID(英小文字・数字・ハイフン)と重ならないよう、下線を含む ID にする */}
           <h2 id="study_stages-title" className="text-xl font-bold">
             段階ごとに確かめる

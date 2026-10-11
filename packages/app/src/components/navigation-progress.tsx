@@ -3,6 +3,7 @@
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { startsNavigation } from "@/lib/progress.ts";
+import { LoadingBadge } from "./loading-badge.tsx";
 
 // 遷移が終わらないときでも、バーが出たままにならないようにする上限
 const MAX_MS = 10_000;
@@ -31,10 +32,14 @@ export function NavigationProgress() {
     return () => clearTimeout(timer);
   }, [active]);
 
-  if (!active) return null;
   return (
-    <div role="progressbar" aria-label="ページを読み込んでいます" className="fixed inset-x-0 top-0 z-50 h-1 bg-line">
-      <div className="progress-bar h-full bg-primary" />
-    </div>
+    <>
+      {active ? (
+        <div role="progressbar" aria-label="ページを読み込んでいます" className="nav-progress">
+          <div className="nav-progress-fill" />
+        </div>
+      ) : null}
+      <LoadingBadge active={active} />
+    </>
   );
 }

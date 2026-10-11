@@ -1,6 +1,13 @@
 @import "tailwindcss";
 
-/* 色は役割で決める(docs/app/design-tone.md)。ライトとダークで同じ役割の組を持つ。 */
+/*
+ * 色は役割で決める(docs/app/design-tone.md)。ライトとダーク、リッチとシンプルで、同じ役割の組を持つ。
+ * 4 通りの値は、次のブロックが持つ。手動の選択(data-theme)が、端末の設定より優先される。
+ *   リッチ × ライト   :root
+ *   リッチ × ダーク   :root[data-theme="dark"]、端末がダークで選択がないとき
+ *   シンプル × ライト :root[data-style="simple"]
+ *   シンプル × ダーク :root[data-style="simple"][data-theme="dark"]、端末がダークで選択がないとき
+ */
 :root {
   --bg: #f7f6f3;
   --surface: #ffffff;
@@ -12,6 +19,29 @@
   --correct: #166534;
   --incorrect: #b91c1c;
   --warn: #92400e;
+  /* 正誤・注意を伝える面の色。面の上の文字は --text か、同じ組の色(--correct など)にする */
+  --correct-bg: #e8f6ec;
+  --incorrect-bg: #fdeeed;
+  --warn-bg: #fdf3e2;
+  /* 補助色。--soft は主要な操作の色をごく薄くした面。橙は、復習と強調に使う */
+  --soft: #ebf0fd;
+  --violet: #6d28d9;
+  --violet-soft: #f2ecfd;
+  --orange: #c2410c;
+  --orange-soft: #fdefe6;
+  /* アクセントのグラデーション(青から紫)。上に文字を載せるときは --on-primary を使う */
+  --accent-from: #1d4ed8;
+  --accent-to: #6d28d9;
+  /* 影とすりガラス */
+  --shadow-card: 0 1px 2px rgb(31 41 51 / 0.06), 0 6px 20px rgb(31 41 51 / 0.06);
+  --shadow-float: 0 12px 32px rgb(31 41 51 / 0.16);
+  --glass: rgb(255 255 255 / 0.82);
+  --glass-blur: 10px;
+  /* 角丸の段階(小さい順) */
+  --r-sm: 0.375rem;
+  --r-md: 0.625rem;
+  --r-lg: 0.875rem;
+  --r-xl: 1.25rem;
   /* 分野の色(lib/domain-color.ts)。文字の色に使えるよう、背景と面の両方に 4.5:1 以上 */
   --domain-1: #0f766e;
   --domain-2: #7e22ce;
@@ -22,7 +52,6 @@
   color-scheme: light;
 }
 
-/* 手動の選択(data-theme)が、端末の設定より優先される。選択がなければ端末の設定に従う */
 :root[data-theme="dark"] {
   --bg: #12151a;
   --surface: #1b2027;
@@ -34,6 +63,19 @@
   --correct: #86efac;
   --incorrect: #fca5a5;
   --warn: #fcd34d;
+  --correct-bg: #13291d;
+  --incorrect-bg: #351c1e;
+  --warn-bg: #2f2613;
+  --soft: #1b2640;
+  --violet: #c4b5fd;
+  --violet-soft: #251f3f;
+  --orange: #fdba74;
+  --orange-soft: #33241a;
+  --accent-from: #93b4ff;
+  --accent-to: #c4b5fd;
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 6px 20px rgb(0 0 0 / 0.28);
+  --shadow-float: 0 12px 32px rgb(0 0 0 / 0.5);
+  --glass: rgb(27 32 39 / 0.82);
   --domain-1: #5eead4;
   --domain-2: #d8b4fe;
   --domain-3: #fdba74;
@@ -55,6 +97,19 @@
     --correct: #86efac;
     --incorrect: #fca5a5;
     --warn: #fcd34d;
+    --correct-bg: #13291d;
+    --incorrect-bg: #351c1e;
+    --warn-bg: #2f2613;
+    --soft: #1b2640;
+    --violet: #c4b5fd;
+    --violet-soft: #251f3f;
+    --orange: #fdba74;
+    --orange-soft: #33241a;
+    --accent-from: #93b4ff;
+    --accent-to: #c4b5fd;
+    --shadow-card: 0 1px 2px rgb(0 0 0 / 0.3), 0 6px 20px rgb(0 0 0 / 0.28);
+    --shadow-float: 0 12px 32px rgb(0 0 0 / 0.5);
+    --glass: rgb(27 32 39 / 0.82);
     --domain-1: #5eead4;
     --domain-2: #d8b4fe;
     --domain-3: #fdba74;
@@ -62,6 +117,89 @@
     --domain-5: #7dd3fc;
     --domain-6: #a5b4fc;
     color-scheme: dark;
+  }
+}
+
+/*
+ * 画面スタイルがシンプルのとき: 落ち着いたアクセント、影なし、角丸小、グラデーションは単色、すりガラスなし。
+ * 分野の色は、スタイルにかかわらず同じにする(分野の見分けを、すべての画面でそろえる)。
+ */
+:root[data-style="simple"] {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --text: #1d2430;
+  --muted: #55606d;
+  --border: #d3d9e0;
+  --primary: #2a5599;
+  --on-primary: #ffffff;
+  --correct: #166534;
+  --incorrect: #b42318;
+  --warn: #8a4b00;
+  --correct-bg: #eef7f1;
+  --incorrect-bg: #fcf0ef;
+  --warn-bg: #fbf5e8;
+  --soft: #eef2f8;
+  --violet: #5b4b8a;
+  --violet-soft: #f2f0f7;
+  --orange: #9a4a14;
+  --orange-soft: #f8f0ea;
+  --accent-from: #2a5599;
+  --accent-to: #2a5599;
+  --shadow-card: none;
+  --shadow-float: none;
+  --glass: var(--surface);
+  --glass-blur: 0px;
+  --r-sm: 0.125rem;
+  --r-md: 0.25rem;
+  --r-lg: 0.25rem;
+  --r-xl: 0.375rem;
+}
+
+:root[data-style="simple"][data-theme="dark"] {
+  --bg: #111418;
+  --surface: #181c22;
+  --text: #e3e7ec;
+  --muted: #a3adb9;
+  --border: #353c47;
+  --primary: #8fb0e0;
+  --on-primary: #0f1318;
+  --correct: #7fd8a0;
+  --incorrect: #f0a3a3;
+  --warn: #e8c06a;
+  --correct-bg: #16251c;
+  --incorrect-bg: #2c1c1d;
+  --warn-bg: #2a2417;
+  --soft: #1c2430;
+  --violet: #b9b0e0;
+  --violet-soft: #221f30;
+  --orange: #e9ab7c;
+  --orange-soft: #2b221b;
+  --accent-from: #8fb0e0;
+  --accent-to: #8fb0e0;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root[data-style="simple"]:not([data-theme]) {
+    --bg: #111418;
+    --surface: #181c22;
+    --text: #e3e7ec;
+    --muted: #a3adb9;
+    --border: #353c47;
+    --primary: #8fb0e0;
+    --on-primary: #0f1318;
+    --correct: #7fd8a0;
+    --incorrect: #f0a3a3;
+    --warn: #e8c06a;
+    --correct-bg: #16251c;
+    --incorrect-bg: #2c1c1d;
+    --warn-bg: #2a2417;
+    --soft: #1c2430;
+    --violet: #b9b0e0;
+    --violet-soft: #221f30;
+    --orange: #e9ab7c;
+    --orange-soft: #2b221b;
+    --accent-from: #8fb0e0;
+    --accent-to: #8fb0e0;
   }
 }
 
@@ -76,15 +214,36 @@
   --color-correct: var(--correct);
   --color-incorrect: var(--incorrect);
   --color-warn: var(--warn);
+  --color-correct-bg: var(--correct-bg);
+  --color-incorrect-bg: var(--incorrect-bg);
+  --color-warn-bg: var(--warn-bg);
+  --color-soft: var(--soft);
+  --color-violet: var(--violet);
+  --color-violet-soft: var(--violet-soft);
+  --color-orange: var(--orange);
+  --color-orange-soft: var(--orange-soft);
   --color-domain-1: var(--domain-1);
   --color-domain-2: var(--domain-2);
   --color-domain-3: var(--domain-3);
   --color-domain-4: var(--domain-4);
   --color-domain-5: var(--domain-5);
   --color-domain-6: var(--domain-6);
+  /* 角丸のユーティリティ(rounded-sm など)は、スタイルで切り替わる段階を参照する */
+  --radius-sm: var(--r-sm);
+  --radius-md: var(--r-md);
+  --radius-lg: var(--r-lg);
+  --radius-xl: var(--r-xl);
+  --shadow-card: var(--shadow-card);
+  --shadow-float: var(--shadow-float);
+  /* 欧文と和文は、端末に入っているフォントを使う(ビルド時にも表示時にも、外部へフォントを取りに行かない) */
+  --font-sans:
+    ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic UI", Meiryo, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji";
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 }
 
-/* キーボードで操作するとき、フォーカスの位置が常に見えるようにする(マウスのクリックでは出ない) */
+/* キーボードで操作するとき、フォーカスの位置が常に見えるようにする(マウスのクリックでは出ない)。スタイルにかかわらず出す */
 :focus-visible {
   outline: 3px solid var(--primary);
   outline-offset: 2px;
@@ -95,18 +254,326 @@ body {
   color: var(--text);
 }
 
-/* 遷移中のバー。終わりが分からないので、端に近づくほど遅くなる動きにする */
-@keyframes progress {
-  from {
-    width: 0;
+/* リッチだけで出す要素と、シンプルだけで出す要素。見た目の出し分けは、このクラスで行う */
+:root[data-style="simple"] .rich-only,
+:root:not([data-style="simple"]) .simple-only {
+  display: none;
+}
+
+/* ---- 共通の部品のクラス。ユーティリティ(枠の色や余白)で上書きできるよう、レイヤーに入れる ---- */
+@layer components {
+  /* 面、薄い縁、やわらかい影。余白は、使う側でユーティリティを足す(p-4 など) */
+  .card {
+    border: 1px solid var(--border);
+    border-radius: var(--r-lg);
+    background: var(--surface);
+    box-shadow: var(--shadow-card);
   }
-  to {
-    width: 90%;
+
+  /* リンクのカードは、触ると浮き、押すと縮む */
+  a.card {
+    display: block;
+    transition:
+      transform 0.18s ease,
+      box-shadow 0.18s ease,
+      border-color 0.18s ease;
+  }
+  a.card:hover {
+    border-color: var(--primary);
+  }
+  @media (hover: hover) {
+    a.card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-float);
+    }
+  }
+  a.card:active {
+    transform: scale(0.98);
+  }
+
+  /* 点線の枠の面(準備中や、空の状態) */
+  .card-dashed {
+    border: 1px dashed var(--border);
+    border-radius: var(--r-lg);
+    background: var(--surface);
+  }
+
+  /* 色の段階。--tone に役割の色を入れ、部品の側で color-mix で面・縁・文字の色を作る */
+  .tone-primary {
+    --tone: var(--primary);
+  }
+  .tone-correct {
+    --tone: var(--correct);
+  }
+  .tone-incorrect {
+    --tone: var(--incorrect);
+  }
+  .tone-warn {
+    --tone: var(--warn);
+  }
+  .tone-violet {
+    --tone: var(--violet);
+  }
+  .tone-orange {
+    --tone: var(--orange);
+  }
+  .tone-muted {
+    --tone: var(--muted);
+  }
+  .tone-domain-1 {
+    --tone: var(--domain-1);
+  }
+  .tone-domain-2 {
+    --tone: var(--domain-2);
+  }
+  .tone-domain-3 {
+    --tone: var(--domain-3);
+  }
+  .tone-domain-4 {
+    --tone: var(--domain-4);
+  }
+  .tone-domain-5 {
+    --tone: var(--domain-5);
+  }
+  .tone-domain-6 {
+    --tone: var(--domain-6);
+  }
+
+  /* 色付きの小さなラベル。文字は本文の色に寄せ、面の上でも 4.5:1 以上にする */
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    border-radius: 9999px;
+    padding: 0.125rem 0.625rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.5;
+    background: color-mix(in srgb, var(--tone, var(--muted)) 14%, var(--surface));
+    color: color-mix(in srgb, var(--tone, var(--muted)) 80%, var(--text));
+  }
+
+  /* 絵文字を載せる色付きのタイル。絵文字は飾りなので、aria-hidden にして、意味は文字で添える */
+  .tile {
+    display: inline-grid;
+    flex: none;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: var(--r-md);
+    font-size: 1.25rem;
+    line-height: 1;
+    background: color-mix(in srgb, var(--tone, var(--muted)) 16%, var(--surface));
+  }
+
+  /* すりガラスの面(シンプルでは、ただの面になる) */
+  .glass {
+    background: var(--glass);
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    backdrop-filter: blur(var(--glass-blur));
+  }
+
+  /* アクセントのグラデーションの面(シンプルでは単色)。文字は --on-primary */
+  .bg-accent-gradient {
+    background: linear-gradient(135deg, var(--accent-from), var(--accent-to));
+    color: var(--on-primary);
+  }
+
+  /* 見出し。ページの題は .h1、区切りの題は .h2、カードの中の題は .h3 */
+  .h1 {
+    font-size: 1.5rem;
+    line-height: 2rem;
+    font-weight: 700;
+  }
+  .h2 {
+    font-size: 1.125rem;
+    line-height: 1.75rem;
+    font-weight: 700;
+  }
+  .h3 {
+    font-size: 1rem;
+    line-height: 1.5rem;
+    font-weight: 700;
   }
 }
 
-.progress-bar {
-  animation: progress 8s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
+/* ---- 動き。CSS だけで作り、止める一覧(この下の 2 つ)に名前を挙げる ---- */
+
+/* ページを開いたときのフェード(app/template.tsx)と、一覧の子を順に出す動き */
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.motion-page {
+  animation: fade-up 0.28s ease-out backwards;
+}
+
+.motion-stagger > * {
+  animation: fade-up 0.36s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+.motion-stagger > :nth-child(2) {
+  animation-delay: 40ms;
+}
+.motion-stagger > :nth-child(3) {
+  animation-delay: 80ms;
+}
+.motion-stagger > :nth-child(4) {
+  animation-delay: 120ms;
+}
+.motion-stagger > :nth-child(5) {
+  animation-delay: 160ms;
+}
+.motion-stagger > :nth-child(6) {
+  animation-delay: 200ms;
+}
+.motion-stagger > :nth-child(n + 7) {
+  animation-delay: 240ms;
+}
+
+/* 問題カードのスライド。次へは右から、前へは左から入る */
+@keyframes slide-next {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+}
+@keyframes slide-prev {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+}
+
+.motion-slide-next {
+  animation: slide-next 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
+.motion-slide-prev {
+  animation: slide-prev 0.28s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
+/* 選択肢を選んだとき、正解、不正解 */
+@keyframes select-pop {
+  0% {
+    transform: scale(0.985);
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--primary) 45%, transparent);
+  }
+  60% {
+    transform: scale(1.01);
+    box-shadow: 0 0 0 6px transparent;
+  }
+}
+@keyframes correct-pop {
+  0% {
+    transform: scale(0.97);
+  }
+  50% {
+    transform: scale(1.02);
+    box-shadow: 0 0 0 6px color-mix(in srgb, var(--correct) 30%, transparent);
+  }
+}
+@keyframes wrong-shake {
+  25% {
+    transform: translateX(-6px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-3px);
+  }
+}
+
+.motion-select {
+  animation: select-pop 0.35s ease-out;
+}
+
+.motion-correct {
+  animation: correct-pop 0.5s ease-out;
+}
+
+.motion-wrong {
+  animation: wrong-shake 0.35s ease-in-out;
+}
+
+/* 進み具合のバーが伸びる動き(幅の変化をなめらかにする) */
+.motion-bar {
+  transition: width 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* スケルトンの光。止めたときは、光らない面だけが残る */
+@keyframes skeleton-shine {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
+  }
+}
+
+.skeleton {
+  border-radius: var(--r-sm);
+  background:
+    linear-gradient(
+      90deg,
+      var(--border) 0%,
+      color-mix(in srgb, var(--border) 35%, var(--surface)) 50%,
+      var(--border) 100%
+    )
+    0 0 / 200% 100%;
+  animation: skeleton-shine 1.4s linear infinite;
+}
+
+/* ✓ のスタンプ、満点の光、空状態のアイコンが漂う動き */
+@keyframes stamp {
+  0% {
+    opacity: 0;
+    transform: scale(2) rotate(-12deg);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(0.9) rotate(4deg);
+  }
+}
+@keyframes shine {
+  from {
+    transform: translateX(-130%) skewX(-20deg);
+  }
+  to {
+    transform: translateX(230%) skewX(-20deg);
+  }
+}
+@keyframes float {
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+.motion-stamp {
+  display: inline-block;
+  animation: stamp 0.42s cubic-bezier(0.2, 0.9, 0.3, 1.2) backwards;
+}
+
+.motion-shine {
+  position: relative;
+  overflow: hidden;
+}
+.motion-shine::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 45%;
+  pointer-events: none;
+  background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.5), transparent);
+  animation: shine 2.8s ease-in-out infinite;
+}
+
+.motion-float {
+  display: inline-block;
+  animation: float 3s ease-in-out infinite;
 }
 
 /* 紙吹雪(components/confetti.tsx)。上から下へ、回りながら落ちる */
@@ -131,28 +598,185 @@ body {
   animation-fill-mode: both;
 }
 
-/* 画面スタイルがシンプルのとき: 角の丸みを抑え、動きを止める(演出の有無は、部品の側でも判定する) */
-:root[data-style="simple"] {
-  --radius: 0.125rem;
-  --radius-sm: 0.125rem;
-  --radius-md: 0.125rem;
-  --radius-lg: 0.125rem;
+/* 遷移中のバー(components/navigation-progress.tsx)。終わりが分からないので、端に近づくほど遅くなる。
+   先端を光らせ、光の筋を流す */
+@keyframes nav-progress-grow {
+  from {
+    width: 0;
+  }
+  to {
+    width: 90%;
+  }
+}
+@keyframes nav-progress-flow {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: 0 0;
+  }
 }
 
-:root[data-style="simple"] *,
-:root[data-style="simple"] *::before,
-:root[data-style="simple"] *::after {
+.nav-progress {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  height: 4px;
+  pointer-events: none;
+}
+.nav-progress-fill {
+  height: 100%;
+  border-radius: 0 9999px 9999px 0;
+  background:
+    linear-gradient(
+      90deg,
+      var(--accent-from),
+      color-mix(in srgb, var(--accent-to) 60%, white),
+      var(--accent-to),
+      var(--accent-from)
+    )
+    0 0 / 200% 100%;
+  box-shadow:
+    0 0 10px color-mix(in srgb, var(--primary) 70%, transparent),
+    0 0 4px color-mix(in srgb, var(--primary) 60%, transparent);
+  animation:
+    nav-progress-grow 8s cubic-bezier(0.1, 0.8, 0.2, 1) forwards,
+    nav-progress-flow 1.2s linear infinite;
+}
+
+/* 遷移に少し時間がかかったときだけ出す「読み込み中…」のバッジ(components/loading-badge.tsx) */
+@keyframes badge-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.94);
+  }
+}
+
+.loading-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 1.25rem 0.5rem 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--primary) 35%, var(--border));
+  border-radius: 9999px;
+  box-shadow: var(--shadow-float);
+  font-weight: 700;
+  animation: badge-in 0.25s cubic-bezier(0.2, 0.9, 0.3, 1.2) backwards;
+}
+
+/* 二重リングのスピナー(components/skeleton.tsx)。外側と内側が逆に回る */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spinner {
+  position: relative;
+  display: inline-block;
+  flex: none;
+}
+.spinner::before,
+.spinner::after {
+  content: "";
+  position: absolute;
+  border: 3px solid transparent;
+  border-radius: 9999px;
+}
+.spinner::before {
+  inset: 0;
+  border-top-color: var(--primary);
+  border-right-color: var(--primary);
+  animation: spin 1s linear infinite;
+}
+.spinner::after {
+  inset: 22%;
+  border-bottom-color: var(--accent-to);
+  border-left-color: var(--accent-to);
+  animation: spin 0.75s linear infinite reverse;
+}
+
+/*
+ * 止める一覧(1): 動きを減らす設定のとき。スタイルにかかわらず、上の動きをすべて止め、終わりの状態だけを見せる。
+ * レイヤーの外に書くので、ユーティリティと共通の部品のクラスより優先される(!important は使わない)。
+ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  .motion-page,
+  .motion-stagger > *,
+  .motion-slide-next,
+  .motion-slide-prev,
+  .motion-select,
+  .motion-correct,
+  .motion-wrong,
+  .motion-stamp,
+  .motion-shine::after,
+  .motion-float,
+  .skeleton,
+  .confetti-piece,
+  .nav-progress-fill,
+  .loading-badge,
+  .spinner::before,
+  .spinner::after {
+    animation: none;
+  }
+  .motion-bar,
+  a.card {
+    transition: none;
+  }
+  a.card:hover,
+  a.card:active {
+    transform: none;
+  }
+  .motion-shine::after,
+  .confetti-piece {
+    display: none;
+  }
+  /* 遷移中のバーは、伸びずに、途中の長さで止めて見せる */
+  .nav-progress-fill {
+    width: 60%;
+  }
+}
+
+/*
+ * 止める一覧(2): シンプル表示のとき。飾りの動きを止める。
+ * 遷移中のバーとスピナーは、待っていることを伝えるので動かす(光の筋は流さない)。フォーカスの見た目は止めない。
+ */
+:root[data-style="simple"]
+:is(
+  .motion-page,
+  .motion-stagger > *,
+  .motion-slide-next,
+  .motion-slide-prev,
+  .motion-select,
+  .motion-correct,
+  .motion-wrong,
+  .motion-stamp,
+  .motion-float,
+  .skeleton,
+  .confetti-piece,
+  .loading-badge
+),
+:root[data-style="simple"] .motion-shine::after {
   animation: none;
+}
+:root[data-style="simple"] :is(.motion-bar, a.card) {
   transition: none;
 }
-
-/* 動きを減らす設定のときは、演出を止める(レイヤーの外に書くので、ユーティリティより優先される) */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation: none;
-    transition: none;
-    scroll-behavior: auto;
+:root[data-style="simple"] :is(a.card:hover, a.card:active) {
+  transform: none;
+}
+:root[data-style="simple"] .motion-shine::after,
+:root[data-style="simple"] .confetti-piece {
+  display: none;
+}
+:root[data-style="simple"] .nav-progress-fill {
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-style="simple"] .nav-progress-fill {
+    animation: nav-progress-grow 8s cubic-bezier(0.1, 0.8, 0.2, 1) forwards;
   }
 }
