@@ -125,10 +125,11 @@ const PROTECTED_APIS = [
   "/api/push/test",
 ];
 const PUBLIC_FILES = [
+  "/brand/logo-full.png",
+  "/brand/mascot.png",
   "/icons/apple-touch-icon.png",
   "/icons/icon-192.png",
   "/icons/icon-512.png",
-  "/icons/icon.svg",
   "/manifest.webmanifest",
   "/robots.txt",
   "/sitemap.xml",

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseBlocks, parseInline } from "./rich-text.ts";
+import { parseBlocks, parseInline, splitListLabel } from "./rich-text.ts";
 
 describe("parseInline", () => {
   it("強調とコード_種類ごとに分ける", () => {
@@ -54,5 +54,33 @@ describe("parseBlocks", () => {
 
   it("空の文字列_ブロックなし", () => {
     expect(parseBlocks("")).toEqual([]);
+  });
+});
+
+describe("splitListLabel", () => {
+  it("ラベル: 説明_ラベルと残りに分ける", () => {
+    expect(splitListLabel(parseInline("一覧: すべての問題を並べます。"))).toEqual({
+      label: "一覧",
+      rest: [{ kind: "text", text: "すべての問題を並べます。" }],
+    });
+  });
+
+  it("全角のコロンと_後ろの強調_も扱う", () => {
+    expect(splitListLabel(parseInline("リッチ：**動き**を使います"))).toEqual({
+      label: "リッチ",
+      rest: [
+        { kind: "strong", text: "動き" },
+        { kind: "text", text: "を使います" },
+      ],
+    });
+  });
+
+  it.each([
+    ["コロンがない", "択一の問題は、選択肢を 1 つ選びます。"],
+    ["ラベルが長い_句読点を含む", "回答すると、次の問題へ進みます: 最後は採点です"],
+    ["説明が空", "一覧:"],
+    ["先頭が強調", "**一覧**: すべて"],
+  ])("%s_分けない", (_, text) => {
+    expect(splitListLabel(parseInline(text))).toBeNull();
   });
 });

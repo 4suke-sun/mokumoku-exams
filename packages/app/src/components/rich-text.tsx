@@ -1,4 +1,4 @@
-import { type Block, type Inline, parseBlocks, parseInline } from "@/lib/rich-text.ts";
+import { type Block, type Inline, parseBlocks, parseInline, splitListLabel } from "@/lib/rich-text.ts";
 
 function Inlines({ items }: { items: Inline[] }) {
   return items.map((item, i) => {
@@ -16,7 +16,18 @@ function Inlines({ items }: { items: Inline[] }) {
   });
 }
 
-function BlockView({ block }: { block: Block }) {
+/** 箇条書きの 1 項目。`boldLabels` のときは、「ラベル: 説明」のラベルを太くする */
+function ListItem({ item, boldLabels }: { item: Inline[]; boldLabels: boolean }) {
+  const split = boldLabels ? splitListLabel(item) : null;
+  if (!split) return <Inlines items={item} />;
+  return (
+    <>
+      <strong>{split.label}</strong>: <Inlines items={split.rest} />
+    </>
+  );
+}
+
+function BlockView({ block, boldLabels }: { block: Block; boldLabels: boolean }) {
   switch (block.kind) {
     case "heading":
       return (
@@ -30,7 +41,7 @@ function BlockView({ block }: { block: Block }) {
           {block.items.map((item, i) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: 内容は固定で、並べ替えない
             <li key={i}>
-              <Inlines items={item} />
+              <ListItem item={item} boldLabels={boldLabels} />
             </li>
           ))}
         </ul>
@@ -56,14 +67,24 @@ function BlockView({ block }: { block: Block }) {
   }
 }
 
-/** 設問文・解説など、段落・箇条書き・コードを含む文面。 */
-export function RichText({ text, className = "", id }: { text: string; className?: string; id?: string }) {
+/** 設問文・解説など、段落・箇条書き・コードを含む文面。`boldListLabels` で、箇条書きの「ラベル: 説明」のラベルを太くする。 */
+export function RichText({
+  text,
+  className = "",
+  id,
+  boldListLabels = false,
+}: {
+  text: string;
+  className?: string;
+  id?: string;
+  boldListLabels?: boolean;
+}) {
   const blocks = parseBlocks(text);
   return (
     <div id={id} className={`space-y-3 leading-relaxed ${className}`}>
       {blocks.map((block, i) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: 内容は固定で、並べ替えない
-        <BlockView key={i} block={block} />
+        <BlockView key={i} block={block} boldLabels={boldListLabels} />
       ))}
     </div>
   );
