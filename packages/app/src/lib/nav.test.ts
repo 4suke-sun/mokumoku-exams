@@ -91,6 +91,7 @@ describe("pageWidth", () => {
     ["/exams/SAMPLE/result", "wide"],
     ["/achievements", "wide"],
     ["/exams/SAMPLE/cards", "wide"],
+    ["/exams/SAMPLE/info", "wide"],
     ["/exams/SAMPLE/study/basics", "study"],
     ["/bookmarks", "study"],
   ])("%s_%s", (path, width) => {

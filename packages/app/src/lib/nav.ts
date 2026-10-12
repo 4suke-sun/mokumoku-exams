@@ -82,6 +82,6 @@ export function pageWidth(pathname: string): PageWidth {
   if (READ_PATHS.some((href) => isActive(pathname, href))) return "read";
   if (pathname === "/" || pathname === "/exams" || pathname === "/achievements") return "wide";
   // 結果は、広い画面で 2 列にする(左に振り返り、右に得点と操作)。要約カードは、問いと答えを左右に並べる
-  if (/^\/exams\/[^/]+(\/dashboard|\/result|\/cards)?$/.test(pathname)) return "wide";
+  if (/^\/exams\/[^/]+(\/dashboard|\/result|\/cards|\/info)?$/.test(pathname)) return "wide";
   return "study";
 }

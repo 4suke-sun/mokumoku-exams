@@ -11,6 +11,8 @@
 | 公開の状態(`status`) | 問題がそろうまでは `coming-soon`(一覧に「近日公開」と出すだけ)。出題できるようになったら `published` |
 | 分野(`domains`) | `domain1`〜`domainN` のコードと表示名、公式の配点の重み(合計 1) |
 | 本番モードの値 | `officialQuestionCount`(出題数)と `officialTimeMinutes`(制限時間の分)。公式の試験に合わせます |
+| レベルと略称(任意) | `level`(`Foundational`・`Associate`・`Professional`・`Expert`・`Specialty`)は、公式にレベルの区分があるときだけ。`abbr` は、一覧のタイルに出す英数字 1〜4 文字 |
+| 資格の情報(任意) | 受験料、出題形式、言語、有効期間、公式の試験ガイドの URL を、情報ページに出せます(`info`)。公式の情報だけに基づけ、載っていない項目は持たず、確認した日(`checkedAt`)を書きます |
 | 出典のドメイン | 出典(`references`)に使う、その資格のベンダーの公式ドキュメントのホスト名。ほかの学習サイトや講座のサービスなどは使いません |
 
 ## 2. ファイルの命名と配置
@@ -34,7 +36,8 @@
    選択式(択一・複数選択)の問題数は、本番モードの出題数(`officialQuestionCount`)以上にします(自由記述は数えません)。
    出典の URL は `references` に書き、本文には書きません。
 4. **公開にする**。資格マスタの 1 件を `status: "published"` にし、`edition`・`category`・`passingScore`・`totalScore`・
-   `officialQuestionCount`・`officialTimeMinutes`・`domains` を足します。
+   `officialQuestionCount`・`officialTimeMinutes`・`domains` を足します。公式の情報があれば、`level`・`abbr`・`info` も足します
+   (`info.guideUrl` のドメインも、手順 2 の許可の一覧に足します)。
 5. **カリキュラムを書く**(任意)。`data/curriculum.<コード>.json` を、仕様の「11. カリキュラムのデータ」の形で作ります。
 6. **検査する**。次の「4. 検査」を通します。
 7. **画面で確かめる**。`npm run dev` で、資格の一覧、モード選択、通常出題と本番モード、結果の画面を開きます。

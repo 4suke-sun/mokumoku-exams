@@ -19,6 +19,8 @@ type Props = {
   caption: string;
   /** シンプル表示では、バーの代わりに表にする */
   tableInSimple?: boolean;
+  /** 表の 2 列目の見出し(既定は「結果」) */
+  valueLabel?: string;
 };
 
 function Bars({ rows, caption }: Pick<Props, "rows" | "caption">) {
@@ -42,7 +44,7 @@ function Bars({ rows, caption }: Pick<Props, "rows" | "caption">) {
   );
 }
 
-function Table({ rows, caption }: Pick<Props, "rows" | "caption">) {
+function Table({ rows, caption, valueLabel = "結果" }: Pick<Props, "rows" | "caption" | "valueLabel">) {
   return (
     <table className="w-full text-left text-sm">
       <caption className="sr-only">{caption}</caption>
@@ -52,7 +54,7 @@ function Table({ rows, caption }: Pick<Props, "rows" | "caption">) {
             分野
           </th>
           <th scope="col" className="py-1 font-normal">
-            結果
+            {valueLabel}
           </th>
         </tr>
       </thead>
@@ -75,7 +77,7 @@ function Table({ rows, caption }: Pick<Props, "rows" | "caption">) {
  * 分野ごとのバー。リッチはバー、シンプルは表(`tableInSimple`)。見た目の出し分けは CSS で行う。
  * 数値は文字でも添えるので、バーは飾りとして読み上げない。
  */
-export function DomainBars({ rows, caption, tableInSimple = false }: Props) {
+export function DomainBars({ rows, caption, tableInSimple = false, valueLabel }: Props) {
   if (!tableInSimple) return <Bars rows={rows} caption={caption} />;
   return (
     <>
@@ -83,7 +85,7 @@ export function DomainBars({ rows, caption, tableInSimple = false }: Props) {
         <Bars rows={rows} caption={caption} />
       </div>
       <div className="simple-only">
-        <Table rows={rows} caption={caption} />
+        <Table rows={rows} caption={caption} valueLabel={valueLabel} />
       </div>
     </>
   );

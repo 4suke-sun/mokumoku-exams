@@ -30,6 +30,26 @@ describe("前回の続きのカード", () => {
     expect(screen.queryByText("テスト資格 2")).toBeNull();
   });
 
+  it("進み具合_バーで示し_回答した数と全体の数を文字でも伝える", async () => {
+    saveSession(
+      browserStore(),
+      session("TEST", ["TEST-0001", "TEST-0002", "TEST-0003"], { "TEST-0001": ["A"] }, "2026-10-11T00:00:00.000Z"),
+    );
+    render(<ResumeCards exams={exams} />);
+    const bar = await screen.findByRole("progressbar", { name: "テスト資格の進み具合" });
+    expect(bar.getAttribute("aria-valuenow")).toBe("1");
+    expect(bar.getAttribute("aria-valuemax")).toBe("3");
+    expect(bar.getAttribute("aria-valuetext")).toBe("3 問中 1 問に回答");
+    expect((bar.firstElementChild as HTMLElement).style.width).toBe("33%");
+  });
+
+  it("グラデーションの面_カードに使う", async () => {
+    saveSession(browserStore(), session("TEST", ["TEST-0001"], {}, "2026-10-11T00:00:00.000Z"));
+    render(<ResumeCards exams={exams} />);
+    const link = await screen.findByRole("link", { name: "テスト資格を続きから解く" });
+    expect(link.closest("li")?.className).toContain("bg-accent-gradient");
+  });
+
   it("複数の資格に途中の状態がある_新しく始めた順に並べる", async () => {
     saveSession(browserStore(), session("TEST", ["TEST-0001"], {}, "2026-10-10T00:00:00.000Z"));
     saveSession(browserStore(), session("TEST2", ["TEST2-0001"], {}, "2026-10-11T00:00:00.000Z"));

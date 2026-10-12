@@ -358,6 +358,9 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
           </p>
         ) : null}
         <div className="flex flex-wrap gap-4 pt-1 text-sm">
+          <Link href={`/exams/${exam.examCode}/info`} className="text-primary hover:underline">
+            試験の情報
+          </Link>
           <Link href={`/exams/${exam.examCode}/dashboard`} className="text-primary hover:underline">
             学習の状況を見る
           </Link>
