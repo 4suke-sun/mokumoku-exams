@@ -4,16 +4,20 @@ import {
   DEFAULT_SETTINGS,
   type KeyValueStore,
   loadResults,
+  loadSectionProgress,
   loadSession,
   loadSettings,
   loadStageProgress,
   MAX_ANSWER_TIME_MS,
   MAX_RESULTS,
+  mergeSectionProgress,
   passedStages,
   type Result,
+  type SectionProgress,
   type Session,
   type StageCheck,
   saveResult,
+  saveSectionProgress,
   saveSession,
   saveSettings,
   saveStageCheck,
@@ -280,5 +284,61 @@ describe("段階学習の到達の状態", () => {
   it("保存が禁止された環境_保存は失敗し読み出しは空", () => {
     expect(saveStageCheck(brokenStore, "TEST", check())).toBe(false);
     expect(loadStageProgress(brokenStore, "TEST")).toEqual({ examCode: "TEST", passed: {} });
+  });
+});
+
+describe("セクションの進捗の統合", () => {
+  const record = (correct: number, finishedAt: string) => ({ correct, total: 5, finishedAt });
+  const progress = (best: SectionProgress["best"], last?: SectionProgress["last"]): SectionProgress => ({
+    examCode: "TEST",
+    best,
+    ...(last ? { last } : {}),
+  });
+
+  it("同じセクション_正答数の多いほうが残る", () => {
+    const merged = mergeSectionProgress(
+      progress({ "0": record(3, "2026-10-01T00:00:00.000Z") }),
+      progress({ "0": record(4, "2026-10-02T00:00:00.000Z") }),
+    );
+    expect(merged.best["0"]?.correct).toBe(4);
+  });
+
+  it("同じ正答数_すでにある記録(base)を残す", () => {
+    const merged = mergeSectionProgress(
+      progress({ "0": record(4, "2026-10-01T00:00:00.000Z") }),
+      progress({ "0": record(4, "2026-10-02T00:00:00.000Z") }),
+    );
+    expect(merged.best["0"]?.finishedAt).toBe("2026-10-01T00:00:00.000Z");
+  });
+
+  it("片方にだけあるセクション_どちらも残る", () => {
+    const merged = mergeSectionProgress(
+      progress({ "0": record(5, "2026-10-01T00:00:00.000Z") }),
+      progress({ "1": record(2, "2026-10-02T00:00:00.000Z") }),
+    );
+    expect(Object.keys(merged.best).sort()).toEqual(["0", "1"]);
+  });
+
+  it("直近の記録_完了時刻の新しいほうが残り_片方だけにあればそれが残る", () => {
+    const older = { ...record(1, "2026-10-01T00:00:00.000Z"), section: 0 };
+    const newer = { ...record(2, "2026-10-02T00:00:00.000Z"), section: 1 };
+    expect(mergeSectionProgress(progress({}, older), progress({}, newer)).last).toEqual(newer);
+    expect(mergeSectionProgress(progress({}, newer), progress({}, older)).last).toEqual(newer);
+    expect(mergeSectionProgress(progress({}), progress({}, older)).last).toEqual(older);
+    expect(mergeSectionProgress(progress({}), progress({})).last).toBeUndefined();
+  });
+
+  it("統合_元の進捗を書き換えない", () => {
+    const base = progress({ "0": record(3, "2026-10-01T00:00:00.000Z") });
+    mergeSectionProgress(base, progress({ "1": record(2, "2026-10-02T00:00:00.000Z") }));
+    expect(Object.keys(base.best)).toEqual(["0"]);
+  });
+
+  it("端末に保存_そのまま読み直せる", () => {
+    const store = memoryStore();
+    const saved = progress({ "2": record(4, "2026-10-01T00:00:00.000Z") });
+    expect(saveSectionProgress(store, saved)).toBe(true);
+    expect(loadSectionProgress(store, "TEST")).toEqual(saved);
+    expect(loadSectionProgress(store, "OTHER")).toEqual({ examCode: "OTHER", best: {} });
   });
 });

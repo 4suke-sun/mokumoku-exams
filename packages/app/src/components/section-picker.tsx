@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Notice } from "@/components/notice.tsx";
+import { syncSectionProgress } from "@/lib/history/client.ts";
 import { newSession } from "@/lib/quiz.ts";
 import {
   passedSectionCount,
@@ -52,9 +53,17 @@ export function SectionPicker({ exam, items }: Props) {
 
   useEffect(() => {
     const store = browserStore();
+    // まず端末の進捗を出し、サーバーの進捗と 1 つにできたら、差し替える
     setProgress(loadSectionProgress(store, exam.examCode));
+    let active = true;
+    void syncSectionProgress(store, exam.examCode).then((synced) => {
+      if (active) setProgress(synced);
+    });
     const saved = loadSession(store, exam.examCode);
     setResumable(saved?.section !== undefined ? saved : null);
+    return () => {
+      active = false;
+    };
   }, [exam.examCode]);
 
   function start(index: number) {

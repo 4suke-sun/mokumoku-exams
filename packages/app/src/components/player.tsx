@@ -14,7 +14,7 @@ import { RecentMarks, useQuestionStats } from "@/components/question-stats.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
 import { type AnswerTimer, createTimer, elapsedTimes, setVisible, showQuestion } from "@/lib/answer-timer.ts";
 import { judgeFreeText } from "@/lib/free-text.ts";
-import { postServerResult } from "@/lib/history/client.ts";
+import { postServerResult, putSectionProgress } from "@/lib/history/client.ts";
 import { type QuizKeyAction, type QuizKeyPhase, quizKeyAction } from "@/lib/keyboard.ts";
 import {
   answerFor,
@@ -302,10 +302,13 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
         const asked = session.questionIds.flatMap((id) => byId.get(id) ?? []);
         const { correct, total } = score(asked, session.answers, session.textAnswers);
         if (total > 0) {
-          saveSectionCheck(browserStore(), exam.examCode, session.section, {
-            correct,
-            total,
-            finishedAt: result.finishedAt,
+          const record = { correct, total, finishedAt: result.finishedAt };
+          saveSectionCheck(browserStore(), exam.examCode, session.section, record);
+          // サーバーにも残す(別の端末で開いても、同じ進捗になる)。残せなくても、端末には残っていて、次に一覧を開いたときに取り込む
+          void putSectionProgress({
+            examCode: exam.examCode,
+            best: { [String(session.section)]: record },
+            last: { ...record, section: session.section },
           });
         }
       }

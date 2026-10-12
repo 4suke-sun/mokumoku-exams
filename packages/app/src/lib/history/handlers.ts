@@ -23,9 +23,11 @@ import {
   MAX_BOOKMARK_BODY_BYTES,
   MAX_GOAL_BODY_BYTES,
   MAX_REVIEW_BODY_BYTES,
+  MAX_SECTIONS_BODY_BYTES,
   ResultQuerySchema,
   ResultsQuerySchema,
   ReviewRemovalSchema,
+  SectionsChangeSchema,
 } from "./schema.ts";
 
 /** 採点に使う、問題の正解と採点基準。公開中の資格でなければ null。 */
@@ -320,6 +322,35 @@ export async function handlePutGoal(request: Request, deps: HistoryDeps): Promis
     if (!(await (deps.questions ?? examQuestions)(change.examCode))) return fail("bad-request", 400, auth.setCookies);
     await deps.repository.setGoal(auth.user.sub, change.examCode, change.date);
     return json({ status: "saved" }, 200, auth.setCookies);
+  } catch {
+    return fail("unavailable", 503);
+  }
+}
+
+/** 自分のセクションの進捗を返す。保存していなければ、記録のない進捗。 */
+export function handleGetSections(request: Request, deps: HistoryDeps): Promise<Response> {
+  return listByExam(request, deps, async (sub, examCode) => ({
+    progress: (await deps.repository.getSections(sub, examCode)) ?? { examCode, best: {} },
+  }));
+}
+
+/** セクションの進捗を取り込む(保存済みの進捗と 1 つにする)。資格は、公開中のものだけ。統合した進捗を返す。 */
+export async function handlePutSections(request: Request, deps: HistoryDeps): Promise<Response> {
+  const rejected = guard(request);
+  if (rejected) return rejected;
+  const auth = await authorize(request, deps);
+  if (!auth) return fail("unauthorized", 401);
+
+  const read = await readJsonBody(request, MAX_SECTIONS_BODY_BYTES, auth.setCookies);
+  if (read instanceof Response) return read;
+  const parsed = SectionsChangeSchema.safeParse(read.body);
+  if (!parsed.success) return fail("bad-request", 400, auth.setCookies);
+  const incoming = parsed.data;
+
+  try {
+    if (!(await (deps.questions ?? examQuestions)(incoming.examCode))) return fail("bad-request", 400, auth.setCookies);
+    const progress = await deps.repository.mergeSections(auth.user.sub, incoming.examCode, incoming);
+    return json({ status: "saved", progress }, 200, auth.setCookies);
   } catch {
     return fail("unavailable", 503);
   }

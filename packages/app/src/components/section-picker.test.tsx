@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { browserStore, loadSession, saveSectionCheck, saveSession } from "@/lib/storage.ts";
 import type { PublishedExam } from "@/lib/types.ts";
 import { SectionPicker } from "./section-picker.tsx";
@@ -17,9 +17,29 @@ const at = "2026-10-12T00:00:00.000Z";
 beforeEach(() => {
   localStorage.clear();
   push.mockClear();
+  // サーバーの進捗を読めない状態(未ログインなど)から始める。端末の進捗だけで動く
+  vi.stubGlobal(
+    "fetch",
+    vi.fn(async () => new Response("{}", { status: 401 })),
+  );
 });
 
+afterEach(() => vi.unstubAllGlobals());
+
 describe("SectionPicker", () => {
+  it("別の端末の進捗がサーバーにある_端末の記録がなくても同じ進捗を出す", async () => {
+    const server = {
+      progress: { examCode: "TEST", best: { "0": { correct: 5, total: 5, finishedAt: at } } },
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => Response.json(server)),
+    );
+    render(<SectionPicker exam={exam} items={items} />);
+    expect(await screen.findByText("1 / 2 セクション合格")).toBeTruthy();
+    expect(within(screen.getAllByRole("listitem")[0] as HTMLElement).getByText("満点")).toBeTruthy();
+  });
+
   it("5 問ずつに分け_最後は少ない問題数のまま_状態と合格の数を出す", async () => {
     saveSectionCheck(browserStore(), "TEST", 0, { correct: 5, total: 5, finishedAt: at });
     saveSectionCheck(browserStore(), "TEST", 1, { correct: 1, total: 2, finishedAt: at });

@@ -16,6 +16,7 @@ import * as resultRoute from "@/app/api/history/result/route.ts";
 import * as historyRoute from "@/app/api/history/results/route.ts";
 import * as reviewAllRoute from "@/app/api/history/review/all/route.ts";
 import * as reviewRoute from "@/app/api/history/review/route.ts";
+import * as sectionsRoute from "@/app/api/history/sections/route.ts";
 import * as statsRoute from "@/app/api/history/stats/route.ts";
 import * as pushSubscriptionRoute from "@/app/api/push/subscription/route.ts";
 import * as pushTestRoute from "@/app/api/push/test/route.ts";
@@ -132,6 +133,7 @@ const PROTECTED_APIS = [
   "/api/history/days",
   "/api/history/goal",
   "/api/history/prefs",
+  "/api/history/sections",
   "/api/history/result",
   "/api/history/results",
   "/api/history/review",
@@ -291,6 +293,14 @@ describe("認可: 未ログインの拒否", () => {
     );
   });
 
+  it("セクションの進捗の API 本体_入口を通らなくても未ログインを断る(二重の防御)", async () => {
+    expect((await sectionsRoute.GET(request("/api/history/sections?examCode=SAMPLE"))).status).toBe(401);
+    const response = await sectionsRoute.PUT(
+      request("/api/history/sections", { method: "PUT", body: { examCode: "SAMPLE", best: {} } }),
+    );
+    expect(response.status).toBe(401);
+  });
+
   it("日ごとの学習量と目標日の API 本体_入口を通らなくても未ログインを断る(二重の防御)", async () => {
     expect((await daysRoute.GET(request("/api/history/days?examCode=SAMPLE"))).status).toBe(401);
     expect((await goalRoute.GET(request("/api/history/goal?examCode=SAMPLE"))).status).toBe(401);
@@ -335,6 +345,7 @@ describe("認可: 未ログインの拒否", () => {
     expect(methods(daysRoute)).toEqual(["GET"]);
     expect(methods(goalRoute).sort()).toEqual(["GET", "PUT"]);
     expect(methods(prefsRoute).sort()).toEqual(["GET", "PUT"]);
+    expect(methods(sectionsRoute).sort()).toEqual(["GET", "PUT"]);
     expect(methods(changePasswordRoute)).toEqual(["POST"]);
     expect(methods(adminUsersRoute).sort()).toEqual(["GET", "POST"]);
     expect(methods(adminDisableRoute)).toEqual(["POST"]);
@@ -480,6 +491,57 @@ describe("認可: 他人のデータに触れない", () => {
     expect(await bookmarks.json()).toEqual({ questionIds: ["SAMPLE-0002"] });
     const review = await reviewRoute.GET(request("/api/history/review?examCode=SAMPLE", { cookie: own }));
     expect(await review.json()).toEqual({ questionIds: ["SAMPLE-0001"] });
+  });
+
+  it("セクションの進捗_利用者の識別子を本文・問い合わせで渡す_拒否される", async () => {
+    const own = await cookie();
+    const body = { examCode: "SAMPLE", best: {} };
+    for (const key of ["sub", "userId", "PK", "SK"]) {
+      const response = await sectionsRoute.PUT(
+        request("/api/history/sections", { method: "PUT", cookie: own, body: { ...body, [key]: "other-user" } }),
+      );
+      expect(response.status, key).toBe(400);
+    }
+    // 公開していない資格・形の違う記録・キーの区切りを含む資格コードは、断る
+    const put = (body: unknown) =>
+      sectionsRoute.PUT(request("/api/history/sections", { method: "PUT", cookie: own, body }));
+    expect((await put({ examCode: "NOPE", best: {} })).status).toBe(400);
+    expect((await put({ examCode: "SAMPLE", best: { x: { correct: 1, total: 5, finishedAt: "t" } } })).status).toBe(
+      400,
+    );
+    expect((await put({ examCode: "SAMPLE#1", best: {} })).status).toBe(400);
+    const query = await sectionsRoute.GET(
+      request("/api/history/sections?examCode=SAMPLE&sub=other-user", { cookie: own }),
+    );
+    expect(query.status).toBe(400);
+  });
+
+  it("セクションの進捗_自分の分だけに保存され_端末の記録と統合され_他の利用者には見えない", async () => {
+    const own = await cookie();
+    const record = (correct: number, finishedAt: string) => ({ correct, total: 5, finishedAt });
+    const put = (best: Record<string, unknown>) =>
+      sectionsRoute.PUT(
+        request("/api/history/sections", { method: "PUT", cookie: own, body: { examCode: "SAMPLE", best } }),
+      );
+    expect((await put({ "0": record(3, "2026-10-01T00:00:00.000Z") })).status).toBe(200);
+    // 別の端末の記録を取り込むと、セクションごとに正答数の多いほうが残る
+    const merged = await put({
+      "0": record(5, "2026-10-02T00:00:00.000Z"),
+      "1": record(2, "2026-10-02T00:00:00.000Z"),
+    });
+    expect(
+      ((await merged.json()) as { progress: { best: Record<string, { correct: number }> } }).progress.best,
+    ).toMatchObject({
+      "0": { correct: 5 },
+      "1": { correct: 2 },
+    });
+    const mine = await sectionsRoute.GET(request("/api/history/sections?examCode=SAMPLE", { cookie: own }));
+    expect(((await mine.json()) as { progress: { best: object } }).progress.best).toHaveProperty("1");
+    const other = await sectionsRoute.GET(
+      request("/api/history/sections?examCode=SAMPLE", { cookie: await adminCookie() }),
+    );
+    expect(await other.json()).toEqual({ progress: { examCode: "SAMPLE", best: {} } });
+    expect((await sectionsRoute.GET(request("/api/history/sections?examCode=SAMPLE"))).status).toBe(401);
   });
 
   it("目標日と日ごとの学習量_自分の分だけに保存され_取得も自分の分だけ", async () => {

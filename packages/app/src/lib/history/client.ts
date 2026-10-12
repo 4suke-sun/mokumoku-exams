@@ -1,5 +1,14 @@
 import { z } from "zod";
-import { type Result, ResultSchema } from "@/lib/storage.ts";
+import {
+  type KeyValueStore,
+  loadSectionProgress,
+  mergeSectionProgress,
+  type Result,
+  ResultSchema,
+  type SectionProgress,
+  SectionProgressSchema,
+  saveSectionProgress,
+} from "@/lib/storage.ts";
 import { DATE_PATTERN, type StudyDay } from "@/lib/study-days.ts";
 
 const ListSchema = z.object({ results: z.array(ResultSchema).max(50) });
@@ -132,6 +141,55 @@ export async function putGoal(examCode: string, date: string | null): Promise<bo
   } catch {
     return false;
   }
+}
+
+const SectionsSchema = z.object({ progress: SectionProgressSchema });
+
+/** サーバーに保存したセクションの進捗。取得できなければ null(ログイン切れ・通信の失敗など)。 */
+export async function fetchSectionProgress(examCode: string): Promise<SectionProgress | null> {
+  try {
+    const response = await fetch(`/api/history/sections?examCode=${encodeURIComponent(examCode)}`, {
+      cache: "no-store",
+    });
+    if (!response.ok) return null;
+    const parsed = SectionsSchema.safeParse(await response.json());
+    return parsed.success && parsed.data.progress.examCode === examCode ? parsed.data.progress : null;
+  } catch {
+    return null;
+  }
+}
+
+/** セクションの進捗を、サーバーの進捗と 1 つにして保存する。統合した進捗を返す。保存できなければ null。 */
+export async function putSectionProgress(progress: SectionProgress): Promise<SectionProgress | null> {
+  try {
+    const response = await fetch("/api/history/sections", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify(progress),
+    });
+    if (!response.ok) return null;
+    const parsed = SectionsSchema.safeParse(await response.json());
+    return parsed.success && parsed.data.progress.examCode === progress.examCode ? parsed.data.progress : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * 端末のセクションの進捗と、サーバーの進捗を 1 つにして、画面に出す進捗を返す。
+ * - サーバーを読めないとき(未ログイン・通信の失敗)は、端末の進捗をそのまま返す。
+ * - 端末に、サーバーにない記録(別の端末で解く前の記録や、保存に失敗した記録)があれば、サーバーに取り込む。
+ * - 統合した進捗は、端末にも保存する(別のアカウントの記録は、サーバーのものが優先され、混ざらない)。
+ */
+export async function syncSectionProgress(store: KeyValueStore, examCode: string): Promise<SectionProgress> {
+  const local = loadSectionProgress(store, examCode);
+  const server = await fetchSectionProgress(examCode);
+  if (!server) return local;
+  const merged = mergeSectionProgress(server, local);
+  const result =
+    JSON.stringify(merged) === JSON.stringify(server) ? server : ((await putSectionProgress(local)) ?? merged);
+  saveSectionProgress(store, result);
+  return result;
 }
 
 const StatsSchema = z.object({
