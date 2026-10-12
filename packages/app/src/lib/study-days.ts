@@ -75,3 +75,13 @@ export function heatLevel(answered: number): 0 | 1 | 2 | 3 | 4 {
   if (answered < 20) return 3;
   return 4;
 }
+
+/** 資格ごとの日ごとの学習量を、日付ごとに足して 1 つにする(日付の順)。 */
+export function mergeDays(lists: readonly (readonly StudyDay[])[]): StudyDay[] {
+  const byDate = new Map<string, StudyDay>();
+  for (const day of lists.flat()) {
+    const own = byDate.get(day.date) ?? { date: day.date, answered: 0, correct: 0 };
+    byDate.set(day.date, { date: day.date, answered: own.answered + day.answered, correct: own.correct + day.correct });
+  }
+  return [...byDate.values()].sort((a, b) => (a.date < b.date ? -1 : a.date > b.date ? 1 : 0));
+}

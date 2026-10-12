@@ -21,7 +21,11 @@ describe("domainColorIndex", () => {
   });
 
   it("同じ分野_同じクラスを返す", () => {
-    expect(domainColorClasses(domains, "domain2")).toEqual({ text: "text-domain-2", border: "border-l-domain-2" });
+    expect(domainColorClasses(domains, "domain2")).toEqual({
+      text: "text-domain-2",
+      border: "border-l-domain-2",
+      bar: "bg-domain-2",
+    });
   });
 });
 

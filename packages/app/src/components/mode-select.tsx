@@ -11,6 +11,7 @@ import {
   isOfficialTarget,
   newOfficialSession,
   newSession,
+  passLinePercent,
   requestedDomains,
   sessionProgress,
   shuffle,
@@ -51,8 +52,8 @@ const DIFFICULTIES: { id: Difficulty; name: string; tone: string }[] = [
 type Props = {
   exam: PublishedExam;
   pool: PoolItem[];
-  /** カリキュラムがあり、学習モードを使えるか */
-  studyAvailable?: boolean;
+  /** カリキュラムの単元の数。カリキュラムがなく、学習モードを使えないときは null */
+  studyUnits?: number | null;
 };
 
 const COUNT_CHOICES = [5, 10, 20, 50];
@@ -80,44 +81,25 @@ const TARGETS: { id: Target; name: string; description: string }[] = [
   { id: "bookmarks", name: "ブックマーク", description: "ブックマークした問題から出題します。" },
 ];
 
-type Mode = {
+/** 選ぶと、下に出題の設定が出るモード */
+type SettingsMode = "normal" | "review" | "free-text";
+
+/** カードの動き。select は設定を出す、link は別の画面へ、start はそのまま出題を始める */
+type ModeCard = {
   id: string;
   name: string;
+  emoji: string;
+  tone: string;
   description: string;
-  enabled: boolean;
-  href?: string;
-  /** 押すと、そのモードで出題を始める */
-  onStart?: () => void;
-};
+  /** カードの下に添える、数などの文字 */
+  meta?: string;
+  /** 選べない理由(カードを薄くして、押せなくする) */
+  unavailable?: string;
+} & ({ kind: "select"; mode: SettingsMode } | { kind: "link"; href: string } | { kind: "start" });
 
-function modesFor(exam: PublishedExam, studyAvailable: boolean, startOfficial: () => void): Mode[] {
-  return [
-    { id: "normal", name: "通常出題", description: "分野と問題数を選んで、1 問ずつ解きます。", enabled: true },
-    {
-      id: "official",
-      name: "本番モード",
-      description: `本番と同じ ${exam.officialQuestionCount} 問を、制限時間 ${exam.officialTimeMinutes} 分で解きます。選択式のすべての問題から出題し、時間切れで自動的に採点します。`,
-      enabled: true,
-      onStart: startOfficial,
-    },
-    {
-      id: "sections",
-      name: "セクションで解く",
-      description: "全問を 5 問ずつに分けて、順に解きます。5 問中 4 問の正解で合格です。",
-      enabled: true,
-      href: `/exams/${exam.examCode}/sections`,
-    },
-    {
-      id: "study",
-      name: "学習モード",
-      description: "単元ごとに読んでから解きます。",
-      enabled: studyAvailable,
-      href: `/exams/${exam.examCode}/study`,
-    },
-  ];
-}
+const MODE_NAMES: Record<SettingsMode, string> = { normal: "通常出題", review: "復習", "free-text": "自由記述" };
 
-export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
+export function ModeSelect({ exam, pool, studyUnits = null }: Props) {
   const router = useRouter();
   const countId = useId();
   const [domains, setDomains] = useState<string[]>([]);
@@ -127,6 +109,7 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
   const [reveal, setReveal] = useState<Reveal>("end");
   const [resumable, setResumable] = useState<Session | null>(null);
   const [target, setTarget] = useState<Target>("all");
+  const [mode, setMode] = useState<SettingsMode | null>(null);
   const [difficulties, setDifficulties] = useState<Difficulty[]>([]);
   const [preferFewer, setPreferFewer] = useState(false);
   const answerCounts = useAnswerCounts(exam.examCode);
@@ -145,6 +128,8 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
     setReveal(conditions?.reveal ?? settings.reveal ?? "end");
     if (conditions) {
       setTarget(conditions.target);
+      // 前に条件を選んでいたときは、そのモードの設定を開いたままにする
+      setMode(conditions.target === "review" ? "review" : "normal");
       setDifficulties(conditions.difficulties);
       setCount(conditions.count);
       setPreferFewer(conditions.preferFewer);
@@ -167,6 +152,7 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
       // 前回の条件の対象が、いまは読み込めないときは、全問に戻す
       const loaded = { review, bookmarks };
       setTarget((current) => (current !== "all" && loaded[current] === null ? "all" : current));
+      setMode((current) => (current === "review" && review === null ? "normal" : current));
     });
     return () => {
       active = false;
@@ -174,13 +160,17 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
   }, [exam.examCode]);
 
   // 対象で絞ってから、分野で絞る(いまのデータにない問題 ID は、ここで落ちる)
+  // 自由記述のモードは、自由記述の問題だけから出題する
+  const base = mode === "free-text" ? pool.filter((p) => p.questionType === "free-text") : pool;
   const inTarget = (id: Target) => {
-    if (id === "all") return pool;
+    if (id === "all") return base;
     const ids = new Set(lists[id] ?? []);
-    return pool.filter((p) => ids.has(p.questionId));
+    return base.filter((p) => ids.has(p.questionId));
   };
+  // 復習のモードは復習プール、自由記述のモードは全問が対象。通常出題だけが、対象を選べる
+  const activeTarget: Target = mode === "review" ? "review" : mode === "free-text" ? "all" : target;
   // 対象で絞り、難易度で絞る(難易度を選んだときは、難易度のない問題を出さない)
-  const targeted = inTarget(target).filter(
+  const targeted = inTarget(activeTarget).filter(
     (p) => difficulties.length === 0 || (p.difficulty !== undefined && difficulties.includes(p.difficulty)),
   );
   const perDomain = domainCounts(targeted);
@@ -246,7 +236,7 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
       return;
     }
     saveConditions(browserStore(), exam.examCode, {
-      target,
+      target: activeTarget,
       domains,
       difficulties,
       count: Math.max(1, effectiveCount),
@@ -257,19 +247,106 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
     begin(reveal === "each" ? { ...session, reveal } : session);
   }
 
+  const reviewWaiting = lists.review?.length ?? 0;
+  const freeTextCount = pool.filter((p) => p.questionType === "free-text").length;
+  const cards: ModeCard[] = [
+    {
+      id: "normal",
+      name: "通常出題",
+      emoji: "📝",
+      tone: "tone-primary",
+      description: "分野と問題数を選んで、1 問ずつ解きます。",
+      meta: `${pool.length} 問`,
+      kind: "select",
+      mode: "normal",
+    },
+    {
+      id: "review",
+      name: "復習",
+      emoji: "🔁",
+      tone: "tone-orange",
+      description: "間違えた問題と、自信なしの印を付けた問題から出題します。2 回続けて正解すると、外れます。",
+      meta: lists.review === null ? undefined : `待ち ${reviewWaiting} 問`,
+      unavailable: lists.review === null ? "アカウントから読み込めないため、いまは選べません。" : undefined,
+      kind: "select",
+      mode: "review",
+    },
+    {
+      id: "bookmarks",
+      name: "直前チェック",
+      emoji: "⭐",
+      tone: "tone-violet",
+      description: "ブックマークした問題を、正解と解説つきで見直します。",
+      meta: lists.bookmarks === null ? undefined : `ブックマーク ${inTarget("bookmarks").length} 問`,
+      kind: "link",
+      href: "/bookmarks",
+    },
+    {
+      id: "study",
+      name: "学習モード",
+      emoji: "📚",
+      tone: "tone-correct",
+      description: "単元ごとに読んでから解きます。",
+      meta: studyUnits === null ? undefined : `${exam.domains.length} 分野・${studyUnits} 単元`,
+      unavailable: studyUnits === null ? "準備中です" : undefined,
+      kind: "link",
+      href: `/exams/${exam.examCode}/study`,
+    },
+    {
+      id: "sections",
+      name: "セクションで解く",
+      emoji: "🧩",
+      tone: "tone-domain-3",
+      description: "全問を 5 問ずつに分けて、順に解きます。5 問中 4 問の正解で合格です。",
+      kind: "link",
+      href: `/exams/${exam.examCode}/sections`,
+    },
+    {
+      id: "free-text",
+      name: "自由記述",
+      emoji: "✍️",
+      tone: "tone-domain-4",
+      description: "文章で答える問題だけを解きます。回答に含まれる言葉で、観点ごとに判定します。",
+      meta: `${freeTextCount} 問`,
+      unavailable: freeTextCount === 0 ? "自由記述の問題がありません" : undefined,
+      kind: "select",
+      mode: "free-text",
+    },
+    {
+      id: "official",
+      name: "本番モード",
+      emoji: "⏱️",
+      tone: "tone-incorrect",
+      description: `本番と同じ ${exam.officialQuestionCount} 問を、制限時間 ${exam.officialTimeMinutes} 分で解きます。選択式のすべての問題から出題し、時間切れで自動的に採点します。`,
+      kind: "start",
+    },
+  ];
+  const shortOfOfficial = pool.length < exam.officialQuestionCount;
+
   return (
     <section className="space-y-8">
-      <div className="space-y-1">
+      <div className="space-y-2">
         <Link href="/exams" className="text-sm text-primary hover:underline">
           資格の一覧へ戻る
         </Link>
         <h1 className="h1">{exam.name}</h1>
+        <ul aria-label="資格の情報" className="flex flex-wrap items-center gap-2">
+          <li className="chip tone-primary">{exam.examCode}</li>
+          <li className="chip tone-correct">合格ライン {passLinePercent(exam)}%</li>
+          <li className="chip tone-muted">問題 {pool.length} 問</li>
+        </ul>
+        {shortOfOfficial ? (
+          <p className="text-sm text-warn">
+            この資格の問題は {pool.length} 問で、本番の {exam.officialQuestionCount} 問に届いていません。
+            本番モードは、いまある問題から出題します。
+          </p>
+        ) : null}
         <div className="flex flex-wrap gap-4 pt-1 text-sm">
           <Link href={`/exams/${exam.examCode}/dashboard`} className="text-primary hover:underline">
             学習の状況を見る
           </Link>
-          <Link href="/bookmarks" className="text-primary hover:underline">
-            直前チェック(ブックマーク)
+          <Link href="/help" className="text-primary hover:underline">
+            使い方
           </Link>
         </div>
       </div>
@@ -297,192 +374,233 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
 
       <div className="space-y-3">
         <h2 className="h2">モード</h2>
-        <ul className="space-y-2">
-          {modesFor(exam, studyAvailable, startOfficial).map((mode) => (
-            <li key={mode.id} className={`p-4 ${mode.enabled ? "card border-primary" : "card-dashed"}`}>
-              {mode.enabled && mode.href ? (
-                <Link href={mode.href} className="block font-bold text-primary hover:underline">
-                  {mode.name}
-                </Link>
-              ) : mode.enabled && mode.onStart ? (
-                <button
-                  type="button"
-                  onClick={mode.onStart}
-                  className="block text-left font-bold text-primary hover:underline"
-                >
-                  {mode.name}を始める
-                </button>
-              ) : (
-                <span className={`block font-bold ${mode.enabled ? "" : "text-muted"}`}>{mode.name}</span>
-              )}
-              <span className="block text-sm text-muted">
-                {mode.description}
-                {mode.enabled ? "" : "(準備中です)"}
-              </span>
-            </li>
-          ))}
+        <ul className="motion-stagger grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {cards.map((card) => {
+            const selected = card.kind === "select" && mode === card.mode;
+            const waiting = card.id === "review" && reviewWaiting > 0;
+            const blocked = card.unavailable !== undefined;
+            const surface = blocked
+              ? "card-dashed"
+              : `card ${selected ? "border-primary bg-soft" : waiting ? "border-warn bg-warn-bg" : ""}`;
+            // カード全体を押せるように、名前のボタン・リンクを、カードいっぱいに広げる
+            const stretch = "after:absolute after:inset-0 after:content-['']";
+            const nameClass = `block text-left font-bold ${stretch}`;
+            return (
+              <li
+                key={card.id}
+                className={`relative flex gap-3 p-4 has-[:focus-visible]:outline-[3px] has-[:focus-visible]:outline-primary ${surface}`}
+              >
+                <span aria-hidden="true" className={`tile ${card.tone}`}>
+                  {card.emoji}
+                </span>
+                <div className="min-w-0 space-y-1">
+                  {blocked ? (
+                    <span className="block font-bold text-muted">{card.name}</span>
+                  ) : card.kind === "link" ? (
+                    <Link href={card.href} className={`${nameClass} text-primary`}>
+                      {card.name}
+                    </Link>
+                  ) : card.kind === "start" ? (
+                    <button type="button" onClick={startOfficial} className={`${nameClass} text-primary`}>
+                      {card.name}を始める
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      aria-pressed={selected}
+                      onClick={() => setMode(card.mode)}
+                      className={`${nameClass} ${selected ? "text-primary" : ""}`}
+                    >
+                      <span aria-hidden="true">{selected ? "✓ " : ""}</span>
+                      {card.name}
+                    </button>
+                  )}
+                  <span className="block text-sm text-muted">
+                    {card.description}
+                    {card.unavailable ? `(${card.unavailable.replace(/。$/, "")})` : ""}
+                  </span>
+                  {card.meta ? <span className="block text-sm font-bold">{card.meta}</span> : null}
+                  {waiting ? <span className="chip tone-warn">復習の待ちがあります</span> : null}
+                </div>
+              </li>
+            );
+          })}
         </ul>
       </div>
 
-      <fieldset className="space-y-2">
-        <legend className="text-lg font-bold">出題の対象</legend>
-        {TARGETS.map((item) => {
-          const unavailable = item.id !== "all" && lists[item.id] === null;
-          // 復習の待ちがあるときは、色を付けて目立たせる
-          const waiting = item.id === "review" && (lists.review?.length ?? 0) > 0;
-          return (
-            <label
-              key={item.id}
-              className={`flex items-start gap-3 rounded-md border p-3 ${
-                waiting ? "border-warn bg-warn-bg" : "border-line bg-surface"
-              } ${unavailable ? "opacity-50" : ""}`}
-            >
-              <input
-                type="radio"
-                name="target"
-                className="mt-1 size-5"
-                checked={target === item.id}
-                disabled={unavailable}
-                onChange={() => setTarget(item.id)}
-              />
-              <span>
-                {item.name}
-                <span className="ml-2 text-sm text-muted">({inTarget(item.id).length} 問)</span>
-                {waiting ? <span className="ml-2 chip tone-warn">復習の待ちがあります</span> : null}
-                <span className="block text-sm text-muted">
-                  {unavailable ? "アカウントから読み込めないため、いまは選べません。" : item.description}
-                </span>
-              </span>
-            </label>
-          );
-        })}
-      </fieldset>
+      {mode === null ? (
+        <>
+          <p className="text-sm text-muted">「通常出題」「復習」「自由記述」を選ぶと、出題の設定が出ます。</p>
+          {error ? <Notice kind="error">{error}</Notice> : null}
+        </>
+      ) : (
+        <div className="space-y-8">
+          <h2 className="h2">{MODE_NAMES[mode]}の設定</h2>
+          {mode === "normal" ? (
+            <fieldset className="space-y-2">
+              <legend className="text-lg font-bold">出題の対象</legend>
+              {TARGETS.map((item) => {
+                const unavailable = item.id !== "all" && lists[item.id] === null;
+                // 復習の待ちがあるときは、色を付けて目立たせる
+                const waiting = item.id === "review" && (lists.review?.length ?? 0) > 0;
+                return (
+                  <label
+                    key={item.id}
+                    className={`flex items-start gap-3 rounded-md border p-3 ${
+                      waiting ? "border-warn bg-warn-bg" : "border-line bg-surface"
+                    } ${unavailable ? "opacity-50" : ""}`}
+                  >
+                    <input
+                      type="radio"
+                      name="target"
+                      className="mt-1 size-5"
+                      checked={target === item.id}
+                      disabled={unavailable}
+                      onChange={() => setTarget(item.id)}
+                    />
+                    <span>
+                      {item.name}
+                      <span className="ml-2 text-sm text-muted">({inTarget(item.id).length} 問)</span>
+                      {waiting ? <span className="ml-2 chip tone-warn">復習の待ちがあります</span> : null}
+                      <span className="block text-sm text-muted">
+                        {unavailable ? "アカウントから読み込めないため、いまは選べません。" : item.description}
+                      </span>
+                    </span>
+                  </label>
+                );
+              })}
+            </fieldset>
+          ) : null}
 
-      <fieldset className="space-y-2">
-        <legend className="text-lg font-bold">分野</legend>
-        <p className="text-sm text-muted">選ばないときは、すべての分野から出題します。</p>
-        {exam.domains.map((domain) => {
-          const color = domainColorClasses(exam.domains, domain.code);
-          return (
-            <label
-              key={domain.code}
-              className={`flex items-center gap-3 rounded-md border border-l-4 border-line bg-surface p-3 ${color?.border ?? ""}`}
-            >
-              <input
-                type="checkbox"
-                className="size-5"
-                checked={domains.includes(domain.code)}
-                onChange={() => toggleDomain(domain.code)}
-              />
-              <span>
-                <span className={`font-bold ${color?.text ?? ""}`}>{domain.name}</span>
-                <span className="ml-2 text-sm text-muted">({perDomain[domain.code] ?? 0} 問)</span>
-              </span>
-            </label>
-          );
-        })}
-      </fieldset>
+          <fieldset className="space-y-2">
+            <legend className="text-lg font-bold">分野</legend>
+            <p className="text-sm text-muted">選ばないときは、すべての分野から出題します。</p>
+            {exam.domains.map((domain) => {
+              const color = domainColorClasses(exam.domains, domain.code);
+              return (
+                <label
+                  key={domain.code}
+                  className={`flex items-center gap-3 rounded-md border border-l-4 border-line bg-surface p-3 ${color?.border ?? ""}`}
+                >
+                  <input
+                    type="checkbox"
+                    className="size-5"
+                    checked={domains.includes(domain.code)}
+                    onChange={() => toggleDomain(domain.code)}
+                  />
+                  <span>
+                    <span className={`font-bold ${color?.text ?? ""}`}>{domain.name}</span>
+                    <span className="ml-2 text-sm text-muted">({perDomain[domain.code] ?? 0} 問)</span>
+                  </span>
+                </label>
+              );
+            })}
+          </fieldset>
 
-      <fieldset className="space-y-2">
-        <legend className="text-lg font-bold">難易度</legend>
-        <p className="text-sm text-muted">選ばないときは、すべての難易度から出題します。</p>
-        <div className="flex flex-wrap gap-2">
-          {DIFFICULTIES.map((item) => {
-            const on = difficulties.includes(item.id);
-            return (
-              <button
-                key={item.id}
-                type="button"
-                aria-pressed={on}
-                onClick={() => toggleDifficulty(item.id)}
-                className={`chip ${item.tone} border-2 px-3 py-1 text-sm ${on ? "border-current" : "border-transparent"}`}
-              >
-                <span aria-hidden="true">{on ? "✓ " : ""}</span>
-                {item.name}
-              </button>
-            );
-          })}
-        </div>
-      </fieldset>
+          <fieldset className="space-y-2">
+            <legend className="text-lg font-bold">難易度</legend>
+            <p className="text-sm text-muted">選ばないときは、すべての難易度から出題します。</p>
+            <div className="flex flex-wrap gap-2">
+              {DIFFICULTIES.map((item) => {
+                const on = difficulties.includes(item.id);
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    aria-pressed={on}
+                    onClick={() => toggleDifficulty(item.id)}
+                    className={`chip ${item.tone} border-2 px-3 py-1 text-sm ${on ? "border-current" : "border-transparent"}`}
+                  >
+                    <span aria-hidden="true">{on ? "✓ " : ""}</span>
+                    {item.name}
+                  </button>
+                );
+              })}
+            </div>
+          </fieldset>
 
-      <label className="flex items-center gap-3 rounded-md border border-line bg-surface p-3">
-        <input
-          type="checkbox"
-          className="size-5"
-          checked={preferFewer}
-          onChange={(event) => setPreferFewer(event.target.checked)}
-        />
-        <span>
-          解答回数の少ない問題を優先する
-          <span className="block text-sm text-muted">
-            まだ解いていない問題や、解いた回数の少ない問題が出やすくなります。
-          </span>
-        </span>
-      </label>
-
-      <label className="flex items-center gap-3 rounded-md border border-line bg-surface p-3">
-        <input
-          type="checkbox"
-          className="size-5"
-          checked={shuffleChoices}
-          onChange={(event) => changeShuffle(event.target.checked)}
-        />
-        <span>
-          選択肢の並びをシャッフルする
-          <span className="block text-sm text-muted">位置で答えを覚えてしまうのを防ぎます。採点は変わりません。</span>
-        </span>
-      </label>
-
-      <fieldset className="space-y-2">
-        <legend className="text-lg font-bold">解答の表示</legend>
-        {REVEALS.map((item) => (
-          <label key={item.id} className="flex items-start gap-3 rounded-md border border-line bg-surface p-3">
+          <label className="flex items-center gap-3 rounded-md border border-line bg-surface p-3">
             <input
-              type="radio"
-              name="reveal"
-              className="mt-1 size-5"
-              checked={reveal === item.id}
-              onChange={() => changeReveal(item.id)}
+              type="checkbox"
+              className="size-5"
+              checked={preferFewer}
+              onChange={(event) => setPreferFewer(event.target.checked)}
             />
             <span>
-              {item.name}
-              <span className="block text-sm text-muted">{item.description}</span>
+              解答回数の少ない問題を優先する
+              <span className="block text-sm text-muted">
+                まだ解いていない問題や、解いた回数の少ない問題が出やすくなります。
+              </span>
             </span>
           </label>
-        ))}
-        <p className="text-sm text-muted">本番モードは、本番と同じく、まとめて最後に採点します。</p>
-      </fieldset>
 
-      <div className="space-y-2">
-        <label htmlFor={countId} className="block text-lg font-bold">
-          問題数
-        </label>
-        <select
-          id={countId}
-          className="w-full rounded-md border border-line bg-surface p-3"
-          value={effectiveCount}
-          onChange={(event) => setCount(Number(event.target.value))}
-        >
-          {counts.map((n) => (
-            <option key={n} value={n}>
-              {n === available ? `全問(${n} 問)` : `${n} 問`}
-            </option>
-          ))}
-        </select>
-      </div>
+          <label className="flex items-center gap-3 rounded-md border border-line bg-surface p-3">
+            <input
+              type="checkbox"
+              className="size-5"
+              checked={shuffleChoices}
+              onChange={(event) => changeShuffle(event.target.checked)}
+            />
+            <span>
+              選択肢の並びをシャッフルする
+              <span className="block text-sm text-muted">
+                位置で答えを覚えてしまうのを防ぎます。採点は変わりません。
+              </span>
+            </span>
+          </label>
 
-      {available === 0 ? <p className="text-sm text-muted">選んだ条件に合う問題がありません。</p> : null}
+          <fieldset className="space-y-2">
+            <legend className="text-lg font-bold">解答の表示</legend>
+            {REVEALS.map((item) => (
+              <label key={item.id} className="flex items-start gap-3 rounded-md border border-line bg-surface p-3">
+                <input
+                  type="radio"
+                  name="reveal"
+                  className="mt-1 size-5"
+                  checked={reveal === item.id}
+                  onChange={() => changeReveal(item.id)}
+                />
+                <span>
+                  {item.name}
+                  <span className="block text-sm text-muted">{item.description}</span>
+                </span>
+              </label>
+            ))}
+            <p className="text-sm text-muted">本番モードは、本番と同じく、まとめて最後に採点します。</p>
+          </fieldset>
 
-      {error ? <Notice kind="error">{error}</Notice> : null}
+          <div className="space-y-2">
+            <label htmlFor={countId} className="block text-lg font-bold">
+              問題数
+            </label>
+            <select
+              id={countId}
+              className="w-full rounded-md border border-line bg-surface p-3"
+              value={effectiveCount}
+              onChange={(event) => setCount(Number(event.target.value))}
+            >
+              {counts.map((n) => (
+                <option key={n} value={n}>
+                  {n === available ? `全問(${n} 問)` : `${n} 問`}
+                </option>
+              ))}
+            </select>
+          </div>
 
-      <button
-        type="button"
-        onClick={start}
-        disabled={available === 0}
-        className="w-full rounded-md bg-primary px-5 py-3 font-bold text-on-primary hover:opacity-90 disabled:opacity-50"
-      >
-        出題を始める
-      </button>
+          {available === 0 ? <p className="text-sm text-muted">選んだ条件に合う問題がありません。</p> : null}
+
+          {error ? <Notice kind="error">{error}</Notice> : null}
+
+          <button
+            type="button"
+            onClick={start}
+            disabled={available === 0}
+            className="w-full rounded-md bg-primary px-5 py-3 font-bold text-on-primary hover:opacity-90 disabled:opacity-50"
+          >
+            出題を始める
+          </button>
+        </div>
+      )}
     </section>
   );
 }

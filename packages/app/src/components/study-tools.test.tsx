@@ -123,6 +123,7 @@ describe("モード選択の出題の対象", () => {
     stubServer({ review: ["TEST-0002", "TEST-0099"], bookmarks: [] });
     render(<ModeSelect exam={exam} pool={pool} />);
     const user = userEvent.setup();
+    await user.click(await screen.findByRole("button", { name: "通常出題" }));
     const review = await screen.findByRole("radio", { name: /復習プール/ });
     await waitFor(() => expect(review.hasAttribute("disabled")).toBe(false));
     expect(screen.getByText(/復習プール/).textContent).toContain("1 問");
@@ -136,6 +137,7 @@ describe("モード選択の出題の対象", () => {
     stubServer({ review: [], bookmarks: [] });
     render(<ModeSelect exam={exam} pool={pool} />);
     const user = userEvent.setup();
+    await user.click(await screen.findByRole("button", { name: "通常出題" }));
     const bookmarks = await screen.findByRole("radio", { name: /ブックマーク/ });
     await waitFor(() => expect(bookmarks.hasAttribute("disabled")).toBe(false));
     await user.click(bookmarks);
@@ -148,7 +150,11 @@ describe("モード選択の出題の対象", () => {
     render(<ModeSelect exam={exam} pool={pool} />);
     // 復習プール、ブックマーク、解答回数(優先の選び方に使う)の 3 つを取りに行く
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
-    await waitFor(() => expect(screen.getAllByText(/いまは選べません/)).toHaveLength(2));
+    // 復習のカードは選べない。通常出題の設定の中では、復習プールとブックマークの対象が選べない
+    await waitFor(() => expect(screen.getAllByText(/いまは選べません/)).toHaveLength(1));
+    expect(screen.queryByRole("button", { name: "復習" })).toBeNull();
+    await userEvent.setup().click(screen.getByRole("button", { name: "通常出題" }));
+    expect(screen.getAllByText(/いまは選べません/)).toHaveLength(3);
     expect(screen.getByRole("radio", { name: /復習プール/ }).hasAttribute("disabled")).toBe(true);
   });
 });
@@ -173,7 +179,7 @@ describe("学習の状況", () => {
     render(<DashboardView exam={exam} questions={questions} />);
     // (100 + 33.3) / 2 = 66.7%。合格ラインは 70%
     await waitFor(() => expect(pageText()).toContain("合格ライン(70%)まで、あと 3.3 ポイントです。"));
-    expect(pageText()).toContain("直近 2 回の結果の正答率の平均(66.7%)");
+    expect(pageText()).toContain("直近 2 回(最大 10 回)の結果を分野ごとに集計し");
     expect(screen.getByText("2 回")).toBeTruthy();
     expect(screen.getByText("6 問")).toBeTruthy();
     expect(screen.getByText(/復習プール: 1 問/)).toBeTruthy();

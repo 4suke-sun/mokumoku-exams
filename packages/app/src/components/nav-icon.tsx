@@ -5,6 +5,7 @@ const PATHS: Record<NavIconName, string[]> = {
   home: ["M3 10.5 12 3l9 7.5", "M5 9.5V20h5v-6h4v6h5V9.5"],
   review: ["M4 12a8 8 0 1 0 2.3-5.6", "M4 4v4h4", "M12 8v4l3 2"],
   exams: ["M4 5h11a3 3 0 0 1 3 3v12H7a3 3 0 0 1-3-3V5Z", "M18 8h2v12", "M8 9h6", "M8 13h6"],
+  achievements: ["M4 20V10", "M10 20V4", "M16 20v-8", "M22 20H2"],
   bookmark: ["M6 3h12v18l-6-4.5L6 21V3Z"],
   help: ["M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z", "M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.6v.6", "M12 17h.01"],
   release: ["M5 21V4h11l-1.5 4L16 12H5", "M5 4v17"],

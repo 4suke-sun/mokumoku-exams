@@ -6,12 +6,12 @@ export const DOMAIN_COLOR_COUNT = 6;
 
 /** 分野の色のクラス。Tailwind が見つけられるように、クラス名は省略せずに書く */
 const DOMAIN_CLASSES = [
-  { text: "text-domain-1", border: "border-l-domain-1" },
-  { text: "text-domain-2", border: "border-l-domain-2" },
-  { text: "text-domain-3", border: "border-l-domain-3" },
-  { text: "text-domain-4", border: "border-l-domain-4" },
-  { text: "text-domain-5", border: "border-l-domain-5" },
-  { text: "text-domain-6", border: "border-l-domain-6" },
+  { text: "text-domain-1", border: "border-l-domain-1", bar: "bg-domain-1" },
+  { text: "text-domain-2", border: "border-l-domain-2", bar: "bg-domain-2" },
+  { text: "text-domain-3", border: "border-l-domain-3", bar: "bg-domain-3" },
+  { text: "text-domain-4", border: "border-l-domain-4", bar: "bg-domain-4" },
+  { text: "text-domain-5", border: "border-l-domain-5", bar: "bg-domain-5" },
+  { text: "text-domain-6", border: "border-l-domain-6", bar: "bg-domain-6" },
 ] as const;
 
 export type DomainColorClasses = (typeof DOMAIN_CLASSES)[number];

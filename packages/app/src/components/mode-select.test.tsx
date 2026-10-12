@@ -33,6 +33,11 @@ beforeEach(() => {
   push.mockClear();
 });
 
+/** モードのカードを選ぶ(出題の設定は、選んだあとに出る) */
+async function chooseMode(user: ReturnType<typeof userEvent.setup>, name: string | RegExp = "通常出題") {
+  await user.click(await screen.findByRole("button", { name }));
+}
+
 describe("ModeSelect の本番モード", () => {
   it("本番の問題数と制限時間を示す", async () => {
     render(<ModeSelect exam={exam} pool={pool} />);
@@ -42,6 +47,7 @@ describe("ModeSelect の本番モード", () => {
   it("始める_分野の選択によらず本番の問題数で_締め切りつきの出題を保存して出題へ進む", async () => {
     render(<ModeSelect exam={exam} pool={pool} />);
     const user = userEvent.setup();
+    await chooseMode(user);
     await user.click(await screen.findByRole("checkbox", { name: /分野 2/ }));
     await user.click(screen.getByRole("button", { name: "本番モードを始める" }));
 
@@ -93,6 +99,7 @@ describe("ModeSelect の解答の表示", () => {
   it("既定はまとめて最後に_1 問ごとを選ぶと出題の状態に含め_次の既定として覚える", async () => {
     const { unmount } = render(<ModeSelect exam={exam} pool={pool} />);
     const user = userEvent.setup();
+    await chooseMode(user);
     const end = await screen.findByRole("radio", { name: /まとめて最後に/ });
     expect((end as HTMLInputElement).checked).toBe(true);
 
@@ -103,6 +110,7 @@ describe("ModeSelect の解答の表示", () => {
     unmount();
 
     render(<ModeSelect exam={exam} pool={pool} />);
+    await chooseMode(userEvent.setup());
     await waitFor(() =>
       expect((screen.getByRole("radio", { name: /1 問ごと/ }) as HTMLInputElement).checked).toBe(true),
     );
@@ -111,6 +119,7 @@ describe("ModeSelect の解答の表示", () => {
   it("本番モード_1 問ごとを選んでいても_まとめて最後に採点する", async () => {
     render(<ModeSelect exam={exam} pool={pool} />);
     const user = userEvent.setup();
+    await chooseMode(user);
     await user.click(await screen.findByRole("radio", { name: /1 問ごと/ }));
     await user.click(screen.getByRole("button", { name: /本番モードを始める/ }));
     await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/play"));
@@ -157,6 +166,7 @@ describe("ModeSelect の難易度と解答回数と条件の保存", () => {
   it("難易度を選ぶ_その難易度の問題だけで出題し_難易度のない問題は出さない", async () => {
     render(<ModeSelect exam={exam} pool={graded} />);
     const user = userEvent.setup();
+    await chooseMode(user);
     await user.click(await screen.findByRole("button", { name: /むずかしい/ }));
     expect(screen.getByRole("button", { name: /むずかしい/ }).getAttribute("aria-pressed")).toBe("true");
     await user.selectOptions(screen.getByRole("combobox", { name: "問題数" }), "2");
@@ -184,6 +194,7 @@ describe("ModeSelect の難易度と解答回数と条件の保存", () => {
     vi.spyOn(Math, "random").mockReturnValue(0.5);
     render(<ModeSelect exam={exam} pool={many} />);
     const user = userEvent.setup();
+    await chooseMode(user);
     await user.click(await screen.findByRole("checkbox", { name: /解答回数の少ない問題を優先する/ }));
     await waitFor(() => expect(fetchMock.mock.calls.some(([u]) => u.startsWith("/api/history/stats"))).toBe(true));
     await act(async () => {
@@ -197,6 +208,7 @@ describe("ModeSelect の難易度と解答回数と条件の保存", () => {
   it("条件を資格ごとに保存し_次に開いたときに戻す", async () => {
     const first = render(<ModeSelect exam={exam} pool={graded} />);
     const user = userEvent.setup();
+    await chooseMode(user);
     await user.click(await screen.findByRole("button", { name: /やさしい/ }));
     await user.click(screen.getByRole("checkbox", { name: /分野 1/ }));
     await user.click(screen.getByRole("checkbox", { name: /解答回数の少ない問題を優先する/ }));
@@ -225,8 +237,9 @@ describe("ModeSelect の難易度と解答回数と条件の保存", () => {
     );
     render(<ModeSelect exam={exam} pool={graded} />);
     expect(await screen.findByText("復習の待ちがあります")).toBeTruthy();
-    const label = screen.getByRole("radio", { name: /復習プール/ }).closest("label");
-    expect(label?.className).toContain("bg-warn-bg");
+    const card = screen.getByRole("button", { name: "復習" }).closest("li");
+    expect(card?.className).toContain("bg-warn-bg");
+    expect(card?.textContent).toContain("待ち 1 問");
   });
 
   it("前回の対象が読み込めない_全問に戻す", async () => {
@@ -246,5 +259,115 @@ describe("ModeSelect の難易度と解答回数と条件の保存", () => {
     await waitFor(() =>
       expect((screen.getByRole("radio", { name: /すべての問題/ }) as HTMLInputElement).checked).toBe(true),
     );
+  });
+});
+
+describe("ModeSelect のモードのカード", () => {
+  beforeEach(() => {
+    localStorage.clear();
+    push.mockClear();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({ ok: false, status: 503, json: async () => ({}) })),
+    );
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("開いたとき_全モードのカードを並べ_出題の設定はまだ出さない", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({ ok: true, status: 200, json: async () => ({ questionIds: [] }) })),
+    );
+    const withFreeText = [
+      ...pool,
+      { questionId: "TEST-0009", domain: "domain1", questionType: "free-text" as const, choiceKeys: [] },
+    ];
+    render(<ModeSelect exam={exam} pool={withFreeText} studyUnits={4} />);
+    for (const name of ["通常出題", "復習", "自由記述"]) {
+      expect(await screen.findByRole("button", { name })).toBeTruthy();
+    }
+    expect(screen.getByRole("link", { name: "直前チェック" }).getAttribute("href")).toBe("/bookmarks");
+    expect(screen.getByRole("link", { name: "学習モード" }).getAttribute("href")).toBe("/exams/TEST/study");
+    expect(screen.getByRole("link", { name: "セクションで解く" }).getAttribute("href")).toBe("/exams/TEST/sections");
+    expect(screen.getByRole("button", { name: "本番モードを始める" })).toBeTruthy();
+    expect(screen.getByText("2 分野・4 単元")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "出題を始める" })).toBeNull();
+    expect(screen.queryByRole("checkbox", { name: /分野 1/ })).toBeNull();
+  });
+
+  it("カードを選ぶ_押した状態を示し_そのモードの設定を出す", async () => {
+    render(<ModeSelect exam={exam} pool={pool} />);
+    const user = userEvent.setup();
+    const card = await screen.findByRole("button", { name: "通常出題" });
+    expect(card.getAttribute("aria-pressed")).toBe("false");
+    await user.click(card);
+    expect(screen.getByRole("button", { name: /通常出題/ }).getAttribute("aria-pressed")).toBe("true");
+    expect(screen.getByRole("heading", { name: "通常出題の設定" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "出題を始める" })).toBeTruthy();
+  });
+
+  it("自由記述のカード_自由記述の問題だけで出題する", async () => {
+    const mixed = [
+      { questionId: "TEST-0001", domain: "domain1", questionType: "single" as const, choiceKeys: ["A"] },
+      { questionId: "TEST-0002", domain: "domain1", questionType: "free-text" as const, choiceKeys: [] },
+      { questionId: "TEST-0003", domain: "domain2", questionType: "free-text" as const, choiceKeys: [] },
+    ];
+    render(<ModeSelect exam={exam} pool={mixed} />);
+    const user = userEvent.setup();
+    expect(await screen.findByText("2 問")).toBeTruthy();
+    await chooseMode(user, "自由記述");
+    await user.selectOptions(screen.getByRole("combobox", { name: "問題数" }), "2");
+    await user.click(screen.getByRole("button", { name: "出題を始める" }));
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/play"));
+    expect(loadSession(browserStore(), "TEST")?.questionIds.sort()).toEqual(["TEST-0002", "TEST-0003"]);
+  });
+
+  it("自由記述の問題がない_カードを選べない", async () => {
+    render(<ModeSelect exam={exam} pool={pool} />);
+    expect(await screen.findByText(/自由記述の問題がありません/)).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "自由記述" })).toBeNull();
+  });
+
+  it("カリキュラムがない_学習モードは準備中", async () => {
+    render(<ModeSelect exam={exam} pool={pool} />);
+    expect(await screen.findByText(/単元ごとに読んでから解きます。\(準備中です\)/)).toBeTruthy();
+    expect(screen.queryByRole("link", { name: "学習モード" })).toBeNull();
+  });
+});
+
+describe("ModeSelect の見出し", () => {
+  beforeEach(() => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({ ok: false, status: 503, json: async () => ({}) })),
+    );
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("資格コード・合格ライン・問題数と_使い方へのリンクを出す", async () => {
+    const withLine = { ...exam, passingScore: 720, totalScore: 1000 } as PublishedExam;
+    render(<ModeSelect exam={withLine} pool={pool} />);
+    const info = await screen.findByRole("list", { name: "資格の情報" });
+    expect(info.textContent).toContain("TEST");
+    expect(info.textContent).toContain("合格ライン 72%");
+    expect(info.textContent).toContain("問題 5 問");
+    expect(screen.getByRole("link", { name: "使い方" }).getAttribute("href")).toBe("/help");
+  });
+
+  it("問題が本番の数に届かない_注記を出す", async () => {
+    render(<ModeSelect exam={{ ...exam, officialQuestionCount: 85 } as PublishedExam} pool={pool} />);
+    expect(await screen.findByText(/本番の 85 問に届いていません/)).toBeTruthy();
+  });
+
+  it("問題が本番の数に届いている_注記を出さない", async () => {
+    render(<ModeSelect exam={exam} pool={pool} />);
+    await screen.findByRole("list", { name: "資格の情報" });
+    expect(screen.queryByText(/届いていません/)).toBeNull();
   });
 });

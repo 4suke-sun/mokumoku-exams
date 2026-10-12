@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { HomePredictions } from "@/components/home-predictions.tsx";
 import { ResumeCards } from "@/components/resume-cards.tsx";
+import { toScored } from "@/lib/dashboard.ts";
 import { listPublishedExams, loadQuestions } from "@/lib/exam-data.ts";
 
 export default async function HomePage() {
@@ -10,6 +12,11 @@ export default async function HomePage() {
       name: exam.name,
       questionIds: (await loadQuestions(exam)).map((q) => q.questionId),
     })),
+  );
+
+  // 合格予測の集計に要る情報(正解と分野)だけを渡す
+  const entries = await Promise.all(
+    listPublishedExams().map(async (exam) => ({ exam, questions: (await loadQuestions(exam)).map(toScored) })),
   );
 
   return (
@@ -31,6 +38,7 @@ export default async function HomePage() {
         クラウド資格の学習用に、問題を解き、間違いを見直せます。資格を選んで、はじめましょう。
       </p>
       <ResumeCards exams={exams} />
+      <HomePredictions entries={entries} />
       <Link
         href="/exams"
         className="inline-block rounded-md bg-primary px-5 py-3 font-bold text-on-primary hover:opacity-90"

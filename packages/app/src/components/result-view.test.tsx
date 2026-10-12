@@ -24,6 +24,10 @@ const exam = {
   shortName: "TEST",
   passingScore: 720,
   totalScore: 1000,
+  domains: [
+    { code: "domain1", name: "分野 1", weight: 0.6 },
+    { code: "domain2", name: "分野 2", weight: 0.4 },
+  ],
 } as PublishedExam;
 
 function question(id: number, correct: string): Question {
@@ -229,6 +233,9 @@ describe("ResultView のアカウントへの保存", () => {
     saveAnswers({ "TEST-0001": ["A"] });
     render(<ResultView exam={exam} questions={questions} />);
     expect(await screen.findByText(/この端末にだけ残っている記録が 1 件/)).toBeTruthy();
+    expect(
+      screen.getByText("直近の結果は、アカウントに保存できませんでした。この端末にだけ残っています。"),
+    ).toBeTruthy();
 
     await userEvent.setup().click(screen.getByRole("button", { name: "アカウントに移す" }));
     await waitFor(() => expect(screen.queryByText(/この端末にだけ残っている記録/)).toBeNull());
@@ -385,5 +392,71 @@ describe("ResultView の過去の結果とセクション", () => {
     const session = loadSession(browserStore(), "TEST");
     expect(session?.section).toBe(1);
     expect(session?.questionIds).toEqual(["TEST-0006"]);
+  });
+});
+
+describe("ResultView の分野ごとの正答数と得点のカード", () => {
+  const withTimes = (answers: Record<string, string[]>, timesMs?: number[]): Result => ({
+    examCode: "TEST",
+    questionIds: questions.map((q) => q.questionId),
+    answers,
+    finishedAt: "2026-10-10T00:00:00.000Z",
+    ...(timesMs ? { timesMs } : {}),
+  });
+
+  it("分野ごとの正答数を出す_回答時間があれば分野ごとの平均も添える", async () => {
+    saveResult(
+      browserStore(),
+      withTimes({ "TEST-0001": ["A"], "TEST-0002": ["B"], "TEST-0003": ["B"] }, [2000, 4000, 6000]),
+    );
+    render(<ResultView exam={exam} questions={questions} />);
+    const bars = (await screen.findAllByRole("list", { name: "分野ごとの正答数" }))[0];
+    expect(bars?.textContent).toContain("分野 1");
+    expect(bars?.textContent).toContain("2 / 3 問(66.7%、平均 4 秒/問)");
+    // 分野のない分野 2 は出題がないので出さない
+    expect(bars?.textContent).not.toContain("分野 2");
+  });
+
+  it("シンプル表示のために_同じ内容の表も出す", async () => {
+    saveResult(browserStore(), withTimes({ "TEST-0001": ["A"] }));
+    render(<ResultView exam={exam} questions={questions} />);
+    const table = await screen.findByRole("table", { name: "分野ごとの正答数" });
+    expect(table.textContent).toContain("1 / 3 問(33.3%)");
+  });
+
+  it("回答時間がある_平均回答時間を出す", async () => {
+    saveResult(browserStore(), withTimes({ "TEST-0001": ["A"] }, [1000, 2000, 6000]));
+    render(<ResultView exam={exam} questions={questions} />);
+    expect(await screen.findByText("平均回答時間 3 秒/問")).toBeTruthy();
+  });
+
+  it("回答時間のない古い結果_平均を出さず_崩れずに表示する", async () => {
+    saveResult(browserStore(), withTimes({ "TEST-0001": ["A"], "TEST-0002": ["A"] }));
+    render(<ResultView exam={exam} questions={questions} />);
+    expect(await screen.findByText(/3 問中 2 問が正解/)).toBeTruthy();
+    expect(screen.queryByText(/平均回答時間/)).toBeNull();
+    expect(screen.queryByText(/回答時間 /)).toBeNull();
+  });
+
+  it("合格ラインに達している_色と文字の両方で伝える", async () => {
+    saveResult(browserStore(), withTimes({ "TEST-0001": ["A"], "TEST-0002": ["A"], "TEST-0003": ["B"] }));
+    render(<ResultView exam={exam} questions={questions} />);
+    const label = await screen.findByText("合格ライン到達");
+    expect(label.closest("div")?.className).toContain("bg-correct-bg");
+  });
+
+  it("合格ラインに達していない_色と文字の両方で伝える", async () => {
+    saveResult(browserStore(), withTimes({ "TEST-0001": ["A"] }));
+    render(<ResultView exam={exam} questions={questions} />);
+    const label = await screen.findByText("合格ライン未達");
+    expect(label.closest("div")?.className).toContain("bg-warn-bg");
+  });
+
+  it("問題ごとの結果_正誤の色の左の線を付ける", async () => {
+    saveResult(browserStore(), withTimes({ "TEST-0001": ["A"], "TEST-0002": ["B"] }));
+    render(<ResultView exam={exam} questions={questions} />);
+    await screen.findByText("問題 1");
+    expect(screen.getByText("問題 1").closest("li")?.className).toContain("border-l-correct");
+    expect(screen.getByText("問題 2").closest("li")?.className).toContain("border-l-incorrect");
   });
 });

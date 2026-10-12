@@ -138,7 +138,7 @@ describe("モード選択の学習モード", () => {
   });
 
   it("カリキュラムがある_単元の一覧へのリンクを出す", () => {
-    render(<ModeSelect exam={exam} pool={pool} studyAvailable />);
+    render(<ModeSelect exam={exam} pool={pool} studyUnits={3} />);
     expect(screen.getByRole("link", { name: "学習モード" }).getAttribute("href")).toBe("/exams/TEST/study");
   });
 

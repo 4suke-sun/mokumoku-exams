@@ -35,7 +35,7 @@ export default async function ExamPage({ params }: Props) {
         difficulty: q.difficulty,
         choiceKeys: q.questionType === "free-text" ? [] : q.choices.map((c) => c.key),
       }))}
-      studyAvailable={units !== null}
+      studyUnits={units?.length ?? null}
     />
   );
 }
