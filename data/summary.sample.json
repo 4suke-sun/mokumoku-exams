@@ -1,0 +1,23 @@
+{
+  "examCode": "SAMPLE",
+  "cards": [
+    {
+      "questionId": "SAMPLE-0001",
+      "question": "信号機の青(緑)は、何を表すか。",
+      "answers": ["B"],
+      "point": "青(緑)は、進んでよいことを表す。"
+    },
+    {
+      "questionId": "SAMPLE-0004",
+      "question": "物事を進めるとき、最初に行うことは何か。",
+      "answers": ["A"],
+      "point": "最初に目的をはっきりさせると、やることの順番を決めやすい。"
+    },
+    {
+      "questionId": "SAMPLE-0005",
+      "question": "終わったあとの振り返りで確かめる 2 つは何か。",
+      "answers": ["A", "C"],
+      "point": "うまくいったことと、次に変えること。振り返りの結果は、次の計画に生かす。"
+    }
+  ]
+}

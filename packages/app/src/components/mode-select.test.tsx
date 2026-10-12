@@ -289,7 +289,7 @@ describe("ModeSelect のモードのカード", () => {
     for (const name of ["通常出題", "復習", "自由記述"]) {
       expect(await screen.findByRole("button", { name })).toBeTruthy();
     }
-    expect(screen.getByRole("link", { name: "直前チェック" }).getAttribute("href")).toBe("/bookmarks");
+    expect(screen.getByRole("link", { name: "直前チェック(ブックマーク)" }).getAttribute("href")).toBe("/bookmarks");
     expect(screen.getByRole("link", { name: "学習モード" }).getAttribute("href")).toBe("/exams/TEST/study");
     expect(screen.getByRole("link", { name: "セクションで解く" }).getAttribute("href")).toBe("/exams/TEST/sections");
     expect(screen.getByRole("button", { name: "本番モードを始める" })).toBeTruthy();
@@ -329,6 +329,21 @@ describe("ModeSelect のモードのカード", () => {
     render(<ModeSelect exam={exam} pool={pool} />);
     expect(await screen.findByText(/自由記述の問題がありません/)).toBeTruthy();
     expect(screen.queryByRole("button", { name: "自由記述" })).toBeNull();
+  });
+
+  it("要約カードがある_入口と枚数を出し_ブックマークの直前チェックと名前を付け分ける", async () => {
+    render(<ModeSelect exam={exam} pool={pool} summaryCount={50} />);
+    const link = await screen.findByRole("link", { name: "直前チェック(要約カード)" });
+    expect(link.getAttribute("href")).toBe("/exams/TEST/cards");
+    expect(screen.getByText("50 枚")).toBeTruthy();
+    expect(screen.getByRole("link", { name: "直前チェック(ブックマーク)" }).getAttribute("href")).toBe("/bookmarks");
+  });
+
+  it("要約カードがない資格_入口を出さない", async () => {
+    render(<ModeSelect exam={exam} pool={pool} />);
+    await screen.findByRole("button", { name: "通常出題" });
+    expect(screen.queryByRole("link", { name: /要約カード/ })).toBeNull();
+    expect(screen.getByRole("link", { name: "直前チェック(ブックマーク)" })).toBeTruthy();
   });
 
   it("カリキュラムがない_学習モードは準備中", async () => {
