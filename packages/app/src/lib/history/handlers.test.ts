@@ -420,6 +420,12 @@ const failing: HistoryRepository = {
   async setGoal() {
     throw new Error("unavailable");
   },
+  async getSections() {
+    throw new Error("unavailable");
+  },
+  async mergeSections() {
+    throw new Error("unavailable");
+  },
   async getPrefs() {
     throw new Error("unavailable");
   },

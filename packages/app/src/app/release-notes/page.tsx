@@ -14,7 +14,7 @@ export default function ReleaseNotesPage() {
       <p className="text-muted">版ごとの変更の内容です。新しい版から順に並んでいます。</p>
 
       {releases.map((release) => (
-        <section key={release.version} aria-labelledby={`${release.version}-title`} className="space-y-3">
+        <section key={release.version} aria-labelledby={`${release.version}-title`} className="card space-y-3 p-5">
           <h2 id={`${release.version}-title`} className="text-xl font-bold">
             {release.version}
             <time dateTime={release.date} className="ml-3 text-sm font-normal text-muted">

@@ -237,6 +237,41 @@ describe("DynamoDB の日ごとの学習量と目標日", () => {
     expect(await repository.getGoal("user-a", "SAMPLE")).toBeNull();
   });
 
+  it("セクションの進捗_SK は資格ごとに 1 つで_取り込むたびに統合され_別の利用者と混ざらない", async () => {
+    const { items, client } = fakeTable();
+    const repository = createDynamoRepository({ tableName: "table-example", client });
+    const record = (correct: number, finishedAt: string) => ({ correct, total: 5, finishedAt });
+    expect(await repository.getSections("user-a", "SAMPLE")).toBeNull();
+    await repository.mergeSections("user-a", "SAMPLE", {
+      examCode: "SAMPLE",
+      best: { "0": record(3, "2026-10-01T00:00:00.000Z") },
+      last: { ...record(3, "2026-10-01T00:00:00.000Z"), section: 0 },
+    });
+    const merged = await repository.mergeSections("user-a", "SAMPLE", {
+      examCode: "SAMPLE",
+      best: { "0": record(2, "2026-10-02T00:00:00.000Z"), "1": record(5, "2026-10-02T00:00:00.000Z") },
+    });
+    expect(merged.best["0"]?.correct).toBe(3);
+    expect(merged.best["1"]?.correct).toBe(5);
+    expect(merged.last?.section).toBe(0);
+    expect(items.get("USER#user-a|SECTIONS#SAMPLE")).toMatchObject({ type: "sections", examCode: "SAMPLE" });
+    expect(await repository.getSections("user-a", "SAMPLE")).toEqual(merged);
+    expect(await repository.getSections("user-b", "SAMPLE")).toBeNull();
+    expect(await repository.getSections("user-a", "OTHER")).toBeNull();
+  });
+
+  it("セクションの進捗_保存した値が壊れていても_保存していないものとして扱う", async () => {
+    const { items, client } = fakeTable();
+    const repository = createDynamoRepository({ tableName: "table-example", client });
+    items.set("USER#user-a|SECTIONS#SAMPLE", {
+      PK: "USER#user-a",
+      SK: "SECTIONS#SAMPLE",
+      examCode: "SAMPLE",
+      best: { x: 1 },
+    });
+    expect(await repository.getSections("user-a", "SAMPLE")).toBeNull();
+  });
+
   it("表示の設定_PK は利用者の sub で SK は PREFS の 1 件_上書きでき_別の利用者と混ざらない", async () => {
     const { items, client } = fakeTable();
     const repository = createDynamoRepository({ tableName: "table-example", client });
@@ -331,6 +366,10 @@ describe("メモリ上の履歴", () => {
     expect(await repository.getGoal("user-b", "SAMPLE")).toBeNull();
     await repository.setGoal("user-a", "SAMPLE", null);
     expect(await repository.getGoal("user-a", "SAMPLE")).toBeNull();
+    const record = { correct: 4, total: 5, finishedAt: "2026-10-01T00:00:00.000Z" };
+    await repository.mergeSections("user-a", "SAMPLE", { examCode: "SAMPLE", best: { "0": record } });
+    expect((await repository.getSections("user-a", "SAMPLE"))?.best["0"]).toEqual(record);
+    expect(await repository.getSections("user-b", "SAMPLE")).toBeNull();
   });
 });
 

@@ -1,5 +1,10 @@
 import { z } from "zod";
-import { checkPerQuestionLengths, MAX_TEXT_ANSWER_LENGTH, ResultBaseSchema } from "@/lib/storage.ts";
+import {
+  checkPerQuestionLengths,
+  MAX_TEXT_ANSWER_LENGTH,
+  ResultBaseSchema,
+  SectionProgressSchema,
+} from "@/lib/storage.ts";
 import { isValidDate } from "@/lib/study-days.ts";
 
 /** 資格コード(data/exams.json と同じ形)。DynamoDB のキーに使うため、区切りの `#` などを含められない。 */
@@ -131,3 +136,12 @@ export const GoalChangeSchema = z.strictObject({
     )
     .nullable(),
 });
+
+/** セクションの進捗の取り込みの本文の上限(最大 1000 セクションの記録を含められる) */
+export const MAX_SECTIONS_BODY_BYTES = 200_000;
+
+/** セクションの進捗を取り込む。端末に保存する形(`SectionProgressSchema`)に、資格コードの形の条件を足す。 */
+export const SectionsChangeSchema = SectionProgressSchema.refine(
+  (progress) => EXAM_CODE_PATTERN.test(progress.examCode),
+  "資格コードが正しくありません。",
+);

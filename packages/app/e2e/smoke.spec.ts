@@ -42,6 +42,24 @@ async function login(page: Page) {
   await page.waitForURL((url) => !url.pathname.startsWith("/login"));
 }
 
+// 先頭の選択肢を選びながら、最後の問題まで進んで採点する(正誤は問わない)
+async function answerAndFinish(page: Page) {
+  await expect(page.getByRole("progressbar", { name: "進み具合" })).toBeVisible();
+  for (let i = 0; i < 20; i++) {
+    const choice = page.locator("input[type=radio], input[type=checkbox]").first();
+    if (await choice.count()) await choice.check({ force: true });
+    if (await page.getByRole("button", { name: "採点する" }).count()) break;
+    await page.getByRole("button", { name: /次の問題へ|回答せずに次へ/ }).click();
+  }
+  await page.getByRole("button", { name: "採点する" }).click();
+  // 確認がある場合は、確定する
+  if (page.url().includes("/play"))
+    await page
+      .getByRole("button", { name: /採点する|はい|確定/ })
+      .last()
+      .click();
+}
+
 test("未ログイン_ログインの画面へ送られる", async ({ page }) => {
   await page.goto("/exams");
   await expect(page).toHaveURL(/\/login\?next=%2Fexams/);
@@ -77,22 +95,33 @@ test("資格の一覧から出題と結果まで_通して進める", async ({ p
   await page.getByRole("button", { name: "出題を始める" }).click();
   await expect(page).toHaveURL(/\/exams\/SAMPLE\/play/);
 
-  // 先頭の選択肢を選びながら、最後の問題まで進む(正誤は問わない)
-  const progress = page.getByRole("progressbar", { name: "進み具合" });
-  await expect(progress).toBeVisible();
-  for (let i = 0; i < 20; i++) {
-    const choice = page.locator("input[type=radio], input[type=checkbox]").first();
-    if (await choice.count()) await choice.check({ force: true });
-    const finish = page.getByRole("button", { name: "採点する" });
-    if (await finish.count()) break;
-    await page.getByRole("button", { name: /次の問題へ|回答せずに次へ/ }).click();
-  }
-  await page.getByRole("button", { name: "採点する" }).click();
-
-  // 確認がある場合は、確定する
-  const confirm = page.getByRole("button", { name: /採点する|はい|確定/ }).last();
-  if (page.url().includes("/play")) await confirm.click();
+  await answerAndFinish(page);
 
   await expect(page).toHaveURL(/\/exams\/SAMPLE\/result/);
   await expect(page.locator("main")).toContainText("正答");
+});
+
+test("セクションの進捗_別の端末(保存のない新しいブラウザ)でログインしても、同じ進捗が見える", async ({ browser }) => {
+  const first = await browser.newContext();
+  const page = await first.newPage();
+  await login(page);
+  await page.goto("/exams/SAMPLE/sections");
+  const start = page.getByRole("button", { name: "セクション 1 を解く" });
+  await expect(async () => {
+    await start.click();
+    await expect(page).toHaveURL(/\/exams\/SAMPLE\/play/, { timeout: 3_000 });
+  }).toPass();
+  await answerAndFinish(page);
+  await expect(page).toHaveURL(/\/exams\/SAMPLE\/result/);
+  await first.close();
+
+  // 端末の保存(localStorage)を持たない、別のブラウザの状態
+  const second = await browser.newContext();
+  const other = await second.newPage();
+  await login(other);
+  await other.goto("/exams/SAMPLE/sections");
+  const firstCard = other.getByRole("listitem").filter({ hasText: "セクション 1" }).first();
+  await expect(firstCard).toBeVisible();
+  await expect(firstCard).not.toContainText("未挑戦");
+  await second.close();
 });

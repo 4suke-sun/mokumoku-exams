@@ -261,7 +261,7 @@ export function saveStageCheck(store: KeyValueStore, examCode: string, check: St
   return writeJson(store, stagesKey(examCode), next);
 }
 
-/** セクションの記録(セクションの番号ごとの、いちばん良い正答数)。端末の中だけに残る */
+/** セクションの記録(セクションの番号ごとの、いちばん良い正答数)。端末の中と、サーバー(ログイン中)に残る */
 const SectionRecordSchema = z.strictObject({
   correct: z.int().min(0).max(1000),
   total: z.int().min(1).max(1000),
@@ -300,6 +300,30 @@ export function saveSectionCheck(
   const best = before && before.correct >= record.correct ? before : record;
   const next: SectionProgress = { examCode, best: { ...progress.best, [key]: best }, last: { ...record, section } };
   return writeJson(store, sectionsKey(examCode), next);
+}
+
+/**
+ * 2 つの進捗を 1 つにする(端末の進捗とサーバーの進捗、別の端末で採点した進捗)。
+ * セクションごとに、正答数の多いほうを残し(同じなら base)、直近は、完了時刻の新しいほうを残す。
+ */
+export function mergeSectionProgress(base: SectionProgress, incoming: SectionProgress): SectionProgress {
+  const best: SectionProgress["best"] = { ...base.best };
+  for (const [key, record] of Object.entries(incoming.best)) {
+    const before = Object.hasOwn(best, key) ? best[key] : undefined;
+    if (!before || record.correct > before.correct) best[key] = record;
+  }
+  const last =
+    base.last && incoming.last
+      ? incoming.last.finishedAt > base.last.finishedAt
+        ? incoming.last
+        : base.last
+      : (base.last ?? incoming.last);
+  return { examCode: base.examCode, best, ...(last ? { last } : {}) };
+}
+
+/** 進捗を、そのまま端末に保存する(サーバーの進捗を取り込んだあとに使う) */
+export function saveSectionProgress(store: KeyValueStore, progress: SectionProgress): boolean {
+  return writeJson(store, sectionsKey(progress.examCode), progress);
 }
 
 /** 出題の条件(モード選択で選んだもの)。資格ごとに、この端末にだけ保存し、次回の初期値にする */

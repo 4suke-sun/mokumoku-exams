@@ -9,7 +9,13 @@ import {
 } from "@aws-sdk/lib-dynamodb";
 import { type Prefs, PrefsSchema } from "@/lib/prefs.ts";
 import { RECENT_STAT_LIMIT } from "@/lib/question-stats.ts";
-import { type Result, ResultSchema } from "@/lib/storage.ts";
+import {
+  mergeSectionProgress,
+  type Result,
+  ResultSchema,
+  type SectionProgress,
+  SectionProgressSchema,
+} from "@/lib/storage.ts";
 import { isValidDate, jstDate, type StudyDay } from "@/lib/study-days.ts";
 import { MASTER_STREAK, QUESTION_ID_PATTERN } from "./schema.ts";
 
@@ -56,6 +62,13 @@ export interface HistoryRepository {
   getGoal(sub: string, examCode: string): Promise<string | null>;
   /** 目標日を決める。null で消す。 */
   setGoal(sub: string, examCode: string, date: string | null): Promise<void>;
+  /** セクションで解くモードの進捗。保存していなければ null。 */
+  getSections(sub: string, examCode: string): Promise<SectionProgress | null>;
+  /**
+   * 進捗を取り込み、保存済みの進捗と 1 つにして保存する(セクションごとに正答数の多いほうを残す)。統合した進捗を返す。
+   * 2 つの端末が同時に呼ぶと、あとから書いたほうが、先の取り込みを上書きすることがある(次に開いたときの取り込みで戻る)。
+   */
+  mergeSections(sub: string, examCode: string, incoming: SectionProgress): Promise<SectionProgress>;
   /** 表示の設定(テーマ・画面スタイル・シャッフル)。保存していなければ null。 */
   getPrefs(sub: string): Promise<Prefs | null>;
   /** 表示の設定を保存する(上書き)。 */
@@ -112,6 +125,8 @@ export const bookmarkKeyPrefix = (examCode: string) => `BOOKMARK#${examCode}#`;
 export const reviewKeyPrefix = (examCode: string) => `REVIEW#${examCode}#`;
 export const dayKeyPrefix = (examCode: string) => `DAY#${examCode}#`;
 export const goalKey = (examCode: string) => `GOAL#${examCode}`;
+/** セクションで解くモードの進捗(資格ごとに 1 件) */
+export const sectionsKey = (examCode: string) => `SECTIONS#${examCode}`;
 /** 表示の設定(利用者ごとに 1 件) */
 export const PREFS_SORT_KEY = "PREFS";
 export const statKeyPrefix = (examCode: string) => `STAT#${examCode}#`;
@@ -353,6 +368,26 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
       else await put(sub, goalKey(examCode), { type: "goal", examCode, date });
     },
 
+    async getSections(sub, examCode) {
+      const { Item } = (await client.send(
+        new GetCommand({ TableName: tableName, Key: { PK: userKey(sub), SK: sectionsKey(examCode) } }),
+      )) as GetOutput;
+      // 保存した値は外部入力として扱い、形を検査する(壊れた値は、保存していないものとして扱う)
+      const parsed = SectionProgressSchema.safeParse({ examCode: Item?.examCode, best: Item?.best, last: Item?.last });
+      return parsed.success && parsed.data.examCode === examCode ? parsed.data : null;
+    },
+
+    async mergeSections(sub, examCode, incoming) {
+      const merged = mergeSectionProgress((await this.getSections(sub, examCode)) ?? { examCode, best: {} }, incoming);
+      await put(sub, sectionsKey(examCode), {
+        type: "sections",
+        examCode,
+        best: merged.best,
+        ...(merged.last ? { last: merged.last } : {}),
+      });
+      return merged;
+    },
+
     async getPrefs(sub) {
       const { Item } = (await client.send(
         new GetCommand({ TableName: tableName, Key: { PK: userKey(sub), SK: PREFS_SORT_KEY } }),
@@ -383,6 +418,7 @@ export function createMemoryRepository(): HistoryRepository {
   // 利用者と資格ごとの、日付ごとの学習量と、目標日
   const days = new Map<string, Map<string, StudyDay>>();
   const goals = new Map<string, string>();
+  const sections = new Map<string, SectionProgress>();
   // 利用者ごとの、表示の設定
   const prefs = new Map<string, Prefs>();
   const scope = (sub: string, examCode: string) => `${userKey(sub)}|${examCode}`;
@@ -488,6 +524,14 @@ export function createMemoryRepository(): HistoryRepository {
     },
     async getGoal(sub, examCode) {
       return goals.get(scope(sub, examCode)) ?? null;
+    },
+    async getSections(sub, examCode) {
+      return sections.get(scope(sub, examCode)) ?? null;
+    },
+    async mergeSections(sub, examCode, incoming) {
+      const merged = mergeSectionProgress(sections.get(scope(sub, examCode)) ?? { examCode, best: {} }, incoming);
+      sections.set(scope(sub, examCode), merged);
+      return merged;
     },
     async getPrefs(sub) {
       return prefs.get(sub) ?? null;
