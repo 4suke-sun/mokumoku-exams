@@ -53,5 +53,8 @@ export function shouldShowConfetti(style: VisualStyle, reducedMotion: boolean, r
   return reached && effectsEnabled(style, reducedMotion);
 }
 
-/** 初回描画の前に実行して、スタイルの切り替わりによるちらつきを防ぐ。固定の文字列で、入力は含まない。 */
-export const STYLE_INIT_SCRIPT = `try{var s=localStorage.getItem(${JSON.stringify(STYLE_KEY)});document.documentElement.setAttribute("data-style",s==="simple"?"simple":"rich")}catch(e){}`;
+/**
+ * 初回描画の前に実行して、スタイルの切り替わりによるちらつきを防ぐ。固定の文字列で、入力は含まない。
+ * サーバーがアカウントの設定を反映したとき(`<html data-prefs>`)は、端末の値で上書きしない。
+ */
+export const STYLE_INIT_SCRIPT = `try{if(!document.documentElement.hasAttribute("data-prefs")){var s=localStorage.getItem(${JSON.stringify(STYLE_KEY)});document.documentElement.setAttribute("data-style",s==="simple"?"simple":"rich")}}catch(e){}`;

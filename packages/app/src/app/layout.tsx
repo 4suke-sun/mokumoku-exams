@@ -1,9 +1,12 @@
 import type { Metadata, Viewport } from "next";
+import { headers } from "next/headers";
 import type { ReactNode } from "react";
 import { NavigationProgress } from "@/components/navigation-progress.tsx";
 import { PageFooter, PageMain } from "@/components/page-main.tsx";
 import { SessionProvider } from "@/components/session-provider.tsx";
 import { SiteNav } from "@/components/site-nav.tsx";
+import { guardDeps } from "@/lib/auth/deps.ts";
+import { prefsForRequest } from "@/lib/prefs-server.ts";
 import { THEME_COLORS } from "@/lib/pwa.ts";
 import { THEME_INIT_SCRIPT } from "@/lib/theme.ts";
 import { STYLE_INIT_SCRIPT } from "@/lib/visual-style.ts";
@@ -29,9 +32,34 @@ export const viewport: Viewport = {
   ],
 };
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+/**
+ * アカウントの表示の設定を、サーバーが最初の描画から反映する(読み込み後のちらつきをなくす)。
+ * 設定の Cookie の持ち主が、検証した ID トークンの利用者と一致するときだけ反映する(別のアカウントの設定は使わない)。
+ * 反映しないとき(未ログイン・Cookie がない・持ち主が違う)は、端末の設定を、初回描画の前のスクリプトが反映する。
+ */
+async function serverPrefs() {
+  try {
+    return await prefsForRequest((await headers()).get("cookie"), guardDeps());
+  } catch {
+    return null;
+  }
+}
+
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const prefs = await serverPrefs();
   return (
-    <html lang="ja" suppressHydrationWarning>
+    <html
+      lang="ja"
+      suppressHydrationWarning
+      {...(prefs
+        ? {
+            "data-prefs": "1",
+            "data-style": prefs.style,
+            // 「端末に従う」は、属性を付けない(CSS の prefers-color-scheme に任せる)
+            ...(prefs.theme === "system" ? {} : { "data-theme": prefs.theme }),
+          }
+        : {})}
+    >
       <head>
         <script>{THEME_INIT_SCRIPT}</script>
         <script>{STYLE_INIT_SCRIPT}</script>

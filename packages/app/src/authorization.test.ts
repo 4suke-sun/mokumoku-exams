@@ -11,6 +11,7 @@ import * as changePasswordRoute from "@/app/api/auth/change-password/route.ts";
 import * as bookmarksRoute from "@/app/api/history/bookmarks/route.ts";
 import * as daysRoute from "@/app/api/history/days/route.ts";
 import * as goalRoute from "@/app/api/history/goal/route.ts";
+import * as prefsRoute from "@/app/api/history/prefs/route.ts";
 import * as resultRoute from "@/app/api/history/result/route.ts";
 import * as historyRoute from "@/app/api/history/results/route.ts";
 import * as reviewAllRoute from "@/app/api/history/review/all/route.ts";
@@ -92,6 +93,8 @@ const PROTECTED_PAGES = [
   "/account",
   "/achievements",
   "/admin",
+  "/admin/preview",
+  "/admin/preview/sample",
   "/bookmarks",
   "/exams",
   "/exams/sample",
@@ -109,7 +112,7 @@ const PROTECTED_PAGES = [
   "/review",
 ];
 /** 保護される画面のうち、管理者だけが開けるもの */
-const ADMIN_PAGES = ["/admin"];
+const ADMIN_PAGES = ["/admin", "/admin/preview", "/admin/preview/sample"];
 /** 保護される API のうち、管理者だけが呼べるもの */
 const ADMIN_APIS = ["/api/admin/users", "/api/admin/users/disable"];
 const PUBLIC_APIS = [
@@ -128,6 +131,7 @@ const PROTECTED_APIS = [
   "/api/history/bookmarks",
   "/api/history/days",
   "/api/history/goal",
+  "/api/history/prefs",
   "/api/history/result",
   "/api/history/results",
   "/api/history/review",
@@ -330,6 +334,7 @@ describe("認可: 未ログインの拒否", () => {
     expect(methods(statsRoute)).toEqual(["GET"]);
     expect(methods(daysRoute)).toEqual(["GET"]);
     expect(methods(goalRoute).sort()).toEqual(["GET", "PUT"]);
+    expect(methods(prefsRoute).sort()).toEqual(["GET", "PUT"]);
     expect(methods(changePasswordRoute)).toEqual(["POST"]);
     expect(methods(adminUsersRoute).sort()).toEqual(["GET", "POST"]);
     expect(methods(adminDisableRoute)).toEqual(["POST"]);
@@ -350,6 +355,13 @@ describe("認可: 他人のデータに触れない", () => {
 
   async function cookie(): Promise<string> {
     const signedIn = await getAuthProvider().signIn(FAKE_USER_EMAIL, FAKE_USER_PHRASE);
+    if (signedIn.kind !== "signed-in") throw new Error("unexpected");
+    return withTokenCookies(null, signedIn.tokens);
+  }
+
+  /** 別のアカウント(管理者)のログイン */
+  async function adminCookie(): Promise<string> {
+    const signedIn = await getAuthProvider().signIn(FAKE_ADMIN_EMAIL, FAKE_ADMIN_PHRASE);
     if (signedIn.kind !== "signed-in") throw new Error("unexpected");
     return withTokenCookies(null, signedIn.tokens);
   }
@@ -486,6 +498,25 @@ describe("認可: 他人のデータに触れない", () => {
     expect((await daysRoute.GET(request("/api/history/days?examCode=SAMPLE"))).status).toBe(401);
   });
 
+  it("表示の設定_自分の分だけに保存され_識別子を本文・問い合わせで渡しても拒否され_未ログインには見えない", async () => {
+    const own = await cookie();
+    const prefs = { theme: "dark", style: "simple", shuffleChoices: true };
+    const put = (cookieHeader: string | undefined, body: unknown) =>
+      prefsRoute.PUT(request("/api/history/prefs", { method: "PUT", cookie: cookieHeader, body }));
+    expect((await put(undefined, prefs)).status).toBe(401);
+    for (const key of ["sub", "userId", "PK", "SK"]) {
+      expect((await put(own, { ...prefs, [key]: "other-user" })).status, key).toBe(400);
+    }
+    expect((await prefsRoute.GET(request("/api/history/prefs?sub=other-user", { cookie: own }))).status).toBe(400);
+    expect((await put(own, prefs)).status).toBe(200);
+    const mine = await prefsRoute.GET(request("/api/history/prefs", { cookie: own }));
+    expect(await mine.json()).toEqual({ prefs });
+    // 別のアカウント(管理者)には、他人の設定は見えない
+    const other = await prefsRoute.GET(request("/api/history/prefs", { cookie: await adminCookie() }));
+    expect(await other.json()).toEqual({ prefs: null });
+    expect((await prefsRoute.GET(request("/api/history/prefs"))).status).toBe(401);
+  });
+
   it("通知の購読で利用者の識別子を本文で渡す_拒否され_自分の区画にだけ保存される", async () => {
     const own = await cookie();
     const subscription = {
@@ -553,14 +584,14 @@ describe("認可: 管理者だけが開ける", () => {
 
   it("管理者_入口(proxy)を通る", async () => {
     const cookie = await admin();
-    for (const path of [...ADMIN_PAGES, "/admin/users"]) {
+    for (const path of [...ADMIN_PAGES, "/admin/users", "/admin/preview/AIB"]) {
       expect(passed(await proxy(request(path, { cookie }))), path).toBe(true);
     }
   });
 
   it("管理者でない利用者_管理者の画面はホームへ移し_管理者の API は 403 で断る", async () => {
     const cookie = await learner();
-    for (const path of [...ADMIN_PAGES, "/admin/users"]) {
+    for (const path of [...ADMIN_PAGES, "/admin/users", "/admin/preview/AIB"]) {
       const response = await proxy(request(path, { cookie }));
       expect(response.status, path).toBe(307);
       expect(new URL(response.headers.get("location") ?? "").pathname).toBe("/");

@@ -1,21 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { pushPrefs } from "@/lib/prefs-client.ts";
 import { browserStore } from "@/lib/storage.ts";
-import { applyTheme, loadTheme, saveTheme, THEME_CHOICES, type ThemeChoice } from "@/lib/theme.ts";
+import { applyTheme, saveTheme, THEME_CHOICES, type ThemeChoice } from "@/lib/theme.ts";
+import { useThemeChoice } from "@/lib/use-visual-style.ts";
 
+/** 表示テーマの切り替え。選択は `<html data-theme>` に反映し、端末に保存して、アカウントにも送る。 */
 export function ThemeToggle() {
-  // 初回描画はサーバーと同じ値にして、保存された選択は描画のあとに読む
-  const [choice, setChoice] = useState<ThemeChoice>("system");
-
-  useEffect(() => {
-    setChoice(loadTheme(browserStore()));
-  }, []);
+  // 選択の正は <html data-theme>(サーバーが反映した設定と、初回描画の前のスクリプトが反映した端末の設定の、どちらも見る)
+  const choice = useThemeChoice();
 
   function select(next: ThemeChoice) {
-    setChoice(next);
     applyTheme(document.documentElement, next);
     saveTheme(browserStore(), next);
+    void pushPrefs();
   }
 
   return (

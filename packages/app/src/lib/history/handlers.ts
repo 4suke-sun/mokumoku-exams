@@ -1,6 +1,8 @@
 import type { z } from "zod";
 import { authenticate, type GuardDeps } from "@/lib/auth/guard.ts";
 import { guard, json } from "@/lib/auth/handlers.ts";
+import { MAX_PREFS_BODY_BYTES, PrefsSchema } from "@/lib/prefs.ts";
+import { prefsSetCookie } from "@/lib/prefs-cookie.ts";
 import { type GradableQuestion, isQuestionCorrect } from "@/lib/quiz.ts";
 import type { Result } from "@/lib/storage.ts";
 import { examQuestions } from "./questions.ts";
@@ -318,6 +320,51 @@ export async function handlePutGoal(request: Request, deps: HistoryDeps): Promis
     if (!(await (deps.questions ?? examQuestions)(change.examCode))) return fail("bad-request", 400, auth.setCookies);
     await deps.repository.setGoal(auth.user.sub, change.examCode, change.date);
     return json({ status: "saved" }, 200, auth.setCookies);
+  } catch {
+    return fail("unavailable", 503);
+  }
+}
+
+/**
+ * 自分の表示の設定を返す。保存していなければ null。保存済みなら、設定の Cookie も付ける
+ * (別の端末でログインしたとき、次の描画から、サーバーが設定を反映できる)。
+ */
+export async function handleGetPrefs(request: Request, deps: HistoryDeps): Promise<Response> {
+  const auth = await authorize(request, deps);
+  if (!auth) return fail("unauthorized", 401);
+  if ([...new URL(request.url).searchParams.keys()].length > 0) return fail("bad-request", 400, auth.setCookies);
+  try {
+    const prefs = await deps.repository.getPrefs(auth.user.sub);
+    const cookies = prefs
+      ? [...auth.setCookies, prefsSetCookie(auth.user.sub, prefs, deps.auth.secure)]
+      : auth.setCookies;
+    return json({ prefs }, 200, cookies);
+  } catch {
+    return fail("unavailable", 503);
+  }
+}
+
+/**
+ * 表示の設定を保存する(上書き)。保存するのは、検証した ID トークンの利用者の分だけ。利用者の識別子は、本文から受け取らない
+ * (本文に足すと、未知の項目として断る)。設定の Cookie も付ける。
+ */
+export async function handlePutPrefs(request: Request, deps: HistoryDeps): Promise<Response> {
+  const rejected = guard(request);
+  if (rejected) return rejected;
+  const auth = await authorize(request, deps);
+  if (!auth) return fail("unauthorized", 401);
+
+  const read = await readJsonBody(request, MAX_PREFS_BODY_BYTES, auth.setCookies);
+  if (read instanceof Response) return read;
+  const parsed = PrefsSchema.safeParse(read.body);
+  if (!parsed.success) return fail("bad-request", 400, auth.setCookies);
+
+  try {
+    await deps.repository.setPrefs(auth.user.sub, parsed.data);
+    return json({ status: "saved" }, 200, [
+      ...auth.setCookies,
+      prefsSetCookie(auth.user.sub, parsed.data, deps.auth.secure),
+    ]);
   } catch {
     return fail("unavailable", 503);
   }

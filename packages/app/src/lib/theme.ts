@@ -37,5 +37,8 @@ export function applyTheme(root: HTMLElement, choice: ThemeChoice): void {
   else root.setAttribute("data-theme", choice);
 }
 
-/** 初回描画の前に実行して、テーマの切り替わりによるちらつきを防ぐ。固定の文字列で、入力は含まない。 */
-export const THEME_INIT_SCRIPT = `try{var t=localStorage.getItem(${JSON.stringify(THEME_KEY)});if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}`;
+/**
+ * 初回描画の前に実行して、テーマの切り替わりによるちらつきを防ぐ。固定の文字列で、入力は含まない。
+ * サーバーがアカウントの設定を反映したとき(`<html data-prefs>`)は、端末の値で上書きしない。
+ */
+export const THEME_INIT_SCRIPT = `try{if(!document.documentElement.hasAttribute("data-prefs")){var t=localStorage.getItem(${JSON.stringify(THEME_KEY)});if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}}catch(e){}`;

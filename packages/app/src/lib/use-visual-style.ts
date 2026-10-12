@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { parseTheme, type ThemeChoice } from "./theme.ts";
 import { DEFAULT_STYLE, parseStyle, type VisualStyle } from "./visual-style.ts";
 
 // 画面スタイルと、端末の「動きを減らす」設定を、描画に使える形で読む。
@@ -39,5 +40,20 @@ export function usePrefersReducedMotion(): boolean {
     subscribeReducedMotion,
     () => reduceQuery()?.matches ?? false,
     () => true,
+  );
+}
+
+function subscribeTheme(onChange: () => void): () => void {
+  const observer = new MutationObserver(onChange);
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+  return () => observer.disconnect();
+}
+
+/** テーマの選択。正は `<html data-theme>`(属性がなければ、端末に従う)。サーバーでの描画では「端末に従う」。 */
+export function useThemeChoice(): ThemeChoice {
+  return useSyncExternalStore(
+    subscribeTheme,
+    () => parseTheme(document.documentElement.getAttribute("data-theme")),
+    () => "system",
   );
 }
