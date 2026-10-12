@@ -24,11 +24,14 @@ function makeDir(files: Record<string, unknown>): string {
 
 const run = (...args: string[]) => spawnSync("node", [script, ...args], { cwd: root, encoding: "utf8" });
 
-const exams = { exams: [{ examCode: "SAMPLE", status: "published" }] };
+const exams = { exams: [{ examCode: "SAMPLE", status: "published", domains: [{ code: "domain1" }] }] };
 const questions = { examCode: "SAMPLE", questions: [{ questionId: "SAMPLE-0001" }] };
-const curriculum = (questionIds: string[]) => ({
+const curriculum = (questionIds: string[], domain = "domain1") => ({
   examCode: "SAMPLE",
-  units: [{ id: "unit", title: "単元", order: 1, sections: [{ id: "s", title: "節", body: "本文" }], questionIds }],
+  domains: [{ code: domain, summary: "分野の説明" }],
+  units: [
+    { id: "unit", title: "単元", domain, order: 1, sections: [{ id: "s", title: "節", body: "本文" }], questionIds },
+  ],
 });
 
 describe("validate-curriculum-data", () => {
@@ -55,6 +58,17 @@ describe("validate-curriculum-data", () => {
     const r = run(dir);
     expect(r.status).toBe(1);
     expect(r.stderr).toMatch(/units\[0\]\.questionIds\[0\]: 問題データにない問題です/);
+  });
+
+  it("資格マスタにない分野を指している_失敗にする", () => {
+    const dir = makeDir({
+      "exams.json": exams,
+      "questions.sample.json": questions,
+      "curriculum.sample.json": curriculum(["SAMPLE-0001"], "domain9"),
+    });
+    const r = run(dir);
+    expect(r.status).toBe(1);
+    expect(r.stderr).toMatch(/units\[0\]\.domain: 資格マスタの分野にない分野です/);
   });
 
   it("JSON として読めないときは、入力の一部を載せずに失敗にする", () => {

@@ -1,7 +1,14 @@
 // 設問文・選択肢・解説で使える、限定した記法(docs/data-spec.md の「文字の書き方」)。
 // HTML には変換せず、構造だけを返す。画面側が React の要素として組むので、書かれた文字が HTML として解釈されることはない。
 
-export type Inline = { kind: "text"; text: string } | { kind: "strong"; text: string } | { kind: "code"; text: string };
+export type Inline =
+  | { kind: "text"; text: string }
+  | { kind: "strong"; text: string }
+  | { kind: "code"; text: string }
+  | { kind: "mark"; text: string };
+
+/** 解釈する記法の範囲。`mark`(`==強調==`)は、カリキュラムの本文と要約だけで有効にする(docs/data-spec.md の「文字の書き方」) */
+export type ParseOptions = { mark?: boolean };
 
 export type Block =
   | { kind: "paragraph"; lines: Inline[][] }
@@ -10,10 +17,11 @@ export type Block =
   | { kind: "code"; text: string };
 
 const INLINE = /(\*\*[^*\n]+\*\*|`[^`\n]+`)/;
+const INLINE_WITH_MARK = /(\*\*[^*\n]+\*\*|`[^`\n]+`|==[^=\n]+==)/;
 
-export function parseInline(source: string): Inline[] {
+export function parseInline(source: string, { mark = false }: ParseOptions = {}): Inline[] {
   return source
-    .split(INLINE)
+    .split(mark ? INLINE_WITH_MARK : INLINE)
     .filter((part) => part !== "")
     .map((part): Inline => {
       if (part.startsWith("**") && part.endsWith("**") && part.length > 4) {
@@ -22,23 +30,27 @@ export function parseInline(source: string): Inline[] {
       if (part.startsWith("`") && part.endsWith("`") && part.length > 2) {
         return { kind: "code", text: part.slice(1, -1) };
       }
+      if (mark && part.startsWith("==") && part.endsWith("==") && part.length > 4) {
+        return { kind: "mark", text: part.slice(2, -2) };
+      }
       return { kind: "text", text: part };
     });
 }
 
 /** 空行で段落を分ける。`- ` の行は箇条書き、`## ` の行は見出し、``` で囲んだ範囲はコード。 */
-export function parseBlocks(source: string): Block[] {
+export function parseBlocks(source: string, options: ParseOptions = {}): Block[] {
   const blocks: Block[] = [];
   const lines = source.replace(/\r\n?/g, "\n").split("\n");
   let paragraph: string[] = [];
   let list: string[] = [];
 
   const flushParagraph = () => {
-    if (paragraph.length > 0) blocks.push({ kind: "paragraph", lines: paragraph.map(parseInline) });
+    if (paragraph.length > 0)
+      blocks.push({ kind: "paragraph", lines: paragraph.map((line) => parseInline(line, options)) });
     paragraph = [];
   };
   const flushList = () => {
-    if (list.length > 0) blocks.push({ kind: "list", items: list.map(parseInline) });
+    if (list.length > 0) blocks.push({ kind: "list", items: list.map((item) => parseInline(item, options)) });
     list = [];
   };
 
@@ -61,7 +73,7 @@ export function parseBlocks(source: string): Block[] {
     } else if (line.startsWith("## ")) {
       flushParagraph();
       flushList();
-      blocks.push({ kind: "heading", inlines: parseInline(line.slice(3)) });
+      blocks.push({ kind: "heading", inlines: parseInline(line.slice(3), options) });
     } else if (line.startsWith("- ")) {
       flushParagraph();
       list.push(line.slice(2));

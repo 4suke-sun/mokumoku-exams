@@ -2,19 +2,29 @@ import { describe, expect, it } from "vitest";
 import sample from "../../../../data/curriculum.sample.json" with { type: "json" };
 import {
   type Box,
-  type Diagram,
+  type CompareDiagram,
   type DiagramLayout,
+  diagramProblems,
+  type FlowDiagram,
+  fitText,
+  type HierarchyDiagram,
+  layoutAny,
+  layoutCompare,
   layoutDiagram,
+  layoutHierarchy,
+  MAX_FLOW_WIDTH,
+  MIN_FONT_SIZE,
   overlaps,
   segmentCrossesBox,
   textWidth,
+  wrapText,
 } from "./diagram-layout.ts";
 
 const node = (id: string, label = id) => ({ id, label });
 const edge = (from: string, to: string, label?: string) => ({ from, to, ...(label ? { label } : {}) });
 
 /** 配置の約束: 箱どうし、ラベルどうし、ラベルと箱が重ならず、すべてが図の範囲に収まる */
-function expectNoOverlap(layout: DiagramLayout, diagram: Diagram) {
+function expectNoOverlap(layout: DiagramLayout, diagram: FlowDiagram) {
   const labels = layout.edges.flatMap((e) => (e.labelBox ? [e.labelBox] : []));
   expect(labels).toHaveLength(diagram.edges.filter((e) => e.label).length);
   layout.nodes.forEach((a, i) => {
@@ -51,7 +61,7 @@ function layerOf(layout: DiagramLayout, id: string): number {
 }
 
 /** 決まった種から作る、閉路のない図(箱は 2〜20、矢印は最大 40、ラベルの長さはまちまち) */
-function randomDiagrams(count: number): Diagram[] {
+function randomDiagrams(count: number): FlowDiagram[] {
   let seed = 20261011;
   const next = () => {
     seed = (seed * 1103515245 + 12345) % 2147483648;
@@ -60,7 +70,7 @@ function randomDiagrams(count: number): Diagram[] {
   return Array.from({ length: count }, () => {
     const size = 2 + Math.floor(next() * 19);
     const nodes = Array.from({ length: size }, (_, i) => node(`n${i}`, "箱".repeat(1 + Math.floor(next() * 10))));
-    const edges: Diagram["edges"] = [];
+    const edges: FlowDiagram["edges"] = [];
     const seen = new Set<string>();
     for (let k = 0; k < 40; k += 1) {
       const a = Math.floor(next() * size);
@@ -73,7 +83,7 @@ function randomDiagrams(count: number): Diagram[] {
       edges.push(edge(`n${from}`, `n${to}`, label));
     }
     if (edges.length === 0) edges.push(edge("n0", "n1", "次"));
-    return { title: "図", nodes, edges };
+    return { type: "flow" as const, title: "図", nodes, edges };
   });
 }
 
@@ -104,7 +114,8 @@ describe("文字の幅と重なりの判定", () => {
 
 describe("図解の配置", () => {
   it("段組み_矢印の先の箱は、元の箱より下の段に置く", () => {
-    const diagram: Diagram = {
+    const diagram: FlowDiagram = {
+      type: "flow",
       title: "図",
       nodes: [node("d"), node("a"), node("b"), node("c")],
       edges: [edge("a", "b"), edge("b", "c"), edge("a", "c"), edge("c", "d")],
@@ -122,7 +133,8 @@ describe("図解の配置", () => {
   });
 
   it("同じ段の箱_横に並べ、段ごとに中央にそろえる", () => {
-    const diagram: Diagram = {
+    const diagram: FlowDiagram = {
+      type: "flow",
       title: "図",
       nodes: [node("top", "上の箱"), node("l", "左"), node("r", "右")],
       edges: [edge("top", "l"), edge("top", "r")],
@@ -137,7 +149,8 @@ describe("図解の配置", () => {
 
   it("1 つの箱から多くのラベルつきの矢印が出る_ラベルが重ならない", () => {
     const children = Array.from({ length: 8 }, (_, i) => node(`c${i}`, "子"));
-    const diagram: Diagram = {
+    const diagram: FlowDiagram = {
+      type: "flow",
       title: "図",
       nodes: [node("root", "親"), ...children],
       edges: children.map((c) => edge("root", c.id, "長めのラベルです")),
@@ -148,7 +161,8 @@ describe("図解の配置", () => {
   });
 
   it("交差する矢印・段を飛ばす矢印のラベル_重ならない", () => {
-    const diagram: Diagram = {
+    const diagram: FlowDiagram = {
+      type: "flow",
       title: "図",
       nodes: [node("a"), node("b"), node("x"), node("y"), node("z")],
       edges: [
@@ -170,7 +184,7 @@ describe("図解の配置", () => {
   it("サンプルの図_ラベルが重ならず_ほかの矢印の線にもかからない", () => {
     const diagram = sample.units
       .flatMap((u) => u.sections)
-      .flatMap((s) => ("diagram" in s && s.diagram ? [s.diagram as Diagram] : []))[0];
+      .flatMap((s) => ("diagram" in s && s.diagram ? [s.diagram as FlowDiagram] : []))[0];
     if (!diagram) throw new Error("サンプルに図がありません");
     const layout = layoutDiagram(diagram);
     expectNoOverlap(layout, diagram);
@@ -200,7 +214,8 @@ describe("図解の配置", () => {
   });
 
   it("閉路のある図(検査で落ちるため通常は来ない)_止まらずに、重ならないように描く", () => {
-    const diagram: Diagram = {
+    const diagram: FlowDiagram = {
+      type: "flow",
       title: "図",
       nodes: [node("s"), node("a"), node("b"), node("c")],
       edges: [edge("s", "a", "入る"), edge("a", "b", "次"), edge("b", "c", "次"), edge("c", "a", "戻る")],
@@ -209,5 +224,197 @@ describe("図解の配置", () => {
     expect(new Set(layout.nodes.map((n) => n.layer)).size).toBe(4);
     expectNoOverlap(layout, diagram);
     expectLabelsOnEdges(layout);
+  });
+});
+
+describe("文字の折り返しと縮小", () => {
+  it("幅に収まる文字_折り返さず元の大きさのまま", () => {
+    expect(fitText("短い", 200, 14, 2)).toEqual({ lines: ["短い"], fontSize: 14, fits: true });
+  });
+
+  it("幅を超える文字_行数の上限の中で折り返す", () => {
+    const fit = fitText("あ".repeat(20), 150, 14, 2);
+    expect(fit.fits).toBe(true);
+    expect(fit.lines.length).toBeLessThanOrEqual(2);
+    expect(fit.lines.join("")).toBe("あ".repeat(20));
+  });
+
+  it("折り返しでも収まらない文字_小さくして収める", () => {
+    // 14px で 3 行になる長さは、2 行までの上限では、文字を縮めないと収まらない
+    const fit = fitText("あ".repeat(24), 150, 14, 2);
+    expect(fit.fits).toBe(true);
+    expect(fit.fontSize).toBeLessThan(14);
+    expect(fit.fontSize).toBeGreaterThanOrEqual(MIN_FONT_SIZE);
+  });
+
+  it("最小の大きさでも収まらない文字_収まらないと報告する", () => {
+    const fit = fitText("あ".repeat(200), 100, 14, 2);
+    expect(fit.fits).toBe(false);
+    expect(fit.fontSize).toBe(MIN_FONT_SIZE);
+  });
+
+  it("句読点_行の先頭に置かず_前の行の末尾に付ける", () => {
+    const lines = wrapText("あいうえお、かきくけこ。", textWidthOf("あいうえお"), 14);
+    expect(lines.every((line) => !"、。".includes(line[0] ?? ""))).toBe(true);
+    expect(lines.join("")).toBe("あいうえお、かきくけこ。");
+  });
+});
+
+function textWidthOf(text: string): number {
+  return textWidth(text, 14);
+}
+
+describe("流れの図の箱の説明", () => {
+  const flow: FlowDiagram = {
+    type: "flow",
+    title: "説明つき",
+    nodes: [
+      { id: "a", label: "始め", note: "最初に行うこと。目的をはっきりさせる" },
+      { id: "b", label: "終わり" },
+    ],
+    edges: [{ from: "a", to: "b", label: "次に" }],
+  };
+
+  it("説明のある箱_題の下に説明を置き_高さが増える", () => {
+    const layout = layoutDiagram(flow);
+    const [a, b] = [layout.nodes.find((n) => n.id === "a"), layout.nodes.find((n) => n.id === "b")];
+    expect(a?.texts.map((t) => t.role)).toContain("note");
+    expect(b?.texts.map((t) => t.role)).toEqual(["label"]);
+    expect(a?.height ?? 0).toBeGreaterThan(b?.height ?? 0);
+    expectNoOverlap(layout, flow);
+  });
+
+  it("説明のない箱だけの図_これまでと同じ高さ", () => {
+    const layout = layoutDiagram({ ...flow, nodes: flow.nodes.map(({ note: _note, ...n }) => n) });
+    expect(layout.nodes.every((n) => n.height === 36)).toBe(true);
+  });
+
+  it("箱の文字_すべて箱の中に収まる", () => {
+    expect(diagramProblems(layoutDiagram(flow))).toEqual([]);
+  });
+
+  it("1 つの段に箱が多すぎる図_広すぎると報告する", () => {
+    const nodes = [{ id: "root", label: "根" }, ...Array.from({ length: 8 }, (_, i) => node(`n${i}`, "あ".repeat(12)))];
+    const edges = nodes.slice(1).map((n) => edge("root", n.id));
+    const layout = layoutDiagram({ type: "flow", title: "広い", nodes, edges });
+    expect(layout.width).toBeGreaterThan(MAX_FLOW_WIDTH);
+    expect(diagramProblems(layout).some((p) => p.includes("広すぎます"))).toBe(true);
+  });
+});
+
+describe("比較の図の配置", () => {
+  const compare: CompareDiagram = {
+    type: "compare",
+    title: "比較",
+    left: {
+      heading: "左の見出し",
+      items: [{ label: "項目 1", note: "説明" }, { label: "項目 2" }, { label: "項目 3" }],
+    },
+    right: { heading: "右の見出し", items: [{ label: "あ".repeat(20), note: "い".repeat(40) }, { label: "項目 B" }] },
+  };
+
+  it("左右に見出しを並べ_その下に項目を行ごとに並べる", () => {
+    const layout = layoutCompare(compare);
+    expect(layout.kind).toBe("compare");
+    const tones = layout.boxes.map((b) => b.tone);
+    expect(tones.slice(0, 2)).toEqual(["heading-left", "heading-right"]);
+    expect(tones.filter((t) => t === "item")).toHaveLength(5);
+    const [left, right] = [layout.boxes[0], layout.boxes[1]];
+    expect((left?.x ?? 0) + (left?.width ?? 0)).toBeLessThan(right?.x ?? 0);
+  });
+
+  it("箱どうしが重ならず_すべて図の範囲に収まる", () => {
+    const layout = layoutCompare(compare);
+    layout.boxes.forEach((a, i) => {
+      for (const b of layout.boxes.slice(i + 1)) expect(overlaps(a, b), `${i}`).toBe(false);
+      expect(a.x + a.width).toBeLessThanOrEqual(layout.width);
+      expect(a.y + a.height).toBeLessThanOrEqual(layout.height);
+    });
+  });
+
+  it("同じ行の左右_高さをそろえる", () => {
+    const layout = layoutCompare(compare);
+    const items = layout.boxes.filter((b) => b.tone === "item");
+    // 1 行目は、右が長い文字で高い。左も同じ高さにそろう
+    expect(items[0]?.height).toBe(items[1]?.height);
+  });
+
+  it("長い文字_折り返して収め_問題なし", () => {
+    expect(diagramProblems(layoutCompare(compare))).toEqual([]);
+  });
+
+  it("「vs」の位置_左右の見出しの間", () => {
+    const layout = layoutCompare(compare);
+    const [left, right] = [layout.boxes[0], layout.boxes[1]];
+    expect(layout.versus?.x).toBeGreaterThan((left?.x ?? 0) + (left?.width ?? 0));
+    expect(layout.versus?.x).toBeLessThan(right?.x ?? 0);
+  });
+});
+
+describe("階層の図の配置", () => {
+  const hierarchy: HierarchyDiagram = {
+    type: "hierarchy",
+    title: "階層",
+    root: {
+      label: "根",
+      note: "いちばん外側",
+      children: [{ label: "子 1", children: [{ label: "孫 1" }, { label: "孫 2", note: "説明" }] }, { label: "子 2" }],
+    },
+  };
+
+  it("子の箱_親の箱の中に収まり_子どうしは重ならない", () => {
+    const layout = layoutHierarchy(hierarchy);
+    expect(layout.kind).toBe("hierarchy");
+    const [root, child1, grand1, grand2, child2] = layout.boxes;
+    const inside = (inner?: Box, outer?: Box) =>
+      !!inner &&
+      !!outer &&
+      inner.x >= outer.x &&
+      inner.y >= outer.y &&
+      inner.x + inner.width <= outer.x + outer.width &&
+      inner.y + inner.height <= outer.y + outer.height;
+    expect(inside(child1, root)).toBe(true);
+    expect(inside(child2, root)).toBe(true);
+    expect(inside(grand1, child1)).toBe(true);
+    expect(inside(grand2, child1)).toBe(true);
+    expect(overlaps(child1 as Box, child2 as Box)).toBe(false);
+    expect(overlaps(grand1 as Box, grand2 as Box)).toBe(false);
+  });
+
+  it("入れ子の深さ_色の段階に対応する", () => {
+    expect(layoutHierarchy(hierarchy).boxes.map((b) => b.tone)).toEqual([
+      "depth-0",
+      "depth-1",
+      "depth-2",
+      "depth-2",
+      "depth-1",
+    ]);
+  });
+
+  it("題と説明_箱の上の端に寄せる(子が並ぶので中央にしない)", () => {
+    const [root] = layoutHierarchy(hierarchy).boxes;
+    const first = root?.texts[0];
+    expect((first?.y ?? 99) - (root?.y ?? 0)).toBeLessThan(20);
+  });
+
+  it("文字が収まる_問題なし", () => {
+    expect(diagramProblems(layoutHierarchy(hierarchy))).toEqual([]);
+  });
+});
+
+describe("layoutAny", () => {
+  it("図の種類に応じた配置を返す", () => {
+    expect(layoutAny({ type: "flow", title: "f", nodes: [node("a"), node("b")], edges: [edge("a", "b")] }).kind).toBe(
+      "flow",
+    );
+    expect(
+      layoutAny({
+        type: "compare",
+        title: "c",
+        left: { heading: "l", items: [{ label: "x" }] },
+        right: { heading: "r", items: [{ label: "y" }] },
+      }).kind,
+    ).toBe("compare");
+    expect(layoutAny({ type: "hierarchy", title: "h", root: { label: "r" } }).kind).toBe("hierarchy");
   });
 });

@@ -84,3 +84,40 @@ describe("splitListLabel", () => {
     expect(splitListLabel(parseInline(text))).toBeNull();
   });
 });
+
+describe("強調の記法 ==語==", () => {
+  it("カリキュラムの本文(mark を有効にしたとき)_強調として分ける", () => {
+    expect(parseInline("これが==ポイント==です", { mark: true })).toEqual([
+      { kind: "text", text: "これが" },
+      { kind: "mark", text: "ポイント" },
+      { kind: "text", text: "です" },
+    ]);
+  });
+
+  it("既定(問題・解説)_文字のまま残す", () => {
+    expect(parseInline("これが==ポイント==です")).toEqual([{ kind: "text", text: "これが==ポイント==です" }]);
+  });
+
+  it("閉じていない・空の記号_文字のまま残す", () => {
+    expect(parseInline("==閉じない", { mark: true })).toEqual([{ kind: "text", text: "==閉じない" }]);
+    expect(parseInline("a ==== b", { mark: true })).toEqual([{ kind: "text", text: "a ==== b" }]);
+  });
+
+  it("太字と並ぶ_それぞれ解釈する", () => {
+    expect(parseInline("**太**と==強調==", { mark: true }).map((i) => i.kind)).toEqual(["strong", "text", "mark"]);
+  });
+
+  it("段落・箇条書き・見出し_オプションが中まで届く", () => {
+    const blocks = parseBlocks("## ==見出し==\n\n- ==項目==\n\n==段落==", { mark: true });
+    const kinds = blocks.map((b) =>
+      b.kind === "heading"
+        ? b.inlines[0]?.kind
+        : b.kind === "list"
+          ? b.items[0]?.[0]?.kind
+          : b.kind === "paragraph"
+            ? b.lines[0]?.[0]?.kind
+            : "",
+    );
+    expect(kinds).toEqual(["mark", "mark", "mark"]);
+  });
+});

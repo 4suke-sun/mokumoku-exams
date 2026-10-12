@@ -100,6 +100,7 @@ const PROTECTED_PAGES = [
   "/exams/sample/result",
   "/exams/sample/sections",
   "/exams/sample/study",
+  "/exams/sample/study/domains/sample",
   "/exams/sample/study/sample",
   "/help",
   "/release-notes",
