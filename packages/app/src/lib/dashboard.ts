@@ -34,6 +34,9 @@ export type DashboardSummary = {
 
 const round1 = (value: number) => Math.round(value * 10) / 10;
 
+/** 合格予測に使う、直近の結果の回数 */
+export const PREDICTION_WINDOW = 10;
+
 /**
  * 保存した結果(新しい順)から、学習の状況をまとめる。
  * いまのデータにない問題は数えない。数えられる問題が 1 問もない結果は、解いた回数にも入れない。
@@ -56,8 +59,10 @@ export function summarize(
   const answered = recent.reduce((sum, r) => sum + r.total, 0);
   const correct = recent.reduce((sum, r) => sum + r.correct, 0);
   const passLine = passLinePercent(exam);
+  // 合格予測は、直近の `PREDICTION_WINDOW` 回だけで見る(古い結果が、今の力の見積もりを引きずらないように)
+  const window = recent.slice(0, PREDICTION_WINDOW);
   const averagePercent =
-    recent.length === 0 ? 0 : round1(recent.reduce((sum, r) => sum + r.percent, 0) / recent.length);
+    window.length === 0 ? 0 : round1(window.reduce((sum, r) => sum + r.percent, 0) / window.length);
   return {
     attempts: recent.length,
     answered,
@@ -69,7 +74,7 @@ export function summarize(
     prediction:
       recent.length === 0
         ? null
-        : { averagePercent, passLine, reached: averagePercent >= passLine, basedOn: recent.length },
+        : { averagePercent, passLine, reached: averagePercent >= passLine, basedOn: window.length },
   };
 }
 

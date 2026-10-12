@@ -146,7 +146,8 @@ describe("モード選択の出題の対象", () => {
   it("アカウントから読み込めない_復習プールとブックマークは選べない", async () => {
     const fetchMock = stubServer({ review: null, bookmarks: null });
     render(<ModeSelect exam={exam} pool={pool} />);
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    // 復習プール、ブックマーク、解答回数(優先の選び方に使う)の 3 つを取りに行く
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
     await waitFor(() => expect(screen.getAllByText(/いまは選べません/)).toHaveLength(2));
     expect(screen.getByRole("radio", { name: /復習プール/ }).hasAttribute("disabled")).toBe(true);
   });

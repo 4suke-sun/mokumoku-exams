@@ -11,8 +11,11 @@ import * as changePasswordRoute from "@/app/api/auth/change-password/route.ts";
 import * as bookmarksRoute from "@/app/api/history/bookmarks/route.ts";
 import * as daysRoute from "@/app/api/history/days/route.ts";
 import * as goalRoute from "@/app/api/history/goal/route.ts";
+import * as resultRoute from "@/app/api/history/result/route.ts";
 import * as historyRoute from "@/app/api/history/results/route.ts";
+import * as reviewAllRoute from "@/app/api/history/review/all/route.ts";
 import * as reviewRoute from "@/app/api/history/review/route.ts";
+import * as statsRoute from "@/app/api/history/stats/route.ts";
 import * as pushSubscriptionRoute from "@/app/api/push/subscription/route.ts";
 import * as pushTestRoute from "@/app/api/push/test/route.ts";
 import type { AuditEntry } from "@/lib/admin/audit.ts";
@@ -94,10 +97,12 @@ const PROTECTED_PAGES = [
   "/exams/sample/dashboard",
   "/exams/sample/play",
   "/exams/sample/result",
+  "/exams/sample/sections",
   "/exams/sample/study",
   "/exams/sample/study/sample",
   "/help",
   "/release-notes",
+  "/review",
 ];
 /** 保護される画面のうち、管理者だけが開けるもの */
 const ADMIN_PAGES = ["/admin"];
@@ -119,8 +124,11 @@ const PROTECTED_APIS = [
   "/api/history/bookmarks",
   "/api/history/days",
   "/api/history/goal",
+  "/api/history/result",
   "/api/history/results",
   "/api/history/review",
+  "/api/history/review/all",
+  "/api/history/stats",
   "/api/push/subscription",
   "/api/push/test",
 ];
@@ -264,6 +272,17 @@ describe("認可: 未ログインの拒否", () => {
     expect(response.status).toBe(401);
   });
 
+  it("1 回分の結果・集計・復習の一覧と外す API 本体_入口を通らなくても未ログインを断る(二重の防御)", async () => {
+    const at = encodeURIComponent("2026-10-11T12:00:00.000Z");
+    expect((await resultRoute.GET(request(`/api/history/result?examCode=SAMPLE&finishedAt=${at}`))).status).toBe(401);
+    expect((await statsRoute.GET(request("/api/history/stats?examCode=SAMPLE"))).status).toBe(401);
+    expect((await reviewAllRoute.GET(request("/api/history/review/all"))).status).toBe(401);
+    const removal = { examCode: "SAMPLE", questionId: "SAMPLE-0001" };
+    expect((await reviewRoute.DELETE(request("/api/history/review", { method: "DELETE", body: removal }))).status).toBe(
+      401,
+    );
+  });
+
   it("日ごとの学習量と目標日の API 本体_入口を通らなくても未ログインを断る(二重の防御)", async () => {
     expect((await daysRoute.GET(request("/api/history/days?examCode=SAMPLE"))).status).toBe(401);
     expect((await goalRoute.GET(request("/api/history/goal?examCode=SAMPLE"))).status).toBe(401);
@@ -301,7 +320,10 @@ describe("認可: 未ログインの拒否", () => {
     const methods = (module: object) => Object.keys(module).filter((k) => /^[A-Z]+$/.test(k));
     expect(methods(historyRoute).sort()).toEqual(["GET", "POST"]);
     expect(methods(bookmarksRoute).sort()).toEqual(["GET", "PUT"]);
-    expect(methods(reviewRoute)).toEqual(["GET"]);
+    expect(methods(reviewRoute).sort()).toEqual(["DELETE", "GET"]);
+    expect(methods(reviewAllRoute)).toEqual(["GET"]);
+    expect(methods(resultRoute)).toEqual(["GET"]);
+    expect(methods(statsRoute)).toEqual(["GET"]);
     expect(methods(daysRoute)).toEqual(["GET"]);
     expect(methods(goalRoute).sort()).toEqual(["GET", "PUT"]);
     expect(methods(changePasswordRoute)).toEqual(["POST"]);
@@ -680,5 +702,88 @@ describe("認可: 管理者だけが開ける", () => {
     // 送り先を本文で指定することはできない
     expect((await sendTest(cookie, { sub: fakeSub(FAKE_USER_EMAIL) })).status).toBe(400);
     expect(await repository.listSubscriptions(fakeSub(FAKE_USER_EMAIL))).toHaveLength(1);
+  });
+
+  it("1 回分の結果・問題ごとの集計・復習の項目_自分の分だけを読め_他人の分は読めず外せない", async () => {
+    const learnerCookie = await learner();
+    const adminCookie = await admin();
+    const finishedAt = new Date().toISOString();
+    const saved = {
+      examCode: "SAMPLE",
+      questionIds: ["SAMPLE-0001"],
+      answers: { "SAMPLE-0001": ["D"] },
+      finishedAt,
+    };
+    // 学習者が不正解の結果を保存する(復習に入り、解答回数が数えられる)
+    const posted = await historyRoute.POST(
+      request("/api/history/results", { method: "POST", cookie: learnerCookie, body: saved }),
+    );
+    expect(posted.status).toBe(200);
+    const one = (cookie: string) =>
+      resultRoute.GET(
+        request(`/api/history/result?examCode=SAMPLE&finishedAt=${encodeURIComponent(finishedAt)}`, { cookie }),
+      );
+    expect(await (await one(learnerCookie)).json()).toEqual({ result: saved });
+    // 別の利用者は、同じ資格・同じ完了時刻を指定しても読めない
+    const other = await one(adminCookie);
+    expect(other.status).toBe(404);
+    expect(await other.json()).toEqual({ error: "not-found" });
+
+    const stats = async (cookie: string) =>
+      (
+        (await (await statsRoute.GET(request("/api/history/stats?examCode=SAMPLE", { cookie }))).json()) as {
+          stats: { questionId: string; count: number }[];
+        }
+      ).stats;
+    expect((await stats(learnerCookie)).map((s) => [s.questionId, s.count])).toEqual([["SAMPLE-0001", 1]]);
+    expect(await stats(adminCookie)).toEqual([]);
+
+    const items = async (cookie: string) =>
+      (
+        (await (await reviewAllRoute.GET(request("/api/history/review/all", { cookie }))).json()) as {
+          items: { questionId: string }[];
+        }
+      ).items.map((i) => i.questionId);
+    expect(await items(learnerCookie)).toEqual(["SAMPLE-0001"]);
+    expect(await items(adminCookie)).toEqual([]);
+
+    // 別の利用者が外そうとしても、自分の区画の項目(ない)を消すだけで、学習者の復習は残る
+    const removal = { examCode: "SAMPLE", questionId: "SAMPLE-0001" };
+    const removedByOther = await reviewRoute.DELETE(
+      request("/api/history/review", { method: "DELETE", cookie: adminCookie, body: removal }),
+    );
+    expect(removedByOther.status).toBe(200);
+    expect(await items(learnerCookie)).toEqual(["SAMPLE-0001"]);
+    // 利用者の識別子を本文や問い合わせで渡しても、使われず断られる
+    for (const key of ["sub", "userId", "PK", "SK"]) {
+      const withKey = await reviewRoute.DELETE(
+        request("/api/history/review", {
+          method: "DELETE",
+          cookie: adminCookie,
+          body: { ...removal, [key]: fakeSub(FAKE_USER_EMAIL) },
+        }),
+      );
+      expect(withKey.status, key).toBe(400);
+    }
+    for (const path of [
+      "/api/history/review/all?sub=other-user",
+      "/api/history/stats?examCode=SAMPLE&sub=other-user",
+      `/api/history/result?examCode=SAMPLE&finishedAt=${encodeURIComponent(finishedAt)}&sub=other-user`,
+    ]) {
+      const route = path.startsWith("/api/history/review")
+        ? reviewAllRoute
+        : path.startsWith("/api/history/stats")
+          ? statsRoute
+          : resultRoute;
+      expect((await route.GET(request(path, { cookie: adminCookie }))).status, path).toBe(400);
+    }
+    expect(await items(learnerCookie)).toEqual(["SAMPLE-0001"]);
+
+    // 本人は外せる
+    const removed = await reviewRoute.DELETE(
+      request("/api/history/review", { method: "DELETE", cookie: learnerCookie, body: removal }),
+    );
+    expect(removed.status).toBe(200);
+    expect(await items(learnerCookie)).toEqual([]);
   });
 });

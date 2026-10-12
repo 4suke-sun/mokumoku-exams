@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { domainBreakdown, summarize } from "./dashboard.ts";
+import { domainBreakdown, PREDICTION_WINDOW, summarize } from "./dashboard.ts";
 import { mergeResults } from "./history/merge.ts";
 import { MAX_RESULTS, type Result } from "./storage.ts";
 import type { Question } from "./types.ts";
@@ -95,12 +95,15 @@ describe("合格予測の境界", () => {
     expect(summary.attempts).toBe(10);
   });
 
-  it("上限を超える結果_まとめる前に新しい 10 件に切り詰められ_古い結果は平均に入らない", () => {
+  it("10 回を超える結果_合格予測は新しい 10 回だけで見て_古い結果は平均に入らない", () => {
     // いちばん古い 1 回だけ 0%、ほかの 10 回は 100%
     const results = [attempt(0, 2, 0), ...Array.from({ length: 10 }, (_, i) => attempt(i + 1, 2, 2))];
     const merged = mergeResults(results, []);
-    expect(merged).toHaveLength(MAX_RESULTS);
-    expect(summarize(merged, many, exam).prediction).toMatchObject({ averagePercent: 100, basedOn: 10 });
+    expect(merged.length).toBeLessThanOrEqual(MAX_RESULTS);
+    const summary = summarize(merged, many, exam);
+    expect(summary.prediction).toMatchObject({ averagePercent: 100, basedOn: PREDICTION_WINDOW });
+    // 延べの数は、すべての結果で数える
+    expect(summary.attempts).toBe(11);
   });
 
   it("回ごとの問題数が大きく偏る_問題数で重み付けせず_延べの正答率とは別に出す", () => {

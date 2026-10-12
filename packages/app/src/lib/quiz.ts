@@ -243,6 +243,17 @@ export function domainSelectHref(examCode: string, domain: string): string {
   return `/exams/${examCode}?domain=${encodeURIComponent(domain)}`;
 }
 
+/** 1 回分の結果の詳細を開く経路(結果の画面に、完了時刻を渡す) */
+export function resultDetailHref(examCode: string, finishedAt: string): string {
+  return `/exams/${examCode}/result?at=${encodeURIComponent(finishedAt)}`;
+}
+
+/** 結果の画面の問い合わせ(`?at=`)で指定された完了時刻。なければ null */
+export function requestedResultAt(search: string): string | null {
+  const at = new URLSearchParams(search).get("at");
+  return at !== null && at.length <= 64 ? at : null;
+}
+
 /** モード選択の問い合わせ(`?domain=`)で指定された分野。資格の分野でなければ、何も選ばない。 */
 export function requestedDomains(search: string, codes: readonly string[]): string[] {
   const domain = new URLSearchParams(search).get("domain");

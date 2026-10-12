@@ -25,8 +25,11 @@ function applyUpdate(
 }
 
 /** DynamoDB の Put / Get / Update / Query / Delete / Scan だけを、メモリ上で真似る。送られた命令も記録する。 */
-/** `scanPageSize` は、スキャンの 1 回で読む数(本物の 1MB ごとのページ分けの代わり)。 */
-export function fakeTable(options: { scanPageSize?: number } = {}) {
+/**
+ * `scanPageSize` と `queryPageSize` は、スキャンと問い合わせの 1 回で読む数(本物の 1MB ごとのページ分けの代わり)。
+ * 開始の項目(ExclusiveStartKey)は、その項目が消えていても、並びの位置から続ける本物とは違い、ある項目だけを扱う。
+ */
+export function fakeTable(options: { scanPageSize?: number; queryPageSize?: number } = {}) {
   const items = new Map<string, Record<string, unknown>>();
   const sent: unknown[] = [];
   const client: DocumentSender = {
@@ -66,8 +69,14 @@ export function fakeTable(options: { scanPageSize?: number } = {}) {
           .filter((i) => i.PK === values[":pk"] && String(i.SK).startsWith(values[":prefix"] as string))
           .sort((a, b) => String(a.SK).localeCompare(String(b.SK)));
         if (command.input.ScanIndexForward === false) found = found.reverse();
-        if (command.input.Limit) found = found.slice(0, command.input.Limit);
-        return { Items: found };
+        // 続きの問い合わせ(ExclusiveStartKey の項目のあとから)と、1 回で返す数
+        const start = command.input.ExclusiveStartKey as Record<string, string> | undefined;
+        if (start) found = found.slice(found.findIndex((i) => i.SK === start.SK) + 1);
+        const size = command.input.Limit ?? options.queryPageSize;
+        const page = size ? found.slice(0, size) : found;
+        const last = page.at(-1);
+        const more = last !== undefined && page.length < found.length;
+        return { Items: page, ...(more ? { LastEvaluatedKey: { PK: last.PK, SK: last.SK } } : {}) };
       }
       if (command instanceof ScanCommand) {
         // SK の接頭辞での絞り込みと、ページ分けだけを真似る(1 回で読む数は、絞り込みの前に数える)

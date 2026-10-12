@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import type { Result } from "@/lib/storage.ts";
+import { MAX_RESULTS, type Result } from "@/lib/storage.ts";
 import { mergeResults, pendingMigration } from "./merge.ts";
 
 const result = (minute: number, examCode = "SAMPLE"): Result => ({
@@ -33,8 +33,8 @@ describe("mergeResults", () => {
   });
 
   it("上限を超える_新しいものから上限の件数にする", () => {
-    const many = Array.from({ length: 15 }, (_, i) => result(i));
-    expect(mergeResults(many, [])).toHaveLength(10);
-    expect(mergeResults(many, [])[0]?.finishedAt).toBe(result(14).finishedAt);
+    const many = Array.from({ length: MAX_RESULTS + 5 }, (_, i) => result(i));
+    expect(mergeResults(many, [])).toHaveLength(MAX_RESULTS);
+    expect(mergeResults(many, [])[0]?.finishedAt).toBe(result(MAX_RESULTS + 4).finishedAt);
   });
 });

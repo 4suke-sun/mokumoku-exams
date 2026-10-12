@@ -19,8 +19,11 @@ export function browserStore(): KeyValueStore {
 }
 
 const KEY_PREFIX = "mokumoku:v1";
-/** 結果を残す件数(新しい順) */
-export const MAX_RESULTS = 10;
+/**
+ * この端末に結果を残す件数(資格ごと、新しい順)。localStorage の容量(多くのブラウザで 5MB 程度)に収まるよう、上限を置く。
+ * アカウントには、件数の上限なしで残す(docs/app/data.md)。
+ */
+export const MAX_RESULTS = 50;
 
 // 保存された値の大きさに上限を置く(壊れた値や、手で書き換えた値で、画面が重くならないようにする)
 const KEY = z.string().max(64);
@@ -90,6 +93,8 @@ export const SessionSchema = z
     choiceOrder: ChoiceOrderSchema,
     /** 段階の確認問題として始めた出題のときだけ。採点すると、その段階の到達の状態を更新する */
     stage: StageRefSchema.optional(),
+    /** セクション(5 問ずつの区切り)の番号(0 始まり)。セクションの出題のときだけ。採点すると、その記録を更新する */
+    section: z.int().min(0).max(999).optional(),
     /** 本番モードの締め切り(ISO 8601)。再読み込みしても残り時間を保つ。通常の出題では持たない */
     deadline: STAMP.optional(),
     /** 解答の表示のしかた。持たないときは、まとめて最後に */
@@ -254,4 +259,68 @@ export function saveStageCheck(store: KeyValueStore, examCode: string, check: St
     check.passed && !current.includes(check.order) ? [...current, check.order].sort((a, b) => a - b) : current;
   const next: StageProgress = { examCode, passed: { ...progress.passed, [check.unitId]: orders }, last: check };
   return writeJson(store, stagesKey(examCode), next);
+}
+
+/** セクションの記録(セクションの番号ごとの、いちばん良い正答数)。端末の中だけに残る */
+const SectionRecordSchema = z.strictObject({
+  correct: z.int().min(0).max(1000),
+  total: z.int().min(1).max(1000),
+  finishedAt: STAMP,
+});
+export type SectionRecord = z.infer<typeof SectionRecordSchema>;
+
+export const SectionProgressSchema = z.strictObject({
+  examCode: KEY,
+  /** セクションの番号(文字列)ごとの、いちばん良い記録 */
+  best: z.record(z.string().regex(/^\d{1,3}$/), SectionRecordSchema).refine((b) => Object.keys(b).length <= 1000),
+  /** 直近に採点したセクション(結果の画面で、合否と次のセクションを出す) */
+  last: SectionRecordSchema.extend({ section: z.int().min(0).max(999) }).optional(),
+});
+export type SectionProgress = z.infer<typeof SectionProgressSchema>;
+
+function sectionsKey(examCode: string): string {
+  return `${KEY_PREFIX}:sections:${examCode}`;
+}
+
+export function loadSectionProgress(store: KeyValueStore, examCode: string): SectionProgress {
+  const progress = readJson(store, sectionsKey(examCode), SectionProgressSchema);
+  return progress && progress.examCode === examCode ? progress : { examCode, best: {} };
+}
+
+/** セクションの採点を記録する。いちばん良い記録(正答数の多いもの)を残し、直近の記録は上書きする */
+export function saveSectionCheck(
+  store: KeyValueStore,
+  examCode: string,
+  section: number,
+  record: SectionRecord,
+): boolean {
+  const progress = loadSectionProgress(store, examCode);
+  const key = String(section);
+  const before = Object.hasOwn(progress.best, key) ? progress.best[key] : undefined;
+  const best = before && before.correct >= record.correct ? before : record;
+  const next: SectionProgress = { examCode, best: { ...progress.best, [key]: best }, last: { ...record, section } };
+  return writeJson(store, sectionsKey(examCode), next);
+}
+
+/** 出題の条件(モード選択で選んだもの)。資格ごとに、この端末にだけ保存し、次回の初期値にする */
+export const ConditionsSchema = z.strictObject({
+  target: z.enum(["all", "review", "bookmarks"]),
+  domains: z.array(z.string().max(32)).max(50),
+  difficulties: z.array(z.enum(["easy", "medium", "hard"])).max(3),
+  count: z.int().min(1).max(1000),
+  preferFewer: z.boolean(),
+  reveal: z.enum(REVEAL_CHOICES),
+});
+export type Conditions = z.infer<typeof ConditionsSchema>;
+
+function conditionsKey(examCode: string): string {
+  return `${KEY_PREFIX}:conditions:${examCode}`;
+}
+
+export function loadConditions(store: KeyValueStore, examCode: string): Conditions | null {
+  return readJson(store, conditionsKey(examCode), ConditionsSchema);
+}
+
+export function saveConditions(store: KeyValueStore, examCode: string, conditions: Conditions): boolean {
+  return writeJson(store, conditionsKey(examCode), conditions);
 }

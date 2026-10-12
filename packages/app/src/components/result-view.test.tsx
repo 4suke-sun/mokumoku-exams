@@ -9,6 +9,7 @@ import {
   type Result,
   type StageCheck,
   saveResult,
+  saveSectionCheck,
   saveStageCheck,
 } from "@/lib/storage.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
@@ -341,5 +342,48 @@ describe("ResultView の解き直し", () => {
     expect(await screen.findByText("すべて正解でした。見直す問題はありません。")).toBeTruthy();
     expect(screen.queryByRole("button", { name: /解き直す/ })).toBeNull();
     expect(screen.getByRole("link", { name: "別の問題でもう一度" }).getAttribute("href")).toBe("/exams/TEST");
+  });
+});
+
+describe("ResultView の過去の結果とセクション", () => {
+  afterEach(() => {
+    window.history.replaceState(null, "", "/");
+  });
+
+  it("?at= で過去の 1 回分を開き_ほかの回は一覧に並ぶ", async () => {
+    saveResult(browserStore(), {
+      examCode: "TEST",
+      questionIds: questions.map((q) => q.questionId),
+      answers: { "TEST-0001": ["A"] },
+      finishedAt: "2026-10-09T00:00:00.000Z",
+    });
+    saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["A"], "TEST-0003": ["B"] });
+    window.history.replaceState(null, "", `/exams/TEST/result?at=${encodeURIComponent("2026-10-09T00:00:00.000Z")}`);
+    render(<ResultView exam={exam} questions={questions} />);
+    expect(await screen.findByText(/3 問中 1 問が正解/)).toBeTruthy();
+    expect(screen.getByText(/過去の結果/)).toBeTruthy();
+    expect(screen.getByRole("link", { name: "最新の結果へ" })).toBeTruthy();
+  });
+
+  it("?at= の結果がない_見つからない旨を案内する", async () => {
+    saveAnswers({ "TEST-0001": ["A"] });
+    window.history.replaceState(null, "", "/exams/TEST/result?at=2020-01-01T00:00:00.000Z");
+    render(<ResultView exam={exam} questions={questions} />);
+    expect(await screen.findByRole("heading", { name: "その回の結果は見つかりません" })).toBeTruthy();
+  });
+
+  it("直近がセクションの出題_合否と_次のセクションへのボタンを出す", async () => {
+    saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["A"], "TEST-0003": ["B"] });
+    saveSectionCheck(browserStore(), "TEST", 0, { correct: 3, total: 3, finishedAt: "2026-10-10T00:00:00.000Z" });
+    // 6 問あると、2 つ目のセクションがある
+    const six = [...questions, ...[4, 5, 6].map((n) => ({ ...questions[0], questionId: `TEST-000${n}` }) as Question)];
+    render(<ResultView exam={exam} questions={six} />);
+    expect(await screen.findByText(/セクション 1 を満点で合格しました/)).toBeTruthy();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: /次のセクションへ/ }));
+    expect(push).toHaveBeenCalledWith("/exams/TEST/play");
+    const session = loadSession(browserStore(), "TEST");
+    expect(session?.section).toBe(1);
+    expect(session?.questionIds).toEqual(["TEST-0006"]);
   });
 });
