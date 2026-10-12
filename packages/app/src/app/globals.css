@@ -9,31 +9,32 @@
  *   シンプル × ダーク :root[data-style="simple"][data-theme="dark"]、端末がダークで選択がないとき
  */
 :root {
-  --bg: #f7f6f3;
+  /* ページの背景はホワイト。面(--surface)と同じ色なので、カードは、縁(--border)と影(--shadow-card)で区別する */
+  --bg: #ffffff;
   --surface: #ffffff;
   --text: #1f2933;
   --muted: #52606d;
-  --border: #cbd2d9;
+  --border: #c4ccd6;
   --primary: #1d4ed8;
   --on-primary: #ffffff;
   --correct: #166534;
   --incorrect: #b91c1c;
   --warn: #92400e;
   /* 正誤・注意を伝える面の色。面の上の文字は --text か、同じ組の色(--correct など)にする */
-  --correct-bg: #e8f6ec;
-  --incorrect-bg: #fdeeed;
-  --warn-bg: #fdf3e2;
+  --correct-bg: #e6f5ea;
+  --incorrect-bg: #fcebe9;
+  --warn-bg: #fdf1dc;
   /* 補助色。--soft は主要な操作の色をごく薄くした面。橙は、復習と強調に使う */
-  --soft: #ebf0fd;
+  --soft: #e9effd;
   --violet: #6d28d9;
-  --violet-soft: #f2ecfd;
+  --violet-soft: #efe9fd;
   --orange: #c2410c;
-  --orange-soft: #fdefe6;
+  --orange-soft: #fdeee3;
   /* アクセントのグラデーション(青から紫)。上に文字を載せるときは --on-primary を使う */
   --accent-from: #1d4ed8;
   --accent-to: #6d28d9;
   /* 影とすりガラス */
-  --shadow-card: 0 1px 2px rgb(31 41 51 / 0.06), 0 6px 20px rgb(31 41 51 / 0.06);
+  --shadow-card: 0 1px 2px rgb(31 41 51 / 0.08), 0 4px 14px rgb(31 41 51 / 0.1);
   --shadow-float: 0 12px 32px rgb(31 41 51 / 0.16);
   --glass: rgb(255 255 255 / 0.82);
   --glass-blur: 10px;
@@ -125,24 +126,25 @@
  * 分野の色は、スタイルにかかわらず同じにする(分野の見分けを、すべての画面でそろえる)。
  */
 :root[data-style="simple"] {
-  --bg: #f6f7f9;
+  /* シンプルのライトも、背景はホワイト。影がないので、カードは縁で区別する */
+  --bg: #ffffff;
   --surface: #ffffff;
   --text: #1d2430;
   --muted: #55606d;
-  --border: #d3d9e0;
+  --border: #c4ccd6;
   --primary: #2a5599;
   --on-primary: #ffffff;
   --correct: #166534;
   --incorrect: #b42318;
   --warn: #8a4b00;
-  --correct-bg: #eef7f1;
-  --incorrect-bg: #fcf0ef;
-  --warn-bg: #fbf5e8;
-  --soft: #eef2f8;
+  --correct-bg: #e8f4ec;
+  --incorrect-bg: #fbebe9;
+  --warn-bg: #faf1dc;
+  --soft: #eaf0f8;
   --violet: #5b4b8a;
-  --violet-soft: #f2f0f7;
+  --violet-soft: #eeeaf6;
   --orange: #9a4a14;
-  --orange-soft: #f8f0ea;
+  --orange-soft: #f7e9de;
   --accent-from: #2a5599;
   --accent-to: #2a5599;
   --shadow-card: none;
@@ -349,7 +351,7 @@ body {
     font-size: 0.75rem;
     font-weight: 700;
     line-height: 1.5;
-    background: color-mix(in srgb, var(--tone, var(--muted)) 14%, var(--surface));
+    background: color-mix(in srgb, var(--tone, var(--muted)) 16%, var(--surface));
     color: color-mix(in srgb, var(--tone, var(--muted)) 80%, var(--text));
   }
 
@@ -375,7 +377,7 @@ body {
     border-radius: var(--r-md);
     font-size: 1.25rem;
     line-height: 1;
-    background: color-mix(in srgb, var(--tone, var(--muted)) 16%, var(--surface));
+    background: color-mix(in srgb, var(--tone, var(--muted)) 18%, var(--surface));
   }
 
   /* すりガラスの面(シンプルでは、ただの面になる) */
