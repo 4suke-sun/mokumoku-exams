@@ -67,13 +67,15 @@ export function isInExam(pathname: string): boolean {
 }
 
 /** 画面の幅の段階。読む(文章のページ)、学ぶ(出題・結果・単元)、広い(一覧・状況) */
-export type PageWidth = "read" | "study" | "wide";
+export type PageWidth = "read" | "study" | "wide" | "play";
 
 /** 段階ごとの最大の幅(Tailwind が見つけられるように、クラス名は省略せずに書く) */
 export const PAGE_WIDTH_CLASSES: Record<PageWidth, string> = {
   read: "max-w-2xl",
   study: "max-w-3xl",
   wide: "max-w-5xl",
+  // 問題を解く画面は、問題の列と問題一覧が並ぶので、広い画面でゆとりを取る(狭い画面は変わらない)
+  play: "max-w-5xl xl:max-w-6xl",
 };
 
 const READ_PATHS = ["/help", "/release-notes", "/account", "/login", "/forgot-password", "/admin"];
@@ -81,6 +83,7 @@ const READ_PATHS = ["/help", "/release-notes", "/account", "/login", "/forgot-pa
 export function pageWidth(pathname: string): PageWidth {
   // 管理者の全問のプレビューは、問題を読むので、学ぶ画面と同じ幅にする
   if (isActive(pathname, "/admin/preview")) return "study";
+  if (/^\/exams\/[^/]+\/play$/.test(pathname)) return "play";
   if (READ_PATHS.some((href) => isActive(pathname, href))) return "read";
   if (pathname === "/" || pathname === "/exams" || pathname === "/achievements") return "wide";
   // 結果は、広い画面で 2 列にする(左に振り返り、右に得点と操作)。要約カードは、問いと答えを左右に並べる
