@@ -24,10 +24,10 @@ function makeDir(files: Record<string, unknown>): string {
 
 const run = (...args: string[]) => spawnSync("node", [script, ...args], { cwd: root, encoding: "utf8" });
 
-const exams = { exams: [{ examCode: "SAMPLE", status: "published", domains: [{ code: "domain1" }] }] };
-const questions = { examCode: "SAMPLE", questions: [{ questionId: "SAMPLE-0001" }] };
+const exams = { exams: [{ examCode: "EX-SMP-XX", status: "published", domains: [{ code: "domain1" }] }] };
+const questions = { examCode: "EX-SMP-XX", questions: [{ questionId: "SAMPLE-0001" }] };
 const curriculum = (questionIds: string[], domain = "domain1") => ({
-  examCode: "SAMPLE",
+  examCode: "EX-SMP-XX",
   domains: [{ code: domain, summary: "分野の説明" }],
   units: [
     { id: "unit", title: "単元", domain, order: 1, sections: [{ id: "s", title: "節", body: "本文" }], questionIds },
@@ -43,8 +43,8 @@ describe("validate-curriculum-data", () => {
   it("問題データにある問題だけを参照している_通る", () => {
     const dir = makeDir({
       "exams.json": exams,
-      "questions.sample.json": questions,
-      "curriculum.sample.json": curriculum(["SAMPLE-0001"]),
+      "questions.ex-smp-xx.json": questions,
+      "curriculum.ex-smp-xx.json": curriculum(["SAMPLE-0001"]),
     });
     expect(run(dir).status).toBe(0);
   });
@@ -52,8 +52,8 @@ describe("validate-curriculum-data", () => {
   it("問題データにない問題を参照している_失敗にする", () => {
     const dir = makeDir({
       "exams.json": exams,
-      "questions.sample.json": questions,
-      "curriculum.sample.json": curriculum(["SAMPLE-0002"]),
+      "questions.ex-smp-xx.json": questions,
+      "curriculum.ex-smp-xx.json": curriculum(["SAMPLE-0002"]),
     });
     const r = run(dir);
     expect(r.status).toBe(1);
@@ -63,8 +63,8 @@ describe("validate-curriculum-data", () => {
   it("資格マスタにない分野を指している_失敗にする", () => {
     const dir = makeDir({
       "exams.json": exams,
-      "questions.sample.json": questions,
-      "curriculum.sample.json": curriculum(["SAMPLE-0001"], "domain9"),
+      "questions.ex-smp-xx.json": questions,
+      "curriculum.ex-smp-xx.json": curriculum(["SAMPLE-0001"], "domain9"),
     });
     const r = run(dir);
     expect(r.status).toBe(1);
@@ -72,9 +72,9 @@ describe("validate-curriculum-data", () => {
   });
 
   it("JSON として読めないときは、入力の一部を載せずに失敗にする", () => {
-    const r = run(makeDir({ "exams.json": exams, "curriculum.sample.json": '{ "目印XYZ" 壊れた' }));
+    const r = run(makeDir({ "exams.json": exams, "curriculum.ex-smp-xx.json": '{ "目印XYZ" 壊れた' }));
     expect(r.status).toBe(1);
-    expect(r.stderr).toMatch(/curriculum\.sample\.json: JSON として読めません/);
+    expect(r.stderr).toMatch(/curriculum\.ex-smp-xx\.json: JSON として読めません/);
     expect(r.stderr).not.toContain("目印XYZ");
   });
 

@@ -38,7 +38,9 @@ try {
     .map((name) => ({ name, data: read(name) }));
 
   blocks.push(...unreadable);
-  if (unreadable.length === 0) blocks.push(...validateDataSet(exams, questionFiles));
+  const vendorsPath = join(dir, "vendors.json");
+  const vendors = existsSync(vendorsPath) ? read("vendors.json") : null;
+  if (unreadable.length === 0) blocks.push(...validateDataSet(exams, questionFiles, vendors));
 } catch {
   blocks.push(`${dir} を検査できませんでした(フォルダの読み込みに失敗)`);
 }

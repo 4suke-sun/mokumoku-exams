@@ -25,9 +25,9 @@ describe("EmptyState", () => {
   });
 
   it("操作を渡すと_リンクとして表示する", () => {
-    render(<EmptyState title="t" description="d" action={{ label: "モード選択へ", href: "/exams/SAMPLE" }} />);
+    render(<EmptyState title="t" description="d" action={{ label: "モード選択へ", href: "/exams/EX-SMP-XX" }} />);
     const link = screen.getByRole("link", { name: "モード選択へ" });
-    expect(link.getAttribute("href")).toBe("/exams/SAMPLE");
+    expect(link.getAttribute("href")).toBe("/exams/EX-SMP-XX");
   });
 
   it("操作を渡さない_リンクを表示しない", () => {

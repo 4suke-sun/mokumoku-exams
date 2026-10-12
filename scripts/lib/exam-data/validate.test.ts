@@ -15,7 +15,8 @@ import {
 import { validateDataSet } from "./validate.ts";
 
 const published = (overrides: Record<string, unknown> = {}) => ({
-  examCode: "SAMPLE",
+  examCode: "EX-SMP-XX",
+  idPrefix: "SAMPLE",
   status: "published",
   vendor: "Example",
   edition: "S01",
@@ -34,7 +35,7 @@ const published = (overrides: Record<string, unknown> = {}) => ({
 });
 
 const comingSoon = (overrides: Record<string, unknown> = {}) => ({
-  examCode: "LATER",
+  examCode: "EX-LTR-XX",
   status: "coming-soon",
   vendor: "Example",
   name: "近日公開の資格",
@@ -44,7 +45,7 @@ const comingSoon = (overrides: Record<string, unknown> = {}) => ({
 
 const question = (n: number, overrides: Record<string, unknown> = {}) => ({
   questionId: `SAMPLE-${String(n).padStart(4, "0")}`,
-  examCode: "SAMPLE",
+  examCode: "EX-SMP-XX",
   domain: "domain1",
   questionType: "single",
   questionText: `設問 ${n}`,
@@ -59,7 +60,7 @@ const question = (n: number, overrides: Record<string, unknown> = {}) => ({
 
 const freeText = (n: number, overrides: Record<string, unknown> = {}) => ({
   questionId: `SAMPLE-${String(n).padStart(4, "0")}`,
-  examCode: "SAMPLE",
+  examCode: "EX-SMP-XX",
   domain: "domain2",
   questionType: "free-text",
   questionText: `記述の設問 ${n}`,
@@ -74,9 +75,9 @@ const freeText = (n: number, overrides: Record<string, unknown> = {}) => ({
   ...overrides,
 });
 
-const questionsFile = (questions: unknown[] = [question(1), question(2)]) => ({ examCode: "SAMPLE", questions });
+const questionsFile = (questions: unknown[] = [question(1), question(2)]) => ({ examCode: "EX-SMP-XX", questions });
 const exams = (list: unknown[] = [published()]) => ({ exams: list });
-const files = (data: unknown = questionsFile()) => [{ name: "questions.sample.json", data }];
+const files = (data: unknown = questionsFile()) => [{ name: "questions.ex-smp-xx.json", data }];
 
 describe("資格マスタのスキーマ", () => {
   it("公開中と近日公開の両方を通す", () => {
@@ -382,8 +383,8 @@ describe("問題のスキーマ", () => {
     const q = question(1, { references: [{ url: `https://${marker}/x` }, { url: `http://${marker}/y` }] });
     const errors = validateDataSet(exams(), files(questionsFile([q, question(2)])));
     expect(errors).toEqual([
-      "questions.sample.json: questions[0].references[0].url(SAMPLE-0001): 出典に許していないドメインの URL です",
-      "questions.sample.json: questions[0].references[1].url(SAMPLE-0001): https で始まる URL ではありません",
+      "questions.ex-smp-xx.json: questions[0].references[0].url(SAMPLE-0001): 出典に許していないドメインの URL です",
+      "questions.ex-smp-xx.json: questions[0].references[1].url(SAMPLE-0001): https で始まる URL ではありません",
     ]);
     expect(errors.join("\n")).not.toContain(marker);
   });
@@ -420,7 +421,7 @@ describe("問題のスキーマ", () => {
     const report = (r: unknown) =>
       validateDataSet(exams(), files(questionsFile([question(1), question(2), freeText(3, { rubric: r })])));
     const at = (place: string, kind: string) =>
-      `questions.sample.json: questions[2].rubric${place}(SAMPLE-0003): ${kind}`;
+      `questions.ex-smp-xx.json: questions[2].rubric${place}(SAMPLE-0003): ${kind}`;
 
     it("正しい採点基準を通す_合格点が配点の合計ちょうどでもよい", () => {
       expect(report(rubric([criterion({ name: "観点 1" }), criterion({ name: "観点 2" })], 100))).toEqual([]);
@@ -495,14 +496,74 @@ describe("問題のスキーマ", () => {
     };
     expect(m([question(1), question(1, { questionText: "別の設問" })])).toContain("問題の ID が重複しています");
     expect(m([question(1), question(2, { questionText: "設問 1" })])).toContain("同じ設問文の問題があります");
-    expect(m([question(1, { examCode: "OTHER" })])).toContain("ファイルの資格コードと一致しません");
-    expect(m([question(1, { questionId: "OTHER-0001" })])).toContain("ID の接頭辞が資格コードと一致しません");
+    expect(m([question(1, { examCode: "EX-OTH-XX" })])).toContain("ファイルの資格コードと一致しません");
   });
 });
 
 describe("validateDataSet(ファイルをまたぐ検査)", () => {
   it("正しいデータを通す", () => {
     expect(validateDataSet(exams([published(), comingSoon()]), files())).toEqual([]);
+  });
+
+  it("問題の ID の接頭辞が、資格マスタの idPrefix と違う_問題の ID つきで場所を示す", () => {
+    const errors = validateDataSet(
+      exams(),
+      files(questionsFile([question(1, { questionId: "OTHER-0001" }), question(2)])),
+    );
+    expect(errors).toEqual([
+      "questions.ex-smp-xx.json: questions[0](OTHER-0001).questionId: ID の接頭辞が、資格マスタの idPrefix と一致しません",
+    ]);
+  });
+
+  it("問題 ID の接頭辞が資格どうしで重複する・以前のコードが重複する_止める", () => {
+    const second = published({ examCode: "EX-SM2-XX" });
+    const dupPrefix = ExamsFileSchema.safeParse(exams([published(), second]));
+    expect(dupPrefix.success ? [] : dupPrefix.error.issues.map((i) => i.message)).toContain(
+      "問題 ID の接頭辞が重複しています",
+    );
+    const dupPrevious = ExamsFileSchema.safeParse(
+      exams([published({ previousCodes: ["SAMPLE"] }), comingSoon({ previousCodes: ["SAMPLE"] })]),
+    );
+    expect(dupPrevious.success ? [] : dupPrevious.error.issues.map((i) => i.message)).toContain(
+      "以前のコードが、ほかのコードと重複しています",
+    );
+  });
+
+  it("試験コードの形_ベンダー略称-試験略称-版の形だけ(版がなければ XX)", () => {
+    const ok = (code: string) => ExamsFileSchema.safeParse(exams([published({ examCode: code })])).success;
+    expect(ok("AWS-AIB-C01")).toBe(true);
+    expect(ok("EX-SMP-XX")).toBe(true);
+    for (const bad of ["AIB", "AWS-AIB", "aws-aib-c01", "AWS_AIB_C01", "AWS-AIB-C", "AWS-AIB-C0001", "AWS-AIB-C01-X"]) {
+      expect(ok(bad), bad).toBe(false);
+    }
+  });
+
+  describe("ベンダーの略称", () => {
+    const vendors = { vendors: [{ name: "Example", abbr: "EX" }] };
+
+    it("資格のベンダーの略称で始まるコード_通す", () => {
+      expect(validateDataSet(exams(), files(), vendors)).toEqual([]);
+    });
+
+    it("コードの先頭がベンダーの略称と違う・ベンダーが一覧にない・一覧が無い_止める", () => {
+      expect(validateDataSet(exams([published({ vendor: "Other" })]), files(), vendors)).toEqual([
+        "exams.json: exams[0].vendor: vendors.json にないベンダーです",
+      ]);
+      expect(validateDataSet(exams(), files(), { vendors: [{ name: "Example", abbr: "AWS" }] })).toEqual([
+        "exams.json: exams[0].examCode: コードの先頭が、ベンダーの略称と一致しません",
+      ]);
+      expect(validateDataSet(exams(), files(), null)).toEqual(["vendors.json: ファイルがありません"]);
+    });
+
+    it("ベンダーの名前・略称の重複_止める", () => {
+      const dup = {
+        vendors: [
+          { name: "Example", abbr: "EX" },
+          { name: "Example", abbr: "EX" },
+        ],
+      };
+      expect(validateDataSet(exams(), files(), dup)).toHaveLength(2);
+    });
   });
 
   it("資格マスタが無い・不正なとき", () => {
@@ -512,33 +573,36 @@ describe("validateDataSet(ファイルをまたぐ検査)", () => {
 
   it("問題の分野が資格マスタにないとき、問題の ID つきで場所を示す", () => {
     const errors = validateDataSet(exams(), files(questionsFile([question(1, { domain: "domain9" }), question(2)])));
-    expect(errors).toEqual(["questions.sample.json: questions[0](SAMPLE-0001).domain: 資格マスタにない分野です"]);
+    expect(errors).toEqual(["questions.ex-smp-xx.json: questions[0](SAMPLE-0001).domain: 資格マスタにない分野です"]);
   });
 
   it("公開中の資格に問題データのファイルが無い・資格マスタにない資格のファイルがある", () => {
-    expect(validateDataSet(exams(), [])[0]).toMatch(/questions\.sample\.json\)がありません/);
+    expect(validateDataSet(exams(), [])[0]).toMatch(/questions\.ex-smp-xx\.json\)がありません/);
     const other = [
       {
-        name: "questions.other.json",
-        data: { examCode: "OTHER", questions: [question(1, { examCode: "OTHER", questionId: "OTHER-0001" })] },
+        name: "questions.ex-oth-xx.json",
+        data: { examCode: "EX-OTH-XX", questions: [question(1, { examCode: "EX-OTH-XX", questionId: "OTHER-0001" })] },
       },
     ];
-    expect(validateDataSet(exams(), other)).toContain("questions.other.json: 資格マスタにない資格の問題データです");
+    expect(validateDataSet(exams(), other)).toContain("questions.ex-oth-xx.json: 資格マスタにない資格の問題データです");
   });
 
   it("近日公開の資格に問題データがあるとき", () => {
-    const data = { examCode: "LATER", questions: [question(1, { examCode: "LATER", questionId: "LATER-0001" })] };
+    const data = {
+      examCode: "EX-LTR-XX",
+      questions: [question(1, { examCode: "EX-LTR-XX", questionId: "LATER-0001" })],
+    };
     const errors = validateDataSet(exams([published(), comingSoon()]), [
       ...files(),
-      { name: "questions.later.json", data },
+      { name: "questions.ex-ltr-xx.json", data },
     ]);
-    expect(errors).toEqual(["questions.later.json: 公開中ではない資格(近日公開)に問題データがあります"]);
+    expect(errors).toEqual(["questions.ex-ltr-xx.json: 公開中ではない資格(近日公開)に問題データがあります"]);
   });
 
   it("問題数が本番モードの出題数に足りないとき", () => {
     const errors = validateDataSet(exams([published({ officialQuestionCount: 3 })]), files());
     expect(errors).toEqual([
-      "questions.sample.json: 選択式の問題数が、本番モードの出題数(officialQuestionCount)に足りません",
+      "questions.ex-smp-xx.json: 選択式の問題数が、本番モードの出題数(officialQuestionCount)に足りません",
     ]);
   });
 
@@ -552,12 +616,12 @@ describe("validateDataSet(ファイルをまたぐ検査)", () => {
     expect(validateDataSet(exams(), [{ name: "questions.json", data: {} }])[0]).toMatch(/ファイル名が/);
     const mismatch = [
       {
-        name: "questions.sample.json",
-        data: { examCode: "OTHER", questions: [question(1, { examCode: "OTHER", questionId: "OTHER-0001" })] },
+        name: "questions.ex-smp-xx.json",
+        data: { examCode: "EX-OTH-XX", questions: [question(1, { examCode: "EX-OTH-XX", questionId: "OTHER-0001" })] },
       },
     ];
     expect(validateDataSet(exams(), mismatch)).toContain(
-      "questions.sample.json: examCode がファイル名のコードと一致しません",
+      "questions.ex-smp-xx.json: examCode がファイル名のコードと一致しません",
     );
   });
 

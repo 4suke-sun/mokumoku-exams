@@ -60,11 +60,12 @@ describe("groupByVendor", () => {
 
 describe("tileText", () => {
   it("略称がある_略称を使う", () => {
-    expect(tileText({ examCode: "SAMPLE", abbr: "SMP" })).toBe("SMP");
+    expect(tileText({ examCode: "EX-SMP-XX", abbr: "SMP" })).toBe("SMP");
   });
 
-  it("略称がない_資格コードの先頭の 4 文字まで", () => {
-    expect(tileText({ examCode: "SAMPLE" })).toBe("SAMP");
+  it("略称がない_資格コードの試験略称の部分(4 文字まで)", () => {
+    expect(tileText({ examCode: "EX-SMP-XX" })).toBe("SMP");
+    expect(tileText({ examCode: "AWS-LONGNAME-C01" })).toBe("LONG");
     expect(tileText({ examCode: "AB" })).toBe("AB");
   });
 });

@@ -5,7 +5,7 @@
  */
 import type { ZodError } from "zod";
 import type { PublishedExam } from "./schema.ts";
-import { ExamsFileSchema, QuestionsFileSchema } from "./schema.ts";
+import { ExamsFileSchema, QuestionsFileSchema, VendorsFileSchema } from "./schema.ts";
 
 export interface DataFile {
   name: string;
@@ -13,7 +13,8 @@ export interface DataFile {
 }
 
 export const EXAMS_FILE = "exams.json";
-const QUESTIONS_FILE = /^questions\.([a-z][a-z0-9]{1,15})\.json$/;
+export const VENDORS_FILE = "vendors.json";
+const QUESTIONS_FILE = /^questions\.([a-z][a-z0-9]{1,5}-[a-z][a-z0-9]{1,9}-[a-z0-9]{2,4})\.json$/;
 const QUESTION_ID = /^[A-Z][A-Z0-9]{1,15}-\d{4}$/;
 
 const KIND: Record<string, string> = {
@@ -56,8 +57,9 @@ export function formatIssues(file: string, error: ZodError, data: unknown): stri
  * データ全体を検査する。
  * - exams: 資格マスタ(無ければ null)
  * - questionFiles: questions.<コード>.json の一覧
+ * - vendors: ベンダーの略称の一覧(vendors.json)。資格のベンダーと試験コードの先頭が一致するかを検査する
  */
-export function validateDataSet(exams: unknown | null, questionFiles: DataFile[]): string[] {
+export function validateDataSet(exams: unknown | null, questionFiles: DataFile[], vendors?: unknown | null): string[] {
   const errors: string[] = [];
 
   if (exams === null) {
@@ -68,6 +70,27 @@ export function validateDataSet(exams: unknown | null, questionFiles: DataFile[]
   if (!parsedExams.success) {
     errors.push(...formatIssues(EXAMS_FILE, parsedExams.error, exams));
     return errors;
+  }
+
+  const parsedVendors = VendorsFileSchema.safeParse(vendors);
+  if (vendors === undefined) {
+    // ベンダーの略称の検査は、一覧が渡されたときだけ行う
+  } else if (!parsedVendors.success) {
+    errors.push(
+      ...(vendors === null
+        ? [`${VENDORS_FILE}: ファイルがありません`]
+        : formatIssues(VENDORS_FILE, parsedVendors.error, vendors)),
+    );
+  } else {
+    const abbrs = new Map(parsedVendors.data.vendors.map((v) => [v.name, v.abbr]));
+    parsedExams.data.exams.forEach((exam, i) => {
+      const abbr = abbrs.get(exam.vendor);
+      if (abbr === undefined) {
+        errors.push(`${EXAMS_FILE}: exams[${i}].vendor: ${VENDORS_FILE} にないベンダーです`);
+      } else if (!exam.examCode.startsWith(`${abbr}-`)) {
+        errors.push(`${EXAMS_FILE}: exams[${i}].examCode: コードの先頭が、ベンダーの略称と一致しません`);
+      }
+    });
   }
 
   const byCode = new Map(parsedExams.data.exams.map((e) => [e.examCode, e]));
@@ -123,6 +146,11 @@ function checkAgainstExam(
   const errors: string[] = [];
   const domains = new Set(exam.domains.map((d) => d.code));
   questions.forEach((q, i) => {
+    if (!q.questionId.startsWith(`${exam.idPrefix}-`)) {
+      errors.push(
+        `${file}: questions[${i}](${q.questionId}).questionId: ID の接頭辞が、資格マスタの idPrefix と一致しません`,
+      );
+    }
     if (!domains.has(q.domain)) {
       errors.push(`${file}: questions[${i}](${q.questionId}).domain: 資格マスタにない分野です`);
     }

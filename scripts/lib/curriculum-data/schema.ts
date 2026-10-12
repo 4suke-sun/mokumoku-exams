@@ -11,7 +11,7 @@ import { prose, ReferencesSchema } from "../exam-data/schema.ts";
 /** 本文(題・本文・要約・図の文字)は、問題データと同じく、空白だけではなく URL を含まない文字列にする */
 const text = prose;
 
-const EXAM_CODE = /^[A-Z][A-Z0-9]{1,15}$/;
+const EXAM_CODE = /^[A-Z][A-Z0-9]{1,5}-[A-Z][A-Z0-9]{1,9}-[A-Z0-9]{2,4}$/;
 const QUESTION_ID = /^[A-Z][A-Z0-9]{1,15}-\d{4}$/;
 /** 単元と節の ID。単元の ID は URL の一部(`/exams/<資格コード>/study/<単元の ID>`)になる */
 const ID = /^[a-z][a-z0-9-]{0,31}$/;
@@ -295,26 +295,6 @@ export const CurriculumFileSchema = z
         ctx.addIssue({ code: "custom", path: ["units", i, "order"], message: "単元の順番が重複しています" });
       }
       orders.add(unit.order);
-      unit.questionIds.forEach((id, j) => {
-        if (!id.startsWith(`${file.examCode}-`)) {
-          ctx.addIssue({
-            code: "custom",
-            path: ["units", i, "questionIds", j],
-            message: "問題の ID の接頭辞が資格コードと一致しません",
-          });
-        }
-      });
-      unit.stages?.forEach((stage, k) => {
-        stage.questionIds.forEach((id, j) => {
-          if (!id.startsWith(`${file.examCode}-`)) {
-            ctx.addIssue({
-              code: "custom",
-              path: ["units", i, "stages", k, "questionIds", j],
-              message: "問題の ID の接頭辞が資格コードと一致しません",
-            });
-          }
-        });
-      });
     });
   });
 

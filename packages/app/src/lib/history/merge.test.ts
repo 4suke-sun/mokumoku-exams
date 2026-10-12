@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { MAX_RESULTS, type Result } from "@/lib/storage.ts";
 import { mergeResults, pendingMigration } from "./merge.ts";
 
-const result = (minute: number, examCode = "SAMPLE"): Result => ({
+const result = (minute: number, examCode = "EX-SMP-XX"): Result => ({
   examCode,
   questionIds: ["Q-0001"],
   answers: {},

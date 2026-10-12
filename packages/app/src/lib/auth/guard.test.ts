@@ -93,7 +93,7 @@ describe("isPublicPath", () => {
   it.each([
     "/",
     "/exams",
-    "/exams/SAMPLE/play",
+    "/exams/EX-SMP-XX/play",
     "/help",
     "/account",
     "/api/history/results",

@@ -66,6 +66,13 @@ test("未ログイン_ログインの画面へ送られる", async ({ page }) =>
   await expect(page.getByRole("heading", { name: "ログイン" })).toBeVisible();
 });
 
+test("以前の試験コードの URL_新しいコードの URL へ永続的に転送され、問い合わせも引き継がれる", async ({ request }) => {
+  const response = await request.get("/exams/SAMPLE/result?at=2026-10-01", { maxRedirects: 0 });
+  expect(response.status()).toBe(308);
+  expect(new URL(response.headers().location ?? "", "http://localhost").pathname).toBe("/exams/EX-SMP-XX/result");
+  expect(response.headers().location).toContain("at=2026-10-01");
+});
+
 test("誤ったパスワード_ログインできず、理由を示す", async ({ page }) => {
   await openLogin(page);
   await page.getByLabel("メールアドレス").fill(FAKE_USER_EMAIL);
@@ -84,7 +91,7 @@ test("資格の一覧から出題と結果まで_通して進める", async ({ p
     .getByRole("link", { name: /サンプル資格\(動作確認用\)/ })
     .first()
     .click();
-  await expect(page).toHaveURL(/\/exams\/SAMPLE$/);
+  await expect(page).toHaveURL(/\/exams\/EX-SMP-XX$/);
 
   // 読み込みが終わる前の押下は効かないので、選ばれるまで押し直す
   const normal = page.getByRole("button", { name: "通常出題" });
@@ -93,11 +100,11 @@ test("資格の一覧から出題と結果まで_通して進める", async ({ p
     await expect(normal).toHaveAttribute("aria-pressed", "true", { timeout: 2_000 });
   }).toPass();
   await page.getByRole("button", { name: "出題を始める" }).click();
-  await expect(page).toHaveURL(/\/exams\/SAMPLE\/play/);
+  await expect(page).toHaveURL(/\/exams\/EX-SMP-XX\/play/);
 
   await answerAndFinish(page);
 
-  await expect(page).toHaveURL(/\/exams\/SAMPLE\/result/);
+  await expect(page).toHaveURL(/\/exams\/EX-SMP-XX\/result/);
   await expect(page.locator("main")).toContainText("正答");
 });
 
@@ -105,23 +112,36 @@ test("セクションの進捗_別の端末(保存のない新しいブラウザ
   const first = await browser.newContext();
   const page = await first.newPage();
   await login(page);
-  await page.goto("/exams/SAMPLE/sections");
+  await page.goto("/exams/EX-SMP-XX/sections");
   const start = page.getByRole("button", { name: "セクション 1 を解く" });
   await expect(async () => {
     await start.click();
-    await expect(page).toHaveURL(/\/exams\/SAMPLE\/play/, { timeout: 3_000 });
+    await expect(page).toHaveURL(/\/exams\/EX-SMP-XX\/play/, { timeout: 3_000 });
   }).toPass();
   await answerAndFinish(page);
-  await expect(page).toHaveURL(/\/exams\/SAMPLE\/result/);
+  await expect(page).toHaveURL(/\/exams\/EX-SMP-XX\/result/);
   await first.close();
 
   // 端末の保存(localStorage)を持たない、別のブラウザの状態
   const second = await browser.newContext();
   const other = await second.newPage();
   await login(other);
-  await other.goto("/exams/SAMPLE/sections");
+  await other.goto("/exams/EX-SMP-XX/sections");
   const firstCard = other.getByRole("listitem").filter({ hasText: "セクション 1" }).first();
   await expect(firstCard).toBeVisible();
   await expect(firstCard).not.toContainText("未挑戦");
   await second.close();
+});
+
+test("以前の試験コードで保存した端末の記録_転送後の画面に引き継がれ、旧いキーは消える", async ({ page }) => {
+  await login(page);
+  const record = { correct: 5, total: 5, finishedAt: "2026-10-01T00:00:00.000Z" };
+  await page.evaluate((best) => {
+    localStorage.setItem("mokumoku:v1:sections:SAMPLE", JSON.stringify({ examCode: "SAMPLE", best: { "0": best } }));
+  }, record);
+  await page.goto("/exams/SAMPLE/sections");
+  await expect(page).toHaveURL(/\/exams\/EX-SMP-XX\/sections/);
+  await expect(page.getByRole("listitem").filter({ hasText: "セクション 1" }).first()).toContainText("満点");
+  const keys = await page.evaluate(() => Object.keys(localStorage).filter((key) => key.includes(":sections:")));
+  expect(keys).toEqual(["mokumoku:v1:sections:EX-SMP-XX"]);
 });

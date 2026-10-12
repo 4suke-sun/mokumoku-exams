@@ -6,7 +6,7 @@ import type { Question } from "./types.ts";
 const question = (n: number): Question =>
   ({
     questionId: `SAMPLE-000${n}`,
-    examCode: "SAMPLE",
+    examCode: "EX-SMP-XX",
     domain: "domain1",
     questionType: "single",
     questionText: "問題",
@@ -21,7 +21,7 @@ const question = (n: number): Question =>
 const questions = [question(1), question(2)];
 
 const result = (minute: number, answers: Record<string, string[]>, ids = Object.keys(answers)): Result => ({
-  examCode: "SAMPLE",
+  examCode: "EX-SMP-XX",
   questionIds: ids,
   answers,
   finishedAt: new Date(Date.UTC(2026, 9, 11, 12, minute)).toISOString(),
@@ -69,7 +69,7 @@ describe("問題ごとの直近の正誤", () => {
   it("自由記述の問題_採点基準の判定で正誤を決める", () => {
     const freeText = {
       questionId: "SAMPLE-0009",
-      examCode: "SAMPLE",
+      examCode: "EX-SMP-XX",
       domain: "domain2",
       questionType: "free-text",
       questionText: "記述",

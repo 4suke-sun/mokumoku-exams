@@ -45,7 +45,7 @@ const resultItems = (table: ReturnType<typeof fakeTable>) =>
 
 function attempt(finishedAt: string, extra: Partial<Result> = {}): Result {
   return {
-    examCode: "SAMPLE",
+    examCode: "EX-SMP-XX",
     questionIds: ["SAMPLE-0001", "SAMPLE-0002"],
     answers: { "SAMPLE-0001": ["A"], "SAMPLE-0002": ["B", "C"] },
     choiceOrder: { "SAMPLE-0001": ["B", "A"] },
@@ -77,7 +77,7 @@ describe("履歴の保存と取得の通し", () => {
     const { deps } = stack();
     const saved = attempt(minute(1));
     expect((await handlePostResult(post(saved, "a"), deps)).status).toBe(200);
-    expect(await results(deps, "SAMPLE", "a")).toEqual([saved]);
+    expect(await results(deps, "EX-SMP-XX", "a")).toEqual([saved]);
   });
 
   it("選択肢の並びがない結果_並びなしのまま取得できる", async () => {
@@ -85,7 +85,7 @@ describe("履歴の保存と取得の通し", () => {
     const saved = attempt(minute(1));
     delete saved.choiceOrder;
     await handlePostResult(post(saved, "a"), deps);
-    expect(await results(deps, "SAMPLE", "a")).toEqual([saved]);
+    expect(await results(deps, "EX-SMP-XX", "a")).toEqual([saved]);
   });
 
   it("同じ問題を複数回解く_回ごとの結果が積み上がり_新しい順に返る", async () => {
@@ -95,14 +95,14 @@ describe("履歴の保存と取得の通し", () => {
     const third = attempt(minute(9), { answers: { "SAMPLE-0001": ["A"], "SAMPLE-0002": ["C"] } });
     // 保存の順は、時刻の順とは限らない
     for (const result of [second, first, third]) await handlePostResult(post(result, "a"), deps);
-    expect(await results(deps, "SAMPLE", "a")).toEqual([third, second, first]);
+    expect(await results(deps, "EX-SMP-XX", "a")).toEqual([third, second, first]);
   });
 
   it("同じ完了時刻の結果を送り直す_重複せず_あとから送った内容に置き換わる", async () => {
     const { deps, table } = stack();
     await handlePostResult(post(attempt(minute(1), { answers: { "SAMPLE-0001": ["B"] } }), "a"), deps);
     await handlePostResult(post(attempt(minute(1), { answers: { "SAMPLE-0001": ["A"] } }), "a"), deps);
-    const found = await results(deps, "SAMPLE", "a");
+    const found = await results(deps, "EX-SMP-XX", "a");
     expect(found).toHaveLength(1);
     expect(found[0]?.answers["SAMPLE-0001"]).toEqual(["A"]);
     expect(resultItems(table)).toBe(1);
@@ -112,7 +112,7 @@ describe("履歴の保存と取得の通し", () => {
     const { deps, table } = stack();
     const total = 15;
     for (let n = 0; n < total; n++) await handlePostResult(post(attempt(minute(n)), "a"), deps);
-    const found = await results(deps, "SAMPLE", "a");
+    const found = await results(deps, "EX-SMP-XX", "a");
     expect(found).toHaveLength(total);
     expect(found[0]?.finishedAt).toBe(minute(total - 1));
     expect(found.at(-1)?.finishedAt).toBe(minute(0));
@@ -123,7 +123,7 @@ describe("履歴の保存と取得の通し", () => {
     const { deps } = stack();
     for (let n = 10; n < 13; n++) await handlePostResult(post(attempt(minute(n)), "a"), deps);
     await handlePostResult(post(attempt(minute(1)), "a"), deps);
-    expect((await results(deps, "SAMPLE", "a")).map((r) => r.finishedAt)).toEqual([
+    expect((await results(deps, "EX-SMP-XX", "a")).map((r) => r.finishedAt)).toEqual([
       minute(12),
       minute(11),
       minute(10),
@@ -135,29 +135,29 @@ describe("履歴の保存と取得の通し", () => {
     const { deps } = stack();
     const other = (n: number) =>
       attempt(minute(n), {
-        examCode: "OTHER",
+        examCode: "EX-OTH-XX",
         questionIds: ["OTHER-0001"],
         answers: { "OTHER-0001": ["A"] },
         choiceOrder: { "OTHER-0001": ["B", "A"] },
       });
     for (let n = 0; n < 3; n++) await handlePostResult(post(attempt(minute(n)), "a"), deps);
     await handlePostResult(post(other(1), "a"), deps);
-    expect(await results(deps, "SAMPLE", "a")).toHaveLength(3);
-    expect((await results(deps, "OTHER", "a")).map((r) => r.examCode)).toEqual(["OTHER"]);
+    expect(await results(deps, "EX-SMP-XX", "a")).toHaveLength(3);
+    expect((await results(deps, "EX-OTH-XX", "a")).map((r) => r.examCode)).toEqual(["EX-OTH-XX"]);
   });
 
   it("利用者が違う_互いの結果が見えない", async () => {
     const { deps } = stack();
     await handlePostResult(post(attempt(minute(1)), "b"), deps);
     for (let n = 0; n < 3; n++) await handlePostResult(post(attempt(minute(n)), "a"), deps);
-    expect(await results(deps, "SAMPLE", "a")).toHaveLength(3);
-    expect(await results(deps, "SAMPLE", "b")).toEqual([attempt(minute(1))]);
-    expect(await results(deps, "SAMPLE", "c")).toEqual([]);
+    expect(await results(deps, "EX-SMP-XX", "a")).toHaveLength(3);
+    expect(await results(deps, "EX-SMP-XX", "b")).toEqual([attempt(minute(1))]);
+    expect(await results(deps, "EX-SMP-XX", "c")).toEqual([]);
   });
 
   it("結果がまだない資格_空の一覧が返る", async () => {
     const { deps } = stack();
-    expect(await results(deps, "SAMPLE", "a")).toEqual([]);
+    expect(await results(deps, "EX-SMP-XX", "a")).toEqual([]);
   });
 });
 
@@ -180,7 +180,7 @@ describe("履歴の通しでのエラー応答", () => {
   it("未ログイン_401 を返し_保存先を呼ばない", async () => {
     const { deps, table } = stack();
     expect((await handlePostResult(post(attempt(minute(1)), null), deps)).status).toBe(401);
-    expect((await handleListResults(list("SAMPLE", null), deps)).status).toBe(401);
+    expect((await handleListResults(list("EX-SMP-XX", null), deps)).status).toBe(401);
     expect(table.sent).toHaveLength(0);
   });
 
@@ -222,9 +222,9 @@ describe("履歴の通しでのエラー応答", () => {
     expect((await handlePostResult(post(attempt(minute(1)), "a"), deps)).status).toBe(503);
     failStats = false;
     expect((await handlePostResult(post(attempt(minute(1)), "a"), deps)).status).toBe(200);
-    expect(table.items.get("USER#a|DAY#SAMPLE#2026-10-11")?.answered).toBe(2);
+    expect(table.items.get("USER#a|DAY#EX-SMP-XX#2026-10-11")?.answered).toBe(2);
     // 結果の項目は 1 回目に作られているので、送り直しでは解答回数を数えない(集計の取りこぼしは許す)
-    expect(table.items.get("USER#a|STAT#SAMPLE#SAMPLE-0001")).toBeUndefined();
+    expect(table.items.get("USER#a|STAT#EX-SMP-XX#SAMPLE-0001")).toBeUndefined();
   });
 });
 
@@ -251,7 +251,7 @@ describe("入口(proxy)から API までの通し", () => {
       body: JSON.stringify(body),
     });
   const nextGet = (cookie: string | null) =>
-    new NextRequest(`${ORIGIN}/api/history/results?examCode=SAMPLE`, { headers: cookie ? { cookie } : {} });
+    new NextRequest(`${ORIGIN}/api/history/results?examCode=EX-SMP-XX`, { headers: cookie ? { cookie } : {} });
 
   it("ログインして保存し取得する_入口を通り_結果が返る", async () => {
     const cookie = await loginCookie();
@@ -276,7 +276,7 @@ describe("入口(proxy)から API までの通し", () => {
 describe("復習プールの通し", () => {
   const review = async (deps: HistoryDeps, sub: string) => {
     const response = await handleListReview(
-      new Request(`${ORIGIN}/api/history/review?examCode=SAMPLE`, { headers: { cookie: cookieOf(sub) } }),
+      new Request(`${ORIGIN}/api/history/review?examCode=EX-SMP-XX`, { headers: { cookie: cookieOf(sub) } }),
       deps,
     );
     expect(response.status).toBe(200);

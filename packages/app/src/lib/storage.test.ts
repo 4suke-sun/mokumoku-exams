@@ -11,6 +11,7 @@ import {
   MAX_ANSWER_TIME_MS,
   MAX_RESULTS,
   mergeSectionProgress,
+  migrateLegacyExamKeys,
   passedStages,
   type Result,
   type SectionProgress,
@@ -340,5 +341,49 @@ describe("セクションの進捗の統合", () => {
     expect(saveSectionProgress(store, saved)).toBe(true);
     expect(loadSectionProgress(store, "TEST")).toEqual(saved);
     expect(loadSectionProgress(store, "OTHER")).toEqual({ examCode: "OTHER", best: {} });
+  });
+});
+
+describe("以前の試験コードの記録の移行", () => {
+  const legacy = { AIB: "AWS-AIB-C01" };
+  const result = (examCode: string) => ({
+    examCode,
+    questionIds: ["AIB-0001"],
+    answers: {},
+    finishedAt: "2026-10-01T00:00:00.000Z",
+  });
+
+  it("以前のキーの記録_新しいキーへ移り_値の中のコードも新しくなり_以前のキーは消える", () => {
+    const store = memoryStore({
+      "mokumoku:v1:results:AIB": JSON.stringify([result("AIB")]),
+      "mokumoku:v1:sections:AIB": JSON.stringify({ examCode: "AIB", best: {} }),
+    });
+    migrateLegacyExamKeys(store, legacy);
+    expect(store.data.has("mokumoku:v1:results:AIB")).toBe(false);
+    expect(loadResults(store, "AWS-AIB-C01")).toEqual([result("AWS-AIB-C01")]);
+    expect(loadSectionProgress(store, "AWS-AIB-C01")).toEqual({ examCode: "AWS-AIB-C01", best: {} });
+  });
+
+  it("新しいキーにすでに記録がある_それを残し_以前のキーだけ消す", () => {
+    const store = memoryStore({
+      "mokumoku:v1:results:AIB": JSON.stringify([result("AIB")]),
+      "mokumoku:v1:results:AWS-AIB-C01": JSON.stringify([result("AWS-AIB-C01"), result("AWS-AIB-C01")]),
+    });
+    migrateLegacyExamKeys(store, legacy);
+    expect(store.data.has("mokumoku:v1:results:AIB")).toBe(false);
+    expect(loadResults(store, "AWS-AIB-C01")).toHaveLength(2);
+  });
+
+  it("値が読めない_以前のキーを消さない", () => {
+    const store = memoryStore({ "mokumoku:v1:results:AIB": "{not json" });
+    migrateLegacyExamKeys(store, legacy);
+    expect(store.data.get("mokumoku:v1:results:AIB")).toBe("{not json");
+    expect(store.data.has("mokumoku:v1:results:AWS-AIB-C01")).toBe(false);
+  });
+
+  it("記録がない・別の資格の記録_何もしない", () => {
+    const store = memoryStore({ "mokumoku:v1:results:OTHER": "[]" });
+    migrateLegacyExamKeys(store, legacy);
+    expect([...store.data.keys()]).toEqual(["mokumoku:v1:results:OTHER"]);
   });
 });

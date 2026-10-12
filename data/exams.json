@@ -1,7 +1,7 @@
 {
   "exams": [
     {
-      "examCode": "SAMPLE",
+      "examCode": "EX-SMP-XX",
       "status": "published",
       "vendor": "Example",
       "edition": "S01",
@@ -25,20 +25,23 @@
           "name": "考え方",
           "weight": 0.4
         }
-      ]
+      ],
+      "previousCodes": ["SAMPLE"],
+      "idPrefix": "SAMPLE"
     },
     {
-      "examCode": "SAMPLE2",
+      "examCode": "EX-SM2-XX",
       "status": "coming-soon",
       "vendor": "Example",
       "name": "サンプル資格 2(動作確認用)",
       "shortName": "サンプル 2",
       "level": "Associate",
       "abbr": "SM2",
-      "note": "近日公開予定です。"
+      "note": "近日公開予定です。",
+      "previousCodes": ["SAMPLE2"]
     },
     {
-      "examCode": "AIB",
+      "examCode": "AWS-AIB-C01",
       "status": "published",
       "vendor": "AWS",
       "edition": "C01",
@@ -82,7 +85,9 @@
           "note": "ベータ試験の受験料は 50 USD"
         },
         "guideUrl": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01.html"
-      }
+      },
+      "previousCodes": ["AIB"],
+      "idPrefix": "AIB"
     }
   ]
 }

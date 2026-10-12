@@ -7,7 +7,7 @@ import type { Question } from "./types.ts";
 const question = (n: number, correctAnswers = ["A"]): Question =>
   ({
     questionId: `SAMPLE-000${n}`,
-    examCode: "SAMPLE",
+    examCode: "EX-SMP-XX",
     domain: "domain1",
     questionType: "single",
     difficulty: "easy",
@@ -24,7 +24,7 @@ const questions = [question(1), question(2), question(3), question(4)];
 const exam = { passingScore: 70, totalScore: 100 };
 
 const result = (minute: number, answers: Record<string, string[]>, ids = Object.keys(answers)): Result => ({
-  examCode: "SAMPLE",
+  examCode: "EX-SMP-XX",
   questionIds: ids,
   answers,
   finishedAt: new Date(Date.UTC(2026, 9, 11, 12, minute)).toISOString(),
@@ -290,7 +290,7 @@ describe("分野別の正答率", () => {
   it("自由記述の問題_採点基準の判定で正解に数える", () => {
     const freeText = {
       questionId: "SAMPLE-0009",
-      examCode: "SAMPLE",
+      examCode: "EX-SMP-XX",
       domain: "domain2",
       questionType: "free-text",
       questionText: "記述",

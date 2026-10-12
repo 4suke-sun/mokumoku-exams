@@ -25,7 +25,10 @@ describe("DynamoDB の購読", () => {
     const repository = createDynamoPushRepository({ tableName: "table-example", client });
     await repository.putSubscription("user-a", target(1), "t");
     await repository.putSubscription("user-b", target(2), "t");
-    items.set("USER#user-a|BOOKMARK#SAMPLE#SAMPLE-0001", { PK: "USER#user-a", SK: "BOOKMARK#SAMPLE#SAMPLE-0001" });
+    items.set("USER#user-a|BOOKMARK#EX-SMP-XX#SAMPLE-0001", {
+      PK: "USER#user-a",
+      SK: "BOOKMARK#EX-SMP-XX#SAMPLE-0001",
+    });
     expect(await repository.listSubscriptions("user-a")).toEqual([target(1)]);
   });
 

@@ -64,14 +64,14 @@ describe("DOCK_ITEMS", () => {
 
 describe("isPlaying と isInExam", () => {
   it("出題の画面だけが_出題中", () => {
-    expect(isPlaying("/exams/SAMPLE/play")).toBe(true);
-    expect(isPlaying("/exams/SAMPLE/result")).toBe(false);
+    expect(isPlaying("/exams/EX-SMP-XX/play")).toBe(true);
+    expect(isPlaying("/exams/EX-SMP-XX/result")).toBe(false);
     expect(isPlaying("/exams")).toBe(false);
   });
 
   it("資格の中の画面_資格の一覧は含まない", () => {
-    expect(isInExam("/exams/SAMPLE")).toBe(true);
-    expect(isInExam("/exams/SAMPLE/study/basics")).toBe(true);
+    expect(isInExam("/exams/EX-SMP-XX")).toBe(true);
+    expect(isInExam("/exams/EX-SMP-XX/study/basics")).toBe(true);
     expect(isInExam("/exams")).toBe(false);
     expect(isInExam("/")).toBe(false);
   });
@@ -87,14 +87,14 @@ describe("pageWidth", () => {
     ["/login", "read"],
     ["/", "wide"],
     ["/exams", "wide"],
-    ["/exams/SAMPLE", "wide"],
-    ["/exams/SAMPLE/dashboard", "wide"],
-    ["/exams/SAMPLE/play", "play"],
-    ["/exams/SAMPLE/result", "wide"],
+    ["/exams/EX-SMP-XX", "wide"],
+    ["/exams/EX-SMP-XX/dashboard", "wide"],
+    ["/exams/EX-SMP-XX/play", "play"],
+    ["/exams/EX-SMP-XX/result", "wide"],
     ["/achievements", "wide"],
-    ["/exams/SAMPLE/cards", "wide"],
-    ["/exams/SAMPLE/info", "wide"],
-    ["/exams/SAMPLE/study/basics", "study"],
+    ["/exams/EX-SMP-XX/cards", "wide"],
+    ["/exams/EX-SMP-XX/info", "wide"],
+    ["/exams/EX-SMP-XX/study/basics", "study"],
     ["/bookmarks", "study"],
   ])("%s_%s", (path, width) => {
     expect(pageWidth(path)).toBe(width);

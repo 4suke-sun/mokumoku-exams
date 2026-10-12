@@ -77,7 +77,7 @@ describe("joinCards", () => {
 
 describe("loadSummaryCards", () => {
   it("サンプル資格_要約カードを返し_正解の選択肢の本文を持つ", async () => {
-    const exam = findPublishedExam("SAMPLE");
+    const exam = findPublishedExam("EX-SMP-XX");
     if (!exam) throw new Error("サンプル資格がありません");
     const cards = await loadSummaryCards(exam);
     expect(cards?.length).toBeGreaterThan(0);

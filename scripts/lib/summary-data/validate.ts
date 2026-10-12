@@ -7,7 +7,7 @@ import type { DataFile } from "../exam-data/validate.ts";
 import { formatIssues } from "../exam-data/validate.ts";
 import { SummaryFileSchema } from "./schema.ts";
 
-const SUMMARY_FILE = /^summary\.([a-z][a-z0-9]{1,15})\.json$/;
+const SUMMARY_FILE = /^summary\.([a-z][a-z0-9]{1,5}-[a-z][a-z0-9]{1,9}-[a-z0-9]{2,4})\.json$/;
 
 /** 問題の情報: 択一・複数選択は正解のキーの並び。自由記述は null(要約カードは作れない) */
 export type QuestionAnswers = ReadonlyMap<string, readonly string[] | null>;

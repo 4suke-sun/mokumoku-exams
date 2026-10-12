@@ -93,14 +93,14 @@ describe("メニューのシート", () => {
 describe("ドックと上のバー", () => {
   it("出題中_ドックを隠す", () => {
     signedIn(false);
-    pathname = "/exams/SAMPLE/play";
+    pathname = "/exams/EX-SMP-XX/play";
     renderNav();
     expect(screen.queryByRole("button", { name: /メニュー/ })).toBeNull();
   });
 
   it("資格の中の画面_資格の一覧へ戻るボタンを出す", () => {
     signedIn(false);
-    pathname = "/exams/SAMPLE";
+    pathname = "/exams/EX-SMP-XX";
     renderNav();
     expect(screen.getByRole("link", { name: "資格の一覧へ" }).getAttribute("href")).toBe("/exams");
   });

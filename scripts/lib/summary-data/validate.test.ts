@@ -4,7 +4,7 @@ import { validateSummaryData } from "./validate.ts";
 const context = {
   questions: new Map([
     [
-      "SAMPLE",
+      "EX-SMP-XX",
       new Map<string, readonly string[] | null>([
         ["SAMPLE-0001", ["B"]],
         ["SAMPLE-0002", ["A", "C"]],
@@ -21,8 +21,8 @@ const card = (over: Record<string, unknown> = {}) => ({
   point: "青(緑)は進んでよいことを表す",
   ...over,
 });
-const file = (cards: unknown[] = [card()], examCode = "SAMPLE") => ({ examCode, cards });
-const files = (data: unknown = file(), name = "summary.sample.json") => [{ name, data }];
+const file = (cards: unknown[] = [card()], examCode = "EX-SMP-XX") => ({ examCode, cards });
+const files = (data: unknown = file(), name = "summary.ex-smp-xx.json") => [{ name, data }];
 
 describe("validateSummaryData", () => {
   it("正しいデータ_指摘なし(正解の並びは問わない)", () => {
@@ -36,41 +36,41 @@ describe("validateSummaryData", () => {
 
   it("問題データにない問題 ID_場所と種類だけを報告する", () => {
     expect(validateSummaryData(files(file([card({ questionId: "SAMPLE-0099" })])), context)).toEqual([
-      "summary.sample.json: cards[0].questionId: 問題データにない問題です",
+      "summary.ex-smp-xx.json: cards[0].questionId: 問題データにない問題です",
     ]);
   });
 
-  it("別の資格の問題 ID_接頭辞の食い違いとして報告する", () => {
+  it("別の資格の問題 ID_問題データにない問題として報告する", () => {
     const errors = validateSummaryData(files(file([card({ questionId: "OTHER-0001" })])), context);
-    expect(errors).toContain("summary.sample.json: cards[0].questionId: 問題の ID の接頭辞が資格コードと一致しません");
+    expect(errors).toContain("summary.ex-smp-xx.json: cards[0].questionId: 問題データにない問題です");
   });
 
   it("答えのキーが問題の正解と一致しない_不足・過多・別の選択肢を報告する", () => {
     for (const answers of [["A"], ["B", "C"], ["C"]]) {
       expect(validateSummaryData(files(file([card({ answers })])), context)).toEqual([
-        "summary.sample.json: cards[0].answers: 問題の正解と一致しません",
+        "summary.ex-smp-xx.json: cards[0].answers: 問題の正解と一致しません",
       ]);
     }
   });
 
   it("自由記述の問題_選択式ではないと報告する", () => {
     expect(validateSummaryData(files(file([card({ questionId: "SAMPLE-0006" })])), context)).toEqual([
-      "summary.sample.json: cards[0].questionId: 選択式の問題ではありません",
+      "summary.ex-smp-xx.json: cards[0].questionId: 選択式の問題ではありません",
     ]);
   });
 
   it("本文に URL がある_問いの要約と決め手の場所と種類だけを報告する", () => {
     expect(
       validateSummaryData(files(file([card({ question: "詳しくは https://example.com/ を見る" })])), context),
-    ).toEqual(["summary.sample.json: cards[0].question: 本文に URL が含まれています"]);
+    ).toEqual(["summary.ex-smp-xx.json: cards[0].question: 本文に URL が含まれています"]);
     expect(validateSummaryData(files(file([card({ point: "www.example.com" })])), context)).toEqual([
-      "summary.sample.json: cards[0].point: 本文に URL が含まれています",
+      "summary.ex-smp-xx.json: cards[0].point: 本文に URL が含まれています",
     ]);
   });
 
   it("同じ問題の要約カードが重複している_報告する", () => {
     expect(validateSummaryData(files(file([card(), card()])), context)).toEqual([
-      "summary.sample.json: cards[1].questionId: 同じ問題の要約カードが重複しています",
+      "summary.ex-smp-xx.json: cards[1].questionId: 同じ問題の要約カードが重複しています",
     ]);
   });
 
@@ -84,19 +84,22 @@ describe("validateSummaryData", () => {
     expect(validateSummaryData(files(file([card({ answers: [] })])), context)).toHaveLength(1);
     expect(validateSummaryData(files(file([card({ answers: ["b"] })])), context)).toHaveLength(1);
     expect(validateSummaryData(files(file([card({ answers: ["B", "B"] })])), context)).toEqual([
-      "summary.sample.json: cards[0].answers: 正解のキーが重複しています",
+      "summary.ex-smp-xx.json: cards[0].answers: 正解のキーが重複しています",
     ]);
     expect(validateSummaryData(files(file([])), context)).toHaveLength(1);
   });
 
   it("ファイル名の形が違う・ファイル名とコードが違う・公開中でない資格_指摘する", () => {
     expect(validateSummaryData(files(file(), "summary.json"), context)).toHaveLength(1);
-    expect(validateSummaryData(files(file([card({ questionId: "OTHER-0001" })], "OTHER")), context)).toEqual([
-      "summary.sample.json: examCode がファイル名のコードと一致しません",
+    expect(validateSummaryData(files(file([card({ questionId: "OTHER-0001" })], "EX-OTH-XX")), context)).toEqual([
+      "summary.ex-smp-xx.json: examCode がファイル名のコードと一致しません",
     ]);
     expect(
-      validateSummaryData(files(file([card({ questionId: "LATER-0001" })], "LATER"), "summary.later.json"), context),
-    ).toEqual(["summary.later.json: 公開中の資格(問題データのある資格)の要約カードではありません"]);
+      validateSummaryData(
+        files(file([card({ questionId: "LATER-0001" })], "EX-LTR-XX"), "summary.ex-ltr-xx.json"),
+        context,
+      ),
+    ).toEqual(["summary.ex-ltr-xx.json: 公開中の資格(問題データのある資格)の要約カードではありません"]);
   });
 
   it("報告に入力の値を含めない", () => {
