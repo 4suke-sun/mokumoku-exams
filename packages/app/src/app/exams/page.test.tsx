@@ -1,0 +1,118 @@
+// @vitest-environment jsdom
+import { render, screen, within } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+import type { Exam } from "@/lib/types.ts";
+
+const exams = [
+  {
+    examCode: "PRO1",
+    status: "published",
+    vendor: "AWS",
+    edition: "P01",
+    name: "プロの資格",
+    shortName: "プロ",
+    level: "Professional",
+    abbr: "PRO",
+    category: "x",
+    passingScore: 750,
+    totalScore: 1000,
+    officialQuestionCount: 75,
+    officialTimeMinutes: 180,
+    domains: [{ code: "domain1", name: "分野 1", weight: 1 }],
+  },
+  {
+    examCode: "FND1",
+    status: "published",
+    vendor: "AWS",
+    edition: "F01",
+    name: "基礎の資格",
+    shortName: "基礎",
+    level: "Foundational",
+    abbr: "FND",
+    category: "x",
+    passingScore: 700,
+    totalScore: 1000,
+    officialQuestionCount: 65,
+    officialTimeMinutes: 90,
+    domains: [{ code: "domain1", name: "分野 1", weight: 1 }],
+  },
+  {
+    examCode: "NOLV",
+    status: "published",
+    vendor: "AWS",
+    edition: "N01",
+    name: "レベルのない資格",
+    shortName: "レベルなし",
+    category: "x",
+    passingScore: 700,
+    totalScore: 1000,
+    officialQuestionCount: 50,
+    officialTimeMinutes: 60,
+    domains: [{ code: "domain1", name: "分野 1", weight: 1 }],
+  },
+  {
+    examCode: "SOON",
+    status: "coming-soon",
+    vendor: "Other",
+    name: "近日の資格",
+    shortName: "近日",
+    level: "Associate",
+    note: "来春に公開します。",
+  },
+] as unknown as Exam[];
+
+vi.mock("@/lib/exam-data.ts", () => ({ listExams: () => exams }));
+
+const { default: ExamsPage } = await import("./page.tsx");
+
+describe("資格の一覧", () => {
+  it("ベンダーごとに分けて見出しを付ける", () => {
+    render(<ExamsPage />);
+    expect(screen.getByRole("heading", { level: 2, name: "AWS" })).toBeTruthy();
+    expect(screen.getByRole("heading", { level: 2, name: "Other" })).toBeTruthy();
+  });
+
+  it("ベンダーの中_レベルの順に並べ_レベルを持たない資格も出す", () => {
+    render(<ExamsPage />);
+    const group = screen.getByRole("heading", { name: "AWS" }).closest("section") as HTMLElement;
+    const names = within(group)
+      .getAllByRole("listitem")
+      .filter((li) => li.className.includes("card"))
+      .map((li) => within(li).getAllByRole("link")[0]?.textContent);
+    expect(names.map((n) => n?.replace(/\(.*$/, "").replace(/[A-Z0-9]+$/, ""))).toEqual([
+      expect.stringContaining("基礎の資格"),
+      expect.stringContaining("プロの資格"),
+      expect.stringContaining("レベルのない資格"),
+    ]);
+  });
+
+  it("資格_正式名と資格コードとレベルを出し_タイルは読み上げない", () => {
+    render(<ExamsPage />);
+    const link = screen.getByRole("link", { name: /基礎の資格/ });
+    expect(link.getAttribute("href")).toBe("/exams/FND1");
+    expect(link.textContent).toContain("FND1(F01)");
+    expect(screen.getByText("Foundational")).toBeTruthy();
+    const tile = screen.getByText("FND");
+    expect(tile.getAttribute("aria-hidden")).toBe("true");
+  });
+
+  it("公開中の資格_試験の情報と分野のメニューへ行ける", () => {
+    render(<ExamsPage />);
+    expect(screen.getByRole("link", { name: "基礎の試験の情報" }).getAttribute("href")).toBe("/exams/FND1/info");
+    expect(screen.getByRole("navigation", { name: "基礎の分野" })).toBeTruthy();
+  });
+
+  it("近日公開の資格_バッジと注記を出し_リンクにしない", () => {
+    render(<ExamsPage />);
+    expect(screen.getByText("近日公開")).toBeTruthy();
+    expect(screen.getByText("来春に公開します。")).toBeTruthy();
+    expect(screen.queryByRole("link", { name: /近日の資格/ })).toBeNull();
+    const card = screen.getByText("近日の資格").closest("li");
+    expect(card?.className).toContain("bg-surface/60");
+  });
+
+  it("略称のない資格_資格コードの先頭の 4 文字をタイルに出す", () => {
+    render(<ExamsPage />);
+    expect(screen.getByText("NOLV").getAttribute("aria-hidden")).toBe("true");
+  });
+});

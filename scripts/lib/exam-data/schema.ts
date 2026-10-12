@@ -37,12 +37,65 @@ export const DomainSchema = z.strictObject({
   weight: z.number().min(0).max(1),
 });
 
+/**
+ * 資格のレベル(段階)。一覧で、ベンダーの中をこの順に並べる(上が易しい)。
+ * `category`(区分)は、資格の領域を表す自由な文字列で、レベルとは別の項目。
+ */
+export const EXAM_LEVELS = ["Foundational", "Associate", "Professional", "Expert", "Specialty"] as const;
+
 const examBase = {
   examCode: z.string().regex(EXAM_CODE),
   vendor: prose,
   name: prose,
   shortName: prose,
+  /** 資格のレベル。公式にレベルの区分がない資格は、持たない */
+  level: z.enum(EXAM_LEVELS).optional(),
+  /** 一覧のタイルに出す短い表記(英数字 1〜4 文字) */
+  abbr: z
+    .string()
+    .regex(/^[A-Za-z0-9]{1,4}$/)
+    .optional(),
 };
+
+/** 日付(`YYYY-MM-DD`)。実在する日だけ */
+const DATE = z
+  .string()
+  .regex(/^\d{4}-\d{2}-\d{2}$/)
+  .refine((value) => {
+    const time = Date.parse(`${value}T00:00:00.000Z`);
+    return !Number.isNaN(time) && new Date(time).toISOString().slice(0, 10) === value;
+  }, "実在しない日付です");
+
+/**
+ * 資格の情報(情報ページに出す項目)。どれも公式の情報だけに基づく。`checkedAt` は、公式の情報を確認した日。
+ * 公式に載っていない項目は、持たない(画面は、持たない項目を出さない)。
+ */
+export const ExamInfoSchema = z.strictObject({
+  checkedAt: DATE,
+  /** 出題形式(例: 択一選択式と複数選択式) */
+  format: prose.max(80).optional(),
+  /** 受験できる言語 */
+  languages: z.array(prose.max(20)).min(1).max(10).optional(),
+  /** 受験料。`note` は、価格の補足(ベータ価格など) */
+  fee: z
+    .strictObject({
+      amount: z.number().positive().max(1_000_000),
+      currency: z.string().regex(/^[A-Z]{3}$/),
+      note: prose.max(80).optional(),
+    })
+    .optional(),
+  /** 認定の有効期間(年) */
+  validityYears: z.int().min(1).max(10).optional(),
+  /** 公式の試験ガイドの URL。出典と同じく、許したドメインの https の URL だけ */
+  guideUrl: z
+    .string()
+    .max(2000)
+    .superRefine((value, ctx) => {
+      const problem = referenceUrlProblem(value);
+      if (problem) ctx.addIssue({ code: "custom", message: problem });
+    })
+    .optional(),
+});
 
 /** 公開中の資格: 出題に必要な情報がすべてそろっている。 */
 export const PublishedExamSchema = z
@@ -56,6 +109,7 @@ export const PublishedExamSchema = z
     officialQuestionCount: z.int().positive(),
     officialTimeMinutes: z.int().positive(),
     domains: z.array(DomainSchema).min(1),
+    info: ExamInfoSchema.optional(),
   })
   .superRefine((exam, ctx) => {
     if (exam.passingScore > exam.totalScore) {

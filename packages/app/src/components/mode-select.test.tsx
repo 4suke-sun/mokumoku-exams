@@ -353,6 +353,18 @@ describe("ModeSelect のモードのカード", () => {
   });
 });
 
+describe("ModeSelect の見出しの導線", () => {
+  it("試験の情報へのリンクを出す", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({ ok: false, status: 503, json: async () => ({}) })),
+    );
+    render(<ModeSelect exam={exam} pool={pool} />);
+    expect((await screen.findByRole("link", { name: "試験の情報" })).getAttribute("href")).toBe("/exams/TEST/info");
+    vi.unstubAllGlobals();
+  });
+});
+
 describe("ModeSelect の見出し", () => {
   beforeEach(() => {
     vi.stubGlobal(

@@ -127,6 +127,129 @@ describe("資格マスタのスキーマ", () => {
   });
 });
 
+describe("資格マスタのレベル・略称・資格の情報", () => {
+  const info = (overrides: Record<string, unknown> = {}) => ({ checkedAt: "2026-10-12", ...overrides });
+  const errors = (list: unknown[]) => validateDataSet(exams(list), files());
+
+  it("追加した項目はすべて任意_持たない資格もそのまま通す", () => {
+    expect(errors([published(), comingSoon()])).toEqual([]);
+  });
+
+  it("レベルと略称_公開中にも近日公開にも持てる", () => {
+    const list = [published({ level: "Associate", abbr: "SMP" }), comingSoon({ level: "Specialty", abbr: "LT2" })];
+    expect(errors(list)).toEqual([]);
+  });
+
+  it("レベルの値_一覧にあるものだけ", () => {
+    for (const level of ["Foundational", "Associate", "Professional", "Expert", "Specialty"]) {
+      expect(errors([published({ level })])).toEqual([]);
+    }
+    expect(errors([published({ level: "Beginner" })])).not.toEqual([]);
+    expect(errors([comingSoon({ level: "foundational" })])).not.toEqual([]);
+  });
+
+  it("略称_英数字 1〜4 文字だけ", () => {
+    expect(errors([published({ abbr: "AIB1" })])).toEqual([]);
+    for (const abbr of ["", "ABCDE", "あい", "A B", "A-B"]) {
+      expect(errors([published({ abbr })]), abbr).not.toEqual([]);
+    }
+  });
+
+  it("資格の情報_すべての項目を持つ形を通す", () => {
+    const full = info({
+      format: "択一選択式と複数選択式",
+      languages: ["日本語", "英語"],
+      fee: { amount: 100, currency: "USD", note: "ベータ試験は別の価格" },
+      validityYears: 3,
+      guideUrl:
+        "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01.html",
+    });
+    expect(errors([published({ info: full })])).toEqual([]);
+  });
+
+  it("資格の情報_確認した日だけでもよい_確認した日がないと止める", () => {
+    expect(errors([published({ info: info() })])).toEqual([]);
+    expect(errors([published({ info: { format: "択一選択式" } })])).toEqual([
+      "exams.json: exams[0].info.checkedAt: 型が違います",
+    ]);
+  });
+
+  it("確認した日_実在しない日付・形の違う日付を止める", () => {
+    for (const checkedAt of ["2026-02-30", "2026-13-01", "2026/10/12", "20261012", "今日"]) {
+      expect(errors([published({ info: info({ checkedAt }) })]), checkedAt).not.toEqual([]);
+    }
+  });
+
+  it("公式の試験ガイドの URL_許したドメインの https だけ", () => {
+    const guide = (guideUrl: string) => errors([published({ info: info({ guideUrl }) })]);
+    expect(guide("https://aws.amazon.com/certification/certified-ai-business-strategist/")).toEqual([]);
+    expect(guide("https://learning.example.com/guide")).toEqual([
+      "exams.json: exams[0].info.guideUrl: 出典に許していないドメインの URL です",
+    ]);
+    expect(guide("http://docs.aws.amazon.com/guide")).toEqual([
+      "exams.json: exams[0].info.guideUrl: https で始まる URL ではありません",
+    ]);
+    expect(guide("https://user@docs.aws.amazon.com/guide")).not.toEqual([]);
+    expect(guide("https://docs.aws.amazon.com:8443/guide")).not.toEqual([]);
+    expect(guide("https://docs.aws.amazon.com.example.com/guide")).not.toEqual([]);
+  });
+
+  it("受験料_金額は正の数・通貨は大文字 3 文字・補足は 80 文字まで", () => {
+    const fee = (value: Record<string, unknown>) => errors([published({ info: info({ fee: value }) })]);
+    expect(fee({ amount: 100, currency: "USD" })).toEqual([]);
+    expect(fee({ amount: 15000, currency: "JPY" })).toEqual([]);
+    for (const bad of [
+      { amount: 0, currency: "USD" },
+      { amount: -1, currency: "USD" },
+      { amount: 100, currency: "usd" },
+      { amount: 100, currency: "US" },
+      { amount: 100 },
+      { currency: "USD" },
+      { amount: 100, currency: "USD", note: "あ".repeat(81) },
+      { amount: 100, currency: "USD", extra: 1 },
+    ]) {
+      expect(fee(bad), JSON.stringify(Object.keys(bad))).not.toEqual([]);
+    }
+  });
+
+  it("有効期間・言語・出題形式_範囲と長さを止める", () => {
+    const withInfo = (value: Record<string, unknown>) => errors([published({ info: info(value) })]);
+    expect(withInfo({ validityYears: 3 })).toEqual([]);
+    for (const bad of [
+      { validityYears: 0 },
+      { validityYears: 11 },
+      { validityYears: 2.5 },
+      { languages: [] },
+      { languages: ["あ".repeat(21)] },
+      { format: "あ".repeat(81) },
+      { format: "  " },
+      { extra: 1 },
+    ]) {
+      expect(withInfo(bad), JSON.stringify(bad)).not.toEqual([]);
+    }
+  });
+
+  it("資格の情報の文字_URL を止める(URL は guideUrl だけ)", () => {
+    expect(errors([published({ info: info({ format: "https://example.com/ を見る" }) })])).toEqual([
+      "exams.json: exams[0].info.format: 本文に URL が含まれています",
+    ]);
+    expect(
+      errors([published({ info: info({ fee: { amount: 1, currency: "USD", note: "www.example.com" } }) })]),
+    ).not.toEqual([]);
+  });
+
+  it("近日公開の資格_情報(info)は持てない", () => {
+    expect(errors([comingSoon({ info: info() })])).not.toEqual([]);
+  });
+
+  it("報告に入力の値を含めない", () => {
+    const marker = "目印XYZ";
+    const result = errors([published({ info: { checkedAt: marker, guideUrl: `https://${marker}.example.com/` } })]);
+    expect(result.length).toBeGreaterThan(0);
+    expect(result.join("\n")).not.toContain(marker);
+  });
+});
+
 describe("問題のスキーマ", () => {
   const messages = (q: unknown) => {
     const r = QuestionsFileSchema.safeParse(questionsFile([q]));
