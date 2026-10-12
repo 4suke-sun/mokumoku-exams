@@ -1,0 +1,11 @@
+{
+  "name": "@mokumoku-exams/pipeline",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "pipeline": "node src/cli.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  }
+}

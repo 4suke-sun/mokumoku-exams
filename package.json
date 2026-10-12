@@ -14,6 +14,7 @@
     "build": "npm run build --workspaces --if-present",
     "test": "vitest run && npm run test --workspaces --if-present",
     "test:e2e": "npm run test:e2e -w @mokumoku-exams/app",
+    "pipeline": "npm run pipeline -w @mokumoku-exams/pipeline --",
     "check:commit": "node scripts/check-commit-secrets.ts",
     "check:release-notes": "node scripts/check-release-notes.ts",
     "check:lessons": "node scripts/check-lessons.ts",
