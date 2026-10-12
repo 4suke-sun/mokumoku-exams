@@ -25,6 +25,10 @@ describe("NAV_ITEMS", () => {
     expect(NAV_ITEMS.find((item) => item.href === "/release-notes")).toMatchObject({ label: "リリースノート" });
   });
 
+  it("実績の画面_ホームの次の段に置く", () => {
+    expect(NAV_ITEMS.find((item) => item.href === "/achievements")).toMatchObject({ label: "実績" });
+  });
+
   it("まだない画面_置かない", () => {
     expect(NAV_ITEMS.some((item) => item.href === "/history")).toBe(false);
   });
@@ -52,8 +56,8 @@ describe("navItems", () => {
 });
 
 describe("DOCK_ITEMS", () => {
-  it("メニューと合わせて 5 つまで_管理を含まない", () => {
-    expect(DOCK_ITEMS.length + 1).toBeLessThanOrEqual(5);
+  it("メニューと合わせて 6 つまで_管理を含まない", () => {
+    expect(DOCK_ITEMS.length + 1).toBeLessThanOrEqual(6);
     expect(DOCK_ITEMS.some((item) => item.href.startsWith("/admin"))).toBe(false);
   });
 });
@@ -84,7 +88,8 @@ describe("pageWidth", () => {
     ["/exams/SAMPLE", "wide"],
     ["/exams/SAMPLE/dashboard", "wide"],
     ["/exams/SAMPLE/play", "study"],
-    ["/exams/SAMPLE/result", "study"],
+    ["/exams/SAMPLE/result", "wide"],
+    ["/achievements", "wide"],
     ["/exams/SAMPLE/study/basics", "study"],
     ["/bookmarks", "study"],
   ])("%s_%s", (path, width) => {

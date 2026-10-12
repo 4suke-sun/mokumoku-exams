@@ -5,6 +5,7 @@ export type NavIcon =
   | "review"
   | "home"
   | "exams"
+  | "achievements"
   | "bookmark"
   | "help"
   | "release"
@@ -21,6 +22,7 @@ export type NavItem = { label: string; href: string; icon: NavIcon; short?: stri
 export const MAIN_NAV_ITEMS: NavItem[] = [
   { label: "ホーム", href: "/", icon: "home" },
   { label: "資格", href: "/exams", icon: "exams" },
+  { label: "実績", href: "/achievements", icon: "achievements" },
   { label: "復習", href: "/review", icon: "review" },
   { label: "ブックマーク", href: "/bookmarks", icon: "bookmark", short: "ブクマ" },
 ];
@@ -42,7 +44,7 @@ export function navItems(isAdmin: boolean): NavItem[] {
   return isAdmin ? [...NAV_ITEMS, ADMIN_NAV_ITEM] : NAV_ITEMS;
 }
 
-/** スマホの下のドックに並べる項目。最後に「メニュー」(ほかの項目のシート)を足して、5 等分にする(狭い幅でも 1 行に収まるよう、短い名前を使う) */
+/** スマホの下のドックに並べる項目。最後に「メニュー」(ほかの項目のシート)を足して、6 等分にする(狭い幅でも 1 行に収まるよう、短い名前を使う) */
 export const DOCK_ITEMS: NavItem[] = MAIN_NAV_ITEMS;
 
 /** ドックに置かず、メニューのシートに並べる項目 */
@@ -78,7 +80,8 @@ const READ_PATHS = ["/help", "/release-notes", "/account", "/login", "/forgot-pa
 
 export function pageWidth(pathname: string): PageWidth {
   if (READ_PATHS.some((href) => isActive(pathname, href))) return "read";
-  if (pathname === "/" || pathname === "/exams") return "wide";
-  if (/^\/exams\/[^/]+(\/dashboard)?$/.test(pathname)) return "wide";
+  if (pathname === "/" || pathname === "/exams" || pathname === "/achievements") return "wide";
+  // 結果は、広い画面で 2 列にする(左に振り返り、右に得点と操作)
+  if (/^\/exams\/[^/]+(\/dashboard|\/result)?$/.test(pathname)) return "wide";
   return "study";
 }

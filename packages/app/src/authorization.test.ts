@@ -90,6 +90,7 @@ const PUBLIC_PAGES = ["/forgot-password", "/login"];
 const PROTECTED_PAGES = [
   "/",
   "/account",
+  "/achievements",
   "/admin",
   "/bookmarks",
   "/exams",

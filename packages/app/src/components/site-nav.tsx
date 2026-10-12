@@ -202,7 +202,7 @@ function Dock() {
   return (
     <>
       <nav aria-label="主要メニュー" className="glass card fixed inset-x-3 bottom-3 z-30 lg:hidden">
-        <ul className="grid grid-cols-5 gap-0.5 p-1">
+        <ul className="grid grid-cols-6 gap-0.5 p-1">
           {DOCK_ITEMS.map((item) => {
             const active = isActive(pathname, item.href);
             return (

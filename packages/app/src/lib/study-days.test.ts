@@ -6,6 +6,7 @@ import {
   heatmapWeeks,
   isValidDate,
   jstDate,
+  mergeDays,
   type StudyDay,
   streakDays,
 } from "./study-days.ts";
@@ -89,5 +90,26 @@ describe("ヒートマップ", () => {
 
   it("濃さ_解いた問題の数で 5 段階に分ける", () => {
     expect([0, 1, 4, 5, 9, 10, 19, 20, 100].map(heatLevel)).toEqual([0, 1, 1, 2, 2, 3, 3, 4, 4]);
+  });
+});
+
+describe("mergeDays", () => {
+  it("資格ごとの学習量_日付ごとに足して日付の順にする", () => {
+    const merged = mergeDays([
+      [
+        { date: "2026-10-11", answered: 3, correct: 2 },
+        { date: "2026-10-09", answered: 1, correct: 1 },
+      ],
+      [{ date: "2026-10-11", answered: 5, correct: 1 }],
+      [],
+    ]);
+    expect(merged).toEqual([
+      { date: "2026-10-09", answered: 1, correct: 1 },
+      { date: "2026-10-11", answered: 8, correct: 3 },
+    ]);
+  });
+
+  it("どの資格にも学習がない_空", () => {
+    expect(mergeDays([[], []])).toEqual([]);
   });
 });

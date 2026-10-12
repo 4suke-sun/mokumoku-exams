@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { BookmarkError, BookmarkToggle, useBookmarks } from "@/components/bookmark-toggle.tsx";
 import { ChoiceReview } from "@/components/choice-review.tsx";
 import { Confetti } from "@/components/confetti.tsx";
+import { type BarRow, DomainBars } from "@/components/domain-bars.tsx";
 import { EmptyState } from "@/components/empty-state.tsx";
 import { ExplanationView } from "@/components/explanation-view.tsx";
 import { Notice } from "@/components/notice.tsx";
@@ -14,6 +15,9 @@ import { QuestionChips } from "@/components/question-chips.tsx";
 import { ReferenceList } from "@/components/reference-list.tsx";
 import { RichText } from "@/components/rich-text.tsx";
 import { ScoreRing } from "@/components/score-ring.tsx";
+import { attemptDomains, averageTimeMs } from "@/lib/dashboard.ts";
+import { domainColorClasses } from "@/lib/domain-color.ts";
+import { formatAnswerTime, formatDate } from "@/lib/format.ts";
 import { judgeFreeText } from "@/lib/free-text.ts";
 import { fetchServerResult, fetchServerResults, postServerResult } from "@/lib/history/client.ts";
 import { mergeResults, pendingMigration } from "@/lib/history/merge.ts";
@@ -62,19 +66,8 @@ type State =
       target?: Result | "not-found";
     };
 
-function formatDate(iso: string): string {
-  const date = new Date(iso);
-  return Number.isNaN(date.getTime()) ? "" : date.toLocaleString("ja-JP", { dateStyle: "medium", timeStyle: "short" });
-}
-
 function keysLabel(keys: readonly string[]): string {
   return keys.length === 0 ? "未回答" : keys.join("、");
-}
-
-/** 回答時間の表示(秒。1 分以上は分と秒) */
-export function formatAnswerTime(ms: number): string {
-  const seconds = Math.round(ms / 1000);
-  return seconds < 60 ? `${seconds} 秒` : `${Math.floor(seconds / 60)} 分 ${seconds % 60} 秒`;
 }
 
 /** 問題ごとの直近の正誤(新しい順)。 */
@@ -227,6 +220,21 @@ export function ResultView({ exam, questions }: Props) {
   const rows = wrongOnly ? allRows.filter((row) => !row.correct) : allRows;
   const passLine = passLinePercent(exam);
   const reached = result.percent >= passLine;
+  // 回答時間のない古い結果では、平均を出さない
+  const average = averageTimeMs(latest);
+  const names = new Map(exam.domains.map((d) => [d.code, d.name]));
+  const domainRows: BarRow[] = attemptDomains(latest, questions, exam.domains).map((row) => {
+    const color = domainColorClasses(exam.domains, row.domain);
+    const time = row.avgTimeMs === null ? "" : `、平均 ${formatAnswerTime(row.avgTimeMs)}/問`;
+    return {
+      key: row.domain,
+      label: names.get(row.domain) ?? row.domain,
+      percent: row.percent,
+      detail: `${row.correct} / ${row.answered} 問(${row.percent}%${time})`,
+      textClass: color?.text,
+      barClass: color?.bar ?? "bg-primary",
+    };
+  });
   const perfect = result.total > 0 && result.correct === result.total;
   // 直近の結果が段階の確認問題のときだけ、段階の合否を伝える
   const stage = stageCheck && stageCheck.finishedAt === latest.finishedAt ? stageCheck : null;
@@ -271,6 +279,11 @@ export function ResultView({ exam, questions }: Props) {
       ) : null}
       {state.pending.length > 0 ? (
         <div role="status" className="card space-y-2 p-4">
+          {state.pending.some((r) => r.finishedAt === state.results[0]?.finishedAt) ? (
+            <p className="font-bold text-warn">
+              直近の結果は、アカウントに保存できませんでした。この端末にだけ残っています。
+            </p>
+          ) : null}
           <p>
             この端末にだけ残っている記録が {state.pending.length}{" "}
             件あります。アカウントに移すと、ほかの端末からも見られます。
@@ -343,129 +356,169 @@ export function ResultView({ exam, questions }: Props) {
           </a>
         )}
         {isNewest ? <Confetti reached={reached} perfect={perfect} /> : null}
-        <div className={`card flex flex-col items-center gap-5 p-5 sm:flex-row ${perfect ? "motion-shine" : ""}`}>
-          <ScoreRing percent={result.percent} reached={reached} />
-          <div>
-            <p>
-              {result.total} 問中 {result.correct} 問が正解です。
-            </p>
-            <p className={`mt-2 font-bold ${reached ? "text-correct" : "text-warn"}`}>
-              {reached
-                ? `合格ライン(${passLine}%)に達しています。この調子です。`
-                : `合格ライン(${passLine}%)まであと少しです。間違えた問題を見直しましょう。`}
-            </p>
-          </div>
-        </div>
       </div>
 
-      <div className="space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 className="h2">問題ごとの結果</h2>
-          {wrongCount > 0 ? (
+      <div className="space-y-8 lg:grid lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start lg:gap-8 lg:space-y-0">
+        {/* 得点と操作は、広い画面では右に固定する(読む順では、先に置く) */}
+        <aside
+          aria-label="得点と操作"
+          className="space-y-4 lg:sticky lg:top-4 lg:col-start-2 lg:row-start-1 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto"
+        >
+          <div
+            className={`card space-y-4 border-2 p-5 ${reached ? "border-correct bg-correct-bg" : "border-warn bg-warn-bg"} ${
+              perfect ? "motion-shine" : ""
+            }`}
+          >
+            <p className={`font-bold ${reached ? "text-correct" : "text-warn"}`}>
+              <span aria-hidden="true">{reached ? "✓ " : "△ "}</span>
+              {reached ? "合格ライン到達" : "合格ライン未達"}
+            </p>
+            <div className="flex flex-col items-center gap-4 sm:flex-row lg:flex-col">
+              <ScoreRing percent={result.percent} reached={reached} />
+              <div className="space-y-2">
+                <p>
+                  {result.total} 問中 {result.correct} 問が正解です。
+                </p>
+                {average !== null ? (
+                  <p className="text-sm text-muted">平均回答時間 {formatAnswerTime(average)}/問</p>
+                ) : null}
+                <p className={`font-bold ${reached ? "text-correct" : "text-warn"}`}>
+                  {reached
+                    ? `合格ライン(${passLine}%)に達しています。この調子です。`
+                    : `合格ライン(${passLine}%)まであと少しです。間違えた問題を見直しましょう。`}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {domainRows.length > 0 ? (
+            <div className="card space-y-3 p-4">
+              <h2 className="h3">分野ごとの正答数</h2>
+              <DomainBars caption="分野ごとの正答数" rows={domainRows} tableInSimple />
+            </div>
+          ) : null}
+
+          {retryRows.length > 0 ? (
             <button
               type="button"
-              aria-pressed={wrongOnly}
-              onClick={() => setWrongOnly(!wrongOnly)}
-              className="rounded-md border border-line bg-surface px-4 py-2 text-sm font-bold"
+              onClick={retry}
+              className="w-full rounded-md bg-primary px-5 py-3 font-bold text-on-primary hover:opacity-90"
             >
-              {wrongOnly ? "すべての問題を表示する" : `間違えた問題だけを見直す(${wrongCount} 問)`}
+              {`間違えた問題${retryRows.some((row) => row.unsure) ? "と自信なしの問題" : ""}だけで解き直す(${retryRows.length} 問)`}
             </button>
           ) : null}
-        </div>
-        <BookmarkError bookmarks={bookmarks} />
-        {wrongCount === 0 ? <p className="text-correct">すべて正解でした。見直す問題はありません。</p> : null}
-        <ol className="motion-stagger space-y-4">
-          {rows.map(({ question, number, correct, unsure, flagged, timeMs }) => (
-            <li key={question.questionId} className="card space-y-3 p-4">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className={`font-bold ${correct ? "text-correct" : "text-incorrect"}`}>
-                  <span className={correct ? "motion-stamp" : "motion-wrong inline-block"}>
-                    {correct ? "○ 正解" : "× 不正解"}
-                  </span>
-                  <span className="ml-2 text-fg">問題 {number}</span>
-                </p>
-                <BookmarkToggle questionId={question.questionId} bookmarks={bookmarks} />
-              </div>
-              <div className="flex flex-wrap items-center gap-2">
-                <QuestionChips domains={exam.domains} question={question} />
-                {unsure ? <span className="chip tone-warn">自信なし</span> : null}
-                {flagged ? <span className="chip tone-orange">見直し</span> : null}
-                {timeMs !== undefined ? (
-                  <span className="text-sm text-muted">回答時間 {formatAnswerTime(timeMs)}</span>
-                ) : null}
-              </div>
-              <RecentOutcomeMarks outcomes={outcomes.get(question.questionId) ?? []} />
-              <RichText text={question.questionText} />
-              {question.questionType === "free-text" ? (
-                <FreeTextDetail question={question} answer={textAnswerFor(latest.textAnswers, question.questionId)} />
-              ) : (
-                <ChoiceDetail
-                  question={question}
-                  selected={answerFor(latest.answers, question.questionId)}
-                  choiceOrder={latest.choiceOrder}
-                />
-              )}
-              <div className="space-y-2 border-t border-line pt-3">
-                <h3 className="font-bold">解説</h3>
-                <ExplanationView question={question} choiceOrder={latest.choiceOrder} headingLevel={4} />
-              </div>
-              <ReferenceList references={question.references} />
-            </li>
-          ))}
-        </ol>
-      </div>
+          {retryError ? <Notice kind="error">{retryError}</Notice> : null}
+          <div className="flex gap-3">
+            <Link
+              href={`/exams/${exam.examCode}`}
+              className={`flex-1 rounded-md px-5 py-3 text-center font-bold ${
+                retryRows.length > 0 ? "border border-line bg-surface" : "bg-primary text-on-primary hover:opacity-90"
+              }`}
+            >
+              別の問題でもう一度
+            </Link>
+            <Link href="/exams" className="rounded-md border border-line bg-surface px-5 py-3 font-bold">
+              資格の一覧へ
+            </Link>
+          </div>
+        </aside>
 
-      {previous.length > 0 ? (
-        <div className="space-y-2">
-          <h2 className="h2">これまでの結果</h2>
-          <ul className="space-y-1 text-sm">
-            {previous.map((past) => {
-              const pastScore = score(
-                past.questionIds.map((id) => byId.get(id)).filter((q): q is Question => q !== undefined),
-                past.answers,
-                past.textAnswers,
-              );
-              return (
-                <li key={past.finishedAt} className="flex justify-between rounded border border-line bg-surface p-2">
-                  {/* 同じ画面の中で開き直すので、ページごと読み込む */}
-                  <a href={resultDetailHref(exam.examCode, past.finishedAt)} className="text-primary hover:underline">
-                    {formatDate(past.finishedAt)}
-                  </a>
-                  <span>
-                    {pastScore.correct} / {pastScore.total} 問({pastScore.percent}%)
-                  </span>
+        <div className="space-y-8 lg:col-start-1 lg:row-start-1">
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <h2 className="h2">問題ごとの結果</h2>
+              {wrongCount > 0 ? (
+                <button
+                  type="button"
+                  aria-pressed={wrongOnly}
+                  onClick={() => setWrongOnly(!wrongOnly)}
+                  className="rounded-md border border-line bg-surface px-4 py-2 text-sm font-bold"
+                >
+                  {wrongOnly ? "すべての問題を表示する" : `間違えた問題だけを見直す(${wrongCount} 問)`}
+                </button>
+              ) : null}
+            </div>
+            <BookmarkError bookmarks={bookmarks} />
+            {wrongCount === 0 ? <p className="text-correct">すべて正解でした。見直す問題はありません。</p> : null}
+            <ol className="motion-stagger space-y-4">
+              {rows.map(({ question, number, correct, unsure, flagged, timeMs }) => (
+                <li
+                  key={question.questionId}
+                  className={`card space-y-3 border-l-4 p-4 ${correct ? "border-l-correct" : "border-l-incorrect"}`}
+                >
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className={`font-bold ${correct ? "text-correct" : "text-incorrect"}`}>
+                      <span className={correct ? "motion-stamp" : "motion-wrong inline-block"}>
+                        {correct ? "○ 正解" : "× 不正解"}
+                      </span>
+                      <span className="ml-2 text-fg">問題 {number}</span>
+                    </p>
+                    <BookmarkToggle questionId={question.questionId} bookmarks={bookmarks} />
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <QuestionChips domains={exam.domains} question={question} />
+                    {unsure ? <span className="chip tone-warn">自信なし</span> : null}
+                    {flagged ? <span className="chip tone-orange">見直し</span> : null}
+                    {timeMs !== undefined ? (
+                      <span className="text-sm text-muted">回答時間 {formatAnswerTime(timeMs)}</span>
+                    ) : null}
+                  </div>
+                  <RecentOutcomeMarks outcomes={outcomes.get(question.questionId) ?? []} />
+                  <RichText text={question.questionText} />
+                  {question.questionType === "free-text" ? (
+                    <FreeTextDetail
+                      question={question}
+                      answer={textAnswerFor(latest.textAnswers, question.questionId)}
+                    />
+                  ) : (
+                    <ChoiceDetail
+                      question={question}
+                      selected={answerFor(latest.answers, question.questionId)}
+                      choiceOrder={latest.choiceOrder}
+                    />
+                  )}
+                  <div className="space-y-2 border-t border-line pt-3">
+                    <h3 className="font-bold">解説</h3>
+                    <ExplanationView question={question} choiceOrder={latest.choiceOrder} headingLevel={4} />
+                  </div>
+                  <ReferenceList references={question.references} />
                 </li>
-              );
-            })}
-          </ul>
+              ))}
+            </ol>
+          </div>
+
+          {previous.length > 0 ? (
+            <div className="space-y-2">
+              <h2 className="h2">これまでの結果</h2>
+              <ul className="space-y-1 text-sm">
+                {previous.map((past) => {
+                  const pastScore = score(
+                    past.questionIds.map((id) => byId.get(id)).filter((q): q is Question => q !== undefined),
+                    past.answers,
+                    past.textAnswers,
+                  );
+                  return (
+                    <li
+                      key={past.finishedAt}
+                      className="flex justify-between rounded border border-line bg-surface p-2"
+                    >
+                      {/* 同じ画面の中で開き直すので、ページごと読み込む */}
+                      <a
+                        href={resultDetailHref(exam.examCode, past.finishedAt)}
+                        className="text-primary hover:underline"
+                      >
+                        {formatDate(past.finishedAt)}
+                      </a>
+                      <span>
+                        {pastScore.correct} / {pastScore.total} 問({pastScore.percent}%)
+                      </span>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          ) : null}
         </div>
-      ) : null}
-
-      <div className="space-y-3">
-        {retryRows.length > 0 ? (
-          <button
-            type="button"
-            onClick={retry}
-            className="w-full rounded-md bg-primary px-5 py-3 font-bold text-on-primary hover:opacity-90"
-          >
-            {`間違えた問題${retryRows.some((row) => row.unsure) ? "と自信なしの問題" : ""}だけで解き直す(${retryRows.length} 問)`}
-          </button>
-        ) : null}
-        {retryError ? <Notice kind="error">{retryError}</Notice> : null}
-      </div>
-
-      <div className="flex gap-3">
-        <Link
-          href={`/exams/${exam.examCode}`}
-          className={`flex-1 rounded-md px-5 py-3 text-center font-bold ${
-            retryRows.length > 0 ? "border border-line bg-surface" : "bg-primary text-on-primary hover:opacity-90"
-          }`}
-        >
-          別の問題でもう一度
-        </Link>
-        <Link href="/exams" className="rounded-md border border-line bg-surface px-5 py-3 font-bold">
-          資格の一覧へ
-        </Link>
       </div>
     </section>
   );

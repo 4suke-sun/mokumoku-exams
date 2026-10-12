@@ -4,28 +4,16 @@ import Link from "next/link";
 import { useEffect, useId, useState } from "react";
 import { EmptyState } from "@/components/empty-state.tsx";
 import { DashboardSkeleton } from "@/components/page-skeletons.tsx";
-import { ScoreRing } from "@/components/score-ring.tsx";
-import {
-  type DashboardSummary,
-  type DomainStat,
-  domainBreakdown,
-  PREDICTION_WINDOW,
-  summarize,
-} from "@/lib/dashboard.ts";
+import { PredictionPanel } from "@/components/prediction-panel.tsx";
+import { StudyCalendar } from "@/components/study-calendar.tsx";
+import { type DashboardSummary, type DomainStat, domainBreakdown, summarize, toScored } from "@/lib/dashboard.ts";
 import { domainColorClasses } from "@/lib/domain-color.ts";
-import {
-  fetchBookmarks,
-  fetchDays,
-  fetchGoal,
-  fetchReview,
-  fetchServerResults,
-  putGoal,
-} from "@/lib/history/client.ts";
-import { mergeResults, pendingMigration } from "@/lib/history/merge.ts";
+import { formatDate } from "@/lib/format.ts";
+import { fetchBookmarks, fetchDays, fetchGoal, fetchReview, putGoal } from "@/lib/history/client.ts";
+import { loadExamResults } from "@/lib/history/load.ts";
 import { EARLIEST_GOAL_DATE, LATEST_GOAL_DATE } from "@/lib/history/schema.ts";
 import { domainSelectHref, resultDetailHref } from "@/lib/quiz.ts";
-import { browserStore, loadResults } from "@/lib/storage.ts";
-import { daysBetween, heatLevel, heatmapWeeks, jstDate, type StudyDay, streakDays } from "@/lib/study-days.ts";
+import { daysBetween, jstDate, type StudyDay } from "@/lib/study-days.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 
 type Props = { exam: PublishedExam; questions: Question[] };
@@ -47,15 +35,6 @@ type State =
       today: string;
     };
 
-/** ヒートマップの濃さごとの色(0 は学習なし) */
-const HEAT_CLASSES = ["bg-line", "bg-primary/25", "bg-primary/50", "bg-primary/75", "bg-primary"];
-const HEATMAP_WEEKS = 12;
-
-function formatDate(iso: string): string {
-  const date = new Date(iso);
-  return Number.isNaN(date.getTime()) ? "" : date.toLocaleString("ja-JP", { dateStyle: "medium", timeStyle: "short" });
-}
-
 /** 資格の学習の状況(正答率、学習量、合格予測)を表示する。 */
 export function DashboardView({ exam, questions }: Props) {
   const [state, setState] = useState<State>({ status: "loading" });
@@ -63,24 +42,24 @@ export function DashboardView({ exam, questions }: Props) {
   useEffect(() => {
     let active = true;
     void (async () => {
-      const [server, review, bookmarks, days, goal] = await Promise.all([
-        fetchServerResults(exam.examCode),
+      const [loaded, review, bookmarks, days, goal] = await Promise.all([
+        loadExamResults(exam.examCode),
         fetchReview(exam.examCode),
         fetchBookmarks(exam.examCode),
         fetchDays(exam.examCode),
         fetchGoal(exam.examCode),
       ]);
       if (!active) return;
-      const local = loadResults(browserStore(), exam.examCode);
       // 結果の画面と同じく、サーバーを正とし、この端末にだけ残っている記録も合わせて数える
-      const results = server === null ? local : mergeResults(server, pendingMigration(local, server));
+      const { results, source } = loaded;
+      const scored = questions.map(toScored);
       const known = new Set(questions.map((q) => q.questionId));
       const count = (ids: string[] | null) => (ids ? ids.filter((id) => known.has(id)).length : null);
       setState({
         status: "ready",
-        summary: summarize(results, questions, exam),
-        domains: domainBreakdown(results, questions),
-        source: server === null ? "local" : "server",
+        summary: summarize(results, scored, exam),
+        domains: domainBreakdown(results, scored),
+        source,
         review: count(review),
         bookmarks: count(bookmarks),
         days,
@@ -144,28 +123,9 @@ export function DashboardView({ exam, questions }: Props) {
 
       {goalPanel}
 
-      {prediction ? (
-        <div className="space-y-3">
-          <h2 className="h2">合格予測</h2>
-          <div className="card flex flex-col items-center gap-5 p-5 sm:flex-row">
-            <ScoreRing percent={prediction.averagePercent} reached={prediction.reached} />
-            <div className="space-y-2">
-              <p className={`font-bold ${prediction.reached ? "text-correct" : "text-warn"}`}>
-                {prediction.reached
-                  ? `合格ライン(${prediction.passLine}%)に届く見込みです。`
-                  : `合格ライン(${prediction.passLine}%)まで、あと ${Math.round((prediction.passLine - prediction.averagePercent) * 10) / 10} ポイントです。`}
-              </p>
-              <p className="text-sm text-muted">
-                直近 {prediction.basedOn} 回の結果の正答率の平均({prediction.averagePercent}
-                %)が、合格ラインに届いているかで判定します。1 回ごとの正答率を同じ重さで平均します。合格予測には、直近{" "}
-                {PREDICTION_WINDOW} 回までの結果を使います。回数が少ないうちは、ぶれが大きくなります。
-              </p>
-            </div>
-          </div>
-        </div>
-      ) : null}
+      {prediction ? <PredictionPanel exam={exam} prediction={prediction} /> : null}
 
-      <StudyDays days={state.days} today={state.today} />
+      <StudyCalendar days={state.days} today={state.today} scope="この資格" />
 
       <DomainList exam={exam} domains={state.domains} />
 
@@ -307,53 +267,6 @@ function GoalPanel({
           ) : null}
         </div>
       )}
-    </div>
-  );
-}
-
-/** 日ごとの学習量(連続日数と、直近 12 週のヒートマップ)。 */
-function StudyDays({ days, today }: { days: StudyDay[] | null; today: string }) {
-  if (days === null) {
-    return (
-      <div className="space-y-2">
-        <h2 className="h2">日ごとの学習量</h2>
-        <p className="text-sm text-muted">アカウントから読み込めないため、いまは表示できません。</p>
-      </div>
-    );
-  }
-  const weeks = heatmapWeeks(days, today, HEATMAP_WEEKS);
-  const studied = weeks.flat().filter((cell) => (cell.answered ?? 0) > 0).length;
-  return (
-    <div className="space-y-3">
-      <h2 className="h2">日ごとの学習量</h2>
-      <p className="font-bold">連続 {streakDays(days, today)} 日</p>
-      <div className="card space-y-2 p-4">
-        <div
-          role="img"
-          aria-label={`直近 ${HEATMAP_WEEKS} 週のうち、学習した日は ${studied} 日です。`}
-          className="flex gap-1"
-        >
-          {weeks.map((week) => (
-            <div key={week[0]?.date} className="flex flex-col gap-1">
-              {week.map((cell) =>
-                cell.answered === null ? (
-                  <span key={cell.date} className="size-4" />
-                ) : (
-                  <span
-                    key={cell.date}
-                    title={`${cell.date}: ${cell.answered} 問`}
-                    className={`size-4 rounded-sm ${HEAT_CLASSES[heatLevel(cell.answered)]}`}
-                  />
-                ),
-              )}
-            </div>
-          ))}
-        </div>
-        <p className="text-sm text-muted">
-          直近 {HEATMAP_WEEKS} 週(列が週で、上が日曜)。色が濃いほど、その日に多く解いています。
-          アカウントに保存した結果を、完了した日(日本時間)で数えます。
-        </p>
-      </div>
     </div>
   );
 }
