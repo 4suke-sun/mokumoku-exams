@@ -3,20 +3,24 @@ import { createFakeProvider, createFakeVerifier, FAKE_USER_EMAIL, FAKE_USER_PHRA
 import { withTokenCookies } from "@/lib/auth/session.ts";
 import type { AuthProvider } from "@/lib/auth/types.ts";
 import type { TokenVerifier } from "@/lib/auth/verify.ts";
-import { MAX_ANSWER_TIME_MS, MAX_RESULTS, type Result } from "@/lib/storage.ts";
+import { MAX_ANSWER_TIME_MS, type Result } from "@/lib/storage.ts";
 import {
   type HistoryDeps,
+  handleDeleteReview,
   handleGetGoal,
+  handleGetResult,
   handleListBookmarks,
   handleListDays,
   handleListResults,
+  handleListReviewItems,
+  handleListStats,
   handlePostResult,
   handlePutBookmark,
   handlePutGoal,
   reviewChangeOf,
   tallyOf,
 } from "./handlers.ts";
-import { createMemoryRepository, type HistoryRepository } from "./repository.ts";
+import { createMemoryRepository, type HistoryRepository, RESULTS_PAGE_SIZE } from "./repository.ts";
 
 const ORIGIN = "http://localhost";
 /** 完了時刻の範囲の検査を、時計に頼らず確かめるための「いま」 */
@@ -147,16 +151,32 @@ describe("履歴の保存と取得", () => {
     expect(((await listed.json()) as { results: Result[] }).results).toHaveLength(1);
   });
 
-  it("上限を超えて送る_新しい順に上限の件数だけ残る", async () => {
+  it("件数の上限なしで残し_一覧はページで返し_next で続きを取れる", async () => {
     const d = deps();
-    for (let minute = 0; minute <= MAX_RESULTS; minute++) {
-      const finishedAt = new Date(Date.UTC(2026, 9, 11, 12, minute)).toISOString();
-      await handlePostResult(post(body({ finishedAt }), { cookie: asUser("a") }), d);
+    const at = (minute: number) => new Date(Date.UTC(2026, 9, 11, 12, minute)).toISOString();
+    for (let minute = 0; minute <= RESULTS_PAGE_SIZE; minute++) {
+      await handlePostResult(post(body({ finishedAt: at(minute) }), { cookie: asUser("a") }), d);
     }
     const listed = await handleListResults(get("examCode=SAMPLE", { cookie: asUser("a") }), d);
-    const results = ((await listed.json()) as { results: Result[] }).results;
-    expect(results).toHaveLength(MAX_RESULTS);
-    expect(results[0]?.finishedAt).toBe(new Date(Date.UTC(2026, 9, 11, 12, MAX_RESULTS)).toISOString());
+    const page = (await listed.json()) as { results: Result[]; next: string | null };
+    expect(page.results).toHaveLength(RESULTS_PAGE_SIZE);
+    expect(page.results[0]?.finishedAt).toBe(at(RESULTS_PAGE_SIZE));
+    expect(page.next).toBe(at(1));
+    const rest = await handleListResults(
+      get(`examCode=SAMPLE&before=${encodeURIComponent(page.next ?? "")}`, { cookie: asUser("a") }),
+      d,
+    );
+    expect(await rest.json()).toEqual({ results: [body({ finishedAt: at(0) })], next: null });
+  });
+
+  it("続きの問い合わせの時刻が正しくない_400 で断る", async () => {
+    for (const before of ["yesterday", "2026-10-11", "2026-10-11T12:00:00Z"]) {
+      const response = await handleListResults(
+        get(`examCode=SAMPLE&before=${before}`, { cookie: asUser("a") }),
+        deps(),
+      );
+      expect(response.status, before).toBe(400);
+    }
   });
 });
 
@@ -356,6 +376,21 @@ describe("履歴 API の入力の検証", () => {
 
 const failing: HistoryRepository = {
   async putResult() {
+    throw new Error("unavailable");
+  },
+  async getResult() {
+    throw new Error("unavailable");
+  },
+  async updateStats() {
+    throw new Error("unavailable");
+  },
+  async listStats() {
+    throw new Error("unavailable");
+  },
+  async listReviewItems() {
+    throw new Error("unavailable");
+  },
+  async removeReview() {
     throw new Error("unavailable");
   },
   async listResults() {
@@ -719,5 +754,59 @@ describe("目標日の API", () => {
     for (const query of ["", "examCode=SAMPLE&sub=b"]) expect((await read(d, "a", query)).status, query).toBe(400);
     expect((await handlePutGoal(put(goal, { cookie: asUser("a") }), withQuestions(failing))).status).toBe(503);
     expect((await read(withQuestions(failing), "a")).status).toBe(503);
+  });
+});
+
+describe("1 回分の結果・集計・復習の項目の API", () => {
+  const cookie = asUser("a");
+  const at = "2026-10-11T12:00:00.000Z";
+  const withQuestions = (repository = createMemoryRepository()): HistoryDeps => ({
+    ...deps(repository),
+    questions: async () => [{ questionId: "SAMPLE-0001", questionType: "single" as const, correctAnswers: ["A"] }],
+  });
+  const getAt = (path: string) => new Request(`${ORIGIN}${path}`, { headers: { cookie } });
+  const del = (value: unknown) =>
+    new Request(`${ORIGIN}/api/history/review`, {
+      method: "DELETE",
+      headers: { "content-type": "application/json", cookie },
+      body: JSON.stringify(value),
+    });
+
+  it("1 回分の結果_あれば返し_なければ 404_問い合わせが正しくなければ 400", async () => {
+    const d = withQuestions();
+    await handlePostResult(post(body({ finishedAt: at }), { cookie }), d);
+    const found = await handleGetResult(getAt(`/api/history/result?examCode=SAMPLE&finishedAt=${at}`), d);
+    expect(await found.json()).toEqual({ result: body({ finishedAt: at }) });
+    const missing = await handleGetResult(
+      getAt("/api/history/result?examCode=SAMPLE&finishedAt=2026-10-11T12:01:00.000Z"),
+      d,
+    );
+    expect(missing.status).toBe(404);
+    for (const query of ["examCode=SAMPLE", `finishedAt=${at}`, `examCode=SAMPLE&finishedAt=yesterday`]) {
+      expect((await handleGetResult(getAt(`/api/history/result?${query}`), d)).status, query).toBe(400);
+    }
+  });
+
+  it("保存で解答回数と直近の正誤を数え_送り直しでは数えない", async () => {
+    const d = withQuestions();
+    await handlePostResult(post(body({ finishedAt: at }), { cookie }), d);
+    await handlePostResult(post(body({ finishedAt: at }), { cookie }), d);
+    const response = await handleListStats(getAt("/api/history/stats?examCode=SAMPLE"), d);
+    expect(await response.json()).toEqual({ stats: [{ questionId: "SAMPLE-0001", count: 1, recent: [true] }] });
+  });
+
+  it("復習の項目_問い合わせを付けると 400_外す本文が正しくなければ 400", async () => {
+    const d = withQuestions();
+    expect((await handleListReviewItems(getAt("/api/history/review/all?examCode=SAMPLE"), d)).status).toBe(400);
+    expect(await (await handleListReviewItems(getAt("/api/history/review/all"), d)).json()).toEqual({ items: [] });
+    for (const bad of [
+      { examCode: "SAMPLE" },
+      { examCode: "SAMPLE", questionId: "OTHER-0001" },
+      { examCode: "SAMPLE#", questionId: "SAMPLE-0001" },
+      { examCode: "SAMPLE", questionId: "SAMPLE-0001", extra: 1 },
+    ]) {
+      expect((await handleDeleteReview(del(bad), d)).status, JSON.stringify(bad)).toBe(400);
+    }
+    expect((await handleDeleteReview(del({ examCode: "SAMPLE", questionId: "SAMPLE-0001" }), d)).status).toBe(200);
   });
 });

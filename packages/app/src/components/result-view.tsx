@@ -15,7 +15,7 @@ import { ReferenceList } from "@/components/reference-list.tsx";
 import { RichText } from "@/components/rich-text.tsx";
 import { ScoreRing } from "@/components/score-ring.tsx";
 import { judgeFreeText } from "@/lib/free-text.ts";
-import { fetchServerResults, postServerResult } from "@/lib/history/client.ts";
+import { fetchServerResult, fetchServerResults, postServerResult } from "@/lib/history/client.ts";
 import { mergeResults, pendingMigration } from "@/lib/history/merge.ts";
 import {
   answerFor,
@@ -25,17 +25,22 @@ import {
   newSession,
   orderChoices,
   passLinePercent,
+  requestedResultAt,
+  resultDetailHref,
   score,
   textAnswerFor,
 } from "@/lib/quiz.ts";
 import { recentOutcomes } from "@/lib/recent-outcomes.ts";
+import { sectionPassLine, sectionStatus, sectionsOf } from "@/lib/sections.ts";
 import {
   browserStore,
   clearResults,
   loadResults,
+  loadSectionProgress,
   loadSettings,
   loadStageProgress,
   type Result,
+  type SectionProgress,
   type StageCheck,
   saveSession,
 } from "@/lib/storage.ts";
@@ -48,7 +53,14 @@ type State =
   | { status: "loading" }
   // source: 結果の取得元。server はアカウントに保存した記録、local は(サーバーに接続できないときの)この端末の記録。
   // pending: この端末にだけ残っていて、まだアカウントに移していない記録
-  | { status: "ready"; results: Result[]; source: "server" | "local"; pending: Result[] };
+  // target: `?at=` で 1 回分を開いたときの、その結果(見つからなければ "not-found")
+  | {
+      status: "ready";
+      results: Result[];
+      source: "server" | "local";
+      pending: Result[];
+      target?: Result | "not-found";
+    };
 
 function formatDate(iso: string): string {
   const date = new Date(iso);
@@ -92,6 +104,7 @@ export function ResultView({ exam, questions }: Props) {
   const [wrongOnly, setWrongOnly] = useState(false);
   const [migration, setMigration] = useState<"idle" | "busy" | "failed">("idle");
   const [stageCheck, setStageCheck] = useState<StageCheck | null>(null);
+  const [sectionCheck, setSectionCheck] = useState<SectionProgress["last"] | null>(null);
   const bookmarks = useBookmarks(exam.examCode);
 
   useEffect(() => {
@@ -99,14 +112,24 @@ export function ResultView({ exam, questions }: Props) {
     void (async () => {
       const local = loadResults(browserStore(), exam.examCode);
       setStageCheck(loadStageProgress(browserStore(), exam.examCode).last ?? null);
+      setSectionCheck(loadSectionProgress(browserStore(), exam.examCode).last ?? null);
+      const at = requestedResultAt(window.location.search);
       const server = await fetchServerResults(exam.examCode);
       if (!active) return;
-      if (server === null) {
-        setState({ status: "ready", results: local, source: "local", pending: [] });
-        return;
+      const pending = server === null ? [] : pendingMigration(local, server);
+      const results = server === null ? local : mergeResults(server, pending);
+      // 1 回分を開くとき: 一覧になければ(古い結果)、アカウントから 1 件だけ取る
+      let target: Result | "not-found" | undefined;
+      if (at !== null) {
+        target = results.find((r) => r.finishedAt === at);
+        if (!target && server !== null) {
+          const fetched = await fetchServerResult(exam.examCode, at);
+          if (!active) return;
+          target = fetched ?? undefined;
+        }
+        target ??= "not-found";
       }
-      const pending = pendingMigration(local, server);
-      setState({ status: "ready", results: mergeResults(server, pending), source: "server", pending });
+      setState({ status: "ready", results, source: server === null ? "local" : "server", pending, target });
     })();
     return () => {
       active = false;
@@ -132,7 +155,22 @@ export function ResultView({ exam, questions }: Props) {
     return <ResultSkeleton />;
   }
 
-  const [latest, ...previous] = state.results;
+  if (state.target === "not-found") {
+    return (
+      <EmptyState
+        icon="🔍"
+        headingLevel={1}
+        title="その回の結果は見つかりません"
+        description="結果が消えたか、アドレスが違う可能性があります。最新の結果か、学習の状況の一覧から開き直してください。"
+        action={{ label: "最新の結果へ", href: `/exams/${exam.examCode}/result` }}
+      />
+    );
+  }
+
+  // 1 回分を開いたときは、その結果を出し、ほかを「これまでの結果」に並べる
+  const latest = state.target ?? state.results[0];
+  const isNewest = latest !== undefined && latest.finishedAt === state.results[0]?.finishedAt;
+  const previous = state.results.filter((r) => r.finishedAt !== latest?.finishedAt);
   const byId = new Map(questions.map((q) => [q.questionId, q]));
   const answered = latest
     ? latest.questionIds.map((id) => byId.get(id)).filter((q): q is Question => q !== undefined)
@@ -192,6 +230,37 @@ export function ResultView({ exam, questions }: Props) {
   const perfect = result.total > 0 && result.correct === result.total;
   // 直近の結果が段階の確認問題のときだけ、段階の合否を伝える
   const stage = stageCheck && stageCheck.finishedAt === latest.finishedAt ? stageCheck : null;
+  // 直近の結果がセクションの出題のときだけ、セクションの合否と、次のセクションを出す
+  const section = sectionCheck && sectionCheck.finishedAt === latest.finishedAt ? sectionCheck : null;
+  const sections = sectionsOf(questions.map((q) => q.questionId));
+  const nextSection = section && section.section + 1 < sections.length ? section.section + 1 : null;
+
+  /** 次のセクションの出題を始める */
+  function startSection(index: number) {
+    const ids = sections[index] ?? [];
+    const store = browserStore();
+    const { shuffleChoices, reveal } = loadSettings(store);
+    const items = ids.flatMap((id) => {
+      const question = byId.get(id);
+      return question
+        ? [
+            {
+              questionId: id,
+              choiceKeys: question.questionType === "free-text" ? [] : question.choices.map((c) => c.key),
+            },
+          ]
+        : [];
+    });
+    const session = {
+      ...newSession(exam.examCode, items, { shuffleChoices }, Math.random, new Date()),
+      section: index,
+    };
+    if (!saveSession(store, reveal === "each" ? { ...session, reveal } : session)) {
+      setRetryError("この端末では、出題の状態を保存できません。ブラウザの設定を確認してください。");
+      return;
+    }
+    router.push(`/exams/${exam.examCode}/play`);
+  }
 
   return (
     <section className="space-y-8">
@@ -234,12 +303,46 @@ export function ResultView({ exam, questions }: Props) {
           </Link>
         </div>
       ) : null}
+      {section ? (
+        <div role="status" className="card space-y-3 p-4">
+          <p className={`font-bold ${sectionStatus(section) === "failed" ? "text-warn" : "text-correct"}`}>
+            {sectionStatus(section) === "perfect"
+              ? `セクション ${section.section + 1} を満点で合格しました(${section.correct} / ${section.total} 問)。`
+              : sectionStatus(section) === "passed"
+                ? `セクション ${section.section + 1} に合格しました(${section.correct} / ${section.total} 問)。`
+                : `セクション ${section.section + 1} は、${sectionPassLine(section.total)} 問以上の正解で合格です(今回は ${section.correct} / ${section.total} 問)。`}
+          </p>
+          <div className="flex flex-wrap gap-3">
+            {nextSection !== null ? (
+              <button
+                type="button"
+                onClick={() => startSection(nextSection)}
+                className="rounded-md bg-primary px-4 py-2 font-bold text-on-primary hover:opacity-90"
+              >
+                次のセクションへ(セクション {nextSection + 1})
+              </button>
+            ) : null}
+            <Link
+              href={`/exams/${exam.examCode}/sections`}
+              className="rounded-md border border-line bg-surface px-4 py-2 font-bold"
+            >
+              セクションの一覧へ
+            </Link>
+          </div>
+        </div>
+      ) : null}
       <div className="space-y-3">
         <h1 className="h1">結果</h1>
         <p className="text-sm text-muted">
           {exam.name} / {formatDate(latest.finishedAt)}
+          {isNewest ? null : "(過去の結果)"}
         </p>
-        <Confetti reached={reached} perfect={perfect} />
+        {isNewest ? null : (
+          <a href={`/exams/${exam.examCode}/result`} className="text-sm text-primary hover:underline">
+            最新の結果へ
+          </a>
+        )}
+        {isNewest ? <Confetti reached={reached} perfect={perfect} /> : null}
         <div className={`card flex flex-col items-center gap-5 p-5 sm:flex-row ${perfect ? "motion-shine" : ""}`}>
           <ScoreRing percent={result.percent} reached={reached} />
           <div>
@@ -324,7 +427,10 @@ export function ResultView({ exam, questions }: Props) {
               );
               return (
                 <li key={past.finishedAt} className="flex justify-between rounded border border-line bg-surface p-2">
-                  <span>{formatDate(past.finishedAt)}</span>
+                  {/* 同じ画面の中で開き直すので、ページごと読み込む */}
+                  <a href={resultDetailHref(exam.examCode, past.finishedAt)} className="text-primary hover:underline">
+                    {formatDate(past.finishedAt)}
+                  </a>
                   <span>
                     {pastScore.correct} / {pastScore.total} 問({pastScore.percent}%)
                   </span>

@@ -7,27 +7,48 @@ import {
   QueryCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
-import { MAX_RESULTS, type Result, ResultSchema } from "@/lib/storage.ts";
+import { RECENT_STAT_LIMIT } from "@/lib/question-stats.ts";
+import { type Result, ResultSchema } from "@/lib/storage.ts";
 import { isValidDate, jstDate, type StudyDay } from "@/lib/study-days.ts";
-import { QUESTION_ID_PATTERN } from "./schema.ts";
+import { MASTER_STREAK, QUESTION_ID_PATTERN } from "./schema.ts";
 
 /** 履歴の保存先。利用者の識別子(`sub`)は、検証済みのものだけを渡す。 */
 export interface HistoryRepository {
   /**
-   * 結果を保存する(同じ資格・同じ完了時刻は上書きなので、繰り返しても重複しない)。古いものは `MAX_RESULTS` 件までに切り詰める。
+   * 結果を保存する(同じ資格・同じ完了時刻は上書きなので、繰り返しても重複しない)。結果は件数の上限なしで、すべて残す。
    * `tally` を渡すと、結果の項目が新しく作られたときだけ、完了時刻の日(日本時間)の学習量に足す(送り直しで二重に数えない)。
+   * 結果の項目を新しく作ったら true(上書きなら false)。
    */
-  putResult(sub: string, result: Result, tally?: DayTally): Promise<void>;
-  /** 資格の結果を新しい順に返す。 */
-  listResults(sub: string, examCode: string): Promise<Result[]>;
+  putResult(sub: string, result: Result, tally?: DayTally): Promise<boolean>;
+  /**
+   * 資格の結果を新しい順に返す。`before`(完了時刻)を渡すと、それより古いものを返す。
+   * 1 回に返すのは `limit` 件まで(既定は `RESULTS_PAGE_SIZE`)。
+   */
+  listResults(sub: string, examCode: string, page?: { before?: string; limit?: number }): Promise<Result[]>;
+  /** 1 回分の結果。なければ null。 */
+  getResult(sub: string, examCode: string, finishedAt: string): Promise<Result | null>;
+  /**
+   * 問題ごとの解答回数と直近の正誤を更新する。同じ完了時刻の正誤は、二重に数えない。
+   * 直近の正誤は、完了時刻の順に `RECENT_STAT_LIMIT` 回分を残す。
+   */
+  updateStats(sub: string, examCode: string, outcomes: readonly QuestionOutcome[], at: string): Promise<void>;
+  /** 資格の、問題ごとの解答回数と直近の正誤(古い順)。 */
+  listStats(sub: string, examCode: string): Promise<QuestionStat[]>;
   /** ブックマークした問題 ID を、ID の順に返す。 */
   listBookmarks(sub: string, examCode: string): Promise<string[]>;
   /** ブックマークを付ける・外す(同じ操作を繰り返しても、結果は変わらない)。 */
   setBookmark(sub: string, examCode: string, questionId: string, bookmarked: boolean): Promise<void>;
-  /** 復習プールの問題 ID を、ID の順に返す。 */
+  /** 復習プールの、まだマスターしていない問題 ID を、ID の順に返す。 */
   listReview(sub: string, examCode: string): Promise<string[]>;
-  /** 採点の結果で復習プールを更新する。間違えた問題を入れ、正解した問題を外す。 */
+  /** すべての資格の復習の項目(マスター済みを含む)。資格と問題 ID の順。 */
+  listReviewItems(sub: string): Promise<ReviewItem[]>;
+  /**
+   * 採点の結果で復習プールを更新する。間違えた問題(自信なしを含む)は、連続正解を 0 にして入れる。
+   * プールにある問題に正解すると、連続正解を 1 つ増やし、`MASTER_STREAK` 回続いたらマスターにする。
+   */
   updateReview(sub: string, examCode: string, change: ReviewChange): Promise<void>;
+  /** 復習から、手で外す(項目を消す)。 */
+  removeReview(sub: string, examCode: string, questionId: string): Promise<void>;
   /** 日ごとの学習量を、日付の順に返す。 */
   listDays(sub: string, examCode: string): Promise<StudyDay[]>;
   /** 目標日(`YYYY-MM-DD`)。決めていなければ null。 */
@@ -42,6 +63,41 @@ export type DayTally = { answered: number; correct: number };
 /** 復習プールの更新。`at` は、もとにした結果の完了時刻。 */
 export type ReviewChange = { wrong: readonly string[]; correct: readonly string[]; at: string };
 
+/** 復習の項目。`streak` は連続正解の数(古い保存で持たないときは 0) */
+export type ReviewItem = { examCode: string; questionId: string; streak: number; mastered: boolean };
+
+/** 結果の一覧で、1 回に返す件数 */
+export const RESULTS_PAGE_SIZE = 50;
+
+/** 1 回の結果での、1 問の正誤 */
+export type QuestionOutcome = { questionId: string; correct: boolean };
+
+/** 問題ごとの解答回数と、直近の正誤(古い順。true が正解) */
+export type QuestionStat = { questionId: string; count: number; recent: boolean[] };
+
+type RecentEntry = { at: string; correct: boolean };
+
+/** 保存した直近の正誤を読む(壊れた値は除く) */
+function recentOf(value: unknown): RecentEntry[] {
+  if (!Array.isArray(value)) return [];
+  return value.filter(
+    (e): e is RecentEntry =>
+      typeof e === "object" && e !== null && typeof e.at === "string" && typeof e.correct === "boolean",
+  );
+}
+
+/** 直近の正誤に 1 回分を足す(同じ時刻は足さない)。完了時刻の順に並べ、新しい `RECENT_STAT_LIMIT` 回分を残す */
+export function addRecent(recent: readonly RecentEntry[], entry: RecentEntry): RecentEntry[] | null {
+  if (recent.some((e) => e.at === entry.at)) return null;
+  return [...recent, entry].sort((a, b) => (a.at < b.at ? -1 : a.at > b.at ? 1 : 0)).slice(-RECENT_STAT_LIMIT);
+}
+
+/** 復習の項目の、連続正解とマスターを読む(古い保存は、連続正解 0・未マスター) */
+function reviewStateOf(item: Record<string, unknown> | undefined): { streak: number; mastered: boolean } {
+  const streak = Number.isInteger(item?.streak) && (item?.streak as number) >= 0 ? (item?.streak as number) : 0;
+  return { streak, mastered: item?.mastered === true };
+}
+
 /** DynamoDB のキー。単一テーブルで、PK=USER#{sub}、SK で種別を分ける。 */
 export const userKey = (sub: string) => `USER#${sub}`;
 export const resultKeyPrefix = (examCode: string) => `RESULT#${examCode}#`;
@@ -51,6 +107,9 @@ export const bookmarkKeyPrefix = (examCode: string) => `BOOKMARK#${examCode}#`;
 export const reviewKeyPrefix = (examCode: string) => `REVIEW#${examCode}#`;
 export const dayKeyPrefix = (examCode: string) => `DAY#${examCode}#`;
 export const goalKey = (examCode: string) => `GOAL#${examCode}`;
+export const statKeyPrefix = (examCode: string) => `STAT#${examCode}#`;
+/** すべての資格の復習の項目(資格をまたいで一覧するとき) */
+export const REVIEW_PREFIX = "REVIEW#";
 
 const isCount = (value: unknown): value is number => Number.isInteger(value) && (value as number) >= 0;
 
@@ -58,6 +117,22 @@ const isCount = (value: unknown): value is number => Number.isInteger(value) && 
 function studyDayOf(date: string, answered: unknown, correct: unknown): StudyDay | null {
   if (!isValidDate(date) || !isCount(answered) || !isCount(correct) || correct > answered) return null;
   return { date, answered, correct };
+}
+
+/** 保存した項目から、結果の部分だけを取り出して検査する(壊れた項目は null) */
+function resultOf(item: Record<string, unknown>): Result | null {
+  const parsed = ResultSchema.safeParse({
+    examCode: item.examCode,
+    questionIds: item.questionIds,
+    answers: item.answers,
+    textAnswers: item.textAnswers,
+    finishedAt: item.finishedAt,
+    choiceOrder: item.choiceOrder,
+    timesMs: item.timesMs,
+    unsure: item.unsure,
+    flagged: item.flagged,
+  });
+  return parsed.success ? parsed.data : null;
 }
 
 /** 1 回の更新で、同時に送る書き込みの数(問題が多い結果でも、待ち時間を抑える) */
@@ -72,14 +147,18 @@ async function inChunks<T>(items: readonly T[], run: (item: T) => Promise<unknow
 /** DynamoDB のドキュメントクライアントの、使う操作だけ(テストで差し替える) */
 export type DocumentSender = { send(command: unknown): Promise<unknown> };
 
-type QueryOutput = { Items?: Record<string, unknown>[] };
+type QueryOutput = { Items?: Record<string, unknown>[]; LastEvaluatedKey?: Record<string, unknown> };
 type PutOutput = { Attributes?: Record<string, unknown> };
 type GetOutput = { Item?: Record<string, unknown> };
 
 export function createDynamoRepository(options: { tableName: string; client: DocumentSender }): HistoryRepository {
   const { tableName, client } = options;
 
-  const query = (sub: string, prefix: string, extra: { limit?: number; keysOnly?: boolean; newestFirst?: boolean }) =>
+  const query = (
+    sub: string,
+    prefix: string,
+    extra: { limit?: number; keysOnly?: boolean; newestFirst?: boolean; startAfter?: string },
+  ) =>
     client.send(
       new QueryCommand({
         TableName: tableName,
@@ -88,8 +167,24 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
         ...(extra.newestFirst ? { ScanIndexForward: false } : {}),
         ...(extra.limit ? { Limit: extra.limit } : {}),
         ...(extra.keysOnly ? { ProjectionExpression: "SK" } : {}),
+        ...(extra.startAfter ? { ExclusiveStartKey: { PK: userKey(sub), SK: extra.startAfter } } : {}),
       }),
     ) as Promise<QueryOutput>;
+
+  /** 接頭辞の項目を、ページを辿ってすべて読む(1 回の問い合わせは 1MB まで) */
+  const queryAll = async (sub: string, prefix: string) => {
+    const all: Record<string, unknown>[] = [];
+    let startAfter: string | undefined;
+    do {
+      const { Items = [], LastEvaluatedKey } = await query(sub, prefix, { startAfter });
+      all.push(...Items);
+      startAfter = LastEvaluatedKey ? String(LastEvaluatedKey.SK) : undefined;
+    } while (startAfter);
+    return all;
+  };
+  const get = async (sub: string, sk: string) =>
+    ((await client.send(new GetCommand({ TableName: tableName, Key: { PK: userKey(sub), SK: sk } }))) as GetOutput)
+      .Item;
 
   /** SK の接頭辞のあとに続く問題 ID を取り出す(問題 ID の形のものだけ)。 */
   const questionIdsOf = async (sub: string, prefix: string) => {
@@ -137,31 +232,48 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
           }),
         );
       }
-      // 古いものを切り詰める(1 資格あたり高々 MAX_RESULTS + 数件なので、1 回の問い合わせで足りる)
-      const { Items = [] } = await query(sub, resultKeyPrefix(result.examCode), { keysOnly: true, newestFirst: true });
-      for (const item of Items.slice(MAX_RESULTS)) await remove(sub, String(item.SK));
+      // 結果は 1 件ずつ別の項目なので、件数の上限なしで残す(古いものを切り詰めない)
+      return !Attributes;
     },
 
-    async listResults(sub, examCode) {
-      // 完了時刻の新しい順
-      const { Items = [] } = await query(sub, resultKeyPrefix(examCode), { limit: MAX_RESULTS, newestFirst: true });
-      const results: Result[] = [];
-      for (const item of Items) {
-        // 保存した項目から、結果の部分だけを取り出して検査する(壊れた項目は、ないものとして扱う)
-        const parsed = ResultSchema.safeParse({
-          examCode: item.examCode,
-          questionIds: item.questionIds,
-          answers: item.answers,
-          textAnswers: item.textAnswers,
-          finishedAt: item.finishedAt,
-          choiceOrder: item.choiceOrder,
-          timesMs: item.timesMs,
-          unsure: item.unsure,
-          flagged: item.flagged,
-        });
-        if (parsed.success) results.push(parsed.data);
-      }
-      return results;
+    async listResults(sub, examCode, page = {}) {
+      // 完了時刻の新しい順。`before` の項目のあとから、`limit` 件まで
+      const prefix = resultKeyPrefix(examCode);
+      const { Items = [] } = await query(sub, prefix, {
+        limit: page.limit ?? RESULTS_PAGE_SIZE,
+        newestFirst: true,
+        startAfter: page.before ? `${prefix}${page.before}` : undefined,
+      });
+      return Items.map(resultOf).filter((r): r is Result => r !== null);
+    },
+
+    async getResult(sub, examCode, finishedAt) {
+      const item = await get(sub, resultKey({ examCode, finishedAt }));
+      const found = item ? resultOf(item) : null;
+      return found && found.examCode === examCode && found.finishedAt === finishedAt ? found : null;
+    },
+
+    async updateStats(sub, examCode, outcomes, at) {
+      const prefix = statKeyPrefix(examCode);
+      await inChunks(outcomes, async ({ questionId, correct }) => {
+        const sk = `${prefix}${questionId}`;
+        const item = await get(sub, sk);
+        const recent = addRecent(recentOf(item?.recent), { at, correct });
+        if (!recent) return;
+        const count = isCount(item?.count) ? item.count + 1 : 1;
+        await put(sub, sk, { type: "stat", examCode, questionId, count, recent });
+      });
+    },
+
+    async listStats(sub, examCode) {
+      const prefix = statKeyPrefix(examCode);
+      return (await queryAll(sub, prefix))
+        .map((item) => ({
+          questionId: String(item.SK).slice(prefix.length),
+          count: isCount(item.count) ? item.count : 0,
+          recent: recentOf(item.recent).map((e) => e.correct),
+        }))
+        .filter((stat) => QUESTION_ID_PATTERN.test(stat.questionId));
     },
 
     listBookmarks: (sub, examCode) => questionIdsOf(sub, bookmarkKeyPrefix(examCode)),
@@ -172,15 +284,44 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
       else await remove(sub, sk);
     },
 
-    listReview: (sub, examCode) => questionIdsOf(sub, reviewKeyPrefix(examCode)),
+    async listReview(sub, examCode) {
+      const prefix = reviewKeyPrefix(examCode);
+      return (await queryAll(sub, prefix))
+        .filter((item) => !reviewStateOf(item).mastered)
+        .map((item) => String(item.SK).slice(prefix.length))
+        .filter((id) => QUESTION_ID_PATTERN.test(id));
+    },
+
+    async listReviewItems(sub) {
+      return (await queryAll(sub, REVIEW_PREFIX)).flatMap((item): ReviewItem[] => {
+        const [examCode = "", questionId = ""] = String(item.SK).slice(REVIEW_PREFIX.length).split("#");
+        if (!QUESTION_ID_PATTERN.test(questionId) || !questionId.startsWith(`${examCode}-`)) return [];
+        return [{ examCode, questionId, ...reviewStateOf(item) }];
+      });
+    },
 
     async updateReview(sub, examCode, change) {
       const prefix = reviewKeyPrefix(examCode);
       await inChunks(change.wrong, (id) =>
-        put(sub, `${prefix}${id}`, { type: "review", examCode, questionId: id, wrongAt: change.at }),
+        put(sub, `${prefix}${id}`, { type: "review", examCode, questionId: id, wrongAt: change.at, streak: 0 }),
       );
-      // 入っていない問題の削除は、何もしない操作になる(問い合わせて確かめる必要はない)
-      await inChunks(change.correct, (id) => remove(sub, `${prefix}${id}`));
+      // プールにある問題だけ、連続正解を増やす(ない問題は何もしない)。マスターしたら、印を付けて残す(数を出すため)
+      await inChunks(change.correct, async (id) => {
+        const item = await get(sub, `${prefix}${id}`);
+        if (!item) return;
+        const state = reviewStateOf(item);
+        if (state.mastered) return;
+        const streak = state.streak + 1;
+        await put(sub, `${prefix}${id}`, {
+          ...item,
+          streak,
+          ...(streak >= MASTER_STREAK ? { mastered: true, masteredAt: change.at } : {}),
+        });
+      });
+    },
+
+    async removeReview(sub, examCode, questionId) {
+      await remove(sub, `${reviewKeyPrefix(examCode)}${questionId}`);
     },
 
     async listDays(sub, examCode) {
@@ -212,7 +353,9 @@ export function createMemoryRepository(): HistoryRepository {
   const store = new Map<string, Map<string, Result>>();
   // 利用者と資格ごとの、問題 ID の集合
   const bookmarks = new Map<string, Set<string>>();
-  const review = new Map<string, Set<string>>();
+  // 利用者と資格ごとの、問題 ID ごとの復習の状態と、解答回数・直近の正誤
+  const review = new Map<string, Map<string, { streak: number; mastered: boolean }>>();
+  const stats = new Map<string, Map<string, { count: number; recent: RecentEntry[] }>>();
   // 利用者と資格ごとの、日付ごとの学習量と、目標日
   const days = new Map<string, Map<string, StudyDay>>();
   const goals = new Map<string, string>();
@@ -221,6 +364,12 @@ export function createMemoryRepository(): HistoryRepository {
     const key = scope(sub, examCode);
     const found = sets.get(key) ?? new Set<string>();
     sets.set(key, found);
+    return found;
+  };
+  const mapOf = <T>(maps: Map<string, Map<string, T>>, sub: string, examCode: string) => {
+    const key = scope(sub, examCode);
+    const found = maps.get(key) ?? new Map<string, T>();
+    maps.set(key, found);
     return found;
   };
   const sorted = (sub: string, examCode: string) =>
@@ -244,10 +393,29 @@ export function createMemoryRepository(): HistoryRepository {
         days.set(scope(sub, result.examCode), perDay);
       }
       store.set(userKey(sub), own);
-      for (const old of sorted(sub, result.examCode).slice(MAX_RESULTS)) own.delete(resultKey(old));
+      return created;
     },
-    async listResults(sub, examCode) {
-      return sorted(sub, examCode).slice(0, MAX_RESULTS);
+    async listResults(sub, examCode, page = {}) {
+      const { before } = page;
+      return sorted(sub, examCode)
+        .filter((r) => before === undefined || r.finishedAt < before)
+        .slice(0, page.limit ?? RESULTS_PAGE_SIZE);
+    },
+    async getResult(sub, examCode, finishedAt) {
+      return store.get(userKey(sub))?.get(resultKey({ examCode, finishedAt })) ?? null;
+    },
+    async updateStats(sub, examCode, outcomes, at) {
+      const own = mapOf(stats, sub, examCode);
+      for (const { questionId, correct } of outcomes) {
+        const before = own.get(questionId) ?? { count: 0, recent: [] };
+        const recent = addRecent(before.recent, { at, correct });
+        if (recent) own.set(questionId, { count: before.count + 1, recent });
+      }
+    },
+    async listStats(sub, examCode) {
+      return [...mapOf(stats, sub, examCode).entries()]
+        .sort(([a], [b]) => (a < b ? -1 : 1))
+        .map(([questionId, stat]) => ({ questionId, count: stat.count, recent: stat.recent.map((e) => e.correct) }));
     },
     async listBookmarks(sub, examCode) {
       return [...setOf(bookmarks, sub, examCode)].sort();
@@ -258,12 +426,36 @@ export function createMemoryRepository(): HistoryRepository {
       else own.delete(questionId);
     },
     async listReview(sub, examCode) {
-      return [...setOf(review, sub, examCode)].sort();
+      return [...mapOf(review, sub, examCode).entries()]
+        .filter(([, state]) => !state.mastered)
+        .map(([id]) => id)
+        .sort();
+    },
+    async listReviewItems(sub) {
+      const prefix = `${userKey(sub)}|`;
+      return [...review.entries()]
+        .filter(([key]) => key.startsWith(prefix))
+        .flatMap(([key, own]) =>
+          [...own.entries()].map(([questionId, state]) => ({
+            examCode: key.slice(prefix.length),
+            questionId,
+            ...state,
+          })),
+        )
+        .sort((a, b) => `${a.examCode}#${a.questionId}`.localeCompare(`${b.examCode}#${b.questionId}`));
     },
     async updateReview(sub, examCode, change) {
-      const own = setOf(review, sub, examCode);
-      for (const id of change.wrong) own.add(id);
-      for (const id of change.correct) own.delete(id);
+      const own = mapOf(review, sub, examCode);
+      for (const id of change.wrong) own.set(id, { streak: 0, mastered: false });
+      for (const id of change.correct) {
+        const state = own.get(id);
+        if (!state || state.mastered) continue;
+        const streak = state.streak + 1;
+        own.set(id, { streak, mastered: streak >= MASTER_STREAK });
+      }
+    },
+    async removeReview(sub, examCode, questionId) {
+      mapOf(review, sub, examCode).delete(questionId);
     },
     async listDays(sub, examCode) {
       return [...(days.get(scope(sub, examCode))?.values() ?? [])].sort((a, b) => (a.date < b.date ? -1 : 1));

@@ -1,17 +1,29 @@
+import type { z } from "zod";
 import { authenticate, type GuardDeps } from "@/lib/auth/guard.ts";
 import { guard, json } from "@/lib/auth/handlers.ts";
 import { type GradableQuestion, isQuestionCorrect } from "@/lib/quiz.ts";
 import type { Result } from "@/lib/storage.ts";
 import { examQuestions } from "./questions.ts";
-import type { DayTally, HistoryRepository, ReviewChange } from "./repository.ts";
+import {
+  type DayTally,
+  type HistoryRepository,
+  type QuestionOutcome,
+  RESULTS_PAGE_SIZE,
+  type ReviewChange,
+} from "./repository.ts";
 import {
   apiResultSchema,
   BookmarkChangeSchema,
+  EmptyQuerySchema,
   GoalChangeSchema,
   ListQuerySchema,
   MAX_BODY_BYTES,
   MAX_BOOKMARK_BODY_BYTES,
   MAX_GOAL_BODY_BYTES,
+  MAX_REVIEW_BODY_BYTES,
+  ResultQuerySchema,
+  ResultsQuerySchema,
+  ReviewRemovalSchema,
 } from "./schema.ts";
 
 /** 採点に使う、問題の正解と採点基準。公開中の資格でなければ null。 */
@@ -28,9 +40,9 @@ export type HistoryDeps = {
 /**
  * エラー応答の形は `{ "error": "<種類>" }` だけ。原因・内部の情報・入力の値は返さない。
  * 種類とステータス: bad-request 400(入力が正しくない)/ unauthorized 401 / forbidden 403(別サイトからの送信)/
- * too-large 413 / bad-request 415(JSON でない形式)/ unavailable 503(保存先の失敗)。
+ * not-found 404(1 回分の結果がない)/ too-large 413 / bad-request 415(JSON でない形式)/ unavailable 503(保存先の失敗)。
  */
-export type HistoryError = "bad-request" | "unauthorized" | "too-large" | "unavailable";
+export type HistoryError = "bad-request" | "unauthorized" | "not-found" | "too-large" | "unavailable";
 
 export const fail = (error: HistoryError, status: number, cookies: string[] = []) => json({ error }, status, cookies);
 
@@ -47,10 +59,10 @@ export async function authorize(request: Request, deps: { auth: GuardDeps }) {
 }
 
 /** 問い合わせを検査する。同じ名前が 2 回以上あるものは、どちらを使うか曖昧なので断る。 */
-function parseQuery(request: Request) {
+function parseQuery<T extends z.ZodType>(request: Request, schema: T): z.infer<T> | null {
   const entries = [...new URL(request.url).searchParams.entries()];
   if (new Set(entries.map(([name]) => name)).size !== entries.length) return null;
-  const parsed = ListQuerySchema.safeParse(Object.fromEntries(entries));
+  const parsed = schema.safeParse(Object.fromEntries(entries));
   return parsed.success ? parsed.data : null;
 }
 
@@ -93,21 +105,53 @@ export function reviewChangeOf(result: Result, questions: readonly GradableQuest
   return change;
 }
 
+/** 採点し直した、問題ごとの正誤(自信なしの印によらない)。いまのデータにない問題は含めない。同じ問題は 1 回だけ */
+export function outcomesOf(result: Result, questions: readonly GradableQuestion[]): QuestionOutcome[] {
+  const byId = new Map(questions.map((q) => [q.questionId, q]));
+  return [...new Set(result.questionIds)].flatMap((id) => {
+    const question = byId.get(id);
+    return question
+      ? [{ questionId: id, correct: isQuestionCorrect(question, result.answers, result.textAnswers) }]
+      : [];
+  });
+}
+
 /** 採点し直した結果の学習量(正答数は、自信なしの印によらず、正誤で数える)。いまのデータにない問題は数えない。 */
 export function tallyOf(result: Result, questions: readonly GradableQuestion[]): DayTally {
   const change = reviewChangeOf({ ...result, unsure: undefined }, questions);
   return { answered: change.wrong.length + change.correct.length, correct: change.correct.length };
 }
 
-/** 自分の結果を、資格ごとに新しい順で返す。 */
+/**
+ * 自分の結果を、資格ごとに新しい順で返す。1 回に `RESULTS_PAGE_SIZE` 件まで。続きがあるかもしれないときは、
+ * `next` に、次の問い合わせの `before` に渡す完了時刻を返す(なければ null)。
+ */
 export async function handleListResults(request: Request, deps: HistoryDeps): Promise<Response> {
   const auth = await authorize(request, deps);
   if (!auth) return fail("unauthorized", 401);
-  const query = parseQuery(request);
+  const query = parseQuery(request, ResultsQuerySchema);
   if (!query) return fail("bad-request", 400, auth.setCookies);
   try {
-    const results = await deps.repository.listResults(auth.user.sub, query.examCode);
-    return json({ results }, 200, auth.setCookies);
+    const results = await deps.repository.listResults(auth.user.sub, query.examCode, {
+      before: query.before,
+      limit: RESULTS_PAGE_SIZE,
+    });
+    const next = results.length === RESULTS_PAGE_SIZE ? (results.at(-1)?.finishedAt ?? null) : null;
+    return json({ results, next }, 200, auth.setCookies);
+  } catch {
+    return fail("unavailable", 503);
+  }
+}
+
+/** 自分の 1 回分の結果を返す。なければ 404。 */
+export async function handleGetResult(request: Request, deps: HistoryDeps): Promise<Response> {
+  const auth = await authorize(request, deps);
+  if (!auth) return fail("unauthorized", 401);
+  const query = parseQuery(request, ResultQuerySchema);
+  if (!query) return fail("bad-request", 400, auth.setCookies);
+  try {
+    const result = await deps.repository.getResult(auth.user.sub, query.examCode, query.finishedAt);
+    return result ? json({ result }, 200, auth.setCookies) : fail("not-found", 404, auth.setCookies);
   } catch {
     return fail("unavailable", 503);
   }
@@ -133,7 +177,20 @@ export async function handlePostResult(request: Request, deps: HistoryDeps): Pro
   try {
     const questions = await (deps.questions ?? examQuestions)(result.examCode);
     const change = questions ? reviewChangeOf(result, questions) : null;
-    await deps.repository.putResult(auth.user.sub, result, questions ? tallyOf(result, questions) : undefined);
+    const created = await deps.repository.putResult(
+      auth.user.sub,
+      result,
+      questions ? tallyOf(result, questions) : undefined,
+    );
+    // 問題ごとの解答回数と直近の正誤は、結果を新しく保存したときだけ数える(送り直しで二重に数えない)
+    if (questions && created) {
+      await deps.repository.updateStats(
+        auth.user.sub,
+        result.examCode,
+        outcomesOf(result, questions),
+        result.finishedAt,
+      );
+    }
     if (change) await deps.repository.updateReview(auth.user.sub, result.examCode, change);
     return json({ status: "saved" }, 200, auth.setCookies);
   } catch {
@@ -149,7 +206,7 @@ async function listByExam(
 ): Promise<Response> {
   const auth = await authorize(request, deps);
   if (!auth) return fail("unauthorized", 401);
-  const query = parseQuery(request);
+  const query = parseQuery(request, ListQuerySchema);
   if (!query) return fail("bad-request", 400, auth.setCookies);
   try {
     return json(await load(auth.user.sub, query.examCode), 200, auth.setCookies);
@@ -190,6 +247,45 @@ export async function handlePutBookmark(request: Request, deps: HistoryDeps): Pr
     if (!questions?.some((q) => q.questionId === change.questionId)) return fail("bad-request", 400, auth.setCookies);
     await deps.repository.setBookmark(auth.user.sub, change.examCode, change.questionId, change.bookmarked);
     return json({ status: "saved" }, 200, auth.setCookies);
+  } catch {
+    return fail("unavailable", 503);
+  }
+}
+
+/** 自分の、問題ごとの解答回数と直近の正誤を返す。 */
+export function handleListStats(request: Request, deps: HistoryDeps): Promise<Response> {
+  return listByExam(request, deps, async (sub, examCode) => ({
+    stats: await deps.repository.listStats(sub, examCode),
+  }));
+}
+
+/** 自分の、すべての資格の復習の項目(連続正解とマスター)を返す。問い合わせは受け付けない。 */
+export async function handleListReviewItems(request: Request, deps: HistoryDeps): Promise<Response> {
+  const auth = await authorize(request, deps);
+  if (!auth) return fail("unauthorized", 401);
+  if (!parseQuery(request, EmptyQuerySchema)) return fail("bad-request", 400, auth.setCookies);
+  try {
+    return json({ items: await deps.repository.listReviewItems(auth.user.sub) }, 200, auth.setCookies);
+  } catch {
+    return fail("unavailable", 503);
+  }
+}
+
+/** 自分の復習から、手で外す。外すのは、サーバー側で検証した利用者の区画の項目だけ。 */
+export async function handleDeleteReview(request: Request, deps: HistoryDeps): Promise<Response> {
+  const rejected = guard(request);
+  if (rejected) return rejected;
+  const auth = await authorize(request, deps);
+  if (!auth) return fail("unauthorized", 401);
+
+  const read = await readJsonBody(request, MAX_REVIEW_BODY_BYTES, auth.setCookies);
+  if (read instanceof Response) return read;
+  const parsed = ReviewRemovalSchema.safeParse(read.body);
+  if (!parsed.success) return fail("bad-request", 400, auth.setCookies);
+
+  try {
+    await deps.repository.removeReview(auth.user.sub, parsed.data.examCode, parsed.data.questionId);
+    return json({ status: "removed" }, 200, auth.setCookies);
   } catch {
     return fail("unavailable", 503);
   }

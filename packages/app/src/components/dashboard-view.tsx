@@ -5,7 +5,13 @@ import { useEffect, useId, useState } from "react";
 import { EmptyState } from "@/components/empty-state.tsx";
 import { DashboardSkeleton } from "@/components/page-skeletons.tsx";
 import { ScoreRing } from "@/components/score-ring.tsx";
-import { type DashboardSummary, type DomainStat, domainBreakdown, summarize } from "@/lib/dashboard.ts";
+import {
+  type DashboardSummary,
+  type DomainStat,
+  domainBreakdown,
+  PREDICTION_WINDOW,
+  summarize,
+} from "@/lib/dashboard.ts";
 import { domainColorClasses } from "@/lib/domain-color.ts";
 import {
   fetchBookmarks,
@@ -17,8 +23,8 @@ import {
 } from "@/lib/history/client.ts";
 import { mergeResults, pendingMigration } from "@/lib/history/merge.ts";
 import { EARLIEST_GOAL_DATE, LATEST_GOAL_DATE } from "@/lib/history/schema.ts";
-import { domainSelectHref } from "@/lib/quiz.ts";
-import { browserStore, loadResults, MAX_RESULTS } from "@/lib/storage.ts";
+import { domainSelectHref, resultDetailHref } from "@/lib/quiz.ts";
+import { browserStore, loadResults } from "@/lib/storage.ts";
 import { daysBetween, heatLevel, heatmapWeeks, jstDate, type StudyDay, streakDays } from "@/lib/study-days.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 
@@ -151,8 +157,8 @@ export function DashboardView({ exam, questions }: Props) {
               </p>
               <p className="text-sm text-muted">
                 直近 {prediction.basedOn} 回の結果の正答率の平均({prediction.averagePercent}
-                %)が、合格ラインに届いているかで判定します。1 回ごとの正答率を同じ重さで平均します。 保存している結果は{" "}
-                {MAX_RESULTS} 回分までです。回数が少ないうちは、ぶれが大きくなります。
+                %)が、合格ラインに届いているかで判定します。1 回ごとの正答率を同じ重さで平均します。合格予測には、直近{" "}
+                {PREDICTION_WINDOW} 回までの結果を使います。回数が少ないうちは、ぶれが大きくなります。
               </p>
             </div>
           </div>
@@ -176,11 +182,14 @@ export function DashboardView({ exam, questions }: Props) {
       </div>
 
       <div className="space-y-2">
-        <h2 className="h2">直近の結果</h2>
+        <h2 className="h2">これまでの結果</h2>
+        <p className="text-sm text-muted">日時を押すと、その回の結果を詳しく見られます。</p>
         <ul className="space-y-1 text-sm">
           {summary.recent.map((attempt) => (
             <li key={attempt.finishedAt} className="flex justify-between rounded border border-line bg-surface p-2">
-              <span>{formatDate(attempt.finishedAt)}</span>
+              <Link href={resultDetailHref(exam.examCode, attempt.finishedAt)} className="text-primary hover:underline">
+                {formatDate(attempt.finishedAt)}
+              </Link>
               <span>
                 {attempt.correct} / {attempt.total} 問({attempt.percent}%)
               </span>

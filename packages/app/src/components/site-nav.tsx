@@ -202,14 +202,19 @@ function Dock() {
   return (
     <>
       <nav aria-label="主要メニュー" className="glass card fixed inset-x-3 bottom-3 z-30 lg:hidden">
-        <ul className="grid grid-cols-4 gap-1 p-1">
+        <ul className="grid grid-cols-5 gap-0.5 p-1">
           {DOCK_ITEMS.map((item) => {
             const active = isActive(pathname, item.href);
             return (
               <li key={item.href}>
-                <Link href={item.href} aria-current={active ? "page" : undefined} className={dockItemClass(active)}>
+                <Link
+                  href={item.href}
+                  aria-current={active ? "page" : undefined}
+                  aria-label={item.short ? item.label : undefined}
+                  className={dockItemClass(active)}
+                >
                   <NavIcon name={item.icon} />
-                  <span className="whitespace-nowrap">{item.label}</span>
+                  <span className="whitespace-nowrap">{item.short ?? item.label}</span>
                 </Link>
               </li>
             );

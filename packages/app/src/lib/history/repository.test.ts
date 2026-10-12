@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { MAX_RESULTS, type Result } from "@/lib/storage.ts";
+import type { Result } from "@/lib/storage.ts";
 import {
   createDynamoRepository,
   createMemoryRepository,
   getHistoryRepository,
+  type HistoryRepository,
+  RESULTS_PAGE_SIZE,
   resultKey,
   userKey,
 } from "./repository.ts";
@@ -57,14 +59,34 @@ describe("DynamoDB の履歴", () => {
     expect(await repository.listResults("user-a", "SAMPLE")).toHaveLength(1);
   });
 
-  it("上限を超えて保存する_古いものから削除して上限の件数にする", async () => {
+  it("結果は件数の上限なしで残し_一覧は新しい順にページで返す", async () => {
     const { items, client } = fakeTable();
     const repository = createDynamoRepository({ tableName: "table-example", client });
-    for (let minute = 0; minute <= MAX_RESULTS; minute++)
-      await repository.putResult("user-a", result("SAMPLE", minute));
-    expect(items.size).toBe(MAX_RESULTS);
-    const found = await repository.listResults("user-a", "SAMPLE");
-    expect(found.at(-1)?.finishedAt).toBe(result("SAMPLE", 1).finishedAt);
+    const total = RESULTS_PAGE_SIZE + 5;
+    for (let minute = 0; minute < total; minute++) await repository.putResult("user-a", result("SAMPLE", minute));
+    expect(items.size).toBe(total);
+    const first = await repository.listResults("user-a", "SAMPLE");
+    expect(first).toHaveLength(RESULTS_PAGE_SIZE);
+    expect(first[0]?.finishedAt).toBe(result("SAMPLE", total - 1).finishedAt);
+    const rest = await repository.listResults("user-a", "SAMPLE", { before: first.at(-1)?.finishedAt });
+    expect(rest.map((r) => r.finishedAt)).toEqual([4, 3, 2, 1, 0].map((m) => result("SAMPLE", m).finishedAt));
+  });
+
+  it("新しく作ったときだけ true を返す", async () => {
+    const { client } = fakeTable();
+    const repository = createDynamoRepository({ tableName: "table-example", client });
+    expect(await repository.putResult("user-a", result("SAMPLE", 1))).toBe(true);
+    expect(await repository.putResult("user-a", result("SAMPLE", 1))).toBe(false);
+  });
+
+  it("1 回分の結果_自分の分だけを返し_なければ null", async () => {
+    const { client } = fakeTable();
+    const repository = createDynamoRepository({ tableName: "table-example", client });
+    const saved = result("SAMPLE", 1);
+    await repository.putResult("user-a", saved);
+    expect(await repository.getResult("user-a", "SAMPLE", saved.finishedAt)).toEqual(saved);
+    expect(await repository.getResult("user-b", "SAMPLE", saved.finishedAt)).toBeNull();
+    expect(await repository.getResult("user-a", "OTHER", saved.finishedAt)).toBeNull();
   });
 
   it("保存した項目が壊れている_その項目は返さない", async () => {
@@ -79,14 +101,14 @@ describe("DynamoDB の履歴", () => {
     expect(await repository.listResults("user-a", "SAMPLE")).toHaveLength(1);
   });
 
-  it("使う操作は_保存・問い合わせ・削除だけで_スキャンは使わない", async () => {
+  it("結果の保存と取得に使う操作は_保存・取得・問い合わせだけで_スキャンも削除も使わない", async () => {
     const { sent, client } = fakeTable();
     const repository = createDynamoRepository({ tableName: "table-example", client });
-    for (let minute = 0; minute <= MAX_RESULTS; minute++)
-      await repository.putResult("user-a", result("SAMPLE", minute));
+    for (let minute = 0; minute <= 12; minute++) await repository.putResult("user-a", result("SAMPLE", minute));
     await repository.listResults("user-a", "SAMPLE");
+    await repository.getResult("user-a", "SAMPLE", result("SAMPLE", 1).finishedAt);
     const names = new Set(sent.map((c) => (c as { constructor: { name: string } }).constructor.name));
-    expect([...names].sort()).toEqual(["DeleteCommand", "PutCommand", "QueryCommand"]);
+    expect([...names].sort()).toEqual(["GetCommand", "PutCommand", "QueryCommand"]);
   });
 });
 
@@ -104,16 +126,23 @@ describe("DynamoDB のブックマークと復習プール", () => {
     expect(await repository.listBookmarks("user-a", "SAMPLE")).toEqual(["SAMPLE-0002"]);
   });
 
-  it("復習プール_間違えた問題を入れ_正解した問題を外し_結果の項目とは混ざらない", async () => {
+  it("復習プール_間違えた問題を入れ_2 回続けて正解でマスターにし_結果の項目とは混ざらない", async () => {
     const { items, client } = fakeTable();
     const repository = createDynamoRepository({ tableName: "table-example", client });
     await repository.putResult("user-a", result("SAMPLE", 1));
     const at = "2026-10-11T12:00:00.000Z";
     await repository.updateReview("user-a", "SAMPLE", { wrong: ["SAMPLE-0001", "SAMPLE-0002"], correct: [], at });
     await repository.updateReview("user-a", "SAMPLE", { wrong: [], correct: ["SAMPLE-0001", "SAMPLE-0003"], at });
+    // 1 回の正解では、まだ残る。入っていない問題(0003)は、入れない
+    expect(await repository.listReview("user-a", "SAMPLE")).toEqual(["SAMPLE-0001", "SAMPLE-0002"]);
+    await repository.updateReview("user-a", "SAMPLE", { wrong: [], correct: ["SAMPLE-0001"], at });
     expect(await repository.listReview("user-a", "SAMPLE")).toEqual(["SAMPLE-0002"]);
     expect(await repository.listReview("user-b", "SAMPLE")).toEqual([]);
     expect(items.get("USER#user-a|REVIEW#SAMPLE#SAMPLE-0002")?.wrongAt).toBe(at);
+    expect(await repository.listReviewItems("user-a")).toEqual([
+      { examCode: "SAMPLE", questionId: "SAMPLE-0001", streak: 2, mastered: true },
+      { examCode: "SAMPLE", questionId: "SAMPLE-0002", streak: 0, mastered: false },
+    ]);
     expect(await repository.listResults("user-a", "SAMPLE")).toHaveLength(1);
   });
 
@@ -229,12 +258,14 @@ describe("DynamoDB の日ごとの学習量と目標日", () => {
 });
 
 describe("メモリ上の履歴", () => {
-  it("利用者ごとに分かれ_上限を超えると古いものを捨てる", async () => {
+  it("利用者ごとに分かれ_結果は残し_一覧はページで返す", async () => {
     const repository = createMemoryRepository();
-    for (let minute = 0; minute <= MAX_RESULTS; minute++)
+    for (let minute = 0; minute <= RESULTS_PAGE_SIZE; minute++)
       await repository.putResult("user-a", result("SAMPLE", minute));
     await repository.putResult("user-b", result("SAMPLE", 0));
-    expect(await repository.listResults("user-a", "SAMPLE")).toHaveLength(MAX_RESULTS);
+    const first = await repository.listResults("user-a", "SAMPLE");
+    expect(first).toHaveLength(RESULTS_PAGE_SIZE);
+    expect(await repository.listResults("user-a", "SAMPLE", { before: first.at(-1)?.finishedAt })).toHaveLength(1);
     expect(await repository.listResults("user-b", "SAMPLE")).toHaveLength(1);
   });
 
@@ -272,5 +303,80 @@ describe("getHistoryRepository", () => {
     expect(
       getHistoryRepository({ NODE_ENV: "production", HISTORY_TABLE_NAME: "t", AWS_REGION: "us-east-1" }),
     ).toBeDefined();
+  });
+});
+
+/** DynamoDB とメモリの、両方の実装で同じに振る舞うこと */
+describe.each([
+  [
+    "DynamoDB",
+    () => createDynamoRepository({ tableName: "table-example", client: fakeTable({ queryPageSize: 2 }).client }),
+  ],
+  ["メモリ", () => createMemoryRepository()],
+] as [string, () => HistoryRepository][])("%s の、問題ごとの集計と復習", (_name, create) => {
+  const at = (minute: number) => new Date(Date.UTC(2026, 9, 11, 12, minute)).toISOString();
+
+  it("解答回数を数え_直近の正誤を完了時刻の順に 5 回分残し_同じ時刻は二重に数えない", async () => {
+    const repository = create();
+    for (let minute = 0; minute < 7; minute++) {
+      await repository.updateStats(
+        "user-a",
+        "SAMPLE",
+        [{ questionId: "SAMPLE-0001", correct: minute % 2 === 0 }],
+        at(minute),
+      );
+    }
+    // 古い結果をあとから送っても、時刻の順に並べる。同じ時刻は数えない
+    await repository.updateStats("user-a", "SAMPLE", [{ questionId: "SAMPLE-0001", correct: false }], at(6));
+    await repository.updateStats("user-a", "SAMPLE", [{ questionId: "SAMPLE-0002", correct: true }], at(1));
+    expect(await repository.listStats("user-a", "SAMPLE")).toEqual([
+      { questionId: "SAMPLE-0001", count: 7, recent: [true, false, true, false, true] },
+      { questionId: "SAMPLE-0002", count: 1, recent: [true] },
+    ]);
+    expect(await repository.listStats("user-b", "SAMPLE")).toEqual([]);
+    expect(await repository.listStats("user-a", "OTHER")).toEqual([]);
+  });
+
+  it("復習_不正解で連続を 0 に戻し_マスター済みは数えたまま_手で外せる", async () => {
+    const repository = create();
+    const change = (wrong: string[], correct: string[]) => ({ wrong, correct, at: at(0) });
+    await repository.updateReview("user-a", "SAMPLE", change(["SAMPLE-0001", "SAMPLE-0002"], []));
+    await repository.updateReview("user-a", "SAMPLE", change([], ["SAMPLE-0001"]));
+    await repository.updateReview("user-a", "SAMPLE", change(["SAMPLE-0001"], []));
+    await repository.updateReview("user-a", "SAMPLE", change([], ["SAMPLE-0001"]));
+    expect((await repository.listReviewItems("user-a")).find((i) => i.questionId === "SAMPLE-0001")?.streak).toBe(1);
+    await repository.updateReview("user-a", "OTHER", change(["OTHER-0001"], []));
+    await repository.removeReview("user-a", "SAMPLE", "SAMPLE-0002");
+    await repository.removeReview("user-b", "SAMPLE", "SAMPLE-0001");
+    expect(await repository.listReviewItems("user-a")).toEqual([
+      { examCode: "OTHER", questionId: "OTHER-0001", streak: 0, mastered: false },
+      { examCode: "SAMPLE", questionId: "SAMPLE-0001", streak: 1, mastered: false },
+    ]);
+    expect(await repository.listReviewItems("user-b")).toEqual([]);
+  });
+});
+
+describe("DynamoDB の古い形の保存", () => {
+  it("連続正解の数がない復習の項目_連続 0・未マスターとして読み_正解で 1 になる", async () => {
+    const { items, client } = fakeTable();
+    const repository = createDynamoRepository({ tableName: "table-example", client });
+    items.set("USER#user-a|REVIEW#SAMPLE#SAMPLE-0001", {
+      PK: "USER#user-a",
+      SK: "REVIEW#SAMPLE#SAMPLE-0001",
+      type: "review",
+      examCode: "SAMPLE",
+      questionId: "SAMPLE-0001",
+      wrongAt: "2026-10-01T00:00:00.000Z",
+    });
+    expect(await repository.listReview("user-a", "SAMPLE")).toEqual(["SAMPLE-0001"]);
+    expect(await repository.listReviewItems("user-a")).toEqual([
+      { examCode: "SAMPLE", questionId: "SAMPLE-0001", streak: 0, mastered: false },
+    ]);
+    await repository.updateReview("user-a", "SAMPLE", {
+      wrong: [],
+      correct: ["SAMPLE-0001"],
+      at: "2026-10-02T00:00:00.000Z",
+    });
+    expect(items.get("USER#user-a|REVIEW#SAMPLE#SAMPLE-0001")?.streak).toBe(1);
   });
 });

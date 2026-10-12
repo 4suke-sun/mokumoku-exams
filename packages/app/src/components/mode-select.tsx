@@ -19,16 +19,34 @@ import {
   browserStore,
   clearSession,
   DEFAULT_SETTINGS,
+  loadConditions,
   loadSession,
   loadSettings,
   type Reveal,
   type Session,
+  saveConditions,
   saveSession,
   saveSettings,
 } from "@/lib/storage.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
+import { fewerAnsweredWeight, weightedSample } from "@/lib/weighted.ts";
+import { useAnswerCounts } from "./question-stats.tsx";
 
-type PoolItem = { questionId: string; domain: string; questionType: Question["questionType"]; choiceKeys: string[] };
+type PoolItem = {
+  questionId: string;
+  domain: string;
+  questionType: Question["questionType"];
+  difficulty?: Difficulty;
+  choiceKeys: string[];
+};
+
+type Difficulty = NonNullable<Question["difficulty"]>;
+
+const DIFFICULTIES: { id: Difficulty; name: string; tone: string }[] = [
+  { id: "easy", name: "やさしい", tone: "tone-correct" },
+  { id: "medium", name: "ふつう", tone: "tone-orange" },
+  { id: "hard", name: "むずかしい", tone: "tone-incorrect" },
+];
 
 type Props = {
   exam: PublishedExam;
@@ -54,7 +72,11 @@ type Target = "all" | "review" | "bookmarks";
 
 const TARGETS: { id: Target; name: string; description: string }[] = [
   { id: "all", name: "すべての問題", description: "資格のすべての問題から出題します。" },
-  { id: "review", name: "復習プール", description: "間違えた問題から出題します。正解すると、プールから外れます。" },
+  {
+    id: "review",
+    name: "復習プール",
+    description: "間違えた問題から出題します。2 回続けて正解すると、プールから外れます。",
+  },
   { id: "bookmarks", name: "ブックマーク", description: "ブックマークした問題から出題します。" },
 ];
 
@@ -79,6 +101,13 @@ function modesFor(exam: PublishedExam, studyAvailable: boolean, startOfficial: (
       onStart: startOfficial,
     },
     {
+      id: "sections",
+      name: "セクションで解く",
+      description: "全問を 5 問ずつに分けて、順に解きます。5 問中 4 問の正解で合格です。",
+      enabled: true,
+      href: `/exams/${exam.examCode}/sections`,
+    },
+    {
       id: "study",
       name: "学習モード",
       description: "単元ごとに読んでから解きます。",
@@ -98,6 +127,9 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
   const [reveal, setReveal] = useState<Reveal>("end");
   const [resumable, setResumable] = useState<Session | null>(null);
   const [target, setTarget] = useState<Target>("all");
+  const [difficulties, setDifficulties] = useState<Difficulty[]>([]);
+  const [preferFewer, setPreferFewer] = useState(false);
+  const answerCounts = useAnswerCounts(exam.examCode);
   // 取得できなかったときは null(その対象は選べない)
   const [lists, setLists] = useState<Record<Exclude<Target, "all">, string[] | null>>({
     review: null,
@@ -108,27 +140,33 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
     const store = browserStore();
     const settings = loadSettings(store);
     setShuffleChoices(settings.shuffleChoices);
-    setReveal(settings.reveal ?? "end");
+    // 前回この資格で選んだ条件を、初期値にする(なければ、解答の表示だけ、全体の設定から)
+    const conditions = loadConditions(store, exam.examCode);
+    setReveal(conditions?.reveal ?? settings.reveal ?? "end");
+    if (conditions) {
+      setTarget(conditions.target);
+      setDifficulties(conditions.difficulties);
+      setCount(conditions.count);
+      setPreferFewer(conditions.preferFewer);
+    }
+    // 学習の状況の「この分野を解く」から来たときは、その分野を選んでおく(`?domain=`)。ほかは前回の分野
+    const codes = exam.domains.map((d) => d.code);
+    const requested = requestedDomains(window.location.search, codes);
+    setDomains(requested.length > 0 ? requested : (conditions?.domains ?? []).filter((d) => codes.includes(d)));
     const saved = loadSession(store, exam.examCode);
     // 出題中の問題が、いまのデータにすべてあるときだけ続きから解ける
     const ids = new Set(pool.map((p) => p.questionId));
     setResumable(saved?.questionIds.every((id) => ids.has(id)) ? saved : null);
-  }, [exam.examCode, pool]);
-
-  // 学習の状況の「この分野を解く」から来たときは、その分野を選んでおく(`?domain=`)
-  useEffect(() => {
-    setDomains(
-      requestedDomains(
-        window.location.search,
-        exam.domains.map((d) => d.code),
-      ),
-    );
-  }, [exam.domains]);
+  }, [exam.examCode, exam.domains, pool]);
 
   useEffect(() => {
     let active = true;
     void Promise.all([fetchReview(exam.examCode), fetchBookmarks(exam.examCode)]).then(([review, bookmarks]) => {
-      if (active) setLists({ review, bookmarks });
+      if (!active) return;
+      setLists({ review, bookmarks });
+      // 前回の条件の対象が、いまは読み込めないときは、全問に戻す
+      const loaded = { review, bookmarks };
+      setTarget((current) => (current !== "all" && loaded[current] === null ? "all" : current));
     });
     return () => {
       active = false;
@@ -141,12 +179,19 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
     const ids = new Set(lists[id] ?? []);
     return pool.filter((p) => ids.has(p.questionId));
   };
-  const targeted = inTarget(target);
+  // 対象で絞り、難易度で絞る(難易度を選んだときは、難易度のない問題を出さない)
+  const targeted = inTarget(target).filter(
+    (p) => difficulties.length === 0 || (p.difficulty !== undefined && difficulties.includes(p.difficulty)),
+  );
   const perDomain = domainCounts(targeted);
 
   const available = domains.length === 0 ? targeted.length : targeted.filter((p) => domains.includes(p.domain)).length;
   const counts = [...COUNT_CHOICES.filter((n) => n < available), available];
   const effectiveCount = Math.min(count, available);
+
+  function toggleDifficulty(id: Difficulty) {
+    setDifficulties((current) => (current.includes(id) ? current.filter((d) => d !== id) : [...current, id]));
+  }
 
   function toggleDomain(code: string) {
     setDomains((current) => (current.includes(code) ? current.filter((d) => d !== code) : [...current, code]));
@@ -187,11 +232,27 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
 
   function start() {
     const targets = domains.length === 0 ? targeted : targeted.filter((p) => domains.includes(p.domain));
-    const picked = shuffle(targets, Math.random).slice(0, effectiveCount);
+    // 解答回数の少ない問題を優先するときは、重み 1/(1+回数)^2 で選ぶ(回数 0 の問題がいちばん出やすい)
+    const picked = preferFewer
+      ? weightedSample(
+          targets,
+          (p) => fewerAnsweredWeight(answerCounts.get(p.questionId) ?? 0),
+          effectiveCount,
+          Math.random,
+        )
+      : shuffle(targets, Math.random).slice(0, effectiveCount);
     if (picked.length === 0) {
       setError("出題できる問題がありません。出題の対象と分野の選択を見直してください。");
       return;
     }
+    saveConditions(browserStore(), exam.examCode, {
+      target,
+      domains,
+      difficulties,
+      count: Math.max(1, effectiveCount),
+      preferFewer,
+      reveal,
+    });
     const session = newSession(exam.examCode, picked, { shuffleChoices }, Math.random, new Date());
     begin(reveal === "each" ? { ...session, reveal } : session);
   }
@@ -267,10 +328,14 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
         <legend className="text-lg font-bold">出題の対象</legend>
         {TARGETS.map((item) => {
           const unavailable = item.id !== "all" && lists[item.id] === null;
+          // 復習の待ちがあるときは、色を付けて目立たせる
+          const waiting = item.id === "review" && (lists.review?.length ?? 0) > 0;
           return (
             <label
               key={item.id}
-              className={`flex items-start gap-3 rounded-md border border-line bg-surface p-3 ${unavailable ? "opacity-50" : ""}`}
+              className={`flex items-start gap-3 rounded-md border p-3 ${
+                waiting ? "border-warn bg-warn-bg" : "border-line bg-surface"
+              } ${unavailable ? "opacity-50" : ""}`}
             >
               <input
                 type="radio"
@@ -283,6 +348,7 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
               <span>
                 {item.name}
                 <span className="ml-2 text-sm text-muted">({inTarget(item.id).length} 問)</span>
+                {waiting ? <span className="ml-2 chip tone-warn">復習の待ちがあります</span> : null}
                 <span className="block text-sm text-muted">
                   {unavailable ? "アカウントから読み込めないため、いまは選べません。" : item.description}
                 </span>
@@ -316,6 +382,43 @@ export function ModeSelect({ exam, pool, studyAvailable = false }: Props) {
           );
         })}
       </fieldset>
+
+      <fieldset className="space-y-2">
+        <legend className="text-lg font-bold">難易度</legend>
+        <p className="text-sm text-muted">選ばないときは、すべての難易度から出題します。</p>
+        <div className="flex flex-wrap gap-2">
+          {DIFFICULTIES.map((item) => {
+            const on = difficulties.includes(item.id);
+            return (
+              <button
+                key={item.id}
+                type="button"
+                aria-pressed={on}
+                onClick={() => toggleDifficulty(item.id)}
+                className={`chip ${item.tone} border-2 px-3 py-1 text-sm ${on ? "border-current" : "border-transparent"}`}
+              >
+                <span aria-hidden="true">{on ? "✓ " : ""}</span>
+                {item.name}
+              </button>
+            );
+          })}
+        </div>
+      </fieldset>
+
+      <label className="flex items-center gap-3 rounded-md border border-line bg-surface p-3">
+        <input
+          type="checkbox"
+          className="size-5"
+          checked={preferFewer}
+          onChange={(event) => setPreferFewer(event.target.checked)}
+        />
+        <span>
+          解答回数の少ない問題を優先する
+          <span className="block text-sm text-muted">
+            まだ解いていない問題や、解いた回数の少ない問題が出やすくなります。
+          </span>
+        </span>
+      </label>
 
       <label className="flex items-center gap-3 rounded-md border border-line bg-surface p-3">
         <input

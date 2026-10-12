@@ -3,6 +3,7 @@ import { type Result, ResultSchema } from "@/lib/storage.ts";
 import { DATE_PATTERN, type StudyDay } from "@/lib/study-days.ts";
 
 const ListSchema = z.object({ results: z.array(ResultSchema).max(50) });
+const OneSchema = z.object({ result: ResultSchema });
 
 /**
  * サーバーに保存した自分の結果を取得する。ログインが切れた・通信できない・サーバーが失敗したときは null
@@ -16,6 +17,22 @@ export async function fetchServerResults(examCode: string): Promise<Result[] | n
     if (!response.ok) return null;
     const parsed = ListSchema.safeParse(await response.json());
     return parsed.success ? parsed.data.results : null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * サーバーに保存した自分の 1 回分の結果。ないときは "not-found"、取得できないとき(ログイン切れ・通信の失敗など)は null。
+ */
+export async function fetchServerResult(examCode: string, finishedAt: string): Promise<Result | "not-found" | null> {
+  try {
+    const query = `examCode=${encodeURIComponent(examCode)}&finishedAt=${encodeURIComponent(finishedAt)}`;
+    const response = await fetch(`/api/history/result?${query}`, { cache: "no-store" });
+    if (response.status === 404 || response.status === 400) return "not-found";
+    if (!response.ok) return null;
+    const parsed = OneSchema.safeParse(await response.json());
+    return parsed.success ? parsed.data.result : null;
   } catch {
     return null;
   }
@@ -110,6 +127,73 @@ export async function putGoal(examCode: string, date: string | null): Promise<bo
       method: "PUT",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ examCode, date }),
+    });
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+const StatsSchema = z.object({
+  stats: z
+    .array(
+      z.object({
+        questionId: z.string().max(64),
+        count: z.number().int().min(0),
+        recent: z.array(z.boolean()).max(5),
+      }),
+    )
+    .max(100_000),
+});
+
+/** 問題ごとの解答回数と直近の正誤(古い順)。取得できなければ null。 */
+export async function fetchStats(examCode: string): Promise<Map<string, { count: number; recent: boolean[] }> | null> {
+  try {
+    const response = await fetch(`/api/history/stats?examCode=${encodeURIComponent(examCode)}`, { cache: "no-store" });
+    if (!response.ok) return null;
+    const parsed = StatsSchema.safeParse(await response.json());
+    return parsed.success
+      ? new Map(parsed.data.stats.map((s) => [s.questionId, { count: s.count, recent: s.recent }]))
+      : null;
+  } catch {
+    return null;
+  }
+}
+
+const ReviewItemsSchema = z.object({
+  items: z
+    .array(
+      z.object({
+        examCode: z.string().max(16),
+        questionId: z.string().max(64),
+        streak: z.number().int().min(0),
+        mastered: z.boolean(),
+      }),
+    )
+    .max(100_000),
+});
+
+export type ReviewItemView = z.infer<typeof ReviewItemsSchema>["items"][number];
+
+/** すべての資格の復習の項目。取得できなければ null。 */
+export async function fetchReviewItems(): Promise<ReviewItemView[] | null> {
+  try {
+    const response = await fetch("/api/history/review/all", { cache: "no-store" });
+    if (!response.ok) return null;
+    const parsed = ReviewItemsSchema.safeParse(await response.json());
+    return parsed.success ? parsed.data.items : null;
+  } catch {
+    return null;
+  }
+}
+
+/** 復習から、手で外す。外せたら true。 */
+export async function removeReview(examCode: string, questionId: string): Promise<boolean> {
+  try {
+    const response = await fetch("/api/history/review", {
+      method: "DELETE",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ examCode, questionId }),
     });
     return response.ok;
   } catch {

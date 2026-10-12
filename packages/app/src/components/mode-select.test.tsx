@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { beforeEach, describe, expect, it, vi } from "vitest";
-import { browserStore, loadSession } from "@/lib/storage.ts";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { browserStore, loadSession, saveConditions } from "@/lib/storage.ts";
 import type { PublishedExam } from "@/lib/types.ts";
 import { ModeSelect } from "./mode-select.tsx";
 
@@ -115,5 +115,136 @@ describe("ModeSelect の解答の表示", () => {
     await user.click(screen.getByRole("button", { name: /本番モードを始める/ }));
     await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/play"));
     expect(loadSession(browserStore(), "TEST")?.reveal).toBeUndefined();
+  });
+});
+
+describe("ModeSelect の難易度と解答回数と条件の保存", () => {
+  const graded = [
+    {
+      questionId: "TEST-0001",
+      domain: "domain1",
+      questionType: "single" as const,
+      difficulty: "easy" as const,
+      choiceKeys: ["A"],
+    },
+    {
+      questionId: "TEST-0002",
+      domain: "domain1",
+      questionType: "single" as const,
+      difficulty: "hard" as const,
+      choiceKeys: ["A"],
+    },
+    {
+      questionId: "TEST-0003",
+      domain: "domain2",
+      questionType: "single" as const,
+      difficulty: "hard" as const,
+      choiceKeys: ["A"],
+    },
+    { questionId: "TEST-0004", domain: "domain2", questionType: "single" as const, choiceKeys: ["A"] },
+  ];
+
+  beforeEach(() => {
+    localStorage.clear();
+    push.mockClear();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  it("難易度を選ぶ_その難易度の問題だけで出題し_難易度のない問題は出さない", async () => {
+    render(<ModeSelect exam={exam} pool={graded} />);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole("button", { name: /むずかしい/ }));
+    expect(screen.getByRole("button", { name: /むずかしい/ }).getAttribute("aria-pressed")).toBe("true");
+    await user.selectOptions(screen.getByRole("combobox", { name: "問題数" }), "2");
+    await user.click(screen.getByRole("button", { name: "出題を始める" }));
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/play"));
+    expect(loadSession(browserStore(), "TEST")?.questionIds.sort()).toEqual(["TEST-0002", "TEST-0003"]);
+  });
+
+  it("解答回数の少ない問題を優先_回数の少ない問題が選ばれる", async () => {
+    // 10 問のうち、0001〜0005 は 0 回、0006〜0010 は 9 回解いている
+    const many = Array.from({ length: 10 }, (_, i) => ({
+      questionId: `TEST-${String(i + 1).padStart(4, "0")}`,
+      domain: "domain1",
+      questionType: "single" as const,
+      choiceKeys: ["A"],
+    }));
+    const stats = many.slice(5).map(({ questionId }) => ({ questionId, count: 9, recent: [] }));
+    const fetchMock = vi.fn(async (url: string) =>
+      url.startsWith("/api/history/stats")
+        ? { ok: true, status: 200, json: async () => ({ stats }) }
+        : { ok: false, status: 503, json: async () => ({}) },
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    // 乱数を固定すると、重みの大きい(回数の少ない)問題ほど、選ぶ順の値が大きくなる
+    vi.spyOn(Math, "random").mockReturnValue(0.5);
+    render(<ModeSelect exam={exam} pool={many} />);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole("checkbox", { name: /解答回数の少ない問題を優先する/ }));
+    await waitFor(() => expect(fetchMock.mock.calls.some(([u]) => u.startsWith("/api/history/stats"))).toBe(true));
+    await act(async () => {
+      await Promise.resolve();
+    });
+    await user.click(screen.getByRole("button", { name: "出題を始める" }));
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/play"));
+    expect(loadSession(browserStore(), "TEST")?.questionIds.sort()).toEqual(many.slice(0, 5).map((q) => q.questionId));
+  });
+
+  it("条件を資格ごとに保存し_次に開いたときに戻す", async () => {
+    const first = render(<ModeSelect exam={exam} pool={graded} />);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole("button", { name: /やさしい/ }));
+    await user.click(screen.getByRole("checkbox", { name: /分野 1/ }));
+    await user.click(screen.getByRole("checkbox", { name: /解答回数の少ない問題を優先する/ }));
+    await user.click(screen.getByRole("button", { name: "出題を始める" }));
+    await waitFor(() => expect(push).toHaveBeenCalled());
+    first.unmount();
+
+    render(<ModeSelect exam={exam} pool={graded} />);
+    await waitFor(() =>
+      expect(screen.getByRole("button", { name: /やさしい/ }).getAttribute("aria-pressed")).toBe("true"),
+    );
+    expect((screen.getByRole("checkbox", { name: /分野 1/ }) as HTMLInputElement).checked).toBe(true);
+    expect((screen.getByRole("checkbox", { name: /解答回数の少ない問題を優先する/ }) as HTMLInputElement).checked).toBe(
+      true,
+    );
+  });
+
+  it("復習の待ちがある_復習プールの項目に色と文字を付ける", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string) =>
+        url.startsWith("/api/history/review")
+          ? { ok: true, status: 200, json: async () => ({ questionIds: ["TEST-0001"] }) }
+          : { ok: false, status: 503, json: async () => ({}) },
+      ),
+    );
+    render(<ModeSelect exam={exam} pool={graded} />);
+    expect(await screen.findByText("復習の待ちがあります")).toBeTruthy();
+    const label = screen.getByRole("radio", { name: /復習プール/ }).closest("label");
+    expect(label?.className).toContain("bg-warn-bg");
+  });
+
+  it("前回の対象が読み込めない_全問に戻す", async () => {
+    saveConditions(browserStore(), "TEST", {
+      target: "review",
+      domains: [],
+      difficulties: [],
+      count: 1,
+      preferFewer: false,
+      reveal: "end",
+    });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({ ok: false, status: 503, json: async () => ({}) })),
+    );
+    render(<ModeSelect exam={exam} pool={graded} />);
+    await waitFor(() =>
+      expect((screen.getByRole("radio", { name: /すべての問題/ }) as HTMLInputElement).checked).toBe(true),
+    );
   });
 });

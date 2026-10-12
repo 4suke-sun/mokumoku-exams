@@ -67,7 +67,39 @@ export function apiResultSchema(nowMs: number) {
   });
 }
 
+/** 復習の問題に、連続でこの回数だけ正解したら、マスターにする(画面とサーバーで同じ値を使う) */
+export const MASTER_STREAK = 2;
+
 export const ListQuerySchema = z.strictObject({ examCode: z.string().regex(EXAM_CODE_PATTERN) });
+
+/** 完了時刻(ミリ秒つきの ISO 8601。結果のキーの一部) */
+const FINISHED_AT = z.iso.datetime({ precision: 3 });
+
+/** 結果の一覧の問い合わせ。`before` を渡すと、その完了時刻より古いものを返す(ページ分け) */
+export const ResultsQuerySchema = z.strictObject({
+  examCode: z.string().regex(EXAM_CODE_PATTERN),
+  before: FINISHED_AT.optional(),
+});
+
+/** 1 回分の結果の問い合わせ */
+export const ResultQuerySchema = z.strictObject({
+  examCode: z.string().regex(EXAM_CODE_PATTERN),
+  finishedAt: FINISHED_AT,
+});
+
+/** 問い合わせを持たない取得(資格をまたぐ一覧) */
+export const EmptyQuerySchema = z.strictObject({});
+
+/** 復習から手で外す本文。問題 ID は、この資格のもの */
+export const ReviewRemovalSchema = z
+  .strictObject({
+    examCode: z.string().regex(EXAM_CODE_PATTERN),
+    questionId: z.string().regex(QUESTION_ID_PATTERN),
+  })
+  .refine((change) => change.questionId.startsWith(`${change.examCode}-`), "資格コードと合いません。");
+
+/** 復習から外す本文の上限(資格コードと問題 ID だけなので、小さい) */
+export const MAX_REVIEW_BODY_BYTES = 1_000;
 
 /** ブックマークの変更の本文の上限(問題 ID と資格コードだけなので、小さい) */
 export const MAX_BOOKMARK_BODY_BYTES = 1_000;

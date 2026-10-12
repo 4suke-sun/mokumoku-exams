@@ -1,4 +1,4 @@
-import { DeleteCommand } from "@aws-sdk/lib-dynamodb";
+import { GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
 import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { GET, POST } from "@/app/api/history/results/route.ts";
@@ -7,9 +7,9 @@ import { getAuthProvider } from "@/lib/auth/index.ts";
 import { withTokenCookies } from "@/lib/auth/session.ts";
 import type { AuthProvider } from "@/lib/auth/types.ts";
 import type { TokenVerifier } from "@/lib/auth/verify.ts";
-import { MAX_RESULTS, type Result } from "@/lib/storage.ts";
+import type { Result } from "@/lib/storage.ts";
 import { proxy } from "@/proxy.ts";
-import { type HistoryDeps, handleListDays, handleListResults, handleListReview, handlePostResult } from "./handlers.ts";
+import { type HistoryDeps, handleListResults, handleListReview, handlePostResult } from "./handlers.ts";
 import { createDynamoRepository, type DocumentSender } from "./repository.ts";
 import { fakeTable } from "./table-double.ts";
 
@@ -108,23 +108,27 @@ describe("履歴の保存と取得の通し", () => {
     expect(resultItems(table)).toBe(1);
   });
 
-  it("上限を超えて解く_古い結果から消え_保存先の項目数も上限になる", async () => {
+  it("件数の上限なしで残し_保存先の項目もすべて残る", async () => {
     const { deps, table } = stack();
-    for (let n = 0; n < MAX_RESULTS + 3; n++) await handlePostResult(post(attempt(minute(n)), "a"), deps);
+    const total = 15;
+    for (let n = 0; n < total; n++) await handlePostResult(post(attempt(minute(n)), "a"), deps);
     const found = await results(deps, "SAMPLE", "a");
-    expect(found).toHaveLength(MAX_RESULTS);
-    expect(found[0]?.finishedAt).toBe(minute(MAX_RESULTS + 2));
-    expect(found.at(-1)?.finishedAt).toBe(minute(3));
-    expect(resultItems(table)).toBe(MAX_RESULTS);
+    expect(found).toHaveLength(total);
+    expect(found[0]?.finishedAt).toBe(minute(total - 1));
+    expect(found.at(-1)?.finishedAt).toBe(minute(0));
+    expect(resultItems(table)).toBe(total);
   });
 
-  it("上限を超えたあとに古い時刻の結果を送る_新しい 10 件が残る", async () => {
+  it("古い時刻の結果をあとから送る_時刻の順に並ぶ", async () => {
     const { deps } = stack();
-    for (let n = 10; n < 10 + MAX_RESULTS; n++) await handlePostResult(post(attempt(minute(n)), "a"), deps);
+    for (let n = 10; n < 13; n++) await handlePostResult(post(attempt(minute(n)), "a"), deps);
     await handlePostResult(post(attempt(minute(1)), "a"), deps);
-    const found = await results(deps, "SAMPLE", "a");
-    expect(found).toHaveLength(MAX_RESULTS);
-    expect(found.map((r) => r.finishedAt)).not.toContain(minute(1));
+    expect((await results(deps, "SAMPLE", "a")).map((r) => r.finishedAt)).toEqual([
+      minute(12),
+      minute(11),
+      minute(10),
+      minute(1),
+    ]);
   });
 
   it("資格が違う_資格ごとに別々に数え_別の資格の結果は混ざらない", async () => {
@@ -136,17 +140,17 @@ describe("履歴の保存と取得の通し", () => {
         answers: { "OTHER-0001": ["A"] },
         choiceOrder: { "OTHER-0001": ["B", "A"] },
       });
-    for (let n = 0; n < MAX_RESULTS + 2; n++) await handlePostResult(post(attempt(minute(n)), "a"), deps);
+    for (let n = 0; n < 3; n++) await handlePostResult(post(attempt(minute(n)), "a"), deps);
     await handlePostResult(post(other(1), "a"), deps);
-    expect(await results(deps, "SAMPLE", "a")).toHaveLength(MAX_RESULTS);
+    expect(await results(deps, "SAMPLE", "a")).toHaveLength(3);
     expect((await results(deps, "OTHER", "a")).map((r) => r.examCode)).toEqual(["OTHER"]);
   });
 
-  it("利用者が違う_互いの結果が見えず_一人の上限が他人の結果を消さない", async () => {
+  it("利用者が違う_互いの結果が見えない", async () => {
     const { deps } = stack();
     await handlePostResult(post(attempt(minute(1)), "b"), deps);
-    for (let n = 0; n < MAX_RESULTS + 2; n++) await handlePostResult(post(attempt(minute(n)), "a"), deps);
-    expect(await results(deps, "SAMPLE", "a")).toHaveLength(MAX_RESULTS);
+    for (let n = 0; n < 3; n++) await handlePostResult(post(attempt(minute(n)), "a"), deps);
+    expect(await results(deps, "SAMPLE", "a")).toHaveLength(3);
     expect(await results(deps, "SAMPLE", "b")).toEqual([attempt(minute(1))]);
     expect(await results(deps, "SAMPLE", "c")).toEqual([]);
   });
@@ -187,29 +191,27 @@ describe("履歴の通しでのエラー応答", () => {
     expect(table.sent).toHaveLength(0);
   });
 
-  it("保存先が失敗する_原因を返さず 503 にし_送り直せば上限を守って保存できる", async () => {
-    let failDelete = true;
+  it("保存先が失敗する_原因を返さず 503 にし_送り直せば保存できる", async () => {
+    let failPut = true;
     const { deps, table } = stack((client) => ({
       async send(command) {
-        if (command instanceof DeleteCommand && failDelete) throw new Error("internal detail");
+        if (command instanceof PutCommand && failPut) throw new Error("internal detail");
         return client.send(command);
       },
     }));
-    for (let n = 0; n < MAX_RESULTS; n++) await handlePostResult(post(attempt(minute(n)), "a"), deps);
-    const failed = await handlePostResult(post(attempt(minute(MAX_RESULTS)), "a"), deps);
+    const failed = await handlePostResult(post(attempt(minute(1)), "a"), deps);
     expect(failed.status).toBe(503);
     expect(await failed.text()).not.toContain("internal detail");
-    failDelete = false;
-    expect((await handlePostResult(post(attempt(minute(MAX_RESULTS)), "a"), deps)).status).toBe(200);
-    expect(resultItems(table)).toBe(MAX_RESULTS);
-    expect((await results(deps, "SAMPLE", "a"))[0]?.finishedAt).toBe(minute(MAX_RESULTS));
+    failPut = false;
+    expect((await handlePostResult(post(attempt(minute(1)), "a"), deps)).status).toBe(200);
+    expect(resultItems(table)).toBe(1);
   });
 
-  it("古い結果の切り詰めが失敗して送り直す_日ごとの学習量は一度だけ数える", async () => {
-    let failDelete = true;
+  it("問題ごとの集計の途中で失敗して送り直す_日ごとの学習量と解答回数は一度だけ数える", async () => {
+    let failStats = true;
     const { deps, table } = stack((client) => ({
       async send(command) {
-        if (command instanceof DeleteCommand && failDelete) throw new Error("internal detail");
+        if (command instanceof GetCommand && failStats) throw new Error("internal detail");
         return client.send(command);
       },
     }));
@@ -217,17 +219,12 @@ describe("履歴の通しでのエラー応答", () => {
       { questionId: "SAMPLE-0001", questionType: "single" as const, correctAnswers: ["A"] },
       { questionId: "SAMPLE-0002", questionType: "multiple" as const, correctAnswers: ["B", "C"] },
     ];
-    for (let n = 0; n < MAX_RESULTS; n++) await handlePostResult(post(attempt(minute(n)), "a"), deps);
-    expect((await handlePostResult(post(attempt(minute(MAX_RESULTS)), "a"), deps)).status).toBe(503);
-    failDelete = false;
-    expect((await handlePostResult(post(attempt(minute(MAX_RESULTS)), "a"), deps)).status).toBe(200);
-    const response = await handleListDays(
-      new Request(`${ORIGIN}/api/history/days?examCode=SAMPLE`, { headers: { cookie: cookieOf("a") } }),
-      deps,
-    );
-    const answered = (MAX_RESULTS + 1) * 2;
-    expect(await response.json()).toEqual({ days: [{ date: "2026-10-11", answered, correct: answered }] });
-    expect(table.items.get("USER#a|DAY#SAMPLE#2026-10-11")?.answered).toBe(answered);
+    expect((await handlePostResult(post(attempt(minute(1)), "a"), deps)).status).toBe(503);
+    failStats = false;
+    expect((await handlePostResult(post(attempt(minute(1)), "a"), deps)).status).toBe(200);
+    expect(table.items.get("USER#a|DAY#SAMPLE#2026-10-11")?.answered).toBe(2);
+    // 結果の項目は 1 回目に作られているので、送り直しでは解答回数を数えない(集計の取りこぼしは許す)
+    expect(table.items.get("USER#a|STAT#SAMPLE#SAMPLE-0001")).toBeUndefined();
   });
 });
 
@@ -299,14 +296,17 @@ describe("復習プールの通し", () => {
     expect(await review(deps, "a")).toEqual(["SAMPLE-0002"]);
   });
 
-  it("復習プールの問題に正解する_プールから抜ける", async () => {
+  it("復習プールの問題に 2 回続けて正解する_プールから抜け_自信なしの正解は連続に数えない", async () => {
     const { deps } = stack();
     deps.questions = questions;
     await handlePostResult(post(attempt(minute(1)), "a"), deps);
     expect(await review(deps, "a")).toEqual(["SAMPLE-0001", "SAMPLE-0002"]);
     const answers = { "SAMPLE-0001": ["B"], "SAMPLE-0002": ["C", "A"] };
     await handlePostResult(post(attempt(minute(2), { answers }), "a"), deps);
-    expect(await review(deps, "a")).toEqual([]);
+    expect(await review(deps, "a")).toEqual(["SAMPLE-0001", "SAMPLE-0002"]);
+    // 2 問目は自信なし: 正解でも連続が 0 に戻る
+    await handlePostResult(post(attempt(minute(3), { answers, unsure: [false, true] }), "a"), deps);
+    expect(await review(deps, "a")).toEqual(["SAMPLE-0002"]);
   });
 
   it("いまのデータにない問題_どちらにも入らない", async () => {

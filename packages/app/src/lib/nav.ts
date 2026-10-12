@@ -2,6 +2,7 @@
 // 項目は、画面ができているものだけを置く(画面ができた版で足す)。
 
 export type NavIcon =
+  | "review"
   | "home"
   | "exams"
   | "bookmark"
@@ -13,13 +14,15 @@ export type NavIcon =
   | "menu"
   | "back";
 
-export type NavItem = { label: string; href: string; icon: NavIcon };
+/** `short` は、下のドックで使う短い名前(狭い幅で 1 行に収める。読み上げには `label` を使う) */
+export type NavItem = { label: string; href: string; icon: NavIcon; short?: string };
 
 /** 学習の主要な項目(サイドバーの上の段) */
 export const MAIN_NAV_ITEMS: NavItem[] = [
   { label: "ホーム", href: "/", icon: "home" },
   { label: "資格", href: "/exams", icon: "exams" },
-  { label: "ブックマーク", href: "/bookmarks", icon: "bookmark" },
+  { label: "復習", href: "/review", icon: "review" },
+  { label: "ブックマーク", href: "/bookmarks", icon: "bookmark", short: "ブクマ" },
 ];
 
 /** 案内の項目(サイドバーの下の段) */
@@ -39,7 +42,7 @@ export function navItems(isAdmin: boolean): NavItem[] {
   return isAdmin ? [...NAV_ITEMS, ADMIN_NAV_ITEM] : NAV_ITEMS;
 }
 
-/** スマホの下のドックに並べる項目。最後に「メニュー」(ほかの項目のシート)を足して、4 等分にする(狭い幅でも名前が 1 行に収まるように) */
+/** スマホの下のドックに並べる項目。最後に「メニュー」(ほかの項目のシート)を足して、5 等分にする(狭い幅でも 1 行に収まるよう、短い名前を使う) */
 export const DOCK_ITEMS: NavItem[] = MAIN_NAV_ITEMS;
 
 /** ドックに置かず、メニューのシートに並べる項目 */

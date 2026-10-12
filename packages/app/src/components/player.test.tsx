@@ -2,7 +2,16 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { browserStore, loadResults, loadSession, loadStageProgress, passedStages, saveSession } from "@/lib/storage.ts";
+import {
+  browserStore,
+  loadResults,
+  loadSectionProgress,
+  loadSession,
+  loadStageProgress,
+  passedStages,
+  saveResult,
+  saveSession,
+} from "@/lib/storage.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 import { Player } from "./player.tsx";
 
@@ -481,5 +490,45 @@ describe("Player の印と問題一覧", () => {
     await user.click(screen.getByRole("button", { name: /中断する/ }));
     expect(push).toHaveBeenCalledWith("/exams/TEST");
     expect(loadSession(browserStore(), "TEST")?.answers).toEqual({ "TEST-0001": ["A"] });
+  });
+});
+
+describe("Player のセクションと直近の正誤", () => {
+  it("セクションの出題を採点する_そのセクションの記録を残す", async () => {
+    saveSession(browserStore(), {
+      examCode: "TEST",
+      questionIds: questions.map((q) => q.questionId),
+      answers: {},
+      index: 0,
+      startedAt: "2026-10-10T00:00:00.000Z",
+      section: 3,
+    });
+    render(<Player exam={exam} questions={questions} />);
+    const user = userEvent.setup();
+    await screen.findByText("問題文 1");
+    await user.keyboard("a{Enter}");
+    await screen.findByText("問題文 2");
+    await user.keyboard("a{Enter}");
+    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
+    expect(loadSectionProgress(browserStore(), "TEST").best["3"]).toMatchObject({ correct: 1, total: 2 });
+  });
+
+  it("その問題の直近 5 回の正誤を_古い順に出し_足りない分は - で埋める(端末の結果から)", async () => {
+    saveResult(browserStore(), {
+      examCode: "TEST",
+      questionIds: ["TEST-0001"],
+      answers: { "TEST-0001": ["B"] },
+      finishedAt: "2026-10-01T00:00:00.000Z",
+    });
+    saveResult(browserStore(), {
+      examCode: "TEST",
+      questionIds: ["TEST-0001"],
+      answers: { "TEST-0001": ["A"] },
+      finishedAt: "2026-10-02T00:00:00.000Z",
+    });
+    render(<Player exam={exam} questions={questions} />);
+    const marks = await screen.findByRole("img", { name: /直近5回の正誤/ });
+    expect(marks.getAttribute("aria-label")).toContain("未受験、未受験、未受験、不正解、正解");
+    expect(marks.textContent).toBe("---✕○");
   });
 });

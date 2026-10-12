@@ -10,6 +10,7 @@ import { Notice } from "@/components/notice.tsx";
 import { PlaySkeleton } from "@/components/page-skeletons.tsx";
 import { QuestionChips } from "@/components/question-chips.tsx";
 import { QuestionGrid } from "@/components/question-grid.tsx";
+import { RecentMarks, useQuestionStats } from "@/components/question-stats.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
 import { type AnswerTimer, createTimer, elapsedTimes, setVisible, showQuestion } from "@/lib/answer-timer.ts";
 import { judgeFreeText } from "@/lib/free-text.ts";
@@ -37,6 +38,7 @@ import {
   type Result,
   type Session,
   saveResult,
+  saveSectionCheck,
   saveSession,
   saveStageCheck,
 } from "@/lib/storage.ts";
@@ -87,6 +89,7 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
   const finishing = useRef(false);
   const timer = useRef<AnswerTimer>(createTimer([]));
   const bookmarks = useBookmarks(exam.examCode);
+  const stats = useQuestionStats(exam.examCode, questions);
   // 時間切れの自動の採点は、描画のたびに作り直す最新の処理を呼ぶ。1 回だけ試みる
   const finishRef = useRef<() => Promise<void>>(async () => {});
   const autoFinished = useRef(false);
@@ -294,6 +297,18 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
           finishedAt: result.finishedAt,
         });
       }
+      if (session.section !== undefined) {
+        // セクションの出題: 正答数を、そのセクションの記録に残す(残せなくても、結果は保存済みなので先へ進む)
+        const asked = session.questionIds.flatMap((id) => byId.get(id) ?? []);
+        const { correct, total } = score(asked, session.answers, session.textAnswers);
+        if (total > 0) {
+          saveSectionCheck(browserStore(), exam.examCode, session.section, {
+            correct,
+            total,
+            finishedAt: result.finishedAt,
+          });
+        }
+      }
       clearSession(browserStore(), exam.examCode);
       router.push(`/exams/${exam.examCode}/result`);
     } finally {
@@ -401,6 +416,7 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
               </button>
             </div>
           </div>
+          {stats ? <RecentMarks recent={stats.get(question.questionId)?.recent ?? []} /> : null}
           <BookmarkError bookmarks={bookmarks} />
         </div>
 
