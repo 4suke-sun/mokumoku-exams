@@ -165,7 +165,7 @@ export function DashboardView({ exam, questions }: Props) {
           <li>
             ブックマーク: {state.bookmarks === null ? "読み込めませんでした" : `${state.bookmarks} 問`}{" "}
             <Link href="/bookmarks" className="text-primary hover:underline">
-              直前チェックへ
+              直前チェック(ブックマーク)へ
             </Link>
           </li>
         </ul>

@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { ModeSelect } from "@/components/mode-select.tsx";
 import { loadCurriculum } from "@/lib/curriculum-data.ts";
 import { findPublishedExam, listPublishedExams, loadQuestions } from "@/lib/exam-data.ts";
+import { loadSummaryCards } from "@/lib/summary-data.ts";
 
 type Props = { params: Promise<{ code: string }> };
 
@@ -22,7 +23,11 @@ export default async function ExamPage({ params }: Props) {
   const { code } = await params;
   const exam = findPublishedExam(code);
   if (!exam) notFound();
-  const [questions, units] = await Promise.all([loadQuestions(exam), loadCurriculum(exam)]);
+  const [questions, units, summary] = await Promise.all([
+    loadQuestions(exam),
+    loadCurriculum(exam),
+    loadSummaryCards(exam),
+  ]);
 
   return (
     <ModeSelect
@@ -36,6 +41,7 @@ export default async function ExamPage({ params }: Props) {
         choiceKeys: q.questionType === "free-text" ? [] : q.choices.map((c) => c.key),
       }))}
       studyUnits={units?.length ?? null}
+      summaryCount={summary?.length ?? null}
     />
   );
 }

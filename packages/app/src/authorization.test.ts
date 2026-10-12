@@ -95,6 +95,7 @@ const PROTECTED_PAGES = [
   "/bookmarks",
   "/exams",
   "/exams/sample",
+  "/exams/sample/cards",
   "/exams/sample/dashboard",
   "/exams/sample/play",
   "/exams/sample/result",

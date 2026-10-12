@@ -54,6 +54,8 @@ type Props = {
   pool: PoolItem[];
   /** カリキュラムの単元の数。カリキュラムがなく、学習モードを使えないときは null */
   studyUnits?: number | null;
+  /** 要約カードの枚数。要約カードがない資格では null(入口を出さない) */
+  summaryCount?: number | null;
 };
 
 const COUNT_CHOICES = [5, 10, 20, 50];
@@ -99,7 +101,7 @@ type ModeCard = {
 
 const MODE_NAMES: Record<SettingsMode, string> = { normal: "通常出題", review: "復習", "free-text": "自由記述" };
 
-export function ModeSelect({ exam, pool, studyUnits = null }: Props) {
+export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null }: Props) {
   const router = useRouter();
   const countId = useId();
   const [domains, setDomains] = useState<string[]>([]);
@@ -271,9 +273,23 @@ export function ModeSelect({ exam, pool, studyUnits = null }: Props) {
       kind: "select",
       mode: "review",
     },
+    ...(summaryCount === null
+      ? []
+      : [
+          {
+            id: "summary",
+            name: "直前チェック(要約カード)",
+            emoji: "🗂️",
+            tone: "tone-domain-2",
+            description: "要約カードを 1 枚ずつ見て、答えと決め手を確かめます。試験の直前の見返しに向きます。",
+            meta: `${summaryCount} 枚`,
+            kind: "link" as const,
+            href: `/exams/${exam.examCode}/cards`,
+          },
+        ]),
     {
       id: "bookmarks",
-      name: "直前チェック",
+      name: "直前チェック(ブックマーク)",
       emoji: "⭐",
       tone: "tone-violet",
       description: "ブックマークした問題を、正解と解説つきで見直します。",
