@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { createContext, type ReactNode, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { fetchSession, postJson } from "@/lib/auth/client.ts";
 import { refreshDelayMs } from "@/lib/auth/refresh.ts";
+import { syncPrefs } from "@/lib/prefs-client.ts";
 
 export type SessionState =
   | { status: "loading" }
@@ -56,6 +57,20 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     void reload();
   }, [reload]);
+
+  // ログインしたら(ページを開き直したときも)、アカウントの表示の設定を、端末に反映する(別の端末で選んだ設定を引き継ぐ)。
+  // 反映のあと、サーバーが次の描画から設定を使えるよう、アカウントの設定の Cookie は、この取得の応答で付く。
+  const signedIn = state.status === "signed-in";
+  const synced = useRef(false);
+  useEffect(() => {
+    if (!signedIn) {
+      synced.current = false;
+      return;
+    }
+    if (synced.current) return;
+    synced.current = true;
+    void syncPrefs();
+  }, [signedIn]);
 
   const expiresAt = state.status === "signed-in" ? state.expiresAt : null;
   useEffect(() => {

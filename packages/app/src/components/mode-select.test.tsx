@@ -353,6 +353,24 @@ describe("ModeSelect のモードのカード", () => {
   });
 });
 
+describe("ModeSelect のシャッフルの設定", () => {
+  it("シャッフルを切り替える_端末に保存し_アカウントにも送る", async () => {
+    const fetchMock = vi.fn(async (_url: string, _init?: { method?: string; body?: string }) => ({
+      ok: true,
+      status: 200,
+      json: async () => ({}),
+    }));
+    vi.stubGlobal("fetch", fetchMock);
+    render(<ModeSelect exam={exam} pool={pool} />);
+    const user = userEvent.setup();
+    await chooseMode(user);
+    await user.click(await screen.findByRole("checkbox", { name: /選択肢の並びをシャッフルする/ }));
+    const put = fetchMock.mock.calls.find(([url, init]) => url === "/api/history/prefs" && init?.method === "PUT");
+    expect(JSON.parse(put?.[1]?.body ?? "{}")).toEqual({ theme: "system", style: "rich", shuffleChoices: true });
+    vi.unstubAllGlobals();
+  });
+});
+
 describe("ModeSelect の見出しの導線", () => {
   it("試験の情報へのリンクを出す", async () => {
     vi.stubGlobal(

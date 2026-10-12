@@ -82,6 +82,8 @@ describe("pageWidth", () => {
     ["/help", "read"],
     ["/release-notes", "read"],
     ["/admin", "read"],
+    ["/admin/preview", "study"],
+    ["/admin/preview/AIB", "study"],
     ["/login", "read"],
     ["/", "wide"],
     ["/exams", "wide"],

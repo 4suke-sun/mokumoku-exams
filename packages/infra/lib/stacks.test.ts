@@ -241,8 +241,9 @@ describe("WebStack", () => {
     expect(JSON.stringify(history[0].Resource)).not.toContain("*");
   });
 
-  it("Lambda は_Cognito の一覧・招待・無効化だけを_そのユーザープールに限って許される", () => {
+  it("Lambda は_Cognito の一覧・招待・無効化・管理者のグループへの追加だけを_そのユーザープールに限って許される", () => {
     expect([...USER_ADMIN_ACTIONS].sort()).toEqual([
+      "cognito-idp:AdminAddUserToGroup",
       "cognito-idp:AdminCreateUser",
       "cognito-idp:AdminDisableUser",
       "cognito-idp:ListUsers",

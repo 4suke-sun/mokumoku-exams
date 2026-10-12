@@ -597,6 +597,7 @@ exports[`WebStack > 合成すると_スナップショットと一致する 1`] 
                 "cognito-idp:ListUsers",
                 "cognito-idp:AdminCreateUser",
                 "cognito-idp:AdminDisableUser",
+                "cognito-idp:AdminAddUserToGroup",
               ],
               "Effect": "Allow",
               "Resource": "arn:aws:cognito-idp:us-east-1:123456789012:userpool/pool-example",

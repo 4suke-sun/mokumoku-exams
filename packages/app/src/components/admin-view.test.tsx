@@ -97,6 +97,101 @@ describe("AdminView", () => {
   });
 });
 
+describe("管理者への昇格", () => {
+  const users = [
+    row("u-self", "admin@example.com", { self: true }),
+    row("u-off", "off@example.com", { enabled: false }),
+    row("u-1", "one@example.com"),
+  ];
+
+  it("自分と無効な利用者_昇格の操作を出さない", async () => {
+    mockFetch({ status: 200, body: { users } });
+    render(<AdminView />);
+    const items = await screen.findAllByRole("listitem");
+    expect(within(items[0] as HTMLElement).queryByRole("button")).toBeNull();
+    expect(within(items[1] as HTMLElement).queryByRole("button")).toBeNull();
+    expect(within(items[2] as HTMLElement).getByRole("button", { name: "one@example.comを管理者にする" })).toBeTruthy();
+  });
+
+  it("押す_確認のダイアログが開き_安全側のやめるにフォーカスが移り_まだ送らない", async () => {
+    const fetchMock = mockFetch({ status: 200, body: { users } });
+    render(<AdminView />);
+    await userEvent.click(await screen.findByRole("button", { name: "one@example.comを管理者にする" }));
+    const dialog = screen.getByRole("alertdialog", { name: "管理者にしますか" });
+    expect(dialog.getAttribute("aria-modal")).toBe("true");
+    expect(within(dialog).getByText(/one@example.com/)).toBeTruthy();
+    expect(document.activeElement).toBe(within(dialog).getByRole("button", { name: "やめる" }));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("やめる・Esc_閉じて送らず_開いたボタンへフォーカスを戻す", async () => {
+    const fetchMock = mockFetch({ status: 200, body: { users } });
+    render(<AdminView />);
+    const trigger = await screen.findByRole("button", { name: "one@example.comを管理者にする" });
+    await userEvent.click(trigger);
+    await userEvent.click(screen.getByRole("button", { name: "やめる" }));
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    await waitFor(() => expect(document.activeElement).toBe(trigger));
+
+    await userEvent.click(trigger);
+    await userEvent.keyboard("{Escape}");
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    await waitFor(() => expect(document.activeElement).toBe(trigger));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("Tab_ダイアログの中で巡回し_外へ出ない", async () => {
+    mockFetch({ status: 200, body: { users } });
+    render(<AdminView />);
+    await userEvent.click(await screen.findByRole("button", { name: "one@example.comを管理者にする" }));
+    const cancel = screen.getByRole("button", { name: "やめる" });
+    const confirm = screen.getByRole("button", { name: "管理者にする" });
+    expect(document.activeElement).toBe(cancel);
+    await userEvent.tab();
+    expect(document.activeElement).toBe(confirm);
+    await userEvent.tab();
+    expect(document.activeElement).toBe(cancel);
+    await userEvent.tab({ shift: true });
+    expect(document.activeElement).toBe(confirm);
+  });
+
+  it("管理者にする_ユーザー名だけを送り_結果を伝え_一覧を読み直す", async () => {
+    const fetchMock = mockFetch(
+      { status: 200, body: { users } },
+      { status: 200, body: { status: "promoted" } },
+      { status: 200, body: { users } },
+    );
+    render(<AdminView />);
+    await userEvent.click(await screen.findByRole("button", { name: "one@example.comを管理者にする" }));
+    await userEvent.click(screen.getByRole("button", { name: "管理者にする" }));
+    expect((await screen.findByRole("status")).textContent).toContain("one@example.com を管理者にしました");
+    expect(fetchMock.mock.calls[1]?.[0]).toBe("/api/admin/users/promote");
+    expect(JSON.parse(fetchMock.mock.calls[1]?.[1].body)).toEqual({ username: "u-1" });
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+  });
+
+  it("失敗_固定の文言を出し_ダイアログを閉じる", async () => {
+    mockFetch(
+      { status: 200, body: { users } },
+      { status: 403, body: { error: "forbidden" } },
+      { status: 200, body: { users } },
+    );
+    render(<AdminView />);
+    await userEvent.click(await screen.findByRole("button", { name: "one@example.comを管理者にする" }));
+    await userEvent.click(screen.getByRole("button", { name: "管理者にする" }));
+    expect((await screen.findByRole("alert")).textContent).toContain("管理者だけができます");
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+  });
+
+  it("無効化の操作_昇格の操作を足しても変わらず動く", async () => {
+    mockFetch({ status: 200, body: { users: [row("u-1", "one@example.com")] } });
+    render(<AdminView />);
+    await userEvent.click(await screen.findByRole("button", { name: "無効にする…" }));
+    expect(screen.getByText(/無効にしますか/)).toBeTruthy();
+  });
+});
+
 describe("表示の文言", () => {
   it("状態_無効を優先し_既知の状態は日本語にする", () => {
     expect(statusLabel({ enabled: false, status: "CONFIRMED" })).toBe("無効");

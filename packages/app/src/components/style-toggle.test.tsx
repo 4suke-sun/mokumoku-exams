@@ -1,16 +1,25 @@
 // @vitest-environment jsdom
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { afterEach, beforeEach, describe, expect, it } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { STYLE_KEY } from "@/lib/visual-style.ts";
 import { StyleToggle } from "./style-toggle.tsx";
 
+const fetchMock = vi.fn(async (_url: string, _init?: { method?: string; body?: string }) => ({
+  ok: true,
+  status: 200,
+  json: async () => ({ status: "saved" }),
+}));
+
 beforeEach(() => {
   localStorage.clear();
+  fetchMock.mockClear();
+  vi.stubGlobal("fetch", fetchMock);
 });
 
 afterEach(() => {
   document.documentElement.removeAttribute("data-style");
+  vi.unstubAllGlobals();
 });
 
 describe("StyleToggle", () => {
@@ -32,5 +41,13 @@ describe("StyleToggle", () => {
     document.documentElement.setAttribute("data-style", "simple");
     render(<StyleToggle />);
     expect(screen.getByRole("button", { name: "シンプル" }).getAttribute("aria-pressed")).toBe("true");
+  });
+
+  it("シンプルを選ぶ_アカウントにも送る", async () => {
+    render(<StyleToggle />);
+    await userEvent.click(screen.getByRole("button", { name: "シンプル" }));
+    const [url, init] = fetchMock.mock.calls[0] ?? [];
+    expect(url).toBe("/api/history/prefs");
+    expect(JSON.parse(init?.body ?? "{}")).toEqual({ theme: "system", style: "simple", shuffleChoices: false });
   });
 });

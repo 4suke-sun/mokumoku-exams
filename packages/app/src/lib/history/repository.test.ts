@@ -237,6 +237,43 @@ describe("DynamoDB の日ごとの学習量と目標日", () => {
     expect(await repository.getGoal("user-a", "SAMPLE")).toBeNull();
   });
 
+  it("表示の設定_PK は利用者の sub で SK は PREFS の 1 件_上書きでき_別の利用者と混ざらない", async () => {
+    const { items, client } = fakeTable();
+    const repository = createDynamoRepository({ tableName: "table-example", client });
+    expect(await repository.getPrefs("user-a")).toBeNull();
+    await repository.setPrefs("user-a", { theme: "dark", style: "simple", shuffleChoices: true });
+    await repository.setPrefs("user-a", { theme: "light", style: "rich", shuffleChoices: false });
+    await repository.setPrefs("user-b", { theme: "dark", style: "rich", shuffleChoices: false });
+    expect(items.get("USER#user-a|PREFS")).toMatchObject({
+      PK: "USER#user-a",
+      SK: "PREFS",
+      type: "prefs",
+      theme: "light",
+      style: "rich",
+      shuffleChoices: false,
+    });
+    expect(await repository.getPrefs("user-a")).toEqual({ theme: "light", style: "rich", shuffleChoices: false });
+    expect(await repository.getPrefs("user-b")).toEqual({ theme: "dark", style: "rich", shuffleChoices: false });
+    expect(await repository.getPrefs("user-c")).toBeNull();
+    // 設定の項目は、結果などの問い合わせ(SK の前方一致)に入らない
+    expect(await repository.listResults("user-a", "SAMPLE")).toEqual([]);
+  });
+
+  it("壊れた表示の設定_保存していないものとして扱う", async () => {
+    const { items, client } = fakeTable();
+    const repository = createDynamoRepository({ tableName: "table-example", client });
+    items.set("USER#user-a|PREFS", {
+      PK: "USER#user-a",
+      SK: "PREFS",
+      theme: "blue",
+      style: "rich",
+      shuffleChoices: false,
+    });
+    expect(await repository.getPrefs("user-a")).toBeNull();
+    items.set("USER#user-a|PREFS", { PK: "USER#user-a", SK: "PREFS", theme: "dark" });
+    expect(await repository.getPrefs("user-a")).toBeNull();
+  });
+
   it("壊れた目標日_ないものとして扱う", async () => {
     const { items, client } = fakeTable();
     const repository = createDynamoRepository({ tableName: "table-example", client });
@@ -267,6 +304,15 @@ describe("メモリ上の履歴", () => {
     expect(first).toHaveLength(RESULTS_PAGE_SIZE);
     expect(await repository.listResults("user-a", "SAMPLE", { before: first.at(-1)?.finishedAt })).toHaveLength(1);
     expect(await repository.listResults("user-b", "SAMPLE")).toHaveLength(1);
+  });
+
+  it("表示の設定_利用者ごとに分かれ_上書きできる", async () => {
+    const repository = createMemoryRepository();
+    expect(await repository.getPrefs("user-a")).toBeNull();
+    await repository.setPrefs("user-a", { theme: "dark", style: "simple", shuffleChoices: true });
+    await repository.setPrefs("user-b", { theme: "light", style: "rich", shuffleChoices: false });
+    expect(await repository.getPrefs("user-a")).toEqual({ theme: "dark", style: "simple", shuffleChoices: true });
+    expect(await repository.getPrefs("user-b")).toEqual({ theme: "light", style: "rich", shuffleChoices: false });
   });
 
   it("日ごとの学習量と目標日_DynamoDB の実装と同じに振る舞う", async () => {

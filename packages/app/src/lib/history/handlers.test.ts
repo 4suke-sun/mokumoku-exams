@@ -3,11 +3,13 @@ import { createFakeProvider, createFakeVerifier, FAKE_USER_EMAIL, FAKE_USER_PHRA
 import { withTokenCookies } from "@/lib/auth/session.ts";
 import type { AuthProvider } from "@/lib/auth/types.ts";
 import type { TokenVerifier } from "@/lib/auth/verify.ts";
+import { PREFS_COOKIE, parsePrefsCookie } from "@/lib/prefs-cookie.ts";
 import { MAX_ANSWER_TIME_MS, type Result } from "@/lib/storage.ts";
 import {
   type HistoryDeps,
   handleDeleteReview,
   handleGetGoal,
+  handleGetPrefs,
   handleGetResult,
   handleListBookmarks,
   handleListDays,
@@ -17,6 +19,7 @@ import {
   handlePostResult,
   handlePutBookmark,
   handlePutGoal,
+  handlePutPrefs,
   reviewChangeOf,
   tallyOf,
 } from "./handlers.ts";
@@ -417,6 +420,12 @@ const failing: HistoryRepository = {
   async setGoal() {
     throw new Error("unavailable");
   },
+  async getPrefs() {
+    throw new Error("unavailable");
+  },
+  async setPrefs() {
+    throw new Error("unavailable");
+  },
 };
 
 describe("履歴の保存先の失敗", () => {
@@ -808,5 +817,121 @@ describe("1 回分の結果・集計・復習の項目の API", () => {
       expect((await handleDeleteReview(del(bad), d)).status, JSON.stringify(bad)).toBe(400);
     }
     expect((await handleDeleteReview(del({ examCode: "SAMPLE", questionId: "SAMPLE-0001" }), d)).status).toBe(200);
+  });
+});
+
+describe("表示の設定の API", () => {
+  const prefs = { theme: "dark", style: "simple", shuffleChoices: true } as const;
+  const put = (value: unknown, headers: Record<string, string> = {}, raw?: string) =>
+    new Request(`${ORIGIN}/api/history/prefs`, {
+      method: "PUT",
+      headers: { "content-type": "application/json", ...headers },
+      body: raw ?? JSON.stringify(value),
+    });
+  const read = (d: HistoryDeps, sub: string | null, query = "") =>
+    handleGetPrefs(
+      new Request(`${ORIGIN}/api/history/prefs${query}`, { headers: sub ? { cookie: asUser(sub) } : {} }),
+      d,
+    );
+  const cookieOf = (response: Response) =>
+    response.headers
+      .getSetCookie()
+      .find((c) => c.startsWith(`${PREFS_COOKIE}=`))
+      ?.split(";")[0]
+      ?.slice(PREFS_COOKIE.length + 1);
+
+  it("保存していない_null を返し_設定の Cookie は付けない", async () => {
+    const response = await read(deps(), "a");
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ prefs: null });
+    expect(cookieOf(response)).toBeUndefined();
+  });
+
+  it("保存して取得する_自分の分だけに反映され_別の利用者には見えない", async () => {
+    const d = deps();
+    const saved = await handlePutPrefs(put(prefs, { cookie: asUser("a") }), d);
+    expect(saved.status).toBe(200);
+    expect(await saved.json()).toEqual({ status: "saved" });
+    expect(await (await read(d, "a")).json()).toEqual({ prefs });
+    expect(await (await read(d, "b")).json()).toEqual({ prefs: null });
+  });
+
+  it("保存する_設定の Cookie を付け_持ち主は保存した利用者(別の利用者では使えない)", async () => {
+    const response = await handlePutPrefs(put(prefs, { cookie: asUser("a") }), deps());
+    const value = cookieOf(response);
+    expect(parsePrefsCookie(value, "a")).toEqual(prefs);
+    expect(parsePrefsCookie(value, "b")).toBeNull();
+    expect(response.headers.getSetCookie().join(";")).toContain("HttpOnly");
+  });
+
+  it("取得する_保存済みなら設定の Cookie を付ける(別の端末でも、次の描画から反映できる)", async () => {
+    const d = deps();
+    await handlePutPrefs(put(prefs, { cookie: asUser("a") }), d);
+    const response = await read(d, "a");
+    expect(parsePrefsCookie(cookieOf(response), "a")).toEqual(prefs);
+  });
+
+  it("上書きする_最後に保存した設定になる", async () => {
+    const d = deps();
+    await handlePutPrefs(put(prefs, { cookie: asUser("a") }), d);
+    const next = { theme: "light", style: "rich", shuffleChoices: false };
+    await handlePutPrefs(put(next, { cookie: asUser("a") }), d);
+    expect(await (await read(d, "a")).json()).toEqual({ prefs: next });
+  });
+
+  it("本文に別の利用者の識別子・未知の項目_断り_自分にも相手にも保存しない", async () => {
+    const repository = createMemoryRepository();
+    const d = deps(repository);
+    for (const key of ["sub", "userId", "PK", "SK", "owner"]) {
+      const response = await handlePutPrefs(put({ ...prefs, [key]: "b" }, { cookie: asUser("a") }), d);
+      expect(response.status, key).toBe(400);
+    }
+    expect(await repository.getPrefs("a")).toBeNull();
+    expect(await repository.getPrefs("b")).toBeNull();
+  });
+
+  it("値が正しくない_400 を返し_保存しない_応答に入力の値を含めない", async () => {
+    const repository = createMemoryRepository();
+    const d = deps(repository);
+    for (const value of [
+      { ...prefs, theme: "目印XYZ" },
+      { ...prefs, style: 1 },
+      { ...prefs, shuffleChoices: "true" },
+      { theme: "dark" },
+      [],
+      "x",
+    ]) {
+      const response = await handlePutPrefs(put(value, { cookie: asUser("a") }), d);
+      expect(response.status, JSON.stringify(value)).toBe(400);
+      expect(JSON.stringify(await response.json())).not.toContain("目印XYZ");
+    }
+    expect(await repository.getPrefs("a")).toBeNull();
+  });
+
+  it("問い合わせのパラメーターで別の利用者を指す_取得を断る", async () => {
+    expect((await read(deps(), "a", "?sub=b")).status).toBe(400);
+    expect((await read(deps(), "a", "?userId=b")).status).toBe(400);
+  });
+
+  it("未ログイン・別サイト・JSON でない・JSON が壊れている・大きすぎる_それぞれの種類で断る", async () => {
+    const d = deps();
+    expect((await read(d, null)).status).toBe(401);
+    expect((await handlePutPrefs(put(prefs), d)).status).toBe(401);
+    expect((await handlePutPrefs(put(prefs, { cookie: asUser("a"), "sec-fetch-site": "cross-site" }), d)).status).toBe(
+      403,
+    );
+    expect((await handlePutPrefs(put(prefs, { cookie: asUser("a"), "content-type": "text/plain" }), d)).status).toBe(
+      415,
+    );
+    expect((await handlePutPrefs(put(null, { cookie: asUser("a") }, "{broken"), d)).status).toBe(400);
+    const big = put(null, { cookie: asUser("a") }, JSON.stringify({ ...prefs, pad: "a".repeat(1000) }));
+    expect((await handlePutPrefs(big, d)).status).toBe(413);
+  });
+
+  it("保存先が失敗する_原因を返さず 503 にする", async () => {
+    const saved = await handlePutPrefs(put(prefs, { cookie: asUser("a") }), deps(failing));
+    expect(saved.status).toBe(503);
+    expect(await saved.json()).toEqual({ error: "unavailable" });
+    expect((await read(deps(failing), "a")).status).toBe(503);
   });
 });

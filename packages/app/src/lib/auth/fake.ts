@@ -181,6 +181,11 @@ export function createFakeUserAdmin(directory: FakeDirectory, now: () => number 
       if (!found) throw new UserAdminError("not-found");
       found[1].enabled = false;
     },
+    async promoteUser(username) {
+      const found = [...directory].find(([email]) => fakeSub(email) === username);
+      if (!found) throw new UserAdminError("not-found");
+      if (!found[1].groups.includes(ADMIN_GROUP)) found[1].groups.push(ADMIN_GROUP);
+    },
   };
 }
 

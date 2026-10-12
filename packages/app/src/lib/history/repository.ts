@@ -7,6 +7,7 @@ import {
   QueryCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
+import { type Prefs, PrefsSchema } from "@/lib/prefs.ts";
 import { RECENT_STAT_LIMIT } from "@/lib/question-stats.ts";
 import { type Result, ResultSchema } from "@/lib/storage.ts";
 import { isValidDate, jstDate, type StudyDay } from "@/lib/study-days.ts";
@@ -55,6 +56,10 @@ export interface HistoryRepository {
   getGoal(sub: string, examCode: string): Promise<string | null>;
   /** 目標日を決める。null で消す。 */
   setGoal(sub: string, examCode: string, date: string | null): Promise<void>;
+  /** 表示の設定(テーマ・画面スタイル・シャッフル)。保存していなければ null。 */
+  getPrefs(sub: string): Promise<Prefs | null>;
+  /** 表示の設定を保存する(上書き)。 */
+  setPrefs(sub: string, prefs: Prefs): Promise<void>;
 }
 
 /** 1 回の結果の学習量(解いた問題の数と、そのうちの正解の数)。 */
@@ -107,6 +112,8 @@ export const bookmarkKeyPrefix = (examCode: string) => `BOOKMARK#${examCode}#`;
 export const reviewKeyPrefix = (examCode: string) => `REVIEW#${examCode}#`;
 export const dayKeyPrefix = (examCode: string) => `DAY#${examCode}#`;
 export const goalKey = (examCode: string) => `GOAL#${examCode}`;
+/** 表示の設定(利用者ごとに 1 件) */
+export const PREFS_SORT_KEY = "PREFS";
 export const statKeyPrefix = (examCode: string) => `STAT#${examCode}#`;
 /** すべての資格の復習の項目(資格をまたいで一覧するとき) */
 export const REVIEW_PREFIX = "REVIEW#";
@@ -345,6 +352,23 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
       if (date === null) await remove(sub, goalKey(examCode));
       else await put(sub, goalKey(examCode), { type: "goal", examCode, date });
     },
+
+    async getPrefs(sub) {
+      const { Item } = (await client.send(
+        new GetCommand({ TableName: tableName, Key: { PK: userKey(sub), SK: PREFS_SORT_KEY } }),
+      )) as GetOutput;
+      // 保存した値は外部入力として扱い、形を検査する(壊れた値は、保存していないものとして扱う)
+      const parsed = PrefsSchema.safeParse({
+        theme: Item?.theme,
+        style: Item?.style,
+        shuffleChoices: Item?.shuffleChoices,
+      });
+      return parsed.success ? parsed.data : null;
+    },
+
+    async setPrefs(sub, prefs) {
+      await put(sub, PREFS_SORT_KEY, { type: "prefs", ...prefs });
+    },
   };
 }
 
@@ -359,6 +383,8 @@ export function createMemoryRepository(): HistoryRepository {
   // 利用者と資格ごとの、日付ごとの学習量と、目標日
   const days = new Map<string, Map<string, StudyDay>>();
   const goals = new Map<string, string>();
+  // 利用者ごとの、表示の設定
+  const prefs = new Map<string, Prefs>();
   const scope = (sub: string, examCode: string) => `${userKey(sub)}|${examCode}`;
   const setOf = (sets: Map<string, Set<string>>, sub: string, examCode: string) => {
     const key = scope(sub, examCode);
@@ -462,6 +488,12 @@ export function createMemoryRepository(): HistoryRepository {
     },
     async getGoal(sub, examCode) {
       return goals.get(scope(sub, examCode)) ?? null;
+    },
+    async getPrefs(sub) {
+      return prefs.get(sub) ?? null;
+    },
+    async setPrefs(sub, value) {
+      prefs.set(sub, { ...value });
     },
     async setGoal(sub, examCode, date) {
       if (date === null) goals.delete(scope(sub, examCode));

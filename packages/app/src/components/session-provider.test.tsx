@@ -110,3 +110,42 @@ describe("SessionProvider", () => {
     expect(screen.getByRole("link", { name: "ログイン" })).toBeTruthy();
   });
 });
+
+describe("SessionProvider の表示の設定の同期", () => {
+  const prefs = { theme: "dark", style: "simple", shuffleChoices: true };
+
+  afterEach(() => {
+    localStorage.clear();
+    document.documentElement.removeAttribute("data-theme");
+    document.documentElement.removeAttribute("data-style");
+  });
+
+  it("ログインした_アカウントの設定を取得し_端末に反映する(1 回だけ)", async () => {
+    const fetchMock = vi.fn(async (url: string) =>
+      url === "/api/history/prefs"
+        ? reply(200, { prefs })
+        : reply(200, { signedIn: true, email: "u@example.com", expiresAt: far() }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    render(
+      <SessionProvider>
+        <AuthStatus />
+      </SessionProvider>,
+    );
+    await waitFor(() => expect(document.documentElement.getAttribute("data-style")).toBe("simple"));
+    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+    expect(calledPaths(fetchMock as never).filter((p) => p === "/api/history/prefs")).toHaveLength(1);
+  });
+
+  it("ログインしていない_設定を取得しない", async () => {
+    const fetchMock = vi.fn().mockResolvedValue(reply(200, { signedIn: false }));
+    vi.stubGlobal("fetch", fetchMock);
+    render(
+      <SessionProvider>
+        <AuthStatus />
+      </SessionProvider>,
+    );
+    await screen.findByRole("link", { name: "ログイン" });
+    expect(calledPaths(fetchMock)).not.toContain("/api/history/prefs");
+  });
+});

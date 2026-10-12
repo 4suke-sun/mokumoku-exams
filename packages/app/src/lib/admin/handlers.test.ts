@@ -9,6 +9,7 @@ import {
   handleDisableUser,
   handleInviteUser,
   handleListUsers,
+  handlePromoteUser,
   MAX_ADMIN_BODY_BYTES,
 } from "./handlers.ts";
 
@@ -34,6 +35,8 @@ const asUser = (sub: string) => `mokumoku_id=token-${sub}`;
 
 function memoryUsers(initial: ManagedUser[] = []) {
   const users = initial.map((u) => ({ ...u }));
+  /** 管理者のグループに加えたユーザー名 */
+  const promoted: string[] = [];
   const admin: UserAdmin = {
     async listUsers() {
       return users.map((u) => ({ ...u }));
@@ -55,8 +58,12 @@ function memoryUsers(initial: ManagedUser[] = []) {
       if (!user) throw new UserAdminError("not-found");
       user.enabled = false;
     },
+    async promoteUser(username) {
+      if (!users.some((u) => u.username === username)) throw new UserAdminError("not-found");
+      if (!promoted.includes(username)) promoted.push(username);
+    },
   };
-  return { users, admin };
+  return { users, admin, promoted };
 }
 
 const user = (username: string, email: string, createdAt: string | null): ManagedUser => ({
@@ -68,14 +75,14 @@ const user = (username: string, email: string, createdAt: string | null): Manage
 });
 
 function setup(initial: ManagedUser[] = [], audit: AuditLog = createMemoryAuditLog()) {
-  const { users, admin } = memoryUsers(initial);
+  const { users, admin, promoted } = memoryUsers(initial);
   const deps: AdminDeps = {
     auth: { verifier, provider: noRefresh, secure: false },
     users: admin,
     audit,
     now: () => NOW,
   };
-  return { users, deps, audit };
+  return { users, deps, audit, promoted };
 }
 
 const get = (query = "", headers: Record<string, string> = {}) =>
@@ -91,6 +98,8 @@ function post(path: string, value: unknown, headers: Record<string, string> = {}
 const invite = (value: unknown, headers: Record<string, string> = {}) => post("/api/admin/users", value, headers);
 const disable = (value: unknown, headers: Record<string, string> = {}) =>
   post("/api/admin/users/disable", value, headers);
+const promote = (value: unknown, headers: Record<string, string> = {}) =>
+  post("/api/admin/users/promote", value, headers);
 
 afterEach(() => {
   vi.restoreAllMocks();
@@ -98,13 +107,15 @@ afterEach(() => {
 
 describe("管理者の API の認可", () => {
   it("未ログイン・壊れたトークン・管理者でない利用者_どの操作も 403 で断り_何も変えない", async () => {
-    const { users, deps } = setup([user("user-9", "nine@example.com", null)]);
+    const { users, deps, promoted } = setup([user("user-9", "nine@example.com", null)]);
     for (const cookie of [undefined, "mokumoku_id=forged", asUser("learner")]) {
       const headers: Record<string, string> = cookie ? { cookie } : {};
       expect((await handleListUsers(get("", headers), deps)).status).toBe(403);
       expect((await handleInviteUser(invite({ email: "new@example.com" }, headers), deps)).status).toBe(403);
       expect((await handleDisableUser(disable({ username: "user-9" }, headers), deps)).status).toBe(403);
+      expect((await handlePromoteUser(promote({ username: "user-9" }, headers), deps)).status).toBe(403);
     }
+    expect(promoted).toEqual([]);
     expect(users).toHaveLength(1);
     expect(users[0]?.enabled).toBe(true);
   });
@@ -283,6 +294,106 @@ describe("無効化と操作の記録", () => {
   });
 });
 
+describe("管理者への昇格と操作の記録", () => {
+  it("昇格し_操作した管理者の sub・対象・操作・時刻を記録する_メールアドレスは入れない", async () => {
+    const audit = createMemoryAuditLog();
+    const { deps, promoted } = setup([user("user-9", "nine@example.com", null)], audit);
+    const response = await handlePromoteUser(promote({ username: "user-9" }, { cookie: asUser(ADMIN) }), deps);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ status: "promoted" });
+    expect(promoted).toEqual(["user-9"]);
+    expect(audit.entries).toEqual([
+      { at: new Date(NOW).toISOString(), actor: ADMIN, target: "user-9", action: "promote-user" },
+    ]);
+    expect(JSON.stringify(audit.entries)).not.toContain("@");
+  });
+
+  it("管理者でない利用者_昇格を実行できず_記録もしない", async () => {
+    const audit = createMemoryAuditLog();
+    const { deps, promoted } = setup([user("learner", "learner@example.com", null)], audit);
+    // 自分自身を昇格させようとしても、管理者でなければ 403
+    const response = await handlePromoteUser(promote({ username: "learner" }, { cookie: asUser("learner") }), deps);
+    expect(response.status).toBe(403);
+    expect(promoted).toEqual([]);
+    expect(audit.entries).toEqual([]);
+  });
+
+  it("別サイトからの送信_断り_昇格しない", async () => {
+    const { deps, promoted } = setup([user("user-9", "nine@example.com", null)]);
+    const response = await handlePromoteUser(
+      promote({ username: "user-9" }, { cookie: asUser(ADMIN), "sec-fetch-site": "cross-site" }),
+      deps,
+    );
+    expect(response.status).toBe(403);
+    expect(promoted).toEqual([]);
+  });
+
+  it("いない利用者_404 で_記録しない", async () => {
+    const audit = createMemoryAuditLog();
+    const { deps } = setup([], audit);
+    const response = await handlePromoteUser(promote({ username: "user-0" }, { cookie: asUser(ADMIN) }), deps);
+    expect(response.status).toBe(404);
+    expect(audit.entries).toEqual([]);
+  });
+
+  it("操作した管理者を本文で申告する・ユーザー名の形でない・本文が大きすぎる_断り_昇格しない", async () => {
+    const audit = createMemoryAuditLog();
+    const { deps, promoted } = setup([user("user-9", "nine@example.com", null)], audit);
+    const cookie = asUser(ADMIN);
+    for (const key of ["actor", "sub", "admin", "group", "PK", "SK"]) {
+      const response = await handlePromoteUser(promote({ username: "user-9", [key]: "admin-2" }, { cookie }), deps);
+      expect(response.status, key).toBe(400);
+    }
+    for (const username of ["", "a#b", "ADMIN#x", "nine@example.com", "a/b", 1]) {
+      expect((await handlePromoteUser(promote({ username }, { cookie }), deps)).status, String(username)).toBe(400);
+    }
+    const big = post(
+      "/api/admin/users/promote",
+      null,
+      { cookie },
+      JSON.stringify({ username: "a".repeat(MAX_ADMIN_BODY_BYTES) }),
+    );
+    expect((await handlePromoteUser(big, deps)).status).toBe(413);
+    expect(promoted).toEqual([]);
+    expect(audit.entries).toEqual([]);
+  });
+
+  it("すでに管理者のユーザーを昇格する_変わらず成功し_記録は残す", async () => {
+    const audit = createMemoryAuditLog();
+    const { deps, promoted } = setup([user("user-9", "nine@example.com", null)], audit);
+    const cookie = asUser(ADMIN);
+    expect((await handlePromoteUser(promote({ username: "user-9" }, { cookie }), deps)).status).toBe(200);
+    expect((await handlePromoteUser(promote({ username: "user-9" }, { cookie }), deps)).status).toBe(200);
+    expect(promoted).toEqual(["user-9"]);
+    expect(audit.entries).toHaveLength(2);
+  });
+
+  it("記録を残せない_503 を返す", async () => {
+    const audit: AuditLog = {
+      async record() {
+        throw new Error("boom");
+      },
+    };
+    const { deps } = setup([user("user-9", "nine@example.com", null)], audit);
+    const response = await handlePromoteUser(promote({ username: "user-9" }, { cookie: asUser(ADMIN) }), deps);
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({ error: "unavailable" });
+  });
+
+  it("無効化は_昇格の追加後も変わらず動き_自分自身は無効にできない", async () => {
+    const audit = createMemoryAuditLog();
+    const { users, deps } = setup(
+      [user(ADMIN, "admin@example.com", null), user("user-9", "nine@example.com", null)],
+      audit,
+    );
+    const cookie = asUser(ADMIN);
+    expect((await handleDisableUser(disable({ username: "user-9" }, { cookie }), deps)).status).toBe(200);
+    expect((await handleDisableUser(disable({ username: ADMIN }, { cookie }), deps)).status).toBe(400);
+    expect(users.find((u) => u.username === "user-9")?.enabled).toBe(false);
+    expect(audit.entries.map((e) => e.action)).toEqual(["disable-user"]);
+  });
+});
+
 describe("操作の記録の保存先(DynamoDB)", () => {
   it("PK=ADMIN、SK=AUDIT#{時刻}#{対象} に、操作した管理者・対象・操作を保存する", async () => {
     const table = fakeTable();
@@ -292,5 +403,12 @@ describe("操作の記録の保存先(DynamoDB)", () => {
       { PK: "ADMIN", SK: "AUDIT#2026-10-12T00:00:00.000Z#user-9", type: "audit", ...entry },
     ]);
     expect(auditKey(entry)).toBe("AUDIT#2026-10-12T00:00:00.000Z#user-9");
+  });
+
+  it("昇格の記録_操作の種類を持つ", async () => {
+    const table = fakeTable();
+    const entry = { at: "2026-10-12T00:00:00.000Z", actor: ADMIN, target: "user-9", action: "promote-user" } as const;
+    await createDynamoAuditLog({ tableName: "table-example", client: table.client }).record(entry);
+    expect([...table.items.values()][0]).toMatchObject({ type: "audit", action: "promote-user", actor: ADMIN });
   });
 });

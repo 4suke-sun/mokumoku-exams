@@ -8,7 +8,7 @@
 | 項目 | 内容 |
 | --- | --- |
 | パーティションキー `PK` | `USER#{sub}`(`sub` は、サーバー側で検証した ID トークンの値) |
-| ソートキー `SK` | 種別ごとの接頭辞で分ける。結果は `RESULT#{資格コード}#{完了時刻}`、ブックマークは `BOOKMARK#{資格コード}#{問題 ID}`、復習プールは `REVIEW#{資格コード}#{問題 ID}`、問題ごとの解答回数と直近の正誤は `STAT#{資格コード}#{問題 ID}`、日ごとの学習量は `DAY#{資格コード}#{YYYY-MM-DD}`、目標日は `GOAL#{資格コード}`、通知の購読は `PUSH#{endpoint のハッシュ}` |
+| ソートキー `SK` | 種別ごとの接頭辞で分ける。結果は `RESULT#{資格コード}#{完了時刻}`、ブックマークは `BOOKMARK#{資格コード}#{問題 ID}`、復習プールは `REVIEW#{資格コード}#{問題 ID}`、問題ごとの解答回数と直近の正誤は `STAT#{資格コード}#{問題 ID}`、日ごとの学習量は `DAY#{資格コード}#{YYYY-MM-DD}`、目標日は `GOAL#{資格コード}`、表示の設定は `PREFS`(利用者ごとに 1 件)、通知の購読は `PUSH#{endpoint のハッシュ}` |
 | 管理者の操作の記録 | 利用者の区画とは別の `PK=ADMIN` に、`SK=AUDIT#{時刻}#{対象のユーザー名}` で置く(「アクセスパターン」。画面は [認証の仕組み](./auth.md) の「管理者の画面」)。`sub` は `ADMIN` にならない(`USER#` が付く)ため、利用者の区画と混ざらない |
 | 課金 | オンデマンド(使った分だけ。使わなければ、ほぼ無料) |
 | 暗号化 | 既定(AWS 所有のキー。追加の費用なし) |
@@ -36,7 +36,8 @@
 | 日ごとの学習量に足す | `PutItem`(`ReturnValues=ALL_OLD`)→ `UpdateItem`(`ADD`) | 結果の保存で、結果の項目が新しく作られたとき(上書きした項目が返らないとき)だけ、`SK=DAY#{資格}#{日付}` の `answered` と `correct` に足す。項目がなければ 0 から足す |
 | 資格の日ごとの学習量を取る | `Query` | `PK=USER#{sub}` かつ `begins_with(SK, "DAY#{資格}#")`。日付の順 |
 | 目標日を決める・消す・取る | `PutItem` / `DeleteItem` / `GetItem` | `SK=GOAL#{資格}`。資格ごとに 1 項目 |
-| 管理者の操作を記録する | `PutItem` | `PK=ADMIN`、`SK=AUDIT#{時刻}#{対象のユーザー名}`。無効化のあとに 1 件。項目は `at`(時刻)・`actor`(操作した管理者の `sub`)・`target`(対象の Cognito のユーザー名)・`action`(`disable-user`)だけで、メールアドレスは入れない |
+| 表示の設定を保存する・取る | `PutItem` / `GetItem` | `SK=PREFS`。利用者ごとに 1 項目。項目は `type`(`prefs`)・`theme`(`system` / `light` / `dark`)・`style`(`rich` / `simple`)・`shuffleChoices`(真偽値)だけ。上書きする。読み出した値は検査し、壊れた値は、保存していないものとして扱う |
+| 管理者の操作を記録する | `PutItem` | `PK=ADMIN`、`SK=AUDIT#{時刻}#{対象のユーザー名}`。無効化と管理者への昇格のあとに 1 件。項目は `at`(時刻)・`actor`(操作した管理者の `sub`)・`target`(対象の Cognito のユーザー名)・`action`(`disable-user` / `promote-user`)だけで、メールアドレスは入れない |
 | 通知を購読する・やめる | `PutItem` / `DeleteItem` | `SK=PUSH#{endpoint の SHA-256}`。同じ端末(endpoint)は上書き |
 | 自分の購読を取る | `Query` | `PK=USER#{sub}` かつ `begins_with(SK, "PUSH#")`。購読の上限の確認と、テスト通知に使う |
 | 毎日の通知の送り先を集める | `Scan`(`SK` が `PUSH#` のものに絞る) | 送信の Lambda だけが使う(「通知の購読」) |
@@ -109,11 +110,13 @@
 | `GET /api/history/days?examCode=...` | 自分の日ごとの学習量を、日付の順に返す(`{ "days": [{ "date", "answered", "correct" }] }`) |
 | `GET /api/history/goal?examCode=...` | 自分の目標日を返す(`{ "date": "YYYY-MM-DD" }`。決めていなければ `null`) |
 | `PUT /api/history/goal` | 目標日を決める・消す(本文は `{ "examCode", "date" }`。`date` が `null` なら消す) |
+| `GET /api/history/prefs` | 自分の表示の設定を返す(`{ "prefs": { "theme", "style", "shuffleChoices" } }`。保存していなければ `null`)。保存済みなら、設定の Cookie も付ける。問い合わせは受け付けない |
+| `PUT /api/history/prefs` | 表示の設定を保存する(本文は `{ "theme", "style", "shuffleChoices" }`。300 バイトまで)。設定の Cookie も付ける |
 | `PUT /api/push/subscription` | この端末の通知の購読を保存する(本文は `{ "endpoint", "keys": { "p256dh", "auth" } }`) |
 | `DELETE /api/push/subscription` | この端末の通知の購読を消す(本文は `{ "endpoint" }`) |
 | `POST /api/push/test` | 管理者だけ。自分の購読(すべての端末)に、テスト通知を送る(本文は `{}`)。送れた数を返す(`{ "sent": 1 }`)。管理者でなければ `403` |
 
-管理者の API(`/api/admin/*`。利用者の一覧・招待・無効化)は、[認証の仕組み](./auth.md) の「管理者の画面」に書きます。
+管理者の API(`/api/admin/*`。利用者の一覧・招待・無効化・管理者への昇格)は、[認証の仕組み](./auth.md) の「管理者の画面」に書きます。
 
 - どれも、`proxy.ts` と各ハンドラーの両方で、ID トークンを検証します。未ログインは `401` です。
 - **利用者の識別子は、リクエストから受け取りません。** 本文に `sub` などの未知の項目があれば `400`、問い合わせに資格コード以外があれば `400` です。
@@ -161,6 +164,16 @@
 | 本文全体 | JSON のオブジェクト。未知の項目は不可。1KB まで |
 | `examCode` | `[A-Z][A-Z0-9]{1,15}`。公開中の資格 |
 | `date` | 実在する日付の `YYYY-MM-DD`(2020-01-01 から 2099-12-31 まで)か、`null`(消す)。項目そのものは省けない |
+
+### 表示の設定の変更の検査と、設定の Cookie
+
+`PUT /api/history/prefs` の本文は、`theme`(`system`・`light`・`dark`)、`style`(`rich`・`simple`)、`shuffleChoices`(真偽値)の 3 つだけで、すべて必要です。未知の項目(`sub` など)は `400` です。保存するのは、検証した ID トークンの利用者の分だけです。
+
+- **端末をまたぐ**: ログインすると、画面がアカウントの設定を取得し、端末(localStorage)と画面に反映します。アカウントに設定がなく、端末に設定があるときは、初回にアカウントへ上げます。アカウントの設定を、端末の設定で上書きしません。
+- **最初の描画から反映する**: 設定の Cookie(`mokumoku_prefs`)を、サーバーが読み、`<html>` の `data-theme`・`data-style` に最初の描画から反映します(読み込み後のちらつきをなくすため)。反映したときは `<html data-prefs>` を付け、初回描画の前の端末の設定のスクリプトは、上書きしません。
+- **持ち主の照合**: Cookie の値は `v1.<持ち主の照合>.<テーマ>.<スタイル>.<シャッフル>` です。持ち主の照合は、利用者の識別子(`sub`)の SHA-256 の先頭 16 文字で、サーバーが、検証した ID トークンの `sub` から作った値と比べます。一致しない Cookie(別のアカウントで同じブラウザを使ったとき)は、使いません。識別子そのものは、Cookie に入れません。設定は秘密の情報ではないため、署名はしません。Cookie は、サーバーだけが読み(`HttpOnly`)、`SameSite=Lax`、本番では `Secure`、期間は 1 年です。
+- **画面の描画**: ルートのレイアウトが、リクエストごとに設定の Cookie を読むため、画面は静的に作らず、リクエストごとに描画します。CloudFront は、画面をキャッシュしません(`docs/app/infra.md`)。
+- **IAM**: 設定は、履歴と同じテーブルの項目です。テーブルの定義と、Lambda に許す DynamoDB の操作は、変わりません。
 
 ### エラー応答
 

@@ -1,9 +1,11 @@
 import {
+  AdminAddUserToGroupCommand,
   AdminCreateUserCommand,
   AdminDisableUserCommand,
   CognitoIdentityProviderClient,
   ListUsersCommand,
 } from "@aws-sdk/client-cognito-identity-provider";
+import { ADMIN_GROUP } from "./admin.ts";
 
 /**
  * 管理者の画面に出す、利用者の情報。`username` は Cognito のユーザー名(この UserPool では `sub` と同じ値)。
@@ -40,6 +42,8 @@ export interface UserAdmin {
   inviteUser(email: string): Promise<ManagedUser>;
   /** 無効にする。無効にした利用者は、以降ログインもトークンの更新もできない */
   disableUser(username: string): Promise<void>;
+  /** 管理者のグループに加える。すでに入っているユーザーに行っても、変わらない */
+  promoteUser(username: string): Promise<void>;
 }
 
 /** SDK のクライアントの、使う操作だけ(テストで差し替える) */
@@ -142,6 +146,12 @@ export function createCognitoUserAdmin(options: Options): UserAdmin {
 
     async disableUser(username) {
       await call(new AdminDisableUserCommand({ UserPoolId: userPoolId, Username: username }));
+    },
+
+    async promoteUser(username) {
+      await call(
+        new AdminAddUserToGroupCommand({ UserPoolId: userPoolId, Username: username, GroupName: ADMIN_GROUP }),
+      );
     },
   };
 }

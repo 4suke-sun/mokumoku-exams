@@ -6,6 +6,7 @@ import { useEffect, useId, useState } from "react";
 import { Notice } from "@/components/notice.tsx";
 import { domainColorClasses } from "@/lib/domain-color.ts";
 import { fetchBookmarks, fetchReview } from "@/lib/history/client.ts";
+import { pushPrefs } from "@/lib/prefs-client.ts";
 import {
   domainCounts,
   isOfficialTarget,
@@ -192,6 +193,8 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
   function changeShuffle(next: boolean) {
     setShuffleChoices(next);
     saveSettings(browserStore(), { shuffleChoices: next, reveal });
+    // シャッフルは、アカウントにも保存する(解答の表示のしかたは、端末だけ)
+    void pushPrefs();
   }
 
   function changeReveal(next: Reveal) {

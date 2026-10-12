@@ -46,6 +46,7 @@ export const InviteSchema = z.strictObject({
   email: z.string().trim().max(254).pipe(z.email()),
 });
 export const DisableSchema = z.strictObject({ username: z.string().regex(SUB_PATTERN) });
+export const PromoteSchema = z.strictObject({ username: z.string().regex(SUB_PATTERN) });
 
 /** 一覧の 1 行。`self` は、操作している管理者自身か(画面で無効化の操作を出さないため) */
 export type AdminUserRow = ManagedUser & { self: boolean };
@@ -143,4 +144,34 @@ export async function handleDisableUser(request: Request, deps: AdminDeps): Prom
     return fail("unavailable", auth.setCookies);
   }
   return json({ status: "disabled" }, 200, auth.setCookies);
+}
+
+/**
+ * 利用者を管理者のグループに加え、操作の記録を残す(削除は作らない。無効化の方針は変えない)。操作した管理者は、検証した ID トークンの
+ * `sub` だけで決める(本文からは受け取らない)。管理者でない利用者は、実行できない(403)。
+ * 記録が残せなかったときは 503 を返す(昇格そのものは済んでいることがある)。
+ */
+export async function handlePromoteUser(request: Request, deps: AdminDeps): Promise<Response> {
+  const rejected = guard(request);
+  if (rejected) return rejected;
+  const auth = await authorize(request, deps);
+  if (!auth) return fail("forbidden");
+  const input = await readBody(request, PromoteSchema, auth.setCookies);
+  if (input instanceof Response) return input;
+  try {
+    await deps.users.promoteUser(input.username);
+  } catch (error) {
+    return failure(error, auth.setCookies);
+  }
+  try {
+    await deps.audit.record({
+      at: new Date((deps.now ?? Date.now)()).toISOString(),
+      actor: auth.user.sub,
+      target: input.username,
+      action: "promote-user",
+    });
+  } catch {
+    return fail("unavailable", auth.setCookies);
+  }
+  return json({ status: "promoted" }, 200, auth.setCookies);
 }
