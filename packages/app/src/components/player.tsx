@@ -359,7 +359,7 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
     : `Enter で${finishable ? "採点" : "次へ"}(回答してから)`;
 
   return (
-    <section className="space-y-6 lg:grid lg:grid-cols-[minmax(0,1fr)_15rem] lg:items-start lg:gap-6 lg:space-y-0">
+    <section className="space-y-6 lg:grid lg:grid-cols-[minmax(0,1fr)_15rem] lg:items-start lg:gap-6 lg:space-y-0 xl:grid-cols-[minmax(0,1fr)_17rem] xl:gap-10">
       <div className="min-w-0 space-y-6">
         <div className="space-y-2">
           <div className="flex flex-wrap items-center justify-between gap-2">
@@ -425,9 +425,13 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
           ref={questionRef}
           tabIndex={-1}
           aria-labelledby="question-text"
-          className={`space-y-3 ${direction === "next" ? "motion-slide-next" : direction === "prev" ? "motion-slide-prev" : ""}`}
+          className={`space-y-3 xl:space-y-4 ${direction === "next" ? "motion-slide-next" : direction === "prev" ? "motion-slide-prev" : ""}`}
         >
-          <RichText id="question-text" text={question.questionText} className="text-lg font-bold" />
+          <RichText
+            id="question-text"
+            text={question.questionText}
+            className="text-lg font-bold xl:text-xl xl:leading-relaxed"
+          />
           {question.questionType === "free-text" ? (
             <>
               <p className="text-sm text-muted">文章で答えてください({MAX_TEXT_ANSWER_LENGTH} 文字まで)。</p>
@@ -455,7 +459,7 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
                 return (
                   <label
                     key={choice.key}
-                    className={`flex items-start gap-3 rounded-md border p-3 ${
+                    className={`flex items-start gap-3 rounded-md border p-3 xl:p-4 xl:text-lg ${
                       on ? "motion-select border-primary bg-soft" : "border-line bg-surface"
                     } has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-primary`}
                   >
