@@ -36,8 +36,10 @@ try {
   if (!apply) {
     process.stdout.write("確認だけです。移行するには --apply を付けて、もう一度実行してください。\n");
   } else {
-    const { moved } = await applyMigration(client, tableName, mapping, plan);
-    process.stdout.write(`移行しました: ${moved} 件\n`);
+    const { moved, conflicts } = await applyMigration(client, tableName, mapping, plan);
+    process.stdout.write(
+      `移行しました: ${moved} 件(書き込みの時点で衝突した項目: ${conflicts} 件。旧い項目は残しています)\n`,
+    );
   }
 } catch {
   // 原因の詳細(テーブルの名前やアカウントを含みうる)は出さない

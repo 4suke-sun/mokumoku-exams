@@ -65,14 +65,18 @@ export async function planMigration(
   return plan;
 }
 
-/** 計画の項目を、新コードの SK に写してから、旧い項目を消す。写せなかった項目は、消さない。 */
+/**
+ * 計画の項目を、新コードの SK に写してから、旧い項目を消す。写せなかった項目は、消さない。
+ * 書き込みは「その SK に項目がないとき」だけにする(計画のあとに、新コードで書かれた項目を上書きしない)。あれば、衝突として数える。
+ */
 export async function applyMigration(
   client: Sender,
   tableName: string,
   mapping: Readonly<Record<string, string>>,
   plan: Plan,
-): Promise<{ moved: number }> {
+): Promise<{ moved: number; conflicts: number }> {
   let moved = 0;
+  let conflicts = 0;
   for (const move of plan.moves) {
     const got = (await client.send(new GetCommand({ TableName: tableName, Key: { PK: move.pk, SK: move.from } }))) as {
       Item?: Item;
@@ -81,9 +85,19 @@ export async function applyMigration(
     const item: Item = { ...got.Item, SK: move.to };
     if (typeof item.examCode === "string" && Object.hasOwn(mapping, item.examCode))
       item.examCode = mapping[item.examCode];
-    await client.send(new PutCommand({ TableName: tableName, Item: item }));
+    try {
+      await client.send(
+        new PutCommand({ TableName: tableName, Item: item, ConditionExpression: "attribute_not_exists(PK)" }),
+      );
+    } catch (error) {
+      if ((error as { name?: string }).name === "ConditionalCheckFailedException") {
+        conflicts++;
+        continue;
+      }
+      throw error;
+    }
     await client.send(new DeleteCommand({ TableName: tableName, Key: { PK: move.pk, SK: move.from } }));
     moved++;
   }
-  return { moved };
+  return { moved, conflicts };
 }

@@ -17,8 +17,13 @@ function fakeTable() {
         return { Items: page, ...(start + 2 < all.length ? { LastEvaluatedKey: { offset: start + 2 } } : {}) };
       }
       if (command instanceof GetCommand) return { Item: items.get(id(command.input.Key as Record<string, unknown>)) };
-      if (command instanceof PutCommand)
-        items.set(id(command.input.Item as Record<string, unknown>), command.input.Item as Record<string, unknown>);
+      if (command instanceof PutCommand) {
+        const item = command.input.Item as Record<string, unknown>;
+        if (command.input.ConditionExpression === "attribute_not_exists(PK)" && items.has(id(item))) {
+          throw Object.assign(new Error("conditional"), { name: "ConditionalCheckFailedException" });
+        }
+        items.set(id(item), item);
+      }
       if (command instanceof DeleteCommand) items.delete(id(command.input.Key as Record<string, unknown>));
       return {};
     },
@@ -75,7 +80,7 @@ describe("DynamoDB の移行", () => {
   it("実行_新コードの SK に写し_項目の中のコードも新しくし_旧い項目を消す", async () => {
     const { client, items } = seed();
     const plan = await planMigration(client, "table-example", mapping);
-    expect((await applyMigration(client, "table-example", mapping, plan)).moved).toBe(4);
+    expect(await applyMigration(client, "table-example", mapping, plan)).toEqual({ moved: 4, conflicts: 0 });
     expect(items.has("USER#a|RESULT#AIB#2026-10-01T00:00:00.000Z")).toBe(false);
     expect(items.get("USER#a|RESULT#AWS-AIB-C01#2026-10-01T00:00:00.000Z")).toMatchObject({
       examCode: "AWS-AIB-C01",
@@ -93,6 +98,16 @@ describe("DynamoDB の移行", () => {
     const again = await planMigration(client, "table-example", mapping);
     expect(again.moves).toEqual([]);
     expect(items).toEqual(after);
+  });
+
+  it("計画のあとに新コードの SK へ項目が書かれた_上書きせず衝突として数え_旧い項目を残す", async () => {
+    const { client, items } = seed();
+    const plan = await planMigration(client, "table-example", mapping);
+    items.set("USER#a|GOAL#AWS-AIB-C01", { PK: "USER#a", SK: "GOAL#AWS-AIB-C01", date: "2027-01-01" });
+    const result = await applyMigration(client, "table-example", mapping, plan);
+    expect(result).toEqual({ moved: 3, conflicts: 1 });
+    expect(items.get("USER#a|GOAL#AWS-AIB-C01")).toMatchObject({ date: "2027-01-01" });
+    expect(items.has("USER#a|GOAL#AIB")).toBe(true);
   });
 
   it("新コードの SK に項目がすでにある_上書きせず衝突として数える", async () => {
