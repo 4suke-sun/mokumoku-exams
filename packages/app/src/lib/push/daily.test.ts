@@ -42,9 +42,9 @@ describe("毎日の通知", () => {
     seed(items, "user-a", 1);
     seed(items, "user-b", 2);
     seed(items, "user-c", 3);
-    items.set("USER#user-a|RESULT#SAMPLE#2026-10-11T00:00:00.000Z", {
+    items.set("USER#user-a|RESULT#EX-SMP-XX#2026-10-11T00:00:00.000Z", {
       PK: "USER#user-a",
-      SK: "RESULT#SAMPLE#2026-10-11T00:00:00.000Z",
+      SK: "RESULT#EX-SMP-XX#2026-10-11T00:00:00.000Z",
       endpoint: endpointOf(9),
     });
     const found = await scanSubscriptions(client, "table-example");
@@ -64,7 +64,10 @@ describe("毎日の通知", () => {
     const { items, client, sent: commands } = fakeTable();
     seed(items, "user-a", 1);
     seed(items, "user-b", 2);
-    items.set("USER#user-b|BOOKMARK#SAMPLE#SAMPLE-0001", { PK: "USER#user-b", SK: "BOOKMARK#SAMPLE#SAMPLE-0001" });
+    items.set("USER#user-b|BOOKMARK#EX-SMP-XX#SAMPLE-0001", {
+      PK: "USER#user-b",
+      SK: "BOOKMARK#EX-SMP-XX#SAMPLE-0001",
+    });
     const { sent, send } = sender({ [endpointOf(2)]: "gone" });
 
     const result = await runDaily({ client, tableName: "table-example", send });
@@ -72,7 +75,7 @@ describe("毎日の通知", () => {
     expect(result).toEqual({ sent: 1, failed: 0, gone: 1 });
     expect(sent.sort()).toEqual([endpointOf(1), endpointOf(2)]);
     expect([...items.keys()].sort()).toEqual(
-      [`USER#user-a|${pushKey(endpointOf(1))}`, "USER#user-b|BOOKMARK#SAMPLE#SAMPLE-0001"].sort(),
+      [`USER#user-a|${pushKey(endpointOf(1))}`, "USER#user-b|BOOKMARK#EX-SMP-XX#SAMPLE-0001"].sort(),
     );
     const deletes = commands.filter((c) => c instanceof DeleteCommand) as DeleteCommand[];
     expect(deletes).toHaveLength(1);

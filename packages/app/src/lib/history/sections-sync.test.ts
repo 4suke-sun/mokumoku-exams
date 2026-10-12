@@ -12,7 +12,7 @@ function memoryStore(): KeyValueStore {
 }
 
 const record = (correct: number, finishedAt = "2026-10-01T00:00:00.000Z") => ({ correct, total: 5, finishedAt });
-const progress = (best: SectionProgress["best"]): SectionProgress => ({ examCode: "SAMPLE", best });
+const progress = (best: SectionProgress["best"]): SectionProgress => ({ examCode: "EX-SMP-XX", best });
 
 /** fetch の代わり。GET はサーバーの進捗を返し、PUT は受け取った進捗とサーバーの進捗を 1 つにして返す */
 function fakeServer(initial: SectionProgress | null, options: { failPut?: boolean } = {}) {
@@ -45,9 +45,9 @@ describe("セクションの進捗の同期", () => {
   it("別の端末の進捗がサーバーにある_端末にも取り込み_同じ進捗が見える", async () => {
     const server = fakeServer(progress({ "0": record(5), "1": record(4) }));
     const store = memoryStore();
-    const synced = await syncSectionProgress(store, "SAMPLE");
+    const synced = await syncSectionProgress(store, "EX-SMP-XX");
     expect(Object.keys(synced.best)).toEqual(["0", "1"]);
-    expect(loadSectionProgress(store, "SAMPLE").best["1"]?.correct).toBe(4);
+    expect(loadSectionProgress(store, "EX-SMP-XX").best["1"]?.correct).toBe(4);
     expect(server.calls).toEqual(["GET"]);
   });
 
@@ -55,7 +55,7 @@ describe("セクションの進捗の同期", () => {
     const server = fakeServer(progress({ "0": record(3) }));
     const store = memoryStore();
     saveSectionProgress(store, progress({ "0": record(5), "2": record(4) }));
-    const synced = await syncSectionProgress(store, "SAMPLE");
+    const synced = await syncSectionProgress(store, "EX-SMP-XX");
     expect(synced.best["0"]?.correct).toBe(5);
     expect(synced.best["2"]?.correct).toBe(4);
     expect(server.current()?.best["2"]?.correct).toBe(4);
@@ -66,7 +66,7 @@ describe("セクションの進捗の同期", () => {
     const server = fakeServer(progress({ "0": record(5) }));
     const store = memoryStore();
     saveSectionProgress(store, progress({ "0": record(4) }));
-    await syncSectionProgress(store, "SAMPLE");
+    await syncSectionProgress(store, "EX-SMP-XX");
     expect(server.calls).toEqual(["GET"]);
   });
 
@@ -74,15 +74,15 @@ describe("セクションの進捗の同期", () => {
     fakeServer(null);
     const store = memoryStore();
     saveSectionProgress(store, progress({ "0": record(4) }));
-    expect((await syncSectionProgress(store, "SAMPLE")).best["0"]?.correct).toBe(4);
+    expect((await syncSectionProgress(store, "EX-SMP-XX")).best["0"]?.correct).toBe(4);
   });
 
   it("取り込みの送信に失敗した_端末の進捗を含めた統合結果を返し_端末の記録は残る", async () => {
     fakeServer(progress({ "1": record(2) }), { failPut: true });
     const store = memoryStore();
     saveSectionProgress(store, progress({ "0": record(4) }));
-    const synced = await syncSectionProgress(store, "SAMPLE");
+    const synced = await syncSectionProgress(store, "EX-SMP-XX");
     expect(Object.keys(synced.best).sort()).toEqual(["0", "1"]);
-    expect(Object.keys(loadSectionProgress(store, "SAMPLE").best).sort()).toEqual(["0", "1"]);
+    expect(Object.keys(loadSectionProgress(store, "EX-SMP-XX").best).sort()).toEqual(["0", "1"]);
   });
 });

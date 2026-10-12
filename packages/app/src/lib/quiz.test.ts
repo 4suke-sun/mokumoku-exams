@@ -227,8 +227,8 @@ describe("分野を選んだ状態のモード選択", () => {
   const codes = ["domain1", "domain2"];
 
   it("経路の分野_資格の分野なら選び_読み戻すと同じ分野になる", () => {
-    const href = domainSelectHref("SAMPLE", "domain2");
-    expect(href).toBe("/exams/SAMPLE?domain=domain2");
+    const href = domainSelectHref("EX-SMP-XX", "domain2");
+    expect(href).toBe("/exams/EX-SMP-XX?domain=domain2");
     expect(requestedDomains(new URL(href, "http://localhost").search, codes)).toEqual(["domain2"]);
   });
 
@@ -350,8 +350,8 @@ describe("newSession", () => {
   const now = new Date(Date.UTC(2026, 9, 11, 0, 0));
 
   it("渡した順に出題し_回答なし・最初の問題から始める", () => {
-    expect(newSession("SAMPLE", items, { shuffleChoices: false }, Math.random, now)).toEqual({
-      examCode: "SAMPLE",
+    expect(newSession("EX-SMP-XX", items, { shuffleChoices: false }, Math.random, now)).toEqual({
+      examCode: "EX-SMP-XX",
       questionIds: ["Q-2", "Q-1"],
       answers: {},
       index: 0,
@@ -361,7 +361,7 @@ describe("newSession", () => {
   });
 
   it("選択肢をシャッフルする_問題ごとに並びを決める", () => {
-    const session = newSession("SAMPLE", items, { shuffleChoices: true }, () => 0, now);
+    const session = newSession("EX-SMP-XX", items, { shuffleChoices: true }, () => 0, now);
     expect(Object.keys(session.choiceOrder ?? {}).sort()).toEqual(["Q-1", "Q-2"]);
     expect([...(session.choiceOrder?.["Q-2"] ?? [])].sort()).toEqual(["A", "B", "C"]);
   });

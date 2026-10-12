@@ -255,12 +255,12 @@ describe("認可: 未ログインの拒否", () => {
   });
 
   it("履歴の API 本体_入口を通らなくても未ログインを断る(二重の防御)", async () => {
-    expect((await historyRoute.GET(request("/api/history/results?examCode=SAMPLE"))).status).toBe(401);
+    expect((await historyRoute.GET(request("/api/history/results?examCode=EX-SMP-XX"))).status).toBe(401);
     const response = await historyRoute.POST(
       request("/api/history/results", {
         method: "POST",
         body: {
-          examCode: "SAMPLE",
+          examCode: "EX-SMP-XX",
           questionIds: ["SAMPLE-0001"],
           answers: {},
           finishedAt: new Date().toISOString(),
@@ -271,12 +271,12 @@ describe("認可: 未ログインの拒否", () => {
   });
 
   it("ブックマークと復習プールの API 本体_入口を通らなくても未ログインを断る(二重の防御)", async () => {
-    expect((await bookmarksRoute.GET(request("/api/history/bookmarks?examCode=SAMPLE"))).status).toBe(401);
-    expect((await reviewRoute.GET(request("/api/history/review?examCode=SAMPLE"))).status).toBe(401);
+    expect((await bookmarksRoute.GET(request("/api/history/bookmarks?examCode=EX-SMP-XX"))).status).toBe(401);
+    expect((await reviewRoute.GET(request("/api/history/review?examCode=EX-SMP-XX"))).status).toBe(401);
     const response = await bookmarksRoute.PUT(
       request("/api/history/bookmarks", {
         method: "PUT",
-        body: { examCode: "SAMPLE", questionId: "SAMPLE-0001", bookmarked: true },
+        body: { examCode: "EX-SMP-XX", questionId: "SAMPLE-0001", bookmarked: true },
       }),
     );
     expect(response.status).toBe(401);
@@ -284,28 +284,30 @@ describe("認可: 未ログインの拒否", () => {
 
   it("1 回分の結果・集計・復習の一覧と外す API 本体_入口を通らなくても未ログインを断る(二重の防御)", async () => {
     const at = encodeURIComponent("2026-10-11T12:00:00.000Z");
-    expect((await resultRoute.GET(request(`/api/history/result?examCode=SAMPLE&finishedAt=${at}`))).status).toBe(401);
-    expect((await statsRoute.GET(request("/api/history/stats?examCode=SAMPLE"))).status).toBe(401);
+    expect((await resultRoute.GET(request(`/api/history/result?examCode=EX-SMP-XX&finishedAt=${at}`))).status).toBe(
+      401,
+    );
+    expect((await statsRoute.GET(request("/api/history/stats?examCode=EX-SMP-XX"))).status).toBe(401);
     expect((await reviewAllRoute.GET(request("/api/history/review/all"))).status).toBe(401);
-    const removal = { examCode: "SAMPLE", questionId: "SAMPLE-0001" };
+    const removal = { examCode: "EX-SMP-XX", questionId: "SAMPLE-0001" };
     expect((await reviewRoute.DELETE(request("/api/history/review", { method: "DELETE", body: removal }))).status).toBe(
       401,
     );
   });
 
   it("セクションの進捗の API 本体_入口を通らなくても未ログインを断る(二重の防御)", async () => {
-    expect((await sectionsRoute.GET(request("/api/history/sections?examCode=SAMPLE"))).status).toBe(401);
+    expect((await sectionsRoute.GET(request("/api/history/sections?examCode=EX-SMP-XX"))).status).toBe(401);
     const response = await sectionsRoute.PUT(
-      request("/api/history/sections", { method: "PUT", body: { examCode: "SAMPLE", best: {} } }),
+      request("/api/history/sections", { method: "PUT", body: { examCode: "EX-SMP-XX", best: {} } }),
     );
     expect(response.status).toBe(401);
   });
 
   it("日ごとの学習量と目標日の API 本体_入口を通らなくても未ログインを断る(二重の防御)", async () => {
-    expect((await daysRoute.GET(request("/api/history/days?examCode=SAMPLE"))).status).toBe(401);
-    expect((await goalRoute.GET(request("/api/history/goal?examCode=SAMPLE"))).status).toBe(401);
+    expect((await daysRoute.GET(request("/api/history/days?examCode=EX-SMP-XX"))).status).toBe(401);
+    expect((await goalRoute.GET(request("/api/history/goal?examCode=EX-SMP-XX"))).status).toBe(401);
     const response = await goalRoute.PUT(
-      request("/api/history/goal", { method: "PUT", body: { examCode: "SAMPLE", date: "2026-12-20" } }),
+      request("/api/history/goal", { method: "PUT", body: { examCode: "EX-SMP-XX", date: "2026-12-20" } }),
     );
     expect(response.status).toBe(401);
   });
@@ -378,7 +380,7 @@ describe("認可: 他人のデータに触れない", () => {
   }
 
   const result = () => ({
-    examCode: "SAMPLE",
+    examCode: "EX-SMP-XX",
     questionIds: ["SAMPLE-0001"],
     answers: { "SAMPLE-0001": ["A"] },
     finishedAt: new Date().toISOString(),
@@ -394,11 +396,11 @@ describe("認可: 他人のデータに触れない", () => {
     }
     for (const key of ["sub", "userId", "user", "owner", "PK"]) {
       const response = await historyRoute.GET(
-        request(`/api/history/results?examCode=SAMPLE&${key}=other-user`, { cookie: own }),
+        request(`/api/history/results?examCode=EX-SMP-XX&${key}=other-user`, { cookie: own }),
       );
       expect(response.status, key).toBe(400);
     }
-    const withHeaders = new NextRequest("http://localhost/api/history/results?examCode=SAMPLE", {
+    const withHeaders = new NextRequest("http://localhost/api/history/results?examCode=EX-SMP-XX", {
       headers: {
         cookie: own,
         "x-user-id": "other-user",
@@ -413,7 +415,7 @@ describe("認可: 他人のデータに触れない", () => {
 
   it("ブックマークで利用者の識別子を本文・問い合わせで渡す_拒否される", async () => {
     const own = await cookie();
-    const change = { examCode: "SAMPLE", questionId: "SAMPLE-0001", bookmarked: true };
+    const change = { examCode: "EX-SMP-XX", questionId: "SAMPLE-0001", bookmarked: true };
     for (const key of ["sub", "userId", "PK", "SK"]) {
       const response = await bookmarksRoute.PUT(
         request("/api/history/bookmarks", { method: "PUT", cookie: own, body: { ...change, [key]: "other-user" } }),
@@ -422,7 +424,7 @@ describe("認可: 他人のデータに触れない", () => {
     }
     for (const route of [bookmarksRoute, reviewRoute]) {
       const response = await route.GET(
-        request("/api/history/bookmarks?examCode=SAMPLE&sub=other-user", { cookie: own }),
+        request("/api/history/bookmarks?examCode=EX-SMP-XX&sub=other-user", { cookie: own }),
       );
       expect(response.status).toBe(400);
     }
@@ -430,7 +432,7 @@ describe("認可: 他人のデータに触れない", () => {
 
   it("目標日と日ごとの学習量で利用者の識別子を本文・問い合わせで渡す_拒否される", async () => {
     const own = await cookie();
-    const change = { examCode: "SAMPLE", date: "2026-12-20" };
+    const change = { examCode: "EX-SMP-XX", date: "2026-12-20" };
     for (const key of ["sub", "userId", "PK", "SK"]) {
       const response = await goalRoute.PUT(
         request("/api/history/goal", { method: "PUT", cookie: own, body: { ...change, [key]: "other-user" } }),
@@ -441,14 +443,21 @@ describe("認可: 他人のデータに触れない", () => {
       [goalRoute, "/api/history/goal"],
       [daysRoute, "/api/history/days"],
     ] as const) {
-      const response = await route.GET(request(`${path}?examCode=SAMPLE&sub=other-user`, { cookie: own }));
+      const response = await route.GET(request(`${path}?examCode=EX-SMP-XX&sub=other-user`, { cookie: own }));
       expect(response.status, path).toBe(400);
     }
   });
 
   it("資格コードにキーの区切りを入れて他の区画を読もうとする_断られる", async () => {
     const own = await cookie();
-    for (const examCode of ["SAMPLE%23", "SAMPLE%23USER%23other", "%23", "USER%23other", "SAMPLE%2523", "sample"]) {
+    for (const examCode of [
+      "EX-SMP-XX%23",
+      "EX-SMP-XX%23USER%23other",
+      "%23",
+      "USER%23other",
+      "EX-SMP-XX%2523",
+      "sample",
+    ]) {
       const response = await historyRoute.GET(request(`/api/history/results?examCode=${examCode}`, { cookie: own }));
       expect(response.status, examCode).toBe(400);
     }
@@ -469,10 +478,10 @@ describe("認可: 他人のデータに触れない", () => {
     expect(
       (await historyRoute.POST(request("/api/history/results", { method: "POST", cookie: own, body: saved }))).status,
     ).toBe(200);
-    const mine = await historyRoute.GET(request("/api/history/results?examCode=SAMPLE", { cookie: own }));
+    const mine = await historyRoute.GET(request("/api/history/results?examCode=EX-SMP-XX", { cookie: own }));
     expect(((await mine.json()) as { results: unknown[] }).results).toEqual([saved]);
     // ログインしていない人には、何も見えない
-    expect((await historyRoute.GET(request("/api/history/results?examCode=SAMPLE"))).status).toBe(401);
+    expect((await historyRoute.GET(request("/api/history/results?examCode=EX-SMP-XX"))).status).toBe(401);
   });
 
   it("ブックマークと復習プール_自分の分だけに保存され_取得も自分の分だけ", async () => {
@@ -481,21 +490,21 @@ describe("認可: 他人のデータに触れない", () => {
       request("/api/history/bookmarks", {
         method: "PUT",
         cookie: own,
-        body: { examCode: "SAMPLE", questionId: "SAMPLE-0002", bookmarked: true },
+        body: { examCode: "EX-SMP-XX", questionId: "SAMPLE-0002", bookmarked: true },
       }),
     );
     expect(put.status).toBe(200);
     // 不正解の結果を保存すると、その問題が復習プールに入る
     await historyRoute.POST(request("/api/history/results", { method: "POST", cookie: own, body: result() }));
-    const bookmarks = await bookmarksRoute.GET(request("/api/history/bookmarks?examCode=SAMPLE", { cookie: own }));
+    const bookmarks = await bookmarksRoute.GET(request("/api/history/bookmarks?examCode=EX-SMP-XX", { cookie: own }));
     expect(await bookmarks.json()).toEqual({ questionIds: ["SAMPLE-0002"] });
-    const review = await reviewRoute.GET(request("/api/history/review?examCode=SAMPLE", { cookie: own }));
+    const review = await reviewRoute.GET(request("/api/history/review?examCode=EX-SMP-XX", { cookie: own }));
     expect(await review.json()).toEqual({ questionIds: ["SAMPLE-0001"] });
   });
 
   it("セクションの進捗_利用者の識別子を本文・問い合わせで渡す_拒否される", async () => {
     const own = await cookie();
-    const body = { examCode: "SAMPLE", best: {} };
+    const body = { examCode: "EX-SMP-XX", best: {} };
     for (const key of ["sub", "userId", "PK", "SK"]) {
       const response = await sectionsRoute.PUT(
         request("/api/history/sections", { method: "PUT", cookie: own, body: { ...body, [key]: "other-user" } }),
@@ -506,12 +515,12 @@ describe("認可: 他人のデータに触れない", () => {
     const put = (body: unknown) =>
       sectionsRoute.PUT(request("/api/history/sections", { method: "PUT", cookie: own, body }));
     expect((await put({ examCode: "NOPE", best: {} })).status).toBe(400);
-    expect((await put({ examCode: "SAMPLE", best: { x: { correct: 1, total: 5, finishedAt: "t" } } })).status).toBe(
+    expect((await put({ examCode: "EX-SMP-XX", best: { x: { correct: 1, total: 5, finishedAt: "t" } } })).status).toBe(
       400,
     );
-    expect((await put({ examCode: "SAMPLE#1", best: {} })).status).toBe(400);
+    expect((await put({ examCode: "EX-SMP-XX#1", best: {} })).status).toBe(400);
     const query = await sectionsRoute.GET(
-      request("/api/history/sections?examCode=SAMPLE&sub=other-user", { cookie: own }),
+      request("/api/history/sections?examCode=EX-SMP-XX&sub=other-user", { cookie: own }),
     );
     expect(query.status).toBe(400);
   });
@@ -521,7 +530,7 @@ describe("認可: 他人のデータに触れない", () => {
     const record = (correct: number, finishedAt: string) => ({ correct, total: 5, finishedAt });
     const put = (best: Record<string, unknown>) =>
       sectionsRoute.PUT(
-        request("/api/history/sections", { method: "PUT", cookie: own, body: { examCode: "SAMPLE", best } }),
+        request("/api/history/sections", { method: "PUT", cookie: own, body: { examCode: "EX-SMP-XX", best } }),
       );
     expect((await put({ "0": record(3, "2026-10-01T00:00:00.000Z") })).status).toBe(200);
     // 別の端末の記録を取り込むと、セクションごとに正答数の多いほうが残る
@@ -535,29 +544,29 @@ describe("認可: 他人のデータに触れない", () => {
       "0": { correct: 5 },
       "1": { correct: 2 },
     });
-    const mine = await sectionsRoute.GET(request("/api/history/sections?examCode=SAMPLE", { cookie: own }));
+    const mine = await sectionsRoute.GET(request("/api/history/sections?examCode=EX-SMP-XX", { cookie: own }));
     expect(((await mine.json()) as { progress: { best: object } }).progress.best).toHaveProperty("1");
     const other = await sectionsRoute.GET(
-      request("/api/history/sections?examCode=SAMPLE", { cookie: await adminCookie() }),
+      request("/api/history/sections?examCode=EX-SMP-XX", { cookie: await adminCookie() }),
     );
-    expect(await other.json()).toEqual({ progress: { examCode: "SAMPLE", best: {} } });
-    expect((await sectionsRoute.GET(request("/api/history/sections?examCode=SAMPLE"))).status).toBe(401);
+    expect(await other.json()).toEqual({ progress: { examCode: "EX-SMP-XX", best: {} } });
+    expect((await sectionsRoute.GET(request("/api/history/sections?examCode=EX-SMP-XX"))).status).toBe(401);
   });
 
   it("目標日と日ごとの学習量_自分の分だけに保存され_取得も自分の分だけ", async () => {
     const own = await cookie();
     const put = await goalRoute.PUT(
-      request("/api/history/goal", { method: "PUT", cookie: own, body: { examCode: "SAMPLE", date: "2026-12-20" } }),
+      request("/api/history/goal", { method: "PUT", cookie: own, body: { examCode: "EX-SMP-XX", date: "2026-12-20" } }),
     );
     expect(put.status).toBe(200);
     await historyRoute.POST(request("/api/history/results", { method: "POST", cookie: own, body: result() }));
-    const goal = await goalRoute.GET(request("/api/history/goal?examCode=SAMPLE", { cookie: own }));
+    const goal = await goalRoute.GET(request("/api/history/goal?examCode=EX-SMP-XX", { cookie: own }));
     expect(await goal.json()).toEqual({ date: "2026-12-20" });
-    const days = await daysRoute.GET(request("/api/history/days?examCode=SAMPLE", { cookie: own }));
+    const days = await daysRoute.GET(request("/api/history/days?examCode=EX-SMP-XX", { cookie: own }));
     expect(((await days.json()) as { days: { answered: number }[] }).days.map((d) => d.answered)).toEqual([1]);
     // ログインしていない人には、何も見えない
-    expect((await goalRoute.GET(request("/api/history/goal?examCode=SAMPLE"))).status).toBe(401);
-    expect((await daysRoute.GET(request("/api/history/days?examCode=SAMPLE"))).status).toBe(401);
+    expect((await goalRoute.GET(request("/api/history/goal?examCode=EX-SMP-XX"))).status).toBe(401);
+    expect((await daysRoute.GET(request("/api/history/days?examCode=EX-SMP-XX"))).status).toBe(401);
   });
 
   it("表示の設定_自分の分だけに保存され_識別子を本文・問い合わせで渡しても拒否され_未ログインには見えない", async () => {
@@ -806,7 +815,7 @@ describe("認可: 管理者だけが開ける", () => {
     const adminCookie = await admin();
     const finishedAt = new Date().toISOString();
     const saved = {
-      examCode: "SAMPLE",
+      examCode: "EX-SMP-XX",
       questionIds: ["SAMPLE-0001"],
       answers: { "SAMPLE-0001": ["D"] },
       finishedAt,
@@ -818,7 +827,7 @@ describe("認可: 管理者だけが開ける", () => {
     expect(posted.status).toBe(200);
     const one = (cookie: string) =>
       resultRoute.GET(
-        request(`/api/history/result?examCode=SAMPLE&finishedAt=${encodeURIComponent(finishedAt)}`, { cookie }),
+        request(`/api/history/result?examCode=EX-SMP-XX&finishedAt=${encodeURIComponent(finishedAt)}`, { cookie }),
       );
     expect(await (await one(learnerCookie)).json()).toEqual({ result: saved });
     // 別の利用者は、同じ資格・同じ完了時刻を指定しても読めない
@@ -828,7 +837,7 @@ describe("認可: 管理者だけが開ける", () => {
 
     const stats = async (cookie: string) =>
       (
-        (await (await statsRoute.GET(request("/api/history/stats?examCode=SAMPLE", { cookie }))).json()) as {
+        (await (await statsRoute.GET(request("/api/history/stats?examCode=EX-SMP-XX", { cookie }))).json()) as {
           stats: { questionId: string; count: number }[];
         }
       ).stats;
@@ -845,7 +854,7 @@ describe("認可: 管理者だけが開ける", () => {
     expect(await items(adminCookie)).toEqual([]);
 
     // 別の利用者が外そうとしても、自分の区画の項目(ない)を消すだけで、学習者の復習は残る
-    const removal = { examCode: "SAMPLE", questionId: "SAMPLE-0001" };
+    const removal = { examCode: "EX-SMP-XX", questionId: "SAMPLE-0001" };
     const removedByOther = await reviewRoute.DELETE(
       request("/api/history/review", { method: "DELETE", cookie: adminCookie, body: removal }),
     );
@@ -864,8 +873,8 @@ describe("認可: 管理者だけが開ける", () => {
     }
     for (const path of [
       "/api/history/review/all?sub=other-user",
-      "/api/history/stats?examCode=SAMPLE&sub=other-user",
-      `/api/history/result?examCode=SAMPLE&finishedAt=${encodeURIComponent(finishedAt)}&sub=other-user`,
+      "/api/history/stats?examCode=EX-SMP-XX&sub=other-user",
+      `/api/history/result?examCode=EX-SMP-XX&finishedAt=${encodeURIComponent(finishedAt)}&sub=other-user`,
     ]) {
       const route = path.startsWith("/api/history/review")
         ? reviewAllRoute

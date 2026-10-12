@@ -2,8 +2,8 @@ import { describe, expect, it } from "vitest";
 import { validateCurriculumData } from "./validate.ts";
 
 const context = {
-  questionIds: new Map([["SAMPLE", new Set(["SAMPLE-0001", "SAMPLE-0002", "SAMPLE-0003"])]]),
-  domains: new Map([["SAMPLE", new Set(["domain1", "domain2"])]]),
+  questionIds: new Map([["EX-SMP-XX", new Set(["SAMPLE-0001", "SAMPLE-0002", "SAMPLE-0003"])]]),
+  domains: new Map([["EX-SMP-XX", new Set(["domain1", "domain2"])]]),
 };
 
 const section = (over: Record<string, unknown> = {}) => ({
@@ -38,12 +38,12 @@ const diagram = (over: Record<string, unknown> = {}) => ({
 const withDiagram = (over: Record<string, unknown> = {}) =>
   files(curriculum([unit({ sections: [section({ diagram: diagram(over) })] })]));
 const domainSummaries = [{ code: "domain1", summary: "分野 1 の説明です。" }];
-const curriculum = (units: unknown[] = [unit()], examCode = "SAMPLE", domains: unknown[] = domainSummaries) => ({
+const curriculum = (units: unknown[] = [unit()], examCode = "EX-SMP-XX", domains: unknown[] = domainSummaries) => ({
   examCode,
   domains,
   units,
 });
-const files = (data: unknown = curriculum(), name = "curriculum.sample.json") => [{ name, data }];
+const files = (data: unknown = curriculum(), name = "curriculum.ex-smp-xx.json") => [{ name, data }];
 
 describe("validateCurriculumData", () => {
   it("正しいデータ_指摘なし", () => {
@@ -57,31 +57,29 @@ describe("validateCurriculumData", () => {
 
   it("問題データにない問題 ID_場所と種類だけを報告する", () => {
     const errors = validateCurriculumData(files(curriculum([unit({ questionIds: ["SAMPLE-0099"] })])), context);
-    expect(errors).toEqual(["curriculum.sample.json: units[0].questionIds[0]: 問題データにない問題です"]);
+    expect(errors).toEqual(["curriculum.ex-smp-xx.json: units[0].questionIds[0]: 問題データにない問題です"]);
   });
 
-  it("別の資格の問題 ID_接頭辞の食い違いとして報告する", () => {
+  it("別の資格の問題 ID_問題データにない問題として報告する", () => {
     const errors = validateCurriculumData(files(curriculum([unit({ questionIds: ["OTHER-0001"] })])), context);
-    expect(errors).toEqual([
-      "curriculum.sample.json: units[0].questionIds[0]: 問題の ID の接頭辞が資格コードと一致しません",
-    ]);
+    expect(errors).toEqual(["curriculum.ex-smp-xx.json: units[0].questionIds[0]: 問題データにない問題です"]);
   });
 
   it("単元の ID・単元の順番・節の ID・単元の中の問題 ID の重複_それぞれ報告する", () => {
     const dupUnit = validateCurriculumData(files(curriculum([unit(), unit({ order: 2 })])), context);
-    expect(dupUnit).toEqual(["curriculum.sample.json: units[1].id: 単元の ID が重複しています"]);
+    expect(dupUnit).toEqual(["curriculum.ex-smp-xx.json: units[1].id: 単元の ID が重複しています"]);
 
     const dupOrder = validateCurriculumData(files(curriculum([unit(), unit({ id: "unit-two" })])), context);
-    expect(dupOrder).toEqual(["curriculum.sample.json: units[1].order: 単元の順番が重複しています"]);
+    expect(dupOrder).toEqual(["curriculum.ex-smp-xx.json: units[1].order: 単元の順番が重複しています"]);
 
     const dupSection = validateCurriculumData(files(curriculum([unit({ sections: [section(), section()] })])), context);
-    expect(dupSection).toEqual(["curriculum.sample.json: units[0].sections[1].id: 節の ID が重複しています"]);
+    expect(dupSection).toEqual(["curriculum.ex-smp-xx.json: units[0].sections[1].id: 節の ID が重複しています"]);
 
     const dupQuestion = validateCurriculumData(
       files(curriculum([unit({ questionIds: ["SAMPLE-0001", "SAMPLE-0001"] })])),
       context,
     );
-    expect(dupQuestion).toEqual(["curriculum.sample.json: units[0].questionIds[1]: 問題の ID が重複しています"]);
+    expect(dupQuestion).toEqual(["curriculum.ex-smp-xx.json: units[0].questionIds[1]: 問題の ID が重複しています"]);
   });
 
   it("必須の項目がない・空・未知の項目_指摘する", () => {
@@ -91,7 +89,7 @@ describe("validateCurriculumData", () => {
     expect(validateCurriculumData(files(curriculum([])), context)).not.toEqual([]);
     expect(validateCurriculumData(files(curriculum([unit({ extra: 1 })])), context)).toHaveLength(1);
     expect(validateCurriculumData(files(curriculum([unit({ sections: [section({ body: "  " })] })])), context)).toEqual(
-      ["curriculum.sample.json: units[0].sections[0].body: 形式が違います"],
+      ["curriculum.ex-smp-xx.json: units[0].sections[0].body: 形式が違います"],
     );
   });
 
@@ -105,7 +103,7 @@ describe("validateCurriculumData", () => {
     ];
     for (const [data, path] of cases) {
       expect(validateCurriculumData(files(data), context)).toEqual([
-        `curriculum.sample.json: ${path}: 本文に URL が含まれています`,
+        `curriculum.ex-smp-xx.json: ${path}: 本文に URL が含まれています`,
       ]);
     }
     expect(validateCurriculumData(withDiagram({ title: `図 ${url}` }), context)).toHaveLength(1);
@@ -120,8 +118,8 @@ describe("validateCurriculumData", () => {
     expect(
       validateCurriculumData(files(curriculum([unit({ sections: [section({ references: bad })] })])), context),
     ).toEqual([
-      "curriculum.sample.json: units[0].sections[0].references[0].url: 出典に許していないドメインの URL です",
-      "curriculum.sample.json: units[0].sections[0].references[1].url: https で始まる URL ではありません",
+      "curriculum.ex-smp-xx.json: units[0].sections[0].references[0].url: 出典に許していないドメインの URL です",
+      "curriculum.ex-smp-xx.json: units[0].sections[0].references[1].url: https で始まる URL ではありません",
     ]);
   });
 
@@ -135,18 +133,18 @@ describe("validateCurriculumData", () => {
   });
 
   it("ファイル名の形が違う・ファイル名とコードが違う_指摘する", () => {
-    expect(validateCurriculumData(files(curriculum(), "curriculum.SAMPLE.json"), context)).toEqual([
-      "curriculum.SAMPLE.json: ファイル名が curriculum.<コード(英小文字と数字)>.json の形ではありません",
+    expect(validateCurriculumData(files(curriculum(), "curriculum.EX-SMP-XX.json"), context)).toEqual([
+      "curriculum.EX-SMP-XX.json: ファイル名が curriculum.<コード(英小文字と数字)>.json の形ではありません",
     ]);
-    expect(validateCurriculumData(files(curriculum(), "curriculum.other.json"), context)).toEqual([
-      "curriculum.other.json: examCode がファイル名のコードと一致しません",
+    expect(validateCurriculumData(files(curriculum(), "curriculum.ex-oth-xx.json"), context)).toEqual([
+      "curriculum.ex-oth-xx.json: examCode がファイル名のコードと一致しません",
     ]);
   });
 
   it("公開中ではない資格・問題データのない資格のカリキュラム_指摘する", () => {
-    const data = curriculum([unit({ questionIds: ["LATER-0001"] })], "LATER");
-    expect(validateCurriculumData(files(data, "curriculum.later.json"), context)).toEqual([
-      "curriculum.later.json: 公開中の資格(問題データのある資格)のカリキュラムではありません",
+    const data = curriculum([unit({ questionIds: ["LATER-0001"] })], "EX-LTR-XX");
+    expect(validateCurriculumData(files(data, "curriculum.ex-ltr-xx.json"), context)).toEqual([
+      "curriculum.ex-ltr-xx.json: 公開中の資格(問題データのある資格)のカリキュラムではありません",
     ]);
   });
 
@@ -160,11 +158,11 @@ describe("validateCurriculumData", () => {
       { id: "a", label: "重複" },
     ];
     expect(validateCurriculumData(withDiagram({ nodes, edges: [{ from: "a", to: "a" }] }), context)).toEqual([
-      "curriculum.sample.json: units[0].sections[0].diagram.nodes[1].id: 図の箱の ID が重複しています",
-      "curriculum.sample.json: units[0].sections[0].diagram.edges[0]: 自分自身への矢印は置けません",
+      "curriculum.ex-smp-xx.json: units[0].sections[0].diagram.nodes[1].id: 図の箱の ID が重複しています",
+      "curriculum.ex-smp-xx.json: units[0].sections[0].diagram.edges[0]: 自分自身への矢印は置けません",
     ]);
     expect(validateCurriculumData(withDiagram({ edges: [{ from: "a", to: "x" }] }), context)).toEqual([
-      "curriculum.sample.json: units[0].sections[0].diagram.edges[0].to: 図にない箱を指しています",
+      "curriculum.ex-smp-xx.json: units[0].sections[0].diagram.edges[0].to: 図にない箱を指しています",
     ]);
   });
 
@@ -174,7 +172,7 @@ describe("validateCurriculumData", () => {
       { from: "a", to: "b", label: "重複" },
     ];
     expect(validateCurriculumData(withDiagram({ edges: dup }), context)).toEqual([
-      "curriculum.sample.json: units[0].sections[0].diagram.edges[1]: 同じ向きの矢印が重複しています",
+      "curriculum.ex-smp-xx.json: units[0].sections[0].diagram.edges[1]: 同じ向きの矢印が重複しています",
     ]);
     const cycle = [
       { from: "a", to: "b" },
@@ -182,7 +180,7 @@ describe("validateCurriculumData", () => {
       { from: "c", to: "a" },
     ];
     expect(validateCurriculumData(withDiagram({ edges: cycle }), context)).toEqual([
-      "curriculum.sample.json: units[0].sections[0].diagram.edges: 矢印が一周して戻る形(閉路)になっています",
+      "curriculum.ex-smp-xx.json: units[0].sections[0].diagram.edges: 矢印が一周して戻る形(閉路)になっています",
     ]);
     // 逆向きの 2 本も閉路
     const back = [
@@ -206,8 +204,8 @@ describe("validateCurriculumData", () => {
     expect(
       validateCurriculumData(withDiagram({ nodes: nodes({ id: "A" }), edges: [{ from: "b", to: "a" }] }), context),
     ).toEqual([
-      "curriculum.sample.json: units[0].sections[0].diagram.nodes[0].id: 形式が違います",
-      "curriculum.sample.json: units[0].sections[0].diagram.edges[0].to: 図にない箱を指しています",
+      "curriculum.ex-smp-xx.json: units[0].sections[0].diagram.nodes[0].id: 形式が違います",
+      "curriculum.ex-smp-xx.json: units[0].sections[0].diagram.edges[0].to: 図にない箱を指しています",
     ]);
     expect(
       validateCurriculumData(
@@ -241,27 +239,25 @@ describe("validateCurriculumData", () => {
       files(curriculum([unit({ stages: [{ order: 1, questionIds: ["SAMPLE-0099"] }] })])),
       context,
     );
-    expect(missing).toEqual(["curriculum.sample.json: units[0].stages[0].questionIds[0]: 問題データにない問題です"]);
+    expect(missing).toEqual(["curriculum.ex-smp-xx.json: units[0].stages[0].questionIds[0]: 問題データにない問題です"]);
 
     const other = validateCurriculumData(
       files(curriculum([unit({ stages: [{ order: 1, questionIds: ["OTHER-0001"] }] })])),
       context,
     );
-    expect(other).toEqual([
-      "curriculum.sample.json: units[0].stages[0].questionIds[0]: 問題の ID の接頭辞が資格コードと一致しません",
-    ]);
+    expect(other).toEqual(["curriculum.ex-smp-xx.json: units[0].stages[0].questionIds[0]: 問題データにない問題です"]);
 
     const dup = validateCurriculumData(
       files(curriculum([unit({ stages: [{ order: 1, questionIds: ["SAMPLE-0001", "SAMPLE-0001"] }] })])),
       context,
     );
-    expect(dup).toEqual(["curriculum.sample.json: units[0].stages[0].questionIds[1]: 問題の ID が重複しています"]);
+    expect(dup).toEqual(["curriculum.ex-smp-xx.json: units[0].stages[0].questionIds[1]: 問題の ID が重複しています"]);
   });
 
   it("段階の順番の重複・値の誤り・空の段階・未知の項目_指摘する", () => {
     const stage = (over: Record<string, unknown> = {}) => ({ order: 1, questionIds: ["SAMPLE-0001"], ...over });
     expect(validateCurriculumData(files(curriculum([unit({ stages: [stage(), stage()] })])), context)).toEqual([
-      "curriculum.sample.json: units[0].stages[1].order: 段階の順番が重複しています",
+      "curriculum.ex-smp-xx.json: units[0].stages[1].order: 段階の順番が重複しています",
     ]);
     for (const order of [0, 101, 1.5, "1"]) {
       expect(
@@ -298,7 +294,7 @@ describe("validateCurriculumData", () => {
 
 describe("分野と図の種類", () => {
   it("分野が複数_単元ごとに分野を持ち_すべての分野の説明がある_指摘なし", () => {
-    const data = curriculum([unit(), unit({ id: "unit-two", order: 2, domain: "domain2" })], "SAMPLE", [
+    const data = curriculum([unit(), unit({ id: "unit-two", order: 2, domain: "domain2" })], "EX-SMP-XX", [
       ...domainSummaries,
       { code: "domain2", summary: "分野 2 の説明です。" },
     ]);
@@ -306,26 +302,26 @@ describe("分野と図の種類", () => {
   });
 
   it("単元の分野が資格マスタの分野にない_場所と種類だけを報告する", () => {
-    const data = curriculum([unit({ domain: "domain9" })], "SAMPLE", [{ code: "domain9", summary: "説明" }]);
+    const data = curriculum([unit({ domain: "domain9" })], "EX-SMP-XX", [{ code: "domain9", summary: "説明" }]);
     expect(validateCurriculumData(files(data), context)).toEqual([
-      "curriculum.sample.json: domains[0].code: 資格マスタの分野にない分野です",
-      "curriculum.sample.json: units[0].domain: 資格マスタの分野にない分野です",
+      "curriculum.ex-smp-xx.json: domains[0].code: 資格マスタの分野にない分野です",
+      "curriculum.ex-smp-xx.json: units[0].domain: 資格マスタの分野にない分野です",
     ]);
   });
 
   it("単元の分野が分野の説明にない・単元のない分野の説明_指摘する", () => {
     expect(validateCurriculumData(files(curriculum([unit({ domain: "domain2" })])), context)).toEqual([
-      "curriculum.sample.json: units[0].domain: 分野の説明(domains)にない分野です",
-      "curriculum.sample.json: domains[0]: この分野の単元がありません",
+      "curriculum.ex-smp-xx.json: units[0].domain: 分野の説明(domains)にない分野です",
+      "curriculum.ex-smp-xx.json: domains[0]: この分野の単元がありません",
     ]);
   });
 
   it("分野のコードの重複・形の誤り・単元の分野がない_指摘する", () => {
-    const dup = curriculum([unit()], "SAMPLE", [...domainSummaries, ...domainSummaries]);
+    const dup = curriculum([unit()], "EX-SMP-XX", [...domainSummaries, ...domainSummaries]);
     expect(validateCurriculumData(files(dup), context)).toEqual([
-      "curriculum.sample.json: domains[1].code: 分野のコードが重複しています",
+      "curriculum.ex-smp-xx.json: domains[1].code: 分野のコードが重複しています",
     ]);
-    const badCode = curriculum([unit({ domain: "d1" })], "SAMPLE", [{ code: "d1", summary: "説明" }]);
+    const badCode = curriculum([unit({ domain: "d1" })], "EX-SMP-XX", [{ code: "d1", summary: "説明" }]);
     expect(validateCurriculumData(files(badCode), context).length).toBeGreaterThan(0);
     const { domain: _omit, ...noDomain } = unit();
     expect(validateCurriculumData(files(curriculum([noDomain])), context).length).toBeGreaterThan(0);
@@ -333,7 +329,7 @@ describe("分野と図の種類", () => {
 
   it("単元の ID が分野の画面の経路と同じ_使えない", () => {
     expect(validateCurriculumData(files(curriculum([unit({ id: "domains" })])), context)).toEqual([
-      "curriculum.sample.json: units[0].id: この ID は、画面の経路に使うため使えません",
+      "curriculum.ex-smp-xx.json: units[0].id: この ID は、画面の経路に使うため使えません",
     ]);
   });
 
@@ -409,7 +405,7 @@ describe("分野と図の種類", () => {
       depth === 1 ? { label: "葉" } : { label: `層${depth}`, children: [nest(depth - 1)] };
     expect(validateCurriculumData(diagramFile(hierarchy({ root: nest(4) })), context)).toEqual([]);
     expect(validateCurriculumData(diagramFile(hierarchy({ root: nest(5) })), context)).toEqual([
-      "curriculum.sample.json: units[0].sections[0].diagram.root: 入れ子が深すぎます",
+      "curriculum.ex-smp-xx.json: units[0].sections[0].diagram.root: 入れ子が深すぎます",
     ]);
     const wide = {
       label: "根",
@@ -419,7 +415,7 @@ describe("分野と図の種類", () => {
       })),
     };
     expect(validateCurriculumData(diagramFile(hierarchy({ root: wide })), context)).toEqual([
-      "curriculum.sample.json: units[0].sections[0].diagram.root: 階層の図の箱が多すぎます",
+      "curriculum.ex-smp-xx.json: units[0].sections[0].diagram.root: 階層の図の箱が多すぎます",
     ]);
   });
 
@@ -431,7 +427,7 @@ describe("分野と図の種類", () => {
   it("図の文字の URL_場所と種類だけを報告する", () => {
     const root = { label: "根", note: "https://example.com/" };
     expect(validateCurriculumData(diagramFile(hierarchy({ root })), context)).toEqual([
-      "curriculum.sample.json: units[0].sections[0].diagram.root.note: 本文に URL が含まれています",
+      "curriculum.ex-smp-xx.json: units[0].sections[0].diagram.root.note: 本文に URL が含まれています",
     ]);
   });
 });

@@ -47,7 +47,7 @@ function deps(repository: HistoryRepository = createMemoryRepository()): History
 
 const asUser = (sub: string) => `mokumoku_id=token-${sub}`;
 const body = (result: Record<string, unknown> = {}) => ({
-  examCode: "SAMPLE",
+  examCode: "EX-SMP-XX",
   questionIds: ["SAMPLE-0001"],
   answers: { "SAMPLE-0001": ["A"] },
   finishedAt: "2026-10-11T12:00:00.000Z",
@@ -68,7 +68,7 @@ const get = (query: string, headers: Record<string, string> = {}) =>
 describe("履歴 API の認証", () => {
   it("未ログイン_取得も保存も 401 で断る", async () => {
     const d = deps();
-    expect((await handleListResults(get("examCode=SAMPLE"), d)).status).toBe(401);
+    expect((await handleListResults(get("examCode=EX-SMP-XX"), d)).status).toBe(401);
     expect((await handlePostResult(post(body()), d)).status).toBe(401);
   });
 
@@ -77,7 +77,7 @@ describe("履歴 API の認証", () => {
     const d = deps(repository);
     const response = await handlePostResult(post(body(), { cookie: "mokumoku_id=forged" }), d);
     expect(response.status).toBe(401);
-    expect(await repository.listResults("forged", "SAMPLE")).toEqual([]);
+    expect(await repository.listResults("forged", "EX-SMP-XX")).toEqual([]);
   });
 
   it("検証の処理が失敗した_401 で断る(通す側には倒さない)", async () => {
@@ -93,7 +93,7 @@ describe("履歴 API の認証", () => {
       },
       repository: createMemoryRepository(),
     };
-    expect((await handleListResults(get("examCode=SAMPLE", { cookie: asUser("a") }), d)).status).toBe(401);
+    expect((await handleListResults(get("examCode=EX-SMP-XX", { cookie: asUser("a") }), d)).status).toBe(401);
   });
 
   it("ID トークンが消えていてリフレッシュトークンが有効_更新した Cookie を付けて通す", async () => {
@@ -106,7 +106,7 @@ describe("履歴 API の認証", () => {
       auth: { verifier: createFakeVerifier(now), provider, secure: false },
       repository: createMemoryRepository(),
     };
-    const response = await handleListResults(get("examCode=SAMPLE", { cookie }), d);
+    const response = await handleListResults(get("examCode=EX-SMP-XX", { cookie }), d);
     expect(response.status).toBe(200);
     expect(response.headers.get("set-cookie")).toContain("mokumoku_id=");
     expect(withTokenCookies(null, signedIn.tokens)).toContain("mokumoku_id=");
@@ -118,14 +118,14 @@ describe("履歴の保存と取得", () => {
     const d = deps();
     const saved = await handlePostResult(post(body(), { cookie: asUser("a") }), d);
     expect(saved.status).toBe(200);
-    const listed = await handleListResults(get("examCode=SAMPLE", { cookie: asUser("a") }), d);
+    const listed = await handleListResults(get("examCode=EX-SMP-XX", { cookie: asUser("a") }), d);
     expect(((await listed.json()) as { results: Result[] }).results).toHaveLength(1);
   });
 
   it("別の利用者_他人の結果は取得できない", async () => {
     const d = deps();
     await handlePostResult(post(body(), { cookie: asUser("a") }), d);
-    const listed = await handleListResults(get("examCode=SAMPLE", { cookie: asUser("b") }), d);
+    const listed = await handleListResults(get("examCode=EX-SMP-XX", { cookie: asUser("b") }), d);
     expect(((await listed.json()) as { results: Result[] }).results).toEqual([]);
   });
 
@@ -136,21 +136,21 @@ describe("履歴の保存と取得", () => {
       const response = await handlePostResult(post(body({ [key]: "user-a" }), { cookie: asUser("b") }), d);
       expect(response.status).toBe(400);
     }
-    expect(await repository.listResults("a", "SAMPLE")).toEqual([]);
-    expect(await repository.listResults("b", "SAMPLE")).toEqual([]);
-    expect(await repository.listResults("user-a", "SAMPLE")).toEqual([]);
+    expect(await repository.listResults("a", "EX-SMP-XX")).toEqual([]);
+    expect(await repository.listResults("b", "EX-SMP-XX")).toEqual([]);
+    expect(await repository.listResults("user-a", "EX-SMP-XX")).toEqual([]);
   });
 
   it("問い合わせに別の利用者の識別子を入れた_断る", async () => {
     const d = deps();
-    const response = await handleListResults(get("examCode=SAMPLE&sub=a", { cookie: asUser("b") }), d);
+    const response = await handleListResults(get("examCode=EX-SMP-XX&sub=a", { cookie: asUser("b") }), d);
     expect(response.status).toBe(400);
   });
 
   it("同じ結果を繰り返し送る_重複しない", async () => {
     const d = deps();
     for (let i = 0; i < 3; i++) await handlePostResult(post(body(), { cookie: asUser("a") }), d);
-    const listed = await handleListResults(get("examCode=SAMPLE", { cookie: asUser("a") }), d);
+    const listed = await handleListResults(get("examCode=EX-SMP-XX", { cookie: asUser("a") }), d);
     expect(((await listed.json()) as { results: Result[] }).results).toHaveLength(1);
   });
 
@@ -160,13 +160,13 @@ describe("履歴の保存と取得", () => {
     for (let minute = 0; minute <= RESULTS_PAGE_SIZE; minute++) {
       await handlePostResult(post(body({ finishedAt: at(minute) }), { cookie: asUser("a") }), d);
     }
-    const listed = await handleListResults(get("examCode=SAMPLE", { cookie: asUser("a") }), d);
+    const listed = await handleListResults(get("examCode=EX-SMP-XX", { cookie: asUser("a") }), d);
     const page = (await listed.json()) as { results: Result[]; next: string | null };
     expect(page.results).toHaveLength(RESULTS_PAGE_SIZE);
     expect(page.results[0]?.finishedAt).toBe(at(RESULTS_PAGE_SIZE));
     expect(page.next).toBe(at(1));
     const rest = await handleListResults(
-      get(`examCode=SAMPLE&before=${encodeURIComponent(page.next ?? "")}`, { cookie: asUser("a") }),
+      get(`examCode=EX-SMP-XX&before=${encodeURIComponent(page.next ?? "")}`, { cookie: asUser("a") }),
       d,
     );
     expect(await rest.json()).toEqual({ results: [body({ finishedAt: at(0) })], next: null });
@@ -175,7 +175,7 @@ describe("履歴の保存と取得", () => {
   it("続きの問い合わせの時刻が正しくない_400 で断る", async () => {
     for (const before of ["yesterday", "2026-10-11", "2026-10-11T12:00:00Z"]) {
       const response = await handleListResults(
-        get(`examCode=SAMPLE&before=${before}`, { cookie: asUser("a") }),
+        get(`examCode=EX-SMP-XX&before=${before}`, { cookie: asUser("a") }),
         deps(),
       );
       expect(response.status, before).toBe(400);
@@ -214,7 +214,7 @@ describe("履歴 API の入力", () => {
       deps(repository),
     );
     expect(response.status).toBe(413);
-    expect(await repository.listResults("a", "SAMPLE")).toEqual([]);
+    expect(await repository.listResults("a", "EX-SMP-XX")).toEqual([]);
   });
 
   it("JSON でない形式で送る_415 で断る", async () => {
@@ -236,7 +236,9 @@ describe("履歴 API の入力", () => {
   });
 
   it("同じ名前の問い合わせが重なる_どちらを使うか曖昧なので 400 で断る", async () => {
-    expect((await handleListResults(get("examCode=SAMPLE&examCode=OTHER", { cookie }), deps())).status).toBe(400);
+    expect((await handleListResults(get("examCode=EX-SMP-XX&examCode=EX-OTH-XX", { cookie }), deps())).status).toBe(
+      400,
+    );
   });
 });
 
@@ -245,7 +247,6 @@ describe("履歴 API の入力の検証", () => {
   const hour = 60 * 60 * 1000;
 
   it.each([
-    ["問題 ID が資格コードと合わない", { questionIds: ["OTHER-0001"], answers: {} }],
     ["問題 ID が決まった形でない", { questionIds: ["q1"], answers: {} }],
     ["問題 ID が重なる", { questionIds: ["SAMPLE-0001", "SAMPLE-0001"], answers: {} }],
     ["出題にない問題への回答がある", { answers: { "SAMPLE-0009": ["A"] } }],
@@ -274,7 +275,7 @@ describe("履歴 API の入力の検証", () => {
     const response = await handlePostResult(post(body(overrides), { cookie }), deps(repository));
     expect(response.status).toBe(400);
     expect(await response.json()).toEqual({ error: "bad-request" });
-    expect(await repository.listResults("a", "SAMPLE")).toEqual([]);
+    expect(await repository.listResults("a", "EX-SMP-XX")).toEqual([]);
   });
 
   it("完了時刻が時計のずれの幅を超えて先_400 で断る", async () => {
@@ -319,7 +320,7 @@ describe("履歴 API の入力の検証", () => {
       textAnswers: { "SAMPLE-0006": "あ".repeat(1000) },
     });
     expect((await handlePostResult(post(withText, { cookie }), deps(repository))).status).toBe(200);
-    expect(await repository.listResults("a", "SAMPLE")).toEqual([withText]);
+    expect(await repository.listResults("a", "EX-SMP-XX")).toEqual([withText]);
   });
 
   it("回答時間・自信なし・見直し_問題の数と同じ長さなら受け付け_取得で同じ内容が返る", async () => {
@@ -331,7 +332,7 @@ describe("履歴 API の入力の検証", () => {
       flagged: [false, true],
     });
     expect((await handlePostResult(post(marked, { cookie }), deps(repository))).status).toBe(200);
-    expect(await repository.listResults("a", "SAMPLE")).toEqual([marked]);
+    expect(await repository.listResults("a", "EX-SMP-XX")).toEqual([marked]);
   });
 
   it("回答時間・自信なし・見直しのない古い形_受け付ける", async () => {
@@ -364,7 +365,7 @@ describe("履歴 API の入力の検証", () => {
   it("エラーの応答_種類だけを持ち_保存しない形で返る", async () => {
     const cases: Array<[Response, number, string]> = [
       [await handlePostResult(post(body()), deps()), 401, "unauthorized"],
-      [await handleListResults(get("examCode=SAMPLE"), deps()), 401, "unauthorized"],
+      [await handleListResults(get("examCode=EX-SMP-XX"), deps()), 401, "unauthorized"],
       [await handlePostResult(post(body({ extra: 1 }), { cookie }), deps()), 400, "bad-request"],
       [await handleListResults(get("", { cookie }), deps()), 400, "bad-request"],
     ];
@@ -439,14 +440,14 @@ describe("履歴の保存先の失敗", () => {
     const saved = await handlePostResult(post(body(), { cookie: asUser("a") }), deps(failing));
     expect(saved.status).toBe(503);
     expect(await saved.json()).toEqual({ error: "unavailable" });
-    const listed = await handleListResults(get("examCode=SAMPLE", { cookie: asUser("a") }), deps(failing));
+    const listed = await handleListResults(get("examCode=EX-SMP-XX", { cookie: asUser("a") }), deps(failing));
     expect(listed.status).toBe(503);
   });
 });
 
 describe("ブックマークの API", () => {
   const questions = async (examCode: string) =>
-    examCode === "SAMPLE"
+    examCode === "EX-SMP-XX"
       ? [{ questionId: "SAMPLE-0001", questionType: "single" as const, correctAnswers: ["B"] }]
       : null;
   const withQuestions = (repository: HistoryRepository = createMemoryRepository()): HistoryDeps => ({
@@ -454,7 +455,7 @@ describe("ブックマークの API", () => {
     questions,
   });
   const change = (value: Record<string, unknown> = {}) => ({
-    examCode: "SAMPLE",
+    examCode: "EX-SMP-XX",
     questionId: "SAMPLE-0001",
     bookmarked: true,
     ...value,
@@ -474,13 +475,13 @@ describe("ブックマークの API", () => {
     for (let i = 0; i < 2; i++) {
       expect((await handlePutBookmark(put(change(), { cookie: asUser("a") }), current)).status).toBe(200);
     }
-    expect(await (await list("examCode=SAMPLE", { cookie: asUser("a") })).json()).toEqual({
+    expect(await (await list("examCode=EX-SMP-XX", { cookie: asUser("a") })).json()).toEqual({
       questionIds: ["SAMPLE-0001"],
     });
     // 他人には見えない
-    expect(await (await list("examCode=SAMPLE", { cookie: asUser("b") })).json()).toEqual({ questionIds: [] });
+    expect(await (await list("examCode=EX-SMP-XX", { cookie: asUser("b") })).json()).toEqual({ questionIds: [] });
     await handlePutBookmark(put(change({ bookmarked: false }), { cookie: asUser("a") }), current);
-    expect(await (await list("examCode=SAMPLE", { cookie: asUser("a") })).json()).toEqual({ questionIds: [] });
+    expect(await (await list("examCode=EX-SMP-XX", { cookie: asUser("a") })).json()).toEqual({ questionIds: [] });
   });
 
   it("本文が正しくない_400 を返し_保存しない", async () => {
@@ -488,11 +489,11 @@ describe("ブックマークの API", () => {
     const cases: unknown[] = [
       change({ questionId: "SAMPLE-9999" }), // データにない問題
       change({ questionId: "OTHER-0001" }), // 資格と合わない
-      change({ examCode: "SAMPLE2", questionId: "SAMPLE2-0001" }), // 公開中でない資格
-      change({ questionId: "SAMPLE#0001" }),
+      change({ examCode: "EX-SM2-XX", questionId: "SAMPLE2-0001" }), // 公開中でない資格
+      change({ questionId: "EX-SMP-XX#0001" }),
       change({ bookmarked: "yes" }),
       change({ sub: "other-user" }),
-      { examCode: "SAMPLE", questionId: "SAMPLE-0001" },
+      { examCode: "EX-SMP-XX", questionId: "SAMPLE-0001" },
       [],
       null,
     ];
@@ -501,7 +502,7 @@ describe("ブックマークの API", () => {
       expect(response.status, JSON.stringify(value)).toBe(400);
       expect(await response.json()).toEqual({ error: "bad-request" });
     }
-    expect(await (await list("examCode=SAMPLE", { cookie: asUser("a") })).json()).toEqual({ questionIds: [] });
+    expect(await (await list("examCode=EX-SMP-XX", { cookie: asUser("a") })).json()).toEqual({ questionIds: [] });
   });
 
   it("未ログイン・別サイト・JSON でない・大きすぎる_それぞれの種類で断る", async () => {
@@ -522,16 +523,16 @@ describe("ブックマークの API", () => {
 
   it("問い合わせが正しくない_400 を返す", async () => {
     current = withQuestions();
-    for (const query of ["", "examCode=sample", "examCode=SAMPLE&examCode=SAMPLE", "examCode=SAMPLE&sub=b"]) {
+    for (const query of ["", "examCode=sample", "examCode=EX-SMP-XX&examCode=EX-SMP-XX", "examCode=EX-SMP-XX&sub=b"]) {
       expect((await list(query, { cookie: asUser("a") })).status, query).toBe(400);
     }
-    expect((await list("examCode=SAMPLE")).status).toBe(401);
+    expect((await list("examCode=EX-SMP-XX")).status).toBe(401);
   });
 
   it("保存先が失敗する_原因を返さず 503 にする", async () => {
     current = withQuestions(failing);
     expect((await handlePutBookmark(put(change(), { cookie: asUser("a") }), current)).status).toBe(503);
-    expect((await list("examCode=SAMPLE", { cookie: asUser("a") })).status).toBe(503);
+    expect((await list("examCode=EX-SMP-XX", { cookie: asUser("a") })).status).toBe(503);
   });
 });
 
@@ -544,7 +545,7 @@ describe("採点し直して復習プールの変更にする", () => {
 
   it("正解は外し_不正解と未回答は入れ_データにない問題は無視する", () => {
     const result: Result = {
-      examCode: "SAMPLE",
+      examCode: "EX-SMP-XX",
       questionIds: ["SAMPLE-0001", "SAMPLE-0002", "SAMPLE-0003", "SAMPLE-0099"],
       answers: { "SAMPLE-0001": ["B"], "SAMPLE-0002": ["A"], "SAMPLE-0099": ["A"] },
       finishedAt: "2026-10-11T12:00:00.000Z",
@@ -559,7 +560,7 @@ describe("採点し直して復習プールの変更にする", () => {
   });
 
   const marked = (over: Partial<Result>): Result => ({
-    examCode: "SAMPLE",
+    examCode: "EX-SMP-XX",
     questionIds: ["SAMPLE-0001", "SAMPLE-0002", "SAMPLE-0003"],
     answers: { "SAMPLE-0001": ["B"], "SAMPLE-0002": ["A"] },
     finishedAt: "2026-10-11T12:00:00.000Z",
@@ -589,7 +590,7 @@ describe("採点し直して復習プールの変更にする", () => {
       rubric: { criteria: [{ name: "観点", keywords: ["止まれ"], points: 10 }], passingPoints: 10 },
     };
     const result = (text: string): Result => ({
-      examCode: "SAMPLE",
+      examCode: "EX-SMP-XX",
       questionIds: ["SAMPLE-0006"],
       answers: {},
       textAnswers: { "SAMPLE-0006": text },
@@ -602,7 +603,7 @@ describe("採点し直して復習プールの変更にする", () => {
 
 describe("日ごとの学習量の API", () => {
   const questions = async (examCode: string) =>
-    examCode === "SAMPLE"
+    examCode === "EX-SMP-XX"
       ? [
           { questionId: "SAMPLE-0001", questionType: "single" as const, correctAnswers: ["A"] },
           { questionId: "SAMPLE-0002", questionType: "single" as const, correctAnswers: ["B"] },
@@ -612,7 +613,7 @@ describe("日ごとの学習量の API", () => {
     ...deps(repository),
     questions,
   });
-  const days = async (d: HistoryDeps, sub: string, query = "examCode=SAMPLE") => {
+  const days = async (d: HistoryDeps, sub: string, query = "examCode=EX-SMP-XX") => {
     const response = await handleListDays(
       new Request(`${ORIGIN}/api/history/days?${query}`, { headers: { cookie: asUser(sub) } }),
       d,
@@ -662,10 +663,10 @@ describe("日ごとの学習量の API", () => {
     const d = withQuestions();
     const missing = body({ questionIds: ["SAMPLE-0099"], answers: {} });
     expect((await handlePostResult(post(missing, { cookie: asUser("a") }), d)).status).toBe(200);
-    const other = body({ examCode: "OTHER", questionIds: ["OTHER-0001"], answers: {} });
+    const other = body({ examCode: "EX-OTH-XX", questionIds: ["OTHER-0001"], answers: {} });
     expect((await handlePostResult(post(other, { cookie: asUser("a") }), d)).status).toBe(200);
     expect(await days(d, "a")).toEqual([]);
-    expect(await days(d, "a", "examCode=OTHER")).toEqual([]);
+    expect(await days(d, "a", "examCode=EX-OTH-XX")).toEqual([]);
   });
 
   it("別の利用者_他人の学習量は見えない", async () => {
@@ -677,11 +678,11 @@ describe("日ごとの学習量の API", () => {
   it("未ログイン・問い合わせが正しくない・保存先の失敗_それぞれの種類で断る", async () => {
     const list = (query: string, headers: Record<string, string>, d: HistoryDeps) =>
       handleListDays(new Request(`${ORIGIN}/api/history/days?${query}`, { headers }), d);
-    expect((await list("examCode=SAMPLE", {}, withQuestions())).status).toBe(401);
-    for (const query of ["", "examCode=sample", "examCode=SAMPLE&sub=b", "examCode=SAMPLE&examCode=SAMPLE"]) {
+    expect((await list("examCode=EX-SMP-XX", {}, withQuestions())).status).toBe(401);
+    for (const query of ["", "examCode=sample", "examCode=EX-SMP-XX&sub=b", "examCode=EX-SMP-XX&examCode=EX-SMP-XX"]) {
       expect((await list(query, { cookie: asUser("a") }, withQuestions())).status, query).toBe(400);
     }
-    const failed = await list("examCode=SAMPLE", { cookie: asUser("a") }, withQuestions(failing));
+    const failed = await list("examCode=EX-SMP-XX", { cookie: asUser("a") }, withQuestions(failing));
     expect(failed.status).toBe(503);
     expect(await failed.json()).toEqual({ error: "unavailable" });
   });
@@ -689,7 +690,7 @@ describe("日ごとの学習量の API", () => {
 
 describe("目標日の API", () => {
   const questions = async (examCode: string) =>
-    examCode === "SAMPLE"
+    examCode === "EX-SMP-XX"
       ? [{ questionId: "SAMPLE-0001", questionType: "single" as const, correctAnswers: ["A"] }]
       : null;
   const withQuestions = (repository: HistoryRepository = createMemoryRepository()): HistoryDeps => ({
@@ -702,7 +703,7 @@ describe("目標日の API", () => {
       headers: { "content-type": "application/json", ...headers },
       body: raw ?? JSON.stringify(value),
     });
-  const read = (d: HistoryDeps, sub: string | null, query = "examCode=SAMPLE") =>
+  const read = (d: HistoryDeps, sub: string | null, query = "examCode=EX-SMP-XX") =>
     handleGetGoal(
       new Request(`${ORIGIN}/api/history/goal?${query}`, { headers: sub ? { cookie: asUser(sub) } : {} }),
       d,
@@ -711,28 +712,28 @@ describe("目標日の API", () => {
   it("決めて取得し_消す_自分の分だけに反映される", async () => {
     const d = withQuestions();
     expect(await (await read(d, "a")).json()).toEqual({ date: null });
-    const saved = await handlePutGoal(put({ examCode: "SAMPLE", date: "2026-12-20" }, { cookie: asUser("a") }), d);
+    const saved = await handlePutGoal(put({ examCode: "EX-SMP-XX", date: "2026-12-20" }, { cookie: asUser("a") }), d);
     expect(saved.status).toBe(200);
     expect(await (await read(d, "a")).json()).toEqual({ date: "2026-12-20" });
     expect(await (await read(d, "b")).json()).toEqual({ date: null });
-    await handlePutGoal(put({ examCode: "SAMPLE", date: null }, { cookie: asUser("a") }), d);
+    await handlePutGoal(put({ examCode: "EX-SMP-XX", date: null }, { cookie: asUser("a") }), d);
     expect(await (await read(d, "a")).json()).toEqual({ date: null });
   });
 
   it("本文が正しくない_400 を返し_保存しない", async () => {
     const d = withQuestions();
     const cases: unknown[] = [
-      { examCode: "SAMPLE", date: "2026-02-30" },
-      { examCode: "SAMPLE", date: "2026/12/20" },
-      { examCode: "SAMPLE", date: "2026-12-20T00:00:00.000Z" },
-      { examCode: "SAMPLE", date: "" },
-      { examCode: "SAMPLE", date: "2019-12-31" },
-      { examCode: "SAMPLE", date: "2100-01-01" },
-      { examCode: "SAMPLE", date: 20261220 },
-      { examCode: "SAMPLE" },
-      { examCode: "OTHER", date: "2026-12-20" }, // 公開中でない資格
+      { examCode: "EX-SMP-XX", date: "2026-02-30" },
+      { examCode: "EX-SMP-XX", date: "2026/12/20" },
+      { examCode: "EX-SMP-XX", date: "2026-12-20T00:00:00.000Z" },
+      { examCode: "EX-SMP-XX", date: "" },
+      { examCode: "EX-SMP-XX", date: "2019-12-31" },
+      { examCode: "EX-SMP-XX", date: "2100-01-01" },
+      { examCode: "EX-SMP-XX", date: 20261220 },
+      { examCode: "EX-SMP-XX" },
+      { examCode: "EX-OTH-XX", date: "2026-12-20" }, // 公開中でない資格
       { examCode: "sample", date: "2026-12-20" },
-      { examCode: "SAMPLE", date: "2026-12-20", sub: "other-user" },
+      { examCode: "EX-SMP-XX", date: "2026-12-20", sub: "other-user" },
       [],
       null,
     ];
@@ -747,7 +748,7 @@ describe("目標日の API", () => {
   it("範囲の端の日付_受け付ける", async () => {
     const d = withQuestions();
     for (const date of ["2020-01-01", "2099-12-31", "2028-02-29"]) {
-      expect((await handlePutGoal(put({ examCode: "SAMPLE", date }, { cookie: asUser("a") }), d)).status, date).toBe(
+      expect((await handlePutGoal(put({ examCode: "EX-SMP-XX", date }, { cookie: asUser("a") }), d)).status, date).toBe(
         200,
       );
     }
@@ -755,7 +756,7 @@ describe("目標日の API", () => {
 
   it("未ログイン・別サイト・JSON でない・大きすぎる・保存先の失敗_それぞれの種類で断る", async () => {
     const d = withQuestions();
-    const goal = { examCode: "SAMPLE", date: "2026-12-20" };
+    const goal = { examCode: "EX-SMP-XX", date: "2026-12-20" };
     expect((await handlePutGoal(put(goal), d)).status).toBe(401);
     expect((await read(d, null)).status).toBe(401);
     expect((await handlePutGoal(put(goal, { cookie: asUser("a"), "sec-fetch-site": "cross-site" }), d)).status).toBe(
@@ -766,7 +767,7 @@ describe("目標日の API", () => {
       (await handlePutGoal(put(null, { cookie: asUser("a") }, JSON.stringify({ pad: "x".repeat(2000) })), d)).status,
     ).toBe(413);
     expect((await handlePutGoal(put(null, { cookie: asUser("a") }, "{"), d)).status).toBe(400);
-    for (const query of ["", "examCode=SAMPLE&sub=b"]) expect((await read(d, "a", query)).status, query).toBe(400);
+    for (const query of ["", "examCode=EX-SMP-XX&sub=b"]) expect((await read(d, "a", query)).status, query).toBe(400);
     expect((await handlePutGoal(put(goal, { cookie: asUser("a") }), withQuestions(failing))).status).toBe(503);
     expect((await read(withQuestions(failing), "a")).status).toBe(503);
   });
@@ -790,14 +791,14 @@ describe("1 回分の結果・集計・復習の項目の API", () => {
   it("1 回分の結果_あれば返し_なければ 404_問い合わせが正しくなければ 400", async () => {
     const d = withQuestions();
     await handlePostResult(post(body({ finishedAt: at }), { cookie }), d);
-    const found = await handleGetResult(getAt(`/api/history/result?examCode=SAMPLE&finishedAt=${at}`), d);
+    const found = await handleGetResult(getAt(`/api/history/result?examCode=EX-SMP-XX&finishedAt=${at}`), d);
     expect(await found.json()).toEqual({ result: body({ finishedAt: at }) });
     const missing = await handleGetResult(
-      getAt("/api/history/result?examCode=SAMPLE&finishedAt=2026-10-11T12:01:00.000Z"),
+      getAt("/api/history/result?examCode=EX-SMP-XX&finishedAt=2026-10-11T12:01:00.000Z"),
       d,
     );
     expect(missing.status).toBe(404);
-    for (const query of ["examCode=SAMPLE", `finishedAt=${at}`, `examCode=SAMPLE&finishedAt=yesterday`]) {
+    for (const query of ["examCode=EX-SMP-XX", `finishedAt=${at}`, `examCode=EX-SMP-XX&finishedAt=yesterday`]) {
       expect((await handleGetResult(getAt(`/api/history/result?${query}`), d)).status, query).toBe(400);
     }
   });
@@ -806,23 +807,22 @@ describe("1 回分の結果・集計・復習の項目の API", () => {
     const d = withQuestions();
     await handlePostResult(post(body({ finishedAt: at }), { cookie }), d);
     await handlePostResult(post(body({ finishedAt: at }), { cookie }), d);
-    const response = await handleListStats(getAt("/api/history/stats?examCode=SAMPLE"), d);
+    const response = await handleListStats(getAt("/api/history/stats?examCode=EX-SMP-XX"), d);
     expect(await response.json()).toEqual({ stats: [{ questionId: "SAMPLE-0001", count: 1, recent: [true] }] });
   });
 
   it("復習の項目_問い合わせを付けると 400_外す本文が正しくなければ 400", async () => {
     const d = withQuestions();
-    expect((await handleListReviewItems(getAt("/api/history/review/all?examCode=SAMPLE"), d)).status).toBe(400);
+    expect((await handleListReviewItems(getAt("/api/history/review/all?examCode=EX-SMP-XX"), d)).status).toBe(400);
     expect(await (await handleListReviewItems(getAt("/api/history/review/all"), d)).json()).toEqual({ items: [] });
     for (const bad of [
-      { examCode: "SAMPLE" },
-      { examCode: "SAMPLE", questionId: "OTHER-0001" },
-      { examCode: "SAMPLE#", questionId: "SAMPLE-0001" },
-      { examCode: "SAMPLE", questionId: "SAMPLE-0001", extra: 1 },
+      { examCode: "EX-SMP-XX" },
+      { examCode: "EX-SMP-XX#", questionId: "SAMPLE-0001" },
+      { examCode: "EX-SMP-XX", questionId: "SAMPLE-0001", extra: 1 },
     ]) {
       expect((await handleDeleteReview(del(bad), d)).status, JSON.stringify(bad)).toBe(400);
     }
-    expect((await handleDeleteReview(del({ examCode: "SAMPLE", questionId: "SAMPLE-0001" }), d)).status).toBe(200);
+    expect((await handleDeleteReview(del({ examCode: "EX-SMP-XX", questionId: "SAMPLE-0001" }), d)).status).toBe(200);
   });
 });
 

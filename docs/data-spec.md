@@ -25,7 +25,9 @@
 {
   "exams": [
     {
-      "examCode": "SAMPLE",           // 英大文字で始まる英大文字と数字(2〜16 文字)。一意
+      "examCode": "EX-SMP-XX",        // 試験コード `<ベンダー略称>-<試験略称>-<版>`(下の「試験コード」)。一意
+      "idPrefix": "SAMPLE",           // 公開中は必須。問題 ID の接頭辞(問題 ID は `<接頭辞>-<4 桁の連番>`)。資格どうしで重複しない
+      "previousCodes": ["SAMPLE"],    // 任意。以前の試験コード(旧コードの URL を転送し、保存済みの記録を移すために使う)
       "status": "published",          // "published"(公開中)| "coming-soon"(近日公開)
       "vendor": "Example",            // 提供元。一覧のグループ分けに使う
       "edition": "S01",               // 試験の版
@@ -49,7 +51,8 @@
       }
     },
     {
-      "examCode": "SAMPLE2",
+      "examCode": "EX-SM2-XX",
+      "previousCodes": ["SAMPLE2"],
       "status": "coming-soon",
       "vendor": "Example",
       "name": "サンプル資格 2",
@@ -62,7 +65,36 @@
 }
 ```
 
-- **公開中**(`published`)の資格は、上の項目がすべて必要です。問題データのファイルも必要です。
+### 試験コード
+
+試験コード(`examCode`)は、`<ベンダー略称>-<試験略称>-<版>` の形で、すべて大文字と数字です(正規表現: `^[A-Z][A-Z0-9]{1,5}-[A-Z][A-Z0-9]{1,9}-[A-Z0-9]{2,4}$`)。
+例: AWS Certified AI Business Strategist は `AWS-AIB-C01` です。
+
+- **ベンダー略称**: `data/vendors.json` の、資格のベンダー(`vendor`)に対応する略称です。コードの先頭は、この略称と一致します
+  (`npm run validate:data` が検査します)。略称は、ベンダーをまたいでコードが衝突しないように使います。
+- **試験略称**: 試験を表す短い表記です(例: `AIB`)。ベンダーが違えば、同じ略称でもかまいません(例: `AWS-DEA-C01` と `EX-DEA-XX`)。
+- **版**: 公式の呼び名に合わせます(例: `C01`)。公式に版の呼び名がない試験は `XX` にします。
+- 大文字だけにします(`Aws` のように、混在させません)。
+- URL・ファイル名・DynamoDB のキー・端末の保存のキーに使います。ファイル名は、コードを英小文字にしたものです(`questions.aws-aib-c01.json`)。
+
+`data/vendors.json` は、ベンダーの名前と略称の一覧です。名前と略称は、それぞれ重複しません。
+
+```jsonc
+{ "vendors": [{ "name": "AWS", "abbr": "AWS" }, { "name": "Example", "abbr": "EX" }] }
+```
+
+### 問題 ID の接頭辞と、以前のコード
+
+- 問題 ID は `<接頭辞>-<4 桁の連番>` です。接頭辞(`idPrefix`)は、試験コードとは別に、資格マスタに明示します。
+  試験の略称が同じ試験(ベンダー違いの `DEA` など)でも、接頭辞を変えれば、問題 ID は衝突しません。接頭辞は、資格どうしで重複させません。
+  問題 ID は、保存済みの記録(回答・ブックマーク・復習・解答回数)の中にも入っているので、試験コードを変えても、変えません。
+- 試験コードを変えたときは、以前のコードを `previousCodes` に残します。旧コードの URL(`/exams/<旧コード>/…`、`/admin/preview/<旧コード>`)は、
+  新しいコードの URL へ、問い合わせを引き継いで、永続的に(308)転送します。保存済みの記録は、次の手順で移します。
+  - 端末(localStorage): ページを開いたときに、旧コードのキーの記録を新しいコードのキーへ、1 回だけ移します。
+  - アカウント(DynamoDB): `scripts/migrate-exam-codes.ts` で移します(既定は件数の確認だけ。`--apply` で実行)。
+    旧コードの SK の項目を、新しいコードの SK の項目に写し(項目の中の `examCode` も新しくします)、旧い項目を消します。何度実行しても同じ結果になります。
+
+- **公開中**(`published`)の資格は、上の項目がすべて必要です(`idPrefix` を含みます)。問題データのファイルも必要です。
 - **近日公開**(`coming-soon`)の資格は、`examCode`・`vendor`・`name`・`shortName` と、任意の `level`・`abbr`・`note` だけを持ちます。
   一覧に表示するだけで、問題データは持ちません。
 - 分野は `domain1`〜`domainN` のコードで表します。**表示名はマスタ側にだけ**置きます(問題側に名前を書くと、
@@ -73,7 +105,7 @@
 
 - `level`(任意)は、資格のレベル(段階)です。値は `Foundational`・`Associate`・`Professional`・`Expert`・`Specialty` のいずれかで、
   資格の一覧では、ベンダーの中を、この順に並べます。公式にレベルの区分がない資格は、持ちません(一覧の最後に並びます)。
-- `abbr`(任意)は、一覧のタイルに出す短い表記です。英数字 1〜4 文字です。持たないときは、資格コードの先頭の 4 文字までを使います。
+- `abbr`(任意)は、一覧のタイルに出す短い表記です。英数字 1〜4 文字です。持たないときは、試験コードの試験略称の部分(4 文字まで)を使います。
 - `category`(公開中は必須)は、資格の領域を表す自由な文字列です(例: `Business`)。レベルとは別の項目で、並びには使いません。
 
 ### 2.2 資格の情報 `info`
@@ -98,11 +130,11 @@
 
 ```jsonc
 {
-  "examCode": "SAMPLE",
+  "examCode": "EX-SMP-XX",
   "questions": [
     {
-      "questionId": "SAMPLE-0001",     // <資格コード>-<4 桁の連番>。一意。削除しても再利用しない
-      "examCode": "SAMPLE",
+      "questionId": "SAMPLE-0001",     // <問題 ID の接頭辞(idPrefix)>-<4 桁の連番>。一意。削除しても再利用しない
+      "examCode": "EX-SMP-XX",
       "domain": "domain1",             // マスタの分野のコード
       "questionType": "single",        // "single"(択一)| "multiple"(複数選択)| "free-text"(自由記述。「8. 自由記述」)
       "difficulty": "easy",            // 任意: "easy" | "medium" | "hard"
@@ -182,7 +214,7 @@
 
 **1 つのファイルの中**
 
-11. `questionId` は重複しない。接頭辞は、ファイルの資格コードと一致する。
+11. `questionId` は重複しない。接頭辞は、資格マスタの `idPrefix` と一致する。
 12. 同じ設問文の問題がない(空白と全角・半角の違いをならして比べる)。
 13. 各問題の `examCode` は、ファイルの `examCode` と一致する。
 
@@ -268,7 +300,7 @@
 ```jsonc
 {
   "questionId": "SAMPLE-0006",
-  "examCode": "SAMPLE",
+  "examCode": "EX-SMP-XX",
   "domain": "domain1",
   "questionType": "free-text",
   "questionText": "設問文",
@@ -301,10 +333,10 @@
 
 ## 9. サンプルデータ
 
-`data/` の `SAMPLE`(公開中)と `SAMPLE2`(近日公開)は、動作確認用の架空の資格です。実在の試験の問題は含みません。
-`SAMPLE` のカリキュラム(`curriculum.sample.json`)も、動作確認用の架空の教材です。架空の資格なので、出典(`references`)は付けません。テストと動作確認に使うため、実在の資格を加えても残します。
+`data/` の `EX-SMP-XX`(公開中)と `EX-SM2-XX`(近日公開)は、動作確認用の架空の資格です。実在の試験の問題は含みません。
+`EX-SMP-XX` のカリキュラム(`curriculum.ex-smp-xx.json`)も、動作確認用の架空の教材です。架空の資格なので、出典(`references`)は付けません。テストと動作確認に使うため、実在の資格を加えても残します。
 
-実在の資格(`AIB` など)の問題とカリキュラムは、同じ形で、資格ごとのファイル(`questions.<コード>.json`、`curriculum.<コード>.json`)に置きます。
+実在の資格(`AWS-AIB-C01` など)の問題とカリキュラムは、同じ形で、資格ごとのファイル(`questions.<コード>.json`、`curriculum.<コード>.json`)に置きます。
 資格ごとの扱いは、加えるときに、そのつど決めます。どの資格でも、本文に URL は書きません(「4. 機械検査する規則」の 20)。
 
 ## 10. 使い方ページのデータ `help.json`
@@ -355,7 +387,7 @@
 
 ```json
 {
-  "examCode": "SAMPLE",
+  "examCode": "EX-SMP-XX",
   "domains": [{ "code": "domain1", "summary": "分野の説明(分野の一覧に出す短い文章)" }],
   "units": [
     {
@@ -512,7 +544,7 @@
 
 ```json
 {
-  "examCode": "SAMPLE",
+  "examCode": "EX-SMP-XX",
   "cards": [
     {
       "questionId": "SAMPLE-0001",

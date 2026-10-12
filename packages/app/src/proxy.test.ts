@@ -27,16 +27,16 @@ describe("proxy", () => {
   });
 
   it("未ログインで画面を開く_元の場所を付けてログイン画面へ相対のまま移す", async () => {
-    const response = await proxy(request("/exams/SAMPLE?mode=all"));
+    const response = await proxy(request("/exams/EX-SMP-XX?mode=all"));
     expect(response.status).toBe(307);
     // 絶対 URL で返す(Next が同じホストのものを相対の Location に直す)。ホスト以外は、この形になる
     const location = new URL(response.headers.get("location") ?? "");
-    expect(`${location.pathname}${location.search}`).toBe("/login?next=%2Fexams%2FSAMPLE%3Fmode%3Dall");
+    expect(`${location.pathname}${location.search}`).toBe("/login?next=%2Fexams%2FEX-SMP-XX%3Fmode%3Dall");
     expect(response.headers.get("cache-control")).toBe("no-store");
   });
 
   it("未ログインで API を呼ぶ_401 で断る", async () => {
-    const response = await proxy(request("/api/history/results?examCode=SAMPLE"));
+    const response = await proxy(request("/api/history/results?examCode=EX-SMP-XX"));
     expect(response.status).toBe(401);
     expect(await response.json()).toEqual({ error: "unauthorized" });
   });

@@ -17,7 +17,7 @@ type Context = {
 
 function isKnownRoute(path: string, { routes, examCodes }: Context): boolean {
   if (routes.includes(path)) return true;
-  const match = /^\/exams\/([A-Z0-9]+)$/.exec(path);
+  const match = /^\/exams\/([A-Z0-9-]+)$/.exec(path);
   return match !== null && examCodes.includes(match[1] as string);
 }
 

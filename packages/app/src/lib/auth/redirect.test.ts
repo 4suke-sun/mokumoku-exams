@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { safeNext } from "./redirect.ts";
 
 describe("safeNext", () => {
-  it.each(["/exams", "/exams/SAMPLE/play", "/exams/SAMPLE?mode=all", "/help#top"])(
+  it.each(["/exams", "/exams/EX-SMP-XX/play", "/exams/EX-SMP-XX?mode=all", "/help#top"])(
     "このサイト内の画面_%s はそのまま使う",
     (value) => {
       expect(safeNext(value)).toBe(value);

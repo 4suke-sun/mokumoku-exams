@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { validateHelpData } from "./validate.ts";
 
-const context = { routes: ["/", "/exams"], examCodes: ["SAMPLE"] };
+const context = { routes: ["/", "/exams"], examCodes: ["EX-SMP-XX"] };
 const section = (over: Record<string, unknown> = {}) => ({
   id: "start",
   title: "はじめに",
@@ -50,8 +50,8 @@ describe("validateHelpData", () => {
   });
 
   it("公開中の資格のページ_リンクできる", () => {
-    const ok = { sections: [section({ links: [{ label: "サンプル", href: "/exams/SAMPLE" }] })] };
-    const broken = { sections: [section({ links: [{ label: "別", href: "/exams/OTHER" }] })] };
+    const ok = { sections: [section({ links: [{ label: "サンプル", href: "/exams/EX-SMP-XX" }] })] };
+    const broken = { sections: [section({ links: [{ label: "別", href: "/exams/EX-OTH-XX" }] })] };
     expect(validateHelpData(ok, context)).toEqual([]);
     expect(validateHelpData(broken, context)).toHaveLength(1);
   });

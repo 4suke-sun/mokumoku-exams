@@ -7,10 +7,13 @@ import {
 } from "@/lib/storage.ts";
 import { isValidDate } from "@/lib/study-days.ts";
 
-/** 資格コード(data/exams.json と同じ形)。DynamoDB のキーに使うため、区切りの `#` などを含められない。 */
-export const EXAM_CODE_PATTERN = /^[A-Z][A-Z0-9]{1,15}$/;
+/**
+ * 資格コード(data/exams.json と同じ形: `<ベンダー略称>-<試験略称>-<版>`)。DynamoDB のキーに使うため、区切りの `#` などを含められない。
+ * 以前の形(`AIB` など)は、受け付けない。
+ */
+export const EXAM_CODE_PATTERN = /^[A-Z][A-Z0-9]{1,5}-[A-Z][A-Z0-9]{1,9}-[A-Z0-9]{2,4}$/;
 
-/** 問題 ID は `<資格コード>-<4 桁の連番>`(docs/data-spec.md)。 */
+/** 問題 ID は `<問題 ID の接頭辞>-<4 桁の連番>`(接頭辞は資格マスタの `idPrefix`。docs/data-spec.md)。 */
 export const QUESTION_ID_PATTERN = /^[A-Z][A-Z0-9]{1,15}-\d{4}$/;
 
 /** 選択肢のキー。1 つの問題の選択肢は 10 個までなので、A から J。 */
@@ -33,7 +36,7 @@ const questionKey = z.string().max(64);
  * 保存する結果。端末に保存する形(`ResultSchema`)に、サーバー側の条件を足す。
  * - 資格コードは決まった形。完了時刻はミリ秒つきの ISO 8601(ソートキーに使うため、文字の並びが時刻の並びと一致する形)で、
  *   下限と、サーバーの時刻から先への幅の中にある。
- * - 問題 ID は `<資格コード>-<4 桁>` の形で、重複せず、この資格のもの。
+ * - 問題 ID は `<問題 ID の接頭辞>-<4 桁>` の形で、重複しない(この資格のデータにない問題は、学習量などに数えない)。
  * - 回答・自由記述の回答・選択肢の並びは、出題した問題についてのものだけで、選択肢のキーは重複しない。
  *   自由記述の回答は、`MAX_TEXT_ANSWER_LENGTH` 文字まで。
  * - 問題ごとの回答時間・自信なし・見直しは任意で、持つときは、出題した問題の数と同じ長さ。
@@ -58,12 +61,6 @@ export function apiResultSchema(nowMs: number) {
   }).superRefine((result, ctx) => {
     checkPerQuestionLengths(result, ctx);
     const asked = new Set(result.questionIds);
-    const prefix = `${result.examCode}-`;
-    result.questionIds.forEach((id, index) => {
-      if (!id.startsWith(prefix)) {
-        ctx.addIssue({ code: "custom", path: ["questionIds", index], message: "資格コードと合いません。" });
-      }
-    });
     for (const field of ["answers", "textAnswers", "choiceOrder"] as const) {
       for (const id of Object.keys(result[field] ?? {})) {
         if (!asked.has(id)) ctx.addIssue({ code: "custom", path: [field], message: "出題にない問題です。" });
@@ -96,12 +93,10 @@ export const ResultQuerySchema = z.strictObject({
 export const EmptyQuerySchema = z.strictObject({});
 
 /** 復習から手で外す本文。問題 ID は、この資格のもの */
-export const ReviewRemovalSchema = z
-  .strictObject({
-    examCode: z.string().regex(EXAM_CODE_PATTERN),
-    questionId: z.string().regex(QUESTION_ID_PATTERN),
-  })
-  .refine((change) => change.questionId.startsWith(`${change.examCode}-`), "資格コードと合いません。");
+export const ReviewRemovalSchema = z.strictObject({
+  examCode: z.string().regex(EXAM_CODE_PATTERN),
+  questionId: z.string().regex(QUESTION_ID_PATTERN),
+});
 
 /** 復習から外す本文の上限(資格コードと問題 ID だけなので、小さい) */
 export const MAX_REVIEW_BODY_BYTES = 1_000;
@@ -110,13 +105,11 @@ export const MAX_REVIEW_BODY_BYTES = 1_000;
 export const MAX_BOOKMARK_BODY_BYTES = 1_000;
 
 /** ブックマークを付ける・外す。問題 ID は、この資格のもの。 */
-export const BookmarkChangeSchema = z
-  .strictObject({
-    examCode: z.string().regex(EXAM_CODE_PATTERN),
-    questionId: z.string().regex(QUESTION_ID_PATTERN),
-    bookmarked: z.boolean(),
-  })
-  .refine((change) => change.questionId.startsWith(`${change.examCode}-`), "資格コードと合いません。");
+export const BookmarkChangeSchema = z.strictObject({
+  examCode: z.string().regex(EXAM_CODE_PATTERN),
+  questionId: z.string().regex(QUESTION_ID_PATTERN),
+  bookmarked: z.boolean(),
+});
 
 /** 目標日の変更の本文の上限(資格コードと日付だけなので、小さい) */
 export const MAX_GOAL_BODY_BYTES = 1_000;

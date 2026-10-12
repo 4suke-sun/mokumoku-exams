@@ -23,7 +23,7 @@ describe("カリキュラムの読み込み", () => {
   });
 
   it("サンプル資格_カリキュラムの単元を返す", async () => {
-    const exam = findPublishedExam("SAMPLE");
+    const exam = findPublishedExam("EX-SMP-XX");
     if (!exam) throw new Error("サンプル資格がありません");
     const units = await loadCurriculum(exam);
     expect(units?.length).toBeGreaterThan(0);
@@ -31,7 +31,7 @@ describe("カリキュラムの読み込み", () => {
   });
 
   it("type のない図_type を省略すると流れの図になる", async () => {
-    const exam = findPublishedExam("SAMPLE");
+    const exam = findPublishedExam("EX-SMP-XX");
     if (!exam) throw new Error("サンプル資格がありません");
     const diagrams = ((await loadCurriculum(exam)) ?? []).flatMap((u) => u.sections.flatMap((s) => s.diagram ?? []));
     expect(diagrams.length).toBeGreaterThan(0);

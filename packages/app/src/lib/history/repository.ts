@@ -17,7 +17,7 @@ import {
   SectionProgressSchema,
 } from "@/lib/storage.ts";
 import { isValidDate, jstDate, type StudyDay } from "@/lib/study-days.ts";
-import { MASTER_STREAK, QUESTION_ID_PATTERN } from "./schema.ts";
+import { EXAM_CODE_PATTERN, MASTER_STREAK, QUESTION_ID_PATTERN } from "./schema.ts";
 
 /** 履歴の保存先。利用者の識別子(`sub`)は、検証済みのものだけを渡す。 */
 export interface HistoryRepository {
@@ -317,7 +317,7 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
     async listReviewItems(sub) {
       return (await queryAll(sub, REVIEW_PREFIX)).flatMap((item): ReviewItem[] => {
         const [examCode = "", questionId = ""] = String(item.SK).slice(REVIEW_PREFIX.length).split("#");
-        if (!QUESTION_ID_PATTERN.test(questionId) || !questionId.startsWith(`${examCode}-`)) return [];
+        if (!QUESTION_ID_PATTERN.test(questionId) || !EXAM_CODE_PATTERN.test(examCode)) return [];
         return [{ examCode, questionId, ...reviewStateOf(item) }];
       });
     },

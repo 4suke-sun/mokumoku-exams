@@ -7,7 +7,7 @@ import type { DataFile } from "../exam-data/validate.ts";
 import { formatIssues } from "../exam-data/validate.ts";
 import { CurriculumFileSchema } from "./schema.ts";
 
-const CURRICULUM_FILE = /^curriculum\.([a-z][a-z0-9]{1,15})\.json$/;
+const CURRICULUM_FILE = /^curriculum\.([a-z][a-z0-9]{1,5}-[a-z][a-z0-9]{1,9}-[a-z0-9]{2,4})\.json$/;
 
 type Context = {
   /** 公開中の資格ごとの、問題データにある問題 ID */

@@ -9,7 +9,7 @@
 import { z } from "zod";
 import { prose } from "../exam-data/schema.ts";
 
-const EXAM_CODE = /^[A-Z][A-Z0-9]{1,15}$/;
+const EXAM_CODE = /^[A-Z][A-Z0-9]{1,5}-[A-Z][A-Z0-9]{1,9}-[A-Z0-9]{2,4}$/;
 const QUESTION_ID = /^[A-Z][A-Z0-9]{1,15}-\d{4}$/;
 const CHOICE_KEY = /^[A-Z]$/;
 
@@ -46,13 +46,6 @@ export const SummaryFileSchema = z
         });
       }
       ids.add(card.questionId);
-      if (!card.questionId.startsWith(`${file.examCode}-`)) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["cards", i, "questionId"],
-          message: "問題の ID の接頭辞が資格コードと一致しません",
-        });
-      }
     });
   });
 

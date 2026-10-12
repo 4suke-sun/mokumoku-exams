@@ -39,7 +39,7 @@ export function groupByVendor(exams: readonly Exam[], colorCount = 6): VendorGro
   return groups;
 }
 
-/** タイルに出す短い表記。`abbr` がなければ、資格コードの先頭の 4 文字まで */
+/** タイルに出す短い表記。`abbr` がなければ、資格コード(`<ベンダー>-<試験>-<版>`)の試験略称の部分(4 文字まで) */
 export function tileText(exam: Pick<Exam, "abbr" | "examCode">): string {
-  return exam.abbr ?? exam.examCode.slice(0, 4);
+  return exam.abbr ?? (exam.examCode.split("-")[1] ?? exam.examCode).slice(0, 4);
 }

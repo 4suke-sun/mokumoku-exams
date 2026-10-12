@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { LEGACY_EXAM_CODES } from "./legacy-exam-codes.ts";
 
 // ブラウザの localStorage に保存する学習の状態。認証のない段階の保存先で、端末の中だけに残る。
 // 読み出した値は外部の入力として扱い、形を検査する。壊れていたら、保存されていないものとして扱う。
@@ -11,11 +12,65 @@ export type KeyValueStore = Pick<Storage, "getItem" | "setItem" | "removeItem">;
  * 参照を各メソッドの中で行い、この例外を、保存の処理の try で受けられるようにする。
  */
 export function browserStore(): KeyValueStore {
-  return {
+  const store: KeyValueStore = {
     getItem: (key) => window.localStorage.getItem(key),
     setItem: (key, value) => window.localStorage.setItem(key, value),
     removeItem: (key) => window.localStorage.removeItem(key),
   };
+  // 以前の試験コードで保存した記録を、このページの読み込みで 1 回だけ、新しいコードへ移す
+  if (!legacyKeysChecked && typeof window !== "undefined") {
+    legacyKeysChecked = true;
+    try {
+      migrateLegacyExamKeys(store, LEGACY_EXAM_CODES);
+    } catch {
+      // 保存が禁止されているときなど。移せなくても、画面は動く
+    }
+  }
+  return store;
+}
+
+let legacyKeysChecked = false;
+
+/** 資格ごとに持つ記録の種類(キーは `mokumoku:v1:<種類>:<試験コード>`) */
+const PER_EXAM_KINDS = ["session", "results", "stages", "sections", "conditions"] as const;
+
+/** 値の中の `examCode` を、旧コードから新しいコードに置き換える(入れ子の中も) */
+function replaceExamCode(value: unknown, from: string, to: string): unknown {
+  if (Array.isArray(value)) return value.map((item) => replaceExamCode(item, from, to));
+  if (value !== null && typeof value === "object") {
+    return Object.fromEntries(
+      Object.entries(value).map(([key, item]) => [
+        key,
+        key === "examCode" && item === from ? to : replaceExamCode(item, from, to),
+      ]),
+    );
+  }
+  return value;
+}
+
+/**
+ * 以前の試験コードのキーで保存した記録を、新しい試験コードのキーへ移す。値の中の `examCode` も新しいコードにする。
+ * 新しいコードのキーにすでに記録があるときは、それを残し、以前のキーだけを消す。値が読めないときは、以前のキーを消さない。
+ */
+export function migrateLegacyExamKeys(store: KeyValueStore, legacy: Readonly<Record<string, string>>): void {
+  for (const [from, to] of Object.entries(legacy)) {
+    for (const kind of PER_EXAM_KINDS) {
+      const oldKey = `${KEY_PREFIX}:${kind}:${from}`;
+      const raw = store.getItem(oldKey);
+      if (raw === null) continue;
+      const newKey = `${KEY_PREFIX}:${kind}:${to}`;
+      if (store.getItem(newKey) === null) {
+        let moved: string;
+        try {
+          moved = JSON.stringify(replaceExamCode(JSON.parse(raw), from, to));
+        } catch {
+          continue;
+        }
+        store.setItem(newKey, moved);
+      }
+      store.removeItem(oldKey);
+    }
+  }
 }
 
 const KEY_PREFIX = "mokumoku:v1";

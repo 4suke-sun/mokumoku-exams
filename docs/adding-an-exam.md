@@ -17,7 +17,7 @@
 
 ## 2. ファイルの命名と配置
 
-すべて、リポジトリ直下の `data/` に置きます。`<コード>` は、資格コードを英小文字にしたものです(例: 資格コード `SAMPLE` なら `sample`)。
+すべて、リポジトリ直下の `data/` に置きます。`<コード>` は、試験コードを英小文字にしたものです(例: 試験コード `AWS-AIB-C01` なら `aws-aib-c01`)。試験コードの形は、仕様の「試験コード」を見てください。
 
 | ファイル | 内容 | 必要なとき |
 | --- | --- | --- |
@@ -26,17 +26,18 @@
 | `data/curriculum.<コード>.json` | 学習モードの単元と本文 | 任意。ないと、学習モードは「準備中です」になります |
 
 - ファイル名のコードと、ファイルの中の `examCode` は一致させます。
-- 問題の ID は `<資格コード>-<4 桁の連番>`(例: `SAMPLE-0001`)です。一度使った番号は、問題を消しても再利用しません。
+- 問題の ID は `<問題 ID の接頭辞>-<4 桁の連番>`(例: `SAMPLE-0001`)です。接頭辞は、資格マスタの `idPrefix` に書き、資格どうしで重複させません。一度使った番号は、問題を消しても再利用しません。
+- ベンダーを新しく足すときは、`data/vendors.json` に、名前と略称を足します。
 
 ## 3. 手順
 
-1. **近日公開として載せる**(任意)。`data/exams.json` の `exams` に、`examCode`・`status: "coming-soon"`・`vendor`・`name`・`shortName`(と任意の `note`)だけの 1 件を足します。
+1. **近日公開として載せる**(任意)。`data/exams.json` の `exams` に、`examCode`(`<ベンダー略称>-<試験略称>-<版>`。版がなければ `XX`)・`status: "coming-soon"`・`vendor`・`name`・`shortName`(と任意の `note`)だけの 1 件を足します。
 2. **出典のドメインを足す**(出典を付けるとき)。`scripts/lib/exam-data/schema.ts` の `ALLOWED_REFERENCE_HOSTS` に、その資格のベンダーの公式ドキュメントのホスト名(完全一致)を足し、仕様の「3.1 出典」の表にも足します。すでにあれば、足しません。
 3. **問題を書く**。`data/questions.<コード>.json` を作り、[問題データの仕様](./data-spec.md) の「3. 問題」の形で書きます。
    選択式(択一・複数選択)の問題数は、本番モードの出題数(`officialQuestionCount`)以上にします(自由記述は数えません)。
    出典の URL は `references` に書き、本文には書きません。
 4. **公開にする**。資格マスタの 1 件を `status: "published"` にし、`edition`・`category`・`passingScore`・`totalScore`・
-   `officialQuestionCount`・`officialTimeMinutes`・`domains` を足します。公式の情報があれば、`level`・`abbr`・`info` も足します
+   `officialQuestionCount`・`officialTimeMinutes`・`domains`・`idPrefix` を足します。公式の情報があれば、`level`・`abbr`・`info` も足します
    (`info.guideUrl` のドメインも、手順 2 の許可の一覧に足します)。
 5. **カリキュラムを書く**(任意)。`data/curriculum.<コード>.json` を、仕様の「11. カリキュラムのデータ」の形で作ります。
 6. **検査する**。次の「4. 検査」を通します。

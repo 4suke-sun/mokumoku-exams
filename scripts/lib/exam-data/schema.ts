@@ -21,7 +21,13 @@ export function containsUrl(value: string): boolean {
 /** 本文: 空白だけではなく、URL を含まない文字列。 */
 export const prose = text.refine((value) => !containsUrl(value), "本文に URL が含まれています");
 
-const EXAM_CODE = /^[A-Z][A-Z0-9]{1,15}$/;
+/**
+ * 試験コード: `<ベンダー略称>-<試験略称>-<版>`(すべて大文字と数字)。例: `AWS-AIB-C01`。
+ * 公式に版の呼び名がない試験は、版を `XX` にする。ベンダー略称は `data/vendors.json` にあり、資格のベンダーと一致する。
+ */
+export const EXAM_CODE = /^[A-Z][A-Z0-9]{1,5}-[A-Z][A-Z0-9]{1,9}-[A-Z0-9]{2,4}$/;
+/** 問題 ID の接頭辞。試験コードとは別に持ち、資格どうしで重複しない(問題 ID は `<接頭辞>-<4 桁の連番>`) */
+export const ID_PREFIX = /^[A-Z][A-Z0-9]{1,15}$/;
 const DOMAIN_CODE = /^domain\d{1,2}$/;
 
 /** 比較用に、全角・半角、空白の違いをならす。 */
@@ -50,6 +56,11 @@ const examBase = {
   shortName: prose,
   /** 資格のレベル。公式にレベルの区分がない資格は、持たない */
   level: z.enum(EXAM_LEVELS).optional(),
+  /** 以前の試験コード(旧コードの URL を新しいコードへ転送し、保存済みのデータを移すために使う) */
+  previousCodes: z
+    .array(z.string().regex(/^[A-Z][A-Z0-9]{1,15}$/))
+    .max(5)
+    .optional(),
   /** 一覧のタイルに出す短い表記(英数字 1〜4 文字) */
   abbr: z
     .string()
@@ -102,6 +113,8 @@ export const PublishedExamSchema = z
   .strictObject({
     ...examBase,
     status: z.literal("published"),
+    /** 問題 ID の接頭辞(問題 ID は `<接頭辞>-<4 桁の連番>`)。資格どうしで重複しない */
+    idPrefix: z.string().regex(ID_PREFIX),
     edition: prose,
     category: prose,
     passingScore: z.number().positive(),
@@ -136,6 +149,24 @@ export const ComingSoonExamSchema = z.strictObject({
   note: prose.optional(),
 });
 
+/** ベンダーの略称の一覧(`data/vendors.json`)。資格の試験コードの先頭は、資格のベンダーの略称と一致する */
+export const VendorsFileSchema = z
+  .strictObject({
+    vendors: z.array(z.strictObject({ name: prose, abbr: z.string().regex(/^[A-Z][A-Z0-9]{1,5}$/) })).min(1),
+  })
+  .superRefine((file, ctx) => {
+    for (const key of ["name", "abbr"] as const) {
+      const values = file.vendors.map((v) => v[key]);
+      if (new Set(values).size !== values.length) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["vendors"],
+          message: `ベンダーの${key === "name" ? "名前" : "略称"}が重複しています`,
+        });
+      }
+    }
+  });
+
 export const ExamSchema = z.discriminatedUnion("status", [PublishedExamSchema, ComingSoonExamSchema]);
 
 export const ExamsFileSchema = z.strictObject({ exams: z.array(ExamSchema).min(1) }).superRefine((file, ctx) => {
@@ -145,6 +176,24 @@ export const ExamsFileSchema = z.strictObject({ exams: z.array(ExamSchema).min(1
       ctx.addIssue({ code: "custom", path: ["exams", i, "examCode"], message: "資格のコードが重複しています" });
     }
     seen.add(exam.examCode);
+    for (const old of exam.previousCodes ?? []) {
+      if (old === exam.examCode || seen.has(old)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["exams", i, "previousCodes"],
+          message: "以前のコードが、ほかのコードと重複しています",
+        });
+      }
+      seen.add(old);
+    }
+  });
+  const prefixes = new Set<string>();
+  file.exams.forEach((exam, i) => {
+    if (exam.status !== "published") return;
+    if (prefixes.has(exam.idPrefix)) {
+      ctx.addIssue({ code: "custom", path: ["exams", i, "idPrefix"], message: "問題 ID の接頭辞が重複しています" });
+    }
+    prefixes.add(exam.idPrefix);
   });
 });
 
@@ -325,13 +374,6 @@ export const QuestionsFileSchema = z
           code: "custom",
           path: ["questions", i, "examCode"],
           message: "ファイルの資格コードと一致しません",
-        });
-      }
-      if (!q.questionId.startsWith(`${file.examCode}-`)) {
-        ctx.addIssue({
-          code: "custom",
-          path: ["questions", i, "questionId"],
-          message: "ID の接頭辞が資格コードと一致しません",
         });
       }
       const stem = normalizeText(q.questionText);

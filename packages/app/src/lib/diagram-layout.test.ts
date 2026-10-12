@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import sample from "../../../../data/curriculum.sample.json" with { type: "json" };
+import sample from "../../../../data/curriculum.ex-smp-xx.json" with { type: "json" };
 import {
   type Box,
   type CompareDiagram,
