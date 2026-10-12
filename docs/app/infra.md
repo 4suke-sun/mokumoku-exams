@@ -16,7 +16,7 @@
 設定したときだけ、`SITE_URL`(sitemap の絶対 URL)と、`VAPID_PUBLIC_KEY`・`VAPID_PRIVATE_KEY_PARAMETER`・`VAPID_SUBJECT`(通知の購読とテスト通知)も渡されます。
 VAPID の秘密鍵は、値ではなく、置き場所(SSM パラメーター)の名前だけを渡します(「VAPID の秘密鍵」)。
 履歴のテーブルに許す操作は、`GetItem`・`PutItem`・`UpdateItem`・`Query`・`DeleteItem` だけです(テーブル 1 つに限り、スキャンやテーブルの管理はできません)。管理者の操作の記録も、このテーブルに置きます。
-Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCreateUser`・`AdminDisableUser`・`AdminAddUserToGroup`(管理者のグループへの追加)だけです(`<接頭辞>-auth` の UserPool 1 つに限ります)。
+Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCreateUser`・`AdminDisableUser` だけです(`<接頭辞>-auth` の UserPool 1 つに限ります)。
 デプロイの順は、auth → data → web で、push は data のあとです(`cdkd deploy --all` が依存から決めます)。
 
 ### 通知の送信(`<接頭辞>-push`)

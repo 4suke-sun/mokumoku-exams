@@ -50,4 +50,3 @@ const postJson = <T>(path: string, body: unknown) =>
 export const fetchUsers = () => request<{ users: AdminUserRow[] }>("/api/admin/users");
 export const inviteUser = (email: string) => postJson<{ user: ManagedUser }>("/api/admin/users", { email });
 export const disableUser = (username: string) => postJson<{ status: string }>("/api/admin/users/disable", { username });
-export const promoteUser = (username: string) => postJson<{ status: string }>("/api/admin/users/promote", { username });

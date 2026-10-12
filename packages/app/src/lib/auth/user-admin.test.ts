@@ -1,5 +1,4 @@
 import {
-  AdminAddUserToGroupCommand,
   AdminCreateUserCommand,
   AdminDisableUserCommand,
   ListUsersCommand,
@@ -9,7 +8,6 @@ import {
   createFakeDirectory,
   createFakeProvider,
   createFakeUserAdmin,
-  createFakeVerifier,
   FAKE_INVITED_PHRASE,
   FAKE_USER_EMAIL,
   FAKE_USER_PHRASE,
@@ -107,35 +105,6 @@ describe("createCognitoUserAdmin", () => {
     expect((sent[0] as AdminDisableUserCommand).input).toEqual({ UserPoolId: POOL, Username: "user-1" });
   });
 
-  it("昇格_UserPool とユーザー名と管理者のグループだけを指定する", async () => {
-    const { sent, client } = sender(() => ({}));
-    await createCognitoUserAdmin({ region: "us-east-1", userPoolId: POOL, client }).promoteUser("user-1");
-    expect(sent).toHaveLength(1);
-    expect(sent[0]).toBeInstanceOf(AdminAddUserToGroupCommand);
-    expect((sent[0] as AdminAddUserToGroupCommand).input).toEqual({
-      UserPoolId: POOL,
-      Username: "user-1",
-      GroupName: "admins",
-    });
-  });
-
-  it("昇格の失敗_いない利用者は not-found_そのほかは unavailable(原因の文言は持たない)", async () => {
-    for (const [name, code] of [
-      ["UserNotFoundException", "not-found"],
-      ["ResourceNotFoundException", "unavailable"],
-      ["NotAuthorizedException", "unavailable"],
-    ] as const) {
-      const { client } = sender(() => {
-        throw Object.assign(new Error("詳細な文言 目印XYZ"), { name });
-      });
-      const error = await createCognitoUserAdmin({ region: "us-east-1", userPoolId: POOL, client })
-        .promoteUser("user-1")
-        .catch((e: unknown) => e);
-      expect(error).toMatchObject({ code });
-      expect(String((error as Error).message)).not.toContain("目印XYZ");
-    }
-  });
-
   it.each([
     ["UsernameExistsException", "already-exists"],
     ["UserNotFoundException", "not-found"],
@@ -179,24 +148,5 @@ describe("createFakeUserAdmin", () => {
     });
     await expect(provider.refresh(before.tokens.refreshToken)).rejects.toMatchObject({ code: "invalid-credentials" });
     await expect(users.disableUser("fake-nobody")).rejects.toMatchObject({ code: "not-found" });
-  });
-
-  it("昇格_管理者のグループに入り_次のログインのトークンに反映される_いない利用者は断る", async () => {
-    const directory = createFakeDirectory();
-    const users = createFakeUserAdmin(directory);
-    const provider = createFakeProvider(Date.now, directory);
-    const verifier = createFakeVerifier();
-    const groupsAfterSignIn = async () => {
-      const result = await provider.signIn(FAKE_USER_EMAIL, FAKE_USER_PHRASE);
-      if (result.kind !== "signed-in") throw new Error("unexpected");
-      return (await verifier.verifyIdToken(result.tokens.idToken))?.groups;
-    };
-    expect(await groupsAfterSignIn()).not.toContain("admins");
-    await users.promoteUser(fakeSub(FAKE_USER_EMAIL));
-    expect(await groupsAfterSignIn()).toContain("admins");
-    // すでに入っていても、変わらない
-    await users.promoteUser(fakeSub(FAKE_USER_EMAIL));
-    expect((await groupsAfterSignIn())?.filter((g) => g === "admins")).toHaveLength(1);
-    await expect(users.promoteUser("fake-nobody")).rejects.toMatchObject({ code: "not-found" });
   });
 });

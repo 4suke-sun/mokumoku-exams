@@ -3,7 +3,7 @@ import { DynamoDBDocumentClient, PutCommand } from "@aws-sdk/lib-dynamodb";
 import type { DocumentSender } from "@/lib/history/repository.ts";
 
 /** 記録する操作の種類 */
-export type AuditAction = "disable-user" | "promote-user";
+export type AuditAction = "disable-user";
 
 /**
  * 管理者の操作の記録。`actor` は操作した管理者の `sub`(サーバー側で検証した値)、`target` は対象の Cognito のユーザー名。

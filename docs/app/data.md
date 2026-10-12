@@ -37,7 +37,7 @@
 | 資格の日ごとの学習量を取る | `Query` | `PK=USER#{sub}` かつ `begins_with(SK, "DAY#{資格}#")`。日付の順 |
 | 目標日を決める・消す・取る | `PutItem` / `DeleteItem` / `GetItem` | `SK=GOAL#{資格}`。資格ごとに 1 項目 |
 | 表示の設定を保存する・取る | `PutItem` / `GetItem` | `SK=PREFS`。利用者ごとに 1 項目。項目は `type`(`prefs`)・`theme`(`system` / `light` / `dark`)・`style`(`rich` / `simple`)・`shuffleChoices`(真偽値)だけ。上書きする。読み出した値は検査し、壊れた値は、保存していないものとして扱う |
-| 管理者の操作を記録する | `PutItem` | `PK=ADMIN`、`SK=AUDIT#{時刻}#{対象のユーザー名}`。無効化と管理者への昇格のあとに 1 件。項目は `at`(時刻)・`actor`(操作した管理者の `sub`)・`target`(対象の Cognito のユーザー名)・`action`(`disable-user` / `promote-user`)だけで、メールアドレスは入れない |
+| 管理者の操作を記録する | `PutItem` | `PK=ADMIN`、`SK=AUDIT#{時刻}#{対象のユーザー名}`。無効化のあとに 1 件。項目は `at`(時刻)・`actor`(操作した管理者の `sub`)・`target`(対象の Cognito のユーザー名)・`action`(`disable-user`)だけで、メールアドレスは入れない |
 | 通知を購読する・やめる | `PutItem` / `DeleteItem` | `SK=PUSH#{endpoint の SHA-256}`。同じ端末(endpoint)は上書き |
 | 自分の購読を取る | `Query` | `PK=USER#{sub}` かつ `begins_with(SK, "PUSH#")`。購読の上限の確認と、テスト通知に使う |
 | 毎日の通知の送り先を集める | `Scan`(`SK` が `PUSH#` のものに絞る) | 送信の Lambda だけが使う(「通知の購読」) |
@@ -116,7 +116,7 @@
 | `DELETE /api/push/subscription` | この端末の通知の購読を消す(本文は `{ "endpoint" }`) |
 | `POST /api/push/test` | 管理者だけ。自分の購読(すべての端末)に、テスト通知を送る(本文は `{}`)。送れた数を返す(`{ "sent": 1 }`)。管理者でなければ `403` |
 
-管理者の API(`/api/admin/*`。利用者の一覧・招待・無効化・管理者への昇格)は、[認証の仕組み](./auth.md) の「管理者の画面」に書きます。
+管理者の API(`/api/admin/*`。利用者の一覧・招待・無効化)は、[認証の仕組み](./auth.md) の「管理者の画面」に書きます。
 
 - どれも、`proxy.ts` と各ハンドラーの両方で、ID トークンを検証します。未ログインは `401` です。
 - **利用者の識別子は、リクエストから受け取りません。** 本文に `sub` などの未知の項目があれば `400`、問い合わせに資格コード以外があれば `400` です。

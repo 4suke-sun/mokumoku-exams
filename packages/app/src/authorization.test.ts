@@ -6,7 +6,6 @@ import { NextRequest } from "next/server";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import AdminLayout from "@/app/admin/layout.tsx";
 import * as adminDisableRoute from "@/app/api/admin/users/disable/route.ts";
-import * as adminPromoteRoute from "@/app/api/admin/users/promote/route.ts";
 import * as adminUsersRoute from "@/app/api/admin/users/route.ts";
 import * as changePasswordRoute from "@/app/api/auth/change-password/route.ts";
 import * as bookmarksRoute from "@/app/api/history/bookmarks/route.ts";
@@ -115,7 +114,7 @@ const PROTECTED_PAGES = [
 /** 保護される画面のうち、管理者だけが開けるもの */
 const ADMIN_PAGES = ["/admin", "/admin/preview", "/admin/preview/sample"];
 /** 保護される API のうち、管理者だけが呼べるもの */
-const ADMIN_APIS = ["/api/admin/users", "/api/admin/users/disable", "/api/admin/users/promote"];
+const ADMIN_APIS = ["/api/admin/users", "/api/admin/users/disable"];
 const PUBLIC_APIS = [
   "/api/auth/forgot-password",
   "/api/auth/login",
@@ -128,7 +127,6 @@ const PUBLIC_APIS = [
 const PROTECTED_APIS = [
   "/api/admin/users",
   "/api/admin/users/disable",
-  "/api/admin/users/promote",
   "/api/auth/change-password",
   "/api/history/bookmarks",
   "/api/history/days",
@@ -340,7 +338,6 @@ describe("認可: 未ログインの拒否", () => {
     expect(methods(changePasswordRoute)).toEqual(["POST"]);
     expect(methods(adminUsersRoute).sort()).toEqual(["GET", "POST"]);
     expect(methods(adminDisableRoute)).toEqual(["POST"]);
-    expect(methods(adminPromoteRoute)).toEqual(["POST"]);
     expect(methods(pushSubscriptionRoute).sort()).toEqual(["DELETE", "PUT"]);
     expect(methods(pushTestRoute)).toEqual(["POST"]);
   });
@@ -650,8 +647,6 @@ describe("認可: 管理者だけが開ける", () => {
     adminUsersRoute.POST(request("/api/admin/users", { method: "POST", cookie, body }));
   const disable = (cookie: string | undefined, body: unknown) =>
     adminDisableRoute.POST(request("/api/admin/users/disable", { method: "POST", cookie, body }));
-  const promote = (cookie: string | undefined, body: unknown) =>
-    adminPromoteRoute.POST(request("/api/admin/users/promote", { method: "POST", cookie, body }));
 
   it("管理者の API の本体_入口を通らなくても_未ログイン・管理者でない利用者を断り_何も変えない(二重の防御)", async () => {
     const target = fakeSub(FAKE_INVITED_EMAIL);
@@ -660,7 +655,6 @@ describe("認可: 管理者だけが開ける", () => {
       expect((await adminUsersRoute.GET(request("/api/admin/users", { cookie }))).status, label).toBe(403);
       expect((await invite(cookie, { email: "someone@example.com" })).status, label).toBe(403);
       expect((await disable(cookie, { username: target })).status, label).toBe(403);
-      expect((await promote(cookie, { username: target })).status, label).toBe(403);
     }
     const users = await listedUsers();
     expect(users.map((u) => u.email)).not.toContain("someone@example.com");
@@ -687,39 +681,6 @@ describe("認可: 管理者だけが開ける", () => {
     expect(auditEntries()).toEqual([
       { at: expect.any(String), actor: fakeSub(FAKE_ADMIN_EMAIL), target, action: "disable-user" },
     ]);
-  });
-
-  it("管理者への昇格_管理者だけができ_昇格した利用者は次のログインから管理者の画面を開け_記録に管理者の sub が残る", async () => {
-    const target = fakeSub(FAKE_USER_EMAIL);
-    // 管理者でない利用者は、自分自身を昇格させることもできない
-    expect((await promote(await learner(), { username: target })).status).toBe(403);
-    expect((await listedUsers()).length).toBeGreaterThan(0);
-
-    expect((await promote(await admin(), { username: target })).status).toBe(200);
-    expect(auditEntries()).toEqual([
-      { at: expect.any(String), actor: fakeSub(FAKE_ADMIN_EMAIL), target, action: "promote-user" },
-    ]);
-    // 昇格した利用者が、次にログインすると、管理者の API を呼べる
-    const signedIn = await getAuthProvider().signIn(FAKE_USER_EMAIL, FAKE_USER_PHRASE);
-    if (signedIn.kind !== "signed-in") throw new Error("unexpected");
-    const cookie = `mokumoku_id=${signedIn.tokens.idToken}`;
-    expect((await adminUsersRoute.GET(request("/api/admin/users", { cookie }))).status).toBe(200);
-  });
-
-  it("管理者への昇格_利用者の識別子と操作した管理者を、リクエストから受け取らない", async () => {
-    const cookie = await admin();
-    for (const key of ["sub", "userId", "actor", "PK"]) {
-      expect((await promote(cookie, { username: fakeSub(FAKE_USER_EMAIL), [key]: "other-user" })).status, key).toBe(
-        400,
-      );
-    }
-    const withHeaders = new NextRequest("http://localhost/api/admin/users/promote", {
-      method: "POST",
-      headers: { cookie, "content-type": "application/json", "x-user-id": "other-user", "x-amzn-oidc-subject": "x" },
-      body: JSON.stringify({ username: fakeSub(FAKE_USER_EMAIL) }),
-    });
-    expect((await adminPromoteRoute.POST(withHeaders)).status).toBe(200);
-    expect(auditEntries().map((e) => e.actor)).toEqual([fakeSub(FAKE_ADMIN_EMAIL)]);
   });
 
   it("管理者の API_利用者の識別子をリクエストから受け取らない_自分自身は無効にできない", async () => {
