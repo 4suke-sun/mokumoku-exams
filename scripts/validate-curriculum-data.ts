@@ -36,8 +36,13 @@ try {
     .map((name) => ({ name, data: read(name) }));
 
   // 公開中の資格ごとに、問題データにある問題 ID を集める
-  const exams = (read("exams.json") as { exams?: { examCode?: unknown; status?: unknown }[] } | undefined)?.exams;
+  const exams = (
+    read("exams.json") as
+      | { exams?: { examCode?: unknown; status?: unknown; domains?: { code?: unknown }[] }[] }
+      | undefined
+  )?.exams;
   const questionIds = new Map<string, Set<string>>();
+  const domains = new Map<string, Set<string>>();
   for (const exam of Array.isArray(exams) ? exams : []) {
     if (exam.status !== "published" || typeof exam.examCode !== "string") continue;
     const name = `questions.${exam.examCode.toLowerCase()}.json`;
@@ -47,10 +52,14 @@ try {
       .map((q) => q.questionId)
       .filter((id): id is string => typeof id === "string");
     questionIds.set(exam.examCode, new Set(ids));
+    const codes = (Array.isArray(exam.domains) ? exam.domains : [])
+      .map((d) => d.code)
+      .filter((c): c is string => typeof c === "string");
+    domains.set(exam.examCode, new Set(codes));
   }
 
   blocks.push(...unreadable);
-  if (unreadable.length === 0) blocks.push(...validateCurriculumData(curriculumFiles, { questionIds }));
+  if (unreadable.length === 0) blocks.push(...validateCurriculumData(curriculumFiles, { questionIds, domains }));
 } catch {
   blocks.push(`${dir} を検査できませんでした(フォルダの読み込みに失敗)`);
 }

@@ -353,6 +353,18 @@ body {
     color: color-mix(in srgb, var(--tone, var(--muted)) 80%, var(--text));
   }
 
+  /* カリキュラムの強調(==語==)。太字とは別に、橙の太い下線を引く。色だけに頼らず、下線の形でも見分けられる */
+  .mark-emphasis {
+    background: transparent;
+    color: inherit;
+    font-weight: 700;
+    text-decoration: underline;
+    text-decoration-color: var(--orange);
+    text-decoration-thickness: 0.3em;
+    text-underline-offset: -0.05em;
+    text-decoration-skip-ink: none;
+  }
+
   /* 絵文字を載せる色付きのタイル。絵文字は飾りなので、aria-hidden にして、意味は文字で添える */
   .tile {
     display: inline-grid;

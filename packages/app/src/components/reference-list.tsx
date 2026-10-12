@@ -23,17 +23,21 @@ export function isLinkableReference(reference: Reference): boolean {
   return parseUrl(reference.url)?.protocol === "https:";
 }
 
-type Props = { references?: readonly Reference[] | undefined };
+type Props = {
+  references?: readonly Reference[] | undefined;
+  /** 「出典」の見出しを出すか(囲むカードが見出しを持つときは false) */
+  heading?: boolean;
+};
 
 /**
  * 出典(公式ドキュメント)の一覧。外部サイトは、新しいタブで開き、参照元の情報を渡さない。
  * リンクにできない出典は、文字だけで出す。出典がなければ、何も出さない。
  */
-export function ReferenceList({ references }: Props) {
+export function ReferenceList({ references, heading = true }: Props) {
   if (!references || references.length === 0) return null;
   return (
     <div className="space-y-1 text-sm">
-      <h3 className="font-bold">出典</h3>
+      {heading ? <h3 className="font-bold">出典</h3> : null}
       <ul className="list-disc space-y-1 pl-6">
         {references.map((reference) => (
           <li key={reference.url}>

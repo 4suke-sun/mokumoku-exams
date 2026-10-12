@@ -1,9 +1,20 @@
 {
   "examCode": "SAMPLE",
+  "domains": [
+    {
+      "code": "domain1",
+      "summary": "信号機や果物と野菜など、身の回りの基礎の用語を確かめる動作確認用の分野です。"
+    },
+    {
+      "code": "domain2",
+      "summary": "物事の進め方と振り返りを確かめる動作確認用の分野です。"
+    }
+  ],
   "units": [
     {
       "id": "basics",
       "title": "身の回りの基礎の用語",
+      "domain": "domain1",
       "order": 1,
       "summary": [
         "信号機の青(緑)は、進んでよいことを表す",
@@ -29,13 +40,20 @@
       ],
       "questionIds": ["SAMPLE-0001", "SAMPLE-0002", "SAMPLE-0003"],
       "stages": [
-        { "order": 1, "questionIds": ["SAMPLE-0001"] },
-        { "order": 2, "questionIds": ["SAMPLE-0002", "SAMPLE-0003"] }
+        {
+          "order": 1,
+          "questionIds": ["SAMPLE-0001"]
+        },
+        {
+          "order": 2,
+          "questionIds": ["SAMPLE-0002", "SAMPLE-0003"]
+        }
       ]
     },
     {
       "id": "thinking",
       "title": "物事の進め方",
+      "domain": "domain2",
       "order": 2,
       "summary": ["最初に**目的**をはっきりさせる", "振り返りでは、うまくいったことと次に変えることを確かめる"],
       "sections": [
@@ -46,18 +64,51 @@
           "diagram": {
             "title": "物事を進める流れ(動作確認用の架空の図)",
             "nodes": [
-              { "id": "goal", "label": "目的を決める" },
-              { "id": "steps", "label": "手順を並べる" },
-              { "id": "tools", "label": "必要な物をそろえる" },
-              { "id": "do", "label": "進める" },
-              { "id": "review", "label": "振り返る" }
+              {
+                "id": "goal",
+                "label": "目的を決める"
+              },
+              {
+                "id": "steps",
+                "label": "手順を並べる"
+              },
+              {
+                "id": "tools",
+                "label": "必要な物をそろえる"
+              },
+              {
+                "id": "do",
+                "label": "進める"
+              },
+              {
+                "id": "review",
+                "label": "振り返る"
+              }
             ],
             "edges": [
-              { "from": "goal", "to": "steps", "label": "先に" },
-              { "from": "goal", "to": "tools", "label": "あわせて" },
-              { "from": "steps", "to": "do" },
-              { "from": "tools", "to": "do" },
-              { "from": "do", "to": "review", "label": "終わったら" }
+              {
+                "from": "goal",
+                "to": "steps",
+                "label": "先に"
+              },
+              {
+                "from": "goal",
+                "to": "tools",
+                "label": "あわせて"
+              },
+              {
+                "from": "steps",
+                "to": "do"
+              },
+              {
+                "from": "tools",
+                "to": "do"
+              },
+              {
+                "from": "do",
+                "to": "review",
+                "label": "終わったら"
+              }
             ]
           }
         },
@@ -68,7 +119,16 @@
         }
       ],
       "questionIds": ["SAMPLE-0004", "SAMPLE-0005"],
-      "stages": [{ "order": 1, "questionIds": ["SAMPLE-0004"] }, { "order": 2, "questionIds": ["SAMPLE-0005"] }]
+      "stages": [
+        {
+          "order": 1,
+          "questionIds": ["SAMPLE-0004"]
+        },
+        {
+          "order": 2,
+          "questionIds": ["SAMPLE-0005"]
+        }
+      ]
     }
   ]
 }

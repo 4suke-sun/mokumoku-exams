@@ -6,6 +6,7 @@ import type { PublishedExam } from "./types.ts";
 const unit = (id: string, order: number): CurriculumUnit => ({
   id,
   title: id,
+  domain: "domain1",
   order,
   sections: [{ id: "s", title: "節", body: "本文" }],
   questionIds: ["SAMPLE-0001"],
@@ -27,6 +28,14 @@ describe("カリキュラムの読み込み", () => {
     const units = await loadCurriculum(exam);
     expect(units?.length).toBeGreaterThan(0);
     expect(units?.map((u) => u.order)).toEqual([...(units ?? [])].map((u) => u.order).sort((a, b) => a - b));
+  });
+
+  it("type のない図_type を省略すると流れの図になる", async () => {
+    const exam = findPublishedExam("SAMPLE");
+    if (!exam) throw new Error("サンプル資格がありません");
+    const diagrams = ((await loadCurriculum(exam)) ?? []).flatMap((u) => u.sections.flatMap((s) => s.diagram ?? []));
+    expect(diagrams.length).toBeGreaterThan(0);
+    expect(diagrams.every((d) => d.type !== undefined)).toBe(true);
   });
 
   it("カリキュラムのファイルがない資格_null(学習モードを使えない)", async () => {

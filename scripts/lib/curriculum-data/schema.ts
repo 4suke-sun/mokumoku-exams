@@ -15,12 +15,20 @@ const EXAM_CODE = /^[A-Z][A-Z0-9]{1,15}$/;
 const QUESTION_ID = /^[A-Z][A-Z0-9]{1,15}-\d{4}$/;
 /** 単元と節の ID。単元の ID は URL の一部(`/exams/<資格コード>/study/<単元の ID>`)になる */
 const ID = /^[a-z][a-z0-9-]{0,31}$/;
+const DOMAIN_CODE = /^domain\d{1,2}$/;
+/** 単元の画面の経路(`/study/<ID>`)と重ならないよう、分野の画面の経路に使う語は、単元の ID にできない */
+const RESERVED_UNIT_IDS = ["domains"];
 const ID_MESSAGE = "ID は英小文字・数字・ハイフンで、英字から始めます";
 
-/** 図の箱(ノード)。ID は辺の from / to で参照する */
+/** 箱の題と、題の下に添える短い説明(任意) */
+const BOX_LABEL = text.max(20);
+const BOX_NOTE = text.max(40);
+
+/** 流れの図の箱(ノード)。ID は辺の from / to で参照する */
 export const DiagramNodeSchema = z.strictObject({
   id: z.string().regex(ID, ID_MESSAGE),
-  label: text.max(20),
+  label: BOX_LABEL,
+  note: BOX_NOTE.optional(),
 });
 
 /** 図の矢印(辺)。from の箱から to の箱へ向かう。ラベルは任意 */
@@ -30,12 +38,16 @@ export const DiagramEdgeSchema = z.strictObject({
   label: text.max(12).optional(),
 });
 
+/** 図の種類。流れ(箱と矢印)、左右の比較、入れ子の階層 */
+export const DIAGRAM_TYPES = ["flow", "compare", "hierarchy"] as const;
+
 /**
- * 図解: 箱と矢印の図。箱は、矢印の向きに沿って上から下へ段に並べて描く(packages/app/src/lib/diagram-layout.ts)。
+ * 流れの図: 箱と矢印の図。箱は、矢印の向きに沿って上から下へ段に並べて描く(packages/app/src/lib/diagram-layout.ts)。
  * 段に並べられるよう、矢印が一周して戻る形(閉路)と、自分自身への矢印は置けない。
  */
-export const DiagramSchema = z
+const FlowDiagramSchema = z
   .strictObject({
+    type: z.literal("flow"),
     /** 図の題。画面の見出しと、読み上げの名前になる */
     title: text.max(80),
     nodes: z.array(DiagramNodeSchema).min(2).max(20),
@@ -74,6 +86,74 @@ export const DiagramSchema = z
       ctx.addIssue({ code: "custom", path: ["edges"], message: "矢印が一周して戻る形(閉路)になっています" });
     }
   });
+
+/** 比較の図の 1 項目(左右どちらかの側の箱) */
+const CompareItemSchema = z.strictObject({ label: BOX_LABEL, note: BOX_NOTE.optional() });
+
+/** 比較の図の片側: 見出しと、上から順に並べる項目 */
+const CompareSideSchema = z.strictObject({
+  heading: BOX_LABEL,
+  items: z.array(CompareItemSchema).min(1).max(6),
+});
+
+/** 比較の図: 左右 2 つの側を、見出しと項目で並べる。左右の項目は、同じ行どうしを対応させて並べる。 */
+const CompareDiagramSchema = z.strictObject({
+  type: z.literal("compare"),
+  title: text.max(80),
+  left: CompareSideSchema,
+  right: CompareSideSchema,
+});
+
+/** 階層の図の箱。子の箱は、親の箱の中に入れ子にして描く */
+export type HierarchyNode = { label: string; note?: string; children?: HierarchyNode[] };
+
+const HierarchyNodeSchema: z.ZodType<HierarchyNode> = z.lazy(() =>
+  z.strictObject({
+    label: BOX_LABEL,
+    note: BOX_NOTE.optional(),
+    children: z.array(HierarchyNodeSchema).min(1).max(8).optional(),
+  }),
+);
+
+/** 階層の図の入れ子の深さ(根を 1 とする)と、箱の数の上限 */
+export const HIERARCHY_MAX_DEPTH = 4;
+export const HIERARCHY_MAX_NODES = 25;
+
+/** 階層の図: 根の箱の中に、子の箱を入れ子にして描く。 */
+const HierarchyDiagramSchema = z
+  .strictObject({
+    type: z.literal("hierarchy"),
+    title: text.max(80),
+    root: HierarchyNodeSchema,
+  })
+  .superRefine((diagram, ctx) => {
+    let count = 0;
+    let deepest = 0;
+    const walk = (node: HierarchyNode, depth: number) => {
+      count += 1;
+      deepest = Math.max(deepest, depth);
+      for (const child of node.children ?? []) walk(child, depth + 1);
+    };
+    walk(diagram.root, 1);
+    if (deepest > HIERARCHY_MAX_DEPTH) {
+      ctx.addIssue({ code: "custom", path: ["root"], message: "入れ子が深すぎます" });
+    }
+    if (count > HIERARCHY_MAX_NODES) {
+      ctx.addIssue({ code: "custom", path: ["root"], message: "階層の図の箱が多すぎます" });
+    }
+  });
+
+/**
+ * 図解: `type` で 3 種類(`flow`・`compare`・`hierarchy`)を分ける判別ユニオン。
+ * `type` のない図は、流れの図として読む(`type` は省略できる)。
+ */
+export const DiagramSchema = z.preprocess(
+  (value) =>
+    typeof value === "object" && value !== null && !Array.isArray(value) && !("type" in value)
+      ? { type: "flow", ...value }
+      : value,
+  z.discriminatedUnion("type", [FlowDiagramSchema, CompareDiagramSchema, HierarchyDiagramSchema]),
+);
 
 /** 矢印をたどって元の箱に戻れる形があるか(入ってくる矢印のない箱から順に取り除き、残りがあれば閉路) */
 function hasCycle(nodes: readonly { id: string }[], edges: readonly { from: string; to: string }[]): boolean {
@@ -116,6 +196,8 @@ export const CurriculumUnitSchema = z
   .strictObject({
     id: z.string().regex(ID, ID_MESSAGE),
     title: text.max(80),
+    /** 単元が属する分野のコード(資格マスタの分野のコード。ファイルの `domains` にもある) */
+    domain: z.string().regex(DOMAIN_CODE),
     /** 表示の順番。小さい順に並べる */
     order: z.int().positive(),
     /** 単元の要約(短い箇条書き。1 項目が 1 行) */
@@ -126,6 +208,9 @@ export const CurriculumUnitSchema = z
     stages: z.array(CurriculumStageSchema).min(1).max(20).optional(),
   })
   .superRefine((unit, ctx) => {
+    if (RESERVED_UNIT_IDS.includes(unit.id)) {
+      ctx.addIssue({ code: "custom", path: ["id"], message: "この ID は、画面の経路に使うため使えません" });
+    }
     const sections = new Set<string>();
     unit.sections.forEach((section, i) => {
       if (sections.has(section.id)) {
@@ -160,12 +245,45 @@ export const CurriculumUnitSchema = z
     });
   });
 
+/** 分野の説明: 学習モードの分野の一覧に出す。分野の名前は、資格マスタ(`data/exams.json`)の分野の名前を使う */
+export const CurriculumDomainSchema = z.strictObject({
+  /** 資格マスタの分野のコード */
+  code: z.string().regex(DOMAIN_CODE),
+  /** 分野の説明(短い文章) */
+  summary: text.max(200),
+});
+
 export const CurriculumFileSchema = z
   .strictObject({
     examCode: z.string().regex(EXAM_CODE),
+    /** 分野の説明。単元が属する分野を、すべて書く。表示の順は、資格マスタの分野の並び */
+    domains: z.array(CurriculumDomainSchema).min(1).max(20),
     units: z.array(CurriculumUnitSchema).min(1).max(100),
   })
   .superRefine((file, ctx) => {
+    const domains = new Set<string>();
+    file.domains.forEach((domain, i) => {
+      if (domains.has(domain.code)) {
+        ctx.addIssue({ code: "custom", path: ["domains", i, "code"], message: "分野のコードが重複しています" });
+      }
+      domains.add(domain.code);
+    });
+    const used = new Set<string>();
+    file.units.forEach((unit, i) => {
+      used.add(unit.domain);
+      if (!domains.has(unit.domain)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["units", i, "domain"],
+          message: "分野の説明(domains)にない分野です",
+        });
+      }
+    });
+    file.domains.forEach((domain, i) => {
+      if (!used.has(domain.code)) {
+        ctx.addIssue({ code: "custom", path: ["domains", i], message: "この分野の単元がありません" });
+      }
+    });
     const ids = new Set<string>();
     const orders = new Set<number>();
     file.units.forEach((unit, i) => {
@@ -201,6 +319,10 @@ export const CurriculumFileSchema = z
   });
 
 export type Diagram = z.infer<typeof DiagramSchema>;
+export type FlowDiagram = Extract<Diagram, { type: "flow" }>;
+export type CompareDiagram = Extract<Diagram, { type: "compare" }>;
+export type HierarchyDiagram = Extract<Diagram, { type: "hierarchy" }>;
+export type CurriculumDomain = z.infer<typeof CurriculumDomainSchema>;
 export type CurriculumSection = z.infer<typeof CurriculumSectionSchema>;
 export type CurriculumStage = z.infer<typeof CurriculumStageSchema>;
 export type CurriculumUnit = z.infer<typeof CurriculumUnitSchema>;

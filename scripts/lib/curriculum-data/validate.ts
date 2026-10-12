@@ -12,9 +12,11 @@ const CURRICULUM_FILE = /^curriculum\.([a-z][a-z0-9]{1,15})\.json$/;
 type Context = {
   /** 公開中の資格ごとの、問題データにある問題 ID */
   questionIds: ReadonlyMap<string, ReadonlySet<string>>;
+  /** 公開中の資格ごとの、資格マスタの分野のコード */
+  domains: ReadonlyMap<string, ReadonlySet<string>>;
 };
 
-export function validateCurriculumData(files: DataFile[], { questionIds }: Context): string[] {
+export function validateCurriculumData(files: DataFile[], { questionIds, domains }: Context): string[] {
   const errors: string[] = [];
   for (const file of [...files].sort((a, b) => a.name.localeCompare(b.name))) {
     const match = CURRICULUM_FILE.exec(file.name);
@@ -38,7 +40,17 @@ export function validateCurriculumData(files: DataFile[], { questionIds }: Conte
       errors.push(`${file.name}: 公開中の資格(問題データのある資格)のカリキュラムではありません`);
       continue;
     }
+    // 分野のコードは、資格マスタの分野の一覧にあるものだけ(単元と、分野の説明の両方)
+    const masterDomains = domains.get(code) ?? new Set<string>();
+    parsed.data.domains.forEach((domain, i) => {
+      if (!masterDomains.has(domain.code)) {
+        errors.push(`${file.name}: domains[${i}].code: 資格マスタの分野にない分野です`);
+      }
+    });
     parsed.data.units.forEach((unit, i) => {
+      if (!masterDomains.has(unit.domain)) {
+        errors.push(`${file.name}: units[${i}].domain: 資格マスタの分野にない分野です`);
+      }
       unit.questionIds.forEach((id, j) => {
         if (!known.has(id)) {
           errors.push(`${file.name}: units[${i}].questionIds[${j}]: 問題データにない問題です`);

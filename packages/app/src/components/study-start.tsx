@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Notice } from "@/components/notice.tsx";
+import { UnitPractice } from "@/components/unit-practice.tsx";
 import { newSession } from "@/lib/quiz.ts";
 import {
   browserStore,
@@ -13,14 +14,18 @@ import {
   type Session,
   saveSession,
 } from "@/lib/storage.ts";
+import type { NextStep } from "@/lib/study-nav.ts";
 import { STAGE_PASS_PERCENT, type StageStatus, stageStatuses } from "@/lib/study-stages.ts";
+import type { ChoiceQuestion, PublishedExam } from "@/lib/types.ts";
 
 type Item = { questionId: string; choiceKeys: string[] };
 
 type Props = {
-  examCode: string;
-  /** 単元に関連する問題(この順に出題する) */
-  items: Item[];
+  exam: Pick<PublishedExam, "examCode" | "domains">;
+  /** 単元の問題(択一・複数選択)。その場で 1 問ずつ解く */
+  questions: ChoiceQuestion[];
+  /** 単元を終えたあとに進む先 */
+  next: NextStep;
   /** 段階学習: 単元の ID と、順番の小さい順に並べた段階(段階のない単元では省く) */
   stages?: { unitId: string; list: { order: number; items: Item[] }[] };
 };
@@ -38,10 +43,11 @@ const STATUS_CLASS: Record<StageStatus, string> = {
 };
 
 /**
- * 学習モードの出題の開始。「この単元の問題を解く」で、単元に関連する問題だけで出題を始める。
- * 段階のある単元では、段階ごとの確認問題も始められる(前の段階に合格した段階だけ)。
+ * 学習モードの出題。「この単元の問題を解く」で、単元の問題をその場で 1 問ずつ解く(UnitPractice)。
+ * 段階のある単元では、段階ごとの確認問題も始められる(前の段階に合格した段階だけ。出題の画面で解き、結果で段階の合否を決める)。
  */
-export function StudyStart({ examCode, items, stages }: Props) {
+export function StudyStart({ exam, questions, next, stages }: Props) {
+  const examCode = exam.examCode;
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [hasSession, setHasSession] = useState(false);
@@ -54,15 +60,15 @@ export function StudyStart({ examCode, items, stages }: Props) {
     if (unitId) setPassed(passedStages(loadStageProgress(store, examCode), unitId));
   }, [examCode, unitId]);
 
-  function start(questions: readonly Item[], stage?: Session["stage"]) {
-    if (questions.length === 0) {
+  function start(list: readonly Item[], stage?: Session["stage"]) {
+    if (list.length === 0) {
       setError("出題できる問題がありません。");
       return;
     }
     const store = browserStore();
     // 解答の表示のしかたは、モード選択で最後に選んだもの(学習モードでも、1 問ごとに確かめられる)
     const { shuffleChoices, reveal } = loadSettings(store);
-    const session = newSession(examCode, questions, { shuffleChoices }, Math.random, new Date());
+    const session = newSession(examCode, list, { shuffleChoices }, Math.random, new Date());
     const withReveal = reveal === "each" ? { ...session, reveal } : session;
     if (!saveSession(store, stage ? { ...withReveal, stage } : withReveal)) {
       setError("この端末では、出題の状態を保存できません。ブラウザの設定を確認してください。");
@@ -111,14 +117,7 @@ export function StudyStart({ examCode, items, stages }: Props) {
           </ol>
         </section>
       ) : null}
-      <button
-        type="button"
-        onClick={() => start(items)}
-        disabled={items.length === 0}
-        className="w-full rounded-md bg-primary px-5 py-3 font-bold text-on-primary hover:opacity-90 disabled:opacity-50"
-      >
-        この単元の問題を解く({items.length} 問)
-      </button>
+      <UnitPractice exam={exam} questions={questions} next={next} />
     </div>
   );
 }
