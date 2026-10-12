@@ -19,6 +19,7 @@ npm install   # 依存を入れ、検査フック(.githooks)を有効にしま�
 | `npm run typecheck` | 型検査(tsc) |
 | `npm run build` | ビルド |
 | `npm test` | テスト(Vitest) |
+| `npm run test:e2e` | 主要な画面の通し確認(Playwright)。開発サーバーを代替の認証で起動して通す。初回は `npx playwright install chromium` が必要 |
 | `npm run check:release-notes` | リリースノートとタグの対応の検査 |
 | `npm run validate:data` | 資格マスタ・問題データ・カリキュラム・使い方ページのデータの検査(仕様: `docs/data-spec.md`) |
 | `npm run check:lessons` | 学びの記録(`docs/app/lessons/`)の書式の検査。`-- --write` で一覧を更新 |

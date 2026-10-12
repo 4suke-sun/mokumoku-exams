@@ -46,4 +46,5 @@
 - [0004 デプロイ前の差分の出力は、環境変数の値を伏せてから扱う](./0004-mask-diff-output.md)
 - [0005 Next.js の proxy で返すリダイレクトは、絶対 URL にする](./0005-proxy-redirect-absolute-url.md)
 - [0006 ログインの直後の画面の移動は、ページごと読み込み直す](./0006-reload-after-sign-in.md)
+- [0007 ブラウザの自動操作では、画面が React の受け持ちになるまで待ってから押す](./0007-wait-for-hydration-in-e2e.md)
 <!-- lessons:end -->
