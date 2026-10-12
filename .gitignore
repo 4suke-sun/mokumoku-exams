@@ -15,3 +15,6 @@ coverage/
 .claude/settings.local.json
 # next dev が自動生成するエージェント向けの指示ファイル(このリポジトリでは使わない)
 packages/app/AGENTS.md
+# Playwright の実行結果
+test-results/
+playwright-report/

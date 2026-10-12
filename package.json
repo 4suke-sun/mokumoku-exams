@@ -13,6 +13,7 @@
     "typecheck": "tsc --noEmit && npm run typecheck --workspaces --if-present",
     "build": "npm run build --workspaces --if-present",
     "test": "vitest run && npm run test --workspaces --if-present",
+    "test:e2e": "npm run test:e2e -w @mokumoku-exams/app",
     "check:commit": "node scripts/check-commit-secrets.ts",
     "check:release-notes": "node scripts/check-release-notes.ts",
     "check:lessons": "node scripts/check-lessons.ts",
