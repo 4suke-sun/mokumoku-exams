@@ -215,3 +215,118 @@ export function readChoiceRequests(root: string): DraftRequest[] {
 export function freeTextDraftFor(request: DraftRequest, overrides: Partial<FreeTextDraft> = {}): FreeTextDraft {
   return freeTextDraft({ factIds: [(request.facts[0] as DraftRequest["facts"][number]).id], ...overrides });
 }
+
+// ---- fixture とスタブ ----
+
+/** fixture を読む */
+export function draftFixture<T>(name: string): T {
+  return JSON.parse(readFileSync(join(import.meta.dirname, "fixtures", name), "utf8")) as T;
+}
+
+/** fixture の事実カード(通過済み。根拠の出典は、台帳にある架空の出典) */
+export function fixtureCards(): FactCard[] {
+  const { facts } = draftFixture<{ facts: { id: string; domain: string; claim: string }[] }>("facts.json");
+  return facts.map((f) => card({ id: f.id, domain: f.domain, claim: f.claim }));
+}
+
+/** fixture の公開済みの問題を、データの形にする */
+export function fixturePublished() {
+  const { questions } = draftFixture<{
+    questions: {
+      questionId: string;
+      domain: string;
+      questionType: "single";
+      difficulty: "easy" | "medium" | "hard";
+      questionText: string;
+      choices: string[];
+      correctAnswers: string[];
+    }[];
+  }>("published.json");
+  return {
+    examCode: EXAM,
+    questions: questions.map((q) => ({
+      questionId: q.questionId,
+      examCode: EXAM,
+      domain: q.domain,
+      questionType: q.questionType,
+      difficulty: q.difficulty,
+      questionText: q.questionText,
+      choices: q.choices.map((text, i) => ({ key: String.fromCharCode(65 + i), text })),
+      correctAnswers: q.correctAnswers,
+      explanation: "架空の解説です。",
+    })),
+  };
+}
+
+/**
+ * モデルの代わりに依頼へ答えるスタブ。依頼の種別と事実カードに合わせ、fixture の話題から下書きを作って出力に書く。
+ * 通信もモデルも使わない。書いた依頼の数を返す。
+ */
+export function stubAgent(root: string, start = 0): number {
+  const { topics } = draftFixture<{ topics: string[] }>("stub.json");
+  let n = start;
+  for (const request of readRequests(root)) {
+    const drafts: Draft[] = [];
+    for (let i = 0; i < request.count; i++, n++) {
+      const topic = topics[n % topics.length] as string;
+      const factId = (request.facts[i % request.facts.length] as DraftRequest["facts"][number]).id;
+      drafts.push(
+        stubDraft(request.kind, `${topic}${Math.floor(n / topics.length) > 0 ? ` その${n}` : ""}`, n, factId),
+      );
+    }
+    writeOutput(root, request, drafts);
+  }
+  return readRequests(root).length;
+}
+
+function stubDraft(kind: DraftRequest["kind"], topic: string, n: number, factId: string): Draft {
+  const explanation = `${topic}について、依頼の事実カードの主張にもとづいて、正答の理由を説明します。ほかの選択肢は、適用範囲や数値が異なります。`;
+  if (kind === "free-text") {
+    return {
+      questionType: "free-text",
+      questionText: `${topic}について、仕組みと注意点を説明してください。`,
+      rubric: {
+        criteria: [
+          { name: `${topic}の仕組み`, keywords: [`仕組み${n}`, "動作"], points: 50 },
+          { name: `${topic}の注意点`, keywords: [`注意${n}`, "制限"], points: 50 },
+        ],
+        passingPoints: 60,
+      },
+      explanation,
+      factIds: [factId],
+    };
+  }
+  const base = {
+    questionText:
+      kind === "multiple"
+        ? `${topic}に関する説明として、正しいものを 2 つ選択してください。`
+        : `${topic}に関する説明として、正しいものはどれですか。`,
+    explanation,
+    factIds: [factId],
+    distractors: [
+      { key: "A", type: "misconception" as const, reason: "既定の設定を取り違えた誤りです", basis: { factId } },
+      { key: "C", type: "condition-reversal" as const, reason: "条件を逆に述べた誤りです", basis: { factId } },
+      {
+        key: "D",
+        type: "scope-difference" as const,
+        reason: "対象の範囲が異なる誤りです",
+        basis: { scope: "別の機能の説明" },
+      },
+    ],
+  };
+  const choices = [
+    { key: "A", text: `既定では無効になっていて、手動で有効にする必要がある${n}` },
+    { key: "B", text: `既定で ${20 + n} 件に制限されている` },
+    { key: "C", text: `上限を持たず、いくつでも利用できる${n}` },
+    { key: "D", text: `管理者の権限を持つ利用者だけが参照できる${n}` },
+  ];
+  if (kind === "multiple") {
+    return {
+      ...base,
+      questionType: "multiple",
+      choices: [...choices, { key: "E", text: `どの設定でも変更できない仕様である${n}` }],
+      correctAnswers: ["B", "E"],
+    };
+  }
+  return { ...base, questionType: "single", choices, correctAnswers: ["B"] };
+}

@@ -1,0 +1,23 @@
+{
+  "note": "公開済みの問題に見立てた、架空の問題",
+  "questions": [
+    {
+      "questionId": "AIB-0001",
+      "domain": "domain1",
+      "questionType": "single",
+      "difficulty": "easy",
+      "questionText": "架空の既存の設問その一について、正しいものはどれですか。",
+      "choices": ["既存の選択肢 A", "既存の選択肢 B"],
+      "correctAnswers": ["A"]
+    },
+    {
+      "questionId": "AIB-0002",
+      "domain": "domain2",
+      "questionType": "single",
+      "difficulty": "medium",
+      "questionText": "まったく別の架空の既存の設問その二を答えてください。",
+      "choices": ["既存の選択肢 C", "既存の選択肢 D"],
+      "correctAnswers": ["B"]
+    }
+  ]
+}

@@ -231,6 +231,8 @@ function requestStep(
       outputPath: relative(rootDir, join(paths.outDir, `${key}.json`)),
     };
     if (!dryRun) writeJson(requestPath, request);
+    // 同じ実行の次の依頼は、まだ使われていない事実カードを先に選ぶ(同じ根拠の下書きが並ばないようにする)
+    for (const c of selected.slice(0, count)) usage.set(c.id, (usage.get(c.id) ?? 0) + 1);
     report(output, "下書きの依頼", relative(rootDir, requestPath));
     requested++;
   }
