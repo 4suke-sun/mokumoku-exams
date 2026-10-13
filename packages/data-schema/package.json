@@ -1,0 +1,23 @@
+{
+  "name": "@mokumoku-exams/data-schema",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./exam-data/schema": "./src/exam-data/schema.ts",
+    "./exam-data/validate": "./src/exam-data/validate.ts",
+    "./curriculum-data/schema": "./src/curriculum-data/schema.ts",
+    "./curriculum-data/validate": "./src/curriculum-data/validate.ts",
+    "./summary-data/schema": "./src/summary-data/schema.ts",
+    "./summary-data/validate": "./src/summary-data/validate.ts",
+    "./help-data/schema": "./src/help-data/schema.ts",
+    "./help-data/validate": "./src/help-data/validate.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "zod": "4.6.5"
+  }
+}

@@ -6,8 +6,8 @@
  */
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import type { DataFile } from "./lib/exam-data/validate.ts";
-import { validateDataSet } from "./lib/exam-data/validate.ts";
+import type { DataFile } from "@mokumoku-exams/data-schema/exam-data/validate";
+import { validateDataSet } from "@mokumoku-exams/data-schema/exam-data/validate";
 import { report } from "./lib/git-check.ts";
 
 const args = process.argv.slice(2);

@@ -3,11 +3,11 @@ import type {
   CurriculumFile,
   CurriculumStage,
   CurriculumUnit,
-} from "../../../../scripts/lib/curriculum-data/schema.ts";
+} from "@mokumoku-exams/data-schema/curriculum-data/schema";
 import type { PublishedExam } from "./types.ts";
 
 // リポジトリ直下の data/ のカリキュラム(静的な JSON)を読む。形と問題 ID は `npm run validate:data` が検査している。
-// 型だけを参照し、検査の処理は読み込まない(ADR 0004 と同じ方針)。サーバー側(ビルド時を含む)だけで使う。
+// 型だけを参照し、検査の処理は読み込まない(データの契約は共有パッケージから読む。ADR 0011)。サーバー側(ビルド時を含む)だけで使う。
 
 export type { CurriculumDomain, CurriculumStage, CurriculumUnit };
 

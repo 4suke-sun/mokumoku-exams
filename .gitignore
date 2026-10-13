@@ -18,3 +18,5 @@ packages/app/AGENTS.md
 # Playwright の実行結果
 test-results/
 playwright-report/
+# 作問パイプラインの作業用の置き場(取得した本文、段階の成果物)。コミットしない
+pipeline-work/

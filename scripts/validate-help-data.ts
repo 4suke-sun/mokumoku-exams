@@ -6,9 +6,9 @@
  */
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { HELP_FILE, validateHelpData } from "@mokumoku-exams/data-schema/help-data/validate";
 import { NAV_ITEMS } from "../packages/app/src/lib/nav.ts";
 import { report } from "./lib/git-check.ts";
-import { HELP_FILE, validateHelpData } from "./lib/help-data/validate.ts";
 
 const args = process.argv.slice(2);
 if (args.length > 1) {

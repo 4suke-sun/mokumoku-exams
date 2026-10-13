@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import {
   checkAuthors,
   checkEntries,
+  checkProseBodies,
   checkSensitiveFilenames,
   checkUnexpectedPaths,
   parseAddedLines,
@@ -151,5 +152,71 @@ describe("checkAuthors", () => {
 describe("parseDenylist", () => {
   it("コメントと空行を除く", () => {
     expect(parseDenylist("# c\n\n a \nb\n")).toEqual(["a", "b"]);
+  });
+});
+
+describe("checkProseBodies", () => {
+  const entry = (file: string, line: number, text: string) => ({ file, line, text });
+  const ledger = "packages/pipeline/ledger/example.json";
+  const longJa = "これは出典の本文を写した長い文章です。".repeat(20);
+  const longEn = "This sentence is a long copied passage from a source document. ".repeat(4);
+
+  it("台帳の形(ハッシュ・URL・短い言い換え)_止めない", () => {
+    const entries = [
+      entry(ledger, 1, `    "sourceHash": "${"a".repeat(64)}",`),
+      entry(ledger, 2, '    "url": "https://example.com/guide/some/long/path/that/keeps/going/and/going/index.html",'),
+      entry(ledger, 3, '    "paraphrase": "サービスの上限は既定で 100 件である。",'),
+    ];
+    expect(checkProseBodies(entries)).toEqual([]);
+  });
+
+  it("長い日本語の本文_止める。報告に本文を含めない", () => {
+    const hits = checkProseBodies([entry(ledger, 5, `    "text": "${longJa}",`)]);
+    expect(hits).toEqual([`本文らしい長い文章: ${ledger}:5`]);
+    expect(hits.join("")).not.toContain("出典の本文");
+  });
+
+  it("長い英語の本文_止める", () => {
+    expect(checkProseBodies([entry(ledger, 2, longEn)])).toEqual([`本文らしい長い文章: ${ledger}:2`]);
+  });
+
+  it("折り返された本文_連続した長めの行を止める", () => {
+    const wrapped = Array.from({ length: 4 }, (_, i) => entry("packages/pipeline/work/a.txt", 10 + i, "あ".repeat(70)));
+    expect(checkProseBodies(wrapped)).toEqual(["本文らしい折り返された文章: packages/pipeline/work/a.txt:10"]);
+  });
+
+  it("短い行をはさむ_折り返しとみなさない", () => {
+    const lines = [70, 70, 10, 70, 70].map((n, i) => entry(ledger, 1 + i, "あ".repeat(n)));
+    expect(checkProseBodies(lines)).toEqual([]);
+  });
+
+  it("対象外のファイル(ソース・文書・data)_長い文章があっても止めない", () => {
+    expect(checkProseBodies([entry("packages/pipeline/src/a.ts", 1, longJa)])).toEqual([]);
+    expect(checkProseBodies([entry("docs/a.md", 1, longJa)])).toEqual([]);
+    expect(checkProseBodies([entry("data/questions.x.json", 1, `"explanation": "${longJa}"`)])).toEqual([]);
+  });
+
+  it("拡張子の大文字と、その他のデータ形式_対象にする", () => {
+    expect(checkProseBodies([entry("packages/pipeline/x/A.JSON", 1, longJa)])).toHaveLength(1);
+    expect(checkProseBodies([entry("packages/pipeline/x/a.jsonl", 1, longJa)])).toHaveLength(1);
+    expect(checkProseBodies([entry("packages/pipeline/x/a.yaml", 1, longJa)])).toHaveLength(1);
+  });
+
+  it("URL で始まる日本語の本文_URL とはみなさず止める", () => {
+    expect(checkProseBodies([entry(ledger, 1, `"text": "https://example.com/${longJa}"`)])).toHaveLength(1);
+  });
+
+  it("空白が極端に長い行_短い時間で終わる", () => {
+    const start = Date.now();
+    checkProseBodies([entry(ledger, 1, `"a": "${" ".repeat(200_000)}x`)]);
+    expect(Date.now() - start).toBeLessThan(2000);
+  });
+
+  it("checkEntries に含まれる_差分の検査が止める", () => {
+    expect(checkEntries([entry(ledger, 1, longJa)]).blocks).toEqual([`本文らしい長い文章: ${ledger}:1`]);
+  });
+
+  it("作業用の置き場のパス_混入として止める", () => {
+    expect(checkUnexpectedPaths(["pipeline-work/guide.html"])).toHaveLength(1);
   });
 });

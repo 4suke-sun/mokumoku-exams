@@ -15,7 +15,7 @@ export type FreeTextJudgement = {
 
 /**
  * キーワードとの照合のために、全角・半角、大文字・小文字の違いをならし、空白を除く。
- * データの検査(scripts/lib/exam-data/schema.ts の normalizeKeyword)と同じならし方にする。
+ * データの検査(packages/data-schema/src/exam-data/schema.ts の normalizeKeyword)と同じならし方にする。
  */
 export function normalizeForMatch(value: string): string {
   return value.normalize("NFKC").toLowerCase().replace(/\s+/g, "");

@@ -1,0 +1,5 @@
+{
+  "workDir": "pipeline-work",
+  "ledgerDir": "packages/pipeline/ledger",
+  "maxItemsPerRun": 20
+}

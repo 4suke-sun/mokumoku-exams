@@ -1,4 +1,4 @@
-import { EXAM_LEVELS } from "../../../../scripts/lib/exam-data/schema.ts";
+import { EXAM_LEVELS } from "@mokumoku-exams/data-schema/exam-data/schema";
 import type { Exam } from "./types.ts";
 
 // 資格の一覧の整理: ベンダーごとに分け、その中をレベルの順に並べる。画面から切り離した純粋な関数にして、単体テストする。
