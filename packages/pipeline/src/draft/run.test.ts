@@ -311,3 +311,105 @@ describe("draft の取り込み", () => {
     expect(readDrafts(workPath(root, "drafts.json"), EXAM).drafts).toHaveLength(1);
   });
 });
+
+describe("draft の来歴", () => {
+  const provenanceFile = (root: string) => join(root, baseConfig.provenanceDir, "aws-aib-c01.json");
+
+  async function imported(root: string) {
+    await prepare(root);
+    const request = readRequests(root)[0] as ReturnType<typeof readRequests>[number];
+    writeOutput(root, request, [draftFor(request)]);
+    await runMain(root, ["draft", EXAM, "--import"]);
+    return request;
+  }
+
+  it("取り込んだ下書き_根拠の事実カードと出典を結ぶ来歴が記録され_本文を含まない", async () => {
+    const root = setupDraftRoot();
+    const request = await imported(root);
+    const record = readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0];
+    const text = readFileSync(provenanceFile(root), "utf8");
+    const file = JSON.parse(text) as { entries: { draftId: string; factIds: string[]; sources: { url: string }[] }[] };
+    expect(file.entries).toHaveLength(1);
+    expect(file.entries[0]).toMatchObject({ draftId: record?.id, factIds: [request.facts[0]?.id] });
+    expect(file.entries[0]?.sources[0]?.url).toMatch(/^https:\/\//);
+    expect(text).not.toContain(record?.draft?.questionText ?? "あり得ない");
+  });
+
+  it("不採用の下書き_来歴を記録しない", async () => {
+    const root = setupDraftRoot();
+    await prepare(root);
+    const request = readRequests(root)[0] as ReturnType<typeof readRequests>[number];
+    writeOutput(root, request, [
+      draftFor(request, { questionText: "https://example.com/x を読んで、2 つ選択してください。" }),
+    ]);
+    await runMain(root, ["draft", EXAM, "--import"]);
+    expect(existsSync(provenanceFile(root))).toBe(false);
+  });
+
+  it("出典が台帳にない_来歴を作れず不採用になる", async () => {
+    const root = setupDraftRoot();
+    const { emptyLedger, ledgerPath, writeLedger } = await import("../collect/ledger.ts");
+    writeLedger(ledgerPath(join(root, baseConfig.ledgerDir), EXAM), emptyLedger(EXAM));
+    await prepare(root);
+    const request = readRequests(root)[0] as ReturnType<typeof readRequests>[number];
+    writeOutput(root, request, [draftFor(request)]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.out).toContain("provenance:source-not-in-ledger");
+    expect(readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0]?.status).toBe("rejected");
+    expect(existsSync(provenanceFile(root))).toBe(false);
+  });
+
+  it("--check_来歴のある下書きだけなら通る", async () => {
+    const root = setupDraftRoot();
+    await imported(root);
+    const r = await runMain(root, ["draft", EXAM, "--check"]);
+    expect(r.code).toBe(EXIT.ok);
+    expect(r.out).toContain("来歴のある通過済みの下書き 1 件");
+  });
+
+  it("--check_来歴のない下書きは先へ進めず失敗として報告される", async () => {
+    const root = setupDraftRoot();
+    await imported(root);
+    const { writeFileSync } = await import("node:fs");
+    writeFileSync(provenanceFile(root), `${JSON.stringify({ examCode: EXAM, entries: [] })}\n`);
+    const r = await runMain(root, ["draft", EXAM, "--check"]);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain("来歴なし: d-");
+  });
+
+  it("--check_存在しない事実カードを指す来歴は失敗する", async () => {
+    const root = setupDraftRoot();
+    await imported(root);
+    const { emptyFacts, factsPath, writeFacts } = await import("../facts/schema.ts");
+    writeFacts(factsPath(join(root, baseConfig.factsDir), EXAM), emptyFacts(EXAM));
+    const r = await runMain(root, ["draft", EXAM, "--check"]);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain("fact-not-found");
+  });
+
+  it("--check_許可していないドメインの出典は失敗する", async () => {
+    const root = setupDraftRoot();
+    await imported(root);
+    const { writeFileSync } = await import("node:fs");
+    const file = JSON.parse(readFileSync(provenanceFile(root), "utf8"));
+    file.entries[0].sources[0].url = "https://example.com/doc";
+    writeFileSync(provenanceFile(root), JSON.stringify(file));
+    const r = await runMain(root, ["draft", EXAM, "--check"]);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain("source-url-host-not-allowed");
+  });
+
+  it("--check_壊れた来歴ファイルは失敗し_値を出さない", async () => {
+    const root = setupDraftRoot();
+    await imported(root);
+    const { writeFileSync } = await import("node:fs");
+    writeFileSync(
+      provenanceFile(root),
+      JSON.stringify({ examCode: EXAM, entries: [{ draftId: "secret-looking-id" }] }),
+    );
+    const r = await runMain(root, ["draft", EXAM, "--check"]);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain("来歴の誤り");
+    expect(r.err).not.toContain("secret-looking-id");
+  });
+});

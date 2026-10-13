@@ -2,6 +2,7 @@
   "workDir": "pipeline-work",
   "ledgerDir": "packages/pipeline/ledger",
   "factsDir": "packages/pipeline/facts",
+  "provenanceDir": "packages/pipeline/provenance",
   "plansDir": "packages/pipeline/plans",
   "examsFile": "data/exams.json",
   "maxItemsPerRun": 20,

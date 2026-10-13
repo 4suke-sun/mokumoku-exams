@@ -21,6 +21,8 @@ export const ConfigSchema = z.strictObject({
   ledgerDir: z.string().min(1),
   /** 事実カードの置き場(資格ごとの JSON。コミットする) */
   factsDir: z.string().min(1),
+  /** 問題の来歴の置き場(資格ごとの JSON。コミットする) */
+  provenanceDir: z.string().min(1),
   /** 収集の計画の置き場(資格ごとの JSON。コミットする) */
   plansDir: z.string().min(1),
   /** 資格マスタ(読み取り専用で参照する) */

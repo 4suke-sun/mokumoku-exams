@@ -1,12 +1,24 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { loadExam } from "../collect/collect.ts";
+import { LedgerError, type LedgerFile, ledgerPath, readLedger } from "../collect/ledger.ts";
 import type { Config } from "../config.ts";
 import { EXAM_CODE } from "../contract.ts";
 import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { FactsError, type FactsFile, factsPath, readFacts } from "../facts/schema.ts";
 import { type Output, report } from "../log.ts";
 import { PlanError, type PlanFile, planPath, readPlan } from "../plan/schema.ts";
+import {
+  buildEntry,
+  checkProvenance,
+  type ProvenanceEntry,
+  ProvenanceError,
+  type ProvenanceFile,
+  provenancePath,
+  readProvenance,
+  unprovenanced,
+  writeProvenance,
+} from "./provenance.ts";
 import {
   type DraftRequest,
   DraftRequestSchema,
@@ -31,11 +43,12 @@ import { evaluateStyle, STYLE_VERSION } from "./style.ts";
 /**
  * draft コマンド: 出題計画と事実カードから、選択式の問題の下書きを作る。
  * - draft <資格コード>            計画の項目ごとに、下書きの依頼を作業用の置き場に書く(同じ入力は依頼しない)
- * - draft <資格コード> --import   エージェントの出力を検査して取り込む(形、スタイル規則、根拠の事実カード)
+ * - draft <資格コード> --import   エージェントの出力を検査して取り込む(形、スタイル規則、根拠の事実カード、来歴)
+ * - draft <資格コード> --check    下書きの来歴を検査する(来歴のない下書きは、検証の段階へ進めない)
  * モデルは呼ばない。下書きはエージェント(question-drafter)が書く(ADR 0009)。data/ は変えない。
  */
 
-export type DraftMode = "request" | "import";
+export type DraftMode = "request" | "import" | "check";
 
 export interface DraftOptions {
   config: Config;
@@ -49,6 +62,8 @@ export interface DraftOptions {
 interface Paths {
   plan: string;
   facts: string;
+  ledger: string;
+  provenance: string;
   requestsDir: string;
   outDir: string;
   drafts: string;
@@ -61,6 +76,8 @@ function pathsFor(config: Config, rootDir: string, examCode: string): Paths {
   return {
     plan: planPath(work, examCode),
     facts: factsPath(resolve(rootDir, config.factsDir), examCode),
+    ledger: ledgerPath(resolve(rootDir, config.ledgerDir), examCode),
+    provenance: provenancePath(resolve(rootDir, config.provenanceDir), examCode),
     requestsDir: join(dir, "requests"),
     outDir: join(dir, "out"),
     drafts: join(dir, "drafts.json"),
@@ -93,18 +110,29 @@ export function runDraft(options: DraftOptions): ExitCode {
   const paths = pathsFor(config, rootDir, examCode);
   let facts: FactsFile;
   let drafts: DraftsFile;
+  let ledger: LedgerFile;
+  let provenance: ProvenanceFile;
   try {
     facts = readFacts(paths.facts, examCode);
     drafts = readDrafts(paths.drafts, examCode);
+    ledger = readLedger(paths.ledger, examCode);
+    provenance = readProvenance(paths.provenance, examCode);
   } catch (error) {
     if (error instanceof FactsError) for (const p of error.paths) report(output, "事実カードの誤り", p);
     else if (error instanceof DraftsError) for (const p of error.paths) report(output, "下書きの誤り", p);
+    else if (error instanceof LedgerError) for (const p of error.paths) report(output, "台帳の誤り", p);
+    else if (error instanceof ProvenanceError) for (const p of error.paths) report(output, "来歴の誤り", p);
     else throw error;
     return EXIT.checkFailed;
   }
-  return options.mode === "request"
-    ? requestStep(options, paths, master.domains, facts, drafts)
-    : importStep(options, paths, facts, drafts);
+  switch (options.mode) {
+    case "request":
+      return requestStep(options, paths, master.domains, facts, drafts);
+    case "import":
+      return importStep(options, paths, facts, drafts, ledger, provenance);
+    case "check":
+      return checkStep(options, facts, drafts, provenance, master.exam.vendor);
+  }
 }
 
 function requestStep(
@@ -222,7 +250,14 @@ function uniqueSorted(values: string[]): string[] {
   return [...new Set(values)].sort();
 }
 
-function importStep(options: DraftOptions, paths: Paths, facts: FactsFile, current: DraftsFile): ExitCode {
+function importStep(
+  options: DraftOptions,
+  paths: Paths,
+  facts: FactsFile,
+  current: DraftsFile,
+  ledger: LedgerFile,
+  provenance: ProvenanceFile,
+): ExitCode {
   const { examCode, output, dryRun } = options;
   const state = readState(paths.state);
   const requestFiles = existsSync(paths.requestsDir)
@@ -231,6 +266,7 @@ function importStep(options: DraftOptions, paths: Paths, facts: FactsFile, curre
         .sort()
     : [];
   const incoming: DraftRecord[] = [];
+  const entries = new Map<string, ProvenanceEntry>();
   const doneFiles: string[] = [];
   let failures = 0;
   let accepted = 0;
@@ -317,9 +353,13 @@ function importStep(options: DraftOptions, paths: Paths, facts: FactsFile, curre
           invalid = true;
           break;
         }
+        const built = buildEntry(id, draft.factIds, facts, ledger);
+        if ("reasons" in built) for (const r of built.reasons) reasons.push(`provenance:${r}`);
+        else entries.set(id, built.entry);
       }
       for (const f of verdict.blockers) report(output, "下書きの不採用", `${id} ${f.rule} ${f.path}`);
       for (const r of reasons.filter((r) => !r.startsWith("style:"))) report(output, "下書きの不採用", `${id} ${r}`);
+      if (reasons.length > 0) entries.delete(id);
       for (const f of verdict.warnings) report(output, "下書きの警告", `${id} ${f.rule} ${f.path}`);
       batch.push({
         id,
@@ -357,6 +397,15 @@ function importStep(options: DraftOptions, paths: Paths, facts: FactsFile, curre
     return failures > 0 ? EXIT.checkFailed : EXIT.ok;
   }
   const next: DraftsFile = { examCode, drafts: [...current.drafts, ...incoming] };
+  const added = incoming.filter((d) => d.status !== "rejected").flatMap((d) => entries.get(d.id) ?? []);
+  // 来歴を先に書く。下書きより先に来歴があっても害はなく、逆は「来歴のない下書き」になる
+  if (added.length > 0) {
+    const ids = new Set(added.map((e) => e.draftId));
+    writeProvenance(paths.provenance, {
+      examCode,
+      entries: [...provenance.entries.filter((e) => !ids.has(e.draftId)), ...added],
+    });
+  }
   if (incoming.length > 0) writeDrafts(paths.drafts, next);
   writeState(paths.state, state);
   for (const file of doneFiles) {
@@ -364,4 +413,25 @@ function importStep(options: DraftOptions, paths: Paths, facts: FactsFile, curre
     rmSync(join(paths.outDir, file), { force: true });
   }
   return failures > 0 ? EXIT.checkFailed : EXIT.ok;
+}
+
+function checkStep(
+  options: DraftOptions,
+  facts: FactsFile,
+  drafts: DraftsFile,
+  provenance: ProvenanceFile,
+  vendor: string,
+): ExitCode {
+  const { output } = options;
+  const problems = checkProvenance(provenance, facts, vendor);
+  for (const p of problems) report(output, "来歴の誤り", `${p.draftId} ${p.code}`);
+  const missing = unprovenanced(drafts.drafts, provenance);
+  for (const id of missing) report(output, "来歴なし", id);
+  const ready = drafts.drafts.filter((d) => d.status === "passed" && !missing.includes(d.id)).length;
+  report(
+    output,
+    "情報",
+    `来歴の検査: 来歴のある通過済みの下書き ${ready} 件、来歴の誤り ${problems.length} 件、来歴なし ${missing.length} 件`,
+  );
+  return problems.length > 0 || missing.length > 0 ? EXIT.checkFailed : EXIT.ok;
 }
