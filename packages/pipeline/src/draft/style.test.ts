@@ -13,7 +13,7 @@ describe("スタイル規則", () => {
     expect(checkStyle(multipleDraft())).toEqual([]);
   });
 
-  it("規則の名前が重複しない", () => {
+  it("規則の一覧_名前が重複しない", () => {
     const names = STYLE_RULES.map((r) => r.name);
     expect(new Set(names).size).toBe(names.length);
   });
@@ -200,7 +200,7 @@ describe("スタイル規則", () => {
     });
   });
 
-  it("報告に本文が含まれない", () => {
+  it("違反の報告_本文が含まれない", () => {
     const d = choiceDraft({ questionText: "秘密めいた本文 https://example.com が URL を含む。" });
     const serialized = JSON.stringify(checkStyle(d));
     expect(serialized).not.toContain("秘密めいた本文");
@@ -241,7 +241,7 @@ describe("スタイル規則", () => {
       expect(names).toEqual(new Set(["stem-question-form"]));
     });
 
-    it("自由記述の規則は選択式に適用しない", () => {
+    it("選択式の下書き_自由記述の規則を適用しない", () => {
       const names = checkStyle(choiceDraft()).map((f) => f.rule);
       expect(names.some((n) => n.startsWith("rubric-"))).toBe(false);
     });

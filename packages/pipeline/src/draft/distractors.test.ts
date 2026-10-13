@@ -160,7 +160,7 @@ describe("checkDistractors", () => {
     });
   });
 
-  it("報告に本文が含まれない", () => {
+  it("誤答の検査の結果_報告に本文が含まれない", () => {
     const d = choiceDraft({
       distractors: [entry({ key: "A", reason: "短", basis: { factId: "f-ffffffffffff" } })],
     });

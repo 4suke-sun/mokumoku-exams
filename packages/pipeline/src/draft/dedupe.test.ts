@@ -43,7 +43,7 @@ describe("findDuplicates", () => {
     expect(findDuplicates(target(), [existing("AIB-0003", other)], thresholds)).toEqual([]);
   });
 
-  it("下書き同士の重複も検出される", () => {
+  it("下書き同士で設問文がほぼ同じ_重複として検出される", () => {
     const sibling: Candidate = { ...target(BASE.replace("どれ", "いくつ")), ref: "d-222222222222" };
     const found = findDuplicates(target(), [sibling], thresholds);
     expect(found).toEqual([
@@ -98,13 +98,13 @@ describe("findDuplicates", () => {
     expect(found).toEqual([]);
   });
 
-  it("しきい値を変えられる", () => {
+  it("しきい値を下げた_重複の判定が厳しくなる", () => {
     const close = "Widget Store で、1 つのアカウントが 1 リージョンに作成できるバケット数の上限はどれですか。";
     const strict = { duplicate: 0.75, hold: 0.5 };
     expect(findDuplicates(target(), [existing("AIB-0002", close)], strict)[0]?.level).toBe("duplicate");
   });
 
-  it("報告に本文が含まれない", () => {
+  it("重複の検出の結果_報告に本文が含まれない", () => {
     const near = BASE.replace("どれ", "いくつ");
     expect(JSON.stringify(findDuplicates(target(), [existing("AIB-0001", near)], thresholds))).not.toContain("Widget");
   });

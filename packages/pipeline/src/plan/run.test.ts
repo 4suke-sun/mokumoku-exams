@@ -119,8 +119,8 @@ describe("plan コマンド", () => {
       exams: { examCode: string; status: string }[];
     };
     const soon = exams.exams.find((e) => e.status === "coming-soon");
-    if (soon === undefined) return;
-    const r = await run(setupRoot(), ["plan", soon.examCode]);
+    expect(soon).toBeDefined();
+    const r = await run(setupRoot(), ["plan", soon?.examCode ?? ""]);
     expect(r.code).toBe(EXIT.inputError);
   });
 });
