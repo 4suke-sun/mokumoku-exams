@@ -46,7 +46,7 @@ describe("コマンドの体系", () => {
     expect((await run([name, "--help"])).code).toBe(EXIT.ok);
   });
 
-  it.each(COMMANDS.filter((c) => !["collect", "facts", "plan"].includes(c.name)).map((c) => c.name))(
+  it.each(COMMANDS.filter((c) => !["collect", "facts", "plan", "draft"].includes(c.name)).map((c) => c.name))(
     "%s_未実装で、--dry-run を受け付ける",
     async (name) => {
       const r = await run([name, "--dry-run"]);

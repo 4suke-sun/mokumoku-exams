@@ -56,6 +56,17 @@ export const ConfigSchema = z.strictObject({
     /** 抜き取りで、分野ごとに選ぶ件数の上限 */
     samplePerDomain: z.number().int().positive(),
   }),
+  /** 下書き */
+  draft: z.strictObject({
+    /** 依頼 1 件の取り込みを、形の検査に通らずにやり直せる回数の上限 */
+    maxAttempts: z.number().int().positive(),
+    /** 依頼 1 件で書かせる下書きの数の上限 */
+    maxPerRequest: z.number().int().positive(),
+    /** 依頼 1 件に載せる事実カードの数の上限 */
+    maxFactsPerRequest: z.number().int().positive(),
+    /** 計画の項目 1 つについて、全件が不採用になったとき、依頼を出し直せる回数の上限 */
+    maxRounds: z.number().int().positive(),
+  }),
   /** 出題計画。目標の問題数と、難易度・種別の配分(試験ごとに overrides で上書きする) */
   plan: z.strictObject({
     /** 目標の問題数 = 本番の出題数 × この倍率(問題の蓄えを、1 回の出題より多くする) */

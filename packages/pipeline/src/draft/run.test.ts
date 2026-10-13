@@ -1,0 +1,313 @@
+import { existsSync, readFileSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
+import { describe, expect, it } from "vitest";
+import { EXIT } from "../exit-codes.ts";
+import { DraftRequestSchema } from "./request.ts";
+import { readDrafts, readState } from "./store.ts";
+import {
+  baseConfig,
+  choiceDraft,
+  draftFor,
+  EXAM,
+  readRequests,
+  runMain,
+  setupDraftRoot,
+  workPath,
+  writeOutput,
+  writeRaw,
+} from "./test-helpers.ts";
+
+/** plan を実行して、draft の依頼まで進める */
+async function prepare(root: string, overrides: Record<string, unknown> = {}) {
+  expect((await runMain(root, ["plan", EXAM], overrides)).code).toBe(EXIT.ok);
+  return runMain(root, ["draft", EXAM], overrides);
+}
+
+describe("draft の依頼", () => {
+  it("計画と事実カードがある_項目ごとに依頼を書く", async () => {
+    const root = setupDraftRoot();
+    const r = await prepare(root);
+    expect(r.code).toBe(EXIT.ok);
+    const requests = readRequests(root);
+    expect(requests.length).toBeGreaterThan(0);
+    for (const request of requests) {
+      expect(DraftRequestSchema.safeParse(request).success).toBe(true);
+      expect(request.kind).not.toBe("free-text");
+      expect(request.count).toBeLessThanOrEqual(baseConfig.draft.maxPerRequest);
+      expect(request.facts.every((f) => f.claim.startsWith("架空の主張"))).toBe(true);
+      expect(request.styleRules.length).toBeGreaterThan(0);
+    }
+    expect(r.out).toContain("下書きの依頼:");
+  });
+
+  it("事実カードのない分野_下書きの依頼を作らず失敗する", async () => {
+    const root = setupDraftRoot({ cards: [] });
+    const r = await prepare(root);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain("下書きの誤り: no-facts domain1");
+    expect(readRequests(root)).toEqual([]);
+  });
+
+  it("通過していない事実カードだけの分野_依頼を作らない", async () => {
+    const { card } = await import("../facts/test-helpers.ts");
+    const root = setupDraftRoot({
+      cards: [1, 2, 3, 4].map((n) =>
+        card({ id: `f-${String(n).repeat(12)}`, domain: `domain${n}`, status: n === 1 ? "held" : "passed" }),
+      ),
+    });
+    const r = await prepare(root);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain("no-facts domain1");
+    expect(readRequests(root).every((q) => q.domain.code !== "domain1")).toBe(true);
+  });
+
+  it("出題計画がない_入力の誤り", async () => {
+    const root = setupDraftRoot();
+    const r = await runMain(root, ["draft", EXAM]);
+    expect(r.code).toBe(EXIT.inputError);
+  });
+
+  it("依頼の数が maxItemsPerRun を超える_上限で止まり_再実行で続きから進む", async () => {
+    const root = setupDraftRoot();
+    const r = await prepare(root, { maxItemsPerRun: 2 });
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(readRequests(root)).toHaveLength(2);
+    expect(r.err).toContain("件数の上限");
+    const again = await runMain(root, ["draft", EXAM], { maxItemsPerRun: 2 });
+    expect(again.out).toContain("依頼済みで待っている 2 件");
+    expect(readRequests(root)).toHaveLength(4);
+  });
+
+  it("--dry-run_何も書かない", async () => {
+    const root = setupDraftRoot();
+    await runMain(root, ["plan", EXAM]);
+    const r = await runMain(root, ["draft", EXAM, "--dry-run"]);
+    expect(r.code).toBe(EXIT.ok);
+    expect(readRequests(root)).toEqual([]);
+    expect(r.out).toContain("書き込みをしない(dry-run)");
+  });
+});
+
+function existingQuestion() {
+  return {
+    questionId: "AIB-0001",
+    examCode: EXAM,
+    domain: "domain1",
+    questionType: "single",
+    questionText: "架空の既存の設問です。",
+    choices: [
+      { key: "A", text: "選択肢 A" },
+      { key: "B", text: "選択肢 B" },
+    ],
+    correctAnswers: ["A"],
+    explanation: "架空の解説です。",
+  };
+}
+
+describe("draft の取り込み", () => {
+  async function firstRequest(root: string, overrides: Record<string, unknown> = {}) {
+    await prepare(root, overrides);
+    return readRequests(root)[0] as ReturnType<typeof readRequests>[number];
+  }
+
+  it("正しい出力_通過として取り込み_依頼と出力を片づける", async () => {
+    const root = setupDraftRoot();
+    const request = await firstRequest(root);
+    writeOutput(root, request, [draftFor(request)]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.code).toBe(EXIT.ok);
+    const drafts = readDrafts(workPath(root, "drafts.json"), EXAM).drafts;
+    expect(drafts).toHaveLength(1);
+    expect(drafts[0]).toMatchObject({ status: "passed", reasons: [], planItemId: request.planItemId });
+    expect(existsSync(join(root, request.outputPath))).toBe(false);
+    expect(readRequests(root).some((q) => q.requestKey === request.requestKey)).toBe(false);
+    expect(readState(workPath(root, "state.json")).done).toContain(request.requestKey);
+  });
+
+  it("取り込んだあとの依頼_同じ入力は再び依頼せず_残りの数だけ依頼する", async () => {
+    const root = setupDraftRoot();
+    const request = await firstRequest(root);
+    writeOutput(root, request, [draftFor(request)]);
+    await runMain(root, ["draft", EXAM, "--import"]);
+    const again = await runMain(root, ["draft", EXAM]);
+    expect(again.code).toBe(EXIT.ok);
+    const keys = readRequests(root).map((q) => q.requestKey);
+    // 取り込み済みの鍵は、もう依頼されない
+    expect(keys).not.toContain(request.requestKey);
+    const sameItem = readRequests(root).find((q) => q.planItemId === request.planItemId);
+    if (sameItem) expect(sameItem.count).toBe(request.count - 1);
+  });
+
+  it("形に合わない出力_上限まで再試行され_超えたら失敗として記録される", async () => {
+    const root = setupDraftRoot();
+    const request = await firstRequest(root);
+    for (let i = 0; i < baseConfig.draft.maxAttempts; i++) {
+      writeRaw(root, request, JSON.stringify({ unexpected: true }));
+      const r = await runMain(root, ["draft", EXAM, "--import"]);
+      expect(r.code).toBe(EXIT.checkFailed);
+      expect(r.err).toContain("output-invalid");
+      expect(existsSync(join(root, request.outputPath))).toBe(false);
+    }
+    expect(readState(workPath(root, "state.json")).attempts[request.requestKey]).toBe(baseConfig.draft.maxAttempts);
+    // 依頼のファイルを消して出し直そうとしても、上限を超えた鍵は依頼されない
+    const { rmSync } = await import("node:fs");
+    rmSync(workPath(root, "requests", `${request.requestKey}.json`));
+    const again = await runMain(root, ["draft", EXAM]);
+    expect(again.code).toBe(EXIT.checkFailed);
+    expect(again.err).toContain("再試行の上限");
+    expect(readRequests(root).some((q) => q.requestKey === request.requestKey)).toBe(false);
+  });
+
+  it("データの契約に合わない下書き_schema-invalid で止め_何も取り込まない", async () => {
+    const root = setupDraftRoot();
+    const request = await firstRequest(root);
+    // 選択肢のキーが A から始まらない(スタイル規則では止まらず、データの契約で止まる)
+    const bad = draftFor(request, {
+      choices: draftFor(request).choices.map((c, i) => ({ ...c, key: String.fromCharCode(66 + i) })),
+    });
+    writeOutput(root, request, [draftFor(request), bad]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain("schema-invalid");
+    expect(existsSync(workPath(root, "drafts.json"))).toBe(false);
+  });
+
+  it("依頼と違う鍵の出力_request-mismatch", async () => {
+    const root = setupDraftRoot();
+    const request = await firstRequest(root);
+    writeOutput(root, request, [draftFor(request)], { requestKey: "0".repeat(16) });
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.err).toContain("request-mismatch");
+  });
+
+  it("依頼の数を超える出力_output-invalid", async () => {
+    const root = setupDraftRoot();
+    const request = await firstRequest(root);
+    const many = Array.from({ length: request.count + 1 }, (_, i) =>
+      draftFor(request, { questionText: `別の設問 ${i} についての上限はどれですか。` }),
+    );
+    writeOutput(root, request, many);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.err).toContain("output-invalid");
+  });
+
+  it("依頼のファイルの鍵が名前と違う_request-invalid", async () => {
+    const root = setupDraftRoot();
+    const request = await firstRequest(root);
+    writeOutput(root, request, [draftFor(request)]);
+    const path = workPath(root, "requests", `${request.requestKey}.json`);
+    writeFileSync(path, JSON.stringify({ ...request, requestKey: "0".repeat(16) }));
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain(`${request.requestKey} request-invalid`);
+  });
+
+  it("依頼のあとに事実カードが変わった_request-stale で依頼を捨てる", async () => {
+    const root = setupDraftRoot();
+    const request = await firstRequest(root);
+    writeOutput(root, request, [draftFor(request)]);
+    const { card } = await import("../facts/test-helpers.ts");
+    const { writeFacts, emptyFacts, factsPath } = await import("../facts/schema.ts");
+    writeFacts(factsPath(join(root, baseConfig.factsDir), EXAM), {
+      ...emptyFacts(EXAM),
+      cards: [card({ id: request.facts[0]?.id ?? "", domain: request.domain.code, claim: "変わった主張" })],
+    });
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.err).toContain("request-stale");
+    expect(existsSync(workPath(root, "requests", `${request.requestKey}.json`))).toBe(false);
+  });
+
+  it("止める規則に違反する下書き_不採用になり_本文を保存せず_報告にも出さない", async () => {
+    const root = setupDraftRoot();
+    const request = await firstRequest(root);
+    const leaky = draftFor(request, {
+      questionText: "https://example.com/secret-looking-path を読んで、正しいものを 2 つ選択してください。",
+    });
+    writeOutput(root, request, [leaky]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.code).toBe(EXIT.ok);
+    expect(r.out).toContain("下書きの不採用:");
+    expect(r.out).toContain("no-url questionText");
+    expect(r.err + r.out).not.toContain("secret-looking-path");
+    const drafts = readDrafts(workPath(root, "drafts.json"), EXAM).drafts;
+    expect(drafts[0]).toMatchObject({ status: "rejected", draft: null, reasons: ["style:no-url"] });
+    expect(readFileSync(workPath(root, "drafts.json"), "utf8")).not.toContain("secret-looking-path");
+  });
+
+  it("警告の規則だけに違反する下書き_通過し_警告として報告される", async () => {
+    const root = setupDraftRoot();
+    const request = await firstRequest(root);
+    const warned = draftFor(request, {
+      questionText:
+        request.kind === "multiple" ? "誤っている説明を 2 つ選択してください。" : "誤っているものはどれですか。",
+    });
+    writeOutput(root, request, [warned]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.out).toContain("下書きの警告:");
+    const drafts = readDrafts(workPath(root, "drafts.json"), EXAM).drafts;
+    expect(drafts[0]?.status).toBe("passed");
+    expect(drafts[0]?.warnings.map((w) => w.rule)).toContain("stem-negation");
+  });
+
+  it("依頼にない事実カードを根拠にした下書き_不採用", async () => {
+    const root = setupDraftRoot();
+    const request = await firstRequest(root);
+    writeOutput(root, request, [draftFor(request, { factIds: ["f-ffffffffffff"] })]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.out).toContain("fact-not-in-request");
+    expect(readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0]?.status).toBe("rejected");
+  });
+
+  it("依頼の種別と違う下書き_不採用", async () => {
+    const root = setupDraftRoot();
+    const request = await firstRequest(root);
+    const other = request.kind === "single" ? "multiple" : "single";
+    writeOutput(root, request, [draftFor(request, { questionType: other })]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.out).toContain("kind-mismatch");
+  });
+
+  it("全件が不採用_出し直しの依頼が出て_回数の上限で止まる", async () => {
+    const root = setupDraftRoot();
+    let request = await firstRequest(root);
+    const seen = new Set<string>();
+    for (let round = 0; round < baseConfig.draft.maxRounds; round++) {
+      expect(seen.has(request.requestKey)).toBe(false);
+      seen.add(request.requestKey);
+      writeOutput(root, request, [draftFor(request, { questionText: `上限は ${round} 個です。` })]);
+      await runMain(root, ["draft", EXAM, "--import"]);
+      const next = await runMain(root, ["draft", EXAM]);
+      const same = readRequests(root).find((q) => q.planItemId === request.planItemId);
+      if (round < baseConfig.draft.maxRounds - 1) {
+        expect(same).toBeDefined();
+        request = same as typeof request;
+      } else {
+        expect(same).toBeUndefined();
+        expect(next.err).toContain("再試行の上限");
+      }
+    }
+  });
+
+  it("実行しても_data の問題データは変わらない", async () => {
+    const questions = { examCode: EXAM, questions: [existingQuestion()] };
+    const root = setupDraftRoot({ questions });
+    const file = join(root, "data/questions.aws-aib-c01.json");
+    const before = readFileSync(file, "utf8");
+    const request = await firstRequest(root);
+    writeOutput(root, request, [draftFor(request)]);
+    await runMain(root, ["draft", EXAM, "--import"]);
+    expect(readFileSync(file, "utf8")).toBe(before);
+  });
+
+  it("同じ設問の下書きを再び取り込む_重ねて記録しない", async () => {
+    const root = setupDraftRoot();
+    const request = await firstRequest(root);
+    const d = choiceDraft({ factIds: [request.facts[0]?.id ?? ""] });
+    writeOutput(root, request, [
+      request.kind === "multiple" ? draftFor(request) : d,
+      request.kind === "multiple" ? draftFor(request) : d,
+    ]);
+    await runMain(root, ["draft", EXAM, "--import"]);
+    expect(readDrafts(workPath(root, "drafts.json"), EXAM).drafts).toHaveLength(1);
+  });
+});

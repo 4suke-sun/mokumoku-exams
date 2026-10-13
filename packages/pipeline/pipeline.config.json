@@ -23,6 +23,12 @@
     "sampleSeed": 1,
     "samplePerDomain": 3
   },
+  "draft": {
+    "maxAttempts": 3,
+    "maxPerRequest": 5,
+    "maxFactsPerRequest": 12,
+    "maxRounds": 3
+  },
   "plan": {
     "targetMultiplier": 3,
     "difficultyMix": { "easy": 0.3, "medium": 0.5, "hard": 0.2 },
