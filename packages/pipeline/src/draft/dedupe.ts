@@ -3,7 +3,7 @@ import { dirname, resolve } from "node:path";
 import type { Config } from "../config.ts";
 import { normalizeText, QuestionsFileSchema } from "../contract.ts";
 import { compact } from "../text.ts";
-import type { ChoiceDraft } from "./schema.ts";
+import { type Draft, isChoiceDraft } from "./schema.ts";
 import { similarity } from "./similarity.ts";
 
 /**
@@ -45,13 +45,15 @@ const TOPIC_MIN_SIMILARITY = 0.3;
 /** 正答の文言が短すぎる(数値だけなど)ときは、正答が同じでも論点が同じとはみなさない */
 const ANSWERS_MIN_LENGTH = 8;
 
-export function candidateOf(ref: string, source: Candidate["source"], draft: ChoiceDraft): Candidate {
+export function candidateOf(ref: string, source: Candidate["source"], draft: Draft): Candidate {
+  const factKey = [...new Set(draft.factIds)].sort().join(",");
+  if (!isChoiceDraft(draft)) return { ref, source, text: draft.questionText, factKey };
   const correct = draft.choices.filter((c) => draft.correctAnswers.includes(c.key));
   return {
     ref,
     source,
     text: draft.questionText,
-    factKey: [...new Set(draft.factIds)].sort().join(","),
+    factKey,
     answers: correct
       .map((c) => compact(c.text))
       .sort()

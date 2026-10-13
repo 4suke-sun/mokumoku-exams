@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import type { ChoiceDraft } from "./schema.ts";
+import type { Draft, FreeTextDraft } from "./schema.ts";
 import { checkStyle, evaluateStyle, STYLE_RULES } from "./style.ts";
-import { choiceDraft, multipleDraft } from "./test-helpers.ts";
+import { choiceDraft, freeTextDraft, multipleDraft } from "./test-helpers.ts";
 
-function findings(draft: ChoiceDraft, rule: string) {
+function findings(draft: Draft, rule: string) {
   return checkStyle(draft).filter((f) => f.rule === rule);
 }
 
@@ -223,6 +223,83 @@ describe("スタイル規則", () => {
 
     it("違反がない_どちらも空", () => {
       expect(evaluateStyle(choiceDraft())).toEqual({ blockers: [], warnings: [] });
+    });
+  });
+
+  describe("自由記述", () => {
+    const rubric = (criteria: FreeTextDraft["rubric"]["criteria"], passingPoints = 60): FreeTextDraft["rubric"] => ({
+      criteria,
+      passingPoints,
+    });
+
+    it("規則に違反しない自由記述_指摘が出ない", () => {
+      expect(checkStyle(freeTextDraft())).toEqual([]);
+    });
+
+    it("選択式の規則は自由記述に適用しない_選択肢の規則が出ない", () => {
+      const names = new Set(checkStyle(freeTextDraft({ questionText: "上限は 100 個です。" })).map((f) => f.rule));
+      expect(names).toEqual(new Set(["stem-question-form"]));
+    });
+
+    it("自由記述の規則は選択式に適用しない", () => {
+      const names = checkStyle(choiceDraft()).map((f) => f.rule);
+      expect(names.some((n) => n.startsWith("rubric-"))).toBe(false);
+    });
+
+    it("設問文が問いの形で終わらない_止める", () => {
+      expect(findings(freeTextDraft({ questionText: "上限について述べる。" }), "stem-question-form")).toHaveLength(1);
+    });
+
+    it("観点が 1 つだけ_警告する", () => {
+      const d = freeTextDraft({ rubric: rubric([{ name: "上限", keywords: ["上限"], points: 100 }], 60) });
+      expect(findings(d, "rubric-criteria-count")).toEqual([
+        { rule: "rubric-criteria-count", severity: "warn", path: "rubric.criteria" },
+      ]);
+    });
+
+    it("1 文字のキーワード_警告する", () => {
+      const d = freeTextDraft({
+        rubric: rubric([
+          { name: "上限", keywords: ["上限", "数"], points: 50 },
+          { name: "対処", keywords: ["申請"], points: 50 },
+        ]),
+      });
+      expect(findings(d, "rubric-keyword-short")).toEqual([
+        { rule: "rubric-keyword-short", severity: "warn", path: "rubric.criteria.0.keywords.1" },
+      ]);
+    });
+
+    it("同じキーワードが複数の観点にある_警告する", () => {
+      const d = freeTextDraft({
+        rubric: rubric([
+          { name: "上限", keywords: ["上限", "申請"], points: 50 },
+          { name: "対処", keywords: ["申請"], points: 50 },
+        ]),
+      });
+      expect(findings(d, "rubric-keyword-shared")).toEqual([
+        { rule: "rubric-keyword-shared", severity: "warn", path: "rubric.criteria.1.keywords.0" },
+      ]);
+    });
+
+    it("合格点の割合が偏る_警告する", () => {
+      expect(
+        findings(freeTextDraft({ rubric: { ...freeTextDraft().rubric, passingPoints: 30 } }), "rubric-pass-ratio"),
+      ).toHaveLength(1);
+      expect(
+        findings(freeTextDraft({ rubric: { ...freeTextDraft().rubric, passingPoints: 100 } }), "rubric-pass-ratio"),
+      ).toHaveLength(1);
+    });
+
+    it("観点名やキーワードに URL がある_止め_場所を報告する", () => {
+      const d = freeTextDraft({
+        rubric: rubric([
+          { name: "上限", keywords: ["https://example.com/x"], points: 50 },
+          { name: "対処", keywords: ["申請"], points: 50 },
+        ]),
+      });
+      expect(findings(d, "no-url")).toEqual([
+        { rule: "no-url", severity: "block", path: "rubric.criteria.0.keywords.0" },
+      ]);
     });
   });
 });

@@ -7,7 +7,7 @@ import { emptyFacts, type FactCard, factsPath, writeFacts } from "../facts/schem
 import { card, DOC_HASH, DOC_URL } from "../facts/test-helpers.ts";
 import { main } from "../main.ts";
 import type { DraftRequest } from "./request.ts";
-import type { ChoiceDraft } from "./schema.ts";
+import type { ChoiceDraft, Draft, FreeTextDraft } from "./schema.ts";
 import { draftWorkDir } from "./store.ts";
 
 /** 通る下書き(テスト用の既定値。架空のサービス Widget Store の内容) */
@@ -44,6 +44,25 @@ export function choiceDraft(overrides: Partial<ChoiceDraft> = {}): ChoiceDraft {
         basis: { factId: "f-aaaaaaaaaaaa" },
       },
     ],
+    ...overrides,
+  };
+}
+
+/** 通る自由記述の下書き */
+export function freeTextDraft(overrides: Partial<FreeTextDraft> = {}): FreeTextDraft {
+  return {
+    questionType: "free-text",
+    questionText: "Widget Store のバケットに上限がある理由と、上限を超えるときの対処を説明してください。",
+    rubric: {
+      criteria: [
+        { name: "上限の存在", keywords: ["上限", "100 個"], points: 50 },
+        { name: "超えるときの対処", keywords: ["申請", "引き上げ"], points: 50 },
+      ],
+      passingPoints: 60,
+    },
+    explanation:
+      "バケットはアカウントとリージョンごとに 100 個までと定められており、超える場合は上限の引き上げを申請します。",
+    factIds: ["f-aaaaaaaaaaaa"],
     ...overrides,
   };
 }
@@ -163,7 +182,7 @@ export function writeRaw(root: string, request: DraftRequest, content: string) {
 }
 
 /** 依頼に対するエージェントの出力を、依頼の outputPath に書く */
-export function writeOutput(root: string, request: DraftRequest, drafts: ChoiceDraft[], overrides: object = {}) {
+export function writeOutput(root: string, request: DraftRequest, drafts: Draft[], overrides: object = {}) {
   const path = join(root, request.outputPath);
   mkdirSync(join(path, ".."), { recursive: true });
   writeFileSync(
@@ -185,4 +204,14 @@ export function draftFor(request: DraftRequest, overrides: Partial<ChoiceDraft> 
   // 誤答の根拠も、依頼の事実カードに合わせる
   const distractors = (base.distractors ?? []).map((d) => ("factId" in d.basis ? { ...d, basis: { factId } } : d));
   return { ...base, factIds: [factId], distractors, ...overrides };
+}
+
+/** 選択式の依頼だけ(自由記述の依頼を除く) */
+export function readChoiceRequests(root: string): DraftRequest[] {
+  return readRequests(root).filter((q) => q.kind !== "free-text");
+}
+
+/** 自由記述の依頼に対する、通る下書き */
+export function freeTextDraftFor(request: DraftRequest, overrides: Partial<FreeTextDraft> = {}): FreeTextDraft {
+  return freeTextDraft({ factIds: [(request.facts[0] as DraftRequest["facts"][number]).id], ...overrides });
 }

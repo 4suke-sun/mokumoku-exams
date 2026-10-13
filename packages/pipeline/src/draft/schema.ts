@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { sha256 } from "../collect/fetcher.ts";
-import { ChoiceQuestionSchema, normalizeText } from "../contract.ts";
+import { ChoiceQuestionSchema, FreeTextQuestionSchema, normalizeText } from "../contract.ts";
 
 /**
  * 選択式(単一・複数)の問題の下書き。エージェントが書く形。
@@ -63,6 +63,38 @@ export const ChoiceDraftSchema = z.strictObject({
 
 export type ChoiceDraft = z.infer<typeof ChoiceDraftSchema>;
 
+/** 採点基準の観点。回答がキーワードのどれかを含めば、観点を満たし、配点を得る */
+export const DraftCriterionSchema = z.strictObject({
+  name: text(100),
+  keywords: z.array(text(100)).min(1).max(20),
+  points: z.number().int().min(1).max(1000),
+});
+
+/** 自由記述の問題の下書き。選択肢はなく、採点基準(rubric)を持つ。形はデータの仕様(docs/data-spec.md の「自由記述」)に合わせる */
+export const FreeTextDraftSchema = z.strictObject({
+  questionType: z.literal("free-text"),
+  questionText: text(1000),
+  rubric: z.strictObject({
+    criteria: z.array(DraftCriterionSchema).min(1).max(10),
+    passingPoints: z.number().int().min(1).max(10000),
+  }),
+  /** 総合解説。解答の例を含めてよい */
+  explanation: text(3000),
+  supplement: text(1000).optional(),
+  /** 根拠にした事実カードの ID(1 つ以上)。観点とキーワードは、この主張だけを根拠にする */
+  factIds: z.array(FACT_ID).min(1).max(10),
+});
+
+export type FreeTextDraft = z.infer<typeof FreeTextDraftSchema>;
+
+/** 下書き: 選択式(単一・複数)か、自由記述 */
+export const DraftSchema = z.union([ChoiceDraftSchema, FreeTextDraftSchema]);
+export type Draft = ChoiceDraft | FreeTextDraft;
+
+export function isChoiceDraft(draft: Draft): draft is ChoiceDraft {
+  return draft.questionType !== "free-text";
+}
+
 /** 下書きの識別子。出題計画の項目、根拠の事実カード、設問文から決まるので、同じ下書きなら同じ ID になる */
 export function draftId(
   examCode: string,
@@ -76,7 +108,7 @@ export function draftId(
 
 /** 下書きから、データの問題の形を組み立てる。ID は仮(書き出しの段階で採番する) */
 export function assembleQuestion(
-  draft: ChoiceDraft,
+  draft: Draft,
   context: {
     examCode: string;
     domain: string;
@@ -84,23 +116,25 @@ export function assembleQuestion(
     referenceUrls: readonly string[];
   },
 ): unknown {
-  return {
+  const common = {
     questionId: "DRAFT-0000",
     examCode: context.examCode,
     domain: context.domain,
     difficulty: context.difficulty,
     questionType: draft.questionType,
     questionText: draft.questionText,
-    choices: draft.choices,
-    correctAnswers: draft.correctAnswers,
     explanation: draft.explanation,
     ...(draft.supplement !== undefined ? { supplement: draft.supplement } : {}),
     ...(context.referenceUrls.length > 0 ? { references: context.referenceUrls.map((url) => ({ url })) } : {}),
   };
+  return isChoiceDraft(draft)
+    ? { ...common, choices: draft.choices, correctAnswers: draft.correctAnswers }
+    : { ...common, rubric: draft.rubric };
 }
 
 /** 組み立てた問題が、データの契約を通るか。通らなければ、問題の項目の場所(値は含めない)を返す */
 export function schemaProblems(question: unknown): string[] {
-  const parsed = ChoiceQuestionSchema.safeParse(question);
+  const isFreeText = (question as { questionType?: unknown }).questionType === "free-text";
+  const parsed = (isFreeText ? FreeTextQuestionSchema : ChoiceQuestionSchema).safeParse(question);
   return parsed.success ? [] : parsed.error.issues.map((i) => i.path.join(".") || "(全体)");
 }

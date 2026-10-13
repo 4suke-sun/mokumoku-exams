@@ -3,7 +3,7 @@ import { dirname, join } from "node:path";
 import { z } from "zod";
 import { EXAM_CODE } from "../contract.ts";
 import { DIFFICULTIES } from "../plan/schema.ts";
-import { ChoiceDraftSchema } from "./schema.ts";
+import { DraftSchema } from "./schema.ts";
 
 /**
  * 下書きの置き場(作業用の置き場。コミットしない)。
@@ -27,7 +27,7 @@ export const DraftRecordSchema = z.strictObject({
   /** 警告の規則の名前と場所(本文は含まない) */
   warnings: z.array(z.strictObject({ rule: REASON, path: z.string().max(60) })).max(80),
   /** 不採用のときは null */
-  draft: ChoiceDraftSchema.nullable(),
+  draft: DraftSchema.nullable(),
 });
 
 export const DraftsFileSchema = z.strictObject({

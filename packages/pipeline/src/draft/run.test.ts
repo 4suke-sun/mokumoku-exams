@@ -9,7 +9,9 @@ import {
   choiceDraft,
   draftFor,
   EXAM,
+  freeTextDraftFor,
   multipleDraft,
+  readChoiceRequests,
   readRequests,
   runMain,
   setupDraftRoot,
@@ -33,7 +35,7 @@ describe("draft の依頼", () => {
     expect(requests.length).toBeGreaterThan(0);
     for (const request of requests) {
       expect(DraftRequestSchema.safeParse(request).success).toBe(true);
-      expect(request.kind).not.toBe("free-text");
+      expect(["single", "multiple", "free-text"]).toContain(request.kind);
       expect(request.count).toBeLessThanOrEqual(baseConfig.draft.maxPerRequest);
       expect(request.facts.every((f) => f.claim.startsWith("架空の主張"))).toBe(true);
       expect(request.styleRules.length).toBeGreaterThan(0);
@@ -108,7 +110,7 @@ function existingQuestion() {
 describe("draft の取り込み", () => {
   async function firstRequest(root: string, overrides: Record<string, unknown> = {}) {
     await prepare(root, overrides);
-    return readRequests(root)[0] as ReturnType<typeof readRequests>[number];
+    return readChoiceRequests(root)[0] as ReturnType<typeof readRequests>[number];
   }
 
   it("正しい出力_通過として取り込み_依頼と出力を片づける", async () => {
@@ -323,7 +325,7 @@ describe("draft の来歴", () => {
 
   async function imported(root: string) {
     await prepare(root);
-    const request = readRequests(root)[0] as ReturnType<typeof readRequests>[number];
+    const request = readChoiceRequests(root)[0] as ReturnType<typeof readRequests>[number];
     writeOutput(root, request, [draftFor(request)]);
     await runMain(root, ["draft", EXAM, "--import"]);
     return request;
@@ -344,7 +346,7 @@ describe("draft の来歴", () => {
   it("不採用の下書き_来歴を記録しない", async () => {
     const root = setupDraftRoot();
     await prepare(root);
-    const request = readRequests(root)[0] as ReturnType<typeof readRequests>[number];
+    const request = readChoiceRequests(root)[0] as ReturnType<typeof readRequests>[number];
     writeOutput(root, request, [
       draftFor(request, { questionText: "https://example.com/x を読んで、2 つ選択してください。" }),
     ]);
@@ -357,7 +359,7 @@ describe("draft の来歴", () => {
     const { emptyLedger, ledgerPath, writeLedger } = await import("../collect/ledger.ts");
     writeLedger(ledgerPath(join(root, baseConfig.ledgerDir), EXAM), emptyLedger(EXAM));
     await prepare(root);
-    const request = readRequests(root)[0] as ReturnType<typeof readRequests>[number];
+    const request = readChoiceRequests(root)[0] as ReturnType<typeof readRequests>[number];
     writeOutput(root, request, [draftFor(request)]);
     const r = await runMain(root, ["draft", EXAM, "--import"]);
     expect(r.out).toContain("provenance:source-not-in-ledger");
@@ -423,7 +425,7 @@ describe("draft の来歴", () => {
 describe("draft の誤答の検査", () => {
   async function requestOf(root: string) {
     await prepare(root);
-    return readRequests(root)[0] as ReturnType<typeof readRequests>[number];
+    return readChoiceRequests(root)[0] as ReturnType<typeof readRequests>[number];
   }
 
   it("誤答の設計がない下書き_不採用になり_誤答の理由コードで報告される", async () => {
@@ -497,7 +499,7 @@ describe("draft の重複の検出", () => {
 
   async function firstRequest(root: string) {
     await prepare(root);
-    return readRequests(root)[0] as ReturnType<typeof readRequests>[number];
+    return readChoiceRequests(root)[0] as ReturnType<typeof readRequests>[number];
   }
 
   it("公開済みの問題とほぼ同じ設問文_重複として落とし_相手の識別子と類似度だけを報告する", async () => {
@@ -575,5 +577,117 @@ describe("draft の重複の検出", () => {
     writeOutput(root, request, [draftFor(request)]);
     await runMain(root, ["draft", EXAM, "--import"]);
     expect(readFileSync(file, "utf8")).toBe(before);
+  });
+});
+
+describe("draft の自由記述", () => {
+  async function freeTextRequest(root: string) {
+    await prepare(root, { plan: { ...baseConfig.plan, typeMix: { single: 0, multiple: 0, "free-text": 1 } } });
+    return readRequests(root)[0] as ReturnType<typeof readRequests>[number];
+  }
+
+  it("種別が自由記述の計画_自由記述の依頼を書く", async () => {
+    const root = setupDraftRoot();
+    const request = await freeTextRequest(root);
+    expect(request.kind).toBe("free-text");
+    expect(readRequests(root).every((q) => q.kind === "free-text")).toBe(true);
+    // 採点基準の規則は載るが、選択肢の規則は載らない
+    const names = request.styleRules.map((r) => r.name);
+    expect(names).toContain("rubric-pass-ratio");
+    expect(names).not.toContain("choice-count");
+  });
+
+  it("正しい自由記述の下書き_通過し_来歴が記録される", async () => {
+    const root = setupDraftRoot();
+    const request = await freeTextRequest(root);
+    writeOutput(root, request, [freeTextDraftFor(request)]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.code).toBe(EXIT.ok);
+    const record = readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0];
+    expect(record).toMatchObject({ status: "passed", reasons: [] });
+    expect(record?.draft?.questionType).toBe("free-text");
+    expect((await runMain(root, ["draft", EXAM, "--check"])).code).toBe(EXIT.ok);
+  });
+
+  it("合格点が配点の合計を超える採点基準_schema-invalid で止まる", async () => {
+    const root = setupDraftRoot();
+    const request = await freeTextRequest(root);
+    const ok = freeTextDraftFor(request);
+    writeOutput(root, request, [{ ...ok, rubric: { ...ok.rubric, passingPoints: 101 } }]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain("schema-invalid");
+    expect(existsSync(workPath(root, "drafts.json"))).toBe(false);
+  });
+
+  it("観点名が重複する採点基準_schema-invalid で止まる", async () => {
+    const root = setupDraftRoot();
+    const request = await freeTextRequest(root);
+    const ok = freeTextDraftFor(request);
+    const first = ok.rubric.criteria[0] as (typeof ok.rubric.criteria)[number];
+    writeOutput(root, request, [
+      { ...ok, rubric: { ...ok.rubric, criteria: [first, { ...first, keywords: ["別の語"] }] } },
+    ]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.err).toContain("schema-invalid");
+  });
+
+  it("キーワードが空になる採点基準_schema-invalid で止まる", async () => {
+    const root = setupDraftRoot();
+    const request = await freeTextRequest(root);
+    const ok = freeTextDraftFor(request);
+    const [first, second] = ok.rubric.criteria as [
+      (typeof ok.rubric.criteria)[number],
+      (typeof ok.rubric.criteria)[number],
+    ];
+    writeOutput(root, request, [
+      { ...ok, rubric: { ...ok.rubric, criteria: [{ ...first, keywords: ["  "] }, second] } },
+    ]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.code).toBe(EXIT.checkFailed);
+  });
+
+  it("根拠の事実カードが依頼にない自由記述_不採用になり_来歴も作らない", async () => {
+    const root = setupDraftRoot();
+    const request = await freeTextRequest(root);
+    writeOutput(root, request, [freeTextDraftFor(request, { factIds: ["f-ffffffffffff"] })]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.out).toContain("fact-not-in-request");
+    expect(readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0]?.status).toBe("rejected");
+  });
+
+  it("選択式の依頼に自由記述を返す_kind-mismatch で不採用", async () => {
+    const root = setupDraftRoot();
+    await prepare(root);
+    const request = readChoiceRequests(root)[0] as ReturnType<typeof readRequests>[number];
+    writeOutput(root, request, [freeTextDraftFor(request)]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.out).toContain("kind-mismatch");
+  });
+
+  it("来歴のない自由記述の下書き_--check で先へ進めない", async () => {
+    const root = setupDraftRoot();
+    const request = await freeTextRequest(root);
+    writeOutput(root, request, [freeTextDraftFor(request)]);
+    await runMain(root, ["draft", EXAM, "--import"]);
+    writeFileSync(
+      join(root, baseConfig.provenanceDir, "aws-aib-c01.json"),
+      `${JSON.stringify({ examCode: EXAM, entries: [] })}\n`,
+    );
+    const r = await runMain(root, ["draft", EXAM, "--check"]);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain("来歴なし: d-");
+  });
+
+  it("自由記述の本文_不採用の場合は保存しない", async () => {
+    const root = setupDraftRoot();
+    const request = await freeTextRequest(root);
+    writeOutput(root, request, [
+      freeTextDraftFor(request, { questionText: "https://example.com/secret-looking-path を説明してください。" }),
+    ]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.out).toContain("no-url questionText");
+    expect(r.out + r.err).not.toContain("secret-looking-path");
+    expect(readFileSync(workPath(root, "drafts.json"), "utf8")).not.toContain("secret-looking-path");
   });
 });

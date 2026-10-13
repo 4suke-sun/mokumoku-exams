@@ -29,7 +29,7 @@ import {
   selectFacts,
   styleRuleSummaries,
 } from "./request.ts";
-import { assembleQuestion, DISTRACTOR_TYPES, draftId, schemaProblems } from "./schema.ts";
+import { assembleQuestion, DISTRACTOR_TYPES, draftId, isChoiceDraft, schemaProblems } from "./schema.ts";
 import {
   type DraftRecord,
   DraftsError,
@@ -170,15 +170,10 @@ function requestStep(
   let satisfied = 0;
   let cached = 0;
   let pending = 0;
-  let unsupported = 0;
   let exhausted = 0;
   let limited = false;
   const noFacts = new Set<string>();
   for (const item of plan.items) {
-    if (item.kind === "free-text") {
-      unsupported++;
-      continue;
-    }
     const have = drafts.drafts.filter((d) => d.planItemId === item.id && d.status !== "rejected").length;
     const remaining = item.count - have;
     if (remaining <= 0) {
@@ -232,7 +227,7 @@ function requestStep(
       facts: selected.map((c) => ({ id: c.id, claim: c.claim, confidence: c.confidence, scope: c.scope })),
       distractorTypes: [...DISTRACTOR_TYPES],
       styleVersion: STYLE_VERSION,
-      styleRules: styleRuleSummaries(),
+      styleRules: styleRuleSummaries(item.kind),
       outputPath: relative(rootDir, join(paths.outDir, `${key}.json`)),
     };
     if (!dryRun) writeJson(requestPath, request);
@@ -242,7 +237,7 @@ function requestStep(
   report(
     output,
     "情報",
-    `依頼 ${requested} 件、依頼済みで待っている ${pending} 件、計画を満たして飛ばした ${satisfied} 件、取り込み済みの入力で飛ばした ${cached} 件、自由記述で飛ばした ${unsupported} 件`,
+    `依頼 ${requested} 件、依頼済みで待っている ${pending} 件、計画を満たして飛ばした ${satisfied} 件、取り込み済みの入力で飛ばした ${cached} 件`,
   );
   if (dryRun) report(output, "書き込みをしない(dry-run)");
   if (limited) report(output, "件数の上限", "maxItemsPerRun(再実行で続きから進む)");
@@ -351,10 +346,13 @@ function importStep(
       if (!draft.factIds.every((f) => factIds.has(f))) reasons.push("fact-not-in-request");
       const verdict = evaluateStyle(draft);
       for (const f of verdict.blockers) reasons.push(`style:${f.rule}`);
-      const distractors = checkDistractors(draft, {
-        factIds,
-        claims: draft.factIds.flatMap((fid) => facts.cards.find((c) => c.id === fid)?.claim ?? []),
-      });
+      // 誤答の検査は選択式だけ(自由記述に誤答はない)
+      const distractors = isChoiceDraft(draft)
+        ? checkDistractors(draft, {
+            factIds,
+            claims: draft.factIds.flatMap((fid) => facts.cards.find((c) => c.id === fid)?.claim ?? []),
+          })
+        : { blockers: [], warnings: [], ambiguous: [] };
       for (const f of distractors.blockers) reasons.push(`distractor:${f.code}`);
       if (reasons.length === 0) {
         const urls = uniqueSorted(

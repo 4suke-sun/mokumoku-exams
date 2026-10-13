@@ -2,11 +2,11 @@ import { z } from "zod";
 import { sha256 } from "../collect/fetcher.ts";
 import type { FactCard } from "../facts/schema.ts";
 import { DIFFICULTIES } from "../plan/schema.ts";
-import { ChoiceDraftSchema, DISTRACTOR_TYPES, FACT_ID } from "./schema.ts";
+import { DISTRACTOR_TYPES, DraftSchema, FACT_ID } from "./schema.ts";
 import { STYLE_RULES, STYLE_VERSION } from "./style.ts";
 
 /** 依頼の形が変わったら上げる。鍵に入るので、上げると依頼のキャッシュが切れる */
-export const REQUEST_VERSION = 2;
+export const REQUEST_VERSION = 3;
 
 /** エージェントへの依頼(作業用の置き場に書く)。事実カードの主張は、言い換えた短い文 */
 export const DraftRequestSchema = z.strictObject({
@@ -15,7 +15,7 @@ export const DraftRequestSchema = z.strictObject({
   planItemId: z.string().regex(/^p-[0-9a-f]{12}$/),
   domain: z.strictObject({ code: z.string().min(1), name: z.string().min(1) }),
   difficulty: z.enum(DIFFICULTIES),
-  kind: z.enum(["single", "multiple"]),
+  kind: z.enum(["single", "multiple", "free-text"]),
   /** 書かせる下書きの数(最大) */
   count: z.number().int().min(1).max(100),
   facts: z
@@ -43,13 +43,19 @@ export const DraftsOutputSchema = z.strictObject({
   examCode: z.string().min(1),
   requestKey: z.string().min(1),
   planItemId: z.string().min(1),
-  drafts: z.array(ChoiceDraftSchema).min(1).max(100),
+  drafts: z.array(DraftSchema).min(1).max(100),
 });
 
 export type DraftsOutput = z.infer<typeof DraftsOutputSchema>;
 
-export function styleRuleSummaries(): DraftRequest["styleRules"] {
-  return STYLE_RULES.map((r) => ({ name: r.name, severity: r.severity, summary: r.summary }));
+/** 依頼の種別に適用するスタイル規則の説明 */
+export function styleRuleSummaries(kind: DraftRequest["kind"]): DraftRequest["styleRules"] {
+  const applies = kind === "free-text" ? "free-text" : "choice";
+  return STYLE_RULES.filter((r) => r.appliesTo === "both" || r.appliesTo === applies).map((r) => ({
+    name: r.name,
+    severity: r.severity,
+    summary: r.summary,
+  }));
 }
 
 /**
