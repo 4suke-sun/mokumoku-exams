@@ -339,6 +339,8 @@ function importStep(
       continue;
     }
     const factIds = new Set(request.facts.map((f) => f.id));
+    // この出力が捨てられたら、比較の相手に足した分も戻す
+    const poolMark = pool.length;
     const batch: DraftRecord[] = [];
     let invalid = false;
     for (const draft of out.drafts) {
@@ -421,6 +423,7 @@ function importStep(
       if (held || reasons.length === 0) pool.push(candidateOf(id, "draft", draft));
     }
     if (invalid) {
+      pool.length = poolMark;
       fail("schema-invalid");
       continue;
     }
@@ -450,6 +453,7 @@ function importStep(
     return failures > 0 ? EXIT.checkFailed : EXIT.ok;
   }
   const next: DraftsFile = { examCode, drafts: [...current.drafts, ...incoming] };
+  // 捨てた出力の分が entries に残っていても、取り込んだ下書き(incoming)の ID だけを使うので、来歴には入らない
   const added = incoming.filter((d) => d.status !== "rejected").flatMap((d) => entries.get(d.id) ?? []);
   // 来歴を先に書く。下書きより先に来歴があっても害はなく、逆は「来歴のない下書き」になる
   if (added.length > 0) {

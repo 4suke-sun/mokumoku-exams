@@ -558,6 +558,34 @@ describe("draft の重複の検出", () => {
     expect((await runMain(root, ["draft", EXAM, "--check"])).code).toBe(EXIT.ok);
   });
 
+  it("捨てられた出力の下書き_後の出力の重複の比較の相手に残らない", async () => {
+    const root = setupDraftRoot();
+    await prepare(root);
+    // 同じ種別の依頼を 2 つ取る(取り込みは、依頼の鍵の順に処理する)
+    const requests = readChoiceRequests(root);
+    const first = requests[0] as ReturnType<typeof readRequests>[number];
+    const second = requests.find((q) => q !== first && q.kind === first.kind) as typeof first;
+    const base = draftFor(first);
+    // 1 つ目の出力は、通る下書きと、データの契約に合わない下書きを含み、全体が捨てられる
+    const shift = (key: string) => String.fromCharCode(key.charCodeAt(0) + 1);
+    const bad = {
+      ...base,
+      questionText: `別の設問として、${base.questionText}`,
+      choices: base.choices.map((c) => ({ ...c, key: shift(c.key) })),
+      correctAnswers: base.correctAnswers.map(shift),
+      distractors: (base.distractors ?? []).map((d) => ({ ...d, key: shift(d.key) })),
+    };
+    writeOutput(root, first, [base, bad]);
+    // 2 つ目の出力は、捨てられる下書きとほぼ同じ設問文
+    writeOutput(root, second, [draftFor(second, { questionText: base.questionText })]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.err).toContain("schema-invalid");
+    expect(r.out).not.toContain("duplicate-similar");
+    const drafts = readDrafts(workPath(root, "drafts.json"), EXAM).drafts;
+    expect(drafts).toHaveLength(1);
+    expect(drafts[0]?.status).toBe("passed");
+  });
+
   it("問題データの形が違う_取り込みを止め_本文を出さない", async () => {
     const root = setupDraftRoot({
       questions: { examCode: EXAM, questions: [{ questionText: "secret-looking-stem" }] },
