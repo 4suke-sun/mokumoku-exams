@@ -148,8 +148,9 @@ async function collectStep(
   // 来歴(問題 → 事実カード)は、事実カード・作問の段階で足す
   const provenance: Provenance = {};
   const kindOf = new Map(plan.sources.map((s) => [s.url, s.kind]));
-  const queue: { url: string; depth: number }[] = plan.sources.map((s) => ({ url: s.url, depth: 0 }));
-  const seen = new Set(queue.map((q) => q.url));
+  const starts = [...new Set([...plan.sources.map((s) => s.url), ...(plan.guidePages ?? [])])];
+  const queue: { url: string; depth: number }[] = starts.map((url) => ({ url, depth: 0 }));
+  const seen = new Set(starts);
   let fetchedCount = 0;
   let resumedCount = 0;
   let limited = false;
@@ -272,16 +273,36 @@ function writeGuideRequest(
   rootDir: string,
   output: Output,
 ): void {
-  const guideUrl = plan.sources.find((s) => s.kind === "exam-guide")?.url;
-  const source = ledger.sources.find((s) => s.url === guideUrl);
-  if (source?.status !== "active" || source.contentHash === null || !cache.has(source.contentHash)) return;
-  if (ledger.guide?.contentHash === source.contentHash) return;
+  const ready = (url: string | undefined) => {
+    const s = ledger.sources.find((e) => e.url === url);
+    return s?.status === "active" && s.contentHash !== null && cache.has(s.contentHash)
+      ? { url: s.url, contentHash: s.contentHash }
+      : null;
+  };
+  const bodyPath = (hash: string) => relative(rootDir, join(paths.cacheDir, `${hash}.body`));
+  const source = ready(plan.sources.find((s) => s.kind === "exam-guide")?.url);
+  if (source === null) return;
+  const pages = (plan.guidePages ?? []).map(ready);
+  if (pages.some((p) => p === null)) {
+    report(output, "試験ガイドの抽出の保留", "guide-page-not-ready");
+    return;
+  }
+  const readyPages = pages.filter((p) => p !== null);
+  const imported = ledger.guide;
+  if (
+    imported?.contentHash === source.contentHash &&
+    imported.pages.length === readyPages.length &&
+    readyPages.every((p) => imported.pages.some((q) => q.url === p.url && q.contentHash === p.contentHash))
+  ) {
+    return;
+  }
   const code = ledger.examCode.toLowerCase();
   const request: GuideRequest = {
     examCode: ledger.examCode,
     sourceUrl: source.url,
     contentHash: source.contentHash,
-    bodyPath: relative(rootDir, join(paths.cacheDir, `${source.contentHash}.body`)),
+    bodyPath: bodyPath(source.contentHash),
+    pages: readyPages.map((p) => ({ ...p, bodyPath: bodyPath(p.contentHash) })),
     outputPath: relative(rootDir, join(paths.guideDir, `${code}.extract.json`)),
   };
   const requestPath = join(paths.guideDir, `${code}.request.json`);
@@ -308,10 +329,14 @@ function importGuideStep(
     report(output, "試験ガイドの取り込みの停止", "extract-invalid");
     return EXIT.checkFailed;
   }
-  const hash = (raw as { contentHash?: unknown } | null)?.contentHash;
+  const { plan, problems } = loadPlan(paths.plan, examCode);
+  if (plan === null) {
+    for (const p of problems) report(output, "計画の誤り", `${p.path} ${p.reason}`);
+    return EXIT.checkFailed;
+  }
   const cache = new BodyCache(paths.cacheDir, config.cache, deps.now);
-  const body = typeof hash === "string" && /^[0-9a-f]{64}$/.test(hash) ? cache.read(hash) : null;
-  const result = importGuide(raw, ledger, body?.toString("utf8") ?? null, deps.today());
+  const readBody = (hash: string) => cache.read(hash)?.toString("utf8") ?? null;
+  const result = importGuide(raw, ledger, plan.guidePages ?? [], readBody, deps.today());
   if (!result.ok) {
     report(output, "試験ガイドの取り込みの停止", result.reason);
     return EXIT.checkFailed;

@@ -32,6 +32,7 @@
        { "url": "https://docs.example.com/certification/guide.html", "kind": "exam-guide" },
        { "url": "https://docs.example.com/service/overview.html", "kind": "official-doc" }
      ],
+     "guidePages": ["https://docs.example.com/certification/guide-domain1.html"],
      "scope": { "prefixes": ["https://docs.example.com/certification/", "https://docs.example.com/service/"], "maxDepth": 1 },
      "exclude": ["https://docs.example.com/service/archive/"],
      "regions": ["us-east-1"]
@@ -41,6 +42,7 @@
    | 項目 | 意味 |
    | --- | --- |
    | `sources` | 収集を始める URL と種別(`exam-guide`・`official-doc`・`standard`)。試験ガイドは 1 つまで |
+   | `guidePages` | 任意。試験ガイドの続きのページ(分野ごとの出題範囲など)。深さにかかわらず取得し、試験ガイドの抽出の材料に含める。試験ガイドと重ねない |
    | `scope.prefixes` | リンクをたどってよい URL の接頭辞。`sources` の URL も、どれかの接頭辞の中にあること |
    | `scope.maxDepth` | `sources` からリンクをたどる深さ(0〜3)。0 はたどらない |
    | `exclude` | たどらない URL の接頭辞。`sources` の URL と重ねない |
@@ -62,13 +64,16 @@
    上限に達したら「件数の上限」を出して止まるので、もう一度実行すると、続きから進みます(同じ日に取得済みのものは取り直しません)。
 
 5. **試験ガイドを取り込む。** 試験ガイドが検査に合格すると、`pipeline-work/guide/<コード>.request.json` に抽出の依頼が書かれます。
+   依頼には、試験ガイドの本文と、計画の `guidePages` の本文の場所が入ります(`guidePages` が 1 つでも検査に合格していなければ、
+   依頼を出さず「試験ガイドの抽出の保留」を出します)。試験ガイドか `guidePages` のどれかの本文が、前に取り込んだときから変わると、依頼し直します。
    Claude Code で、エージェント `guide-extractor` に、その依頼のファイルを渡して抽出させます。抽出が書かれたら、取り込みます。
 
    ```sh
    npm run pipeline -- collect <試験コード> --import-guide
    ```
 
-   CLI が、抽出の形、配点の合計(100%)、分野の番号の抜け、本文の写しでないことを検査してから、台帳に取り込みます。
+   CLI が、抽出の形、配点の合計(100%)、分野の番号の抜け、`guidePages` をすべて材料にしていること、本文の写しでないことを検査してから、
+   台帳に取り込みます。
    資格マスタ(`data/exams.json`)との差分(マスタにない分野、ガイドにない分野、配点のずれ)を報告します。
    **マスタは書き換えません。** 差分を見て、人がマスタを直すかを判断し、通常の PR で直します。
 
@@ -125,10 +130,11 @@
 | `exam-code-mismatch` | 中の `examCode` が、指定した資格と違う | ファイル名と `examCode` を合わせる |
 | `not-https` / `malformed` / `userinfo` / `port` | URL の形が出典に使えない | `https://` の、ユーザー情報・ポートのない URL にする |
 | `host-not-allowed` | 許可ドメインにない | 許可ドメインの追加の手順を経るか、URL を外す |
-| `out-of-scope` | 収集を始める URL が、どの接頭辞の中にもない | `scope.prefixes` を足すか、URL を直す |
-| `excluded-listed` | 収集を始める URL が、除外に当たる | 一覧か除外の一方を直す |
-| `duplicate` | 同じ URL・接頭辞の重複 | 重複を消す |
+| `out-of-scope` | 収集を始める URL・`guidePages` が、どの接頭辞の中にもない | `scope.prefixes` を足すか、URL を直す |
+| `excluded-listed` | 収集を始める URL・`guidePages` が、除外に当たる | 一覧か除外の一方を直す |
+| `duplicate` | 同じ URL・接頭辞の重複。`guidePages` と試験ガイドの重複 | 重複を消す |
 | `multiple-exam-guides` | 試験ガイドが 2 つ以上 | 1 つにする |
+| `no-exam-guide` | `guidePages` があるのに、試験ガイドがない | 試験ガイドを `sources` に足すか、`guidePages` を外す |
 
 ### 取得の失敗(`取得: <URL> <状態> <理由コード>`)
 
@@ -162,7 +168,8 @@
 | --- | --- | --- |
 | `extract-not-found` / `extract-invalid` | 抽出のファイルがない・形が違う | エージェントに抽出をやり直させる |
 | `exam-mismatch` / `source-not-in-ledger` | 依頼と違う資格・出典の抽出 | 依頼のファイルを渡し直す |
-| `source-not-active` | 試験ガイドが検査に合格していない | 出典の検査の失敗を先に直す |
+| `source-not-active` | 試験ガイドか `guidePages` が検査に合格していない | 出典の検査の失敗を先に直す |
+| `page-mismatch` | 抽出の `pages` が、計画の `guidePages` と合わない | 依頼を出し直して(収集をやり直す)、抽出をやり直させる |
 | `source-hash-mismatch` / `body-not-cached` | 抽出のもとの本文が、台帳の最新と違う・キャッシュにない | 収集をやり直してから、抽出をやり直させる |
 | `domain-numbering` | 分野の番号に抜けや重複がある | 抽出をやり直させる |
 | `weight-sum-mismatch` | 配点の合計が 100% にならない | 試験ガイドを確かめ、抽出をやり直させる |

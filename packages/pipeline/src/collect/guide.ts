@@ -8,12 +8,18 @@ import { withinParaphraseLimit } from "./text-limits.ts";
  */
 
 const Paraphrase = z.string().min(1).refine(withinParaphraseLimit);
+const Sha256 = z.string().regex(/^[0-9a-f]{64}$/);
 
 /** エージェントが書く抽出の結果 */
 export const GuideExtractSchema = z.strictObject({
   examCode: z.string().min(1),
   sourceUrl: z.string().min(1),
-  contentHash: z.string().regex(/^[0-9a-f]{64}$/),
+  contentHash: Sha256,
+  /** 抽出の材料にした続きのページ。依頼の pages の url と contentHash を写す */
+  pages: z
+    .array(z.strictObject({ url: z.string().min(1), contentHash: Sha256 }))
+    .max(20)
+    .default([]),
   domains: z
     .array(
       z.strictObject({
@@ -38,6 +44,8 @@ export interface GuideRequest {
   contentHash: string;
   /** 本文(キャッシュ)の場所。リポジトリ直下からの相対パス */
   bodyPath: string;
+  /** 試験ガイドの続きのページ(計画の guidePages)。分野ごとの出題範囲などを読む */
+  pages: { url: string; contentHash: string; bodyPath: string }[];
   /** 抽出の結果を書く場所。リポジトリ直下からの相対パス */
   outputPath: string;
 }
@@ -62,6 +70,7 @@ export type GuideStopReason =
   | "source-not-in-ledger"
   | "source-not-active"
   | "source-hash-mismatch"
+  | "page-mismatch"
   | "body-not-cached"
   | "domain-numbering"
   | "weight-sum-mismatch"
@@ -69,12 +78,14 @@ export type GuideStopReason =
 
 /**
  * 抽出の結果を検査し、台帳に入れる形にする。止めるときは理由コードを返す。
- * body は、抽出のもとにした本文(キャッシュから読む)。言い換えが本文の写しでないかを確かめる。
+ * readBody は、本文のハッシュからキャッシュの本文を返す。言い換えが、試験ガイドと続きのページの本文の写しでないかを確かめる。
+ * pageUrls は、計画の guidePages。抽出が、そのすべてを材料にしていることを確かめる。
  */
 export function importGuide(
   raw: unknown,
   ledger: LedgerFile,
-  body: string | null,
+  pageUrls: readonly string[],
+  readBody: (hash: string) => string | null,
   today: string,
 ): { ok: true; guide: GuideRecord } | { ok: false; reason: GuideStopReason } {
   const parsed = GuideExtractSchema.safeParse(raw);
@@ -85,16 +96,26 @@ export function importGuide(
   if (!source) return { ok: false, reason: "source-not-in-ledger" };
   if (source.status !== "active") return { ok: false, reason: "source-not-active" };
   if (source.contentHash !== extract.contentHash) return { ok: false, reason: "source-hash-mismatch" };
-  if (body === null) return { ok: false, reason: "body-not-cached" };
+  const extractUrls = extract.pages.map((p) => p.url);
+  if (extractUrls.length !== pageUrls.length || pageUrls.some((u) => !extractUrls.includes(u))) {
+    return { ok: false, reason: "page-mismatch" };
+  }
+  for (const page of extract.pages) {
+    const entry = ledger.sources.find((s) => s.url === page.url);
+    if (entry?.status !== "active") return { ok: false, reason: "source-not-active" };
+    if (entry.contentHash !== page.contentHash) return { ok: false, reason: "source-hash-mismatch" };
+  }
+  const bodies = [extract.contentHash, ...extract.pages.map((p) => p.contentHash)].map(readBody);
+  if (bodies.some((b) => b === null)) return { ok: false, reason: "body-not-cached" };
 
   const numbers = extract.domains.map((d) => d.number).sort((a, b) => a - b);
   if (numbers.some((n, i) => n !== i + 1)) return { ok: false, reason: "domain-numbering" };
   const sum = extract.domains.reduce((s, d) => s + d.weightPercent, 0);
   if (Math.abs(sum - 100) > WEIGHT_SUM_TOLERANCE) return { ok: false, reason: "weight-sum-mismatch" };
 
-  const plain = normalize(body);
+  const plains = bodies.map((b) => normalize(b ?? ""));
   const texts = extract.domains.flatMap((d) => [d.name, ...d.scope]).map(normalize);
-  if (texts.some((t) => t.length >= VERBATIM_MIN_CHARS && plain.includes(t))) {
+  if (texts.some((t) => t.length >= VERBATIM_MIN_CHARS && plains.some((p) => p.includes(t)))) {
     return { ok: false, reason: "verbatim-copy" };
   }
 
@@ -103,6 +124,7 @@ export function importGuide(
     guide: {
       sourceUrl: extract.sourceUrl,
       contentHash: extract.contentHash,
+      pages: extract.pages,
       importedAt: today,
       domains: [...extract.domains]
         .sort((a, b) => a.number - b.number)

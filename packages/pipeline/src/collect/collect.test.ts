@@ -202,6 +202,40 @@ describe("collect --import-guide", () => {
     expect(readFileSync(join(root, "data/exams.json"), "utf8")).toBe(masterBefore);
   });
 
+  it("試験ガイドの続きのページ_深さ 0 でも取得し、依頼と取り込みに含める。ページが変わると依頼し直す", async () => {
+    const root = setupRoot({ ...plan, scope: { prefixes: [BASE], maxDepth: 0 }, guidePages: [ONE] });
+    const first = await run(root, ["collect", CODE]);
+    expect(first.net.requests).toContain(ONE);
+    const requestPath = join(root, config.workDir, "guide/aws-aib-c01.request.json");
+    const request = JSON.parse(readFileSync(requestPath, "utf8"));
+    const pageHash = sha256(Buffer.from(fixture("doc.html")));
+    expect(request.pages).toEqual([
+      { url: ONE, contentHash: pageHash, bodyPath: `pipeline-work/cache/${pageHash}.body` },
+    ]);
+    const hash = sha256(Buffer.from(fixture("guide.html")));
+    writeFileSync(
+      join(root, config.workDir, "guide/aws-aib-c01.extract.json"),
+      JSON.stringify({
+        examCode: CODE,
+        sourceUrl: GUIDE,
+        contentHash: hash,
+        pages: [{ url: ONE, contentHash: pageHash }],
+        domains: [{ number: 1, name: "分野 1", weightPercent: 100, scope: ["範囲の言い換え"] }],
+      }),
+    );
+    expect((await run(root, ["collect", CODE, "--import-guide"])).code).toBe(EXIT.ok);
+    expect(readLedger(join(root, config.ledgerDir, "aws-aib-c01.json"), CODE).guide?.pages).toEqual([
+      { url: ONE, contentHash: pageHash },
+    ]);
+    // 取り込み済みで、どれも変わらなければ、依頼し直さない
+    const same = await run(root, ["collect", CODE], routes, {}, "2026-10-14");
+    expect(same.out).not.toContain("試験ガイドの抽出の依頼");
+    // 続きのページだけが変わっても、依頼し直す
+    const changed = { ...routes, [ONE]: { body: fixture("guide.html").replace("Synthetic", "Changed") } };
+    const again = await run(root, ["collect", CODE], changed, {}, "2026-10-15");
+    expect(again.out).toContain("試験ガイドの抽出の依頼");
+  });
+
   it("配点の合計が合わない・抽出がない_取り込みを止め、理由コードを出す", async () => {
     const root = await collected();
     expect((await run(root, ["collect", CODE, "--import-guide"])).err).toContain("extract-not-found");

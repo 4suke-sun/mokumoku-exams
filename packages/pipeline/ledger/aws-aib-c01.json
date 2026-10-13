@@ -1,0 +1,400 @@
+{
+  "examCode": "AWS-AIB-C01",
+  "guide": {
+    "contentHash": "557fe833dbbc7017d752a9fef5b17b0d5357838a0dc4aef42edbdbf6544b9407",
+    "domains": [
+      {
+        "code": "domain1",
+        "name": "AIの基礎とリテラシー",
+        "scope": [
+          "AIの基本的な概念を、事業の場面に当てはめて説明する",
+          "AI、機械学習、生成AIの違いを区別する",
+          "構造化データと非構造化データを区別し、AIにとってのデータの種類の意味を説明する",
+          "データ品質がAIの成果に与える影響を説明する",
+          "過去のデータを使ったモデルの学習の考え方を説明する",
+          "AIに関する国際規格などの共通の枠組みと用語を把握する",
+          "ルールベースの自動化とAIのどちらを使うかを判断する",
+          "AIエージェントを他のAIの仕組みと区別し、その中核となる機能を理解する",
+          "モデルのドリフトや性能の変化を検知して是正するための、継続的な監視と更新の必要性を説明する",
+          "承認済み・禁止・評価中などの分類でAIツールを明確に管理し、シャドーAIのリスクを抑える",
+          "プロンプトの基本的な原則を適用して、望む出力を得る",
+          "トークン上限やコンテキストウィンドウの制約が生成AIの性能に与える影響を見極める",
+          "RAGやファインチューニングなどのモデル適応技術が、事業上のニーズにどう効くかを理解する"
+        ],
+        "weight": 0.24
+      },
+      {
+        "code": "domain2",
+        "name": "AI戦略と事業価値の創出",
+        "scope": [
+          "事業上の影響が大きいAI活用領域を見つけ、AIの能力を事業成果に結びつける",
+          "自社開発・購入・パートナー委託の判断を、予算、期間、体制、規制要件などから評価する",
+          "事業価値、実現可能性、持続性、戦略との整合でAI施策を優先づけし、拡大・保留・中止を決める",
+          "業務課題にAIが適さない場合を見極める",
+          "業務をAIベースへ移行する際や、AIの基盤を切り替える際の、事業継続・コスト・データの準備・性能への影響を検討する",
+          "有形・無形の効果を含めて、AI施策の成果指標（KPI）を定める",
+          "AI導入の効果を正しく測るため、導入前のベースライン指標を設定する",
+          "時間削減、コスト削減、売上増などを含めて、AIの投資対効果（ROI）を算出する",
+          "AI施策の成功を予測する先行指標を見つける",
+          "AI導入のコスト計画と最適化の基本的な管理を行う",
+          "競合環境を分析し、AI導入による優位性を見極める",
+          "AIを使ってビジネスモデルを変革する機会を見つける",
+          "AIがもたらす持続的な競争優位と業務改善の仕組みを説明する",
+          "業界の成熟度と競争状況に応じて、適切なAI投資の水準を決める"
+        ],
+        "weight": 0.28
+      },
+      {
+        "code": "domain3",
+        "name": "AIガバナンスと責任あるAIのリーダーシップ",
+        "scope": [
+          "公平性、説明可能性、プライバシー、安全性などの責任あるAIの原則を事業の場面に当てはめる",
+          "事業目標と責任あるAIの原則が衝突するときのトレードオフを整理して判断する",
+          "AIプロジェクトの計画段階から責任あるAIの実践を組み込み、設計段階からガバナンスを効かせる",
+          "人の監督が必要な場面を見極め、幻覚の検出、ガードレール、エスカレーション基準などの安全策を選ぶ",
+          "部門横断の代表を含み、責任の所在が明確なAIガバナンスの体制を作る",
+          "AIを使う業務で生じる規制遵守のリスクを特定し、対処する",
+          "AIシステムに対するアクセス制御とデータセキュリティの対策を見極める",
+          "AIのリスク分類の枠組みを使い、ライフサイクル全体でガバナンスと遵守の優先度を決める",
+          "本番稼働中のAIに対するリスク統制と監視の仕組みの必要性を見極める",
+          "バイアスがライフサイクルの複数の段階で生じ得ることを理解し、バイアスのドリフトを継続的に監視する重要性を説明する",
+          "有害なコンテンツのリスクと知的財産に関する懸念を管理する",
+          "幻覚、データ品質の劣化、モデルのドリフトなど、AIの信頼性に関するリスクを特定し、抑える"
+        ],
+        "weight": 0.24
+      },
+      {
+        "code": "domain4",
+        "name": "事業の準備、リーダーシップ、AI変革",
+        "scope": [
+          "事業のAI導入の準備状況を、経営層の足並み、データ品質、文化、技術基盤、ガバナンスの観点から評価する",
+          "AI成熟度モデルを使い、企業がAI活用のどの段階にあるかを評価する",
+          "人、プロセス、技術、ガバナンスにまたがり、AI変革を妨げる能力のギャップを特定する",
+          "戦略目標と現在の成熟度に基づいて育成への投資を優先し、段階的な育成の道筋を作る",
+          "データの準備状況（品質、利用しやすさ、データのサイロ化の影響）を評価する",
+          "AIの土台となるデータ戦略、データの所有権、データ共有の枠組みを説明する",
+          "AI施策を支える基盤技術とインフラの要件を評価する",
+          "経営層のスポンサーシップと足並みをそろえ、AI推進者を見つけて任せ、全社の勢いを維持する",
+          "事業部門、技術、法務、コンプライアンスなど多様な専門性を持つ部門横断チームを作り、AI施策の責任の基準を定める",
+          "AI導入に対する従業員の懸念（導入時期、成果の期待、役割への影響）に、透明性のある説明で応える",
+          "文化的な障壁（リスク回避、変化への抵抗、失敗への恐れ）を見極め、経営層の働きかけで対処する",
+          "PoCやハッカソン、研修など、全社的なAIリテラシーを高める育成の方法を選ぶ",
+          "人の手作業から、AIとの協働と人による監督へ役割を移す機会を見つけ、人の強みとAIの能力のバランスを取る戦略判断を行う",
+          "試行から全社展開へ、反復的な変革の段階（構想、実験、導入、拡大など）を適用する",
+          "短期的な成果を積み上げ、全社展開へ広げていく拡大の方法を実施する",
+          "AIの専門組織（COE）と部門横断の協力の仕組みを作り、拡大を支える",
+          "継続的なフィードバックの仕組みと成功指標を定め、施策の進捗と長期的な価値を追う",
+          "実験段階から本番運用レベルへの移行で、ガバナンスと運用上の要件に対応する",
+          "全社展開の過程で、事業継続性と性能を保つための複数の要因を評価する"
+        ],
+        "weight": 0.24
+      }
+    ],
+    "importedAt": "2026-10-13",
+    "pages": [
+      {
+        "contentHash": "ba51eb011206c99d22f4c298de01551f92687659dce8f242e2d9eea5612dab74",
+        "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain1.html"
+      },
+      {
+        "contentHash": "8384e336b329bb95e346ddaa827f161cb480908890537ebcf48ad91c57d0af26",
+        "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.html"
+      },
+      {
+        "contentHash": "01e3457cb68f733e1ee96c0d77578b6193d55b9376aeb909bda188d22592a75d",
+        "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain3.html"
+      },
+      {
+        "contentHash": "0f3084e3ee1ad8fe7db9f476466419137ba8fc765d515b3c2099182e8b194c83",
+        "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
+      }
+    ],
+    "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01.html"
+  },
+  "recheck": {
+    "facts": [],
+    "questions": []
+  },
+  "sources": [
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "ba51eb011206c99d22f4c298de01551f92687659dce8f242e2d9eea5612dab74",
+      "fetchedAt": "2026-10-13",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "updatedAt": "2026-10-12",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain1.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "8384e336b329bb95e346ddaa827f161cb480908890537ebcf48ad91c57d0af26",
+      "fetchedAt": "2026-10-13",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "updatedAt": "2026-10-12",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "01e3457cb68f733e1ee96c0d77578b6193d55b9376aeb909bda188d22592a75d",
+      "fetchedAt": "2026-10-13",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "updatedAt": "2026-10-12",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain3.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "0f3084e3ee1ad8fe7db9f476466419137ba8fc765d515b3c2099182e8b194c83",
+      "fetchedAt": "2026-10-13",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "updatedAt": "2026-10-12",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "557fe833dbbc7017d752a9fef5b17b0d5357838a0dc4aef42edbdbf6544b9407",
+      "fetchedAt": "2026-10-13",
+      "kind": "exam-guide",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "updatedAt": "2026-10-12",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "6ce3fd5e152df46abba7f03ff1efff3b8c146f15aeccac7a2783822a29fa2d43",
+      "fetchedAt": "2026-10-13",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "updatedAt": "2026-10-12",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-in-scope-services.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "b02df633777fa7477749250060012717035561bce4228312fdc103fa32ed4881",
+      "fetchedAt": "2026-10-13",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "updatedAt": "2026-10-12",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-out-of-scope-services.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "b12e2724789c8ed07a2b94414d9f529b1d293eea01b242cc30b3da0b98ed13a3",
+      "fetchedAt": "2026-10-13",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "updatedAt": "2026-10-12",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-technologies-concepts.html"
+    }
+  ]
+}

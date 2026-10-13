@@ -52,6 +52,17 @@ describe("収集の計画の検査", () => {
     expect(reasons(plan({ sources: [g(1), g(2)] }))).toContain("multiple-exam-guides");
   });
 
+  it("試験ガイドの続きのページ_範囲の中なら通し、試験ガイドがない・範囲の外・除外・重複は落とす", () => {
+    const page = "https://docs.aws.amazon.com/guide/domain1.html";
+    expect(checkPlan(plan({ guidePages: [page] }), CODE).problems).toEqual([]);
+    const docOnly = { url: "https://docs.aws.amazon.com/guide/a", kind: "official-doc" as const };
+    expect(reasons(plan({ sources: [docOnly], guidePages: [page] }))).toContain("no-exam-guide");
+    expect(reasons(plan({ guidePages: ["https://docs.aws.amazon.com/other/a"] }))).toContain("out-of-scope");
+    expect(reasons(plan({ guidePages: ["https://docs.aws.amazon.com/guide/private/a"] }))).toContain("excluded-listed");
+    expect(reasons(plan({ guidePages: [page, page] }))).toContain("duplicate");
+    expect(reasons(plan({ guidePages: ["https://docs.aws.amazon.com/guide/index.html"] }))).toContain("duplicate");
+  });
+
   it("範囲の判定_接頭辞の中で、除外に当たらず、出典に使える URL だけ", () => {
     const p = plan();
     expect(inScope(p, "https://docs.aws.amazon.com/guide/a.html")).toBe(true);

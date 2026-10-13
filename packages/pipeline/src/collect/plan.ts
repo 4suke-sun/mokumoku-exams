@@ -23,6 +23,11 @@ export const PlanSchema = z.strictObject({
     /** 収集を始める URL から、リンクをたどる深さ。0 はたどらない */
     maxDepth: z.number().int().min(0).max(MAX_DEPTH),
   }),
+  /**
+   * 試験ガイドの続きのページ(分野ごとの出題範囲など)。収集を始める URL に加え、試験ガイドの抽出の材料に含める。
+   * 指定がなければ、試験ガイドのページだけを抽出の材料にする
+   */
+  guidePages: z.array(z.string().max(2000)).max(20).optional(),
   /** 除外する URL の接頭辞 */
   exclude: z.array(z.string().max(2000)).max(100),
   /** 対象のリージョン。指定がなければ制限しない */
@@ -67,6 +72,7 @@ export function checkPlan(raw: unknown, examCode: string): { plan: Plan | null; 
   if (plan.examCode !== examCode) problems.push({ path: "examCode", reason: "exam-code-mismatch" });
   const urlLists: [string, readonly string[]][] = [
     ["sources", plan.sources.map((s) => s.url)],
+    ["guidePages", plan.guidePages ?? []],
     ["scope.prefixes", plan.scope.prefixes],
     ["exclude", plan.exclude],
   ];
@@ -85,6 +91,14 @@ export function checkPlan(raw: unknown, examCode: string): { plan: Plan | null; 
   if (plan.sources.filter((s) => s.kind === "exam-guide").length > 1) {
     problems.push({ path: "sources", reason: "multiple-exam-guides" });
   }
+  const guideUrl = plan.sources.find((s) => s.kind === "exam-guide")?.url;
+  (plan.guidePages ?? []).forEach((url, i) => {
+    const path = `guidePages.${i}`;
+    if (guideUrl === undefined) problems.push({ path, reason: "no-exam-guide" });
+    if (url === guideUrl) problems.push({ path, reason: "duplicate" });
+    if (!startsWithAny(url, plan.scope.prefixes)) problems.push({ path, reason: "out-of-scope" });
+    if (startsWithAny(url, plan.exclude)) problems.push({ path, reason: "excluded-listed" });
+  });
   return { plan: problems.length === 0 ? plan : null, problems };
 }
 

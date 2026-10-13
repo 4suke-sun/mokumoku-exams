@@ -84,6 +84,11 @@ const GuideDomainSchema = z.strictObject({
 export const GuideRecordSchema = z.strictObject({
   sourceUrl: SourceUrl,
   contentHash: SHA256,
+  /** 抽出の材料にした、試験ガイドの続きのページ(計画の guidePages)と、その本文のハッシュ */
+  pages: z
+    .array(z.strictObject({ url: SourceUrl, contentHash: SHA256 }))
+    .max(20)
+    .default([]),
   importedAt: ISO_DATE,
   domains: z.array(GuideDomainSchema).min(1).max(20),
 });
