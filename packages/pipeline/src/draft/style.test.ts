@@ -1,0 +1,228 @@
+import { describe, expect, it } from "vitest";
+import type { ChoiceDraft } from "./schema.ts";
+import { checkStyle, evaluateStyle, STYLE_RULES } from "./style.ts";
+import { choiceDraft, multipleDraft } from "./test-helpers.ts";
+
+function findings(draft: ChoiceDraft, rule: string) {
+  return checkStyle(draft).filter((f) => f.rule === rule);
+}
+
+describe("スタイル規則", () => {
+  it("規則に違反しない下書き_指摘が出ない", () => {
+    expect(checkStyle(choiceDraft())).toEqual([]);
+    expect(checkStyle(multipleDraft())).toEqual([]);
+  });
+
+  it("規則の名前が重複しない", () => {
+    const names = STYLE_RULES.map((r) => r.name);
+    expect(new Set(names).size).toBe(names.length);
+  });
+
+  describe("stem-question-form", () => {
+    it("問いの形で終わる_通る", () => {
+      for (const stem of ["上限はどれですか。", "上限を選択してください。", "上限はどれか?", "上限を選びなさい"]) {
+        expect(findings(choiceDraft({ questionText: stem }), "stem-question-form")).toEqual([]);
+      }
+    });
+
+    it("問いの形で終わらない_止める", () => {
+      const f = findings(choiceDraft({ questionText: "バケットの上限は 100 個です。" }), "stem-question-form");
+      expect(f).toEqual([{ rule: "stem-question-form", severity: "block", path: "questionText" }]);
+    });
+  });
+
+  describe("multi-select-count", () => {
+    it("選ぶ数が書かれている_通る", () => {
+      expect(findings(multipleDraft(), "multi-select-count")).toEqual([]);
+      expect(
+        findings(multipleDraft({ questionText: "正しいものを二つ選んでください。" }), "multi-select-count"),
+      ).toEqual([]);
+    });
+
+    it("複数選択で選ぶ数がない_止める", () => {
+      const f = findings(multipleDraft({ questionText: "正しい説明を選択してください。" }), "multi-select-count");
+      expect(f).toHaveLength(1);
+      expect(f[0]?.severity).toBe("block");
+    });
+
+    it("単一選択では_数がなくても通る", () => {
+      expect(findings(choiceDraft(), "multi-select-count")).toEqual([]);
+    });
+
+    it("書いた数と正答の数が違う_止める", () => {
+      const f = findings(
+        multipleDraft({ questionText: "正しい説明を 3 つ選択してください。" }),
+        "multi-select-count-mismatch",
+      );
+      expect(f).toHaveLength(1);
+      expect(findings(multipleDraft(), "multi-select-count-mismatch")).toEqual([]);
+    });
+  });
+
+  describe("否定", () => {
+    it("否定を 1 つ含む_警告する", () => {
+      const f = findings(choiceDraft({ questionText: "次のうち、誤っているものはどれですか。" }), "stem-negation");
+      expect(f).toEqual([{ rule: "stem-negation", severity: "warn", path: "questionText" }]);
+    });
+
+    it("否定がない_指摘が出ない", () => {
+      expect(findings(choiceDraft(), "stem-negation")).toEqual([]);
+    });
+
+    it("否定を 2 つ含む_止める", () => {
+      const q = "次のうち、誤っているとは言えないものを除き、適切ではないものはどれですか。";
+      expect(findings(choiceDraft({ questionText: q }), "stem-double-negation")).toHaveLength(1);
+    });
+
+    it("何度呼んでも_同じ結果になる(状態を持たない)", () => {
+      const d = choiceDraft({ questionText: "次のうち、誤っているものはどれですか。" });
+      expect(findings(d, "stem-negation")).toHaveLength(1);
+      expect(findings(d, "stem-negation")).toHaveLength(1);
+    });
+  });
+
+  describe("選択肢", () => {
+    it("選択肢が 3 つ_警告する", () => {
+      const d = choiceDraft({
+        choices: [
+          { key: "A", text: "10 個" },
+          { key: "B", text: "100 個" },
+          { key: "C", text: "1,000 個" },
+        ],
+      });
+      expect(findings(d, "choice-count")).toHaveLength(1);
+      expect(findings(choiceDraft(), "choice-count")).toEqual([]);
+    });
+
+    it("長さが大きく違う_警告する", () => {
+      const long = "バケットの名前は、リージョンの中で一意であり、作成の後に変更することはできない".repeat(1);
+      const d = choiceDraft({
+        choices: [
+          { key: "A", text: "10 個" },
+          { key: "B", text: long },
+          { key: "C", text: "1,000 個" },
+          { key: "D", text: "上限はない" },
+        ],
+      });
+      expect(findings(d, "choice-length-balance")).toHaveLength(1);
+      expect(findings(choiceDraft(), "choice-length-balance")).toEqual([]);
+    });
+
+    it("正答だけが長い_警告し_そろっていれば通る", () => {
+      const d = choiceDraft({
+        choices: [
+          { key: "A", text: "リージョンごとに数える上限" },
+          { key: "B", text: "リージョンごとに数え、アカウントの上限として定められている数" },
+          { key: "C", text: "ゾーンごとに数える上限" },
+          { key: "D", text: "区画ごとに数える上限" },
+        ],
+      });
+      expect(findings(d, "correct-length-bias")).toHaveLength(1);
+      expect(findings(choiceDraft(), "correct-length-bias")).toEqual([]);
+    });
+
+    it("ほぼ同じ文言の選択肢_警告する", () => {
+      const d = choiceDraft({
+        choices: [
+          { key: "A", text: "リージョンごとに 100 個まで作れる" },
+          { key: "B", text: "リージョンごとに 100 個まで作れます" },
+          { key: "C", text: "ゾーンごとに 10 個まで" },
+          { key: "D", text: "上限はない" },
+        ],
+      });
+      const f = findings(d, "choice-similar-pair");
+      expect(f).toEqual([{ rule: "choice-similar-pair", severity: "warn", path: "choices.1.text" }]);
+    });
+
+    it("まとめる選択肢_止める", () => {
+      for (const text of ["上記のすべて", "いずれでもない", "すべて正しい", "None of the above"]) {
+        const d = choiceDraft({
+          choices: [
+            { key: "A", text: "10 個" },
+            { key: "B", text: "100 個" },
+            { key: "C", text: "1,000 個" },
+            { key: "D", text },
+          ],
+        });
+        expect(findings(d, "choice-catch-all")).toEqual([
+          { rule: "choice-catch-all", severity: "block", path: "choices.3.text" },
+        ]);
+      }
+      expect(findings(choiceDraft(), "choice-catch-all")).toEqual([]);
+    });
+  });
+
+  describe("禁止事項", () => {
+    it("断定しすぎる語_警告し_場所だけを報告する", () => {
+      const d = choiceDraft({
+        choices: [
+          { key: "A", text: "必ず 10 個になる" },
+          { key: "B", text: "100 個" },
+          { key: "C", text: "1,000 個" },
+          { key: "D", text: "上限はない" },
+        ],
+      });
+      expect(findings(d, "overclaim-term")).toEqual([
+        { rule: "overclaim-term", severity: "warn", path: "choices.0.text" },
+      ]);
+      expect(findings(choiceDraft(), "overclaim-term")).toEqual([]);
+    });
+
+    it("URL_設問文・選択肢・解説のどこでも止める", () => {
+      const d = choiceDraft({
+        questionText: "https://example.com/doc を読んで、上限はどれですか。",
+        explanation: "詳しくは www.example.com を参照してください。上限は 100 個と定められています。",
+      });
+      const paths = findings(d, "no-url").map((f) => f.path);
+      expect(paths).toEqual(["questionText", "explanation"]);
+      expect(findings(choiceDraft(), "no-url")).toEqual([]);
+    });
+
+    it("環境固有の値_止める", () => {
+      const cases = [
+        `アカウント ${"1234".repeat(3)} のバケットの上限はどれですか。`,
+        "arn:aws:s3:::example の上限はどれですか。",
+        `${"AKI" + "A"}${"ABCDEFGH" + "IJKLMNOP"} の上限はどれですか。`,
+        "user@example.com の上限はどれですか。",
+        `${"/Us" + "ers"}/name/work の上限はどれですか。`,
+      ];
+      for (const q of cases) {
+        expect(findings(choiceDraft({ questionText: q }), "no-env-value")).toHaveLength(1);
+      }
+      expect(findings(choiceDraft({ questionText: "CIDR 10.0.0.0/16 の上限はどれですか。" }), "no-env-value")).toEqual(
+        [],
+      );
+    });
+
+    it("総合解説が短い_警告する", () => {
+      expect(findings(choiceDraft({ explanation: "100 個です。" }), "explanation-length")).toHaveLength(1);
+      expect(findings(choiceDraft(), "explanation-length")).toEqual([]);
+    });
+  });
+
+  it("報告に本文が含まれない", () => {
+    const d = choiceDraft({ questionText: "秘密めいた本文 https://example.com が URL を含む。" });
+    const serialized = JSON.stringify(checkStyle(d));
+    expect(serialized).not.toContain("秘密めいた本文");
+    expect(serialized).not.toContain("example.com");
+  });
+
+  describe("evaluateStyle", () => {
+    it("止める規則に違反する下書き_blockers に入り_warnings には入らない", () => {
+      const d = choiceDraft({ questionText: "バケットの上限は 100 個です。" });
+      const v = evaluateStyle(d);
+      expect(v.blockers.map((f) => f.rule)).toEqual(["stem-question-form"]);
+      expect(v.warnings).toEqual([]);
+    });
+
+    it("警告の規則だけに違反する下書き_warnings に入り_blockers は空", () => {
+      const v = evaluateStyle(choiceDraft({ questionText: "次のうち、誤っているものはどれですか。" }));
+      expect(v.blockers).toEqual([]);
+      expect(v.warnings.map((f) => f.rule)).toEqual(["stem-negation"]);
+    });
+
+    it("違反がない_どちらも空", () => {
+      expect(evaluateStyle(choiceDraft())).toEqual({ blockers: [], warnings: [] });
+    });
+  });
+});
