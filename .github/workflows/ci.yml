@@ -14,6 +14,45 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  # 変更したパスから、app / infra / pipeline のジョブを動かすかを決める。
+  # 契約・リポジトリ直下のファイル(ルートの設定)・scripts・CI の定義が変わったときは、すべて動かす。main への push でも、すべて動かす
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      app: ${{ steps.paths.outputs.app }}
+      infra: ${{ steps.paths.outputs.infra }}
+      pipeline: ${{ steps.paths.outputs.pipeline }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - id: paths
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          set -eu
+          if [ "$EVENT_NAME" = "pull_request" ]; then
+            files="$(git diff --name-only --no-renames "$BASE_SHA...$HEAD_SHA")"
+          else
+            files=""
+          fi
+          matches() { printf '%s\n' "$files" | grep -Eq "$1"; }
+          all=false
+          if [ "$EVENT_NAME" != "pull_request" ] \
+            || matches '^[^/]+$|^\.github/|^scripts/|^packages/data-schema/'; then
+            all=true
+          fi
+          flag() { if [ "$all" = true ] || matches "$1"; then echo true; else echo false; fi; }
+          {
+            echo "app=$(flag '^packages/app/|^data/')"
+            echo "infra=$(flag '^packages/infra/')"
+            echo "pipeline=$(flag '^packages/pipeline/')"
+          } >> "$GITHUB_OUTPUT"
+
   check:
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -30,8 +69,9 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
-      - run: npm run build
-      - run: npm test
+      # ワークスペースのテストと build は、変更に応じて下の個別のジョブで動かす。共有する契約と scripts のテストは、常にここで動かす
+      - run: npx vitest run
+      - run: npm test -w @mokumoku-exams/data-schema
       - run: npm run check:release-notes
       - run: npm run check:lessons
       - run: npm run check:boundary
@@ -52,8 +92,60 @@ jobs:
           HEAD_SHA: ${{ github.sha }}
         run: printf 'refs/heads/main %s refs/heads/main %s\n' "$HEAD_SHA" "$BEFORE_SHA" | node scripts/check-push-secrets.ts
 
+  app:
+    needs: changes
+    if: needs.changes.outputs.app == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - run: npm test -w @mokumoku-exams/app
+
+  infra:
+    needs: changes
+    if: needs.changes.outputs.infra == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test -w @mokumoku-exams/infra
+
+  # 作問パイプライン。テストは fixture だけを使い、外部へ通信しない。API キーなどの環境値は渡さない
+  pipeline:
+    needs: changes
+    if: needs.changes.outputs.pipeline == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm test -w @mokumoku-exams/pipeline
+
   # 主要な画面の通し確認(ブラウザ)。開発サーバーを、AWS に接続しない代替の認証で起動して通す
   e2e:
+    needs: changes
+    if: needs.changes.outputs.app == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -68,3 +160,21 @@ jobs:
       - run: npx playwright install --with-deps chromium
         working-directory: packages/app
       - run: npm run test:e2e
+
+  # 必須のチェックは、このジョブだけにする。変更がなくて動かなかった(skipped)ジョブは成功として扱い、
+  # 失敗・取り消しがあれば失敗にする。動かなかったジョブのせいで、待ち続けない
+  ci-ok:
+    needs: [changes, check, app, infra, pipeline, e2e]
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          for r in $RESULTS; do
+            case "$r" in
+              success|skipped) ;;
+              *) echo "失敗または取り消しのジョブがあります"; exit 1 ;;
+            esac
+          done
