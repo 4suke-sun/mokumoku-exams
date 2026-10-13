@@ -1,0 +1,49 @@
+{
+  "note": "架空のサービスについての、架空の主張。公式の文書の本文ではない",
+  "facts": [
+    {
+      "id": "f-1000000000a1",
+      "domain": "domain1",
+      "claim": "Widget Store では、バケット名に使える文字は英小文字と数字とハイフンだけ。"
+    },
+    {
+      "id": "f-1000000000a2",
+      "domain": "domain1",
+      "claim": "Widget Store のバケットは、作成後に別のリージョンへ移せない。"
+    },
+    {
+      "id": "f-1000000000a3",
+      "domain": "domain1",
+      "claim": "Widget Store のライフサイクル設定は、保存後に順次反映される。"
+    },
+    {
+      "id": "f-2000000000b1",
+      "domain": "domain2",
+      "claim": "Gadget Queue のメッセージは、最長 14 日間まで保持できる。"
+    },
+    {
+      "id": "f-2000000000b2",
+      "domain": "domain2",
+      "claim": "Gadget Queue の可視性タイムアウトを超えると、メッセージは再び取得できる。"
+    },
+    {
+      "id": "f-2000000000b3",
+      "domain": "domain2",
+      "claim": "Gadget Queue は、順序を保証する種類と保証しない種類を持つ。"
+    },
+    { "id": "f-3000000000c1", "domain": "domain3", "claim": "Sprocket Cache のノードは、稼働中に追加できる。" },
+    {
+      "id": "f-3000000000c2",
+      "domain": "domain3",
+      "claim": "Sprocket Cache のスナップショットは、メンテナンスの時間帯を避けて取得される。"
+    },
+    { "id": "f-3000000000c3", "domain": "domain3", "claim": "Sprocket Cache は、保存時の暗号化を選択できる。" },
+    {
+      "id": "f-4000000000d1",
+      "domain": "domain4",
+      "claim": "Gizmo Stream のシャードは、書き込みの量に応じて分割できる。"
+    },
+    { "id": "f-4000000000d2", "domain": "domain4", "claim": "Gizmo Stream のデータは、既定で 1 日間保持される。" },
+    { "id": "f-4000000000d3", "domain": "domain4", "claim": "Gizmo Stream の読み取り側は、複数のアプリで共有できる。" }
+  ]
+}

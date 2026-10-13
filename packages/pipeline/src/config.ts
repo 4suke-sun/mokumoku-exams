@@ -1,6 +1,18 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { z } from "zod";
+import { EXAM_CODE } from "./contract.ts";
+
+/** 配分の合計が 1 になること(許容誤差 0.001) */
+const sumsToOne = (mix: Record<string, number>) => Math.abs(Object.values(mix).reduce((a, b) => a + b, 0) - 1) <= 0.001;
+
+const share = z.number().min(0).max(1);
+export const DifficultyMixSchema = z
+  .strictObject({ easy: share, medium: share, hard: share })
+  .refine(sumsToOne, "配分の合計が 1 ではありません");
+export const TypeMixSchema = z
+  .strictObject({ single: share, multiple: share, "free-text": share })
+  .refine(sumsToOne, "配分の合計が 1 ではありません");
 
 export const ConfigSchema = z.strictObject({
   /** 作業用の置き場(取得した本文、段階の成果物)。リポジトリ直下からの相対パス */
@@ -9,6 +21,8 @@ export const ConfigSchema = z.strictObject({
   ledgerDir: z.string().min(1),
   /** 事実カードの置き場(資格ごとの JSON。コミットする) */
   factsDir: z.string().min(1),
+  /** 問題の来歴の置き場(資格ごとの JSON。コミットする) */
+  provenanceDir: z.string().min(1),
   /** 収集の計画の置き場(資格ごとの JSON。コミットする) */
   plansDir: z.string().min(1),
   /** 資格マスタ(読み取り専用で参照する) */
@@ -43,6 +57,36 @@ export const ConfigSchema = z.strictObject({
     sampleSeed: z.number().int().min(0),
     /** 抜き取りで、分野ごとに選ぶ件数の上限 */
     samplePerDomain: z.number().int().positive(),
+  }),
+  /** 下書き */
+  draft: z.strictObject({
+    /** 依頼 1 件の取り込みを、形の検査に通らずにやり直せる回数の上限 */
+    maxAttempts: z.number().int().positive(),
+    /** 依頼 1 件で書かせる下書きの数の上限 */
+    maxPerRequest: z.number().int().positive(),
+    /** 依頼 1 件に載せる事実カードの数の上限 */
+    maxFactsPerRequest: z.number().int().positive(),
+    /** 計画の項目 1 つについて、全件が不採用になったとき、依頼を出し直せる回数の上限 */
+    maxRounds: z.number().int().positive(),
+    /** 設問文の類似度(0〜1)のしきい値。duplicate 以上は重複として落とし、hold 以上は保留にして確かめる */
+    similarity: z
+      .strictObject({ duplicate: z.number().min(0).max(1), hold: z.number().min(0).max(1) })
+      .refine((v) => v.hold < v.duplicate, "保留のしきい値は、重複のしきい値より小さくする"),
+  }),
+  /** 出題計画。目標の問題数と、難易度・種別の配分(試験ごとに overrides で上書きする) */
+  plan: z.strictObject({
+    /** 目標の問題数 = 本番の出題数 × この倍率(問題の蓄えを、1 回の出題より多くする) */
+    targetMultiplier: z.number().positive().max(100),
+    difficultyMix: DifficultyMixSchema,
+    typeMix: TypeMixSchema,
+    overrides: z.record(
+      z.string().regex(EXAM_CODE),
+      z.strictObject({
+        targetTotal: z.number().int().positive().optional(),
+        difficultyMix: DifficultyMixSchema.optional(),
+        typeMix: TypeMixSchema.optional(),
+      }),
+    ),
   }),
   checks: z.strictObject({
     /** 出典の更新日が、この日数以内なら新しいとみなす */

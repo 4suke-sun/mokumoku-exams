@@ -70,7 +70,12 @@ export function loadExam(
   config: Config,
   rootDir: string,
   examCode: string,
-): { exam: ExamInfo; domains: { code: string; name: string; weight: number }[] } | null {
+): {
+  exam: ExamInfo;
+  domains: { code: string; name: string; weight: number }[];
+  /** 本番の出題数。公開中でない資格は null */
+  officialQuestionCount: number | null;
+} | null {
   const parsed = ExamsFileSchema.safeParse(JSON.parse(readFileSync(resolve(rootDir, config.examsFile), "utf8")));
   if (!parsed.success) throw new LedgerError(["(資格マスタ)"]);
   const exam = parsed.data.exams.find((e) => e.examCode === examCode);
@@ -80,6 +85,7 @@ export function loadExam(
   return {
     exam: { examCode: exam.examCode, vendor: exam.vendor, ...(edition !== undefined ? { edition } : {}) },
     domains,
+    officialQuestionCount: "officialQuestionCount" in exam ? exam.officialQuestionCount : null,
   };
 }
 

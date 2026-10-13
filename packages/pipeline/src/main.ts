@@ -3,9 +3,11 @@ import { type CollectDeps, runCollect } from "./collect/collect.ts";
 import { defaultDeps, Fetcher } from "./collect/fetcher.ts";
 import { COMMANDS } from "./commands.ts";
 import { type Config, ConfigError, loadConfig } from "./config.ts";
+import { runDraft } from "./draft/run.ts";
 import { EXIT, type ExitCode } from "./exit-codes.ts";
 import { type FactsMode, runFacts } from "./facts/facts.ts";
 import { type Output, report, reportInternalError } from "./log.ts";
+import { runPlan } from "./plan/run.ts";
 
 export interface Context {
   config: Config;
@@ -25,11 +27,12 @@ export interface MainOptions {
   collectDeps?: CollectDeps;
 }
 
-const KNOWN_FLAGS = ["--help", "-h", "--dry-run", "--import-guide", "--import", "--coverage", "--report"];
+const KNOWN_FLAGS = ["--help", "-h", "--dry-run", "--import-guide", "--import", "--coverage", "--report", "--check"];
 /** コマンドごとに、受け付ける動作のオプション(同時には 1 つだけ) */
 const MODE_FLAGS: Record<string, readonly string[]> = {
   collect: ["--import-guide"],
   facts: ["--import", "--coverage", "--report"],
+  draft: ["--import", "--check"],
 };
 
 function defaultCollectDeps(config: Config): CollectDeps {
@@ -60,6 +63,10 @@ function helpText(): string {
     "facts <資格コード> --import         エージェントが抽出した事実カードを検査し、取り込む",
     "facts <資格コード> --coverage       分野ごとの件数と、試験ガイドの範囲に対する抜けを報告する",
     "facts <資格コード> --report         本文を含まないレビューレポートを書く",
+    "plan <資格コード>                    分野の配点から目標の問題数を出し、既存の問題との差を計画に書く",
+    "draft <資格コード>                   計画の項目ごとに、選択式の下書きの依頼を書く",
+    "draft <資格コード> --import         エージェントが書いた下書きを検査し、取り込む",
+    "draft <資格コード> --check          下書きの来歴(根拠の事実カードと出典)を検査する",
     "",
     "終了コード: 0 成功 / 1 検査の失敗 / 2 入力の誤り / 3 内部の誤り",
     "",
@@ -85,7 +92,8 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
       return help || argv.length === 0 ? EXIT.ok : EXIT.inputError;
     }
     const command = COMMANDS.find((c) => c.name === positional[0]);
-    const takesExam = command?.name === "collect" || command?.name === "facts";
+    const takesExam =
+      command?.name === "collect" || command?.name === "facts" || command?.name === "plan" || command?.name === "draft";
     const maxArgs = takesExam ? 2 : 1;
     if (positional.length > maxArgs || command === undefined) {
       report(output, "不明なコマンド");
@@ -101,6 +109,8 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
       const usages: Record<string, string> = {
         collect: "使い方: collect <資格コード> [--import-guide]\n",
         facts: "使い方: facts <資格コード> [--import | --coverage | --report]\n",
+        plan: "使い方: plan <資格コード>\n",
+        draft: "使い方: draft <資格コード> [--import | --check]\n",
       };
       const usage = usages[command.name] ?? "";
       output.out(`${command.name}: ${command.summary}\n${usage}\nオプション: --dry-run, --help\n`);
@@ -146,6 +156,23 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
         output,
         deps: { today: deps.today, now: deps.now },
       });
+    }
+    if (command.name === "plan") {
+      const examCode = positional[1];
+      if (examCode === undefined) {
+        report(output, "入力の誤り", "資格コードの指定がない");
+        return EXIT.inputError;
+      }
+      return runPlan({ config, rootDir, examCode, dryRun, output });
+    }
+    if (command.name === "draft") {
+      const examCode = positional[1];
+      if (examCode === undefined) {
+        report(output, "入力の誤り", "資格コードの指定がない");
+        return EXIT.inputError;
+      }
+      const mode = flags.includes("--import") ? "import" : flags.includes("--check") ? "check" : "request";
+      return runDraft({ config, rootDir, examCode, mode, dryRun, output });
     }
     const context: Context = {
       config,

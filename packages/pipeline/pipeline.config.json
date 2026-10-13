@@ -2,6 +2,7 @@
   "workDir": "pipeline-work",
   "ledgerDir": "packages/pipeline/ledger",
   "factsDir": "packages/pipeline/facts",
+  "provenanceDir": "packages/pipeline/provenance",
   "plansDir": "packages/pipeline/plans",
   "examsFile": "data/exams.json",
   "maxItemsPerRun": 20,
@@ -22,6 +23,19 @@
     "maxAttempts": 3,
     "sampleSeed": 1,
     "samplePerDomain": 3
+  },
+  "draft": {
+    "maxAttempts": 3,
+    "maxPerRequest": 5,
+    "maxFactsPerRequest": 12,
+    "maxRounds": 3,
+    "similarity": { "duplicate": 0.85, "hold": 0.6 }
+  },
+  "plan": {
+    "targetMultiplier": 3,
+    "difficultyMix": { "easy": 0.3, "medium": 0.5, "hard": 0.2 },
+    "typeMix": { "single": 0.75, "multiple": 0.2, "free-text": 0.05 },
+    "overrides": {}
   },
   "checks": {
     "freshnessDays": 365

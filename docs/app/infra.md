@@ -126,6 +126,8 @@ aws ssm put-parameter --type SecureString --name /<パラメーターの名前> 
 
 ## ビルドとデプロイ
 
+デプロイの前に、[デプロイ前のチェックリスト](../pre-deploy-checklist.md)を通します。
+
 ```sh
 npm run build          # アプリをビルドする
 npm run build:lambda   # Lambda に載せるアセットを dist/ に作る(dist/lambda、dist/static、dist/push)
@@ -133,6 +135,8 @@ npm run synth          # スタックを合成する
 npm run diff -w @mokumoku-exams/infra -- --all     # すべてのスタックの変わる内容を確かめる
 npm run deploy -w @mokumoku-exams/infra -- --all   # すべてのスタックをデプロイする
 ```
+
+デプロイの直後に、[デプロイ後の画面確認](../post-deploy-smoke.md)を通します。通るまで、本番へ進みません。
 
 - `npm run synth` / `deploy` / `diff` / `destroy`(`-w @mokumoku-exams/infra`)は、`.env` を読み込んでから `cdkd` を実行します。
 - 合成は AWS の認証情報が必要です(`cdkd` がアカウントを調べるため)。CI では合成せず、スタックの単体テスト(スナップショットを含む)で確かめます。
