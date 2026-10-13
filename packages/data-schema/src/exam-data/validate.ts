@@ -5,7 +5,7 @@
  */
 import type { ZodError } from "zod";
 import type { PublishedExam } from "./schema.ts";
-import { ExamsFileSchema, QuestionsFileSchema, VendorsFileSchema } from "./schema.ts";
+import { ExamsFileSchema, QuestionsFileSchema, REFERENCE_HOST_VENDORS, VendorsFileSchema } from "./schema.ts";
 
 export interface DataFile {
   name: string;
@@ -51,6 +51,22 @@ export function formatIssues(file: string, error: ZodError, data: unknown): stri
     const kind = issue.code === "custom" ? issue.message : (KIND[issue.code] ?? `検査に合いません(${issue.code})`);
     return `${file}: ${formatPath(issue.path)}${id ? `(${id})` : ""}: ${kind}`;
   });
+}
+
+/**
+ * 出典のホストとベンダーの対応表(REFERENCE_HOST_VENDORS)が、ベンダーの一覧にない名前を持たないかの検査。
+ * 場所はホスト名で示す。一覧が読めないときは、validateDataSet の側で報告するので、ここでは何もしない。
+ */
+export function validateHostVendors(
+  vendors: unknown,
+  hostVendors: Readonly<Record<string, readonly string[]>> = REFERENCE_HOST_VENDORS,
+): string[] {
+  const parsed = VendorsFileSchema.safeParse(vendors);
+  if (!parsed.success) return [];
+  const names = new Set(parsed.data.vendors.map((v) => v.name));
+  return Object.entries(hostVendors)
+    .filter(([, list]) => list.some((name) => !names.has(name)))
+    .map(([host]) => `REFERENCE_HOST_VENDORS: ${host}: ${VENDORS_FILE} にないベンダーです`);
 }
 
 /**

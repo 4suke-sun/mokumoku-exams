@@ -7,11 +7,10 @@ import { main } from "./main.ts";
 const envFile = resolve(import.meta.dirname, "../.env");
 if (existsSync(envFile)) process.loadEnvFile(envFile);
 
-process.exit(
-  main({
-    argv: process.argv.slice(2),
-    env: process.env,
-    output: { out: (t) => process.stdout.write(t), err: (t) => process.stderr.write(t) },
-    configPath: defaultConfigPath(),
-  }),
-);
+process.exitCode = await main({
+  argv: process.argv.slice(2),
+  env: process.env,
+  output: { out: (t) => process.stdout.write(t), err: (t) => process.stderr.write(t) },
+  configPath: defaultConfigPath(),
+  rootDir: resolve(import.meta.dirname, "../../.."),
+});

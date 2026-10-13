@@ -1,0 +1,26 @@
+{
+  "examCode": "AWS-AIB-C01",
+  "sources": [
+    {
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01.html",
+      "kind": "exam-guide"
+    }
+  ],
+  "guidePages": [
+    "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain1.html",
+    "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.html",
+    "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain3.html",
+    "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
+  ],
+  "scope": {
+    "prefixes": ["https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/"],
+    "maxDepth": 1
+  },
+  "exclude": [
+    "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01.md",
+    "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain1.md",
+    "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.md",
+    "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain3.md",
+    "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.md"
+  ]
+}

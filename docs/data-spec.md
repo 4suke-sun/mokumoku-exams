@@ -184,11 +184,15 @@
 
 **許すドメイン**は、`packages/data-schema/src/exam-data/schema.ts` の `ALLOWED_REFERENCE_HOSTS` の 1 か所で定めます。ホスト名の完全一致で比べます(サブドメインも、別に足さない限り許しません)。
 
-| ホスト名 | 内容 |
-| --- | --- |
-| `docs.aws.amazon.com` | AWS の公式ドキュメント |
-| `aws.amazon.com` | AWS の公式サイト |
-| `www.nist.gov` | NIST の公式サイト |
+| ホスト名 | 内容 | 出典にしてよい資格のベンダー |
+| --- | --- | --- |
+| `docs.aws.amazon.com` | AWS の公式ドキュメント | AWS |
+| `aws.amazon.com` | AWS の公式サイト | AWS |
+| `www.nist.gov` | NIST の公式サイト | AWS |
+
+ホストごとに、そのホストを出典にしてよい資格のベンダーを、同じファイルの `REFERENCE_HOST_VENDORS` で定めます。
+作問パイプラインは、出典が公式かどうかを、この対応で判定します。ベンダーの名前は `data/vendors.json` にあるものだけで、
+`npm run validate:data` が確かめます。
 
 資格を足すときに、その資格のベンダーの公式ドキュメントのドメインを、一覧に足します([資格を追加する手順](./adding-an-exam.md))。
 出典の扱い(持つもの・持たないもの、言い換えと引用の上限、ドメインを足す手順)は、[出典と権利の方針](./source-policy.md)にあります。

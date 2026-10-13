@@ -5,10 +5,38 @@ import { z } from "zod";
 export const ConfigSchema = z.strictObject({
   /** 作業用の置き場(取得した本文、段階の成果物)。リポジトリ直下からの相対パス */
   workDir: z.string().min(1),
-  /** 出典の台帳の置き場 */
+  /** 出典の台帳の置き場(資格ごとの JSON。コミットする) */
   ledgerDir: z.string().min(1),
-  /** 1 回の実行で扱う件数の上限(費用の管理) */
+  /** 収集の計画の置き場(資格ごとの JSON。コミットする) */
+  plansDir: z.string().min(1),
+  /** 資格マスタ(読み取り専用で参照する) */
+  examsFile: z.string().min(1),
+  /** 1 回の実行で扱う件数の上限(費用の管理)。収集では、取得する URL の数の上限 */
   maxItemsPerRun: z.number().int().positive(),
+  /** 出典の取得。相手に負担をかけないための間隔と上限 */
+  fetch: z.strictObject({
+    /** 同じホストへの、取得の開始の間隔 */
+    perHostIntervalMs: z.number().int().min(0),
+    /** 同じホストへの、同時の取得の数 */
+    perHostConcurrency: z.number().int().positive(),
+    /** 全体の同時の取得の数 */
+    maxConcurrency: z.number().int().positive(),
+    timeoutMs: z.number().int().positive(),
+    /** 本文の大きさの上限(バイト) */
+    maxBytes: z.number().int().positive(),
+    maxRedirects: z.number().int().min(0),
+    /** 取得元を示す。連絡先などの個人情報や環境固有の値は入れない */
+    userAgent: z.string().min(1),
+  }),
+  /** 取得した本文の作業用キャッシュ */
+  cache: z.strictObject({
+    retentionDays: z.number().int().positive(),
+    maxBytes: z.number().int().positive(),
+  }),
+  checks: z.strictObject({
+    /** 出典の更新日が、この日数以内なら新しいとみなす */
+    freshnessDays: z.number().int().positive(),
+  }),
 });
 
 export type Config = z.infer<typeof ConfigSchema>;

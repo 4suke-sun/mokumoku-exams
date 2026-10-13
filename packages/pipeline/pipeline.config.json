@@ -1,5 +1,23 @@
 {
   "workDir": "pipeline-work",
   "ledgerDir": "packages/pipeline/ledger",
-  "maxItemsPerRun": 20
+  "plansDir": "packages/pipeline/plans",
+  "examsFile": "data/exams.json",
+  "maxItemsPerRun": 20,
+  "fetch": {
+    "perHostIntervalMs": 2000,
+    "perHostConcurrency": 1,
+    "maxConcurrency": 4,
+    "timeoutMs": 15000,
+    "maxBytes": 5000000,
+    "maxRedirects": 5,
+    "userAgent": "mokumoku-exams-pipeline/1.0 (source collector)"
+  },
+  "cache": {
+    "retentionDays": 30,
+    "maxBytes": 500000000
+  },
+  "checks": {
+    "freshnessDays": 365
+  }
 }

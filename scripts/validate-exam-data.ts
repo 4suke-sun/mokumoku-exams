@@ -7,7 +7,7 @@
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { DataFile } from "@mokumoku-exams/data-schema/exam-data/validate";
-import { validateDataSet } from "@mokumoku-exams/data-schema/exam-data/validate";
+import { validateDataSet, validateHostVendors } from "@mokumoku-exams/data-schema/exam-data/validate";
 import { report } from "./lib/git-check.ts";
 
 const args = process.argv.slice(2);
@@ -40,7 +40,8 @@ try {
   blocks.push(...unreadable);
   const vendorsPath = join(dir, "vendors.json");
   const vendors = existsSync(vendorsPath) ? read("vendors.json") : null;
-  if (unreadable.length === 0) blocks.push(...validateDataSet(exams, questionFiles, vendors));
+  if (unreadable.length === 0)
+    blocks.push(...validateDataSet(exams, questionFiles, vendors), ...validateHostVendors(vendors));
 } catch {
   blocks.push(`${dir} を検査できませんでした(フォルダの読み込みに失敗)`);
 }
