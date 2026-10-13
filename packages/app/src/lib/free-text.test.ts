@@ -1,5 +1,5 @@
+import { normalizeKeyword } from "@mokumoku-exams/data-schema/exam-data/schema";
 import { describe, expect, it } from "vitest";
-import { normalizeKeyword } from "../../../../scripts/lib/exam-data/schema.ts";
 import { judgeFreeText, normalizeForMatch } from "./free-text.ts";
 import type { Rubric } from "./types.ts";
 

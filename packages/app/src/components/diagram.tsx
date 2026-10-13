@@ -1,3 +1,4 @@
+import type { HierarchyNode } from "@mokumoku-exams/data-schema/curriculum-data/schema";
 import {
   type AnyLayout,
   type BoxLayout,
@@ -7,7 +8,6 @@ import {
   layoutAny,
   type PlacedText,
 } from "@/lib/diagram-layout.ts";
-import type { HierarchyNode } from "../../../../scripts/lib/curriculum-data/schema.ts";
 
 type Props = {
   diagram: Diagram;

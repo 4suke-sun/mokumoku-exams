@@ -1,4 +1,4 @@
-import type { SummaryFile } from "../../../../scripts/lib/summary-data/schema.ts";
+import type { SummaryFile } from "@mokumoku-exams/data-schema/summary-data/schema";
 import { loadQuestions } from "./exam-data.ts";
 import type { PublishedExam, Question } from "./types.ts";
 

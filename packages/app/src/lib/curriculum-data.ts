@@ -3,7 +3,7 @@ import type {
   CurriculumFile,
   CurriculumStage,
   CurriculumUnit,
-} from "../../../../scripts/lib/curriculum-data/schema.ts";
+} from "@mokumoku-exams/data-schema/curriculum-data/schema";
 import type { PublishedExam } from "./types.ts";
 
 // リポジトリ直下の data/ のカリキュラム(静的な JSON)を読む。形と問題 ID は `npm run validate:data` が検査している。

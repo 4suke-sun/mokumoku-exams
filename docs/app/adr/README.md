@@ -35,3 +35,4 @@
 - [0008 問題の来歴を台帳で結び、公開データの正は `data/` に置く](./0008-provenance-and-data-source-of-truth.md)
 - [0009 モデルを使う段階は、Claude Code のエージェントで実行する](./0009-execution-via-claude-code-agents.md)
 - [0010 pipeline の版はアプリと同じ版で運用し、切り出しは v1.0.0 以降に判断する](./0010-pipeline-versioning-and-extraction.md)
+- [0011 データの契約を共有パッケージ(`packages/data-schema`)に置く](./0011-data-contract-shared-package.md)

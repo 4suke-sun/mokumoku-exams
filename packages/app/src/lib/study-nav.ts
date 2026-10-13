@@ -1,4 +1,4 @@
-import type { CurriculumDomain } from "../../../../scripts/lib/curriculum-data/schema.ts";
+import type { CurriculumDomain } from "@mokumoku-exams/data-schema/curriculum-data/schema";
 import type { CurriculumUnit } from "./curriculum-data.ts";
 
 // 学習モードの構成: 分野の一覧 → 単元の一覧 → 教科書 → 問題。単元が 1 つだけの分野は、単元の一覧を飛ばす。

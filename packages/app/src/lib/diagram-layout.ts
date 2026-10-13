@@ -4,7 +4,7 @@ import type {
   FlowDiagram,
   HierarchyDiagram,
   HierarchyNode,
-} from "../../../../scripts/lib/curriculum-data/schema.ts";
+} from "@mokumoku-exams/data-schema/curriculum-data/schema";
 
 // 図解の配置を決める。描画(components/diagram.tsx)から切り離した純粋な関数にして、単体テストする。
 // 流れの図(flow):

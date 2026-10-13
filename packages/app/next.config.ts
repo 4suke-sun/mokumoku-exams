@@ -24,6 +24,8 @@ function legacyExamRedirects() {
 const config: NextConfig = {
   // Lambda に載せるため、実行に必要なファイルだけをまとめた出力(.next/standalone)を作る
   output: "standalone",
+  // 契約の共有パッケージは TypeScript のまま配るので、アプリのビルドで変換する
+  transpilePackages: ["@mokumoku-exams/data-schema"],
   turbopack: { root: repoRoot },
   outputFileTracingRoot: repoRoot,
   redirects: async () => legacyExamRedirects(),

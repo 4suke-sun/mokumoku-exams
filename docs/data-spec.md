@@ -3,7 +3,7 @@
 資格マスタ(`exams.json`)と問題データ(`questions.<コード>.json`)の形を定めます。アプリの実装には依存せず、
 **この仕様に従っていれば、表示・採点・分野別の分析ができる**ことを目標にします。
 
-スキーマの正本は `scripts/lib/exam-data/schema.ts`(Zod)で、この文書は、その意味を説明します。
+スキーマの正本は `packages/data-schema/src/exam-data/schema.ts`(Zod)で、この文書は、その意味を説明します。
 検査は `npm run validate:data` で行います(CI でも実行します)。
 資格を追加する順番とファイルの置き場所は、[資格を追加する手順](./adding-an-exam.md) にまとめています。
 
@@ -182,7 +182,7 @@
 | `references[].title` | 文字列 | 任意 | 資料の題。空白だけは不可。200 文字以内。URL を含めない。ないときは、画面に URL のホスト名を出す |
 | `references[].url` | 文字列 | 必須 | 2000 文字以内。`https://` で始まり、ユーザー情報(`user@` など)とポートを持たず、ホスト名が「許すドメイン」の一覧にある |
 
-**許すドメイン**は、`scripts/lib/exam-data/schema.ts` の `ALLOWED_REFERENCE_HOSTS` の 1 か所で定めます。ホスト名の完全一致で比べます(サブドメインも、別に足さない限り許しません)。
+**許すドメイン**は、`packages/data-schema/src/exam-data/schema.ts` の `ALLOWED_REFERENCE_HOSTS` の 1 か所で定めます。ホスト名の完全一致で比べます(サブドメインも、別に足さない限り許しません)。
 
 | ホスト名 | 内容 |
 | --- | --- |
@@ -341,7 +341,7 @@
 
 ## 10. 使い方ページのデータ `help.json`
 
-使い方ページの内容です。スキーマの正本は `scripts/lib/help-data/schema.ts` で、`npm run validate:data` が検査します。
+使い方ページの内容です。スキーマの正本は `packages/data-schema/src/help-data/schema.ts` で、`npm run validate:data` が検査します。
 
 ```json
 {
@@ -383,7 +383,7 @@
 ## 11. カリキュラムのデータ `curriculum.<コード>.json`
 
 学習モードで読む単元と、単元ごとに解く問題です。`<コード>` は資格コードの英小文字です。
-スキーマの正本は `scripts/lib/curriculum-data/schema.ts` で、`npm run validate:data` が検査します。
+スキーマの正本は `packages/data-schema/src/curriculum-data/schema.ts` で、`npm run validate:data` が検査します。
 
 ```json
 {
@@ -540,7 +540,7 @@
 
 直前チェックで、1 枚ずつ見返すためのデータです。`<コード>` は資格コードの英小文字です。
 問題 1 問につき、カードを 1 枚持ちます。分野・難易度・選択肢の本文は、問題から引くので、ここでは持ちません(重複して持たない)。
-スキーマの正本は `scripts/lib/summary-data/schema.ts` で、`npm run validate:data` が検査します。
+スキーマの正本は `packages/data-schema/src/summary-data/schema.ts` で、`npm run validate:data` が検査します。
 
 ```json
 {

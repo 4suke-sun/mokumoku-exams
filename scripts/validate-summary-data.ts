@@ -7,9 +7,9 @@
  */
 import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
-import type { DataFile } from "./lib/exam-data/validate.ts";
+import type { DataFile } from "@mokumoku-exams/data-schema/exam-data/validate";
+import { type QuestionAnswers, validateSummaryData } from "@mokumoku-exams/data-schema/summary-data/validate";
 import { report } from "./lib/git-check.ts";
-import { type QuestionAnswers, validateSummaryData } from "./lib/summary-data/validate.ts";
 
 const args = process.argv.slice(2);
 if (args.length > 1) {

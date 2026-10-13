@@ -16,6 +16,7 @@
     "@aws-sdk/client-dynamodb": "3.1149.0",
     "@aws-sdk/client-ssm": "3.1149.0",
     "@aws-sdk/lib-dynamodb": "3.1149.0",
+    "@mokumoku-exams/data-schema": "*",
     "next": "16.4.0",
     "react": "19.3.0",
     "react-dom": "19.3.0",

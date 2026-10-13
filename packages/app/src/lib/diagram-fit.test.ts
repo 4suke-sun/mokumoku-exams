@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
+import { CurriculumFileSchema } from "@mokumoku-exams/data-schema/curriculum-data/schema";
 import { describe, expect, it } from "vitest";
-import { CurriculumFileSchema } from "../../../../scripts/lib/curriculum-data/schema.ts";
 import { type Diagram, diagramProblems, layoutAny } from "./diagram-layout.ts";
 
 // 実際のカリキュラム(data/curriculum.*.json)のすべての図で、文字が箱に収まることを検査する。
