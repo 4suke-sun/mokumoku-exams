@@ -136,6 +136,8 @@ npm run diff -w @mokumoku-exams/infra -- --all     # すべてのスタックの
 npm run deploy -w @mokumoku-exams/infra -- --all   # すべてのスタックをデプロイする
 ```
 
+デプロイの直後に、[デプロイ後の画面確認](../post-deploy-smoke.md)を通します。通るまで、本番へ進みません。
+
 - `npm run synth` / `deploy` / `diff` / `destroy`(`-w @mokumoku-exams/infra`)は、`.env` を読み込んでから `cdkd` を実行します。
 - 合成は AWS の認証情報が必要です(`cdkd` がアカウントを調べるため)。CI では合成せず、スタックの単体テスト(スナップショットを含む)で確かめます。
 - `dist/` と `cdk.out/` は gitignore 済みです。
