@@ -4,6 +4,7 @@ import { defaultDeps, Fetcher } from "./collect/fetcher.ts";
 import { COMMANDS } from "./commands.ts";
 import { type Config, ConfigError, loadConfig } from "./config.ts";
 import { EXIT, type ExitCode } from "./exit-codes.ts";
+import { type FactsMode, runFacts } from "./facts/facts.ts";
 import { type Output, report, reportInternalError } from "./log.ts";
 
 export interface Context {
@@ -24,7 +25,12 @@ export interface MainOptions {
   collectDeps?: CollectDeps;
 }
 
-const KNOWN_FLAGS = ["--help", "-h", "--dry-run", "--import-guide"];
+const KNOWN_FLAGS = ["--help", "-h", "--dry-run", "--import-guide", "--import", "--coverage", "--report"];
+/** コマンドごとに、受け付ける動作のオプション(同時には 1 つだけ) */
+const MODE_FLAGS: Record<string, readonly string[]> = {
+  collect: ["--import-guide"],
+  facts: ["--import", "--coverage", "--report"],
+};
 
 function defaultCollectDeps(config: Config): CollectDeps {
   return {
@@ -50,6 +56,10 @@ function helpText(): string {
     "",
     "collect <資格コード>                 計画に沿って一次情報を集め、台帳に記録する",
     "collect <資格コード> --import-guide  エージェントが抽出した試験ガイドを検査し、台帳に取り込む",
+    "facts <資格コード>                   出典ごとに、事実カードの抽出の依頼を書く",
+    "facts <資格コード> --import         エージェントが抽出した事実カードを検査し、取り込む",
+    "facts <資格コード> --coverage       分野ごとの件数と、試験ガイドの範囲に対する抜けを報告する",
+    "facts <資格コード> --report         本文を含まないレビューレポートを書く",
     "",
     "終了コード: 0 成功 / 1 検査の失敗 / 2 入力の誤り / 3 内部の誤り",
     "",
@@ -75,17 +85,24 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
       return help || argv.length === 0 ? EXIT.ok : EXIT.inputError;
     }
     const command = COMMANDS.find((c) => c.name === positional[0]);
-    const maxArgs = command?.name === "collect" ? 2 : 1;
+    const takesExam = command?.name === "collect" || command?.name === "facts";
+    const maxArgs = takesExam ? 2 : 1;
     if (positional.length > maxArgs || command === undefined) {
       report(output, "不明なコマンド");
       return EXIT.inputError;
     }
-    if (flags.includes("--import-guide") && command.name !== "collect") {
+    const allowed = MODE_FLAGS[command.name] ?? [];
+    const modes = flags.filter((f) => Object.values(MODE_FLAGS).some((list) => list.includes(f)));
+    if (modes.some((f) => !allowed.includes(f)) || modes.length > 1) {
       report(output, "不明なオプション");
       return EXIT.inputError;
     }
     if (help) {
-      const usage = command.name === "collect" ? "使い方: collect <資格コード> [--import-guide]\n" : "";
+      const usages: Record<string, string> = {
+        collect: "使い方: collect <資格コード> [--import-guide]\n",
+        facts: "使い方: facts <資格コード> [--import | --coverage | --report]\n",
+      };
+      const usage = usages[command.name] ?? "";
       output.out(`${command.name}: ${command.summary}\n${usage}\nオプション: --dry-run, --help\n`);
       return EXIT.ok;
     }
@@ -104,6 +121,30 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
         importGuide: flags.includes("--import-guide"),
         output,
         deps: collectDeps ?? defaultCollectDeps(config),
+      });
+    }
+    if (command.name === "facts") {
+      const examCode = positional[1];
+      if (examCode === undefined) {
+        report(output, "入力の誤り", "資格コードの指定がない");
+        return EXIT.inputError;
+      }
+      const deps = collectDeps ?? defaultCollectDeps(config);
+      const mode: FactsMode = flags.includes("--import")
+        ? "import"
+        : flags.includes("--coverage")
+          ? "coverage"
+          : flags.includes("--report")
+            ? "report"
+            : "request";
+      return await runFacts({
+        config,
+        rootDir,
+        examCode,
+        mode,
+        dryRun,
+        output,
+        deps: { today: deps.today, now: deps.now },
       });
     }
     const context: Context = {

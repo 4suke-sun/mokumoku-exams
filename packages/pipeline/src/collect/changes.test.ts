@@ -43,6 +43,16 @@ describe("本文の変化の検知", () => {
     expect(affected).toEqual({ facts: ["f1", "f2"], questions: ["q1", "q3"] });
   });
 
+  it("事実カードの台帳が示す根拠の出典_台帳の主張になくても、洗い出す", () => {
+    const affected = traceAffected(
+      ledger,
+      [A],
+      { q1: ["f7"] },
+      { f7: [A, "https://docs.aws.amazon.com/z"], f8: ["https://docs.aws.amazon.com/z"] },
+    );
+    expect(affected).toEqual({ facts: ["f1", "f2", "f7"], questions: ["q1"] });
+  });
+
   it("印を付けたものは、再検証が済むまで止める", () => {
     const marked = markRecheck(ledger, { facts: ["f1"], questions: ["q1"] });
     expect(isBlockedForRecheck(marked, { fact: "f1" })).toBe(true);

@@ -3,6 +3,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { EXIT } from "../exit-codes.ts";
+import { factsPath, writeFacts } from "../facts/schema.ts";
 import { main } from "../main.ts";
 import { Fetcher, sha256 } from "./fetcher.ts";
 import { emptyLedger, readLedger, serializeLedger } from "./ledger.ts";
@@ -137,6 +138,43 @@ describe("collect", () => {
     expect(r.ledger().recheck.facts).toEqual(["f1"]);
     // 言い換えは残る
     expect(r.ledger().sources[0]?.claims).toHaveLength(1);
+  });
+
+  it("本文が変わった出典を根拠にした事実カード_台帳の主張がなくても、再検証の印を付ける", async () => {
+    const root = setupRoot({ ...plan, scope: { prefixes: [BASE], maxDepth: 0 } });
+    mkdirSync(join(root, config.ledgerDir), { recursive: true });
+    writeFileSync(
+      join(root, config.ledgerDir, "aws-aib-c01.json"),
+      serializeLedger({
+        ...emptyLedger(CODE),
+        sources: [entry({ url: GUIDE, kind: "exam-guide", fetchedAt: "2026-09-01", contentHash: "0".repeat(64) })],
+      }),
+    );
+    const evidence = {
+      url: GUIDE,
+      section: "節",
+      anchor: { heading: "h", quote: "q" },
+      contentHash: "0".repeat(64),
+    };
+    const base = {
+      claim: "言い換え",
+      sources: [evidence],
+      scope: {},
+      confidence: "high" as const,
+      domain: "domain1",
+      scopeItems: [],
+      reasons: [],
+    };
+    writeFacts(factsPath(join(root, config.factsDir), CODE), {
+      examCode: CODE,
+      extracted: [],
+      cards: [
+        { ...base, id: "f-live", status: "passed" },
+        { ...base, id: "f-rejected", status: "rejected", reasons: ["x"] },
+      ],
+    });
+    const r = await run(root, ["collect", CODE]);
+    expect(r.ledger().recheck.facts).toEqual(["f-live"]);
   });
 
   it("計画が検査を通らない_通信せず、場所と理由コードだけを出す", async () => {

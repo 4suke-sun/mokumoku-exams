@@ -7,6 +7,8 @@ export const ConfigSchema = z.strictObject({
   workDir: z.string().min(1),
   /** 出典の台帳の置き場(資格ごとの JSON。コミットする) */
   ledgerDir: z.string().min(1),
+  /** 事実カードの置き場(資格ごとの JSON。コミットする) */
+  factsDir: z.string().min(1),
   /** 収集の計画の置き場(資格ごとの JSON。コミットする) */
   plansDir: z.string().min(1),
   /** 資格マスタ(読み取り専用で参照する) */
@@ -32,6 +34,15 @@ export const ConfigSchema = z.strictObject({
   cache: z.strictObject({
     retentionDays: z.number().int().positive(),
     maxBytes: z.number().int().positive(),
+  }),
+  /** 事実カード */
+  facts: z.strictObject({
+    /** 出典 1 件の抽出を、検査に通らずにやり直せる回数の上限 */
+    maxAttempts: z.number().int().positive(),
+    /** レビューレポートの抜き取りの乱数の種(同じ種なら同じ抜き取り) */
+    sampleSeed: z.number().int().min(0),
+    /** 抜き取りで、分野ごとに選ぶ件数の上限 */
+    samplePerDomain: z.number().int().positive(),
   }),
   checks: z.strictObject({
     /** 出典の更新日が、この日数以内なら新しいとみなす */

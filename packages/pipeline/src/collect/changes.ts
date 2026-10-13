@@ -49,13 +49,24 @@ export interface Affected {
   questions: string[];
 }
 
-/** 変化した出典に結びつく事実カードと、その事実カードを根拠にする問題を、台帳と来歴をたどって洗い出す */
-export function traceAffected(ledger: LedgerFile, changedUrls: readonly string[], provenance: Provenance): Affected {
+/**
+ * 変化した出典に結びつく事実カードと、その事実カードを根拠にする問題を、台帳と来歴をたどって洗い出す。
+ * factSources は、事実カードの ID ごとの、根拠にした出典の URL(事実カードの台帳から作る)。
+ */
+export function traceAffected(
+  ledger: LedgerFile,
+  changedUrls: readonly string[],
+  provenance: Provenance,
+  factSources: Readonly<Record<string, readonly string[]>> = {},
+): Affected {
   const changed = new Set(changedUrls);
   const facts = new Set<string>();
   for (const source of ledger.sources) {
     if (!changed.has(source.url)) continue;
     for (const claim of source.claims) for (const f of claim.factRefs) facts.add(f);
+  }
+  for (const [id, urls] of Object.entries(factSources)) {
+    if (urls.some((u) => changed.has(u))) facts.add(id);
   }
   const questions = Object.entries(provenance)
     .filter(([, refs]) => refs.some((f) => facts.has(f)))

@@ -1,0 +1,34 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { sha256 } from "../collect/fetcher.ts";
+import type { FactCard } from "./schema.ts";
+
+export function factsFixture(name: string): string {
+  return readFileSync(join(import.meta.dirname, "fixtures", name), "utf8");
+}
+
+export const DOC_URL = "https://docs.aws.amazon.com/guide/service.html";
+export const DOC_HASH = sha256(Buffer.from(factsFixture("service-doc.html")));
+
+/** 事実カード(テスト用の既定値。fixture の本文に合う、通る内容) */
+export function card(overrides: Partial<FactCard> = {}): FactCard {
+  return {
+    id: "f-000000000001",
+    claim: "Widget Store では、1 つのアカウントがリージョンごとに持てるバケットは 100 個まで。",
+    sources: [
+      {
+        url: DOC_URL,
+        section: "Quotas and limits",
+        anchor: { heading: "quotas", quote: "up to 100 buckets per account" },
+        contentHash: DOC_HASH,
+      },
+    ],
+    scope: { edition: "C01" },
+    confidence: "high",
+    domain: "domain1",
+    scopeItems: [],
+    status: "passed",
+    reasons: [],
+    ...overrides,
+  };
+}

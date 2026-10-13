@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { normalize } from "../text.ts";
 import type { GuideRecord, LedgerFile } from "./ledger.ts";
 import { withinParaphraseLimit } from "./text-limits.ts";
 
@@ -54,15 +55,6 @@ export interface GuideRequest {
 const WEIGHT_SUM_TOLERANCE = 0.5;
 /** 本文と一致したら写しとみなす、言い換えの長さ(文字) */
 const VERBATIM_MIN_CHARS = 30;
-
-function normalize(text: string): string {
-  return text
-    .replace(/<[^>]*>/g, " ")
-    .normalize("NFKC")
-    .replace(/\s+/g, " ")
-    .trim()
-    .toLowerCase();
-}
 
 export type GuideStopReason =
   | "extract-invalid"
