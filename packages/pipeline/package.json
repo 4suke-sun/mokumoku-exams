@@ -9,6 +9,7 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "@mokumoku-exams/data-schema": "*"
+    "@mokumoku-exams/data-schema": "*",
+    "zod": "4.6.5"
   }
 }

@@ -18,6 +18,16 @@ npm run typecheck -w @mokumoku-exams/pipeline
 npm test -w @mokumoku-exams/pipeline
 ```
 
+## コマンドと設定
+
+- コマンドは段階ごとにあります(`collect` `facts` `plan` `draft` `verify` `explain` `export` `run`)。現在は未実装で、メッセージを出すだけです。
+- どのコマンドも `--help` と `--dry-run` を受け付けます。`--dry-run` では、書き込みと外部への通信をしません。
+- 設定は `pipeline.config.json`(コミットする、環境値を含まない)に書きます。環境値は `packages/pipeline/.env`(gitignore)に書き、
+  `.env.example` にはプレースホルダーだけを置きます。環境値は、設定ファイルの値を上書きします。
+- 終了コード: 0 成功 / 1 検査の失敗 / 2 入力の誤り / 3 内部の誤り。
+- ログの作法: 出力は「種類」と「場所(項目名や位置)」だけです。環境値・鍵・本文、入力した引数の文字列は出しません。
+  想定外の例外は、クラス名だけを出します。
+
 ## 置き場所の決まり
 
 | 場所 | 用途 | コミット |
