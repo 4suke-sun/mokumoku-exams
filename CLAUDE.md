@@ -21,7 +21,12 @@
 - 言語は TypeScript で統一する(`scripts/` も含む)。テストは Vitest。lint と整形は Biome(`npm run lint` / `npm run format`)。
   TypeScript は Node の型除去で直接実行する(ビルド不要。`node scripts/xxx.ts`)。型検査は `tsc --noEmit`。
 - npm workspaces のモノレポ: `packages/app`(Next.js / TypeScript / App Router / Tailwind)、
-  `packages/infra`(素の AWS CDK / TypeScript。Amplify は使わない)。
+  `packages/infra`(素の AWS CDK / TypeScript。Amplify は使わない)、
+  `packages/data-schema`(データの契約: スキーマと検査、出典に許すドメインの一覧)、
+  `packages/pipeline`(作問パイプライン)。
+- `packages/pipeline` は、app など他のワークスペースの内部を import しない。共有するのは `data-schema` だけ
+  (`npm run check:boundary` が CI で守る)。進め方は [docs/pipeline-workflow.md](docs/pipeline-workflow.md)、
+  出典の扱いは [docs/source-policy.md](docs/source-policy.md)。
 - 認証は Cognito UserPool のみ。セルフサインアップ禁止、管理者の招待制、管理者グループ。
 - データは DynamoDB 単一テーブル(`PK=USER#{sub}` / `SK` で種別分岐)。サーバー側で ID トークンを検証し、
   `sub` で自分の分だけ操作する。
@@ -61,6 +66,8 @@
 | コメント・ラベルなど | 機械検査のみ | 省略可 |
 
 - 人の許可なく push しない。
+- `packages/pipeline` の変更も、この流れに従う。API キーなどの環境値は `packages/pipeline/.env`(gitignore)にだけ置き、
+  `.env.example` にはプレースホルダーだけを書く。
 - PR・Issue は `.drafts/` のファイルから投稿する。承認した内容と投稿する内容が同一であることを確認する
   (承認後に編集したら、検査と確認をやり直す)。
 - 編集履歴はあとから消せない。「出してから直す」は前提にしない。
