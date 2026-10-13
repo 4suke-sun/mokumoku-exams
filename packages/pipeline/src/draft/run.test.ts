@@ -161,10 +161,15 @@ describe("draft の取り込み", () => {
   it("データの契約に合わない下書き_schema-invalid で止め_何も取り込まない", async () => {
     const root = setupDraftRoot();
     const request = await firstRequest(root);
-    // 選択肢のキーが A から始まらない(スタイル規則では止まらず、データの契約で止まる)
-    const bad = draftFor(request, {
-      choices: draftFor(request).choices.map((c, i) => ({ ...c, key: String.fromCharCode(66 + i) })),
-    });
+    // 選択肢のキーが A から始まらない(スタイル規則と誤答の検査では止まらず、データの契約で止まる)
+    const base = draftFor(request);
+    const shift = (key: string) => String.fromCharCode(key.charCodeAt(0) + 1);
+    const bad = {
+      ...base,
+      choices: base.choices.map((c) => ({ ...c, key: shift(c.key) })),
+      correctAnswers: base.correctAnswers.map(shift),
+      distractors: (base.distractors ?? []).map((d) => ({ ...d, key: shift(d.key) })),
+    };
     writeOutput(root, request, [draftFor(request), bad]);
     const r = await runMain(root, ["draft", EXAM, "--import"]);
     expect(r.code).toBe(EXIT.checkFailed);
@@ -411,5 +416,61 @@ describe("draft の来歴", () => {
     expect(r.code).toBe(EXIT.checkFailed);
     expect(r.err).toContain("来歴の誤り");
     expect(r.err).not.toContain("secret-looking-id");
+  });
+});
+
+describe("draft の誤答の検査", () => {
+  async function requestOf(root: string) {
+    await prepare(root);
+    return readRequests(root)[0] as ReturnType<typeof readRequests>[number];
+  }
+
+  it("誤答の設計がない下書き_不採用になり_誤答の理由コードで報告される", async () => {
+    const root = setupDraftRoot();
+    const request = await requestOf(root);
+    writeOutput(root, request, [draftFor(request, { distractors: undefined })]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.out).toContain("distractor-missing");
+    const record = readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0];
+    expect(record?.status).toBe("rejected");
+    expect(record?.reasons).toEqual(["distractor:distractor-missing"]);
+    expect(record?.draft).toBeNull();
+  });
+
+  it("誤答の型が偏る下書き_通過し_警告として報告される", async () => {
+    const root = setupDraftRoot();
+    const request = await requestOf(root);
+    const base = draftFor(request);
+    const same = (base.distractors ?? []).map((d) => ({ ...d, type: "misconception" as const }));
+    writeOutput(root, request, [{ ...base, distractors: same }]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.out).toContain("distractor-type-bias distractors");
+    expect(readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0]?.status).toBe("passed");
+  });
+
+  it("正答が複数になりうる誤答_保留になり_本文は残り_計画の数に数える", async () => {
+    const root = setupDraftRoot();
+    const request = await requestOf(root);
+    const base = draftFor(request);
+    // 正答と、ほぼ同じ文言の選択肢を誤答に混ぜる(短すぎる文は類似度で比べないので、十分な長さにする)
+    const correctKey = base.correctAnswers[0];
+    const long = "リージョンごとに数えられる上限として、アカウントに定められている数";
+    const tweaked = base.choices.map((c, i) => {
+      if (c.key === correctKey) return { ...c, text: long };
+      if (i === base.choices.length - 1) return { ...c, text: `${long}です` };
+      return c;
+    });
+    writeOutput(root, request, [{ ...base, choices: tweaked }]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.out).toContain("下書きの保留:");
+    expect(r.out).toContain("ambiguous:similar-to-correct");
+    const record = readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0];
+    expect(record?.status).toBe("held");
+    expect(record?.draft).not.toBeNull();
+    // 保留の下書きは、次の依頼の数に数える(出し直しの依頼にはならない)
+    const again = await runMain(root, ["draft", EXAM]);
+    expect(again.code).toBe(EXIT.ok);
+    const same = readRequests(root).find((q) => q.planItemId === request.planItemId);
+    if (same) expect(same.count).toBe(request.count - 1);
   });
 });

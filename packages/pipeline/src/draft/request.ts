@@ -2,11 +2,11 @@ import { z } from "zod";
 import { sha256 } from "../collect/fetcher.ts";
 import type { FactCard } from "../facts/schema.ts";
 import { DIFFICULTIES } from "../plan/schema.ts";
-import { ChoiceDraftSchema, FACT_ID } from "./schema.ts";
+import { ChoiceDraftSchema, DISTRACTOR_TYPES, FACT_ID } from "./schema.ts";
 import { STYLE_RULES, STYLE_VERSION } from "./style.ts";
 
 /** 依頼の形が変わったら上げる。鍵に入るので、上げると依頼のキャッシュが切れる */
-export const REQUEST_VERSION = 1;
+export const REQUEST_VERSION = 2;
 
 /** エージェントへの依頼(作業用の置き場に書く)。事実カードの主張は、言い換えた短い文 */
 export const DraftRequestSchema = z.strictObject({
@@ -28,6 +28,8 @@ export const DraftRequestSchema = z.strictObject({
       }),
     )
     .min(1),
+  /** 誤答の型の一覧。誤答ごとに型を選ぶ */
+  distractorTypes: z.array(z.enum(DISTRACTOR_TYPES)).min(1),
   styleVersion: z.number().int(),
   styleRules: z.array(z.strictObject({ name: z.string(), severity: z.enum(["block", "warn"]), summary: z.string() })),
   /** 結果を書く場所。リポジトリ直下からの相対パス */

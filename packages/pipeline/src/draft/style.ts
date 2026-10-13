@@ -82,6 +82,11 @@ const ENV_VALUE = [
   /\/Users\/|\/home\/[a-z]|[A-Za-z]:\\/,
 ];
 
+/** 環境固有の値の形を含むか */
+export function hasEnvValue(text: string): boolean {
+  return ENV_VALUE.some((re) => re.test(text));
+}
+
 export const STYLE_RULES: readonly StyleRule[] = [
   {
     name: "stem-question-form",
@@ -185,7 +190,7 @@ export const STYLE_RULES: readonly StyleRule[] = [
     name: "no-env-value",
     severity: "block",
     summary: "環境固有の値(12 桁のアカウント ID、ARN、アクセスキー、メールアドレス、ローカルのパス)を書かない",
-    check: (d) => texts(d).flatMap((t) => (ENV_VALUE.some((re) => re.test(t.text)) ? [t.path] : [])),
+    check: (d) => texts(d).flatMap((t) => (hasEnvValue(t.text) ? [t.path] : [])),
   },
 ];
 

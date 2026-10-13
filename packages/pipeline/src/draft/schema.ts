@@ -17,6 +17,33 @@ export const DraftChoiceSchema = z.strictObject({
   explanation: text(1000).optional(),
 });
 
+/** 誤答の型。誤答が「たまたま間違い」ではなく、根拠のある誤りになるようにする */
+export const DISTRACTOR_TYPES = [
+  "similar-service",
+  "scope-difference",
+  "misconception",
+  "numeric-difference",
+  "condition-reversal",
+] as const;
+
+export type DistractorType = (typeof DISTRACTOR_TYPES)[number];
+
+/** 誤答 1 つの設計: なぜ誤りか、その根拠(事実カードの主張か、適用範囲の違い) */
+export const DistractorSchema = z.strictObject({
+  /** 選択肢の key。正答でない選択肢に 1 つずつ */
+  key: z.string().regex(/^[A-Z]$/),
+  type: z.enum(DISTRACTOR_TYPES),
+  /** 誤りである理由 */
+  reason: text(500),
+  basis: z.union([
+    z.strictObject({ factId: FACT_ID }),
+    /** 適用範囲の違い(版、リージョン、条件)を短く言い表す。type が scope-difference のときだけ */
+    z.strictObject({ scope: text(100) }),
+  ]),
+});
+
+export type Distractor = z.infer<typeof DistractorSchema>;
+
 export const ChoiceDraftSchema = z.strictObject({
   questionType: z.enum(["single", "multiple"]),
   questionText: text(1000),
@@ -30,6 +57,8 @@ export const ChoiceDraftSchema = z.strictObject({
   supplement: text(1000).optional(),
   /** 根拠にした事実カードの ID(1 つ以上)。設問文と正答は、この主張だけを根拠にする */
   factIds: z.array(FACT_ID).min(1).max(10),
+  /** 誤答の設計。形は任意にしてあり、正答でない選択肢ごとにあるかは検査(distractors.ts)で確かめる */
+  distractors: z.array(DistractorSchema).max(10).optional(),
 });
 
 export type ChoiceDraft = z.infer<typeof ChoiceDraftSchema>;

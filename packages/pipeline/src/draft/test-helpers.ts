@@ -24,6 +24,26 @@ export function choiceDraft(overrides: Partial<ChoiceDraft> = {}): ChoiceDraft {
     correctAnswers: ["B"],
     explanation: "Widget Store では、アカウントがリージョンごとに作れるバケットは 100 個までと定められています。",
     factIds: ["f-aaaaaaaaaaaa"],
+    distractors: [
+      {
+        key: "A",
+        type: "numeric-difference",
+        reason: "上限の数値が実際より小さい誤りです",
+        basis: { factId: "f-aaaaaaaaaaaa" },
+      },
+      {
+        key: "C",
+        type: "numeric-difference",
+        reason: "上限の数値が実際より大きい誤りです",
+        basis: { factId: "f-aaaaaaaaaaaa" },
+      },
+      {
+        key: "D",
+        type: "misconception",
+        reason: "上限が定められていることを見落とした誤解です",
+        basis: { factId: "f-aaaaaaaaaaaa" },
+      },
+    ],
     ...overrides,
   };
 }
@@ -41,6 +61,26 @@ export function multipleDraft(overrides: Partial<ChoiceDraft> = {}): ChoiceDraft
       { key: "E", text: "バケットを作ると、自動で公開状態になる" },
     ],
     correctAnswers: ["A", "C"],
+    distractors: [
+      {
+        key: "B",
+        type: "misconception",
+        reason: "リージョンを移せるという誤解です",
+        basis: { factId: "f-aaaaaaaaaaaa" },
+      },
+      {
+        key: "D",
+        type: "condition-reversal",
+        reason: "作成の条件を逆に述べた誤りです",
+        basis: { factId: "f-aaaaaaaaaaaa" },
+      },
+      {
+        key: "E",
+        type: "misconception",
+        reason: "公開状態が既定だという誤解です",
+        basis: { factId: "f-aaaaaaaaaaaa" },
+      },
+    ],
     ...overrides,
   });
 }
@@ -141,5 +181,8 @@ export function writeOutput(root: string, request: DraftRequest, drafts: ChoiceD
 /** 依頼の事実カードを根拠にした、通る下書き。種別は依頼に合わせる */
 export function draftFor(request: DraftRequest, overrides: Partial<ChoiceDraft> = {}): ChoiceDraft {
   const base = request.kind === "multiple" ? multipleDraft() : choiceDraft();
-  return { ...base, factIds: [(request.facts[0] as DraftRequest["facts"][number]).id], ...overrides };
+  const factId = (request.facts[0] as DraftRequest["facts"][number]).id;
+  // 誤答の根拠も、依頼の事実カードに合わせる
+  const distractors = (base.distractors ?? []).map((d) => ("factId" in d.basis ? { ...d, basis: { factId } } : d));
+  return { ...base, factIds: [factId], distractors, ...overrides };
 }

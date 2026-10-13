@@ -8,6 +8,7 @@ import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { FactsError, type FactsFile, factsPath, readFacts } from "../facts/schema.ts";
 import { type Output, report } from "../log.ts";
 import { PlanError, type PlanFile, planPath, readPlan } from "../plan/schema.ts";
+import { checkDistractors } from "./distractors.ts";
 import {
   buildEntry,
   checkProvenance,
@@ -27,7 +28,7 @@ import {
   selectFacts,
   styleRuleSummaries,
 } from "./request.ts";
-import { assembleQuestion, draftId, schemaProblems } from "./schema.ts";
+import { assembleQuestion, DISTRACTOR_TYPES, draftId, schemaProblems } from "./schema.ts";
 import {
   type DraftRecord,
   DraftsError,
@@ -228,6 +229,7 @@ function requestStep(
       kind: item.kind,
       count,
       facts: selected.map((c) => ({ id: c.id, claim: c.claim, confidence: c.confidence, scope: c.scope })),
+      distractorTypes: [...DISTRACTOR_TYPES],
       styleVersion: STYLE_VERSION,
       styleRules: styleRuleSummaries(),
       outputPath: relative(rootDir, join(paths.outDir, `${key}.json`)),
@@ -270,6 +272,7 @@ function importStep(
   const doneFiles: string[] = [];
   let failures = 0;
   let accepted = 0;
+  let heldCount = 0;
   let rejected = 0;
 
   for (const file of requestFiles) {
@@ -337,6 +340,11 @@ function importStep(
       if (!draft.factIds.every((f) => factIds.has(f))) reasons.push("fact-not-in-request");
       const verdict = evaluateStyle(draft);
       for (const f of verdict.blockers) reasons.push(`style:${f.rule}`);
+      const distractors = checkDistractors(draft, {
+        factIds,
+        claims: draft.factIds.flatMap((fid) => facts.cards.find((c) => c.id === fid)?.claim ?? []),
+      });
+      for (const f of distractors.blockers) reasons.push(`distractor:${f.code}`);
       if (reasons.length === 0) {
         const urls = uniqueSorted(
           draft.factIds.flatMap((fid) => facts.cards.find((c) => c.id === fid)?.sources.map((s) => s.url) ?? []),
@@ -358,18 +366,33 @@ function importStep(
         else entries.set(id, built.entry);
       }
       for (const f of verdict.blockers) report(output, "下書きの不採用", `${id} ${f.rule} ${f.path}`);
-      for (const r of reasons.filter((r) => !r.startsWith("style:"))) report(output, "下書きの不採用", `${id} ${r}`);
+      for (const f of distractors.blockers) report(output, "下書きの不採用", `${id} ${f.code} ${f.path}`);
+      for (const r of reasons.filter((r) => !r.startsWith("style:") && !r.startsWith("distractor:"))) {
+        report(output, "下書きの不採用", `${id} ${r}`);
+      }
       if (reasons.length > 0) entries.delete(id);
-      for (const f of verdict.warnings) report(output, "下書きの警告", `${id} ${f.rule} ${f.path}`);
+      const warnings = [
+        ...verdict.warnings.map((f) => ({ rule: f.rule, path: f.path })),
+        ...distractors.warnings.map((f) => ({ rule: f.code, path: f.path })),
+      ];
+      for (const w of warnings) report(output, "下書きの警告", `${id} ${w.rule} ${w.path}`);
+      // 正答が複数になりうる候補は、モデルによる検査(検証の段階)で確かめるまで、先へ進めない
+      const held = reasons.length === 0 && distractors.ambiguous.length > 0;
+      if (held) {
+        for (const f of distractors.ambiguous) {
+          reasons.push(`ambiguous:${f.code}`);
+          report(output, "下書きの保留", `${id} ambiguous:${f.code} ${f.path}`);
+        }
+      }
       batch.push({
         id,
         planItemId: request.planItemId,
         domain: request.domain.code,
         difficulty: request.difficulty,
-        status: reasons.length > 0 ? "rejected" : "passed",
+        status: held ? "held" : reasons.length > 0 ? "rejected" : "passed",
         reasons: uniqueSorted(reasons),
-        warnings: verdict.warnings.map((f) => ({ rule: f.rule, path: f.path })),
-        draft: reasons.length > 0 ? null : draft,
+        warnings,
+        draft: held || reasons.length === 0 ? draft : null,
       });
     }
     if (invalid) {
@@ -382,16 +405,21 @@ function importStep(
       known.add(record.id);
       incoming.push(record);
       if (record.status === "passed") accepted++;
+      else if (record.status === "held") heldCount++;
       else rejected++;
     }
-    const takenHere = batch.filter((r) => r.status === "passed").length;
+    const takenHere = batch.filter((r) => r.status !== "rejected").length;
     state.done.push(key);
     // 全件が不採用だったときだけ、計画の項目の依頼を出し直す(回数に上限がある)
     if (takenHere === 0) state.rounds[request.planItemId] = (state.rounds[request.planItemId] ?? 0) + 1;
     doneFiles.push(file);
   }
 
-  report(output, "情報", `取り込み: 通過 ${accepted} 件、不採用 ${rejected} 件、停止 ${failures} 件`);
+  report(
+    output,
+    "情報",
+    `取り込み: 通過 ${accepted} 件、保留 ${heldCount} 件、不採用 ${rejected} 件、停止 ${failures} 件`,
+  );
   if (dryRun) {
     report(output, "書き込みをしない(dry-run)");
     return failures > 0 ? EXIT.checkFailed : EXIT.ok;
