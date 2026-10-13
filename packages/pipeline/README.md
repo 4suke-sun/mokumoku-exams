@@ -24,4 +24,4 @@ npm test -w @mokumoku-exams/pipeline
 | --- | --- | --- |
 | `src/` | コードとテスト | する |
 | 台帳 | 出典の記録(資格ごとの JSON) | する |
-| 作業用の置き場 | 取得した本文、段階の成果物 | しない(gitignore) |
+| `pipeline-work/`(リポジトリ直下) | 取得した本文、段階の成果物 | しない(gitignore。混入はコミット前・push 前の検査が止める) |

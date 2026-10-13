@@ -43,6 +43,7 @@ export const SENSITIVE_FILENAME_PATTERNS: FilenamePattern[] = [
 export const UNEXPECTED_PATH_PATTERNS: Pattern[] = [
   { name: "エディタの設定", re: /(^|\/)(\.vscode|\.idea)\// },
   { name: "下書き置き場", re: /(^|\/)\.drafts\// },
+  { name: "pipeline の作業用の置き場(取得した本文など)", re: /(^|\/)pipeline-work\// },
   { name: "手元専用の設定", re: /(^|\/)\.claude\/settings\.local\.json$/ },
   { name: "拒否リスト", re: /(^|\/)\.pr-secrets-denylist$/ },
   { name: "OS の一時ファイル", re: /(^|\/)\.DS_Store$/ },
@@ -169,6 +170,58 @@ export function checkUnexpectedPaths(files: string[]): string[] {
   return hits;
 }
 
+/**
+ * 一次情報の本文らしい長い文章の検査の対象。台帳などのデータ形式のファイルだけを見る。
+ * ソースコード・文書(.ts / .md)と data/ には、長い日本語の文が普通にあるので、対象にしない。
+ */
+export const PROSE_SCOPE = /^packages\/pipeline\/.+\.(json|jsonl|ndjson|ya?ml|txt|html?|xml|csv|tsv)$/i;
+/** 1 行の文章(キーと引用符を除く)の長さの上限。台帳の「言い換え」の上限より大きく、本文の段落より小さい値 */
+export const PROSE_LINE_LIMIT = 240;
+/** 英文の語数の上限(1 行) */
+export const PROSE_WORD_LIMIT = 40;
+/** 折り返された本文を捉える。この長さ以上の文章の行が、この数だけ続いたら止める */
+export const PROSE_WRAPPED_LINE = 60;
+export const PROSE_WRAPPED_RUN = 4;
+
+function proseOf(text: string): string {
+  // JSON の「"キー": "値"」の値だけを見る。16 進のハッシュや URL などは、文章としては数えない
+  const value = text
+    .trim()
+    .replace(/^"[^"]*"\s*:\s*/, "")
+    .replace(/^"/, "")
+    .replace(/,$/, "")
+    .replace(/"$/, "");
+  return /^[0-9a-fA-F]{32,}$/.test(value) || /^https?:\/\/[\x21-\x7e]+$/.test(value) ? "" : value;
+}
+
+/** 台帳などに、出典の本文らしい長い文章が入っていないか(止める)。報告は場所と種類だけで、本文は出さない。 */
+export function checkProseBodies(entries: AddedLine[]): string[] {
+  const hits: string[] = [];
+  const runs = new Map<string, { start: number; count: number; reported: boolean }>();
+  for (const { file, line, text } of entries) {
+    if (!PROSE_SCOPE.test(file)) continue;
+    const prose = proseOf(text);
+    const words = prose.split(/\s+/).filter((w) => /^[A-Za-z][A-Za-z'-]*[.,;:]?$/.test(w)).length;
+    if (prose.length > PROSE_LINE_LIMIT || words >= PROSE_WORD_LIMIT) {
+      hits.push(`本文らしい長い文章: ${file}:${line}`);
+    }
+    const run = runs.get(file);
+    const continues = prose.length >= PROSE_WRAPPED_LINE && run !== undefined && run.start + run.count === line;
+    if (prose.length < PROSE_WRAPPED_LINE) {
+      runs.delete(file);
+    } else if (continues) {
+      run.count++;
+      if (run.count >= PROSE_WRAPPED_RUN && !run.reported) {
+        run.reported = true;
+        hits.push(`本文らしい折り返された文章: ${file}:${run.start}`);
+      }
+    } else {
+      runs.set(file, { start: line, count: 1, reported: false });
+    }
+  }
+  return hits;
+}
+
 /** 追加行を検査する。blocks は止める対象、warns は人に見せる対象。 */
 export function checkEntries(
   entries: AddedLine[],
@@ -179,6 +232,7 @@ export function checkEntries(
     ...scan(entries, SECRET_CONTENT_PATTERNS),
     ...scan(entries, ENV_INFO_PATTERNS),
     ...scanDenylist(entries, denylistTerms),
+    ...checkProseBodies(entries),
     ...(message ? scan(entries, MESSAGE_PHRASE_PATTERNS) : []),
   ];
   const warns = scan(entries, PII_CONTENT_PATTERNS);
