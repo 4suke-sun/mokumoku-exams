@@ -9,6 +9,7 @@ import {
   choiceDraft,
   draftFor,
   EXAM,
+  multipleDraft,
   readRequests,
   runMain,
   setupDraftRoot,
@@ -472,5 +473,107 @@ describe("draft の誤答の検査", () => {
     expect(again.code).toBe(EXIT.ok);
     const same = readRequests(root).find((q) => q.planItemId === request.planItemId);
     if (same) expect(same.count).toBe(request.count - 1);
+  });
+});
+
+describe("draft の重複の検出", () => {
+  function published(stems: string[]) {
+    const q = (n: number, stem: string, type: "single" | "multiple") => ({
+      questionId: `AIB-${String(n).padStart(4, "0")}`,
+      examCode: EXAM,
+      domain: "domain1",
+      questionType: type,
+      questionText: stem,
+      choices: [
+        { key: "A", text: `既存の選択肢 ${n} A` },
+        { key: "B", text: `既存の選択肢 ${n} B` },
+        { key: "C", text: `既存の選択肢 ${n} C` },
+      ],
+      correctAnswers: type === "single" ? ["A"] : ["A", "B"],
+      explanation: "架空の解説です。",
+    });
+    return { examCode: EXAM, questions: stems.map((stem, i) => q(i + 1, stem, i % 2 === 0 ? "single" : "multiple")) };
+  }
+
+  async function firstRequest(root: string) {
+    await prepare(root);
+    return readRequests(root)[0] as ReturnType<typeof readRequests>[number];
+  }
+
+  it("公開済みの問題とほぼ同じ設問文_重複として落とし_相手の識別子と類似度だけを報告する", async () => {
+    const root = setupDraftRoot({
+      questions: published([choiceDraft().questionText, multipleDraft().questionText]),
+    });
+    const request = await firstRequest(root);
+    writeOutput(root, request, [draftFor(request)]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.out).toMatch(/下書きの不採用: d-[0-9a-f]{12} duplicate-similar AIB-000[12] 1\.00/);
+    expect(r.out + r.err).not.toContain("Widget Store");
+    const record = readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0];
+    expect(record).toMatchObject({ status: "rejected", draft: null });
+    expect(record?.reasons.some((x) => x.startsWith("duplicate:similar-existing"))).toBe(true);
+  });
+
+  it("無関係な下書き_検出されない", async () => {
+    const root = setupDraftRoot({ questions: published(["ログの保管期間を延ばすには、どの設定を変更しますか。"]) });
+    const request = await firstRequest(root);
+    writeOutput(root, request, [draftFor(request)]);
+    await runMain(root, ["draft", EXAM, "--import"]);
+    expect(readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0]?.status).toBe("passed");
+  });
+
+  it("同じ取り込みの中の下書き同士_あとの下書きが重複として落ちる", async () => {
+    const root = setupDraftRoot();
+    const request = await firstRequest(root);
+    const first = draftFor(request);
+    const second = { ...first, questionText: `なお、${first.questionText}` };
+    writeOutput(root, request, [first, second]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.out).toContain("duplicate-similar d-");
+    const statuses = readDrafts(workPath(root, "drafts.json"), EXAM)
+      .drafts.map((d) => d.status)
+      .sort();
+    expect(statuses).toEqual(["passed", "rejected"]);
+  });
+
+  it("設問文が似ていて同じ事実カードを根拠にする下書き_保留になり_先へ進めない", async () => {
+    const root = setupDraftRoot();
+    const request = await firstRequest(root);
+    const first = draftFor(request);
+    const second = {
+      ...first,
+      questionText: "Widget Store のアカウントごとの上限について、正しい説明を 2 つ選択してください。",
+    };
+    writeOutput(root, request, [first, second]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.out).toContain("下書きの保留:");
+    expect(r.out).toMatch(/review-(topic|similar)/);
+    const drafts = readDrafts(workPath(root, "drafts.json"), EXAM).drafts;
+    expect(drafts.map((d) => d.status).sort()).toEqual(["held", "passed"]);
+    const held = drafts.find((d) => d.status === "held");
+    expect(held?.reasons[0]).toMatch(/^review:(topic|similar)-draft$/);
+    // 保留の下書きは、来歴の検査の対象でもあり、来歴を持つ
+    expect((await runMain(root, ["draft", EXAM, "--check"])).code).toBe(EXIT.ok);
+  });
+
+  it("問題データの形が違う_取り込みを止め_本文を出さない", async () => {
+    const root = setupDraftRoot({
+      questions: { examCode: EXAM, questions: [{ questionText: "secret-looking-stem" }] },
+    });
+    await runMain(root, ["plan", EXAM]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain("問題データの誤り");
+    expect(r.err + r.out).not.toContain("secret-looking-stem");
+  });
+
+  it("実行しても_data の問題データは変わらない", async () => {
+    const root = setupDraftRoot({ questions: published([choiceDraft().questionText]) });
+    const file = join(root, "data/questions.aws-aib-c01.json");
+    const before = readFileSync(file, "utf8");
+    const request = await firstRequest(root);
+    writeOutput(root, request, [draftFor(request)]);
+    await runMain(root, ["draft", EXAM, "--import"]);
+    expect(readFileSync(file, "utf8")).toBe(before);
   });
 });

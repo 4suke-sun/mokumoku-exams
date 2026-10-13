@@ -8,6 +8,7 @@ import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { FactsError, type FactsFile, factsPath, readFacts } from "../facts/schema.ts";
 import { type Output, report } from "../log.ts";
 import { PlanError, type PlanFile, planPath, readPlan } from "../plan/schema.ts";
+import { candidateOf, findDuplicates, readPublishedCandidates } from "./dedupe.ts";
 import { checkDistractors } from "./distractors.ts";
 import {
   buildEntry,
@@ -260,13 +261,23 @@ function importStep(
   ledger: LedgerFile,
   provenance: ProvenanceFile,
 ): ExitCode {
-  const { examCode, output, dryRun } = options;
+  const { config, rootDir, examCode, output, dryRun } = options;
   const state = readState(paths.state);
   const requestFiles = existsSync(paths.requestsDir)
     ? readdirSync(paths.requestsDir)
         .filter((f) => f.endsWith(".json"))
         .sort()
     : [];
+  const published = readPublishedCandidates(config, rootDir, examCode);
+  if (published === "invalid") {
+    report(output, "問題データの誤り", `questions.${examCode.toLowerCase()}.json`);
+    return EXIT.checkFailed;
+  }
+  // 重複を比べる相手: 公開済みの問題(読み取り専用)と、不採用でない下書き
+  const pool = [
+    ...published,
+    ...current.drafts.flatMap((d) => (d.draft === null ? [] : [candidateOf(d.id, "draft", d.draft)])),
+  ];
   const incoming: DraftRecord[] = [];
   const entries = new Map<string, ProvenanceEntry>();
   const doneFiles: string[] = [];
@@ -370,6 +381,13 @@ function importStep(
       for (const r of reasons.filter((r) => !r.startsWith("style:") && !r.startsWith("distractor:"))) {
         report(output, "下書きの不採用", `${id} ${r}`);
       }
+      // 重複の検出: 公開済みの問題や下書きとほぼ同じなら落とし、近ければ保留にして確かめる
+      const dups =
+        reasons.length === 0 ? findDuplicates(candidateOf(id, "draft", draft), pool, config.draft.similarity) : [];
+      for (const f of dups.filter((d) => d.level === "duplicate")) {
+        reasons.push(`duplicate:${f.kind}-${f.source}`);
+        report(output, "下書きの不採用", `${id} duplicate-${f.kind} ${f.other} ${f.score.toFixed(2)}`);
+      }
       if (reasons.length > 0) entries.delete(id);
       const warnings = [
         ...verdict.warnings.map((f) => ({ rule: f.rule, path: f.path })),
@@ -377,11 +395,16 @@ function importStep(
       ];
       for (const w of warnings) report(output, "下書きの警告", `${id} ${w.rule} ${w.path}`);
       // 正答が複数になりうる候補は、モデルによる検査(検証の段階)で確かめるまで、先へ進めない
-      const held = reasons.length === 0 && distractors.ambiguous.length > 0;
+      const holdDups = dups.filter((d) => d.level === "hold");
+      const held = reasons.length === 0 && (distractors.ambiguous.length > 0 || holdDups.length > 0);
       if (held) {
         for (const f of distractors.ambiguous) {
           reasons.push(`ambiguous:${f.code}`);
           report(output, "下書きの保留", `${id} ambiguous:${f.code} ${f.path}`);
+        }
+        for (const f of holdDups) {
+          reasons.push(`review:${f.kind}-${f.source}`);
+          report(output, "下書きの保留", `${id} review-${f.kind} ${f.other} ${f.score.toFixed(2)}`);
         }
       }
       batch.push({
@@ -394,6 +417,8 @@ function importStep(
         warnings,
         draft: held || reasons.length === 0 ? draft : null,
       });
+      // 以降の下書きは、この下書きとも比べる
+      if (held || reasons.length === 0) pool.push(candidateOf(id, "draft", draft));
     }
     if (invalid) {
       fail("schema-invalid");

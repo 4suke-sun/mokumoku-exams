@@ -28,7 +28,8 @@
     "maxAttempts": 3,
     "maxPerRequest": 5,
     "maxFactsPerRequest": 12,
-    "maxRounds": 3
+    "maxRounds": 3,
+    "similarity": { "duplicate": 0.85, "hold": 0.6 }
   },
   "plan": {
     "targetMultiplier": 3,

@@ -68,6 +68,10 @@ export const ConfigSchema = z.strictObject({
     maxFactsPerRequest: z.number().int().positive(),
     /** 計画の項目 1 つについて、全件が不採用になったとき、依頼を出し直せる回数の上限 */
     maxRounds: z.number().int().positive(),
+    /** 設問文の類似度(0〜1)のしきい値。duplicate 以上は重複として落とし、hold 以上は保留にして確かめる */
+    similarity: z
+      .strictObject({ duplicate: z.number().min(0).max(1), hold: z.number().min(0).max(1) })
+      .refine((v) => v.hold < v.duplicate, "保留のしきい値は、重複のしきい値より小さくする"),
   }),
   /** 出題計画。目標の問題数と、難易度・種別の配分(試験ごとに overrides で上書きする) */
   plan: z.strictObject({
