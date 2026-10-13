@@ -126,6 +126,8 @@ aws ssm put-parameter --type SecureString --name /<パラメーターの名前> 
 
 ## ビルドとデプロイ
 
+デプロイの前に、[デプロイ前のチェックリスト](../pre-deploy-checklist.md)を通します。
+
 ```sh
 npm run build          # アプリをビルドする
 npm run build:lambda   # Lambda に載せるアセットを dist/ に作る(dist/lambda、dist/static、dist/push)

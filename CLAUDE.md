@@ -79,4 +79,5 @@
 
 - lint / build / test が通る。
 - リリースノートとタグが対応している。
+- デプロイを伴う段階では、`docs/pre-deploy-checklist.md` をデプロイの前に、`docs/post-deploy-smoke.md` をデプロイの直後に通す。
 - 環境固有の値・個人情報・外部の名称が、差分にない。
