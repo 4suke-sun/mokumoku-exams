@@ -10,6 +10,20 @@ import { hasEnvValue } from "./style.ts";
  * 報告は、規則の名前と場所(選択肢・項目)だけで、本文を引用しない。
  */
 
+/** 誤答の検査が出すコードと、その結果。docs/question-style.md の表と一致させる(テストで確かめる) */
+export const DISTRACTOR_CODES: Readonly<Record<string, "block" | "warn" | "hold">> = {
+  "distractor-missing": "block",
+  "distractor-unknown-key": "block",
+  "distractor-duplicate": "block",
+  "distractor-reason-short": "block",
+  "distractor-basis-not-in-request": "block",
+  "distractor-basis-scope-type": "block",
+  "distractor-forbidden-text": "block",
+  "distractor-type-bias": "warn",
+  "similar-to-correct": "hold",
+  "supported-by-fact": "hold",
+};
+
 export interface DistractorFinding {
   code: string;
   /** 場所。choices.2、distractors.1、distractors など */
