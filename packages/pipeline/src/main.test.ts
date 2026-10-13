@@ -7,7 +7,7 @@ import { COMMANDS } from "./commands.ts";
 import { EXIT } from "./exit-codes.ts";
 import { main } from "./main.ts";
 
-const validConfig = { workDir: "pipeline-work", ledgerDir: "packages/pipeline/ledger", maxItemsPerRun: 20 };
+const validConfig = JSON.parse(readFileSync(resolve(import.meta.dirname, "../pipeline.config.json"), "utf8"));
 
 function configFile(content: unknown): string {
   const path = join(mkdtempSync(join(tmpdir(), "pipeline-test-")), "pipeline.config.json");
@@ -15,10 +15,10 @@ function configFile(content: unknown): string {
   return path;
 }
 
-function run(argv: string[], { config = validConfig as unknown, env = {} as Record<string, string> } = {}) {
+async function run(argv: string[], { config = validConfig as unknown, env = {} as Record<string, string> } = {}) {
   let out = "";
   let err = "";
-  const code = main({
+  const code = await main({
     argv,
     env,
     output: {
@@ -30,43 +30,61 @@ function run(argv: string[], { config = validConfig as unknown, env = {} as Reco
       },
     },
     configPath: configFile(config),
+    rootDir: mkdtempSync(join(tmpdir(), "pipeline-root-")),
   });
   return { code, out, err };
 }
 
 describe("コマンドの体系", () => {
-  it("引数なし_ヘルプを出して成功する", () => {
-    const r = run([]);
+  it("引数なし_ヘルプを出して成功する", async () => {
+    const r = await run([]);
     expect(r.code).toBe(EXIT.ok);
     for (const c of COMMANDS) expect(r.out).toContain(c.name);
   });
 
-  it.each(COMMANDS.map((c) => c.name))("%s_--help と --dry-run を受け付ける", (name) => {
-    expect(run([name, "--help"]).code).toBe(EXIT.ok);
-    const r = run([name, "--dry-run"]);
-    expect(r.code).toBe(EXIT.ok);
-    expect(r.out).toContain("未実装");
-    expect(r.out).toContain("dry-run");
+  it.each(COMMANDS.map((c) => c.name))("%s_--help を受け付ける", async (name) => {
+    expect((await run([name, "--help"])).code).toBe(EXIT.ok);
   });
+
+  it.each(COMMANDS.filter((c) => c.name !== "collect").map((c) => c.name))(
+    "%s_未実装で、--dry-run を受け付ける",
+    async (name) => {
+      const r = await run([name, "--dry-run"]);
+      expect(r.code).toBe(EXIT.ok);
+      expect(r.out).toContain("未実装");
+      expect(r.out).toContain("dry-run");
+    },
+  );
 });
 
 describe("終了コード", () => {
-  it("不明なコマンド_入力の誤りで、入力した文字列を出さない", () => {
-    const r = run(["no-such-command-xyz"]);
+  it("不明なコマンド_入力の誤りで、入力した文字列を出さない", async () => {
+    const r = await run(["no-such-command-xyz"]);
     expect(r.code).toBe(EXIT.inputError);
     expect(r.err + r.out).not.toContain("no-such-command-xyz");
   });
 
-  it("不明なオプション_入力の誤りで、入力した文字列を出さない", () => {
-    const r = run(["collect", "--secret-looking-option"]);
+  it("不明なオプション_入力の誤りで、入力した文字列を出さない", async () => {
+    const r = await run(["collect", "--secret-looking-option"]);
     expect(r.code).toBe(EXIT.inputError);
     expect(r.err + r.out).not.toContain("secret-looking-option");
   });
 
-  it("想定外の例外_内部の誤りで、クラス名だけを出し、メッセージを出さない", () => {
+  it("collect 以外の --import-guide_入力の誤り", async () => {
+    expect((await run(["facts", "--import-guide"])).code).toBe(EXIT.inputError);
+  });
+
+  it("collect の資格コードがない、または形が違う_入力の誤りで、入力した文字列を出さない", async () => {
+    expect((await run(["collect"])).code).toBe(EXIT.inputError);
+    const r = await run(["collect", "secret-looking-code"]);
+    expect(r.code).toBe(EXIT.inputError);
+    expect(r.err + r.out).not.toContain("secret-looking-code");
+  });
+
+  it("想定外の例外_内部の誤りで、クラス名だけを出し、メッセージを出さない", async () => {
     let err = "";
-    const code = main({
-      argv: ["collect"],
+    const code = await main({
+      argv: ["facts"],
       env: {},
       output: {
         out: () => {
@@ -77,6 +95,7 @@ describe("終了コード", () => {
         },
       },
       configPath: configFile(validConfig),
+      rootDir: tmpdir(),
     });
     expect(code).toBe(EXIT.internalError);
     expect(err).toContain("内部の誤り: TypeError");
@@ -85,36 +104,36 @@ describe("終了コード", () => {
 });
 
 describe("設定", () => {
-  it("項目の欠落_項目名だけを報告する", () => {
-    const r = run(["collect"], { config: { workDir: "x" } });
+  it("項目の欠落_項目名だけを報告する", async () => {
+    const r = await run(["collect"], { config: { workDir: "x" } });
     expect(r.code).toBe(EXIT.inputError);
     expect(r.err).toContain("設定の欠落: ledgerDir");
     expect(r.err).toContain("設定の欠落: maxItemsPerRun");
   });
 
-  it("値が不正_項目名だけを報告し、値を出さない", () => {
-    const r = run(["collect"], { config: { ...validConfig, maxItemsPerRun: "very-secret-value" } });
+  it("値が不正_項目名だけを報告し、値を出さない", async () => {
+    const r = await run(["collect"], { config: { ...validConfig, maxItemsPerRun: "very-secret-value" } });
     expect(r.code).toBe(EXIT.inputError);
     expect(r.err).toContain("設定の不正: maxItemsPerRun");
     expect(r.err + r.out).not.toContain("very-secret-value");
   });
 
-  it("未知の項目_項目名も値も出さずに、不正として報告する", () => {
-    const r = run(["collect"], { config: { ...validConfig, someUnknownKey: "unknown-value" } });
+  it("未知の項目_項目名も値も出さずに、不正として報告する", async () => {
+    const r = await run(["collect"], { config: { ...validConfig, someUnknownKey: "unknown-value" } });
     expect(r.code).toBe(EXIT.inputError);
     expect(r.err).toContain("設定の不正: (未知の項目)");
     expect(r.err + r.out).not.toContain("someUnknownKey");
     expect(r.err + r.out).not.toContain("unknown-value");
   });
 
-  it("設定ファイルがない_全項目の欠落として報告する", () => {
-    const r = run(["collect"], { config: "{ broken json" });
+  it("設定ファイルがない_全項目の欠落として報告する", async () => {
+    const r = await run(["collect"], { config: "{ broken json" });
     expect(r.code).toBe(EXIT.inputError);
     expect(r.err).toContain("設定の欠落: workDir");
   });
 
-  it("環境値_作業用の置き場を上書きできる。報告に値を出さない", () => {
-    const r = run(["collect"], { env: { PIPELINE_WORK_DIR: "custom-dir-value" } });
+  it("環境値_作業用の置き場を上書きできる。報告に値を出さない", async () => {
+    const r = await run(["facts"], { env: { PIPELINE_WORK_DIR: "custom-dir-value" } });
     expect(r.code).toBe(EXIT.ok);
     expect(r.out + r.err).not.toContain("custom-dir-value");
   });

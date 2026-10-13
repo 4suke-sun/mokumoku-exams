@@ -1,7 +1,8 @@
 # 作問パイプラインの進め方
 
 `packages/pipeline` を開発するときの手順です。このリポジトリの規約(`CLAUDE.md`)は、pipeline の変更にもそのまま及びます。
-設計の判断は [ADR 0005〜0011](./app/adr/README.md)、出典の扱いは[出典と権利の方針](./source-policy.md)にあります。
+設計の判断は [ADR 0005〜0011](./app/adr/README.md)、出典の扱いは[出典と権利の方針](./source-policy.md)、
+収集の段階の手順は[一次情報の収集と台帳の運用](./source-collection.md)にあります。
 
 ## 1. 構成と境界
 

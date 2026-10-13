@@ -217,21 +217,56 @@ export const REFERENCE_URL_MAX = 2000;
 export const REFERENCES_MAX = 10;
 
 /**
- * 出典の URL の誤りの種類を返す(問題がなければ null)。返すのは固定の文言で、URL の値は含めない。
- * https で、ユーザー情報とポートを持たず、ホスト名が ALLOWED_REFERENCE_HOSTS にある URL だけを許す。
+ * 出典のホストごとに、そのホストを出典にしてよい資格のベンダー(`data/vendors.json` の name)。
+ * キーは ALLOWED_REFERENCE_HOSTS と同じ集合にする(検査で確かめる)。
+ * ベンダー自身のホストに加え、そのベンダーの試験ガイドが参照する公的な機関のホストも、ここで対応づける。
  */
-export function referenceUrlProblem(value: string): string | null {
-  if (!/^https:\/\/\S+$/.test(value)) return "https で始まる URL ではありません";
+export const REFERENCE_HOST_VENDORS: Readonly<Record<string, readonly string[]>> = {
+  "docs.aws.amazon.com": ["AWS"],
+  "aws.amazon.com": ["AWS"],
+  "www.nist.gov": ["AWS"],
+};
+
+/** 出典の URL を落とす理由のコード。値は含めない */
+export type SourceUrlReason = "not-https" | "malformed" | "userinfo" | "port" | "host-not-allowed";
+
+const SOURCE_URL_MESSAGES: Record<SourceUrlReason, string> = {
+  "not-https": "https で始まる URL ではありません",
+  malformed: "URL の形ではありません",
+  userinfo: "ユーザー情報付きの URL です",
+  port: "ポート付きの URL です",
+  "host-not-allowed": "出典に許していないドメインの URL です",
+};
+
+/**
+ * 出典の URL を落とす理由のコードを返す(問題がなければ null)。
+ * https で、ユーザー情報とポートを持たず、ホスト名が ALLOWED_REFERENCE_HOSTS に完全一致する URL だけを許す。
+ * ホスト名は URL の解釈で小文字になり、既定のポート(443)は取り除かれる。末尾のドットや、似せたホスト名は一致しない。
+ */
+export function sourceUrlReason(value: string): SourceUrlReason | null {
+  if (!/^https:\/\/\S+$/.test(value)) return "not-https";
   let url: URL;
   try {
     url = new URL(value);
   } catch {
-    return "URL の形ではありません";
+    return "malformed";
   }
-  if (url.username !== "" || url.password !== "") return "ユーザー情報付きの URL です";
-  if (url.port !== "") return "ポート付きの URL です";
-  if (!ALLOWED_REFERENCE_HOSTS.includes(url.hostname)) return "出典に許していないドメインの URL です";
+  if (url.protocol !== "https:") return "not-https";
+  if (url.username !== "" || url.password !== "") return "userinfo";
+  if (url.port !== "") return "port";
+  if (!ALLOWED_REFERENCE_HOSTS.includes(url.hostname)) return "host-not-allowed";
   return null;
+}
+
+/** 出典の URL の誤りの種類を、固定の文言で返す(問題がなければ null)。URL の値は含めない */
+export function referenceUrlProblem(value: string): string | null {
+  const reason = sourceUrlReason(value);
+  return reason === null ? null : SOURCE_URL_MESSAGES[reason];
+}
+
+/** その資格のベンダーが、このホストを出典にしてよいか。許可していないホストは false */
+export function hostAllowedForVendor(host: string, vendor: string): boolean {
+  return REFERENCE_HOST_VENDORS[host]?.includes(vendor) ?? false;
 }
 
 /** 出典: 公式ドキュメントへのリンク。題は任意(ないときは、画面にホスト名を出す)。 */

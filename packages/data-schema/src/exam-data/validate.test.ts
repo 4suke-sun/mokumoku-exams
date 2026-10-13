@@ -4,15 +4,18 @@ import {
   CRITERION_NAME_MAX,
   containsUrl,
   ExamsFileSchema,
+  hostAllowedForVendor,
   KEYWORD_MAX,
   normalizeKeyword,
   normalizeText,
   QuestionsFileSchema,
+  REFERENCE_HOST_VENDORS,
   REFERENCE_TITLE_MAX,
   REFERENCES_MAX,
   referenceUrlProblem,
+  sourceUrlReason,
 } from "./schema.ts";
-import { validateDataSet } from "./validate.ts";
+import { validateDataSet, validateHostVendors } from "./validate.ts";
 
 const published = (overrides: Record<string, unknown> = {}) => ({
   examCode: "EX-SMP-XX",
@@ -367,6 +370,24 @@ describe("問題のスキーマ", () => {
     expect(referenceUrlProblem("https://docs.aws.amazon.com:443/x")).toBeNull();
   });
 
+  it("出典_落とす理由をコードで返す", () => {
+    expect(sourceUrlReason("https://docs.aws.amazon.com/x")).toBeNull();
+    expect(sourceUrlReason("http://docs.aws.amazon.com/")).toBe("not-https");
+    expect(sourceUrlReason("https://[::1/")).toBe("malformed");
+    expect(sourceUrlReason("https://u@docs.aws.amazon.com/")).toBe("userinfo");
+    expect(sourceUrlReason("https://docs.aws.amazon.com:8443/")).toBe("port");
+    expect(sourceUrlReason("https://docs.aws.amazon.com./")).toBe("host-not-allowed");
+    expect(sourceUrlReason("https://docs-aws-amazon.com/")).toBe("host-not-allowed");
+  });
+
+  it("出典_ホストとベンダーの対応表_許可の一覧と同じホストを持ち、ベンダーを空にしない", () => {
+    expect(Object.keys(REFERENCE_HOST_VENDORS).sort()).toEqual([...ALLOWED_REFERENCE_HOSTS].sort());
+    for (const vendors of Object.values(REFERENCE_HOST_VENDORS)) expect(vendors.length).toBeGreaterThan(0);
+    expect(hostAllowedForVendor("docs.aws.amazon.com", "AWS")).toBe(true);
+    expect(hostAllowedForVendor("docs.aws.amazon.com", "Example")).toBe(false);
+    expect(hostAllowedForVendor("unknown.example.com", "AWS")).toBe(false);
+  });
+
   it("出典_空の一覧・多すぎる・重複・題が長すぎる・未知の項目を止める", () => {
     const ref = (n: number) => ({ url: `https://docs.aws.amazon.com/${n}` });
     expect(messages(question(1, { references: [] }))).not.toEqual([]);
@@ -553,6 +574,14 @@ describe("validateDataSet(ファイルをまたぐ検査)", () => {
         "exams.json: exams[0].examCode: コードの先頭が、ベンダーの略称と一致しません",
       ]);
       expect(validateDataSet(exams(), files(), null)).toEqual(["vendors.json: ファイルがありません"]);
+    });
+
+    it("出典のホストとベンダーの対応表_一覧にないベンダーを止める", () => {
+      expect(validateHostVendors(vendors, { "docs.example.com": ["Example"] })).toEqual([]);
+      expect(validateHostVendors(vendors, { "docs.example.com": ["Other"] })).toEqual([
+        "REFERENCE_HOST_VENDORS: docs.example.com: vendors.json にないベンダーです",
+      ]);
+      expect(validateHostVendors(null)).toEqual([]);
     });
 
     it("ベンダーの名前・略称の重複_止める", () => {

@@ -1,0 +1,8 @@
+# synthetic robots.txt for tests
+User-agent: *
+Disallow: /private/
+Allow: /private/open/
+Disallow: /*.pdf$
+
+User-agent: mokumoku-exams-pipeline
+Disallow: /guide/private/
