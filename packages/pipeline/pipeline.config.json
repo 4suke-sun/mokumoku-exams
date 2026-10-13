@@ -23,6 +23,12 @@
     "sampleSeed": 1,
     "samplePerDomain": 3
   },
+  "plan": {
+    "targetMultiplier": 3,
+    "difficultyMix": { "easy": 0.3, "medium": 0.5, "hard": 0.2 },
+    "typeMix": { "single": 0.75, "multiple": 0.2, "free-text": 0.05 },
+    "overrides": {}
+  },
   "checks": {
     "freshnessDays": 365
   }

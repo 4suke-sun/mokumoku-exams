@@ -1,6 +1,18 @@
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { z } from "zod";
+import { EXAM_CODE } from "./contract.ts";
+
+/** 配分の合計が 1 になること(許容誤差 0.001) */
+const sumsToOne = (mix: Record<string, number>) => Math.abs(Object.values(mix).reduce((a, b) => a + b, 0) - 1) <= 0.001;
+
+const share = z.number().min(0).max(1);
+export const DifficultyMixSchema = z
+  .strictObject({ easy: share, medium: share, hard: share })
+  .refine(sumsToOne, "配分の合計が 1 ではありません");
+export const TypeMixSchema = z
+  .strictObject({ single: share, multiple: share, "free-text": share })
+  .refine(sumsToOne, "配分の合計が 1 ではありません");
 
 export const ConfigSchema = z.strictObject({
   /** 作業用の置き場(取得した本文、段階の成果物)。リポジトリ直下からの相対パス */
@@ -43,6 +55,21 @@ export const ConfigSchema = z.strictObject({
     sampleSeed: z.number().int().min(0),
     /** 抜き取りで、分野ごとに選ぶ件数の上限 */
     samplePerDomain: z.number().int().positive(),
+  }),
+  /** 出題計画。目標の問題数と、難易度・種別の配分(試験ごとに overrides で上書きする) */
+  plan: z.strictObject({
+    /** 目標の問題数 = 本番の出題数 × この倍率(問題の蓄えを、1 回の出題より多くする) */
+    targetMultiplier: z.number().positive().max(100),
+    difficultyMix: DifficultyMixSchema,
+    typeMix: TypeMixSchema,
+    overrides: z.record(
+      z.string().regex(EXAM_CODE),
+      z.strictObject({
+        targetTotal: z.number().int().positive().optional(),
+        difficultyMix: DifficultyMixSchema.optional(),
+        typeMix: TypeMixSchema.optional(),
+      }),
+    ),
   }),
   checks: z.strictObject({
     /** 出典の更新日が、この日数以内なら新しいとみなす */

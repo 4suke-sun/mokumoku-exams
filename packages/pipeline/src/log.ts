@@ -35,7 +35,10 @@ export type Kind =
   | "再試行の上限"
   | "カバレッジ"
   | "カバレッジの抜け"
-  | "レビューレポート";
+  | "レビューレポート"
+  | "問題データの誤り"
+  | "出題計画の誤り"
+  | "出題計画";
 
 /** 標準出力に出す種類。ほかは標準エラーに出す */
 const OUT_KINDS: ReadonlySet<Kind> = new Set<Kind>([
@@ -54,6 +57,7 @@ const OUT_KINDS: ReadonlySet<Kind> = new Set<Kind>([
   "カバレッジ",
   "カバレッジの抜け",
   "レビューレポート",
+  "出題計画",
 ]);
 
 export interface Output {

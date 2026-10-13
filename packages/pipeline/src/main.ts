@@ -6,6 +6,7 @@ import { type Config, ConfigError, loadConfig } from "./config.ts";
 import { EXIT, type ExitCode } from "./exit-codes.ts";
 import { type FactsMode, runFacts } from "./facts/facts.ts";
 import { type Output, report, reportInternalError } from "./log.ts";
+import { runPlan } from "./plan/run.ts";
 
 export interface Context {
   config: Config;
@@ -60,6 +61,7 @@ function helpText(): string {
     "facts <資格コード> --import         エージェントが抽出した事実カードを検査し、取り込む",
     "facts <資格コード> --coverage       分野ごとの件数と、試験ガイドの範囲に対する抜けを報告する",
     "facts <資格コード> --report         本文を含まないレビューレポートを書く",
+    "plan <資格コード>                    分野の配点から目標の問題数を出し、既存の問題との差を計画に書く",
     "",
     "終了コード: 0 成功 / 1 検査の失敗 / 2 入力の誤り / 3 内部の誤り",
     "",
@@ -85,7 +87,7 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
       return help || argv.length === 0 ? EXIT.ok : EXIT.inputError;
     }
     const command = COMMANDS.find((c) => c.name === positional[0]);
-    const takesExam = command?.name === "collect" || command?.name === "facts";
+    const takesExam = command?.name === "collect" || command?.name === "facts" || command?.name === "plan";
     const maxArgs = takesExam ? 2 : 1;
     if (positional.length > maxArgs || command === undefined) {
       report(output, "不明なコマンド");
@@ -101,6 +103,7 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
       const usages: Record<string, string> = {
         collect: "使い方: collect <資格コード> [--import-guide]\n",
         facts: "使い方: facts <資格コード> [--import | --coverage | --report]\n",
+        plan: "使い方: plan <資格コード>\n",
       };
       const usage = usages[command.name] ?? "";
       output.out(`${command.name}: ${command.summary}\n${usage}\nオプション: --dry-run, --help\n`);
@@ -146,6 +149,14 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
         output,
         deps: { today: deps.today, now: deps.now },
       });
+    }
+    if (command.name === "plan") {
+      const examCode = positional[1];
+      if (examCode === undefined) {
+        report(output, "入力の誤り", "資格コードの指定がない");
+        return EXIT.inputError;
+      }
+      return runPlan({ config, rootDir, examCode, dryRun, output });
     }
     const context: Context = {
       config,
