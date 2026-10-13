@@ -1,6 +1,7 @@
 {
   "workDir": "pipeline-work",
   "ledgerDir": "packages/pipeline/ledger",
+  "factsDir": "packages/pipeline/facts",
   "plansDir": "packages/pipeline/plans",
   "examsFile": "data/exams.json",
   "maxItemsPerRun": 20,
@@ -16,6 +17,11 @@
   "cache": {
     "retentionDays": 30,
     "maxBytes": 500000000
+  },
+  "facts": {
+    "maxAttempts": 3,
+    "sampleSeed": 1,
+    "samplePerDomain": 3
   },
   "checks": {
     "freshnessDays": 365

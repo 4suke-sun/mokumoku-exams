@@ -23,8 +23,9 @@ npm test -w @mokumoku-exams/pipeline
 ## コマンドと設定
 
 - コマンドは段階ごとにあります(`collect` `facts` `plan` `draft` `verify` `explain` `export` `run`)。
-  実装済みは `collect`(一次情報の収集と台帳。手順は [一次情報の収集と台帳の運用](../../docs/source-collection.md))です。
-  ほかは未実装で、メッセージを出すだけです。
+  実装済みは次の 2 つです。ほかは未実装で、メッセージを出すだけです。
+  - `collect`: 一次情報の収集と台帳。手順は [一次情報の収集と台帳の運用](../../docs/source-collection.md)
+  - `facts`: 出典から事実カードを作る。手順は [事実カードの作法と運用手順](../../docs/fact-cards.md)
 - どのコマンドも `--help` と `--dry-run` を受け付けます。`--dry-run` では、書き込みと外部への通信をしません。
 - 設定は `pipeline.config.json`(コミットする、環境値を含まない)に書きます。環境値は `packages/pipeline/.env`(gitignore)に書き、
   `.env.example` にはプレースホルダーだけを置きます。環境値は、設定ファイルの値を上書きします。
@@ -38,5 +39,6 @@ npm test -w @mokumoku-exams/pipeline
 | --- | --- | --- |
 | `src/` | コードとテスト | する |
 | `ledger/` | 出典の台帳(資格ごとの JSON) | する |
+| `facts/` | 事実カードの台帳(資格ごとの JSON) | する |
 | `plans/` | 収集の計画(資格ごとの JSON) | する |
 | `pipeline-work/`(リポジトリ直下) | 取得した本文、段階の成果物 | しない(gitignore。混入はコミット前・push 前の検査が止める) |

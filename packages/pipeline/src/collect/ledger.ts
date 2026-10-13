@@ -19,18 +19,21 @@ export type SourceStatus = (typeof SOURCE_STATUSES)[number];
 export type CheckName = (typeof CHECK_NAMES)[number];
 export type CheckResult = (typeof CHECK_RESULTS)[number];
 
-const ID = z.string().regex(/^[a-z0-9][a-z0-9-]{0,63}$/);
-const ISO_DATE = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
-const SHA256 = z.string().regex(/^[0-9a-f]{64}$/);
+export const ID = z.string().regex(/^[a-z0-9][a-z0-9-]{0,63}$/);
+export const ISO_DATE = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
+export const SHA256 = z.string().regex(/^[0-9a-f]{64}$/);
 /** 理由コード。小文字とハイフンだけにして、値や本文が入らないようにする */
-const REASON = z.string().regex(/^[a-z][a-z0-9-]{0,47}$/);
+export const REASON = z.string().regex(/^[a-z][a-z0-9-]{0,47}$/);
 
-const SourceUrl = z
+export const SourceUrl = z
   .string()
   .max(2000)
   .refine((value) => sourceUrlReason(value) === null, "出典に使えない URL");
 
-const Paraphrase = z.string().min(1).refine(withinParaphraseLimit, "言い換えが長すぎる");
+/** 対象のリージョンの表記(us-east-1 など) */
+export const REGION = z.string().regex(/^[a-z0-9-]{1,32}$/);
+
+export const Paraphrase = z.string().min(1).refine(withinParaphraseLimit, "言い換えが長すぎる");
 
 const ClaimSchema = z.strictObject({
   id: ID,
@@ -54,10 +57,7 @@ export const SourceEntrySchema = z.strictObject({
   target: z.strictObject({
     examCode: z.string().regex(EXAM_CODE),
     edition: z.string().min(1).max(16).optional(),
-    region: z
-      .string()
-      .regex(/^[a-z0-9-]{1,32}$/)
-      .optional(),
+    region: REGION.optional(),
   }),
   /** 最後に取得を試みた日。まだ一度も取得していなければ null */
   fetchedAt: ISO_DATE.nullable(),

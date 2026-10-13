@@ -46,7 +46,7 @@ describe("コマンドの体系", () => {
     expect((await run([name, "--help"])).code).toBe(EXIT.ok);
   });
 
-  it.each(COMMANDS.filter((c) => c.name !== "collect").map((c) => c.name))(
+  it.each(COMMANDS.filter((c) => c.name !== "collect" && c.name !== "facts").map((c) => c.name))(
     "%s_未実装で、--dry-run を受け付ける",
     async (name) => {
       const r = await run([name, "--dry-run"]);
@@ -70,8 +70,11 @@ describe("終了コード", () => {
     expect(r.err + r.out).not.toContain("secret-looking-option");
   });
 
-  it("collect 以外の --import-guide_入力の誤り", async () => {
+  it("対応しないコマンドの動作のオプション_入力の誤り", async () => {
+    expect((await run(["plan", "--import-guide"])).code).toBe(EXIT.inputError);
     expect((await run(["facts", "--import-guide"])).code).toBe(EXIT.inputError);
+    expect((await run(["collect", "--coverage"])).code).toBe(EXIT.inputError);
+    expect((await run(["facts", "--import", "--report"])).code).toBe(EXIT.inputError);
   });
 
   it("collect の資格コードがない、または形が違う_入力の誤りで、入力した文字列を出さない", async () => {
@@ -84,7 +87,7 @@ describe("終了コード", () => {
   it("想定外の例外_内部の誤りで、クラス名だけを出し、メッセージを出さない", async () => {
     let err = "";
     const code = await main({
-      argv: ["facts"],
+      argv: ["plan"],
       env: {},
       output: {
         out: () => {
@@ -133,7 +136,7 @@ describe("設定", () => {
   });
 
   it("環境値_作業用の置き場を上書きできる。報告に値を出さない", async () => {
-    const r = await run(["facts"], { env: { PIPELINE_WORK_DIR: "custom-dir-value" } });
+    const r = await run(["plan"], { env: { PIPELINE_WORK_DIR: "custom-dir-value" } });
     expect(r.code).toBe(EXIT.ok);
     expect(r.out + r.err).not.toContain("custom-dir-value");
   });

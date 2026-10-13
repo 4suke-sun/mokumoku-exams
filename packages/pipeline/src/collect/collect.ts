@@ -3,6 +3,7 @@ import { dirname, join, relative, resolve } from "node:path";
 import type { Config } from "../config.ts";
 import { EXAM_CODE, ExamsFileSchema } from "../contract.ts";
 import { EXIT, type ExitCode } from "../exit-codes.ts";
+import { FactsError, factsPath, readFacts } from "../facts/schema.ts";
 import { type Output, report } from "../log.ts";
 import { BodyCache } from "./cache.ts";
 import {
@@ -64,11 +65,12 @@ function pathsFor(config: Config, rootDir: string, examCode: string): Paths {
   };
 }
 
-function loadExam(
+/** 資格マスタから、検査に使う資格の情報と分野を読む。資格がなければ null */
+export function loadExam(
   config: Config,
   rootDir: string,
   examCode: string,
-): { exam: ExamInfo; domains: { code: string; weight: number }[] } | null {
+): { exam: ExamInfo; domains: { code: string; name: string; weight: number }[] } | null {
   const parsed = ExamsFileSchema.safeParse(JSON.parse(readFileSync(resolve(rootDir, config.examsFile), "utf8")));
   if (!parsed.success) throw new LedgerError(["(資格マスタ)"]);
   const exam = parsed.data.exams.find((e) => e.examCode === examCode);
@@ -138,6 +140,19 @@ async function collectStep(
     );
     report(output, "書き込みをしない(dry-run)");
     return EXIT.ok;
+  }
+
+  // 事実カードの根拠にした出典。本文が変わったら、そのカードに再検証の印を付ける
+  const factSources: Record<string, string[]> = {};
+  try {
+    const facts = readFacts(factsPath(resolve(rootDir, config.factsDir), examCode), examCode);
+    for (const card of facts.cards) {
+      if (card.status !== "rejected") factSources[card.id] = card.sources.map((s) => s.url);
+    }
+  } catch (error) {
+    if (!(error instanceof FactsError)) throw error;
+    for (const p of error.paths) report(output, "事実カードの誤り", p);
+    return EXIT.checkFailed;
   }
 
   const today = deps.today();
@@ -210,7 +225,7 @@ async function collectStep(
       changes.unconfirmed.push(...change.unconfirmed);
       ledger = { ...ledger, sources: [...ledger.sources.filter((s) => s.url !== url), entry] };
       if (change.changed.length > 0) {
-        const found = traceAffected(ledger, [url], provenance);
+        const found = traceAffected(ledger, [url], provenance, factSources);
         affected.facts.push(...found.facts);
         affected.questions.push(...found.questions);
         ledger = markRecheck(ledger, found);
