@@ -54,6 +54,15 @@ function gitPath(args: string[]): string | null {
   }
 }
 
+/** 拒否リストの置き場を、読めるものから順に返す(検査役に、読むべきファイルを渡すために使う)。無ければ空。 */
+export function findDenylistPaths(): string[] {
+  const candidates = denylistCandidates(
+    gitPath(["rev-parse", "--show-toplevel"]),
+    gitPath(["rev-parse", "--path-format=absolute", "--git-common-dir"]),
+  );
+  return candidates.filter((path) => loadDenylist([path], (p) => readFileSync(p, "utf8")) !== null);
+}
+
 /**
  * 拒否リスト(gitignore 済み。個人固有の語をリポジトリに入れずに検査するための、手元だけのファイル)を読む。
  * 手元で見つからないときは、置き場と書式を案内して終了コード 1 で止める(検査が効かないまま通さない)。
