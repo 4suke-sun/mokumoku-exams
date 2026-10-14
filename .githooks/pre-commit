@@ -4,6 +4,7 @@
 # 有効化: git config core.hooksPath .githooks(npm install の prepare でも設定される)
 set -euo pipefail
 
+node scripts/check-branch.ts
 node scripts/check-commit-secrets.ts
 # ステージしたファイルの lint と整形(CI と同じ基準。直すときは `npm run format`)
 npx --no-install biome check --staged --error-on-warnings --no-errors-on-unmatched
