@@ -14,6 +14,7 @@ npm install   # 依存を入れ、検査フック(.githooks)を有効にしま�
 
 | コマンド | 内容 |
 | --- | --- |
+| `npm run status` | 作業の状態の表示(読み取りだけ)。最新のタグ、開いたマイルストーンと未完了の Issue、開いた PR、未 push のコミット、マージ済みで残ったブランチ、作業ツリー。GitHub の情報(`gh`)や git の情報が取れないときは、取れなかった項目を示して、取れた項目だけを表示する。「マージ済みで残ったブランチ」は、`origin/main` に含まれるブランチのうち、コミットのない新しいブランチ(先頭が `origin/main` と同じ)を除いたもの。作業の開始と再開で実行する |
 | `npm run lint` | lint と整形の確認(Biome) |
 | `npm run format` | lint の自動修正と整形 |
 | `npm run typecheck` | 型検査(tsc) |
