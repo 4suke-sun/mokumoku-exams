@@ -27,7 +27,7 @@ commit・push・PR・Issue の起票は、pipeline の変更でも `CLAUDE.md` �
 
 ## 4. 版と Issue の切り方
 
-- 1 つの版を 1 つのマイルストーンにし、1 つの PR にまとめます。
+- 1 つの版を 1 つのマイルストーン(名前は `vX.Y.Z`)にし、1 つの PR にまとめます。版の番号は、Issue の本文に書かず、マイルストーンだけで持ちます([CONTRIBUTING.md](../CONTRIBUTING.md) の「Issue」)。
 - 1 つのタスクを 1 つの Issue にします。
 - Issue のタイトルは Conventional Commits の形(`feat(pipeline): …` など)にします。
 - Issue の本文に、ほかの Issue の番号は書きません。前提は、タイトルで示します。

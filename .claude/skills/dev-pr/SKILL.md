@@ -35,12 +35,35 @@ PR・Issue の本文は自由度が高いので、作成役は `commit-writer`(H
 4. 版を切る PR の場合: `data/release-notes.json` に、その版のエントリがあるか
 5. タイトルが Conventional Commits か(`feat:` / `fix:` / `chore:` など)
 
+Issue の場合は、さらに次を確かめる(決まりは `CONTRIBUTING.md` の「Issue」):
+
+6. **重複の検索**: 起票の前に、メインのセッションが似た題の Issue を検索し、候補(番号・題・状態・マイルストーン)を人に見せる。
+   「重複」と決めるのは人。作成役と検査役は、重複を探さず、決めない:
+
+   ```sh
+   gh issue list --state all --search "<題の語>" --limit 20 --json number,title,state,milestone
+   ```
+
+7. **版とマイルストーン**: 版の番号は、本文に書かず、マイルストーン(`vX.Y.Z`)だけで持つ。「対象バージョン」の行を書かない。
+   版が決まっている Issue にはその版のマイルストーンを、未定の Issue にはマイルストーンなしでラベル `later` を付ける。
+   新しいマイルストーンが要るときは、説明に、その版の主題と、前の版から何を前提にするかを書く。
+
 ## Step 1. 作成役: 下書きを書く
 
 下書きの置き場所(gitignore 済み):
 
 - PR: `.drafts/pr-<ブランチ名>.md`(1 行目がタイトル、空行を挟んで本文)
-- Issue: `.drafts/issues/<番号>-<slug>.md`(1 行目が `# タイトル`)
+- Issue: 新規は `.drafts/issues/<slug>.md`(番号は投稿まで決まらない)、既存の Issue の編集は `.drafts/issues/<番号>-<slug>.md`。1 行目が `# タイトル`、2 行目が空行、3 行目以降が本文
+- 複数の Issue をまとめて起票・編集するときは、一覧(マニフェスト) `.drafts/issues/manifest.json` も書く(メインのセッションが書いてよい)。
+  1 行が 1 件で、`action`(`create` / `edit`)、`file`(下書きのファイル名)、編集なら `number`、`milestone`、`labels` を持つ:
+
+  ```json
+  [
+    { "action": "create", "file": "example.md", "milestone": "v0.99.0", "labels": ["chore"] },
+    { "action": "create", "file": "later-example.md", "labels": ["feat", "later"] },
+    { "action": "edit", "file": "123-existing.md", "number": 123, "milestone": "v0.99.0" }
+  ]
+  ```
 
 作成役に依頼する内容:
 
@@ -125,6 +148,12 @@ shasum -a 256 <下書きファイル>
 git rev-parse HEAD && git rev-list --count origin/main..HEAD
 ```
 
+一覧から Issue を投稿するときは、承認の直後に、一覧へ封印(下書きのハッシュと、一覧の項目 action・number・milestone・labels のハッシュ)を記録する。投稿は、封印と一致する下書きだけを行う:
+
+```sh
+node scripts/post-issues.ts .drafts/issues/manifest.json --seal
+```
+
 ## Step 6. 投稿
 
 1. 投稿の直前に、もう一度ハッシュ(PR の場合は、範囲の末尾のコミットとコミット数も)を取り、Step 5 の値と**一致する**ことを確認する。
@@ -143,6 +172,23 @@ git rev-parse HEAD && git rev-list --count origin/main..HEAD
    # Issue(1 行目の「# 」を除いてタイトル、3 行目以降を本文として扱う)
    gh issue create --title "$(head -n 1 <下書き> | sed 's/^# //')" --body-file <(tail -n +3 <下書き>)
    ```
+
+   Issue を一覧(マニフェスト)から投稿するときは、スクリプトを使う。封印(承認の時点のハッシュ)と一致しない下書き、
+   題が Conventional Commits の形でない下書き、本文に版の番号の行がある下書き、マイルストーンもラベル `later` もない新規の Issue は、
+   投稿せずに止まる:
+
+   ```sh
+   node scripts/post-issues.ts .drafts/issues/manifest.json --dry-run   # 検査して、投稿する内容の概要(新規か編集か、ファイル、マイルストーン、ラベル)を表示する(何も投稿しない)
+   node scripts/post-issues.ts .drafts/issues/manifest.json             # 投稿し、結果(番号・題・URL)を一覧に書き戻して表示する
+   ```
+
+   投稿の結果の一覧(番号・題・URL)は、人に報告する。一覧は `.drafts/`(gitignore 済み)に残る。
+
+   - 投稿の前に、ラベル(`later` を含む)とマイルストーンが GitHub にあることを確かめる(なければ、`gh label create <名前>`、
+     マイルストーンは `gh api repos/{owner}/{repo}/milestones -f title=vX.Y.Z -f description=<主題と前提>` で作る。作成は人の確認を取る)
+   - 途中で失敗したときは、投稿済みの行に結果が書き戻されている。原因を直して、同じコマンドを再実行する(投稿済みの行は飛ばす)。
+     下書きや一覧の項目を直したときは、検査と承認をやり直し、`--reseal` で封印し直す
+   - 既存の Issue の編集では、ラベルは追加だけ。マイルストーンを付けるときは、ラベル `later` を外す
 
 4. `gh pr create` の前に動くフックはない。下書きの機械検査(`scripts/check-pr-secrets.ts`)は、Step 2 で承認の前に済ませてある
 5. 作ったら、CI の結果を確認する。**最新のコミットの CI が通るまで、マージしない**
