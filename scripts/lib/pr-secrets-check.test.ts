@@ -154,10 +154,19 @@ describe("checkEntries", () => {
     expect(blocks).toEqual(["拒否リストの 1 番目の語: f.md:3"]);
   });
 
-  it("ローカルパスは警告にとどめる", () => {
+  it("ローカルパスは止め、プレースホルダーは通す", () => {
     const { blocks, warns } = checkEntries(entry(fakeLocalPath));
-    expect(blocks).toHaveLength(0);
-    expect(warns).toHaveLength(1);
+    expect(blocks).toEqual(["ローカルのユーザーディレクトリのパス: f.md:3"]);
+    expect(warns).toHaveLength(0);
+    expect(blocks.join()).not.toContain("someone");
+    for (const text of [
+      "/Us" + "ers/<ユーザー名>/work",
+      "/Us" + "ers/example/work",
+      "/Us" + "ers/ など",
+      "/api/admin/users/abc",
+    ]) {
+      expect(checkEntries(entry(text)).blocks, text).toHaveLength(0);
+    }
   });
 
   it("作業の指示への言及は、メッセージのときだけ止める", () => {

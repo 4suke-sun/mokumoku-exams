@@ -91,9 +91,12 @@ export const ENV_INFO_PATTERNS: Pattern[] = [
   },
 ];
 
-// 警告のみ(止めはしない)。
+// 個人情報。ユーザー名を含むパスは、履歴に載ると消しにくいので止める。<ユーザー名> などのプレースホルダーは通す。
 export const PII_CONTENT_PATTERNS: Pattern[] = [
-  { name: "ローカルのユーザーディレクトリのパス", re: /\/Users\/[A-Za-z0-9_.-]+/ },
+  {
+    name: "ローカルのユーザーディレクトリのパス",
+    re: /\/Users\/(?!(?:example|user|username|you|name|xxx+)\b)[A-Za-z0-9_.-]+/,
+  },
 ];
 
 // コミットメッセージと PR・Issue の下書きだけに適用する。作業の会話や内部メモへの言及。
@@ -273,8 +276,7 @@ export function checkEntries(
     ...checkProseBodies(entries),
     ...(message ? scan(entries, MESSAGE_PHRASE_PATTERNS) : []),
   ];
-  const warns = scan(entries, PII_CONTENT_PATTERNS);
-  return { blocks: [...new Set(blocks)], warns: [...new Set(warns)] };
+  return { blocks: [...new Set([...blocks, ...scan(entries, PII_CONTENT_PATTERNS)])], warns: [] };
 }
 
 /** 作者とコミッターのメールアドレスが、GitHub の noreply アドレスか(コミッターは、GitHub 上のマージも認める)。 */
