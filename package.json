@@ -19,6 +19,7 @@
     "check:commit": "node scripts/check-commit-secrets.ts",
     "check:release-notes": "node scripts/check-release-notes.ts",
     "check:lessons": "node scripts/check-lessons.ts",
+    "check:test-titles": "node scripts/check-test-titles.ts",
     "check:boundary": "node scripts/check-pipeline-boundary.ts",
     "validate:data": "node scripts/validate-exam-data.ts && node scripts/validate-curriculum-data.ts && node scripts/validate-summary-data.ts && node scripts/validate-help-data.ts",
     "build:lambda": "node scripts/build-lambda-asset.ts",

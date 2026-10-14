@@ -1,0 +1,346 @@
+{
+  "packages/app/src/app/exams/page.test.tsx": [
+    "ベンダーごとに分けて見出しを付ける"
+  ],
+  "packages/app/src/app/layout.test.tsx": [
+    "初回描画の前のスクリプトを head に持つ"
+  ],
+  "packages/app/src/components/diagram.test.tsx": [
+    "色はテーマの役割の色だけを使う(ライトとダークで切り替わる)",
+    "色はテーマの役割の色だけを使う(ライトとダーク・リッチとシンプルで切り替わる)"
+  ],
+  "packages/app/src/components/empty-state.test.tsx": [
+    "タイトルと説明を表示する",
+    "アイコンは飾りとして読み上げない"
+  ],
+  "packages/app/src/components/exam-info.test.tsx": [
+    "モード選択へ戻るリンク"
+  ],
+  "packages/app/src/components/mode-select.test.tsx": [
+    "本番の問題数と制限時間を示す",
+    "試験の情報へのリンクを出す"
+  ],
+  "packages/app/src/components/notice.test.tsx": [
+    "記号は飾りとして読み上げない"
+  ],
+  "packages/app/src/components/question-preview.test.tsx": [
+    "難易度・種類・語で絞り込む",
+    "管理へ戻るリンク"
+  ],
+  "packages/app/src/components/site-nav.test.tsx": [
+    "背景のタップで閉じる",
+    "閉じるボタンで閉じる"
+  ],
+  "packages/app/src/components/skeleton.test.tsx": [
+    "形だけなので読み上げない"
+  ],
+  "packages/app/src/components/summary-cards.test.tsx": [
+    "モード選択へ戻るリンク"
+  ],
+  "packages/app/src/lib/admin/handlers.test.ts": [
+    "PK=ADMIN、SK=AUDIT#{時刻}#{対象} に、操作した管理者・対象・操作を保存する"
+  ],
+  "packages/app/src/lib/answer-timer.test.ts": [
+    "タブが隠れている間は数えない"
+  ],
+  "packages/app/src/lib/auth/handlers.test.ts": [
+    "ログイン中の状態を返す"
+  ],
+  "packages/app/src/lib/diagram-layout.test.ts": [
+    "図の種類に応じた配置を返す"
+  ],
+  "packages/app/src/lib/domain-color.test.ts": [
+    "資格マスタの分野の並び順で決める"
+  ],
+  "packages/app/src/lib/exam-list.test.ts": [
+    "元の配列を変えない"
+  ],
+  "packages/app/src/lib/explanation.test.ts": [
+    "問題がある"
+  ],
+  "packages/app/src/lib/free-text.test.ts": [
+    "同じ結果になる(ならすと空になるキーワードを、検査で止めるため)"
+  ],
+  "packages/app/src/lib/history/repository.test.ts": [
+    "新しく作ったときだけ true を返す"
+  ],
+  "packages/app/src/lib/nav.test.ts": [
+    "リンク先が重複しない"
+  ],
+  "packages/app/src/lib/origin-verify.test.ts": [
+    "インフラ側と同じ名前に固定されている"
+  ],
+  "packages/app/src/lib/prefs-client.test.ts": [
+    "端末の設定をアカウントへ送る",
+    "送れなくても例外にしない(端末の設定は、そのまま)"
+  ],
+  "packages/app/src/lib/prefs.test.ts": [
+    "値に利用者の識別子そのものを入れない(短い照合だけ)"
+  ],
+  "packages/app/src/lib/question-filter.test.ts": [
+    "問題の種類"
+  ],
+  "packages/app/src/lib/quiz.test.ts": [
+    "択一は、正解の 1 つだけを選んだときに正解",
+    "複数選択は、順序によらず、すべて選んだときだけ正解",
+    "回答がなければ空を返し、継承されたプロパティは回答として扱わない",
+    "元の配列を変えず、同じ要素を返す",
+    "乱数が同じなら、結果も同じ",
+    "分野を指定しないと、全分野から選ぶ",
+    "分野で絞り込む",
+    "出題数が多すぎるときは、出題できる数に切り詰める",
+    "出題数が 0 以下なら、空になる",
+    "正答数 ÷ 出題数 × 100 を返す。未回答は不正解",
+    "出題が 0 問なら 0%",
+    "合格点を満点で割った割合を返す",
+    "キーを昇順にそろえる"
+  ],
+  "packages/app/src/lib/release-notes.test.ts": [
+    "新しい版から順に並ぶ"
+  ],
+  "packages/app/src/lib/release-seen.test.ts": [
+    "見た版を保存して読み直せる"
+  ],
+  "packages/app/src/lib/sections.test.ts": [
+    "5 問ずつに分ける",
+    "満点・合格・未達・未挑戦"
+  ],
+  "packages/app/src/lib/site.test.ts": [
+    "ログインなしで開ける画面だけを載せる"
+  ],
+  "packages/app/src/lib/storage.test.ts": [
+    "保存した状態を読み出せる",
+    "保存がなければ null",
+    "消すと読み出せなくなる",
+    "壊れた値や、形の違う値は、保存がないものとして扱う",
+    "大きすぎる値は、保存がないものとして扱う",
+    "__proto__ という名前のキーがあっても、Object のプロトタイプを書き換えない",
+    "別の資格の状態が入っていたら、使わない",
+    "新しい順に保存する",
+    "壊れた値は、空の一覧として扱う",
+    "読み出しは null か空、保存は false を返し、例外を出さない"
+  ],
+  "packages/app/src/lib/summary-keys.test.ts": [
+    "A と Enter は答えの開閉"
+  ],
+  "packages/app/src/lib/visual-style.test.ts": [
+    "保存した選択を読み戻す"
+  ],
+  "packages/app/src/lib/weighted.test.ts": [
+    "1/(1+回数)^2"
+  ],
+  "packages/data-schema/src/curriculum-data/validate.test.ts": [
+    "報告に入力の値を含めない"
+  ],
+  "packages/data-schema/src/exam-data/validate.test.ts": [
+    "公開中と近日公開の両方を通す",
+    "公開中の資格に必須の項目が欠けていたら止める",
+    "近日公開の資格は、最小限の項目だけでよい。未知の項目は止める",
+    "合格点が満点を超える・分野の重みの合計が 1 でない・分野のコードが重複する",
+    "資格マスタの表示名・分野名・添える文言の URL を止める",
+    "資格のコードの重複を止める",
+    "報告に入力の値を含めない",
+    "正しい問題を通す(択一・複数選択)",
+    "選択肢のキーが A から連番でないとき",
+    "正解が選択肢にない・重複している・種類と数が合わない",
+    "同じ文言の選択肢(空白・全角半角の違いを除く)を止める",
+    "未知の項目・不正な URL・空白だけの文字列を止める",
+    "出典の誤りの報告に、URL の値を載せない",
+    "タグの URL を止める",
+    "報告に、観点名やキーワードの値を載せない",
+    "ファイル内の ID の重複・同じ設問文・資格コードの不一致を止める",
+    "正しいデータを通す",
+    "資格マスタが無い・不正なとき",
+    "問題の分野が資格マスタにないとき、問題の ID つきで場所を示す",
+    "公開中の資格に問題データのファイルが無い・資格マスタにない資格のファイルがある",
+    "近日公開の資格に問題データがあるとき",
+    "問題数が本番モードの出題数に足りないとき",
+    "ファイル名が不正・ファイル名のコードと examCode が違うとき",
+    "報告に、設問文や選択肢の本文を載せない"
+  ],
+  "packages/data-schema/src/help-data/validate.test.ts": [
+    "報告に入力の値を含めない"
+  ],
+  "packages/data-schema/src/summary-data/validate.test.ts": [
+    "報告に入力の値を含めない"
+  ],
+  "packages/infra/lib/config.test.ts": [
+    "ホストゾーンは省略できる"
+  ],
+  "packages/infra/lib/stacks.test.ts": [
+    "セルフサインアップが禁止されている"
+  ],
+  "packages/pipeline/src/collect/cache.test.ts": [
+    "ハッシュをキーに書いて読める"
+  ],
+  "packages/pipeline/src/collect/changes.test.ts": [
+    "ハッシュが変わったものだけを変化ありにし、取得できないものは別に報告する",
+    "変化した出典に結びつく事実カードと問題を、漏れなく洗い出す",
+    "印を付けたものは、再検証が済むまで止める"
+  ],
+  "packages/pipeline/src/collect/collect.test.ts": [
+    "計画に沿って、取得・キャッシュ・台帳の更新・検査を順に行う"
+  ],
+  "packages/pipeline/src/collect/guide.test.ts": [
+    "分野の過不足と配点のずれを報告する"
+  ],
+  "packages/pipeline/src/collect/ledger.test.ts": [
+    "往復しても内容と順序が変わらず、並びとキーの順序が固定される"
+  ],
+  "packages/pipeline/src/collect/robots.test.ts": [
+    "製品名の組があれば、その組だけを使う"
+  ],
+  "packages/pipeline/src/contract.test.ts": [
+    "共有パッケージから許可ドメインとスキーマと検査を読める"
+  ],
+  "packages/pipeline/src/facts/coverage.test.ts": [
+    "分野ごとの件数を数え、試験ガイドの範囲にカードのない項目を抜けとして返す"
+  ],
+  "packages/pipeline/src/facts/dedupe.test.ts": [
+    "確度はまとめた先で低いほうに合わせ、試験ガイドの項目は和集合にする"
+  ],
+  "packages/pipeline/src/facts/facts.test.ts": [
+    "台帳の active な出典ごとに、本文の場所と分野を書いた依頼を作業用の置き場に書く。本文は書かない",
+    "分野ごとの件数と、試験ガイドの範囲に対する抜けを報告する。本文を含まない"
+  ],
+  "packages/pipeline/src/facts/grounding.test.ts": [
+    "下の深さの見出しの内容も、上の節の範囲で確かめられる"
+  ],
+  "packages/pipeline/src/facts/overlap.test.ts": [
+    "上限を指定できる"
+  ],
+  "packages/pipeline/src/facts/review.test.ts": [
+    "分野ごとに最大の件数を選び、偏らない。通過したカードだけが対象",
+    "入力の並びが違っても同じ抜き取り",
+    "件数・分野別・理由ごとの件数・抜き取りの表が載る",
+    "本文や引用を含まない"
+  ],
+  "packages/pipeline/src/facts/sections.test.ts": [
+    "見出しごとに分け、同じか上の深さの見出しの直前までを節の本文にする",
+    "見出しの ID または見出しの文で、節を探す",
+    "見出しの中のアンカー要素の ID も読む"
+  ],
+  "packages/pipeline/src/main.test.ts": [
+    "プレースホルダーだけを持つ"
+  ],
+  "scripts/check-lessons.test.ts": [
+    "--write で一覧を更新すると、通る",
+    "出来事を語る書き方を、本文を載せずに止める",
+    "機密らしい内容を止める",
+    "フォルダが無いときは、失敗にする",
+    "引数が不正なときは、成功にしない"
+  ],
+  "scripts/check-push-secrets.test.ts": [
+    "履歴の最初から検査し、違反を止める",
+    "メタデータのある画像を、場所と種類だけで止める",
+    "noreply ではない作者を止める",
+    "問題がなければ通す",
+    "main の最初の push でも、全履歴を検査する",
+    "途中のコミットで追加して、あとで消した値も見つける",
+    "内容が `++ ` で始まる行に隠した値も見つける",
+    "検査を完了できないとき(リモートの SHA がローカルに無い)は、止める"
+  ],
+  "scripts/check-release-notes.test.ts": [
+    "引数の綴りを誤ったときは、成功にしない",
+    "--tag に値が無いときは、成功にしない",
+    "エントリの無いタグを指定したときは、失敗にする",
+    "エントリのあるタグを指定したときは、成功にする"
+  ],
+  "scripts/lib/inspection-ledger.test.ts": [
+    "記録に差分の内容を持たない"
+  ],
+  "scripts/lib/lessons-check.test.ts": [
+    "正しい書式は通す",
+    "ファイル名の形を検査する",
+    "1 行目が「# 題」でないとき",
+    "見出しの欠け・順序違いを止める",
+    "空の節を止める",
+    "出来事を語る書き方を、場所と種類だけで止める",
+    "インラインコードとコードブロックの中は、書き方の検査の対象にしない",
+    "~~~ とインデントされたフェンスの中も、書き方の検査の対象にしない",
+    "規則として書いた現在形は通す",
+    "番号の重複を止める",
+    "番号順の一覧を返す",
+    "一覧を作る。無いときは(まだありません)",
+    "マーカーの内側だけを置き換える",
+    "マーカーが無いときは null",
+    "最新でなければ止め、最新なら通す"
+  ],
+  "scripts/lib/pr-secrets-check.test.ts": [
+    "追加行をファイルと行番号つきで取り出す",
+    "削除されたファイルは無視する",
+    "内容が `++ ` で始まる追加行(差分上は `+++ `)も、追加行として扱う",
+    "複数のファイルを、それぞれのファイル名で取り出す",
+    "アクセスキーを止め、値を報告に含めない",
+    "アカウント ID の実値を止め、例示用 ID は通す",
+    "ユーザープール ID の実値を止め、プレースホルダーは通す",
+    "クライアント ID は名前つきの代入で止め、プレースホルダーと名前のない文字列は通す",
+    "配信のドメインの実値を止め、プレースホルダーと例示は通す",
+    "Function URL の実値を止め、プレースホルダーは通す",
+    "検出の報告に値が出ない",
+    "許可する宛先以外のメールアドレスを止め、場所と種類だけを報告する",
+    "noreply・予約済みのドメイン・署名の行・URL の認証情報の形は通す",
+    "プロファイル名はプレースホルダーなら通す",
+    "拒否リストの語を、語を出さずに止める",
+    "ローカルパスは止め、プレースホルダーは通す",
+    "Claude のセッションへのリンクは、メッセージのときだけ止める",
+    "作業の指示への言及は、メッセージのときだけ止める",
+    "問題のない文面は通す",
+    ".env は止め、.env.example は通す",
+    "成果物ではないパスを止める",
+    "noreply 以外の作者を止める",
+    "GitHub 上のマージコミットのコミッターは認めるが、作者としては認めない",
+    "noreply 以外のコミッターを止める",
+    "コメントと空行を除く"
+  ],
+  "scripts/lib/release-notes-check.test.ts": [
+    "数値として比較する(0.10.0 は 0.9.0 より新しい)",
+    "先頭ゼロの版を認めない",
+    "型の違う値を弾く",
+    "日付の形式違いを弾く",
+    "正しい構造は通す",
+    "releases が無い・空のとき",
+    "版の形式、重複、並び順を検査する",
+    "0.9.0 → 0.10.0 の順は、新しい順として通す",
+    "日付が実在しないとき",
+    "タイトルと項目を検査し、本文は報告に含めない",
+    "項目が空のとき",
+    "最新のエントリは、タグを切る前でもよい",
+    "最新でないエントリにタグが無いとき",
+    "エントリの無いタグを止める。`v` 以外で始まるタグは対象にしない",
+    "`v` で始まるが vX.Y.Z ではないタグは、形式の誤りとして止める",
+    "エントリがあれば通す",
+    "エントリが無い・形式が違うとき",
+    "タイトルと項目を、種類のラベルつきの Markdown にする"
+  ],
+  "scripts/pipeline-boundary-check.test.ts": [
+    "報告に import の文字列が含まれない"
+  ],
+  "scripts/release-notes-body.test.ts": [
+    "指定した版のエントリの本文を出す",
+    "エントリの無い版は、何も出さずに失敗にする",
+    "JSON として読めないときは、何も出さずに失敗にする",
+    "構造が不正なときは、何も出さずに失敗にする",
+    "データのファイルが無いときは、何も出さずに失敗にする",
+    "引数が無い・多いときは、失敗にする",
+    "本文を含んだまま壊れた JSON でも、エラーメッセージに本文を載せない",
+    "構造が不正でも、エラーメッセージに本文を載せない"
+  ],
+  "scripts/validate-curriculum-data.test.ts": [
+    "リポジトリの data/ が、検査を通る",
+    "JSON として読めないときは、入力の一部を載せずに失敗にする",
+    "引数が多いとき、成功にしない"
+  ],
+  "scripts/validate-exam-data.test.ts": [
+    "リポジトリの data/ が、検査を通る",
+    "exams.json が無いとき、失敗にする",
+    "JSON として読めないときは、入力の一部を載せずに失敗にする",
+    "フォルダが無いとき、失敗にする",
+    "引数が多いとき、成功にしない"
+  ],
+  "scripts/validate-summary-data.test.ts": [
+    "リポジトリの data/ が、検査を通る",
+    "JSON として読めないときは、入力の一部を載せずに失敗にする",
+    "引数が多いとき、成功にしない"
+  ]
+}

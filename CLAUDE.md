@@ -42,6 +42,7 @@
 - lint / build / test はルートから実行でき、CI で回す。
 - 並行する作業は、`git worktree` で作業ツリーを分ける(同じ作業ディレクトリで並行しない)。作り方、依存の扱い、並列の上限、
   直列にする条件は [CONTRIBUTING.md](CONTRIBUTING.md) の「並行する作業」。
+- テストの題は、日本語で「前提条件_期待結果」。`npm run check:test-titles` が CI で守る([CONTRIBUTING.md](CONTRIBUTING.md) の「テスト」)。
 - 失敗と対処は、1 件 1 ファイルで `docs/app/lessons/` に記録する。一般的な注意書きの形で書き、
   出来事を語る書き方にしない。
 
