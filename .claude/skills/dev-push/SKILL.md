@@ -38,14 +38,20 @@ printf 'refs/heads/%s %s refs/heads/%s %s\n' "$(git branch --show-current)" "$(g
 
 ## Step 2. 検査役: 確認する
 
+検査役は Bash を持たない。先に、検査役が読む入力を書き出す(範囲は Step 0 で決めたもの):
+
+```sh
+node scripts/prepare-inspection.ts --range origin/main..HEAD
+```
+
 検査役に依頼する内容:
 
-- 作業ディレクトリと、push する範囲(Step 0 で決めた `git log` の範囲)
-- 「`.claude/skills/dev-commit/checklist.md` を読み、その項目に沿って、`git log -p <範囲>` の
-  **全コミットの差分**と、**コミットメッセージ、ブランチ名**を確認する。最後のコミットだけで済ませない」
-- 「**読み取り専用**。編集、`commit` / `push` / `reset`、ネットワーク操作はしない」
-- 「`.pr-secrets-denylist` があれば読み、その語がどこにもないかも確認する。**語そのものは報告に書かない**」
+- 作業ディレクトリ
+- 「`.claude/skills/dev-commit/checklist.md` を読み、その項目に沿って、`.drafts/inspect/` のファイル
+  (**全コミットの差分**、**コミットメッセージ、ブランチ名**)を確認する。最後のコミットだけで済ませない」
 - 「報告は、チェックリストの『報告のしかた』に従う(値を引用しない。最後に `判定: OK/WARN/BLOCK`)」
+
+検査が終わったら、書き出したファイルを消す: `node scripts/prepare-inspection.ts --clean`
 
 範囲の差分に次のパスが含まれるときは、`inspector-deep`(Sonnet)も別に起動し、`inspector` と**両方**の判定を合わせる
 (最も重い判定を採用する)。`scripts/`、`.githooks/`、`.github/workflows/`、`.claude/`。検査の仕組みそのものを変える差分は、

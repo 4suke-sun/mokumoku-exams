@@ -50,14 +50,20 @@ node scripts/check-pr-secrets.ts <下書きファイル>
 
 ## Step 3. 検査役: 確認する
 
+検査役は Bash を持たない。先に、検査役が読む入力を書き出す(PR の場合。Issue だけのときは不要):
+
+```sh
+node scripts/prepare-inspection.ts --pr
+```
+
 検査役に依頼する内容:
 
 - 作業ディレクトリと、下書きファイルのパス
-- 「`.claude/skills/dev-commit/checklist.md` を読み、その項目に沿って、下書きと、PR の場合は
-  `git diff origin/main...HEAD` の全差分・`git log origin/main..HEAD` の全コミットメッセージ・ブランチ名を確認する」
-- 「**読み取り専用**。編集、`commit` / `push` / `gh` の書き込み系、ネットワーク操作はしない」
-- 「`.pr-secrets-denylist` があれば読み、その語がどこにもないかも確認する。**語そのものは報告に書かない**」
+- 「`.claude/skills/dev-commit/checklist.md` を読み、その項目に沿って、下書きと、PR の場合は `.drafts/inspect/` のファイル
+  (基準との全差分・全コミットメッセージ・ブランチ名)を確認する」
 - 「報告は、チェックリストの『報告のしかた』に従う(値を引用しない。最後に `判定: OK/WARN/BLOCK`)」
+
+検査が終わったら、書き出したファイルを消す: `node scripts/prepare-inspection.ts --clean`
 
 PR の差分に次のパスが含まれるときは、`inspector-deep`(Sonnet)も別に起動し、`inspector` と**両方**の判定を合わせる
 (最も重い判定を採用する)。`scripts/`、`.githooks/`、`.github/workflows/`、`.claude/`。検査の仕組みそのものを変える差分は、

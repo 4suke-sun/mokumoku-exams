@@ -47,14 +47,20 @@ node scripts/check-commit-secrets.ts
 
 ## Step 3. 検査役: 確認する
 
+検査役は Bash を持たない。先に、検査役が読む入力を書き出す:
+
+```sh
+node scripts/prepare-inspection.ts --cached
+```
+
 検査役(`subagent_type: inspector`)に依頼する内容:
 
 - 作業ディレクトリ
-- 「`.claude/skills/dev-commit/checklist.md` を読み、その項目に沿って、`git diff --cached` の差分と
+- 「`.claude/skills/dev-commit/checklist.md` を読み、その項目に沿って、`.drafts/inspect/` のファイルと
   `.drafts/commit-msg.txt` を確認する」
-- 「**読み取り専用**。編集、`git add` / `commit` / `push`、ネットワーク操作はしない」
-- 「`.pr-secrets-denylist` があれば読み、その語が差分にないかも確認する。**語そのものは報告に書かない**」
 - 「報告は、チェックリストの『報告のしかた』に従う(値を引用しない。最後に `判定: OK/WARN/BLOCK`)」
+
+検査が終わったら、書き出したファイルを消す: `node scripts/prepare-inspection.ts --clean`
 
 差分に次のパスが含まれるときは、`inspector-deep`(Sonnet)も別に起動し、`inspector` と**両方**の判定を合わせる
 (最も重い判定を採用する)。`scripts/`、`.githooks/`、`.github/workflows/`、`.claude/`。検査の仕組みそのものを変える差分は、
