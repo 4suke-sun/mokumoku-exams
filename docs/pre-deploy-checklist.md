@@ -13,7 +13,7 @@
 | 必須の値が、`.env` にそろっていて、形が合っている | `.env` を `.env.example` と見比べる。足りない、または形が違うと、`packages/infra/lib/config.ts` の検査が、変数の名前だけを示して止まる(`npm test -w @mokumoku-exams/infra` が通る) |
 | 使う機能の任意の値が、そろっている | 通知を使う環境は、`VAPID_PUBLIC_KEY`・`VAPID_PRIVATE_KEY_PARAMETER`・`VAPID_SUBJECT` の 3 つをそろえ、秘密鍵の SSM パラメーターをデプロイの前に作っておく。独自ドメインは、`DOMAIN_NAME` と `CERTIFICATE_ARN` をそろえる。一部だけ渡すと、合成の前に、変数の名前を示して止まる(まったく渡さなければ、その機能は作られない) |
 | アプリが読む値が、実行時に読まれる(Lambda の環境変数)ものと、ビルドに埋め込まれるものとで、取り違えられていない | 今の構成では、アプリが読む値(`ORIGIN_VERIFY_VALUE`、`COGNITO_USER_POOL_ID`、`HISTORY_TABLE_NAME`、`VAPID_PUBLIC_KEY` など)は、Lambda の環境変数で、実行時に読む。`NEXT_PUBLIC_` で始まる、ビルドに埋め込まれる値は使っていない。ビルドに埋め込まれる値を足したときは、値を変えるたびに `npm run build` と `npm run build:lambda` をやり直す |
-| アプリが読む環境変数が、アプリの Lambda(`<接頭辞>-web`)へ渡される | `npm run check:env` が通る(アプリが読む名前と、`packages/infra/lib/web-stack.ts` の `environment` を突き合わせる。Lambda が自動で与える `AWS_REGION` と、開発用の `AUTH_FAKE` は除く)。渡す側に足した変数が、アプリで使われているかは、この検査では確かめない。通知の送信の Lambda(`<接頭辞>-push`)に渡す変数と、動的な参照(`env[変数]` など)も対象外なので、送信の Lambda を変えたときは、`packages/infra/lib/push-stack.ts` を見て確かめる |
+| アプリが読む環境変数が、アプリの Lambda(`<接頭辞>-web` スタックの関数 `<接頭辞>-app`)へ渡される | `npm run check:env` が通る(アプリが読む名前と、`packages/infra/lib/web-stack.ts` の `environment` を突き合わせる。Lambda が自動で与える `AWS_REGION` と、開発用の `AUTH_FAKE` は除く)。渡す側に足した変数が、アプリで使われているかは、この検査では確かめない。通知の送信の Lambda(`<接頭辞>-push` スタックの関数 `<接頭辞>-push-sender`)に渡す変数と、動的な参照(`env[変数]` など)も対象外なので、送信の Lambda を変えたときは、`packages/infra/lib/push-stack.ts` を見て確かめる |
 | 環境変数の値が、リポジトリのファイルにない | `node scripts/check-commit-secrets.ts` が通る。`.env` が追跡されていない(`git ls-files` に出ない) |
 
 ## 2. 同じ配信元の構成
