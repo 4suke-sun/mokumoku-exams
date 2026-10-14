@@ -14,6 +14,11 @@ flowchart LR
   fn -->|ID トークンの検証| cognito
   fn -->|自分の分だけ読み書き| ddb[(DynamoDB 単一テーブル)]
   fn -->|読み込み| data[問題データ JSON]
+  sched[EventBridge のルール\n毎日] --> push[Lambda\n通知の送信]
+  push -->|購読の読み取りと、無効な購読の削除| ddb
+  push -->|秘密鍵の読み取り| ssm[SSM パラメーター]
+  push -->|リマインド| browserpush[ブラウザのプッシュサービス]
+  fn -.->|秘密鍵の読み取り| ssm
 ```
 
 ## 構成要素
@@ -25,6 +30,7 @@ flowchart LR
 | 認証 | Cognito UserPool のみ。セルフサインアップ禁止、管理者の招待制、管理者グループ | v0.9.0 以降 |
 | データ | 学習履歴は DynamoDB の単一テーブル。問題データは、リポジトリの静的な JSON | v0.3.0(問題データ)、v0.12.0(履歴) |
 | ホスティング | Lambda Web Adapter + CloudFront + S3 | v0.9.0 以降 |
+| 通知の送信(`<接頭辞>-push`) | 毎日、購読している端末へ学習のリマインドを送る。通知の設定をそろえたときだけ作る。詳細は [インフラの構築とデプロイ](./infra.md) | v0.23.0 以降 |
 | インフラ(`packages/infra`) | AWS CDK(TypeScript)。デプロイは `cdkd`。手順は [インフラの構築とデプロイ](./infra.md) | v0.9.0 以降 |
 
 ## 主な方針
@@ -39,7 +45,4 @@ flowchart LR
 
 ## 関連する判断(ADR)
 
-- [0001 言語とツールの統一(TypeScript、Biome、Vitest)](./adr/0001-language-and-tooling.md)
-- [0002 データの検証に Zod を使う](./adr/0002-schema-validation-zod.md)
-
-実装が進むにつれて、認証、データ、ホスティングの判断を、ADR として追加します。
+判断の一覧は [ADR の一覧](./adr/README.md) にあります。ここには書き写しません。

@@ -24,6 +24,7 @@ npm install   # 依存を入れ、検査フック(.githooks)を有効にしま�
 | `npm run validate:data` | 資格マスタ・問題データ・カリキュラム・使い方ページのデータの検査(仕様: `docs/data-spec.md`) |
 | `npm run check:lessons` | 学びの記録(`docs/app/lessons/`)の書式の検査。`-- --write` で一覧を更新 |
 | `npm run check:test-titles` | テストの題(`it` / `test`)の形の検査。`-- --write` で、直した題を基準から消す |
+| `npm run check:docs` | 文書の相対リンクの先と、`npm run <名前>` のスクリプトが実在することの検査(対象: `README.md`、`CLAUDE.md`、`CONTRIBUTING.md`、`docs/`、`.claude/skills/`、`packages/*/README.md`) |
 
 PR を出す前に、上のコマンド(`format` 以外)がローカルで通ることを確認してください。同じものが CI でも実行されます。
 

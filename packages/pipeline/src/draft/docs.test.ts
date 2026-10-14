@@ -1,5 +1,5 @@
 import { existsSync, readFileSync } from "node:fs";
-import { dirname, resolve } from "node:path";
+import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { DISTRACTOR_CODES } from "./distractors.ts";
 import { STYLE_RULES } from "./style.ts";
@@ -69,16 +69,6 @@ describe("下書きの手順と設定の一致", () => {
 });
 
 describe("文書の参照", () => {
-  const files = ["question-style.md", "drafting.md"];
-
-  it.each(files)("%s_相対リンクの先が実在する", (name) => {
-    const text = read(name);
-    for (const m of text.matchAll(/\]\((\.\/[^)#]+)\)/g)) {
-      const target = resolve(dirname(resolve(docsDir, name)), m[1] as string);
-      expect(existsSync(target), `${name} から ${m[1]}`).toBe(true);
-    }
-  });
-
   it("エージェントの定義と実装が参照する文書が_実在する", () => {
     expect(existsSync(resolve(docsDir, "question-style.md"))).toBe(true);
     const agent = readFileSync(resolve(docsDir, "../.claude/agents/question-drafter.md"), "utf8");
