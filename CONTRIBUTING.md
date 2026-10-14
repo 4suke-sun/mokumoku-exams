@@ -167,6 +167,26 @@ Closes #12
 
 ## リリース
 
-1. 版の PR をマージします(リリースノートのエントリを含みます)。
-2. `main` の該当のコミットに、タグ `vX.Y.Z` を付けて push します。
-3. タグの push で、リリースが自動で作られます(リリースノートのエントリが本文になります)。タグとリリースノートは、1 対 1 で対応します。
+版の PR をマージし、タグ・Release・マイルストーン・ブランチの削除までは、`scripts/release.ts` で行います(スキル: `.claude/skills/dev-release`)。マージ・タグ・ブランチの削除は、人の明示の指示ごとに行います。
+
+```sh
+npm run release -- <PR の番号> --check   # マージの前の確認だけ(GitHub とファイルの内容は変えない。リモートの情報の取得 `git fetch` で、ローカルの追跡の参照とタグは更新する)
+npm run release -- <PR の番号>           # マージから確認の一覧まで
+```
+
+- 順に行うこと: CI と PR の状態の確認(全ジョブが成功か、変更がなく動かなかった(skipped、neutral)で、`ci-ok` が成功で、`CLEAN`)→ マージ(マージコミット。確認した PR の先頭のコミットに固定する)→ マージコミットの `data/release-notes.json` の先頭が対象の版であることの確認 → マージコミットへの軽量タグの作成と push → タグの push で `release-tag.yml` が作る Release(リモートに同名のタグがあれば、`fetch --tags` でローカルに取り込まれ、マージコミット以外を指すときは、衝突として止まります) の確認 → 版と同名のマイルストーンを閉じる(未完了の Issue があれば、閉じずに止まる)→ 作業ブランチの削除(リモートとローカル。次は残す: `main`・`dev` などの保護対象の名前、フォークからの PR、リモートの先頭が PR の先頭から動いたブランチ、別の作業ツリーで出ているブランチ、`origin/main` に含まれないブランチ)→ `Closes` の Issue と `main` の確認。段階ごとの結果は表で表示します。
+- 再実行してよい作りです。タグ・Release・閉じたマイルストーン・消えたブランチは、「済み」として扱います。失敗した段階(未完了の Issue が残るマイルストーンを含む)で止まり、どの段階まで終えたかを表示します。
+- Release は、タグの push で `release-tag.yml` が作ります(リリースノートのエントリが本文になります)。スクリプトは、作られるまで待って確かめます。タグとリリースノートは、1 対 1 で対応します。
+- スクリプトの呼び出しは、`.claude/settings.json` の確認必須(`ask`)に入っています。権限の確認を省く動作モードでは確認にならないので、人の明示の指示をスキルの中で確かめます。
+- 版の締めでは、この版で引っかかったことを振り返り、再発を防ぐ形(機械検査、共通の決まり、スキルの手順、`docs/app/lessons/`)にします(スキルの Step 4)。
+
+### リポジトリの設定
+
+マージのあと、作業ブランチが残らないように、次の設定にします。
+
+| 設定 | 値 | 確かめ方 |
+| --- | --- | --- |
+| マージ後にブランチを自動で消す(`delete_branch_on_merge`) | 有効 | `gh api repos/{owner}/{repo} --jq .delete_branch_on_merge` が `true` |
+| マージの方式 | マージコミットだけ(`allow_merge_commit` が `true`、`allow_squash_merge` と `allow_rebase_merge` が `false`) | `gh api repos/{owner}/{repo} --jq '{allow_merge_commit, allow_squash_merge, allow_rebase_merge}'` |
+
+設定の変更は、リポジトリの管理者の操作です(`gh api -X PATCH repos/{owner}/{repo} -F delete_branch_on_merge=true -F allow_squash_merge=false -F allow_rebase_merge=false`)。実行の前に、人の確認を取ります。

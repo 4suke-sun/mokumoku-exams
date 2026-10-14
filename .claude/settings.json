@@ -11,7 +11,9 @@
       "Bash(gh issue create*)",
       "Bash(gh issue edit*)",
       "Bash(gh issue close*)",
-      "Bash(gh api*)"
+      "Bash(gh api*)",
+      "Bash(*scripts/release.ts*)",
+      "Bash(npm*run*release*)"
     ],
     "deny": ["Bash(git*--force*)", "Bash(git*--no-verify*)"]
   }
