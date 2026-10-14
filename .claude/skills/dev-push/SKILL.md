@@ -9,6 +9,9 @@ push すると、その範囲の**履歴すべて**がリモートに載る。�
 (あとで消した値も、途中のコミットには残っている)。フック(`.githooks/pre-push`)は正規表現で拾えるものを
 止める。このスキルは、**文脈で判断するもの**と**作者情報**を確認する(フックとの二重防御)。
 
+PR も出すときは、このスキルではなく `/dev-pr` を使う(push も含めて、検査と承認が 1 回になる)。
+commit のときに検査した差分は、台帳に記録されていれば読み直さない(`scripts/inspection-ledger.ts`)。
+
 検査は、検査役のサブエージェント(Agent ツール、`subagent_type: inspector`。定義は `.claude/agents/`)が行う。コミットを作った
 セッションとは別の、文脈を引き継がない目で見る。**push は、検査が OK でも、人が結果を見て承認するまで行わない。**
 
@@ -41,14 +44,14 @@ printf 'refs/heads/%s %s refs/heads/%s %s\n' "$(git branch --show-current)" "$(g
 検査役は Bash を持たない。先に、検査役が読む入力を書き出す(範囲は Step 0 で決めたもの):
 
 ```sh
-node scripts/prepare-inspection.ts --range origin/main..HEAD
+node scripts/prepare-inspection.ts --range <Step 0 で決めた範囲>
 ```
 
 検査役に依頼する内容:
 
 - 作業ディレクトリ
 - 「`.claude/skills/dev-commit/checklist.md` を読み、その項目に沿って、`.drafts/inspect/` のファイル
-  (**全コミットの差分**、**コミットメッセージ、ブランチ名**)を確認する。最後のコミットだけで済ませない」
+  (範囲の全コミットの差分。検査済みで `covered.txt` に挙げられたコミットの差分は除く。**コミットメッセージ、ブランチ名**)を確認する。最後のコミットだけで済ませない」
 - 「報告は、チェックリストの『報告のしかた(必ず守る)』に従う(値を引用しない。最後に `判定: OK/WARN/BLOCK`)」
 
 検査が終わったら、書き出したファイルを消す: `node scripts/prepare-inspection.ts --clean`
@@ -88,4 +91,4 @@ git push -u origin "$(git branch --show-current)"
 
 - `--force` / `--force-with-lease` は、このスキルでは実行しない。必要なら、理由を説明して人の承認を待つ
 - push が失敗したら、原因を確認してから、1 回だけ再試行する
-- push 後、PR を作るなら `/dev-pr` へ
+- PR も出すなら、push の前に `/dev-pr` を使う(push も含めて、検査と承認が 1 回になる)。このスキルで先に push したあとに PR だけ出すときも、`/dev-pr` を使う

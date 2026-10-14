@@ -89,6 +89,14 @@ git commit -F .drafts/commit-msg.txt
 - メッセージの末尾には、`Co-Authored-By:` の署名の行を付けてよい。作成役の案に無ければ、ここで足す。
   足すだけなら、`.claude/skills/dev-commit/reconfirm.md` の例外のとおり、再検査は要らない。
   Claude のセッションへのリンク(`Claude-Session:` の行など)は付けない。機械検査が止める
+- コミット後、検査した差分を台帳に記録する。種類は、実施した検査(`mechanical`、`inspector`、`inspector-deep`)をコンマでつなぎ、
+  判定は、合わせた判定(`OK` / `WARN`)を渡す。push と PR の検査で、台帳に一致する差分は読み直されない
+  (判定が `WARN` のものは、読み直される):
+
+  ```sh
+  node scripts/inspection-ledger.ts record HEAD mechanical,inspector OK
+  ```
+
 - コミット後、`git log -1 --format='%an <%ae>'` で、作者が noreply アドレスであることを確認する。違えば、
   `git config user.email` を直して `git commit --amend --reset-author`(push 前のローカルのみ)
 - `git commit --no-verify` は使わない。フックが止めたら、指摘を直す
