@@ -16,6 +16,7 @@
     "test:e2e": "npm run test:e2e -w @mokumoku-exams/app",
     "pipeline": "npm run pipeline -w @mokumoku-exams/pipeline --",
     "status": "node scripts/status.ts",
+    "verify": "node scripts/verify.ts",
     "check:branch": "node scripts/check-branch.ts",
     "check:commit": "node scripts/check-commit-secrets.ts",
     "check:release-notes": "node scripts/check-release-notes.ts",

@@ -15,6 +15,7 @@ npm install   # 依存を入れ、検査フック(.githooks)を有効にしま�
 | コマンド | 内容 |
 | --- | --- |
 | `npm run status` | 作業の状態の表示(読み取りだけ)。最新のタグ、開いたマイルストーンと未完了の Issue、開いた PR、未 push のコミット、マージ済みで残ったブランチ、作業ツリー。GitHub の情報(`gh`)や git の情報が取れないときは、取れなかった項目を示して、取れた項目だけを表示する。「マージ済みで残ったブランチ」は、`origin/main` に含まれるブランチのうち、コミットのない新しいブランチ(先頭が `origin/main` と同じ)を除いたもの。作業の開始と再開で実行する |
+| `npm run verify` | PR の前に通す検査をまとめて実行する(lint、型検査、`check:*`、データ検査、関係するテスト、関係する build)。失敗した段階を示して止まる。E2E は含まない |
 | `npm run lint` | lint と整形の確認(Biome) |
 | `npm run format` | lint の自動修正と整形 |
 | `npm run typecheck` | 型検査(tsc) |
@@ -29,7 +30,24 @@ npm install   # 依存を入れ、検査フック(.githooks)を有効にしま�
 | `npm run check:env` | アプリ(`packages/app`)が読む環境変数が、CDK(`packages/infra/lib/web-stack.ts`)から Lambda へ渡されることの検査。Lambda が自動で与える変数と開発用の変数は、`scripts/lib/env-contract-check.ts` の一覧で除く。通知の送信の Lambda と、動的な参照(`env[変数]` など)は対象にしない |
 | `npm run check:pr-closes -- --pr <番号>` | PR の `Closes` の Issue が同じ版のマイルストーンで、リリースノートの最新の版がそのマイルストーンの名前(`vX.Y.Z`)と同じで、マイルストーンに `Closes` にない未完了の Issue がないことの検査(`gh` で読む)。`--body-file <下書き>` で、投稿の前に下書きを検査できる。CI の PR で実行する |
 
-PR を出す前に、上のコマンド(`format` 以外)がローカルで通ることを確認してください。`check:pr-closes` は PR の番号が要るので、PR の前は `-- --body-file <下書き>` で下書きを検査します。同じものが CI でも実行されます。
+### 手元の検査(PR の前)
+
+PR を出す前に、`npm run verify` を通します。`verify` の各検査は、CI でも別々のジョブで実行されます(`verify` 自体は CI で動きません)。
+
+- `verify` が順に実行するもの: `lint`、`typecheck`、`check:release-notes`・`check:lessons`・`check:test-titles`・`check:docs`・`check:env`・`check:boundary`(CI の `check` ジョブが実行するもの。フック用の `check:branch`・`check:commit` と、`check:pr-closes` は含まない)、`validate:data`、関係するテスト、関係するワークスペースの `build`。失敗した段階の名前を示して、終了コード 1 で止まります。段階ごとの時間も表示します。
+- 関係するワークスペース(app / infra / pipeline)は、`origin/main` との差分と、未コミット・未追跡の変更から選びます。`origin/main` がないなど、変更が分からないときは、すべて選びます。選び方は、CI の `changes` ジョブと同じです(指定の文字列が CI とずれないことは、テストが確かめます)。契約(`packages/data-schema`)、ルートの設定、`scripts/`、CI の定義が変わったときは、すべて選びます。`scripts/` のテストと `packages/data-schema` のテストは、常に実行します。
+- `verify` に含まないもの: `npm run test:e2e`(ブラウザを使う通し確認で重い。CI の `e2e` ジョブが通す。画面の動きを変えたときは、手元でも実行する)、`check:pr-closes`(PR の番号が要る。PR の前は `npm run check:pr-closes -- --body-file <下書き>` で下書きを検査する)。
+
+### テストが止まる・遅いとき
+
+全部のテスト(`npm test`)は、ルートの `scripts/` のテストのあと、各ワークスペースのテストを順に実行します。手元の一般的な環境で、数十秒で終わる目安です。1 件のテストが 1 秒を超えることは、まれです(最も遅いのは、git や node の子プロセスを起動するテスト)。終わらないプロセスは、`--reporter=hanging-process` で探せます。
+
+止まる、または遅いときは、次の順に切り分けます。
+
+1. 負荷を確かめる。ほかのテストの並行実行、開発サーバー、E2E、ブラウザが動いていると、子プロセスを起動するテストが遅くなります。並行して実行せず、`npm run verify` を 1 つだけ実行します。
+2. 終わらないプロセスを探す: `npx vitest run --reporter=hanging-process`(ワークスペースの中では、そのワークスペースのテストだけを調べる)。
+3. 遅いテストを探す: `npx vitest run --reporter=verbose`。
+4. 子プロセスを起動するテストのタイムアウトは、ルートが 30 秒(`vitest.config.ts`)、スタックの合成(`packages/infra`)が長く設定してあります。これを延ばして直す前に、上の 1〜3 で原因を確かめます。
 
 ## ブランチ
 
