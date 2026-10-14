@@ -101,7 +101,7 @@ describe("checkEntries", () => {
   });
 
   it("配信のドメインの実値を止め、プレースホルダーと例示は通す", () => {
-    const domain = `d${"1a2b3c4d5e".repeat(1)}xyz.cloudfront.net`;
+    const domain = `d${"a".repeat(13)}.cloudfront.net`;
     expect(checkEntries(entry(`https://${domain}/`)).blocks).toEqual(["配信のドメイン: f.md:3"]);
     expect(checkEntries(entry("https://xxxx.cloudfront.net/")).blocks).toHaveLength(0);
     expect(checkEntries(entry("https://d111111abcdef8.cloudfront.net/")).blocks).toHaveLength(0);

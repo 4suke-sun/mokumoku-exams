@@ -29,7 +29,7 @@ PR・Issue の本文は自由度が高いので、作成役は `commit-writer`(H
 1. PR の場合: PR の範囲(`git log --oneline origin/main..HEAD`)が空でないか。検査と承認は、この範囲の全体に対して行う。
    push は、Step 6 で承認のあとに行う(先に `/dev-push` はしない)。リモートに同名のブランチがあり、
    `git log --oneline @{upstream}..HEAD` が空なら、push は飛ばす
-2. PR の場合: ブランチが `main` でないこと(`git branch --show-current`)。`main` への直接 push は、リリースタグの運用に従うときだけで、通常はしない。
+2. PR の場合: ブランチが `main` でないこと(`git branch --show-current`)。
    `git remote get-url origin` が、意図したリポジトリであること
 3. PR の場合: 対応する Issue があるか(ブランチ名が `<prefix>/#<番号>-…` か)
 4. 版を切る PR の場合: `data/release-notes.json` に、その版のエントリがあるか
@@ -65,10 +65,16 @@ printf 'refs/heads/%s %s refs/heads/%s %s\n' "$(git branch --show-current)" "$(g
 
 ## Step 3. 検査役: 確認する
 
-検査役は Bash を持たない。先に、検査役が読む入力を書き出す(PR の場合。Issue だけのときは不要):
+検査役は Bash を持たない。先に、検査役が読む入力を書き出す。PR の場合:
 
 ```sh
 node scripts/prepare-inspection.ts --pr
+```
+
+Issue だけの場合も、拒否リストの置き場を検査役に渡すために実行する(何もステージしていなければ、差分は空で、置き場だけが出る):
+
+```sh
+node scripts/prepare-inspection.ts --cached
 ```
 
 検査役に依頼する内容:
