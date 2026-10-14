@@ -1,4 +1,4 @@
-import { createHash } from "node:crypto";
+import { ownerTag } from "./owner-tag.ts";
 import { DEFAULT_PREFS, type Prefs, STYLE_VALUES, THEME_VALUES } from "./prefs.ts";
 
 // 表示の設定を、サーバーが最初の描画から反映するための Cookie。サーバーだけが読む(HttpOnly)。
@@ -10,10 +10,8 @@ const VERSION = "v1";
 /** 1 年 */
 const MAX_AGE_SECONDS = 365 * 24 * 60 * 60;
 
-/** 持ち主の照合。`sub` の SHA-256 の先頭 16 文字(識別子そのものは、Cookie に入れない) */
-export function ownerTag(sub: string): string {
-  return createHash("sha256").update(sub).digest("hex").slice(0, 16);
-}
+/** 持ち主の照合は、`owner-tag.ts` の印(識別子そのものは、Cookie に入れない) */
+export { ownerTag };
 
 export function prefsCookieValue(sub: string, prefs: Prefs): string {
   return [VERSION, ownerTag(sub), prefs.theme, prefs.style, prefs.shuffleChoices ? "1" : "0"].join(".");

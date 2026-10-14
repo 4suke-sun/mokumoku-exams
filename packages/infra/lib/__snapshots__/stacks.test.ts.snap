@@ -320,6 +320,16 @@ exports[`PushStack > 合成すると_スナップショットと一致する 1`]
       },
       "Type": "AWS::Lambda::Function",
     },
+    "SenderFunctionEventInvokeConfig4E3E1651": {
+      "Properties": {
+        "FunctionName": {
+          "Ref": "SenderFunction5DD1AB71",
+        },
+        "MaximumRetryAttempts": 0,
+        "Qualifier": "$LATEST",
+      },
+      "Type": "AWS::Lambda::EventInvokeConfig",
+    },
     "SenderFunctionServiceRoleCA9393B1": {
       "Properties": {
         "AssumeRolePolicyDocument": {

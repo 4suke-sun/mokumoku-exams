@@ -72,7 +72,7 @@ describe("毎日の通知", () => {
 
     const result = await runDaily({ client, tableName: "table-example", send });
 
-    expect(result).toEqual({ sent: 1, failed: 0, gone: 1 });
+    expect(result).toEqual({ sent: 1, failed: 0, gone: 1, deleteFailed: 0 });
     expect(sent.sort()).toEqual([endpointOf(1), endpointOf(2)]);
     expect([...items.keys()].sort()).toEqual(
       [`USER#user-a|${pushKey(endpointOf(1))}`, "USER#user-b|BOOKMARK#EX-SMP-XX#SAMPLE-0001"].sort(),
@@ -90,7 +90,7 @@ describe("毎日の通知", () => {
       tableName: "table-example",
       send: sender({ [endpointOf(1)]: "failed" }).send,
     });
-    expect(result).toEqual({ sent: 0, failed: 1, gone: 0 });
+    expect(result).toEqual({ sent: 0, failed: 1, gone: 0, deleteFailed: 0 });
     expect(items.size).toBe(1);
   });
 
@@ -108,7 +108,43 @@ describe("毎日の通知", () => {
     seed(items, "user-a", 1);
     const log = vi.fn();
     await runDailyAndLog({ client, tableName: "table-example", send: sender().send }, log);
-    expect(log.mock.calls).toEqual([[JSON.stringify({ message: "daily push", sent: 1, failed: 0, gone: 0 })]]);
+    expect(log.mock.calls).toEqual([
+      [JSON.stringify({ message: "daily push", sent: 1, failed: 0, gone: 0, deleteFailed: 0 })],
+    ]);
+  });
+
+  it("購読の削除が 1 件失敗した_残りの削除を続け_失敗の数を返し_関数は失敗にしない", async () => {
+    const { items, client: table } = fakeTable();
+    seed(items, "user-a", 1);
+    seed(items, "user-b", 2);
+    seed(items, "user-c", 3);
+    const failing = pushKey(endpointOf(2));
+    // 2 件目の購読の削除だけ、条件に外れて失敗する(スキャンのあとに、利用者が通知を止めたときなど)
+    const client = {
+      async send(command: unknown) {
+        if (command instanceof DeleteCommand && (command.input.Key as { SK: string }).SK === failing) {
+          throw new Error("ConditionalCheckFailedException");
+        }
+        return table.send(command);
+      },
+    };
+    const gone = Object.fromEntries([1, 2, 3].map((n) => [endpointOf(n), "gone" as const]));
+    const log = vi.fn();
+
+    const result = await runDailyAndLog({ client, tableName: "table-example", send: sender(gone).send }, log);
+
+    expect(result).toEqual({ sent: 0, failed: 0, gone: 2, deleteFailed: 1 });
+    expect([...items.keys()]).toEqual([`USER#user-b|${failing}`]);
+    expect(log.mock.calls).toEqual([
+      [JSON.stringify({ message: "daily push", sent: 0, failed: 0, gone: 2, deleteFailed: 1 })],
+    ]);
+    // ログに、購読の情報(endpoint やキー)を出さない
+    const line = String(log.mock.calls[0]?.[0]);
+    for (const n of [1, 2, 3]) {
+      expect(line).not.toContain(endpointOf(n));
+      expect(line).not.toContain(pushKey(endpointOf(n)));
+    }
+    expect(line).not.toContain("user-");
   });
 
   it("秘密鍵を読めない_数ではなく種類だけを記録して失敗にし_購読を消さない", async () => {

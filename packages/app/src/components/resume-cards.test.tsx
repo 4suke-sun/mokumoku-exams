@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it } from "vitest";
-import { browserStore, type Session, saveSession } from "@/lib/storage.ts";
+import { browserStore, type Session, saveSession, setStorageOwner } from "@/lib/storage.ts";
 import { ResumeCards } from "./resume-cards.tsx";
 
 const exams = [
@@ -68,6 +68,31 @@ describe("前回の続きのカード", () => {
 
   it("いまのデータにない問題を含む_続きから解けないので出さない", () => {
     saveSession(browserStore(), session("TEST", ["TEST-0001", "TEST-0099"], {}, "2026-10-11T00:00:00.000Z"));
+    const { container } = render(<ResumeCards exams={exams} />);
+    expect(container.textContent).toBe("");
+  });
+
+  it("別のアカウントの途中の状態_出さない", () => {
+    setStorageOwner("aaaaaaaaaaaaaaaa");
+    saveSession(browserStore(), session("TEST", ["TEST-0001"], {}, "2026-10-11T00:00:00.000Z"));
+    setStorageOwner("bbbbbbbbbbbbbbbb");
+    const { container } = render(<ResumeCards exams={exams} />);
+    expect(container.textContent).toBe("");
+  });
+
+  it("持ち主の印が取れるまで_読まず_取れたら_そのアカウントの途中の状態を出す", async () => {
+    saveSession(browserStore(), session("TEST", ["TEST-0001"], {}, "2026-10-11T00:00:00.000Z"));
+    const owner = "0123456789abcdef";
+    setStorageOwner(undefined);
+    const { container } = render(<ResumeCards exams={exams} />);
+    expect(container.textContent).toBe("");
+    act(() => setStorageOwner(owner));
+    expect(await screen.findByRole("link", { name: "テスト資格を続きから解く" })).toBeTruthy();
+  });
+
+  it("持ち主の印が取れない_途中の状態を出さない", () => {
+    saveSession(browserStore(), session("TEST", ["TEST-0001"], {}, "2026-10-11T00:00:00.000Z"));
+    setStorageOwner(null);
     const { container } = render(<ResumeCards exams={exams} />);
     expect(container.textContent).toBe("");
   });

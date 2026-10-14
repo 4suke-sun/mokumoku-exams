@@ -1,18 +1,15 @@
 "use client";
 
-import { pushPrefs } from "@/lib/prefs-client.ts";
-import { browserStore } from "@/lib/storage.ts";
+import { changePrefs } from "@/lib/prefs-client.ts";
 import { useVisualStyle } from "@/lib/use-visual-style.ts";
-import { applyStyle, STYLE_CHOICES, saveStyle, type VisualStyle } from "@/lib/visual-style.ts";
+import { STYLE_CHOICES, type VisualStyle } from "@/lib/visual-style.ts";
 
 /** 画面スタイル(リッチ / シンプル)の切り替え。選択は `<html data-style>` に反映し、端末に保存して、アカウントにも送る。 */
 export function StyleToggle() {
   const style = useVisualStyle();
 
   function select(next: VisualStyle) {
-    applyStyle(document.documentElement, next);
-    saveStyle(browserStore(), next);
-    void pushPrefs();
+    void changePrefs({ style: next });
   }
 
   return (

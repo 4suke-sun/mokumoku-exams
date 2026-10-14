@@ -179,7 +179,9 @@ export async function putSectionProgress(progress: SectionProgress): Promise<Sec
  * 端末のセクションの進捗と、サーバーの進捗を 1 つにして、画面に出す進捗を返す。
  * - サーバーを読めないとき(未ログイン・通信の失敗)は、端末の進捗をそのまま返す。
  * - 端末に、サーバーにない記録(別の端末で解く前の記録や、保存に失敗した記録)があれば、サーバーに取り込む。
- * - 統合した進捗は、端末にも保存する(別のアカウントの記録は、サーバーのものが優先され、混ざらない)。
+ * - 統合した進捗は、端末にも保存する。
+ * 端末の記録は、`browserStore()` の持ち主の照合を通したものだけを扱う。ほかのアカウントの記録はキーが違うので読まず、取り込まない。
+ * 持ち主の印が取れないときは、端末の記録を読まないので、サーバーの進捗だけになる。
  */
 export async function syncSectionProgress(store: KeyValueStore, examCode: string): Promise<SectionProgress> {
   const local = loadSectionProgress(store, examCode);

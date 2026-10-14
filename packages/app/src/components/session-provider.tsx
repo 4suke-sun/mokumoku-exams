@@ -5,6 +5,7 @@ import { createContext, type ReactNode, useCallback, useContext, useEffect, useM
 import { fetchSession, postJson } from "@/lib/auth/client.ts";
 import { refreshDelayMs } from "@/lib/auth/refresh.ts";
 import { syncPrefs } from "@/lib/prefs-client.ts";
+import { setStorageOwner, storageOwner } from "@/lib/storage.ts";
 
 export type SessionState =
   | { status: "loading" }
@@ -32,8 +33,14 @@ export function SessionProvider({ children }: { children: ReactNode }) {
 
   const reload = useCallback(async () => {
     const info = await fetchSession();
-    // 取得できなかったとき(通信の失敗)は、いまの状態を変えない
-    if (info === null) return;
+    // 取得できなかったとき(通信の失敗)は、いまの状態を変えない。
+    // まだ持ち主の印がないときは、印が取れないもの(null)とし、端末の記録を読まない(印は端末に保存しない)
+    if (info === null) {
+      if (storageOwner() === undefined) setStorageOwner(null);
+      return;
+    }
+    // 端末の記録は、この印のアカウントの分だけを読み書きする(storage.ts の browserStore)
+    setStorageOwner(info.signedIn ? (info.owner ?? null) : null);
     if (info.signedIn) {
       wasSignedIn.current = true;
       setState({ status: "signed-in", email: info.email, expiresAt: info.expiresAt, isAdmin: info.isAdmin === true });
@@ -49,6 +56,8 @@ export function SessionProvider({ children }: { children: ReactNode }) {
   const signOut = useCallback(async () => {
     await postJson("/api/auth/logout", {});
     wasSignedIn.current = false;
+    // 端末の記録は消さない(持ち主ごとにキーが分かれるので、次のアカウントには混ざらない)
+    setStorageOwner(null);
     setState({ status: "signed-out" });
     router.push("/login");
     router.refresh();
@@ -83,6 +92,7 @@ export function SessionProvider({ children }: { children: ReactNode }) {
         return;
       }
       wasSignedIn.current = false;
+      setStorageOwner(null);
       setState({ status: "signed-out" });
       router.push("/login");
     };

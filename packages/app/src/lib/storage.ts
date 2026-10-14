@@ -1,25 +1,115 @@
 import { z } from "zod";
 import { LEGACY_EXAM_CODES } from "./legacy-exam-codes.ts";
 
-// ブラウザの localStorage に保存する学習の状態。認証のない段階の保存先で、端末の中だけに残る。
+// ブラウザの localStorage に保存する学習の状態。端末の中だけに残る。
 // 読み出した値は外部の入力として扱い、形を検査する。壊れていたら、保存されていないものとして扱う。
 
 /** localStorage と同じ形の、最小の保存先。テストで差し替えられるようにする。 */
 export type KeyValueStore = Pick<Storage, "getItem" | "setItem" | "removeItem">;
 
+const KEY_PREFIX = "mokumoku:v1";
+
+/** 資格ごとに持つ記録の種類。持ち主(ログインしているアカウント)ごとに分ける */
+const PER_EXAM_KINDS = ["session", "results", "stages", "sections", "conditions"] as const;
+
 /**
- * ブラウザの localStorage。保存が禁止されていると、`window.localStorage` を参照した時点で例外になる。
+ * 資格ごとの記録の、持ち主の印を付ける前のキー(`mokumoku:v1:<種類>:<試験コード>`)。
+ * 各関数はこの形のキーで読み書きし、`ownedStore` が、端末に置くキー(`mokumoku:v1:<持ち主の印>:<種類>:<試験コード>`)に変える。
+ */
+const PER_EXAM_KEY = new RegExp(`^${KEY_PREFIX}:(?:${PER_EXAM_KINDS.join("|")}):`);
+
+/** 持ち主の印の形(`sub` の SHA-256 の先頭 16 文字。`lib/owner-tag.ts`) */
+const OWNER_PATTERN = /^[0-9a-f]{16}$/;
+
+/**
+ * いまの持ち主の印。セッションの API(`GET /api/auth/session`)の応答から、SessionProvider が渡す。端末には保存しない。
+ * undefined は、まだ取れていない間(セッションの読み込み中)。null は、持ち主がいない・印が取れないとき(未ログイン・接続の失敗)。
+ * 印は、端末の記録を持ち主ごとに分けるためだけに使い、認可の判断には使わない。
+ */
+let owner: string | null | undefined;
+const ownerListeners = new Set<() => void>();
+
+/** 持ち主の印を変える。形の合わない値は、印が取れないもの(null)として扱う。undefined は、読み込み中に戻す */
+export function setStorageOwner(next: string | null | undefined): void {
+  const value = typeof next === "string" && !OWNER_PATTERN.test(next) ? null : next;
+  if (value === owner) return;
+  owner = value;
+  for (const listener of ownerListeners) listener();
+}
+
+export function storageOwner(): string | null | undefined {
+  return owner;
+}
+
+/** 持ち主の印が変わったときに呼ぶ関数を登録する。戻り値で登録を外す */
+export function subscribeStorageOwner(listener: () => void): () => void {
+  ownerListeners.add(listener);
+  return () => {
+    ownerListeners.delete(listener);
+  };
+}
+
+/**
+ * 持ち主の照合をした保存先。資格ごとの記録だけ、キーに持ち主の印を入れて読み書きする(ほかのアカウントの記録は、キーが違うので読まない)。
+ * 印がないとき(読み込み中・取れないとき)は、資格ごとの記録を読まず(null)、書かず(例外)、消さない。
+ * 表示の設定など、資格ごとの記録でないキーは、そのまま扱う。
+ */
+export function ownedStore(base: KeyValueStore, tag: string | null | undefined): KeyValueStore {
+  const resolve = (key: string): string | null => {
+    if (!PER_EXAM_KEY.test(key)) return key;
+    return tag ? `${KEY_PREFIX}:${tag}:${key.slice(KEY_PREFIX.length + 1)}` : null;
+  };
+  return {
+    getItem: (key) => {
+      const resolved = resolve(key);
+      return resolved === null ? null : base.getItem(resolved);
+    },
+    setItem: (key, value) => {
+      const resolved = resolve(key);
+      if (resolved === null) throw new Error("持ち主が分からないため、保存しません。");
+      base.setItem(resolved, value);
+    },
+    removeItem: (key) => {
+      const resolved = resolve(key);
+      if (resolved !== null) base.removeItem(resolved);
+    },
+  };
+}
+
+/** 持ち主の印のない、資格ごとの記録(`mokumoku:v1:<種類>:<試験コード>`)を、読まずに消す */
+export function removeUnownedRecords(storage: Pick<Storage, "length" | "key" | "removeItem">): void {
+  const keys: string[] = [];
+  for (let i = 0; i < storage.length; i++) {
+    const key = storage.key(i);
+    if (key !== null && PER_EXAM_KEY.test(key)) keys.push(key);
+  }
+  for (const key of keys) storage.removeItem(key);
+}
+
+/**
+ * ブラウザの localStorage を、いまの持ち主の照合を付けて返す(`ownedStore`)。
+ * 保存が禁止されていると、`window.localStorage` を参照した時点で例外になる。
  * 参照を各メソッドの中で行い、この例外を、保存の処理の try で受けられるようにする。
  */
 export function browserStore(): KeyValueStore {
-  const store: KeyValueStore = {
+  const local: KeyValueStore = {
     getItem: (key) => window.localStorage.getItem(key),
     setItem: (key, value) => window.localStorage.setItem(key, value),
     removeItem: (key) => window.localStorage.removeItem(key),
   };
-  // 以前の試験コードで保存した記録を、このページの読み込みで 1 回だけ、新しいコードへ移す
-  if (!legacyKeysChecked && typeof window !== "undefined") {
-    legacyKeysChecked = true;
+  // 持ち主の印のない記録を、このページの読み込みで 1 回だけ、読まずに消す
+  if (!unownedRemoved && typeof window !== "undefined") {
+    unownedRemoved = true;
+    try {
+      removeUnownedRecords(window.localStorage);
+    } catch {
+      // 保存が禁止されているときなど。消せなくても、印のない記録は読まないので、画面は動く
+    }
+  }
+  const store = ownedStore(local, owner);
+  // 以前の試験コードで保存した記録を、持ち主ごとに、このページの読み込みで 1 回だけ、新しいコードへ移す
+  if (owner && !legacyKeysChecked.has(owner) && typeof window !== "undefined") {
+    legacyKeysChecked.add(owner);
     try {
       migrateLegacyExamKeys(store, LEGACY_EXAM_CODES);
     } catch {
@@ -29,10 +119,8 @@ export function browserStore(): KeyValueStore {
   return store;
 }
 
-let legacyKeysChecked = false;
-
-/** 資格ごとに持つ記録の種類(キーは `mokumoku:v1:<種類>:<試験コード>`) */
-const PER_EXAM_KINDS = ["session", "results", "stages", "sections", "conditions"] as const;
+let unownedRemoved = false;
+const legacyKeysChecked = new Set<string>();
 
 /** 値の中の `examCode` を、旧コードから新しいコードに置き換える(入れ子の中も) */
 function replaceExamCode(value: unknown, from: string, to: string): unknown {
@@ -51,6 +139,7 @@ function replaceExamCode(value: unknown, from: string, to: string): unknown {
 /**
  * 以前の試験コードのキーで保存した記録を、新しい試験コードのキーへ移す。値の中の `examCode` も新しいコードにする。
  * 新しいコードのキーにすでに記録があるときは、それを残し、以前のキーだけを消す。値が読めないときは、以前のキーを消さない。
+ * 持ち主の照合をした保存先(`ownedStore`)に使い、同じ持ち主の記録の中で移す。
  */
 export function migrateLegacyExamKeys(store: KeyValueStore, legacy: Readonly<Record<string, string>>): void {
   for (const [from, to] of Object.entries(legacy)) {
@@ -73,7 +162,6 @@ export function migrateLegacyExamKeys(store: KeyValueStore, legacy: Readonly<Rec
   }
 }
 
-const KEY_PREFIX = "mokumoku:v1";
 /**
  * この端末に結果を残す件数(資格ごと、新しい順)。localStorage の容量(多くのブラウザで 5MB 程度)に収まるよう、上限を置く。
  * アカウントには、件数の上限なしで残す(docs/app/data.md)。

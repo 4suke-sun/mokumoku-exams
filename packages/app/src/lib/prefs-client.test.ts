@@ -2,6 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import {
   applyPrefs,
+  changePrefs,
   fetchPrefs,
   hasLocalPrefs,
   pushPrefs,
@@ -173,5 +174,30 @@ describe("変更したあとの送信", () => {
     applyPrefs(browserStore(), prefs);
     await expect(pushPrefs(browserStore())).resolves.toBeUndefined();
     expect(readLocalPrefs(browserStore())).toEqual(prefs);
+  });
+});
+
+describe("表示の設定の変更", () => {
+  it("テーマを変える_画面と端末に反映し_設定の全体をアカウントへ送る", async () => {
+    const server = stubServer(null);
+    await changePrefs({ theme: "dark" });
+    expect(document.documentElement.getAttribute("data-theme")).toBe("dark");
+    expect(readLocalPrefs(browserStore())).toEqual({ theme: "dark", style: "rich", shuffleChoices: false });
+    expect(server.stored()).toEqual({ theme: "dark", style: "rich", shuffleChoices: false });
+  });
+
+  it("画面スタイルを変える_画面と端末に反映し_アカウントへ送る", async () => {
+    const server = stubServer(null);
+    await changePrefs({ style: "simple" });
+    expect(document.documentElement.getAttribute("data-style")).toBe("simple");
+    expect(server.stored()).toEqual({ theme: "system", style: "simple", shuffleChoices: false });
+  });
+
+  it("シャッフルを変える_解答の表示のしかたは端末の値を残し_アカウントへは送らない", async () => {
+    const server = stubServer(null);
+    saveSettings(browserStore(), { shuffleChoices: false, reveal: "each" });
+    await changePrefs({ shuffleChoices: true });
+    expect(loadSettings(browserStore())).toEqual({ shuffleChoices: true, reveal: "each" });
+    expect(server.stored()).toEqual({ theme: "system", style: "rich", shuffleChoices: true });
   });
 });

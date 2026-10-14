@@ -50,6 +50,7 @@ import {
 } from "@/lib/storage.ts";
 import { STAGE_PASS_PERCENT } from "@/lib/study-stages.ts";
 import type { ChoiceQuestion, FreeTextQuestion, PublishedExam, Question } from "@/lib/types.ts";
+import { useStorageOwner } from "@/lib/use-storage-owner.ts";
 
 type Props = { exam: PublishedExam; questions: Question[] };
 
@@ -99,8 +100,11 @@ export function ResultView({ exam, questions }: Props) {
   const [stageCheck, setStageCheck] = useState<StageCheck | null>(null);
   const [sectionCheck, setSectionCheck] = useState<SectionProgress["last"] | null>(null);
   const bookmarks = useBookmarks(exam.examCode);
+  const owner = useStorageOwner();
 
   useEffect(() => {
+    // 持ち主の印が取れるまでは、端末の記録を読まない(印が取れたら、読み直す)
+    if (owner === undefined) return;
     let active = true;
     void (async () => {
       const local = loadResults(browserStore(), exam.examCode);
@@ -127,7 +131,7 @@ export function ResultView({ exam, questions }: Props) {
     return () => {
       active = false;
     };
-  }, [exam.examCode]);
+  }, [exam.examCode, owner]);
 
   /** この端末にだけある記録を、アカウントに移す。すべて移せたときだけ、端末の記録を消す。 */
   async function migrate() {

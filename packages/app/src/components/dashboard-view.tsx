@@ -15,6 +15,7 @@ import { EARLIEST_GOAL_DATE, LATEST_GOAL_DATE } from "@/lib/history/schema.ts";
 import { domainSelectHref, resultDetailHref } from "@/lib/quiz.ts";
 import { daysBetween, jstDate, type StudyDay } from "@/lib/study-days.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
+import { useStorageOwner } from "@/lib/use-storage-owner.ts";
 
 type Props = { exam: PublishedExam; questions: Question[] };
 
@@ -38,8 +39,11 @@ type State =
 /** 資格の学習の状況(正答率、学習量、合格予測)を表示する。 */
 export function DashboardView({ exam, questions }: Props) {
   const [state, setState] = useState<State>({ status: "loading" });
+  const owner = useStorageOwner();
 
   useEffect(() => {
+    // 持ち主の印が取れるまでは、端末の記録を読まない(印が取れたら、読み直す)
+    if (owner === undefined) return;
     let active = true;
     void (async () => {
       const [loaded, review, bookmarks, days, goal] = await Promise.all([
@@ -70,7 +74,7 @@ export function DashboardView({ exam, questions }: Props) {
     return () => {
       active = false;
     };
-  }, [exam, questions]);
+  }, [exam, questions, owner]);
 
   if (state.status === "loading") {
     return <DashboardSkeleton />;
