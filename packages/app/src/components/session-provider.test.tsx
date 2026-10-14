@@ -2,6 +2,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { browserStore, saveSession, setStorageOwner, storageOwner } from "@/lib/storage.ts";
 import { AuthStatus } from "./auth-status.tsx";
 import { SessionProvider } from "./session-provider.tsx";
 
@@ -147,5 +148,58 @@ describe("SessionProvider の表示の設定の同期", () => {
     );
     await screen.findByRole("link", { name: "ログイン" });
     expect(calledPaths(fetchMock)).not.toContain("/api/history/prefs");
+  });
+});
+
+describe("SessionProvider と端末の記録の持ち主", () => {
+  const owner = "aaaaaaaaaaaaaaaa";
+
+  it("ログイン中_セッションの応答の印を_端末の記録の持ち主にする", async () => {
+    setStorageOwner(undefined);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(reply(200, { signedIn: true, email: null, expiresAt: far(), owner })),
+    );
+    render(
+      <SessionProvider>
+        <AuthStatus />
+      </SessionProvider>,
+    );
+    await waitFor(() => expect(storageOwner()).toBe(owner));
+  });
+
+  it("セッションに接続できない_印が取れないもの(null)とし_端末の記録を読まない", async () => {
+    setStorageOwner(undefined);
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
+    render(
+      <SessionProvider>
+        <AuthStatus />
+      </SessionProvider>,
+    );
+    await waitFor(() => expect(storageOwner()).toBeNull());
+  });
+
+  it("ログアウト_印を外し_端末の記録は消さない", async () => {
+    setStorageOwner(owner);
+    saveSession(browserStore(), {
+      examCode: "TEST",
+      questionIds: ["TEST-0001"],
+      answers: {},
+      index: 0,
+      startedAt: "2026-10-01T00:00:00.000Z",
+    });
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(reply(200, { signedIn: true, email: null, expiresAt: far(), owner })),
+    );
+    render(
+      <SessionProvider>
+        <AuthStatus />
+      </SessionProvider>,
+    );
+    await userEvent.setup().click(await screen.findByRole("button", { name: "ログアウト" }));
+    await waitFor(() => expect(storageOwner()).toBeNull());
+    expect(localStorage.getItem(`mokumoku:v1:${owner}:session:TEST`)).not.toBeNull();
+    localStorage.clear();
   });
 });

@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { ownerTag } from "../owner-tag.ts";
 import {
   createFakeProvider,
   FAKE_ADMIN_EMAIL,
@@ -8,6 +9,7 @@ import {
   FAKE_RESET_CODE,
   FAKE_USER_EMAIL,
   FAKE_USER_PHRASE,
+  fakeSub,
 } from "./fake.ts";
 import {
   type Deps,
@@ -181,6 +183,29 @@ describe("ログアウトとセッション", () => {
     const cookie = cookieHeader(await login(d));
     const body = await (await handleSession(new Request("https://example.com/api", { headers: { cookie } }), d)).json();
     expect(body).toMatchObject({ signedIn: true, email: FAKE_USER_EMAIL, isAdmin: false });
+  });
+
+  it("ログイン中_持ち主の印を返し_利用者の識別子は含まない", async () => {
+    const d = deps();
+    const cookie = cookieHeader(await login(d));
+    const response = await handleSession(new Request("https://example.com/api", { headers: { cookie } }), d);
+    const text = await response.text();
+    const body = JSON.parse(text);
+    expect(body.owner).toBe(ownerTag(fakeSub(FAKE_USER_EMAIL)));
+    expect(body.owner).toMatch(/^[0-9a-f]{16}$/);
+    expect(text).not.toContain(fakeSub(FAKE_USER_EMAIL));
+    expect(body).not.toHaveProperty("sub");
+  });
+
+  it("別のアカウント_別の持ち主の印を返す", async () => {
+    const d = deps();
+    const sessionOf = async (email: string, password: string) => {
+      const cookie = cookieHeader(await handleLogin(post({ email, password }), d));
+      return (await handleSession(new Request("https://example.com/api", { headers: { cookie } }), d)).json();
+    };
+    const user = await sessionOf(FAKE_USER_EMAIL, FAKE_USER_PHRASE);
+    const admin = await sessionOf(FAKE_ADMIN_EMAIL, FAKE_ADMIN_PHRASE);
+    expect(user.owner).not.toBe(admin.owner);
   });
 
   it("管理者のグループに入っている_表示のための isAdmin を true で返す", async () => {

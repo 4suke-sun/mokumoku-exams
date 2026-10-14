@@ -79,9 +79,33 @@ export async function syncPrefs(store: KeyValueStore = browserStore()): Promise<
   return false;
 }
 
-/** 端末の設定を変えたあとに、アカウントへ送る(失敗しても、端末の設定はそのまま。次の変更か、ログインで追いつく) */
+/** 端末の設定を、アカウントへ送る(失敗しても、端末の設定はそのまま。次の変更か、ログインで追いつく) */
 export async function pushPrefs(store: KeyValueStore = browserStore()): Promise<void> {
   await putPrefs(readLocalPrefs(store));
+}
+
+/**
+ * 表示の設定(テーマ・画面スタイル・シャッフル)を変える。画面の切り替えは、すべてこの関数を通す。
+ * 変えた項目だけを、いまの画面と端末に反映し、そのあと設定の全体をアカウントへ送る。
+ * 解答の表示のしかたは、表示の設定ではないので、この関数では扱わない(端末にだけ保存し、アカウントへは送らない)。
+ */
+export async function changePrefs(
+  change: Partial<Prefs>,
+  store: KeyValueStore = browserStore(),
+  root: HTMLElement = document.documentElement,
+): Promise<void> {
+  if (change.theme !== undefined) {
+    applyTheme(root, change.theme);
+    saveTheme(store, change.theme);
+  }
+  if (change.style !== undefined) {
+    applyStyle(root, change.style);
+    saveStyle(store, change.style);
+  }
+  if (change.shuffleChoices !== undefined) {
+    saveSettings(store, { ...loadSettings(store), shuffleChoices: change.shuffleChoices });
+  }
+  await pushPrefs(store);
 }
 
 export { DEFAULT_PREFS };

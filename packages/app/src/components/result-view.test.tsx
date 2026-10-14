@@ -11,6 +11,7 @@ import {
   saveResult,
   saveSectionCheck,
   saveStageCheck,
+  setStorageOwner,
 } from "@/lib/storage.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 import { ResultView } from "./result-view.tsx";
@@ -72,6 +73,15 @@ describe("ResultView", () => {
   it("結果がない_案内を表示する", async () => {
     render(<ResultView exam={exam} questions={questions} />);
     expect(await screen.findByText("結果がありません")).toBeTruthy();
+  });
+
+  it("別のアカウントが端末に残した結果_表示せず_移す件数にも数えない", async () => {
+    setStorageOwner("aaaaaaaaaaaaaaaa");
+    saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["A"], "TEST-0003": ["B"] });
+    setStorageOwner("bbbbbbbbbbbbbbbb");
+    render(<ResultView exam={exam} questions={questions} />);
+    expect(await screen.findByText("結果がありません")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /アカウントに移す/ })).toBeNull();
   });
 
   it("2 問が不正解_正答率と_間違えた問題の数を表示する", async () => {

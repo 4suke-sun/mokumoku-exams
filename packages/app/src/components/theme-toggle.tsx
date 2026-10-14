@@ -1,8 +1,7 @@
 "use client";
 
-import { pushPrefs } from "@/lib/prefs-client.ts";
-import { browserStore } from "@/lib/storage.ts";
-import { applyTheme, saveTheme, THEME_CHOICES, type ThemeChoice } from "@/lib/theme.ts";
+import { changePrefs } from "@/lib/prefs-client.ts";
+import { THEME_CHOICES, type ThemeChoice } from "@/lib/theme.ts";
 import { useThemeChoice } from "@/lib/use-visual-style.ts";
 
 /** 表示テーマの切り替え。選択は `<html data-theme>` に反映し、端末に保存して、アカウントにも送る。 */
@@ -11,9 +10,7 @@ export function ThemeToggle() {
   const choice = useThemeChoice();
 
   function select(next: ThemeChoice) {
-    applyTheme(document.documentElement, next);
-    saveTheme(browserStore(), next);
-    void pushPrefs();
+    void changePrefs({ theme: next });
   }
 
   return (

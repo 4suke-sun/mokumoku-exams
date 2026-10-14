@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ownerTag } from "../owner-tag.ts";
 import { ADMIN_GROUP } from "./admin.ts";
 import { clearedCookies, isExpired, readClaims, readCookies, sessionCookies } from "./session.ts";
 import { AuthError, type AuthErrorCode, type AuthProvider, type Tokens } from "./types.ts";
@@ -137,6 +138,7 @@ async function activeTokens(request: Request, deps: Deps): Promise<Active | null
 /**
  * 現在のログイン状態。期限切れでも更新できればログイン中として返す。更新できなければ Cookie を破棄する。
  * `isAdmin` は、ナビゲーションの表示のためだけの値。管理者の経路の認可は、proxy と管理者の画面が、検証したトークンで行う。
+ * `owner` は、端末の記録を持ち主ごとに分けるための印(`sub` から作る。識別子そのものは返さない)。認可の判断には使わない。
  */
 export async function handleSession(request: Request, deps: Deps): Promise<Response> {
   const active = await activeTokens(request, deps);
@@ -144,9 +146,15 @@ export async function handleSession(request: Request, deps: Deps): Promise<Respo
     const hadCookie = Object.values(readCookies(request.headers.get("cookie"))).some(Boolean);
     return json({ signedIn: false }, 200, hadCookie ? clearedCookies(deps.secure) : []);
   }
-  const { exp, email: address, groups } = readClaims(active.tokens.idToken);
+  const { exp, email: address, groups, sub } = readClaims(active.tokens.idToken);
   return json(
-    { signedIn: true, email: address ?? null, expiresAt: exp ?? null, isAdmin: groups?.includes(ADMIN_GROUP) ?? false },
+    {
+      signedIn: true,
+      email: address ?? null,
+      expiresAt: exp ?? null,
+      isAdmin: groups?.includes(ADMIN_GROUP) ?? false,
+      owner: sub ? ownerTag(sub) : null,
+    },
     200,
     active.cookies,
   );

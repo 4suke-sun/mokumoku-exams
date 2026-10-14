@@ -1,5 +1,11 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { type KeyValueStore, loadSectionProgress, type SectionProgress, saveSectionProgress } from "@/lib/storage.ts";
+import {
+  type KeyValueStore,
+  loadSectionProgress,
+  ownedStore,
+  type SectionProgress,
+  saveSectionProgress,
+} from "@/lib/storage.ts";
 import { syncSectionProgress } from "./client.ts";
 
 function memoryStore(): KeyValueStore {
@@ -84,5 +90,26 @@ describe("セクションの進捗の同期", () => {
     const synced = await syncSectionProgress(store, "EX-SMP-XX");
     expect(Object.keys(synced.best).sort()).toEqual(["0", "1"]);
     expect(Object.keys(loadSectionProgress(store, "EX-SMP-XX").best).sort()).toEqual(["0", "1"]);
+  });
+
+  it("端末に別のアカウントの進捗がある_読まず_サーバーへ取り込まず_その記録も残す", async () => {
+    const server = fakeServer(progress({ "1": record(2) }));
+    const device = memoryStore();
+    saveSectionProgress(ownedStore(device, "aaaaaaaaaaaaaaaa"), progress({ "0": record(5), "1": record(5) }));
+    const store = ownedStore(device, "bbbbbbbbbbbbbbbb");
+    const synced = await syncSectionProgress(store, "EX-SMP-XX");
+    expect(synced.best).toEqual({ "1": record(2) });
+    expect(server.calls).toEqual(["GET"]);
+    expect(server.current()?.best).toEqual({ "1": record(2) });
+    expect(loadSectionProgress(ownedStore(device, "aaaaaaaaaaaaaaaa"), "EX-SMP-XX").best["0"]?.correct).toBe(5);
+  });
+
+  it("持ち主の印が取れない_端末の進捗を読まず_サーバーへ取り込まない", async () => {
+    const server = fakeServer(progress({ "1": record(2) }));
+    const device = memoryStore();
+    saveSectionProgress(ownedStore(device, "aaaaaaaaaaaaaaaa"), progress({ "0": record(5) }));
+    const synced = await syncSectionProgress(ownedStore(device, null), "EX-SMP-XX");
+    expect(synced.best).toEqual({ "1": record(2) });
+    expect(server.calls).toEqual(["GET"]);
   });
 });

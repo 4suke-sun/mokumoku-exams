@@ -17,6 +17,7 @@ import {
 import type { NextStep } from "@/lib/study-nav.ts";
 import { STAGE_PASS_PERCENT, type StageStatus, stageStatuses } from "@/lib/study-stages.ts";
 import type { ChoiceQuestion, PublishedExam } from "@/lib/types.ts";
+import { useStorageOwner } from "@/lib/use-storage-owner.ts";
 
 type Item = { questionId: string; choiceKeys: string[] };
 
@@ -53,12 +54,15 @@ export function StudyStart({ exam, questions, next, stages }: Props) {
   const [hasSession, setHasSession] = useState(false);
   const [passed, setPassed] = useState<number[]>([]);
   const unitId = stages?.unitId;
+  const owner = useStorageOwner();
 
   useEffect(() => {
+    // 持ち主の印が取れるまでは、端末の記録を読まない(印が取れたら、読み直す)
+    if (owner === undefined) return;
     const store = browserStore();
     setHasSession(loadSession(store, examCode) !== null);
     if (unitId) setPassed(passedStages(loadStageProgress(store, examCode), unitId));
-  }, [examCode, unitId]);
+  }, [examCode, unitId, owner]);
 
   function start(list: readonly Item[], stage?: Session["stage"]) {
     if (list.length === 0) {

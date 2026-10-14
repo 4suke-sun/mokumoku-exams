@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { sessionProgress } from "@/lib/quiz.ts";
 import { browserStore, loadSession, type Session } from "@/lib/storage.ts";
+import { useStorageOwner } from "@/lib/use-storage-owner.ts";
 
 type ExamItem = { examCode: string; name: string; questionIds: string[] };
 
@@ -14,8 +15,11 @@ type Resumable = { exam: ExamItem; session: Session };
 /** 端末に保存した出題の途中の状態を、資格ごとに「前回の続き」のカードで示す。新しく始めた順に並べる。 */
 export function ResumeCards({ exams }: Props) {
   const [items, setItems] = useState<Resumable[]>([]);
+  const owner = useStorageOwner();
 
   useEffect(() => {
+    // 持ち主の印が取れるまでは、端末の記録を読まない(印が取れたら、読み直す)
+    if (owner === undefined) return;
     const store = browserStore();
     const found: Resumable[] = [];
     for (const exam of exams) {
@@ -26,7 +30,7 @@ export function ResumeCards({ exams }: Props) {
     }
     found.sort((a, b) => b.session.startedAt.localeCompare(a.session.startedAt));
     setItems(found);
-  }, [exams]);
+  }, [exams, owner]);
 
   if (items.length === 0) return null;
 

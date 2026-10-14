@@ -4,7 +4,8 @@ import Link from "next/link";
 import { type FormEvent, useEffect, useState } from "react";
 import { postJson } from "@/lib/auth/client.ts";
 import { PASSWORD_RULE_TEXT, passwordProblem } from "@/lib/auth/password.ts";
-import { browserStore, DEFAULT_SETTINGS, loadSettings, saveSettings } from "@/lib/storage.ts";
+import { changePrefs } from "@/lib/prefs-client.ts";
+import { browserStore, DEFAULT_SETTINGS, loadSettings } from "@/lib/storage.ts";
 import { Field, FormError, SubmitButton } from "./form-parts.tsx";
 import { PushSettings } from "./push-settings.tsx";
 import { useSession } from "./session-provider.tsx";
@@ -68,7 +69,7 @@ export function AccountView({ pushPublicKey = null }: { pushPublicKey?: string |
 
   function changeShuffle(next: boolean) {
     setShuffleChoices(next);
-    saveSettings(browserStore(), { ...loadSettings(browserStore()), shuffleChoices: next });
+    void changePrefs({ shuffleChoices: next });
   }
 
   return (
@@ -118,7 +119,10 @@ export function AccountView({ pushPublicKey = null }: { pushPublicKey?: string |
 
       <div className="space-y-3">
         <h2 className="h2">表示と出題の設定</h2>
-        <p className="text-sm text-muted">この端末のブラウザに保存されます。</p>
+        <p className="text-sm text-muted">
+          この端末と、アカウントに保存されます(ほかの端末でログインしても、同じ設定になります)。
+          モード選択で選ぶ解答の表示のしかたは、この端末にだけ保存されます。
+        </p>
         <div className="flex items-center gap-3">
           <span>表示テーマ</span>
           <ThemeToggle />

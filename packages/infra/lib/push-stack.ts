@@ -77,6 +77,8 @@ export class PushStack extends Stack {
       code: lambda.Code.fromAsset(props.pushCodePath),
       memorySize: 256,
       timeout: Duration.minutes(1),
+      // 非同期の呼び出しが失敗しても、やり直さない(やり直すと、送れた端末にも同じ通知がもう一度届く)
+      retryAttempts: 0,
       environment: {
         NODE_ENV: "production",
         HISTORY_TABLE_NAME: props.historyTable.tableName,

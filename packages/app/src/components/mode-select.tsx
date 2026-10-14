@@ -6,7 +6,7 @@ import { useEffect, useId, useState } from "react";
 import { Notice } from "@/components/notice.tsx";
 import { domainColorClasses } from "@/lib/domain-color.ts";
 import { fetchBookmarks, fetchReview } from "@/lib/history/client.ts";
-import { pushPrefs } from "@/lib/prefs-client.ts";
+import { changePrefs } from "@/lib/prefs-client.ts";
 import {
   domainCounts,
   isOfficialTarget,
@@ -31,6 +31,7 @@ import {
   saveSettings,
 } from "@/lib/storage.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
+import { useStorageOwner } from "@/lib/use-storage-owner.ts";
 import { fewerAnsweredWeight, weightedSample } from "@/lib/weighted.ts";
 import { useAnswerCounts } from "./question-stats.tsx";
 
@@ -116,6 +117,7 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
   const [difficulties, setDifficulties] = useState<Difficulty[]>([]);
   const [preferFewer, setPreferFewer] = useState(false);
   const answerCounts = useAnswerCounts(exam.examCode);
+  const owner = useStorageOwner();
   // 取得できなかったときは null(その対象は選べない)
   const [lists, setLists] = useState<Record<Exclude<Target, "all">, string[] | null>>({
     review: null,
@@ -123,6 +125,8 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
   });
 
   useEffect(() => {
+    // 持ち主の印が取れるまでは、端末の記録を読まない(印が取れたら、読み直す)
+    if (owner === undefined) return;
     const store = browserStore();
     const settings = loadSettings(store);
     setShuffleChoices(settings.shuffleChoices);
@@ -145,7 +149,7 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
     // 出題中の問題が、いまのデータにすべてあるときだけ続きから解ける
     const ids = new Set(pool.map((p) => p.questionId));
     setResumable(saved?.questionIds.every((id) => ids.has(id)) ? saved : null);
-  }, [exam.examCode, exam.domains, pool]);
+  }, [exam.examCode, exam.domains, pool, owner]);
 
   useEffect(() => {
     let active = true;
@@ -192,9 +196,8 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
 
   function changeShuffle(next: boolean) {
     setShuffleChoices(next);
-    saveSettings(browserStore(), { shuffleChoices: next, reveal });
-    // シャッフルは、アカウントにも保存する(解答の表示のしかたは、端末だけ)
-    void pushPrefs();
+    // シャッフルは、端末とアカウントに保存する(解答の表示のしかたは、端末だけ)
+    void changePrefs({ shuffleChoices: next });
   }
 
   function changeReveal(next: Reveal) {
