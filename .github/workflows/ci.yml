@@ -76,6 +76,7 @@ jobs:
       - run: npm run check:lessons
       - run: npm run check:test-titles
       - run: npm run check:docs
+      - run: npm run check:env
       - run: npm run check:boundary
       - run: npm run validate:data
       # PR の範囲(全コミットの追加行・ファイル名・メッセージ・作者)の機密検査。手元の pre-push と同じ検査

@@ -25,6 +25,7 @@ npm install   # 依存を入れ、検査フック(.githooks)を有効にしま�
 | `npm run check:lessons` | 学びの記録(`docs/app/lessons/`)の書式の検査。`-- --write` で一覧を更新 |
 | `npm run check:test-titles` | テストの題(`it` / `test`)の形の検査。`-- --write` で、直した題を基準から消す |
 | `npm run check:docs` | 文書の相対リンクの先と、`npm run <名前>` のスクリプトが実在することの検査(対象: `README.md`、`CLAUDE.md`、`CONTRIBUTING.md`、`docs/`、`.claude/skills/`、`packages/*/README.md`) |
+| `npm run check:env` | アプリ(`packages/app`)が読む環境変数が、CDK(`packages/infra/lib/web-stack.ts`)から Lambda へ渡されることの検査。Lambda が自動で与える変数と開発用の変数は、`scripts/lib/env-contract-check.ts` の一覧で除く。通知の送信の Lambda と、動的な参照(`env[変数]` など)は対象にしない |
 
 PR を出す前に、上のコマンド(`format` 以外)がローカルで通ることを確認してください。同じものが CI でも実行されます。
 
