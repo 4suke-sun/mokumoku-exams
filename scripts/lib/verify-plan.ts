@@ -8,7 +8,10 @@
 export const ALL_PATTERN = String.raw`^[^/]+$|^\.github/|^scripts/|^packages/data-schema/`;
 export const APP_PATTERN = "^packages/app/|^data/";
 export const INFRA_PATTERN = "^packages/infra/";
-export const PIPELINE_PATTERN = "^packages/pipeline/";
+// pipeline のテストは、docs/ の文書、.claude/agents/ の定義、data/exams.json を読む
+export const PIPELINE_PATTERN = String.raw`^packages/pipeline/|^docs/|^\.claude/agents/|^data/exams\.json$`;
+// e2e だけは、リリースノートだけの変更では動かさない(verify は e2e を実行しない。CI との一致を守るために持つ)
+export const E2E_EXCLUDE_PATTERN = String.raw`^data/release-notes\.json$`;
 
 export interface Selection {
   app: boolean;

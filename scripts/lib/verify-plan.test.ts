@@ -6,6 +6,7 @@ import {
   APP_PATTERN,
   buildStages,
   CHECK_SCRIPTS,
+  E2E_EXCLUDE_PATTERN,
   formatResult,
   INFRA_PATTERN,
   PIPELINE_PATTERN,
@@ -40,9 +41,20 @@ describe("selectWorkspaces", () => {
     },
   );
 
-  it("文書だけの変更_どれも選ばない", () => {
-    expect(selectWorkspaces(["docs/known-issues.md"])).toEqual({ app: false, infra: false, pipeline: false });
+  it("docsの変更_pipelineだけ選ぶ(pipelineのテストがdocsの文書を読む)", () => {
+    expect(selectWorkspaces(["docs/known-issues.md"])).toEqual({ app: false, infra: false, pipeline: true });
   });
+
+  it("スキルの文書だけの変更_どれも選ばない", () => {
+    expect(selectWorkspaces([".claude/skills/dev-pr/SKILL.md"])).toEqual({ app: false, infra: false, pipeline: false });
+  });
+
+  it.each([[".claude/agents/question-drafter.md"], ["data/exams.json"]])(
+    "pipelineのテストが読むファイルの変更_pipelineを選ぶ(%s)",
+    (file) => {
+      expect(selectWorkspaces([file]).pipeline).toBe(true);
+    },
+  );
 });
 
 describe("CIの指定との一致", () => {
@@ -51,6 +63,8 @@ describe("CIの指定との一致", () => {
   it("変更のパスの指定_CIのchangesジョブと同じ文字列である", () => {
     expect(ci).toContain(`matches '${ALL_PATTERN}'`);
     expect(ci).toContain(`flag '${APP_PATTERN}'`);
+    expect(ci).toContain(`flag_e2e '${APP_PATTERN}'`);
+    expect(ci).toContain(`grep -v '${E2E_EXCLUDE_PATTERN}'`);
     expect(ci).toContain(`flag '${INFRA_PATTERN}'`);
     expect(ci).toContain(`flag '${PIPELINE_PATTERN}'`);
   });

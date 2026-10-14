@@ -38,6 +38,20 @@ PR を出す前に、`npm run verify` を通します。`verify` の各検査は
 - 関係するワークスペース(app / infra / pipeline)は、`origin/main` との差分と、未コミット・未追跡の変更から選びます。`origin/main` がないなど、変更が分からないときは、すべて選びます。選び方は、CI の `changes` ジョブと同じです(指定の文字列が CI とずれないことは、テストが確かめます)。契約(`packages/data-schema`)、ルートの設定、`scripts/`、CI の定義が変わったときは、すべて選びます。`scripts/` のテストと `packages/data-schema` のテストは、常に実行します。
 - `verify` に含まないもの: `npm run test:e2e`(ブラウザを使う通し確認で重い。CI の `e2e` ジョブが通す。画面の動きを変えたときは、手元でも実行する)、`check:pr-closes`(PR の番号が要る。PR の前は `npm run check:pr-closes -- --body-file <下書き>` で下書きを検査する)。
 
+### CI が動かすジョブ
+
+CI の `changes` ジョブが、変更したパスから、動かすジョブを決めます(`scripts/ci-changes.test.ts` が、変更したパスごとの結果を確かめます)。
+
+| 動かすジョブ | 変更したパス |
+| --- | --- |
+| `app`(ビルド、`build:lambda`、テスト) | `packages/app/`、`data/`(`data/release-notes.json` だけの変更でも動く。アプリがこのファイルを読むため) |
+| `e2e` | `packages/app/`、`data/`(`data/release-notes.json` だけの変更では動かない) |
+| `infra` | `packages/infra/` |
+| `pipeline` | `packages/pipeline/`、`docs/`、`.claude/agents/`、`data/exams.json`(pipeline のテストが読むファイル) |
+| すべて | ルート直下のファイル、`.github/`、`scripts/`、`packages/data-schema/`、`main` への push |
+
+E2E の試験は、再試行なしで通ることを求めます。CI は、失敗した試験を 1 回やり直しますが、やり直して通った試験は、失敗として扱います(`failOnFlakyTests`)。新しい試験は、`npx playwright test <ファイル> --repeat-each=<回数> --retries=0` で繰り返し実行して、通ることを確かめます。
+
 ### テストが止まる・遅いとき
 
 全部のテスト(`npm test`)は、ルートの `scripts/` のテストのあと、各ワークスペースのテストを順に実行します。手元の一般的な環境で、数十秒で終わる目安です。1 件のテストが 1 秒を超えることは、まれです(最も遅いのは、git や node の子プロセスを起動するテスト)。終わらないプロセスは、`--reporter=hanging-process` で探せます。

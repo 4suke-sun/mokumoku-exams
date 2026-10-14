@@ -61,7 +61,7 @@
 | 項目 | 確認の方法 |
 | --- | --- |
 | ルートの検査が通る | `npm run lint`、`npm run typecheck`、`npm test`、`npm run build` が通る |
-| Lambda に載せる成果物を作れる | `npm run build:lambda` が成功する |
+| Lambda に載せる成果物を作れる | `npm run build:lambda` が成功する(CI の `app` ジョブも、`npm run build` のあとに実行する。先に `npm run build` が要る) |
 
 ## 8. 手順の最後に
 
