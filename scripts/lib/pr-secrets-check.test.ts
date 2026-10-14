@@ -175,6 +175,8 @@ describe("checkEntries", () => {
     expect(msg.blocks).toEqual(["Claude のセッションへのリンク: message:1"]);
     expect(msg.blocks.join()).not.toContain("session_example");
     expect(checkEntries(entry(link)).blocks).toHaveLength(0);
+    // push の範囲の履歴には掛けない(すでに履歴にあるものは、書き換えない)
+    expect(checkEntries(textToEntries(link, "message"), [], { message: true, history: true }).blocks).toHaveLength(0);
     // 署名の行(Co-Authored-By)とは区別する
     const signature = textToEntries("Co-Authored-By: Claude <noreply@anthropic.com>", "message");
     expect(checkEntries(signature, [], { message: true }).blocks).toHaveLength(0);

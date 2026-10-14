@@ -72,7 +72,9 @@ export function checkCommits(start: string | null, end: string): string[] {
     const [sha = "", authorEmail = "", committerEmail = "", body = ""] = record.split("\x1f");
     const short = sha.slice(0, 7);
     authors.push({ sha: short, authorEmail, committerEmail });
-    blocks.push(...checkEntries(textToEntries(body, `message:${short}`), denylist, { message: true }).blocks);
+    blocks.push(
+      ...checkEntries(textToEntries(body, `message:${short}`), denylist, { message: true, history: true }).blocks,
+    );
   }
   return [...checkAuthors(authors), ...blocks];
 }

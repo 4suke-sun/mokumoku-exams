@@ -99,10 +99,9 @@ export const PII_CONTENT_PATTERNS: Pattern[] = [
   },
 ];
 
-// コミットメッセージと PR・Issue の下書きだけに適用する。作業の会話や内部メモへの言及と、セッションへのリンク(履歴や本文に載ると消しにくい)。
+// コミットメッセージと PR・Issue の下書きだけに適用する。作業の会話や内部メモへの言及。
 export const MESSAGE_PHRASE_PATTERNS: Pattern[] = [
   { name: "作業の指示・会話への言及", re: /(ユーザー|人)の指示(で|により|に従)|指示により|会話の(中|なか)で/ },
-  { name: "Claude のセッションへのリンク", re: /https?:\/\/claude\.ai\/code\/session_\w+/i },
   { name: "内部メモ", re: /\b(TODO|FIXME|XXX)\b.*(メモ|あとで|後で)|作業メモ/ },
 ];
 
@@ -125,6 +124,12 @@ function scanEmails(entries: AddedLine[]): string[] {
   }
   return hits;
 }
+
+// セッションへのリンクは、これから書くメッセージと下書きにだけ適用する。すでに履歴にあるものは、push の範囲の検査では見ない。
+const SESSION_LINK_PATTERN: Pattern = {
+  name: "Claude のセッションへのリンク",
+  re: /https?:\/\/claude\.ai\/code\/session_\w+/i,
+};
 
 const NOREPLY = /@users\.noreply\.github\.com$/;
 // GitHub 上でマージしたときに、GitHub が作るマージコミットのコミッター(作者ではなく、コミッターにだけ認める)
@@ -267,7 +272,7 @@ export function checkProseBodies(entries: AddedLine[]): string[] {
 export function checkEntries(
   entries: AddedLine[],
   denylistTerms: string[] = [],
-  { message = false }: { message?: boolean } = {},
+  { message = false, history = false }: { message?: boolean; history?: boolean } = {},
 ): CheckResult {
   const blocks = [
     ...scan(entries, SECRET_CONTENT_PATTERNS),
@@ -276,6 +281,7 @@ export function checkEntries(
     ...scanDenylist(entries, denylistTerms),
     ...checkProseBodies(entries),
     ...(message ? scan(entries, MESSAGE_PHRASE_PATTERNS) : []),
+    ...(message && !history ? scan(entries, [SESSION_LINK_PATTERN]) : []),
   ];
   return { blocks: [...new Set([...blocks, ...scan(entries, PII_CONTENT_PATTERNS)])], warns: [] };
 }
