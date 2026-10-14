@@ -71,6 +71,24 @@ export const ENV_INFO_PATTERNS: Pattern[] = [
     re: /(?:account[=:]\s*['"]?|arn:aws[a-z-]*:[a-z0-9-]*:[a-z0-9-]*:)(?!123456789012\b)\d{12}\b/i,
   },
   { name: "ホストゾーン ID", re: /\bZ(?!\w*EXAMPLE)(?=[0-9A-Z]*\d)[0-9A-Z]{12,31}\b/ },
+  // x だけの並びと example を含む値は、プレースホルダーなので止めない。
+  {
+    name: "Cognito のユーザープール ID",
+    re: /\b[a-z]{2}(?:-[a-z]+)+-\d_(?!x{9}\b)(?!\w*example)[A-Za-z0-9]{9}\b/i,
+  },
+  // クライアント ID は ID の形だけでは他の文字列と区別できないので、名前つきの代入で見る。
+  {
+    name: "Cognito のクライアント ID",
+    re: /\w*client[_-]?id\w*\s*[:=]\s*['"]?(?!<|\$|x{3}|your|example|\.\.\.)[a-z0-9]{20,}\b/i,
+  },
+  {
+    name: "配信のドメイン",
+    re: /\b(?!x+\.)(?!\w*example)(?!d111111abcdef8\.)[a-z0-9]{8,}\.cloudfront\.net\b/i,
+  },
+  {
+    name: "Lambda の Function URL",
+    re: /\b(?!x+\.)(?!\w*example)[a-z0-9]{20,}\.lambda-url\.[a-z0-9-]+\.on\.aws\b/i,
+  },
 ];
 
 // 警告のみ(止めはしない)。

@@ -84,6 +84,42 @@ describe("checkEntries", () => {
     expect(checkEntries(entry("account: 123456789012")).blocks).toHaveLength(0);
   });
 
+  it("ユーザープール ID の実値を止め、プレースホルダーは通す", () => {
+    const pool = ["ap-northeast-1", "AbCd1234E"].join("_");
+    expect(checkEntries(entry(`pool: ${pool}`)).blocks).toEqual(["Cognito のユーザープール ID: f.md:3"]);
+    expect(checkEntries(entry(`pool: ap-northeast-1_${"x".repeat(9)}`)).blocks).toHaveLength(0);
+    expect(checkEntries(entry("pool: us-east-1_EXAMPLE12")).blocks).toHaveLength(0);
+  });
+
+  it("クライアント ID は名前つきの代入で止め、プレースホルダーと名前のない文字列は通す", () => {
+    const id = "a1b2c3d4e5".repeat(2) + "f6g7h8";
+    expect(checkEntries(entry(`COGNITO_CLIENT_ID=${id}`)).blocks).toEqual(["Cognito のクライアント ID: f.md:3"]);
+    expect(checkEntries(entry(`clientId: "${id}"`)).blocks).toHaveLength(1);
+    expect(checkEntries(entry("COGNITO_CLIENT_ID=<クライアント ID>")).blocks).toHaveLength(0);
+    expect(checkEntries(entry("COGNITO_CLIENT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxx")).blocks).toHaveLength(0);
+    expect(checkEntries(entry(`token ${id}`)).blocks).toHaveLength(0);
+  });
+
+  it("配信のドメインの実値を止め、プレースホルダーと例示は通す", () => {
+    const domain = `d${"1a2b3c4d5e".repeat(1)}xyz.cloudfront.net`;
+    expect(checkEntries(entry(`https://${domain}/`)).blocks).toEqual(["配信のドメイン: f.md:3"]);
+    expect(checkEntries(entry("https://xxxx.cloudfront.net/")).blocks).toHaveLength(0);
+    expect(checkEntries(entry("https://d111111abcdef8.cloudfront.net/")).blocks).toHaveLength(0);
+    expect(checkEntries(entry("https://example.cloudfront.net/")).blocks).toHaveLength(0);
+  });
+
+  it("Function URL の実値を止め、プレースホルダーは通す", () => {
+    const url = `https://${"a1b2c3d4e5".repeat(2)}.lambda-url.ap-northeast-1.on.aws/`;
+    expect(checkEntries(entry(url)).blocks).toEqual(["Lambda の Function URL: f.md:3"]);
+    expect(checkEntries(entry(`https://${"x".repeat(20)}.lambda-url.us-east-1.on.aws/`)).blocks).toHaveLength(0);
+    expect(checkEntries(entry("https://example.lambda-url.us-east-1.on.aws/")).blocks).toHaveLength(0);
+  });
+
+  it("検出の報告に値が出ない", () => {
+    const id = "a1b2c3d4e5".repeat(2) + "f6g7h8";
+    expect(checkEntries(entry(`COGNITO_CLIENT_ID=${id}`)).blocks.join()).not.toContain(id);
+  });
+
   it("プロファイル名はプレースホルダーなら通す", () => {
     expect(checkEntries(entry("AWS_PROFILE=<プロファイル名>")).blocks).toHaveLength(0);
     expect(checkEntries(entry(fakeProfileAssignment)).blocks).toHaveLength(1);
