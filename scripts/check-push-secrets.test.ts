@@ -33,7 +33,7 @@ function makeRepo(email: string, files: Record<string, string>, message: string,
 
 function runCheck(dir: string, branch = "work", remoteSha = ZERO) {
   const input = `refs/heads/${branch} ${git(dir, "rev-parse", "HEAD")} refs/heads/${branch} ${remoteSha}\n`;
-  return spawnSync("node", [script], { cwd: dir, input, encoding: "utf8" });
+  return spawnSync("node", [script], { cwd: dir, input, encoding: "utf8", env: { ...process.env, CI: "1" } });
 }
 
 describe("check-push-secrets(基準のブランチが無い最初の push)", () => {

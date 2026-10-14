@@ -6,7 +6,7 @@ const script = fileURLToPath(new URL("./check-release-notes.ts", import.meta.url
 const root = fileURLToPath(new URL("..", import.meta.url));
 
 function run(...args: string[]) {
-  return spawnSync("node", [script, ...args], { cwd: root, encoding: "utf8" });
+  return spawnSync("node", [script, ...args], { cwd: root, encoding: "utf8", env: { ...process.env, CI: "1" } });
 }
 
 describe("check-release-notes(引数)", () => {
