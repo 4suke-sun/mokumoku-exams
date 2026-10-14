@@ -6,16 +6,15 @@
  */
 import { execFileSync } from "node:child_process";
 import { git } from "./lib/git-check.ts";
+import { coveredCommits } from "./lib/inspection-covered.ts";
 import {
   addEntries,
-  isCovered,
   isReusable,
   KINDS,
   type Kind,
   ledgerPath,
   patchIdOf,
   readLedger,
-  requiredKinds,
   rulesHash,
   VERDICTS,
   type Verdict,
@@ -50,16 +49,7 @@ try {
       process.stdout.write(`台帳に記録しました(${kinds.join(",")}: ${c})\n`);
     }
   } else if (command === "covered" && a) {
-    const ledger = readLedger(path);
-    const shas = git(["rev-list", "--reverse", "--no-merges", a]).split("\n").filter(Boolean);
-    for (const sha of shas) {
-      const diff = commitPatch(sha);
-      const patchId = patchIdOf(diff);
-      const files = git(["show", "--format=", "--name-only", sha]).split("\n").filter(Boolean);
-      if (patchId && isReusable(diff) && isCovered(ledger, patchId, requiredKinds(files), rules)) {
-        process.stdout.write(`${sha}\n`);
-      }
-    }
+    for (const sha of coveredCommits(a, root)) process.stdout.write(`${sha}\n`);
   } else {
     process.stderr.write(
       "使い方: node scripts/inspection-ledger.ts record <コミット> <種類[,種類]> <OK|WARN|BLOCK> | covered <範囲>\n",
