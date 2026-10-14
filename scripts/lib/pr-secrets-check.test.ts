@@ -169,6 +169,17 @@ describe("checkEntries", () => {
     }
   });
 
+  it("Claude のセッションへのリンクは、メッセージのときだけ止める", () => {
+    const link = "Claude-Session: https://claude.ai/code/session_example";
+    const msg = checkEntries(textToEntries(link, "message"), [], { message: true });
+    expect(msg.blocks).toEqual(["Claude のセッションへのリンク: message:1"]);
+    expect(msg.blocks.join()).not.toContain("session_example");
+    expect(checkEntries(entry(link)).blocks).toHaveLength(0);
+    // 署名の行(Co-Authored-By)とは区別する
+    const signature = textToEntries("Co-Authored-By: Claude <noreply@anthropic.com>", "message");
+    expect(checkEntries(signature, [], { message: true }).blocks).toHaveLength(0);
+  });
+
   it("作業の指示への言及は、メッセージのときだけ止める", () => {
     const text = "ユーザーの指示により変更";
     expect(checkEntries(entry(text)).blocks).toHaveLength(0);

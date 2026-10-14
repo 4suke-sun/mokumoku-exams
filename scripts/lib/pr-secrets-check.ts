@@ -99,9 +99,10 @@ export const PII_CONTENT_PATTERNS: Pattern[] = [
   },
 ];
 
-// コミットメッセージと PR・Issue の下書きだけに適用する。作業の会話や内部メモへの言及。
+// コミットメッセージと PR・Issue の下書きだけに適用する。作業の会話や内部メモへの言及と、セッションへのリンク(履歴や本文に載ると消しにくい)。
 export const MESSAGE_PHRASE_PATTERNS: Pattern[] = [
   { name: "作業の指示・会話への言及", re: /(ユーザー|人)の指示(で|により|に従)|指示により|会話の(中|なか)で/ },
+  { name: "Claude のセッションへのリンク", re: /https?:\/\/claude\.ai\/code\/session_\w+/i },
   { name: "内部メモ", re: /\b(TODO|FIXME|XXX)\b.*(メモ|あとで|後で)|作業メモ/ },
 ];
 

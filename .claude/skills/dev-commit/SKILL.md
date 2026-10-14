@@ -77,8 +77,9 @@ node scripts/check-commit-secrets.ts
 git commit -F .drafts/commit-msg.txt
 ```
 
-- メッセージの末尾には、セッションで指示された署名の行を付ける(作成役の案に無ければ、ここで足す。足したら、
-  追加分は定型の署名だけなので、再検査は要らない)
+- メッセージの末尾には、`Co-Authored-By:` の署名の行を付けてよい(作成役の案に無ければ、ここで足す。足したら、
+  追加分は定型の署名だけなので、再検査は要らない)。Claude のセッションへのリンク(`Claude-Session:` の行など)は
+  付けない。機械検査が止める
 - コミット後、`git log -1 --format='%an <%ae>'` で、作者が noreply アドレスであることを確認する。違えば、
   `git config user.email` を直して `git commit --amend --reset-author`(push 前のローカルのみ)
 - `git commit --no-verify` は使わない。フックが止めたら、指摘を直す
