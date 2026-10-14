@@ -20,10 +20,13 @@ export async function postJson(path: string, body: unknown): Promise<PostResult>
   }
 }
 
-/** ログイン状態。`isAdmin` は、管理者のナビゲーションを出すかどうかの表示のためだけに使う(認可はサーバーが行う)。 */
+/**
+ * ログイン状態。`isAdmin` は、管理者のナビゲーションを出すかどうかの表示のためだけに使う(認可はサーバーが行う)。
+ * `owner` は、端末の記録を持ち主ごとに分けるための印(`storage.ts` の `setStorageOwner`)。
+ */
 export type SessionInfo =
   | { signedIn: false }
-  | { signedIn: true; email: string | null; expiresAt: number | null; isAdmin?: boolean };
+  | { signedIn: true; email: string | null; expiresAt: number | null; isAdmin?: boolean; owner?: string | null };
 
 export async function fetchSession(): Promise<SessionInfo | null> {
   try {

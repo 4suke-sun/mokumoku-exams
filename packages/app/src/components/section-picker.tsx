@@ -24,6 +24,7 @@ import {
   saveSession,
 } from "@/lib/storage.ts";
 import type { PublishedExam } from "@/lib/types.ts";
+import { useStorageOwner } from "@/lib/use-storage-owner.ts";
 
 type Item = { questionId: string; choiceKeys: string[] };
 
@@ -50,8 +51,11 @@ export function SectionPicker({ exam, items }: Props) {
   const [resumable, setResumable] = useState<Session | null>(null);
   const [error, setError] = useState<string | null>(null);
   const sections = sectionsOf(items);
+  const owner = useStorageOwner();
 
   useEffect(() => {
+    // 持ち主の印が取れるまでは、端末の記録を読まない(印が取れたら、読み直す)
+    if (owner === undefined) return;
     const store = browserStore();
     // まず端末の進捗を出し、サーバーの進捗と 1 つにできたら、差し替える
     setProgress(loadSectionProgress(store, exam.examCode));
@@ -64,7 +68,7 @@ export function SectionPicker({ exam, items }: Props) {
     return () => {
       active = false;
     };
-  }, [exam.examCode]);
+  }, [exam.examCode, owner]);
 
   function start(index: number) {
     const store = browserStore();

@@ -445,6 +445,13 @@ describe("PushStack", () => {
       Action: "lambda:InvokeFunction",
       Principal: "events.amazonaws.com",
     });
+    // ルールのターゲットだけでなく、Lambda 自身の非同期呼び出しも、再試行しない
+    template.resourceCountIs("AWS::Lambda::EventInvokeConfig", 1);
+    template.hasResourceProperties("AWS::Lambda::EventInvokeConfig", {
+      FunctionName: { Ref: Match.stringLikeRegexp("SenderFunction") },
+      Qualifier: "$LATEST",
+      MaximumRetryAttempts: 0,
+    });
   });
 
   it("送信の Lambda は_鍵とテーブル名を受け取り_外から呼べる URL を持たない", () => {

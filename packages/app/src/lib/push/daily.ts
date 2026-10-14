@@ -65,7 +65,10 @@ export async function scanSubscriptions(client: DocumentSender, tableName: strin
   return found;
 }
 
-/** 毎日の通知を送り、無効になった購読を消す。数だけを返す(endpoint などは返さない)。 */
+/**
+ * 毎日の通知を送り、無効になった購読を消す。数だけを返す(endpoint などは返さない)。
+ * 購読の削除は、1 件ずつ行い、失敗しても残りを続ける(失敗の数を数え、関数は失敗にしない。送信をやり直さないため)。
+ */
 export async function runDaily(deps: {
   client: DocumentSender;
   tableName: string;
@@ -73,21 +76,30 @@ export async function runDaily(deps: {
 }): Promise<DailyResult> {
   const targets = await scanSubscriptions(deps.client, deps.tableName);
   const summary = await sendToAll(targets, DAILY_MESSAGE, deps.send);
+  let gone = 0;
+  let deleteFailed = 0;
   for (const target of summary.gone as StoredTarget[]) {
-    // 購読の項目だけを消す(条件で、ほかの種類の項目を消さないことを確かめる)
-    await deps.client.send(
-      new DeleteCommand({
-        TableName: deps.tableName,
-        Key: { PK: target.PK, SK: target.SK },
-        ConditionExpression: "begins_with(SK, :prefix)",
-        ExpressionAttributeValues: { ":prefix": PUSH_KEY_PREFIX },
-      }),
-    );
+    try {
+      // 購読の項目だけを消す(条件で、ほかの種類の項目を消さないことを確かめる)
+      await deps.client.send(
+        new DeleteCommand({
+          TableName: deps.tableName,
+          Key: { PK: target.PK, SK: target.SK },
+          ConditionExpression: "begins_with(SK, :prefix)",
+          ExpressionAttributeValues: { ":prefix": PUSH_KEY_PREFIX },
+        }),
+      );
+      gone += 1;
+    } catch {
+      // 原因(購読がすでに消えている、保存先の失敗など)と購読の情報は、返さない
+      deleteFailed += 1;
+    }
   }
-  return { sent: summary.sent, failed: summary.failed, gone: summary.gone.length };
+  return { sent: summary.sent, failed: summary.failed, gone, deleteFailed };
 }
 
-type DailyResult = { sent: number; failed: number; gone: number };
+/** 送れた数・送れなかった数・消した購読の数・消せなかった購読の数 */
+type DailyResult = { sent: number; failed: number; gone: number; deleteFailed: number };
 
 /**
  * 毎日の通知を送り、結果をログに記録する。記録するのは数だけ(endpoint は個人に紐づくため、ログに出さない)。

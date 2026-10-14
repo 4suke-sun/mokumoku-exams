@@ -3,6 +3,7 @@ import {
   clearSession,
   DEFAULT_SETTINGS,
   type KeyValueStore,
+  loadConditions,
   loadResults,
   loadSectionProgress,
   loadSession,
@@ -12,16 +13,21 @@ import {
   MAX_RESULTS,
   mergeSectionProgress,
   migrateLegacyExamKeys,
+  ownedStore,
   passedStages,
   type Result,
+  removeUnownedRecords,
   type SectionProgress,
   type Session,
   type StageCheck,
+  saveConditions,
   saveResult,
   saveSectionProgress,
   saveSession,
   saveSettings,
   saveStageCheck,
+  setStorageOwner,
+  storageOwner,
 } from "./storage.ts";
 
 function memoryStore(initial: Record<string, string> = {}): KeyValueStore & { data: Map<string, string> } {
@@ -385,5 +391,114 @@ describe("以前の試験コードの記録の移行", () => {
     const store = memoryStore({ "mokumoku:v1:results:OTHER": "[]" });
     migrateLegacyExamKeys(store, legacy);
     expect([...store.data.keys()]).toEqual(["mokumoku:v1:results:OTHER"]);
+  });
+});
+
+describe("端末の記録の持ち主の照合", () => {
+  const A = "aaaaaaaaaaaaaaaa";
+  const B = "bbbbbbbbbbbbbbbb";
+  const result: Result = {
+    examCode: "TEST",
+    questionIds: ["TEST-0001"],
+    answers: {},
+    finishedAt: "2026-10-01T00:00:00.000Z",
+  };
+
+  it("資格ごとの記録_持ち主の印をキーに入れ_一致する記録だけを読む", () => {
+    const device = memoryStore();
+    expect(saveSession(ownedStore(device, A), session)).toBe(true);
+    expect([...device.data.keys()]).toEqual([`mokumoku:v1:${A}:session:TEST`]);
+    expect(loadSession(ownedStore(device, A), "TEST")).toEqual(session);
+    expect(loadSession(ownedStore(device, B), "TEST")).toBeNull();
+  });
+
+  it("5 種類の記録_どれも持ち主ごとに分かれ_別のアカウントの記録を上書きしない", () => {
+    const device = memoryStore();
+    const a = ownedStore(device, A);
+    const b = ownedStore(device, B);
+    saveSession(a, session);
+    saveResult(a, result);
+    saveStageCheck(a, "TEST", { unitId: "basics", order: 1, percent: 100, passed: true, finishedAt: "x" });
+    saveSectionProgress(a, { examCode: "TEST", best: { "0": { correct: 5, total: 5, finishedAt: "x" } } });
+    saveConditions(a, "TEST", {
+      target: "all",
+      domains: [],
+      difficulties: [],
+      count: 10,
+      preferFewer: false,
+      reveal: "end",
+    });
+    saveSession(b, { ...session, index: 0 });
+    expect(loadSession(a, "TEST")?.index).toBe(1);
+    expect(loadConditions(b, "TEST")).toBeNull();
+    expect(loadResults(b, "TEST")).toEqual([]);
+    expect(passedStages(loadStageProgress(b, "TEST"), "basics")).toEqual([]);
+    expect(loadSectionProgress(b, "TEST").best).toEqual({});
+    const kinds = [...device.data.keys()]
+      .filter((key) => key.startsWith(`mokumoku:v1:${A}:`))
+      .map((k) => k.split(":")[3]);
+    expect(kinds.sort()).toEqual(["conditions", "results", "sections", "session", "stages"]);
+  });
+
+  it("持ち主の印がない_資格ごとの記録を読まず_書かず_消さない", () => {
+    const device = memoryStore();
+    saveSession(ownedStore(device, A), session);
+    for (const tag of [undefined, null]) {
+      const store = ownedStore(device, tag);
+      expect(loadSession(store, "TEST")).toBeNull();
+      expect(saveResult(store, result)).toBe(false);
+      clearSession(store, "TEST");
+    }
+    expect([...device.data.keys()]).toEqual([`mokumoku:v1:${A}:session:TEST`]);
+  });
+
+  it("表示の設定_照合の対象外で_持ち主によらず同じ値を読む", () => {
+    const device = memoryStore();
+    saveSettings(ownedStore(device, A), { shuffleChoices: true });
+    expect([...device.data.keys()]).toEqual(["mokumoku:v1:settings"]);
+    expect(loadSettings(ownedStore(device, B)).shuffleChoices).toBe(true);
+    expect(loadSettings(ownedStore(device, null)).shuffleChoices).toBe(true);
+  });
+
+  it("印のない資格ごとの記録_読まずに消し_持ち主のある記録とほかの値は残す", () => {
+    const device = memoryStore({
+      "mokumoku:v1:session:TEST": "{}",
+      "mokumoku:v1:results:TEST": "[]",
+      "mokumoku:v1:stages:TEST": "{}",
+      "mokumoku:v1:sections:TEST": "{}",
+      "mokumoku:v1:conditions:TEST": "{}",
+      [`mokumoku:v1:${A}:session:TEST`]: "{}",
+      "mokumoku:v1:settings": "{}",
+      "mokumoku:v1:theme": "dark",
+    });
+    const keys = () => [...device.data.keys()];
+    removeUnownedRecords({
+      get length() {
+        return device.data.size;
+      },
+      key: (index) => keys()[index] ?? null,
+      removeItem: device.removeItem,
+    });
+    expect(keys().sort()).toEqual(
+      [`mokumoku:v1:${A}:session:TEST`, "mokumoku:v1:settings", "mokumoku:v1:theme"].sort(),
+    );
+  });
+
+  it("持ち主の印_形の合わない値は_取れないもの(null)として扱う", () => {
+    setStorageOwner("not-a-tag");
+    expect(storageOwner()).toBeNull();
+    setStorageOwner(A);
+    expect(storageOwner()).toBe(A);
+  });
+
+  it("以前の試験コードの記録の移行_同じ持ち主の記録の中で移す", () => {
+    const device = memoryStore({
+      [`mokumoku:v1:${A}:sections:AIB`]: JSON.stringify({ examCode: "AIB", best: {} }),
+      [`mokumoku:v1:${B}:sections:AIB`]: JSON.stringify({ examCode: "AIB", best: {} }),
+    });
+    migrateLegacyExamKeys(ownedStore(device, A), { AIB: "AWS-AIB-C01" });
+    expect([...device.data.keys()].sort()).toEqual(
+      [`mokumoku:v1:${A}:sections:AWS-AIB-C01`, `mokumoku:v1:${B}:sections:AIB`].sort(),
+    );
   });
 });

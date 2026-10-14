@@ -5,6 +5,7 @@ import { fetchStats } from "@/lib/history/client.ts";
 import { type QuestionStatView, RECENT_STAT_LIMIT, recentMarks, statsFromResults } from "@/lib/question-stats.ts";
 import { browserStore, loadResults } from "@/lib/storage.ts";
 import type { Question } from "@/lib/types.ts";
+import { useStorageOwner } from "@/lib/use-storage-owner.ts";
 
 /**
  * 問題ごとの解答回数と直近の正誤。アカウントの集計を使い、取れないとき(通信の失敗など)は、この端末の結果から数える。
@@ -15,7 +16,10 @@ export function useQuestionStats(
   questions: readonly Question[],
 ): ReadonlyMap<string, QuestionStatView> | null {
   const [stats, setStats] = useState<ReadonlyMap<string, QuestionStatView> | null>(null);
+  const owner = useStorageOwner();
   useEffect(() => {
+    // 持ち主の印が取れるまでは、端末の記録を読まない(印が取れたら、読み直す)
+    if (owner === undefined) return;
     let active = true;
     void fetchStats(examCode).then((server) => {
       if (!active) return;
@@ -24,7 +28,7 @@ export function useQuestionStats(
     return () => {
       active = false;
     };
-  }, [examCode, questions]);
+  }, [examCode, questions, owner]);
   return stats;
 }
 
@@ -34,7 +38,10 @@ export function useQuestionStats(
  */
 export function useAnswerCounts(examCode: string): ReadonlyMap<string, number> {
   const [counts, setCounts] = useState<ReadonlyMap<string, number>>(new Map());
+  const owner = useStorageOwner();
   useEffect(() => {
+    // 持ち主の印が取れるまでは、端末の記録を読まない(印が取れたら、読み直す)
+    if (owner === undefined) return;
     let active = true;
     void fetchStats(examCode).then((server) => {
       if (!active) return;
@@ -51,7 +58,7 @@ export function useAnswerCounts(examCode: string): ReadonlyMap<string, number> {
     return () => {
       active = false;
     };
-  }, [examCode]);
+  }, [examCode, owner]);
   return counts;
 }
 

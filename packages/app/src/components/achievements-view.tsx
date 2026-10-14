@@ -10,6 +10,7 @@ import { formatDate } from "@/lib/format.ts";
 import { type ExamEntry, type ExamSummary, loadAllDays, loadSummaries } from "@/lib/history/summaries.ts";
 import { resultDetailHref } from "@/lib/quiz.ts";
 import { jstDate, type StudyDay } from "@/lib/study-days.ts";
+import { useStorageOwner } from "@/lib/use-storage-owner.ts";
 
 type State =
   | { status: "loading" }
@@ -19,8 +20,11 @@ type State =
 /** 全資格の学習の実績(連続学習、カレンダー、資格ごとの受験の概要と合格予測)。 */
 export function AchievementsView({ entries }: { entries: ExamEntry[] }) {
   const [state, setState] = useState<State>({ status: "loading" });
+  const owner = useStorageOwner();
 
   useEffect(() => {
+    // 持ち主の印が取れるまでは、端末の記録を読まない(印が取れたら、読み直す)
+    if (owner === undefined) return;
     let active = true;
     void (async () => {
       const [summaries, days] = await Promise.all([loadSummaries(entries), loadAllDays(entries)]);
@@ -30,7 +34,7 @@ export function AchievementsView({ entries }: { entries: ExamEntry[] }) {
     return () => {
       active = false;
     };
-  }, [entries]);
+  }, [entries, owner]);
 
   const header = (
     <div className="space-y-1">

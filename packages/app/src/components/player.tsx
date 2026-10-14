@@ -44,6 +44,7 @@ import {
 } from "@/lib/storage.ts";
 import { isStagePassed } from "@/lib/study-stages.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
+import { useStorageOwner } from "@/lib/use-storage-owner.ts";
 
 type Props = {
   exam: PublishedExam;
@@ -77,6 +78,7 @@ function isVisible(): boolean {
 export function Player({ exam, questions, clock = systemClock }: Props) {
   const router = useRouter();
   const [state, setState] = useState<State>({ status: "loading" });
+  const owner = useStorageOwner();
   const [saveFailed, setSaveFailed] = useState(false);
   // キー操作は、描画のたびに作り直す最新の処理を呼ぶ(リスナーは付け直さない)
   const keyHandler = useRef<(action: QuizKeyAction, key: string) => void>(() => {});
@@ -124,13 +126,15 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
   }, []);
 
   useEffect(() => {
+    // 持ち主の印が取れるまでは、端末の記録を読まない(印が取れたら、読み直す)
+    if (owner === undefined) return;
     const session = loadSession(browserStore(), exam.examCode);
     const ids = new Set(questions.map((q) => q.questionId));
     // 出題中の問題が、いまのデータにすべてあるときだけ続きから解く
     const usable = session?.questionIds.every((id) => ids.has(id)) === true;
     if (usable && session) timer.current = createTimer(session.timesMs ?? []);
     setState(usable && session ? { status: "ready", session } : { status: "empty" });
-  }, [exam.examCode, questions]);
+  }, [exam.examCode, questions, owner]);
 
   // タブが隠れている間は、回答時間を数えない
   useEffect(() => {
