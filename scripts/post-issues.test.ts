@@ -47,7 +47,7 @@ describe("post-issues", () => {
     const changed = JSON.parse(readFileSync(manifest, "utf8"));
     changed[0].milestone = "v0.6.0";
     writeFileSync(manifest, JSON.stringify(changed));
-    const result = run([manifest, "--dry-run"]);
+    const result = run([manifest]);
     expect(result.status).toBe(1);
     expect(result.stderr).toContain("承認の時点から変わっている");
   });
@@ -95,17 +95,19 @@ describe("post-issues", () => {
     expect(result.stdout).toContain("| #9 | chore: 題 |");
   });
 
-  it("封印がない_投稿せず終了コード1で終わる", () => {
-    const result = run([setup([entry]), "--dry-run"]);
-    expect(result.status).toBe(1);
-    expect(result.stderr).toContain("封印がない");
+  it("封印がない_dry-runは通り_投稿は終了コード1で止まる", () => {
+    const manifest = setup([entry]);
+    expect(run([manifest, "--dry-run"]).status).toBe(0);
+    const post = run([manifest]);
+    expect(post.status).toBe(1);
+    expect(post.stderr).toContain("封印がない");
   });
 
   it("封印のあとに下書きが変わった_終了コード1で終わる", () => {
     const manifest = setup([entry]);
     run([manifest, "--seal"]);
     writeFileSync(join(manifest, "..", "a.md"), "# chore: 題を変えた\n\n本文\n");
-    const result = run([manifest, "--dry-run"]);
+    const result = run([manifest]);
     expect(result.status).toBe(1);
     expect(result.stderr).toContain("承認の時点から変わっている");
   });

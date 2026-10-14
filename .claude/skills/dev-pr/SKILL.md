@@ -137,6 +137,7 @@ PR の差分に次のパスが含まれるときは、`inspector-deep`(Sonnet)�
 - 下書きの全文(タイトルと本文)
 - 差分の要約と、push する範囲のコミット一覧、作者アドレスの確認結果(PR の場合)
 - この承認は、push と PR の作成の両方に対するもの(PR の場合)
+- 一覧(マニフェスト)から Issue を投稿するときは、一覧の内容(各行の `action`・`number`・`milestone`・`labels`)と、`--dry-run` の出力も見せる(封印は、下書きとこれらの項目を覆う)
 - 機械検査と検査役の判定(場所と種類のみ。値は引用しない)
 
 承認の時点で、下書きのハッシュと、PR の場合は範囲の末尾のコミットとコミット数を控える
@@ -147,7 +148,7 @@ shasum -a 256 <下書きファイル>
 git rev-parse HEAD && git rev-list --count origin/main..HEAD
 ```
 
-一覧から Issue を投稿するときは、承認の直後に、一覧へ封印(下書きのハッシュと、一覧の項目 action・number・milestone・labels のハッシュ)を記録する。投稿は、封印と一致する下書きだけを行う:
+一覧から Issue を投稿するときは(承認の前に見せる `--dry-run` のコマンドは、Step 6)、承認の直後に、一覧へ封印(下書きのハッシュと、一覧の項目 action・number・milestone・labels のハッシュ)を記録する。投稿は、封印と一致する下書きだけを行う:
 
 ```sh
 node scripts/post-issues.ts .drafts/issues/manifest.json --seal
@@ -172,12 +173,12 @@ node scripts/post-issues.ts .drafts/issues/manifest.json --seal
    gh issue create --title "$(head -n 1 <下書き> | sed 's/^# //')" --body-file <(tail -n +3 <下書き>)
    ```
 
-   Issue を一覧(マニフェスト)から投稿するときは、スクリプトを使う。封印(承認の時点のハッシュ)と一致しない下書き、
+   Issue を一覧(マニフェスト)から投稿するときは、スクリプトを使う。投稿(フラグなし)では、封印(承認の時点のハッシュ)と一致しない下書き、
    題が Conventional Commits の形でない下書き、本文に版の番号の行がある下書き、マイルストーンもラベル `later` もない新規の Issue は、
    投稿せずに止まる:
 
    ```sh
-   node scripts/post-issues.ts .drafts/issues/manifest.json --dry-run   # 検査して、投稿する内容の概要(新規か編集か、ファイル、マイルストーン、ラベル)を表示する(何も投稿しない)
+   node scripts/post-issues.ts .drafts/issues/manifest.json --dry-run   # 検査して、投稿する内容の概要(新規か編集か、ファイル、マイルストーン、ラベル)を表示する(何も投稿しない。封印は求めない。承認の前に見せる)
    node scripts/post-issues.ts .drafts/issues/manifest.json             # 投稿し、結果(番号・題・URL)を一覧に書き戻して表示する
    ```
 

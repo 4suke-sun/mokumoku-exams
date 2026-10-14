@@ -4,7 +4,7 @@
  *   node scripts/post-issues.ts <一覧.json> --seal      承認の時点の封印(下書きと、一覧の項目のハッシュ)を、一覧に記録する(承認の直後に行う)。
  *                                                       すでに封印があり、内容が変わっているときは拒否する(承認をやり直して、--reseal で封印し直す)
  *   node scripts/post-issues.ts <一覧.json> --reseal    封印し直す(検査と承認をやり直したあとにだけ使う)
- *   node scripts/post-issues.ts <一覧.json> --dry-run   検査して、投稿する内容の概要を表示する(何も投稿しない)
+ *   node scripts/post-issues.ts <一覧.json> --dry-run   検査して、投稿する内容の概要を表示する(何も投稿しない。封印は求めない。承認の前に見せるために使う)
  *   node scripts/post-issues.ts <一覧.json>             検査して投稿し、結果(番号・題・URL)を一覧に書き戻して表示する
  * 一覧と下書きは .drafts/(gitignore 済み)に置く。投稿は、承認した内容と封印が一致するときだけ行う。
  * 途中で失敗しても、結果を書き戻した行は、再実行で飛ばす(gh の成功のあと、書き戻しの前に止まった行は、再実行の前に GitHub で重複を確かめる)。
@@ -94,7 +94,8 @@ if (mode === "--seal" || mode === "--reseal") {
   process.exit(0);
 }
 
-const sealErrors = verifySeals(entries, seals);
+// --dry-run は何も投稿しないので、承認の前に出せるよう、封印を求めない。投稿のときだけ、封印の一致を求める
+const sealErrors = mode === "--dry-run" ? [] : verifySeals(entries, seals);
 if (sealErrors.length > 0) fail(sealErrors);
 
 const work = mkdtempSync(join(tmpdir(), "post-issues-"));
