@@ -27,7 +27,7 @@ function makeCwd(files: Record<string, string>, index = "") {
 }
 
 function run(cwd: string, ...args: string[]) {
-  return spawnSync("node", [script, ...args], { cwd, encoding: "utf8" });
+  return spawnSync("node", [script, ...args], { cwd, encoding: "utf8", env: { ...process.env, CI: "1" } });
 }
 
 describe("check-lessons", () => {

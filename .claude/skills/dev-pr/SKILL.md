@@ -1,6 +1,6 @@
 ---
 name: dev-pr
-description: PR・Issue の起票や編集の前に、タイトルと本文を .drafts/ に下書きし、作成役・検査役の別々のサブエージェントと機械検査で確認し、本文と結果を人に見せて承認を得てから、承認された内容と同一のファイルから投稿する。PR や Issue を作る・編集するときは、必ずこの手順で行う。
+description: PR・Issue の起票や編集の前に、タイトルと本文を .drafts/ に下書きし、作成役・検査役の別々のサブエージェントと機械検査で確認し、本文と結果を人に見せて承認を得てから、承認された内容と同一のファイルから投稿する。PR は push も含めて、検査と承認を 1 回にまとめる。PR や Issue を作る・編集するときは、必ずこの手順で行う。
 ---
 
 # /dev-pr — 漏えいを確認してから PR・Issue を出す
@@ -8,6 +8,10 @@ description: PR・Issue の起票や編集の前に、タイトルと本文を .
 PR・Issue のタイトルと本文は、リモートに残る。編集履歴も、あとから消せない。「出してから直す」は前提にしない。
 PR ができると、ブランチの全コミットが参照として保持される。フック(`scripts/check-pr-secrets.ts`)は正規表現で
 拾えるものを止める。このスキルは、**文脈で判断するもの**を確認する(フックとの二重防御)。
+
+PR を出すときは、push も含めて、検査を 1 回、人の承認を 1 回にまとめる(範囲の全コミット・作者・ブランチ名と、PR の下書きを、
+まとめて検査する)。push は、承認のあとに行う。commit のときに検査した差分は、台帳に記録されていれば、読み直さない
+(`scripts/inspection-ledger.ts`)。
 
 ## 役割の分け方
 
@@ -22,10 +26,14 @@ PR・Issue の本文は自由度が高いので、作成役は `commit-writer`(H
 
 ## Step 0. 前提の確認
 
-1. PR の場合: ブランチが push 済みか(`git status -sb`)。未 push なら、先に `/dev-push`
-2. PR の場合: 対応する Issue があるか(ブランチ名が `<prefix>/#<番号>-…` か)
-3. 版を切る PR の場合: `data/release-notes.json` に、その版のエントリがあるか
-4. タイトルが Conventional Commits か(`feat:` / `fix:` / `chore:` など)
+1. PR の場合: PR の範囲(`git log --oneline origin/main..HEAD`)が空でないか。検査と承認は、この範囲の全体に対して行う。
+   push は、Step 6 で承認のあとに行う(先に `/dev-push` はしない)。リモートに同名のブランチがあり、
+   `git log --oneline @{upstream}..HEAD` が空なら、push は飛ばす
+2. PR の場合: ブランチが `main` でないこと(`git branch --show-current`)。
+   `git remote get-url origin` が、意図したリポジトリであること
+3. PR の場合: 対応する Issue があるか(ブランチ名が `<prefix>/#<番号>-…` か)
+4. 版を切る PR の場合: `data/release-notes.json` に、その版のエントリがあるか
+5. タイトルが Conventional Commits か(`feat:` / `fix:` / `chore:` など)
 
 ## Step 1. 作成役: 下書きを書く
 
@@ -37,8 +45,7 @@ PR・Issue の本文は自由度が高いので、作成役は `commit-writer`(H
 作成役に依頼する内容:
 
 - 作業ディレクトリ、対象(PR のブランチ範囲 `origin/main..HEAD`、または Issue の趣旨)
-- 「上の形式で下書きを書く。`Closes #<番号>` は番号ごとに 1 行ずつ。**書いてよいのは `.drafts/` だけ**」
-- 「`.claude/skills/dev-commit/checklist.md` の『見るもの』を守って書く」
+- 「上の形式で下書きを書く。`Closes #<番号>` は番号ごとに 1 行ずつ」
 
 ## Step 2. 機械的な検査
 
@@ -48,16 +55,36 @@ node scripts/check-pr-secrets.ts <下書きファイル>
 
 終了コードが 0 でなければ、指摘を直す(下書きを直し、再度検査する)。
 
+PR の場合は、push 前のフックと同じ検査(範囲内の全コミットの差分・メッセージ・作者)も先に行う:
+
+```sh
+printf 'refs/heads/%s %s refs/heads/%s %s\n' "$(git branch --show-current)" "$(git rev-parse HEAD)" "$(git branch --show-current)" 0000000000000000000000000000000000000000 | node scripts/check-push-secrets.ts
+```
+
+範囲の作者が、GitHub の noreply アドレスであることも確かめる(`git log --format='%h %ae' origin/main..HEAD`)。
+
 ## Step 3. 検査役: 確認する
+
+検査役は Bash を持たない。先に、検査役が読む入力を書き出す。PR の場合:
+
+```sh
+node scripts/prepare-inspection.ts --pr
+```
+
+Issue だけの場合も、拒否リストの置き場を検査役に渡すために実行する(何もステージしていなければ、差分は空で、置き場だけが出る):
+
+```sh
+node scripts/prepare-inspection.ts --cached
+```
 
 検査役に依頼する内容:
 
 - 作業ディレクトリと、下書きファイルのパス
-- 「`.claude/skills/dev-commit/checklist.md` を読み、その項目に沿って、下書きと、PR の場合は
-  `git diff origin/main...HEAD` の全差分・`git log origin/main..HEAD` の全コミットメッセージ・ブランチ名を確認する」
-- 「**読み取り専用**。編集、`commit` / `push` / `gh` の書き込み系、ネットワーク操作はしない」
-- 「`.pr-secrets-denylist` があれば読み、その語がどこにもないかも確認する。**語そのものは報告に書かない**」
-- 「報告は、チェックリストの『報告のしかた』に従う(値を引用しない。最後に `判定: OK/WARN/BLOCK`)」
+- 「`.claude/skills/dev-commit/checklist.md` を読み、その項目に沿って、下書きと、PR の場合は `.drafts/inspect/` のファイル
+  (基準との差分。検査済みで `covered.txt` に挙げられたコミットの差分は除く。全コミットのメッセージ、ブランチ名)を確認する」
+- 「報告は、チェックリストの『報告のしかた(必ず守る)』に従う(値を引用しない。最後に `判定: OK/WARN/BLOCK`)」
+
+検査が終わったら、書き出したファイルを消す: `node scripts/prepare-inspection.ts --clean`
 
 PR の差分に次のパスが含まれるときは、`inspector-deep`(Sonnet)も別に起動し、`inspector` と**両方**の判定を合わせる
 (最も重い判定を採用する)。`scripts/`、`.githooks/`、`.github/workflows/`、`.claude/`。検査の仕組みそのものを変える差分は、
@@ -70,7 +97,7 @@ PR の差分に次のパスが含まれるときは、`inspector-deep`(Sonnet)�
 
 | 判定 | 動き |
 |---|---|
-| `BLOCK` | **出さない。** 指摘(場所と種類)を見せ、直し方を提案する。下書きを直したら Step 2 からやり直す。ブランチに問題があれば、PR を作る前にコミットを直す |
+| `BLOCK` | **出さない。** 指摘(場所と種類)を見せ、直し方を提案する。下書きを直したら、`.claude/skills/dev-commit/reconfirm.md` のとおりやり直す。ブランチに問題があれば、PR を作る前にコミットを直す |
 | `WARN` / `OK` | Step 5 へ |
 
 ## Step 5. 人の確認(必須)
@@ -78,20 +105,29 @@ PR の差分に次のパスが含まれるときは、`inspector-deep`(Sonnet)�
 次を人に見せて、承認を待つ。
 
 - 下書きの全文(タイトルと本文)
-- 差分の要約(PR の場合)
+- 差分の要約と、push する範囲のコミット一覧、作者アドレスの確認結果(PR の場合)
+- この承認は、push と PR の作成の両方に対するもの(PR の場合)
 - 機械検査と検査役の判定(場所と種類のみ。値は引用しない)
 
-承認の時点で、下書きのハッシュを控える:
+承認の時点で、下書きのハッシュと、PR の場合は範囲の末尾のコミットとコミット数を控える
+(再確認の条件は `.claude/skills/dev-commit/reconfirm.md`):
 
 ```sh
 shasum -a 256 <下書きファイル>
+git rev-parse HEAD && git rev-list --count origin/main..HEAD
 ```
 
 ## Step 6. 投稿
 
-1. 投稿の直前に、もう一度ハッシュを取り、Step 5 の値と**一致する**ことを確認する。一致しなければ、
-   下書きが承認後に変わっている。投稿せず、Step 2 からやり直す
-2. 下書きのファイルから投稿する(本文を手で打ち直さない):
+1. 投稿の直前に、もう一度ハッシュ(PR の場合は、範囲の末尾のコミットとコミット数も)を取り、Step 5 の値と**一致する**ことを確認する。
+   一致しなければ、push も投稿もせず、`.claude/skills/dev-commit/reconfirm.md` のとおりやり直す
+2. PR の場合: まず push する(承認済みの範囲)。`--force` 系は使わない:
+
+   ```sh
+   git push -u origin "$(git branch --show-current)"
+   ```
+
+3. 下書きのファイルから投稿する(本文を手で打ち直さない):
 
    ```sh
    # PR(1 行目をタイトル、3 行目以降を本文として扱う)
@@ -100,8 +136,8 @@ shasum -a 256 <下書きファイル>
    gh issue create --title "$(head -n 1 <下書き> | sed 's/^# //')" --body-file <(tail -n +3 <下書き>)
    ```
 
-3. `gh pr create` の前には、フック(`scripts/check-pr-secrets.ts`)も動く。止められたら、指摘を直す
-4. 作ったら、CI の結果を確認する。**最新のコミットの CI が通るまで、マージしない**
-5. マージは、このスキルの範囲外(人の指示があるときだけ行う)
+4. `gh pr create` の前には、フック(`scripts/check-pr-secrets.ts`)も動く。止められたら、指摘を直す
+5. 作ったら、CI の結果を確認する。**最新のコミットの CI が通るまで、マージしない**
+6. マージは、このスキルの範囲外(人の指示があるときだけ行う)
 
 コメントやラベルなど、本文の残らない軽い操作は、機械検査のみで足りる(人の確認は省いてよい)。

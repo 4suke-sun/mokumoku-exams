@@ -17,7 +17,7 @@ function git(cwd: string, ...args: string[]): string {
   return r.stdout.trim();
 }
 
-function makeRepo(email: string, files: Record<string, string>, message: string, branch = "work"): string {
+function makeRepo(email: string, files: Record<string, string | Buffer>, message: string, branch = "work"): string {
   const dir = mkdtempSync(join(tmpdir(), "push-check-"));
   git(dir, "init", "-q", "-b", branch);
   git(dir, "config", "user.email", email);
@@ -33,7 +33,7 @@ function makeRepo(email: string, files: Record<string, string>, message: string,
 
 function runCheck(dir: string, branch = "work", remoteSha = ZERO) {
   const input = `refs/heads/${branch} ${git(dir, "rev-parse", "HEAD")} refs/heads/${branch} ${remoteSha}\n`;
-  return spawnSync("node", [script], { cwd: dir, input, encoding: "utf8" });
+  return spawnSync("node", [script], { cwd: dir, input, encoding: "utf8", env: { ...process.env, CI: "1" } });
 }
 
 describe("check-push-secrets(基準のブランチが無い最初の push)", () => {
@@ -44,6 +44,27 @@ describe("check-push-secrets(基準のブランチが無い最初の push)", () 
     expect(r.stderr).toMatch(/エディタの設定/);
     expect(r.stderr).toMatch(/アクセスキー ID: a\.txt:1/);
     expect(r.stderr).not.toContain(fakeKey);
+  });
+
+  it("メタデータのある画像を、場所と種類だけで止める", () => {
+    const chunk = (type: string, body: Buffer) => {
+      const head = Buffer.alloc(8);
+      head.writeUInt32BE(body.length, 0);
+      head.write(type, 4, "latin1");
+      return Buffer.concat([head, body, Buffer.alloc(4)]);
+    };
+    const signature = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
+    const image = (...extra: Buffer[]) =>
+      Buffer.concat([signature, chunk("IHDR", Buffer.alloc(13)), ...extra, chunk("IEND", Buffer.alloc(0))]);
+    const dir = makeRepo(
+      NOREPLY,
+      { "clean.png": image(), "tagged.png": image(chunk("tEXt", Buffer.from("k\0v"))) },
+      "chore: add",
+    );
+    const r = runCheck(dir);
+    expect(r.status).toBe(1);
+    expect(r.stderr).toMatch(/画像のメタデータ\(埋め込みテキスト\): tagged\.png/);
+    expect(r.stderr).not.toMatch(/clean\.png/);
   });
 
   it("noreply ではない作者を止める", () => {

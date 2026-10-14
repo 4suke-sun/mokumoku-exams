@@ -17,11 +17,9 @@ tools: Read, Grep, Glob, Bash, Write
 
 ## 守ること
 
-- 書いてよいのは `.drafts/` の下のファイルだけ。ほかは編集しない。
-- Bash で実行してよいのは、`git diff` / `git log` / `git show` / `git status` / `git rev-parse` と、`cat` / `ls` / `grep` だけ。
-  git の書き込み、`gh`、ネットワーク操作、リダイレクト(`>`)は使わない。
-- `.claude/skills/dev-commit/checklist.md` の「見るもの」を守る。環境固有の値・個人情報・社外の名称や経緯を書かない。
-- 一般的な現在形で書き、出来事を語らない。
+- 共通の決まりは `.claude/skills/dev-commit/writer-rules.md`。最初に読み、そのとおりに動く。
+- 書いてよいのは `.drafts/` の下のファイルだけ。
+- Bash で実行してよいのは、`git diff` / `git log` / `git show` / `git status` / `git rev-parse` と、`cat` / `ls` / `grep` だけ。`gh` は使わない。
 
 ## 報告
 

@@ -71,12 +71,32 @@ export const ENV_INFO_PATTERNS: Pattern[] = [
     re: /(?:account[=:]\s*['"]?|arn:aws[a-z-]*:[a-z0-9-]*:[a-z0-9-]*:)(?!123456789012\b)\d{12}\b/i,
   },
   { name: "ホストゾーン ID", re: /\bZ(?!\w*EXAMPLE)(?=[0-9A-Z]*\d)[0-9A-Z]{12,31}\b/ },
+  // x だけの並びと example を含む値は、プレースホルダーなので止めない。
+  {
+    name: "Cognito のユーザープール ID",
+    re: /\b[a-z]{2}(?:-[a-z]+)+-\d_(?!x{9}\b)(?!\w*example)[A-Za-z0-9]{9}\b/i,
+  },
+  // クライアント ID は ID の形だけでは他の文字列と区別できないので、名前つきの代入で見る。
+  {
+    name: "Cognito のクライアント ID",
+    re: /\w*client[_-]?id\w*\s*[:=]\s*['"]?(?!<|\$|x{3}|your|example|\.\.\.)[a-z0-9]{20,}\b/i,
+  },
+  {
+    name: "配信のドメイン",
+    re: /\b(?!x+\.)(?!\w*example)(?!d111111abcdef8\.)[a-z0-9]{8,}\.cloudfront\.net\b/i,
+  },
+  {
+    name: "Lambda の Function URL",
+    re: /\b(?!x+\.)(?!\w*example)[a-z0-9]{20,}\.lambda-url\.[a-z0-9-]+\.on\.aws\b/i,
+  },
 ];
 
-// 警告のみ(止めはしない)。
+// 個人情報。ユーザー名を含むパスは、履歴に載ると消しにくいので止める。<ユーザー名> などのプレースホルダーは通す。
 export const PII_CONTENT_PATTERNS: Pattern[] = [
-  { name: "ローカルのユーザーディレクトリのパス", re: /\/Users\/[A-Za-z0-9_.-]+/ },
-  { name: "個人向けメールアドレス", re: /[A-Za-z0-9._%+-]+@(gmail|yahoo|outlook|hotmail|icloud)\.com/i },
+  {
+    name: "ローカルのユーザーディレクトリのパス",
+    re: /\/Users\/(?!(?:example|user|username|you|name|xxx+)\b)[A-Za-z0-9_.-]+/,
+  },
 ];
 
 // コミットメッセージと PR・Issue の下書きだけに適用する。作業の会話や内部メモへの言及。
@@ -84,6 +104,32 @@ export const MESSAGE_PHRASE_PATTERNS: Pattern[] = [
   { name: "作業の指示・会話への言及", re: /(ユーザー|人)の指示(で|により|に従)|指示により|会話の(中|なか)で/ },
   { name: "内部メモ", re: /\b(TODO|FIXME|XXX)\b.*(メモ|あとで|後で)|作業メモ/ },
 ];
+
+// メールアドレスの検査で通す宛先。GitHub の noreply、予約済みのドメイン(example.com など)、ssh の git@github.com。
+const ALLOWED_EMAIL =
+  /^(?:[^@]+@users\.noreply\.github\.com|noreply@github\.com|git@github\.com|[^@]+@(?:[a-z0-9-]+\.)*(?:example\.(?:com|net|org)|[a-z0-9-]+\.(?:example|test|invalid|localhost)|(?:example|test|invalid|localhost)))$/i;
+const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}/g;
+// user@host や user:pass@host の形の URL は、メールアドレスではない。
+const URL_CREDENTIALS = /[a-z][a-z0-9+.-]*:\/\/[^\s/@]*@/gi;
+// 署名の行(Co-Authored-By: 名前 <noreply@…>)の宛先は、定型として通す。文書やテストが例として引用する場合もある。
+const SIGNATURE_LINE = /Co-Authored-By:[^<]*<noreply@[a-z0-9.-]+>/i;
+
+function scanEmails(entries: AddedLine[]): string[] {
+  const hits: string[] = [];
+  for (const { file, line, text } of entries) {
+    if (SIGNATURE_LINE.test(text)) continue;
+    const found = text.replace(URL_CREDENTIALS, "").match(EMAIL) ?? [];
+    if (found.some((address) => !ALLOWED_EMAIL.test(address)))
+      hits.push(`許可されていないメールアドレス: ${file}:${line}`);
+  }
+  return hits;
+}
+
+// セッションへのリンクは、これから書くメッセージと下書きにだけ適用する。すでに履歴にあるものは、push の範囲の検査では見ない。
+const SESSION_LINK_PATTERN: Pattern = {
+  name: "Claude のセッションへのリンク",
+  re: /https?:\/\/claude\.ai\/code\/session_\w+/i,
+};
 
 const NOREPLY = /@users\.noreply\.github\.com$/;
 // GitHub 上でマージしたときに、GitHub が作るマージコミットのコミッター(作者ではなく、コミッターにだけ認める)
@@ -226,17 +272,18 @@ export function checkProseBodies(entries: AddedLine[]): string[] {
 export function checkEntries(
   entries: AddedLine[],
   denylistTerms: string[] = [],
-  { message = false }: { message?: boolean } = {},
+  { message = false, history = false }: { message?: boolean; history?: boolean } = {},
 ): CheckResult {
   const blocks = [
     ...scan(entries, SECRET_CONTENT_PATTERNS),
     ...scan(entries, ENV_INFO_PATTERNS),
+    ...scanEmails(entries),
     ...scanDenylist(entries, denylistTerms),
     ...checkProseBodies(entries),
     ...(message ? scan(entries, MESSAGE_PHRASE_PATTERNS) : []),
+    ...(message && !history ? scan(entries, [SESSION_LINK_PATTERN]) : []),
   ];
-  const warns = scan(entries, PII_CONTENT_PATTERNS);
-  return { blocks: [...new Set(blocks)], warns: [...new Set(warns)] };
+  return { blocks: [...new Set([...blocks, ...scan(entries, PII_CONTENT_PATTERNS)])], warns: [] };
 }
 
 /** 作者とコミッターのメールアドレスが、GitHub の noreply アドレスか(コミッターは、GitHub 上のマージも認める)。 */

@@ -9,6 +9,9 @@ push すると、その範囲の**履歴すべて**がリモートに載る。�
 (あとで消した値も、途中のコミットには残っている)。フック(`.githooks/pre-push`)は正規表現で拾えるものを
 止める。このスキルは、**文脈で判断するもの**と**作者情報**を確認する(フックとの二重防御)。
 
+PR も出すときは、このスキルではなく `/dev-pr` を使う(push も含めて、検査と承認が 1 回になる)。
+commit のときに検査した差分は、台帳に記録されていれば読み直さない(`scripts/inspection-ledger.ts`)。
+
 検査は、検査役のサブエージェント(Agent ツール、`subagent_type: inspector`。定義は `.claude/agents/`)が行う。コミットを作った
 セッションとは別の、文脈を引き継がない目で見る。**push は、検査が OK でも、人が結果を見て承認するまで行わない。**
 
@@ -38,14 +41,20 @@ printf 'refs/heads/%s %s refs/heads/%s %s\n' "$(git branch --show-current)" "$(g
 
 ## Step 2. 検査役: 確認する
 
+検査役は Bash を持たない。先に、検査役が読む入力を書き出す(範囲は Step 0 で決めたもの):
+
+```sh
+node scripts/prepare-inspection.ts --range <Step 0 で決めた範囲>
+```
+
 検査役に依頼する内容:
 
-- 作業ディレクトリと、push する範囲(Step 0 で決めた `git log` の範囲)
-- 「`.claude/skills/dev-commit/checklist.md` を読み、その項目に沿って、`git log -p <範囲>` の
-  **全コミットの差分**と、**コミットメッセージ、ブランチ名**を確認する。最後のコミットだけで済ませない」
-- 「**読み取り専用**。編集、`commit` / `push` / `reset`、ネットワーク操作はしない」
-- 「`.pr-secrets-denylist` があれば読み、その語がどこにもないかも確認する。**語そのものは報告に書かない**」
-- 「報告は、チェックリストの『報告のしかた』に従う(値を引用しない。最後に `判定: OK/WARN/BLOCK`)」
+- 作業ディレクトリ
+- 「`.claude/skills/dev-commit/checklist.md` を読み、その項目に沿って、`.drafts/inspect/` のファイル
+  (範囲の全コミットの差分。検査済みで `covered.txt` に挙げられたコミットの差分は除く。**コミットメッセージ、ブランチ名**)を確認する。最後のコミットだけで済ませない」
+- 「報告は、チェックリストの『報告のしかた(必ず守る)』に従う(値を引用しない。最後に `判定: OK/WARN/BLOCK`)」
+
+検査が終わったら、書き出したファイルを消す: `node scripts/prepare-inspection.ts --clean`
 
 範囲の差分に次のパスが含まれるときは、`inspector-deep`(Sonnet)も別に起動し、`inspector` と**両方**の判定を合わせる
 (最も重い判定を採用する)。`scripts/`、`.githooks/`、`.github/workflows/`、`.claude/`。検査の仕組みそのものを変える差分は、
@@ -58,7 +67,7 @@ printf 'refs/heads/%s %s refs/heads/%s %s\n' "$(git branch --show-current)" "$(g
 
 | 判定 | 動き |
 |---|---|
-| `BLOCK` | **push しない。** 指摘(場所と種類、どのコミットか)を見せ、直し方を提案する。まだ push していないので、コミットを作り直せる(`git reset --soft` で戻して、直して、コミットし直す)。直したら Step 0 からやり直す |
+| `BLOCK` | **push しない。** 指摘(場所と種類、どのコミットか)を見せ、直し方を提案する。まだ push していないので、コミットを作り直せる(`git reset --soft` で戻して、直して、コミットし直す)。直したら、`.claude/skills/dev-commit/reconfirm.md` のとおりやり直す |
 | `WARN` / `OK` | Step 4 へ |
 
 ## Step 4. 人の確認(必須)
@@ -69,9 +78,12 @@ printf 'refs/heads/%s %s refs/heads/%s %s\n' "$(git branch --show-current)" "$(g
 - 作者アドレスの確認結果
 - 機械検査と検査役の判定(場所と種類のみ。値は引用しない)
 
-承認が出るまで、push しない。承認後に範囲が変わった(コミットが増えた、作り直した)場合は、Step 0 からやり直す。
+承認が出るまで、push しない。承認の時点で、範囲の末尾のコミットとコミット数を控え、push の直前にもう一度取って比べる。
+承認後の再確認は、`.claude/skills/dev-commit/reconfirm.md` に従う。
 
 ## Step 5. push
+
+push の直前に、範囲の末尾のコミットとコミット数をもう一度取り、Step 4 の承認の時点と一致することを確かめる(`.claude/skills/dev-commit/reconfirm.md`)。
 
 ```sh
 git push -u origin "$(git branch --show-current)"
@@ -79,4 +91,4 @@ git push -u origin "$(git branch --show-current)"
 
 - `--force` / `--force-with-lease` は、このスキルでは実行しない。必要なら、理由を説明して人の承認を待つ
 - push が失敗したら、原因を確認してから、1 回だけ再試行する
-- push 後、PR を作るなら `/dev-pr` へ
+- PR も出すなら、push の前に `/dev-pr` を使う(push も含めて、検査と承認が 1 回になる)。このスキルで先に push したあとに PR だけ出すときも、`/dev-pr` を使う

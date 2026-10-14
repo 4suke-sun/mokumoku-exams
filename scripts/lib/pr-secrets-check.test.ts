@@ -84,6 +84,66 @@ describe("checkEntries", () => {
     expect(checkEntries(entry("account: 123456789012")).blocks).toHaveLength(0);
   });
 
+  it("ユーザープール ID の実値を止め、プレースホルダーは通す", () => {
+    const pool = ["ap-northeast-1", "AbCd1234E"].join("_");
+    expect(checkEntries(entry(`pool: ${pool}`)).blocks).toEqual(["Cognito のユーザープール ID: f.md:3"]);
+    expect(checkEntries(entry(`pool: ap-northeast-1_${"x".repeat(9)}`)).blocks).toHaveLength(0);
+    expect(checkEntries(entry("pool: us-east-1_EXAMPLE12")).blocks).toHaveLength(0);
+  });
+
+  it("クライアント ID は名前つきの代入で止め、プレースホルダーと名前のない文字列は通す", () => {
+    const id = `${"a1b2c3d4e5".repeat(2)}f6g7h8`;
+    expect(checkEntries(entry(`COGNITO_CLIENT_ID=${id}`)).blocks).toEqual(["Cognito のクライアント ID: f.md:3"]);
+    expect(checkEntries(entry(`clientId: "${id}"`)).blocks).toHaveLength(1);
+    expect(checkEntries(entry("COGNITO_CLIENT_ID=<クライアント ID>")).blocks).toHaveLength(0);
+    expect(checkEntries(entry("COGNITO_CLIENT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxx")).blocks).toHaveLength(0);
+    expect(checkEntries(entry(`token ${id}`)).blocks).toHaveLength(0);
+  });
+
+  it("配信のドメインの実値を止め、プレースホルダーと例示は通す", () => {
+    const domain = `d${"a".repeat(13)}.cloudfront.net`;
+    expect(checkEntries(entry(`https://${domain}/`)).blocks).toEqual(["配信のドメイン: f.md:3"]);
+    expect(checkEntries(entry("https://xxxx.cloudfront.net/")).blocks).toHaveLength(0);
+    expect(checkEntries(entry("https://d111111abcdef8.cloudfront.net/")).blocks).toHaveLength(0);
+    expect(checkEntries(entry("https://example.cloudfront.net/")).blocks).toHaveLength(0);
+  });
+
+  it("Function URL の実値を止め、プレースホルダーは通す", () => {
+    const url = `https://${"a1b2c3d4e5".repeat(2)}.lambda-url.ap-northeast-1.on.aws/`;
+    expect(checkEntries(entry(url)).blocks).toEqual(["Lambda の Function URL: f.md:3"]);
+    expect(checkEntries(entry(`https://${"x".repeat(20)}.lambda-url.us-east-1.on.aws/`)).blocks).toHaveLength(0);
+    expect(checkEntries(entry("https://example.lambda-url.us-east-1.on.aws/")).blocks).toHaveLength(0);
+  });
+
+  it("検出の報告に値が出ない", () => {
+    const id = `${"a1b2c3d4e5".repeat(2)}f6g7h8`;
+    expect(checkEntries(entry(`COGNITO_CLIENT_ID=${id}`)).blocks.join()).not.toContain(id);
+  });
+
+  it("許可する宛先以外のメールアドレスを止め、場所と種類だけを報告する", () => {
+    const personal = ["someone", "gmail.com"].join("@");
+    const corporate = ["a.b+c", "mail.example.co.jp"].join("@");
+    expect(checkEntries(entry(`連絡先: ${personal}`)).blocks).toEqual(["許可されていないメールアドレス: f.md:3"]);
+    expect(checkEntries(entry(corporate)).blocks).toHaveLength(1);
+    expect(checkEntries(entry(personal)).blocks.join()).not.toContain("someone");
+  });
+
+  it("noreply・予約済みのドメイン・署名の行・URL の認証情報の形は通す", () => {
+    const ok = [
+      "1234+name@users.noreply.github.com",
+      "noreply@github.com",
+      "user@example.com",
+      "user@mail.example.org",
+      "user@host.test",
+      "git@github.com:owner/repo.git",
+      "Co-Authored-By: Claude <noreply@anthropic.com>",
+      "https://user:pass@host.example.net/path",
+      "postgres://admin@db.example.net:5432/app",
+      "npm i pkg@1.2.3 @scope/pkg@2.0.0-beta.1",
+    ];
+    for (const text of ok) expect(checkEntries(entry(text)).blocks, text).toHaveLength(0);
+  });
+
   it("プロファイル名はプレースホルダーなら通す", () => {
     expect(checkEntries(entry("AWS_PROFILE=<プロファイル名>")).blocks).toHaveLength(0);
     expect(checkEntries(entry(fakeProfileAssignment)).blocks).toHaveLength(1);
@@ -94,10 +154,32 @@ describe("checkEntries", () => {
     expect(blocks).toEqual(["拒否リストの 1 番目の語: f.md:3"]);
   });
 
-  it("ローカルパスは警告にとどめる", () => {
+  it("ローカルパスは止め、プレースホルダーは通す", () => {
     const { blocks, warns } = checkEntries(entry(fakeLocalPath));
-    expect(blocks).toHaveLength(0);
-    expect(warns).toHaveLength(1);
+    expect(blocks).toEqual(["ローカルのユーザーディレクトリのパス: f.md:3"]);
+    expect(warns).toHaveLength(0);
+    expect(blocks.join()).not.toContain("someone");
+    for (const text of [
+      "/Us" + "ers/<ユーザー名>/work",
+      "/Us" + "ers/example/work",
+      "/Us" + "ers/ など",
+      "/api/admin/users/abc",
+    ]) {
+      expect(checkEntries(entry(text)).blocks, text).toHaveLength(0);
+    }
+  });
+
+  it("Claude のセッションへのリンクは、メッセージのときだけ止める", () => {
+    const link = "Claude-Session: https://claude.ai/code/session_example";
+    const msg = checkEntries(textToEntries(link, "message"), [], { message: true });
+    expect(msg.blocks).toEqual(["Claude のセッションへのリンク: message:1"]);
+    expect(msg.blocks.join()).not.toContain("session_example");
+    expect(checkEntries(entry(link)).blocks).toHaveLength(0);
+    // push の範囲の履歴には掛けない(すでに履歴にあるものは、書き換えない)
+    expect(checkEntries(textToEntries(link, "message"), [], { message: true, history: true }).blocks).toHaveLength(0);
+    // 署名の行(Co-Authored-By)とは区別する
+    const signature = textToEntries("Co-Authored-By: Claude <noreply@anthropic.com>", "message");
+    expect(checkEntries(signature, [], { message: true }).blocks).toHaveLength(0);
   });
 
   it("作業の指示への言及は、メッセージのときだけ止める", () => {
