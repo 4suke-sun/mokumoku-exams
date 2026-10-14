@@ -1,4 +1,5 @@
 import { execFileSync } from "node:child_process";
+import { checkImageMetadata } from "./image-metadata-check.ts";
 import { readLocalDenylist } from "./local-denylist.ts";
 import type { CheckResult, CommitAuthor } from "./pr-secrets-check.ts";
 import {
@@ -23,6 +24,10 @@ export function git(args: string[]): string {
   });
 }
 
+function gitBuffer(args: string[]): Buffer {
+  return execFileSync("git", args, { stdio: ["ignore", "pipe", "ignore"], maxBuffer: 256 * 1024 * 1024 });
+}
+
 export function tryGit(args: string[]): string {
   try {
     return git(args);
@@ -42,8 +47,14 @@ export function checkDiff(diffArgs: string[]): CheckResult {
   // テストファイルも除外しない。テストのダミー値は、文字列の連結で組み立てて、検査に当たらないようにする。
   const diff = git(["diff", "-U0", ...diffArgs]);
   const { blocks, warns } = checkEntries(parseAddedLines(diff), readLocalDenylist());
+  // 画像の中身は差分に出ない(Binary files … differ)ので、追加・変更されたものを読んで調べる。
+  const added = git(["diff", "--name-only", "--diff-filter=AMR", ...diffArgs])
+    .split("\n")
+    .filter(Boolean);
+  const blobRef = (file: string) => (diffArgs.length >= 2 ? `${diffArgs[1]}:${file}` : `:${file}`);
+  const images = checkImageMetadata(added, (file) => gitBuffer(["show", blobRef(file)]));
   return {
-    blocks: [...checkSensitiveFilenames(files), ...checkUnexpectedPaths(files), ...blocks],
+    blocks: [...checkSensitiveFilenames(files), ...checkUnexpectedPaths(files), ...images, ...blocks],
     warns,
   };
 }
