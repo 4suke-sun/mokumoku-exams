@@ -27,8 +27,7 @@ PR・Issue の本文は自由度が高いので、作成役は `commit-writer`(H
 ## Step 0. 前提の確認
 
 1. PR の場合: PR の範囲(`git log --oneline origin/main..HEAD`)が空でないか。検査と承認は、この範囲の全体に対して行う。
-   push は、Step 6 で承認のあとに行う(先に `/dev-push` はしない)。リモートに同名のブランチがあり、
-   `git log --oneline @{upstream}..HEAD` が空なら、push は飛ばす
+   push は、Step 6 で承認のあとに行う(先に `/dev-push` はしない。push を飛ばす条件も Step 6 に書く)
 2. PR の場合: ブランチが `main` でないこと(`git branch --show-current`)。
    `git remote get-url origin` が、意図したリポジトリであること
 3. PR の場合: 対応する Issue があるか(ブランチ名が `<prefix>/#<番号>-…` か)
@@ -158,7 +157,7 @@ node scripts/post-issues.ts .drafts/issues/manifest.json --seal
 
 1. 投稿の直前に、もう一度ハッシュ(PR の場合は、範囲の末尾のコミットとコミット数も)を取り、Step 5 の値と**一致する**ことを確認する。
    一致しなければ、push も投稿もせず、`.claude/skills/dev-commit/reconfirm.md` のとおりやり直す
-2. PR の場合: まず push する(承認済みの範囲)。`--force` 系は使わない:
+2. PR の場合: まず push する(承認済みの範囲)。リモートに同名のブランチがあり、upstream が設定されていて、`git log --oneline @{upstream}..HEAD` が空なら、push は飛ばす(すでに push 済み)。upstream がない、または `@{upstream}` を解決できないときは、push する。`--force` 系は使わない:
 
    ```sh
    git push -u origin "$(git branch --show-current)"

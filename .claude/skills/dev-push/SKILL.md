@@ -20,7 +20,8 @@ commit のときに検査した差分は、台帳に記録されていれば読�
 1. `git branch --show-current` でブランチを確認する。`main` への直接 push は、リリースタグの運用に従う
    ときだけで、通常はしない
 2. push する範囲を決める: `git log --oneline origin/main..HEAD`(新規ブランチ)、
-   既存ブランチなら `git log --oneline @{upstream}..HEAD`。**空なら、ここで止める**
+   既存ブランチなら `git log --oneline @{upstream}..HEAD`。**空なら、ここで止める**(push するものがない。
+   `/dev-pr` は、このスキルを使わず、push を飛ばす条件を Step 6 で別に判断する。PR の作成が残っているので、push だけを飛ばして先へ進む)
 3. 範囲の全コミットの作者が、GitHub の noreply アドレスであることを確認する:
    ```sh
    git log --format='%h %ae' origin/main..HEAD
