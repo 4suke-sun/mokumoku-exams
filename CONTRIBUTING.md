@@ -26,8 +26,9 @@ npm install   # 依存を入れ、検査フック(.githooks)を有効にしま�
 | `npm run check:test-titles` | テストの題(`it` / `test`)の形の検査。`-- --write` で、直した題を基準から消す |
 | `npm run check:docs` | 文書の相対リンクの先と、`npm run <名前>` のスクリプトが実在することの検査(対象: `README.md`、`CLAUDE.md`、`CONTRIBUTING.md`、`docs/`、`.claude/skills/`、`packages/*/README.md`) |
 | `npm run check:env` | アプリ(`packages/app`)が読む環境変数が、CDK(`packages/infra/lib/web-stack.ts`)から Lambda へ渡されることの検査。Lambda が自動で与える変数と開発用の変数は、`scripts/lib/env-contract-check.ts` の一覧で除く。通知の送信の Lambda と、動的な参照(`env[変数]` など)は対象にしない |
+| `npm run check:pr-closes -- --pr <番号>` | PR の `Closes` の Issue が同じ版のマイルストーンで、リリースノートの最新の版がそのマイルストーンの名前(`vX.Y.Z`)と同じで、マイルストーンに `Closes` にない未完了の Issue がないことの検査(`gh` で読む)。`--body-file <下書き>` で、投稿の前に下書きを検査できる。CI の PR で実行する |
 
-PR を出す前に、上のコマンド(`format` 以外)がローカルで通ることを確認してください。同じものが CI でも実行されます。
+PR を出す前に、上のコマンド(`format` 以外)がローカルで通ることを確認してください。`check:pr-closes` は PR の番号が要るので、PR の前は `-- --body-file <下書き>` で下書きを検査します。同じものが CI でも実行されます。
 
 ## ブランチ
 
@@ -119,6 +120,7 @@ Closes #12
 - PR のタイトルも、Conventional Commits の形式にします。
 - `main` への直接 push は、しません。このリポジトリの現在のプランでは、ブランチ保護(PR の必須化)が使えないため、`main` への push のたびに、CI が機密検査を実行して検知します(止めるものではなく、検知して直すためのものです)。ブランチ保護が使えるようになったら、PR の必須化に切り替えます。
 - 版を切る PR には、`data/release-notes.json` にその版のエントリを足します(新しい版を先頭に)。
+- 版単位の PR は、`Closes` の Issue をすべて同じ版のマイルストーンにし、そのマイルストーンに `Closes` にない未完了の Issue を残しません(`npm run check:pr-closes` が CI で守ります)。`Closes` の Issue がどれもマイルストーンを持たない PR は、Issue 単位の PR(hotfix)として、検査しません。検査は PR の作成と更新(push)で動きます。PR の本文や、Issue のマイルストーンを直したときは、CI の `pr-closes` ジョブを再実行します。
 
 ## 版番号
 

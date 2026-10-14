@@ -164,10 +164,31 @@ jobs:
         working-directory: packages/app
       - run: npm run test:e2e
 
+  # PR の Closes の Issue と、マイルストーン・リリースノートの版の対応。Issue と PR を読むだけなので、権限は読み取りに限る
+  pr-closes:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      issues: read
+      pull-requests: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: 22
+      - run: npm run check:pr-closes -- --pr "$PR_NUMBER"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+
   # 必須のチェックは、このジョブだけにする。変更がなくて動かなかった(skipped)ジョブは成功として扱い、
   # 失敗・取り消しがあれば失敗にする。動かなかったジョブのせいで、待ち続けない
   ci-ok:
-    needs: [changes, check, app, infra, pipeline, e2e]
+    needs: [changes, check, app, infra, pipeline, e2e, pr-closes]
     if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 5

@@ -63,6 +63,14 @@ printf 'refs/heads/%s %s refs/heads/%s %s\n' "$(git branch --show-current)" "$(g
 
 範囲の作者が、GitHub の noreply アドレスであることも確かめる(`git log --format='%h %ae' origin/main..HEAD`)。
 
+PR の下書きに `Closes` がある場合は、`Closes` の Issue と、マイルストーン・リリースノートの最新の版の対応も確かめる(`gh` で読むだけ。CI の PR でも同じ検査が動く):
+
+```sh
+node scripts/check-pr-closes.ts --body-file <下書きファイル>
+```
+
+`Closes` の Issue がどれもマイルストーンを持たない PR(Issue 単位の PR・hotfix)は、検査されない。止められたら、`Closes` の Issue、マイルストーン、`data/release-notes.json` の最新の版をそろえる。
+
 ## Step 3. 検査役: 確認する
 
 検査役は Bash を持たない。先に、検査役が読む入力を書き出す。PR の場合:
