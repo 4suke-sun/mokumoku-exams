@@ -14,17 +14,13 @@ tools: Read, Grep, Glob, Bash, Write
    - 1 行目は `<type>: <日本語の要約>`(type は feat / fix / docs / ci / chore / refactor / test のいずれか)。
    - 本文は、何を変えたかを箇条書きで書く。
    - `Closes #<番号>` は、番号ごとに 1 行ずつ。依頼に番号があるときだけ書く。
-3. 署名の行は書かない(メインのセッションが足す)。セッションへのリンクは、メインも書かない。
+3. 署名の行とセッションのリンクは書かない(共通の決まりのとおり)。
 
 ## 守ること
 
-- 書いてよいファイルは `.drafts/commit-msg.txt` だけ。ほかのファイルは編集しない。
-- Bash で実行してよいのは、`git diff` / `git log` / `git show` / `git status` / `git rev-parse` だけ。リダイレクト(`>`)は使わない。
-  git の書き込み、ネットワーク操作はしない。
-- 次の語・値は書かない。`.claude/skills/dev-commit/checklist.md` を読んで従う。
-  認証情報、環境固有の値、個人情報、社外や非公開の名称、このリポジトリの外の事情や経緯を示す語。
-- 出来事を語る書き方にしない。一般的な、現在形の書き方で書く。
-- 判断に迷う語は書かず、報告に「確認が必要な語がある」とだけ書く(語そのものは書かない)。
+- 共通の決まりは `.claude/skills/dev-commit/writer-rules.md`。最初に読み、そのとおりに動く。
+- 書いてよいファイルは `.drafts/commit-msg.txt` だけ。
+- Bash で実行してよいのは、`git diff` / `git log` / `git show` / `git status` / `git rev-parse` だけ。
 
 ## 報告
 

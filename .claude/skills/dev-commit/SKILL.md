@@ -42,10 +42,11 @@ node scripts/check-commit-secrets.ts
 
 - 作業ディレクトリ(リポジトリのルート)
 - 「`git diff --cached` を読み、[Conventional Commits](https://www.conventionalcommits.org/) 形式のコミットメッセージ案を
-  `.drafts/commit-msg.txt` に書く。`Closes #<番号>` は番号ごとに 1 行ずつ。**書いてよいのは `.drafts/commit-msg.txt` だけ**」
-- 「`.claude/skills/dev-commit/checklist.md` の『書いてはいけないもの』を守る」
+  `.drafts/commit-msg.txt` に書く。`Closes #<番号>` は番号ごとに 1 行ずつ」
 
 ## Step 3. 検査役: 確認する
+
+検査役に依頼する前に、ステージした差分とメッセージ案のハッシュを控える(`.claude/skills/dev-commit/reconfirm.md`)。
 
 検査役は Bash を持たない。先に、検査役が読む入力を書き出す:
 
@@ -58,7 +59,7 @@ node scripts/prepare-inspection.ts --cached
 - 作業ディレクトリ
 - 「`.claude/skills/dev-commit/checklist.md` を読み、その項目に沿って、`.drafts/inspect/` のファイルと
   `.drafts/commit-msg.txt` を確認する」
-- 「報告は、チェックリストの『報告のしかた』に従う(値を引用しない。最後に `判定: OK/WARN/BLOCK`)」
+- 「報告は、チェックリストの『報告のしかた(必ず守る)』に従う(値を引用しない。最後に `判定: OK/WARN/BLOCK`)」
 
 検査が終わったら、書き出したファイルを消す: `node scripts/prepare-inspection.ts --clean`
 
@@ -73,19 +74,21 @@ node scripts/prepare-inspection.ts --cached
 
 | 判定 | 動き |
 |---|---|
-| `BLOCK` | **コミットしない。** 指摘(場所と種類)を人に見せ、直し方を提案する。直したら Step 1 からやり直す |
+| `BLOCK` | **コミットしない。** 指摘(場所と種類)を人に見せ、直し方を提案する。直したら(メッセージ案だけなら、案を直接直す)、`.claude/skills/dev-commit/reconfirm.md` のとおり Step 1 からやり直す |
 | `WARN` | 指摘を人に見せ、コミットしてよいか聞く |
 | `OK` | Step 5 へ(人の確認は要らない) |
 
 ## Step 5. コミット
 
+commit の直前に、差分とメッセージ案のハッシュをもう一度取り、検査のときと一致することを確かめる。
+
 ```sh
 git commit -F .drafts/commit-msg.txt
 ```
 
-- メッセージの末尾には、`Co-Authored-By:` の署名の行を付けてよい(作成役の案に無ければ、ここで足す。足したら、
-  追加分は定型の署名だけなので、再検査は要らない)。Claude のセッションへのリンク(`Claude-Session:` の行など)は
-  付けない。機械検査が止める
+- メッセージの末尾には、`Co-Authored-By:` の署名の行を付けてよい。作成役の案に無ければ、ここで足す。
+  足すだけなら、`.claude/skills/dev-commit/reconfirm.md` の例外のとおり、再検査は要らない。
+  Claude のセッションへのリンク(`Claude-Session:` の行など)は付けない。機械検査が止める
 - コミット後、`git log -1 --format='%an <%ae>'` で、作者が noreply アドレスであることを確認する。違えば、
   `git config user.email` を直して `git commit --amend --reset-author`(push 前のローカルのみ)
 - `git commit --no-verify` は使わない。フックが止めたら、指摘を直す

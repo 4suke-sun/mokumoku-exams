@@ -37,8 +37,7 @@ PR・Issue の本文は自由度が高いので、作成役は `commit-writer`(H
 作成役に依頼する内容:
 
 - 作業ディレクトリ、対象(PR のブランチ範囲 `origin/main..HEAD`、または Issue の趣旨)
-- 「上の形式で下書きを書く。`Closes #<番号>` は番号ごとに 1 行ずつ。**書いてよいのは `.drafts/` だけ**」
-- 「`.claude/skills/dev-commit/checklist.md` の『見るもの』を守って書く」
+- 「上の形式で下書きを書く。`Closes #<番号>` は番号ごとに 1 行ずつ」
 
 ## Step 2. 機械的な検査
 
@@ -61,7 +60,7 @@ node scripts/prepare-inspection.ts --pr
 - 作業ディレクトリと、下書きファイルのパス
 - 「`.claude/skills/dev-commit/checklist.md` を読み、その項目に沿って、下書きと、PR の場合は `.drafts/inspect/` のファイル
   (基準との全差分・全コミットメッセージ・ブランチ名)を確認する」
-- 「報告は、チェックリストの『報告のしかた』に従う(値を引用しない。最後に `判定: OK/WARN/BLOCK`)」
+- 「報告は、チェックリストの『報告のしかた(必ず守る)』に従う(値を引用しない。最後に `判定: OK/WARN/BLOCK`)」
 
 検査が終わったら、書き出したファイルを消す: `node scripts/prepare-inspection.ts --clean`
 
@@ -76,7 +75,7 @@ PR の差分に次のパスが含まれるときは、`inspector-deep`(Sonnet)�
 
 | 判定 | 動き |
 |---|---|
-| `BLOCK` | **出さない。** 指摘(場所と種類)を見せ、直し方を提案する。下書きを直したら Step 2 からやり直す。ブランチに問題があれば、PR を作る前にコミットを直す |
+| `BLOCK` | **出さない。** 指摘(場所と種類)を見せ、直し方を提案する。下書きを直したら、`.claude/skills/dev-commit/reconfirm.md` のとおりやり直す。ブランチに問題があれば、PR を作る前にコミットを直す |
 | `WARN` / `OK` | Step 5 へ |
 
 ## Step 5. 人の確認(必須)
@@ -87,7 +86,7 @@ PR の差分に次のパスが含まれるときは、`inspector-deep`(Sonnet)�
 - 差分の要約(PR の場合)
 - 機械検査と検査役の判定(場所と種類のみ。値は引用しない)
 
-承認の時点で、下書きのハッシュを控える:
+承認の時点で、下書きのハッシュを控える(再確認の条件は `.claude/skills/dev-commit/reconfirm.md`):
 
 ```sh
 shasum -a 256 <下書きファイル>
@@ -96,7 +95,7 @@ shasum -a 256 <下書きファイル>
 ## Step 6. 投稿
 
 1. 投稿の直前に、もう一度ハッシュを取り、Step 5 の値と**一致する**ことを確認する。一致しなければ、
-   下書きが承認後に変わっている。投稿せず、Step 2 からやり直す
+   投稿せず、`.claude/skills/dev-commit/reconfirm.md` のとおりやり直す
 2. 下書きのファイルから投稿する(本文を手で打ち直さない):
 
    ```sh

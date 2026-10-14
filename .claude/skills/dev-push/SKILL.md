@@ -49,7 +49,7 @@ node scripts/prepare-inspection.ts --range origin/main..HEAD
 - 作業ディレクトリ
 - 「`.claude/skills/dev-commit/checklist.md` を読み、その項目に沿って、`.drafts/inspect/` のファイル
   (**全コミットの差分**、**コミットメッセージ、ブランチ名**)を確認する。最後のコミットだけで済ませない」
-- 「報告は、チェックリストの『報告のしかた』に従う(値を引用しない。最後に `判定: OK/WARN/BLOCK`)」
+- 「報告は、チェックリストの『報告のしかた(必ず守る)』に従う(値を引用しない。最後に `判定: OK/WARN/BLOCK`)」
 
 検査が終わったら、書き出したファイルを消す: `node scripts/prepare-inspection.ts --clean`
 
@@ -64,7 +64,7 @@ node scripts/prepare-inspection.ts --range origin/main..HEAD
 
 | 判定 | 動き |
 |---|---|
-| `BLOCK` | **push しない。** 指摘(場所と種類、どのコミットか)を見せ、直し方を提案する。まだ push していないので、コミットを作り直せる(`git reset --soft` で戻して、直して、コミットし直す)。直したら Step 0 からやり直す |
+| `BLOCK` | **push しない。** 指摘(場所と種類、どのコミットか)を見せ、直し方を提案する。まだ push していないので、コミットを作り直せる(`git reset --soft` で戻して、直して、コミットし直す)。直したら、`.claude/skills/dev-commit/reconfirm.md` のとおりやり直す |
 | `WARN` / `OK` | Step 4 へ |
 
 ## Step 4. 人の確認(必須)
@@ -75,9 +75,12 @@ node scripts/prepare-inspection.ts --range origin/main..HEAD
 - 作者アドレスの確認結果
 - 機械検査と検査役の判定(場所と種類のみ。値は引用しない)
 
-承認が出るまで、push しない。承認後に範囲が変わった(コミットが増えた、作り直した)場合は、Step 0 からやり直す。
+承認が出るまで、push しない。承認の時点で、範囲の末尾のコミットとコミット数を控え、push の直前にもう一度取って比べる。
+承認後の再確認は、`.claude/skills/dev-commit/reconfirm.md` に従う。
 
 ## Step 5. push
+
+push の直前に、範囲の末尾のコミットとコミット数をもう一度取り、Step 4 の承認の時点と一致することを確かめる(`.claude/skills/dev-commit/reconfirm.md`)。
 
 ```sh
 git push -u origin "$(git branch --show-current)"
