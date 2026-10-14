@@ -94,7 +94,6 @@ export const ENV_INFO_PATTERNS: Pattern[] = [
 // 警告のみ(止めはしない)。
 export const PII_CONTENT_PATTERNS: Pattern[] = [
   { name: "ローカルのユーザーディレクトリのパス", re: /\/Users\/[A-Za-z0-9_.-]+/ },
-  { name: "個人向けメールアドレス", re: /[A-Za-z0-9._%+-]+@(gmail|yahoo|outlook|hotmail|icloud)\.com/i },
 ];
 
 // コミットメッセージと PR・Issue の下書きだけに適用する。作業の会話や内部メモへの言及。
@@ -102,6 +101,26 @@ export const MESSAGE_PHRASE_PATTERNS: Pattern[] = [
   { name: "作業の指示・会話への言及", re: /(ユーザー|人)の指示(で|により|に従)|指示により|会話の(中|なか)で/ },
   { name: "内部メモ", re: /\b(TODO|FIXME|XXX)\b.*(メモ|あとで|後で)|作業メモ/ },
 ];
+
+// メールアドレスの検査で通す宛先。GitHub の noreply、予約済みのドメイン(example.com など)、ssh の git@github.com。
+const ALLOWED_EMAIL =
+  /^(?:[^@]+@users\.noreply\.github\.com|noreply@github\.com|git@github\.com|[^@]+@(?:[a-z0-9-]+\.)*(?:example\.(?:com|net|org)|[a-z0-9-]+\.(?:example|test|invalid|localhost)|(?:example|test|invalid|localhost)))$/i;
+const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}/g;
+// user@host や user:pass@host の形の URL は、メールアドレスではない。
+const URL_CREDENTIALS = /[a-z][a-z0-9+.-]*:\/\/[^\s/@]*@/gi;
+// 署名の行(Co-Authored-By: 名前 <noreply@…>)の宛先は、定型として通す。文書やテストが例として引用する場合もある。
+const SIGNATURE_LINE = /Co-Authored-By:[^<]*<noreply@[a-z0-9.-]+>/i;
+
+function scanEmails(entries: AddedLine[]): string[] {
+  const hits: string[] = [];
+  for (const { file, line, text } of entries) {
+    if (SIGNATURE_LINE.test(text)) continue;
+    const found = text.replace(URL_CREDENTIALS, "").match(EMAIL) ?? [];
+    if (found.some((address) => !ALLOWED_EMAIL.test(address)))
+      hits.push(`許可されていないメールアドレス: ${file}:${line}`);
+  }
+  return hits;
+}
 
 const NOREPLY = /@users\.noreply\.github\.com$/;
 // GitHub 上でマージしたときに、GitHub が作るマージコミットのコミッター(作者ではなく、コミッターにだけ認める)
@@ -249,6 +268,7 @@ export function checkEntries(
   const blocks = [
     ...scan(entries, SECRET_CONTENT_PATTERNS),
     ...scan(entries, ENV_INFO_PATTERNS),
+    ...scanEmails(entries),
     ...scanDenylist(entries, denylistTerms),
     ...checkProseBodies(entries),
     ...(message ? scan(entries, MESSAGE_PHRASE_PATTERNS) : []),

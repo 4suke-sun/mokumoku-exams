@@ -92,7 +92,7 @@ describe("checkEntries", () => {
   });
 
   it("クライアント ID は名前つきの代入で止め、プレースホルダーと名前のない文字列は通す", () => {
-    const id = "a1b2c3d4e5".repeat(2) + "f6g7h8";
+    const id = `${"a1b2c3d4e5".repeat(2)}f6g7h8`;
     expect(checkEntries(entry(`COGNITO_CLIENT_ID=${id}`)).blocks).toEqual(["Cognito のクライアント ID: f.md:3"]);
     expect(checkEntries(entry(`clientId: "${id}"`)).blocks).toHaveLength(1);
     expect(checkEntries(entry("COGNITO_CLIENT_ID=<クライアント ID>")).blocks).toHaveLength(0);
@@ -116,8 +116,32 @@ describe("checkEntries", () => {
   });
 
   it("検出の報告に値が出ない", () => {
-    const id = "a1b2c3d4e5".repeat(2) + "f6g7h8";
+    const id = `${"a1b2c3d4e5".repeat(2)}f6g7h8`;
     expect(checkEntries(entry(`COGNITO_CLIENT_ID=${id}`)).blocks.join()).not.toContain(id);
+  });
+
+  it("許可する宛先以外のメールアドレスを止め、場所と種類だけを報告する", () => {
+    const personal = ["someone", "gmail.com"].join("@");
+    const corporate = ["a.b+c", "mail.example.co.jp"].join("@");
+    expect(checkEntries(entry(`連絡先: ${personal}`)).blocks).toEqual(["許可されていないメールアドレス: f.md:3"]);
+    expect(checkEntries(entry(corporate)).blocks).toHaveLength(1);
+    expect(checkEntries(entry(personal)).blocks.join()).not.toContain("someone");
+  });
+
+  it("noreply・予約済みのドメイン・署名の行・URL の認証情報の形は通す", () => {
+    const ok = [
+      "1234+name@users.noreply.github.com",
+      "noreply@github.com",
+      "user@example.com",
+      "user@mail.example.org",
+      "user@host.test",
+      "git@github.com:owner/repo.git",
+      "Co-Authored-By: Claude <noreply@anthropic.com>",
+      "https://user:pass@host.example.net/path",
+      "postgres://admin@db.example.net:5432/app",
+      "npm i pkg@1.2.3 @scope/pkg@2.0.0-beta.1",
+    ];
+    for (const text of ok) expect(checkEntries(entry(text)).blocks, text).toHaveLength(0);
   });
 
   it("プロファイル名はプレースホルダーなら通す", () => {
