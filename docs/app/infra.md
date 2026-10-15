@@ -34,7 +34,8 @@ Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCre
 
 - `/_next/static/*` は S3 から配ります(CloudFront から S3 へは、オリジンアクセスコントロールで読みます。バケットは公開しません)。
 - `packages/app/public/` のファイル(ブランドの画像、アイコン、通知を受け取る Service Worker)も、S3 から配ります(`/brand/*`・`/icons/*`・`/sw.js`)。
-  Lambda には載せません。入口の proxy を通らないので、`public/` に置いたファイルは、ログインなしで取れます(公開してよいものだけを置きます)。
+  Lambda には載せません。入口の proxy を通らないので、この 3 つの経路のファイルは、ログインなしで取れます(公開してよいものだけを置きます)。
+  `public/` のほかの場所にファイルを足すときは、CloudFront の振り分け(`packages/infra/lib/web-stack.ts` の `PUBLIC_ASSET_PATHS`)にも足します。
 - 問題データ(正解と解説を含む)は、静的ファイルとしては配りません。出題・結果・ブックマークの画面は、開いたあとに、表示に要る問題だけを、
   ログインが必要な API(`POST /api/questions`)で取ります。
 - それ以外は Lambda の Function URL へ渡します。Function URL は認証なし(`authType: NONE`)で、CloudFront が付ける合言葉のヘッダー(`x-origin-verify`)を、
@@ -52,7 +53,13 @@ Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCre
 - すべての応答に、次のヘッダーを付けます(アプリ側が同じヘッダーを付けても、CloudFront の設定を優先します)。
   `Strict-Transport-Security`(1 年、サブドメインを含む)、`X-Content-Type-Options: nosniff`、
   `Referrer-Policy: strict-origin-when-cross-origin`、`X-Frame-Options: DENY`。
-  `Content-Security-Policy` は、まだ付けません。
+- CSP は、まず報告だけのヘッダー(`Content-Security-Policy-Report-Only`)で、すべての応答に付けます(値は `packages/infra/lib/web-stack.ts` の `CONTENT_SECURITY_POLICY`)。
+  読み込み元は自分のオリジンだけにし、Next が埋め込むインラインのスクリプトと、インラインの `style` 属性のため、当面は `'unsafe-inline'` を許します。
+  違反は、ブラウザのコンソールで確かめます(報告の受け取り先は作りません)。
+  強制(`Content-Security-Policy`)に切り替えるのは、次がそろったときです。
+  - 主要な画面(ログイン、資格の一覧、出題、結果、学習の状況、アカウント、管理)を本番で開き、コンソールに違反が出ないこと。
+  - 通知の購読とテスト通知(Service Worker)が、報告だけの状態で問題なく動くこと。
+  - 切り替えるときは、ヘッダーの名前だけを変え、値は同じにする(値を変えるときは、また報告だけで確かめる)。
 
 ### ログと監視
 
@@ -74,6 +81,14 @@ Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCre
   アプリが 5xx を返しても、Lambda の呼び出しとしては成功するので、`Errors` には数えられません。アプリの 5xx のアラームは、そのためのものです。
 - `.env` の `ALARM_EMAIL` を渡すと、そのアドレスをトピックに購読させます。デプロイの後に届く確認のメールで、購読を承認します。
   渡さないときは、トピックだけが作られ、アラームの状態は CloudWatch の画面で確かめます。
+
+### 同時実行の上限
+
+- `.env` の `APP_RESERVED_CONCURRENCY` を渡すと、アプリの Lambda に、その数の同時実行を予約します(それより多くは同時に動きません)。
+  上限に達したときの実行の制限は、実行制限のアラーム(`Throttles`)で知らせます。
+- 予約は、アカウントの同時実行の上限から差し引かれ、予約しない分を 10 以上残す必要があります。上限が小さいアカウント(新しいアカウントでは 10 のことがある)では予約できず、
+  デプロイが失敗します。先に、Service Quotas で Lambda の同時実行の上限の引き上げを申請します(例: 上限 100 なら、予約 10 を渡せます)。
+- 渡さないときは、予約しません(アカウントの上限までは同時に動きます)。
 
 ### 独自ドメイン
 
@@ -115,6 +130,7 @@ Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCre
    | `ORIGIN_VERIFY_VALUE` | CloudFront とアプリの間の合言葉。32 文字以上のランダムな文字列を、自分で作ります |
    | `STACK_PREFIX` | (省略可)リソース名の先頭に付ける文字列。既定は `mokumoku-exams` |
    | `ALARM_EMAIL` | (省略可)アラームの通知先のメールアドレス |
+   | `APP_RESERVED_CONCURRENCY` | (省略可)アプリの Lambda の同時実行の上限(1〜1000 の整数)。渡したときだけ付けます(「同時実行の上限」) |
    | `SITE_URL` | (省略可)公開の URL の起点(`https://example.com` の形。末尾のスラッシュなし)。sitemap と robots の絶対 URL に使います。渡さないときは、sitemap は空です |
    | `VAPID_PUBLIC_KEY` | (省略可)プッシュ通知の VAPID の公開鍵。下の 2 つとそろえて渡します |
    | `VAPID_PRIVATE_KEY_PARAMETER` | (省略可)VAPID の秘密鍵を置いた SSM パラメーター(SecureString)の名前。`/` で始まる階層の名前にします。値は `.env` に書きません |

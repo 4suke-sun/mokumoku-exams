@@ -31,7 +31,7 @@
 
 | 項目 | 確認の方法 |
 | --- | --- |
-| 認証のコードと設定が、意図どおりである(ID トークンの検証、保護する画面と API の範囲、UserPool の設定、確認コードの文面) | `npm test` が通る。特に `packages/app/src/authorization.test.ts`(画面・API・ファイルの経路の一覧)と、`packages/infra` のテスト。新しい画面・API・`public/` のファイルを足したときは、一覧に足してあり、公開するか保護するかを決めてある(`public/` のファイルは S3 から配るので、保護できない。公開してよいものだけを置く) |
+| 認証のコードと設定が、意図どおりである(ID トークンの検証、保護する画面と API の範囲、UserPool の設定、確認コードの文面) | `npm test` が通る。特に `packages/app/src/authorization.test.ts`(画面・API・ファイルの経路の一覧)と、`packages/infra` のテスト。新しい画面・API・`public/` のファイルを足したときは、一覧に足してあり、公開するか保護するかを決めてある(`public/` の `/brand/*`・`/icons/*`・`/sw.js` は S3 から配るので、保護できない。公開してよいものだけを置き、ほかの場所に足すときは CloudFront の振り分けにも足す) |
 | Cookie と別サイトからの送信の扱いが、意図どおりである | Cookie が `HttpOnly`・`SameSite=Lax`・本番は `Secure`。状態を変える `POST` が、`Sec-Fetch-Site` で別サイトからのものを断る。詳細は[認証の仕組み](./app/auth.md)の「トークンの扱い」 |
 
 実際にサインインできるかは、デプロイ後の確認で扱います。

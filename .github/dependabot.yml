@@ -1,0 +1,26 @@
+# 依存の更新。週に 1 回、npm(すべてのワークスペースが共有する、リポジトリ直下のロックファイル)と GitHub Actions を、
+# それぞれ 1 件の PR にまとめて出す。更新の PR は、そのままはマージせず、版のブランチに取り込む(CONTRIBUTING.md の「依存の更新」)。
+version: 2
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 1
+    groups:
+      npm:
+        patterns: ["*"]
+    commit-message:
+      prefix: chore
+      include: scope
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 1
+    groups:
+      actions:
+        patterns: ["*"]
+    commit-message:
+      prefix: ci
+      include: scope

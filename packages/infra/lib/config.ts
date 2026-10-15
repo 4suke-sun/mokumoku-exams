@@ -6,6 +6,7 @@ export const REQUIRED_VARIABLES = ["WEB_ADAPTER_LAYER_ARN", "ORIGIN_VERIFY_VALUE
 export const OPTIONAL_VARIABLES = [
   "STACK_PREFIX",
   "ALARM_EMAIL",
+  "APP_RESERVED_CONCURRENCY",
   "SITE_URL",
   "VAPID_PUBLIC_KEY",
   "VAPID_PRIVATE_KEY_PARAMETER",
@@ -39,6 +40,11 @@ export type InfraConfig = {
   push?: PushConfig;
   /** 独自ドメイン。なければ、CloudFront の既定のドメインで配信する */
   customDomain?: CustomDomain;
+  /**
+   * アプリの Lambda の同時実行の上限(予約する同時実行数)。なければ付けない。
+   * アカウントの同時実行の上限から、予約していない分を 10 以上残す必要がある(docs/app/infra.md)
+   */
+  appReservedConcurrency?: number;
 };
 
 export type CustomDomain = {
@@ -105,6 +111,15 @@ export function loadConfig(env: Env): InfraConfig {
     problems.push("ALARM_EMAIL は、メールアドレスの形にしてください");
   }
 
+  const concurrency = env.APP_RESERVED_CONCURRENCY || undefined;
+  const appReservedConcurrency = concurrency === undefined ? undefined : Number(concurrency);
+  if (
+    appReservedConcurrency !== undefined &&
+    !(Number.isInteger(appReservedConcurrency) && appReservedConcurrency >= 1 && appReservedConcurrency <= 1000)
+  ) {
+    problems.push("APP_RESERVED_CONCURRENCY は、1 から 1000 の整数にしてください");
+  }
+
   const siteUrl = env.SITE_URL || undefined;
   if (siteUrl && !SITE_URL.test(siteUrl)) {
     problems.push("SITE_URL は、https://<ホスト> の形(末尾のスラッシュとパスなし)にしてください");
@@ -140,6 +155,7 @@ export function loadConfig(env: Env): InfraConfig {
     originVerifyValue,
     alarmEmail,
     ...(siteUrl ? { siteUrl } : {}),
+    ...(appReservedConcurrency !== undefined ? { appReservedConcurrency } : {}),
     ...(push ? { push } : {}),
     ...(customDomain ? { customDomain } : {}),
   };

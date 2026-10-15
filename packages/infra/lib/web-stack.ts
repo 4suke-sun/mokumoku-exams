@@ -36,6 +36,25 @@ export const PUBLIC_ASSET_PATHS = ["/brand/*", "/icons/*"];
 export const SERVICE_WORKER_PATH = "/sw.js";
 /** ブランドの画像とアイコンを、ブラウザが手元に置く期間(1 日) */
 const PUBLIC_ASSET_MAX_AGE = Duration.days(1);
+/**
+ * CSP。まずは報告だけ(`Content-Security-Policy-Report-Only`)で付け、違反をブラウザのコンソールで確かめる。
+ * Next が埋め込むインラインのスクリプト(描画のデータ、テーマの初期化)と、インラインの style 属性(進み具合の幅など)を使うので、
+ * 当面は 'unsafe-inline' を許す。強制に切り替える条件は docs/app/infra.md。
+ */
+export const CONTENT_SECURITY_POLICY = [
+  "default-src 'self'",
+  "script-src 'self' 'unsafe-inline'",
+  "style-src 'self' 'unsafe-inline'",
+  "img-src 'self' data:",
+  "font-src 'self' data:",
+  "connect-src 'self'",
+  "worker-src 'self'",
+  "manifest-src 'self'",
+  "object-src 'none'",
+  "base-uri 'self'",
+  "form-action 'self'",
+  "frame-ancestors 'none'",
+].join("; ");
 /** HSTS の有効期間(1 年) */
 const HSTS_MAX_AGE = Duration.days(365);
 
@@ -92,6 +111,8 @@ export class WebStack extends Stack {
       layers: [webAdapter],
       memorySize: 1024,
       timeout: Duration.seconds(30),
+      // 同時実行の上限(設定したときだけ)。上限に達したときの実行の制限は、AppThrottlesAlarm で知らせる
+      ...(config.appReservedConcurrency ? { reservedConcurrentExecutions: config.appReservedConcurrency } : {}),
       environment: {
         AWS_LAMBDA_EXEC_WRAPPER: "/opt/bootstrap",
         // アプリが本番の挙動(合言葉が未設定なら、すべて断る)になるよう、明示する
@@ -138,6 +159,12 @@ export class WebStack extends Stack {
           override: true,
         },
         frameOptions: { frameOption: cloudfront.HeadersFrameOption.DENY, override: true },
+      },
+      // 報告だけの CSP は、セキュリティヘッダーの項目にないので、任意のヘッダーとして付ける
+      customHeadersBehavior: {
+        customHeaders: [
+          { header: "Content-Security-Policy-Report-Only", value: CONTENT_SECURITY_POLICY, override: true },
+        ],
       },
     });
 

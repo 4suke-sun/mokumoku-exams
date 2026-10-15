@@ -31,6 +31,14 @@ describe("loadConfig", () => {
     expect(() => loadConfig({ ...valid, ALARM_EMAIL: bad })).not.toThrow(new RegExp(bad));
   });
 
+  it("同時実行の上限を指定すると_その値を使い_範囲の外や整数でなければ失敗する", () => {
+    expect(loadConfig({ ...valid, APP_RESERVED_CONCURRENCY: "10" }).appReservedConcurrency).toBe(10);
+    expect(loadConfig(valid).appReservedConcurrency).toBeUndefined();
+    for (const bad of ["0", "1001", "2.5", "many"]) {
+      expect(() => loadConfig({ ...valid, APP_RESERVED_CONCURRENCY: bad }), bad).toThrow(/APP_RESERVED_CONCURRENCY/);
+    }
+  });
+
   it("公開の URL を指定すると_その値を使い_形が違えば失敗する", () => {
     expect(loadConfig({ ...valid, SITE_URL: "https://example.com" }).siteUrl).toBe("https://example.com");
     expect(loadConfig(valid).siteUrl).toBeUndefined();

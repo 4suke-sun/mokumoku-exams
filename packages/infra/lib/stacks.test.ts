@@ -23,6 +23,7 @@ import {
 import {
   API_FAILURE_EVENT,
   API_FAILURE_METRIC,
+  CONTENT_SECURITY_POLICY,
   ORIGIN_VERIFY_HEADER,
   PUBLIC_ASSET_PATHS,
   SERVICE_WORKER_PATH,
@@ -387,6 +388,29 @@ describe("WebStack", () => {
         AlarmActions: [{ Ref: Match.stringLikeRegexp("AlarmTopic") }],
       });
     }
+  });
+
+  it("同時実行の上限_設定したときだけアプリの Lambda に付ける", () => {
+    const appOf = (template: Template) =>
+      Object.values(template.findResources("AWS::Lambda::Function")).find((f) => f.Properties.Handler === "run.sh");
+    expect(appOf(webTemplate())?.Properties.ReservedConcurrentExecutions).toBeUndefined();
+    expect(appOf(webTemplate(undefined, { appReservedConcurrency: 10 }))?.Properties.ReservedConcurrentExecutions).toBe(
+      10,
+    );
+  });
+
+  it("CSP_報告だけのヘッダーで_すべての応答に付ける", () => {
+    webTemplate().hasResourceProperties("AWS::CloudFront::ResponseHeadersPolicy", {
+      ResponseHeadersPolicyConfig: {
+        CustomHeadersConfig: {
+          Items: [{ Header: "Content-Security-Policy-Report-Only", Value: CONTENT_SECURITY_POLICY, Override: true }],
+        },
+      },
+    });
+    // 強制のヘッダーは、まだ付けない
+    const [policy] = Object.values(webTemplate().findResources("AWS::CloudFront::ResponseHeadersPolicy"));
+    expect(policy?.Properties.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentSecurityPolicy).toBeUndefined();
+    expect(CONTENT_SECURITY_POLICY).toContain("frame-ancestors 'none'");
   });
 
   it("アプリのログ_失敗の記録のうち 5xx だけを数えるメトリクスフィルターがある", () => {
