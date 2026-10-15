@@ -271,3 +271,32 @@ export function domainBreakdown(results: readonly Result[], questions: readonly 
     }))
     .sort((a, b) => a.percent - b.percent || b.answered - a.answered || (a.domain < b.domain ? -1 : 1));
 }
+
+/** 自信なし・見直しの印の集計。どれも問題の数(同じ問題は 1 回だけ数える) */
+export type MarkTally = {
+  /** 自信なしの印を付けたことのある問題 */
+  unsure: number;
+  /** そのうち、印を付けた回に正解していた問題 */
+  unsureCorrect: number;
+  /** 見直しの印を付けたことのある問題 */
+  flagged: number;
+};
+
+/** 読み込んだ結果の範囲で、印を付けた問題を数える。いまのデータにない問題は数えない。 */
+export function markTally(results: readonly Result[], questions: readonly GradableQuestion[]): MarkTally {
+  const byId = new Map(questions.map((q) => [q.questionId, q]));
+  const unsure = new Set<string>();
+  const unsureCorrect = new Set<string>();
+  const flagged = new Set<string>();
+  for (const result of results) {
+    result.questionIds.forEach((id, index) => {
+      const question = byId.get(id);
+      if (!question) return;
+      if (result.flagged?.[index]) flagged.add(id);
+      if (!result.unsure?.[index]) return;
+      unsure.add(id);
+      if (isQuestionCorrect(question, result.answers, result.textAnswers)) unsureCorrect.add(id);
+    });
+  }
+  return { unsure: unsure.size, unsureCorrect: unsureCorrect.size, flagged: flagged.size };
+}

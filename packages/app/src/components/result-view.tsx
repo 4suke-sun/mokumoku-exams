@@ -14,12 +14,11 @@ import { ResultSkeleton } from "@/components/page-skeletons.tsx";
 import { QuestionChips } from "@/components/question-chips.tsx";
 import { ReferenceList } from "@/components/reference-list.tsx";
 import { RichText } from "@/components/rich-text.tsx";
-import { RubricView } from "@/components/rubric-view.tsx";
+import { FreeTextScore } from "@/components/rubric-view.tsx";
 import { ScoreRing } from "@/components/score-ring.tsx";
 import { attemptDomains, averageTimeMs } from "@/lib/dashboard.ts";
 import { domainColorClasses } from "@/lib/domain-color.ts";
 import { formatAnswerTime, formatDate } from "@/lib/format.ts";
-import { judgeFreeText } from "@/lib/free-text.ts";
 import { fetchServerResult, fetchServerResults, postServerResult } from "@/lib/history/client.ts";
 import { mergeResults, pendingMigration } from "@/lib/history/merge.ts";
 import {
@@ -542,17 +541,13 @@ function ChoiceDetail({
 
 /** 自由記述の問題の、回答と、観点ごとの判定と点数 */
 function FreeTextDetail({ question, answer }: { question: FreeTextQuestion; answer: string }) {
-  const judgement = judgeFreeText(question.rubric, answer);
   return (
     <div className="space-y-3 text-sm">
       <div className="space-y-1">
         <h3 className="font-bold">あなたの回答</h3>
         <p className="whitespace-pre-wrap rounded border border-line p-2">{answer.trim() === "" ? "未回答" : answer}</p>
       </div>
-      <RubricView rubric={question.rubric} mode="judged" judgement={judgement} />
-      <p className="text-muted">
-        得点: {judgement.earned} / {judgement.total} 点(合格点 {judgement.passingPoints} 点)
-      </p>
+      <FreeTextScore rubric={question.rubric} answer={answer} />
     </div>
   );
 }

@@ -291,6 +291,36 @@ describe("Player の自由記述", () => {
     await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
     expect(loadStageProgress(browserStore(), "TEST").last).toMatchObject({ percent: 100, passed: true });
   });
+
+  it("1 問ごとの表示で回答する_観点ごとの判定と得点と合格点を出す", async () => {
+    const twoCriteria = {
+      ...freeText,
+      rubric: {
+        criteria: [
+          { name: "保存の観点", keywords: ["保存"], points: 6 },
+          { name: "暗号化の観点", keywords: ["暗号化"], points: 4 },
+        ],
+        passingPoints: 6,
+      },
+    } as Question;
+    saveSession(browserStore(), {
+      examCode: "TEST",
+      questionIds: [twoCriteria.questionId],
+      answers: {},
+      index: 0,
+      startedAt: "2026-10-10T00:00:00.000Z",
+      reveal: "each",
+    });
+    render(<Player exam={exam} questions={[twoCriteria]} />);
+    const user = userEvent.setup();
+    await user.type(await screen.findByRole("textbox", { name: "回答" }), "設定を保存する");
+    await user.click(screen.getByRole("button", { name: "回答する" }));
+    expect(await screen.findByText("観点ごとの判定")).toBeTruthy();
+    const rows = screen.getAllByRole("listitem").map((li) => li.textContent);
+    expect(rows).toContain("○ 満たしている保存の観点6 / 6 点");
+    expect(rows).toContain("× 満たしていない暗号化の観点0 / 4 点");
+    expect(document.body.textContent).toContain("得点: 6 / 10 点(合格点 6 点)");
+  });
 });
 
 describe("Player の本番モード", () => {

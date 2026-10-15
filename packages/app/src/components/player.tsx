@@ -12,9 +12,9 @@ import { QuestionChips } from "@/components/question-chips.tsx";
 import { QuestionGrid } from "@/components/question-grid.tsx";
 import { RecentMarks, useQuestionStats } from "@/components/question-stats.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
+import { FreeTextScore } from "@/components/rubric-view.tsx";
 import { type AnswerTimer, createTimer, elapsedTimes, setVisible, showQuestion } from "@/lib/answer-timer.ts";
 import { recordSessionChecks, resultOf, saveFinishedResult } from "@/lib/finish-session.ts";
-import { judgeFreeText } from "@/lib/free-text.ts";
 import { postServerResult, putSectionProgress } from "@/lib/history/client.ts";
 import { type QuizKeyAction, type QuizKeyPhase, quizKeyAction } from "@/lib/keyboard.ts";
 import {
@@ -466,11 +466,7 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
                   : `× 不正解です。正解は ${labelKeys(question.correctAnswers, labels).join("、")} です`}
               {unsure[index] ? <span className="ml-2 text-sm text-fg">(自信なしの印は、復習に残します)</span> : null}
             </div>
-            {question.questionType === "free-text" ? (
-              <p className="text-sm text-muted">
-                得点: {judgeFreeText(question.rubric, text).earned} / {judgeFreeText(question.rubric, text).total} 点
-              </p>
-            ) : null}
+            {question.questionType === "free-text" ? <FreeTextScore rubric={question.rubric} answer={text} /> : null}
             <details className="card p-3">
               <summary className="cursor-pointer font-bold">解説を見る</summary>
               <div className="mt-3">

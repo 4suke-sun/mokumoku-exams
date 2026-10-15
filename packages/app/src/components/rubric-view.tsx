@@ -1,4 +1,4 @@
-import type { FreeTextJudgement } from "@/lib/free-text.ts";
+import { type FreeTextJudgement, judgeFreeText } from "@/lib/free-text.ts";
 import type { Rubric } from "@/lib/types.ts";
 
 type Props = {
@@ -55,6 +55,19 @@ export function RubricView({ rubric, mode, judgement }: Props) {
           );
         })}
       </ul>
+    </div>
+  );
+}
+
+/** 自由記述の回答の判定: 観点ごとに満たしたかと点数、得点と合格点。結果の画面と、1 問ごとの解答の表示で使う。 */
+export function FreeTextScore({ rubric, answer }: { rubric: Rubric; answer: string }) {
+  const judgement = judgeFreeText(rubric, answer);
+  return (
+    <div className="space-y-3 text-sm">
+      <RubricView rubric={rubric} mode="judged" judgement={judgement} />
+      <p className="text-muted">
+        得点: {judgement.earned} / {judgement.total} 点(合格点 {judgement.passingPoints} 点)
+      </p>
     </div>
   );
 }

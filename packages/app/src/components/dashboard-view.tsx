@@ -7,7 +7,15 @@ import { Notice, type NoticeKind } from "@/components/notice.tsx";
 import { DashboardSkeleton } from "@/components/page-skeletons.tsx";
 import { PredictionPanel } from "@/components/prediction-panel.tsx";
 import { StudyCalendar } from "@/components/study-calendar.tsx";
-import { type DashboardSummary, type DomainStat, domainBreakdown, summarize, toScored } from "@/lib/dashboard.ts";
+import {
+  type DashboardSummary,
+  type DomainStat,
+  domainBreakdown,
+  type MarkTally,
+  markTally,
+  summarize,
+  toScored,
+} from "@/lib/dashboard.ts";
 import { domainColorClasses } from "@/lib/domain-color.ts";
 import { formatDate } from "@/lib/format.ts";
 import { fetchBookmarks, fetchDays, fetchGoal, fetchReview, putGoal } from "@/lib/history/client.ts";
@@ -27,6 +35,7 @@ type State =
       status: "ready";
       summary: DashboardSummary;
       domains: DomainStat[];
+      marks: MarkTally;
       source: "server" | "local";
       review: number | null;
       bookmarks: number | null;
@@ -64,6 +73,7 @@ export function DashboardView({ exam, questions }: Props) {
         status: "ready",
         summary: summarize(results, scored, exam),
         domains: domainBreakdown(results, scored),
+        marks: markTally(results, scored),
         source,
         review: count(review),
         bookmarks: count(bookmarks),
@@ -166,13 +176,20 @@ export function DashboardView({ exam, questions }: Props) {
         <ul className="space-y-1 text-sm">
           <li>復習プール: {state.review === null ? "読み込めませんでした" : `${state.review} 問`}</li>
           <li>
+            自信なしの印: {state.marks.unsure} 問(うち正解 {state.marks.unsureCorrect} 問)
+          </li>
+          <li>見直しの印: {state.marks.flagged} 問</li>
+          <li>
             ブックマーク: {state.bookmarks === null ? "読み込めませんでした" : `${state.bookmarks} 問`}{" "}
             <Link href="/bookmarks" className="text-primary hover:underline">
               直前チェック(ブックマーク)へ
             </Link>
           </li>
         </ul>
-        <p className="text-sm text-muted">復習プールやブックマークの問題は、モード選択の「出題の対象」で選べます。</p>
+        <p className="text-sm text-muted">
+          復習プールやブックマークの問題は、モード選択の「出題の対象」で選べます。印の数は、読み込んだ結果(直近{" "}
+          {summary.attempts} 回)で、印を付けた問題の数です。
+        </p>
       </div>
     </section>
   );
