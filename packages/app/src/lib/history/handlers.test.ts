@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { createFakeProvider, createFakeVerifier, FAKE_USER_EMAIL, FAKE_USER_PHRASE } from "@/lib/auth/fake.ts";
 import { withTokenCookies } from "@/lib/auth/session.ts";
 import type { AuthProvider } from "@/lib/auth/types.ts";
@@ -77,7 +77,7 @@ describe("履歴 API の認証", () => {
     const d = deps(repository);
     const response = await handlePostResult(post(body(), { cookie: "mokumoku_id=forged" }), d);
     expect(response.status).toBe(401);
-    expect(await repository.listResults("forged", "EX-SMP-XX")).toEqual([]);
+    expect((await repository.listResults("forged", "EX-SMP-XX")).results).toEqual([]);
   });
 
   it("検証の処理が失敗した_401 で断る(通す側には倒さない)", async () => {
@@ -136,9 +136,9 @@ describe("履歴の保存と取得", () => {
       const response = await handlePostResult(post(body({ [key]: "user-a" }), { cookie: asUser("b") }), d);
       expect(response.status).toBe(400);
     }
-    expect(await repository.listResults("a", "EX-SMP-XX")).toEqual([]);
-    expect(await repository.listResults("b", "EX-SMP-XX")).toEqual([]);
-    expect(await repository.listResults("user-a", "EX-SMP-XX")).toEqual([]);
+    expect((await repository.listResults("a", "EX-SMP-XX")).results).toEqual([]);
+    expect((await repository.listResults("b", "EX-SMP-XX")).results).toEqual([]);
+    expect((await repository.listResults("user-a", "EX-SMP-XX")).results).toEqual([]);
   });
 
   it("問い合わせに別の利用者の識別子を入れた_断る", async () => {
@@ -214,7 +214,7 @@ describe("履歴 API の入力", () => {
       deps(repository),
     );
     expect(response.status).toBe(413);
-    expect(await repository.listResults("a", "EX-SMP-XX")).toEqual([]);
+    expect((await repository.listResults("a", "EX-SMP-XX")).results).toEqual([]);
   });
 
   it("JSON でない形式で送る_415 で断る", async () => {
@@ -275,7 +275,7 @@ describe("履歴 API の入力の検証", () => {
     const response = await handlePostResult(post(body(overrides), { cookie }), deps(repository));
     expect(response.status).toBe(400);
     expect(await response.json()).toEqual({ error: "bad-request" });
-    expect(await repository.listResults("a", "EX-SMP-XX")).toEqual([]);
+    expect((await repository.listResults("a", "EX-SMP-XX")).results).toEqual([]);
   });
 
   it("完了時刻が時計のずれの幅を超えて先_400 で断る", async () => {
@@ -320,7 +320,7 @@ describe("履歴 API の入力の検証", () => {
       textAnswers: { "SAMPLE-0006": "あ".repeat(1000) },
     });
     expect((await handlePostResult(post(withText, { cookie }), deps(repository))).status).toBe(200);
-    expect(await repository.listResults("a", "EX-SMP-XX")).toEqual([withText]);
+    expect((await repository.listResults("a", "EX-SMP-XX")).results).toEqual([withText]);
   });
 
   it("回答時間・自信なし・見直し_問題の数と同じ長さなら受け付け_取得で同じ内容が返る", async () => {
@@ -332,7 +332,7 @@ describe("履歴 API の入力の検証", () => {
       flagged: [false, true],
     });
     expect((await handlePostResult(post(marked, { cookie }), deps(repository))).status).toBe(200);
-    expect(await repository.listResults("a", "EX-SMP-XX")).toEqual([marked]);
+    expect((await repository.listResults("a", "EX-SMP-XX")).results).toEqual([marked]);
   });
 
   it("回答時間・自信なし・見直しのない古い形_受け付ける", async () => {
@@ -437,11 +437,32 @@ const failing: HistoryRepository = {
 
 describe("履歴の保存先の失敗", () => {
   it("保存先が失敗する_原因を返さず 503 にする", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
     const saved = await handlePostResult(post(body(), { cookie: asUser("a") }), deps(failing));
     expect(saved.status).toBe(503);
     expect(await saved.json()).toEqual({ error: "unavailable" });
     const listed = await handleListResults(get("examCode=EX-SMP-XX", { cookie: asUser("a") }), deps(failing));
     expect(listed.status).toBe(503);
+    log.mockRestore();
+  });
+
+  it("保存先が失敗する_経路・状態・例外の名前だけを記録し_入力と利用者の識別子は出さない", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    const marker = "marker-7f3a";
+    const repository: HistoryRepository = {
+      ...failing,
+      async listResults() {
+        throw new Error(`failed for ${marker}`);
+      },
+    };
+    await handleListResults(get("examCode=EX-SMP-XX", { cookie: asUser("user-a") }), deps(repository));
+    const lines = log.mock.calls.map((call) => call.map(String).join(" "));
+    log.mockRestore();
+    expect(lines.map((line) => JSON.parse(line))).toEqual([
+      { event: "api-failure", path: "/api/history/results", status: 503, error: "Error" },
+    ]);
+    expect(lines.join("\n")).not.toContain(marker);
+    expect(lines.join("\n")).not.toContain("user-a");
   });
 });
 

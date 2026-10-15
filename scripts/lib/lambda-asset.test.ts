@@ -39,12 +39,15 @@ describe("buildLambdaAsset", () => {
     expect(existsSync(join(staticDir, "_next/static/chunks/a.js"))).toBe(true);
   });
 
-  it("public がある_Lambda のアプリの下に置き_Next のサーバーが配る", () => {
+  it("public がある_S3 に置く public の置き場に入れ_Lambda には載せない", () => {
     fakeBuild();
     write(join(appDir, "public/sw.js"), "// worker");
-    const { lambdaDir, staticDir } = buildLambdaAsset({ appDir, outDir });
-    expect(existsSync(join(lambdaDir, "packages/app/public/sw.js"))).toBe(true);
-    // CloudFront は /_next/static/* だけを S3 から配るので、S3 には置かない
+    write(join(appDir, "public/icons/icon-192.png"), "png");
+    const { lambdaDir, staticDir, publicDir } = buildLambdaAsset({ appDir, outDir });
+    expect(existsSync(join(publicDir, "sw.js"))).toBe(true);
+    expect(existsSync(join(publicDir, "icons/icon-192.png"))).toBe(true);
+    expect(existsSync(join(lambdaDir, "packages/app/public"))).toBe(false);
+    // ハッシュつきの静的ファイルとは、キャッシュの扱いが違うので、置き場を分ける
     expect(existsSync(join(staticDir, "sw.js"))).toBe(false);
   });
 

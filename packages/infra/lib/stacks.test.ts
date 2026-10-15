@@ -1,6 +1,7 @@
 import { fileURLToPath } from "node:url";
-import { App, DefaultStackSynthesizer } from "aws-cdk-lib";
+import { App, DefaultStackSynthesizer, Stack } from "aws-cdk-lib";
 import { Match, Template } from "aws-cdk-lib/assertions";
+import * as sns from "aws-cdk-lib/aws-sns";
 import { describe, expect, it } from "vitest";
 import {
   ADMIN_GROUP_NAME,
@@ -19,7 +20,15 @@ import {
   PushStack,
   VAPID_PRIVATE_KEY_ACTIONS,
 } from "./push-stack.ts";
-import { ORIGIN_VERIFY_HEADER, WebStack } from "./web-stack.ts";
+import {
+  API_FAILURE_EVENT,
+  API_FAILURE_METRIC,
+  CONTENT_SECURITY_POLICY,
+  ORIGIN_VERIFY_HEADER,
+  PUBLIC_ASSET_PATHS,
+  SERVICE_WORKER_PATH,
+  WebStack,
+} from "./web-stack.ts";
 
 const config: InfraConfig = {
   stackPrefix: "test",
@@ -85,6 +94,7 @@ function webTemplate(alarmEmail?: string, extra: Partial<InfraConfig> = {}): Tem
     config: { ...config, alarmEmail, ...extra },
     lambdaCodePath: fixture("lambda"),
     staticAssetsPath: fixture("static"),
+    publicAssetsPath: fixture("public"),
     userPoolClientId: "client-example",
     userPoolId: "pool-example",
     userPoolArn: USER_POOL_ARN,
@@ -96,6 +106,9 @@ function webTemplate(alarmEmail?: string, extra: Partial<InfraConfig> = {}): Tem
 function pushTemplate(): Template {
   const app = new App();
   const data = new DataStack(app, "Data", { env, synthesizer });
+  // 通知先は、アプリのスタックから受け取る。ここでは、トピックだけを持つスタックで代える
+  const alarms = new Stack(app, "Alarms", { env, synthesizer });
+  const alarmTopic = new sns.Topic(alarms, "AlarmTopic");
   const stack = new PushStack(app, "Push", {
     env,
     synthesizer,
@@ -103,6 +116,7 @@ function pushTemplate(): Template {
     push,
     pushCodePath: fixture("push"),
     historyTable: data.table,
+    alarmTopic,
   });
   return Template.fromStack(stack);
 }
@@ -294,9 +308,32 @@ describe("WebStack", () => {
         RestrictPublicBuckets: true,
       },
     });
-    template.hasResourceProperties("AWS::CloudFront::Distribution", {
-      DistributionConfig: { CacheBehaviors: [{ PathPattern: "/_next/static/*" }] },
+    const [distribution] = Object.values(template.findResources("AWS::CloudFront::Distribution"));
+    const behaviors = distribution?.Properties.DistributionConfig.CacheBehaviors as {
+      PathPattern: string;
+      CachePolicyId: string;
+      TargetOriginId: string;
+    }[];
+    // マネージドのキャッシュポリシー: CachingOptimized / CachingDisabled
+    const OPTIMIZED = "658327ea-f89d-4fab-a63d-7e88639e58f6";
+    const DISABLED = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad";
+    expect(Object.fromEntries(behaviors.map((b) => [b.PathPattern, b.CachePolicyId]))).toEqual({
+      "/_next/static/*": OPTIMIZED,
+      ...Object.fromEntries(PUBLIC_ASSET_PATHS.map((path) => [path, OPTIMIZED])),
+      [SERVICE_WORKER_PATH]: DISABLED,
     });
+    // どれも、同じ S3 のオリジンから配る
+    expect(new Set(behaviors.map((b) => b.TargetOriginId)).size).toBe(1);
+  });
+
+  it("静的ファイルの配置_古いファイルを消さず_置き場ごとのキャッシュの期間を付ける", () => {
+    const deployments = Object.values(webTemplate().findResources("Custom::CDKBucketDeployment")).map(
+      (d) => d.Properties,
+    );
+    expect(deployments).toHaveLength(3);
+    for (const deployment of deployments) expect(deployment.Prune).toBe(false);
+    const cacheControls = deployments.map((d) => d.SystemMetadata?.["cache-control"]).sort();
+    expect(cacheControls).toEqual(["max-age=86400, public", "no-cache", "public, max-age=31536000, immutable"]);
   });
 
   it("セキュリティヘッダーが_動的な応答と静的ファイルの両方に付く", () => {
@@ -332,9 +369,18 @@ describe("WebStack", () => {
     webTemplate().hasResourceProperties("AWS::Logs::LogGroup", { RetentionInDays: 30 });
   });
 
-  it("エラーと実行制限のアラームが_通知先のトピックにつながる", () => {
+  it("エラーと実行制限と 5xx のアラームが_通知先のトピックにつながる", () => {
     const template = webTemplate();
-    template.resourceCountIs("AWS::CloudWatch::Alarm", 2);
+    template.resourceCountIs("AWS::CloudWatch::Alarm", 3);
+    template.hasResourceProperties("AWS::CloudWatch::Alarm", {
+      MetricName: API_FAILURE_METRIC,
+      Namespace: config.stackPrefix,
+      Statistic: "Sum",
+      Period: 300,
+      Threshold: 1,
+      ComparisonOperator: "GreaterThanOrEqualToThreshold",
+      AlarmActions: [{ Ref: Match.stringLikeRegexp("AlarmTopic") }],
+    });
     for (const metricName of ["Errors", "Throttles"]) {
       template.hasResourceProperties("AWS::CloudWatch::Alarm", {
         MetricName: metricName,
@@ -342,6 +388,41 @@ describe("WebStack", () => {
         AlarmActions: [{ Ref: Match.stringLikeRegexp("AlarmTopic") }],
       });
     }
+  });
+
+  it("同時実行の上限_設定したときだけアプリの Lambda に付ける", () => {
+    const appOf = (template: Template) =>
+      Object.values(template.findResources("AWS::Lambda::Function")).find((f) => f.Properties.Handler === "run.sh");
+    expect(appOf(webTemplate())?.Properties.ReservedConcurrentExecutions).toBeUndefined();
+    expect(appOf(webTemplate(undefined, { appReservedConcurrency: 10 }))?.Properties.ReservedConcurrentExecutions).toBe(
+      10,
+    );
+  });
+
+  it("CSP_報告だけのヘッダーで_すべての応答に付ける", () => {
+    webTemplate().hasResourceProperties("AWS::CloudFront::ResponseHeadersPolicy", {
+      ResponseHeadersPolicyConfig: {
+        CustomHeadersConfig: {
+          Items: [{ Header: "Content-Security-Policy-Report-Only", Value: CONTENT_SECURITY_POLICY, Override: true }],
+        },
+      },
+    });
+    // 強制のヘッダーは、まだ付けない
+    const [policy] = Object.values(webTemplate().findResources("AWS::CloudFront::ResponseHeadersPolicy"));
+    expect(policy?.Properties.ResponseHeadersPolicyConfig.SecurityHeadersConfig.ContentSecurityPolicy).toBeUndefined();
+    expect(CONTENT_SECURITY_POLICY).toContain("frame-ancestors 'none'");
+  });
+
+  it("アプリのログ_失敗の記録のうち 5xx だけを数えるメトリクスフィルターがある", () => {
+    const template = webTemplate();
+    template.resourceCountIs("AWS::Logs::MetricFilter", 1);
+    template.hasResourceProperties("AWS::Logs::MetricFilter", {
+      LogGroupName: { Ref: Match.stringLikeRegexp("AppLogGroup") },
+      FilterPattern: `{ ($.event = "${API_FAILURE_EVENT}") && ($.status >= 500) }`,
+      MetricTransformations: [
+        { MetricNamespace: config.stackPrefix, MetricName: API_FAILURE_METRIC, MetricValue: "1" },
+      ],
+    });
   });
 
   it("公開の URL と通知の鍵は_設定したときだけ Lambda に渡す", () => {
@@ -488,6 +569,20 @@ describe("PushStack", () => {
     expect([...table[0].Action].sort()).toEqual([...PUSH_SENDER_TABLE_ACTIONS].sort());
     expect(JSON.stringify(table[0].Resource)).not.toContain("*");
     expect(statements.filter((s) => s.Resource === "*")).toEqual([]);
+  });
+
+  it("送信の Lambda のエラー_1 回でアプリと同じ通知先へ送るアラームがある", () => {
+    const template = pushTemplate();
+    template.resourceCountIs("AWS::CloudWatch::Alarm", 1);
+    template.hasResourceProperties("AWS::CloudWatch::Alarm", {
+      MetricName: "Errors",
+      Namespace: "AWS/Lambda",
+      Dimensions: [{ Name: "FunctionName", Value: { Ref: Match.stringLikeRegexp("SenderFunction") } }],
+      Statistic: "Sum",
+      Threshold: 1,
+      ComparisonOperator: "GreaterThanOrEqualToThreshold",
+      AlarmActions: [{ "Fn::ImportValue": Match.stringLikeRegexp("AlarmTopic") }],
+    });
   });
 
   it("送信の Lambda のログに_保持期間がある", () => {

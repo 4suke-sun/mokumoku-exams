@@ -8,6 +8,15 @@ import { domainColorClasses } from "@/lib/domain-color.ts";
 import { fetchBookmarks, fetchReview } from "@/lib/history/client.ts";
 import { changePrefs } from "@/lib/prefs-client.ts";
 import {
+  activeTargetOf,
+  inDomains,
+  inTarget,
+  pickQuestions,
+  type SettingsMode,
+  type Target,
+  targetQuestions,
+} from "@/lib/question-pick.ts";
+import {
   domainCounts,
   isOfficialTarget,
   newOfficialSession,
@@ -15,8 +24,8 @@ import {
   passLinePercent,
   requestedDomains,
   sessionProgress,
-  shuffle,
 } from "@/lib/quiz.ts";
+import { SESSION_SAVE_FAILED, saveAndLocate } from "@/lib/start-session.ts";
 import {
   browserStore,
   clearSession,
@@ -27,12 +36,10 @@ import {
   type Reveal,
   type Session,
   saveConditions,
-  saveSession,
   saveSettings,
 } from "@/lib/storage.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 import { useStorageOwner } from "@/lib/use-storage-owner.ts";
-import { fewerAnsweredWeight, weightedSample } from "@/lib/weighted.ts";
 import { useAnswerCounts } from "./question-stats.tsx";
 
 type PoolItem = {
@@ -72,9 +79,6 @@ const REVEALS: { id: Reveal; name: string; description: string }[] = [
   },
 ];
 
-/** 出題の対象。復習プールとブックマークは、アカウントに保存したもの。 */
-type Target = "all" | "review" | "bookmarks";
-
 const TARGETS: { id: Target; name: string; description: string }[] = [
   { id: "all", name: "すべての問題", description: "資格のすべての問題から出題します。" },
   {
@@ -84,9 +88,6 @@ const TARGETS: { id: Target; name: string; description: string }[] = [
   },
   { id: "bookmarks", name: "ブックマーク", description: "ブックマークした問題から出題します。" },
 ];
-
-/** 選ぶと、下に出題の設定が出るモード */
-type SettingsMode = "normal" | "review" | "free-text";
 
 /** カードの動き。select は設定を出す、link は別の画面へ、start はそのまま出題を始める */
 type ModeCard = {
@@ -166,23 +167,12 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
     };
   }, [exam.examCode]);
 
-  // 対象で絞ってから、分野で絞る(いまのデータにない問題 ID は、ここで落ちる)
-  // 自由記述のモードは、自由記述の問題だけから出題する
-  const base = mode === "free-text" ? pool.filter((p) => p.questionType === "free-text") : pool;
-  const inTarget = (id: Target) => {
-    if (id === "all") return base;
-    const ids = new Set(lists[id] ?? []);
-    return base.filter((p) => ids.has(p.questionId));
-  };
-  // 復習のモードは復習プール、自由記述のモードは全問が対象。通常出題だけが、対象を選べる
-  const activeTarget: Target = mode === "review" ? "review" : mode === "free-text" ? "all" : target;
-  // 対象で絞り、難易度で絞る(難易度を選んだときは、難易度のない問題を出さない)
-  const targeted = inTarget(activeTarget).filter(
-    (p) => difficulties.length === 0 || (p.difficulty !== undefined && difficulties.includes(p.difficulty)),
-  );
+  // 対象と難易度で絞ってから、分野で絞る
+  const activeTarget = activeTargetOf(mode, target);
+  const targeted = targetQuestions(pool, { mode, target, lists, difficulties });
   const perDomain = domainCounts(targeted);
 
-  const available = domains.length === 0 ? targeted.length : targeted.filter((p) => domains.includes(p.domain)).length;
+  const available = inDomains(targeted, domains).length;
   const counts = [...COUNT_CHOICES.filter((n) => n < available), available];
   const effectiveCount = Math.min(count, available);
 
@@ -212,11 +202,12 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
 
   /** 出題の状態を保存して、出題の画面へ進む。保存できなければ、その旨を示してとどまる。 */
   function begin(session: Session) {
-    if (!saveSession(browserStore(), session)) {
-      setError("この端末では、出題の状態を保存できません。ブラウザの設定を確認してください。");
+    const href = saveAndLocate(browserStore(), session);
+    if (!href) {
+      setError(SESSION_SAVE_FAILED);
       return;
     }
-    router.push(`/exams/${exam.examCode}/play`);
+    router.push(href);
   }
 
   // 本番モードは、出題の対象と分野の選択によらず、資格の選択式のすべての問題から出題する(自由記述は含めない)
@@ -229,16 +220,12 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
   }
 
   function start() {
-    const targets = domains.length === 0 ? targeted : targeted.filter((p) => domains.includes(p.domain));
-    // 解答回数の少ない問題を優先するときは、重み 1/(1+回数)^2 で選ぶ(回数 0 の問題がいちばん出やすい)
-    const picked = preferFewer
-      ? weightedSample(
-          targets,
-          (p) => fewerAnsweredWeight(answerCounts.get(p.questionId) ?? 0),
-          effectiveCount,
-          Math.random,
-        )
-      : shuffle(targets, Math.random).slice(0, effectiveCount);
+    const picked = pickQuestions(inDomains(targeted, domains), {
+      count: effectiveCount,
+      preferFewer,
+      answerCounts,
+      random: Math.random,
+    });
     if (picked.length === 0) {
       setError("出題できる問題がありません。出題の対象と分野の選択を見直してください。");
       return;
@@ -299,7 +286,7 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
       emoji: "⭐",
       tone: "tone-violet",
       description: "ブックマークした問題を、正解と解説つきで見直します。",
-      meta: lists.bookmarks === null ? undefined : `ブックマーク ${inTarget("bookmarks").length} 問`,
+      meta: lists.bookmarks === null ? undefined : `ブックマーク ${inTarget(pool, mode, "bookmarks", lists).length} 問`,
       kind: "link",
       href: "/bookmarks",
     },
@@ -485,7 +472,9 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
                     />
                     <span>
                       {item.name}
-                      <span className="ml-2 text-sm text-muted">({inTarget(item.id).length} 問)</span>
+                      <span className="ml-2 text-sm text-muted">
+                        ({inTarget(pool, mode, item.id, lists).length} 問)
+                      </span>
                       {waiting ? <span className="ml-2 chip tone-warn">復習の待ちがあります</span> : null}
                       <span className="block text-sm text-muted">
                         {unavailable ? "アカウントから読み込めないため、いまは選べません。" : item.description}

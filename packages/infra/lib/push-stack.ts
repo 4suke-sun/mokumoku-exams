@@ -1,10 +1,13 @@
 import { Duration, RemovalPolicy, Stack, type StackProps } from "aws-cdk-lib";
+import * as cloudwatch from "aws-cdk-lib/aws-cloudwatch";
+import * as cloudwatchActions from "aws-cdk-lib/aws-cloudwatch-actions";
 import type * as dynamodb from "aws-cdk-lib/aws-dynamodb";
 import * as events from "aws-cdk-lib/aws-events";
 import * as targets from "aws-cdk-lib/aws-events-targets";
 import * as iam from "aws-cdk-lib/aws-iam";
 import * as lambda from "aws-cdk-lib/aws-lambda";
 import * as logs from "aws-cdk-lib/aws-logs";
+import type * as sns from "aws-cdk-lib/aws-sns";
 import type { Construct } from "constructs";
 import type { InfraConfig, PushConfig } from "./config.ts";
 
@@ -54,6 +57,8 @@ type Props = StackProps & {
   pushCodePath: string;
   /** 購読を置くテーブル(DataStack の出力。履歴と同じテーブル) */
   historyTable: dynamodb.ITable;
+  /** アラームの通知先(WebStack の出力。アプリのアラームと同じトピック) */
+  alarmTopic: sns.ITopic;
 };
 
 /** プッシュ通知の送信。毎日のスケジュールで Lambda を動かし、購読しているすべての端末にリマインドを送る。 */
@@ -97,5 +102,15 @@ export class PushStack extends Stack {
       // 失敗しても送り直さない(同じ日に、同じ通知が 2 回届かないように)
       targets: [new targets.LambdaFunction(this.senderFunction, { retryAttempts: 0 })],
     });
+
+    // 1 日 1 回の実行なので、1 回の失敗が、その日の送信の失敗になる。1 回でも鳴らす
+    const senderErrors = new cloudwatch.Alarm(this, "SenderErrorsAlarm", {
+      alarmDescription: "毎日の通知を送る Lambda でエラーが出ています",
+      metric: this.senderFunction.metricErrors({ period: Duration.minutes(5), statistic: "Sum" }),
+      threshold: 1,
+      evaluationPeriods: 1,
+      treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
+    });
+    senderErrors.addAlarmAction(new cloudwatchActions.SnsAction(props.alarmTopic));
   }
 }

@@ -1,6 +1,5 @@
-import { isQuestionCorrect } from "./quiz.ts";
+import { type GradableQuestion, isQuestionCorrect } from "./quiz.ts";
 import type { Result } from "./storage.ts";
-import type { Question } from "./types.ts";
 
 /** 問題ごとに残す正誤の回数 */
 export const RECENT_OUTCOMES = 5;
@@ -11,7 +10,7 @@ export const RECENT_OUTCOMES = 5;
  */
 export function recentOutcomes(
   results: readonly Result[],
-  questions: readonly Question[],
+  questions: readonly GradableQuestion[],
   limit: number = RECENT_OUTCOMES,
 ): Map<string, boolean[]> {
   const byId = new Map(questions.map((q) => [q.questionId, q]));

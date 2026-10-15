@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { attemptDomains, averageTimeMs, domainBreakdown, PREDICTION_WINDOW, summarize } from "./dashboard.ts";
+import {
+  attemptDomains,
+  averageTimeMs,
+  domainBreakdown,
+  markTally,
+  PREDICTION_WINDOW,
+  summarize,
+} from "./dashboard.ts";
 import { mergeResults } from "./history/merge.ts";
 import { MAX_RESULTS, type Result } from "./storage.ts";
 import type { Question } from "./types.ts";
@@ -304,5 +311,26 @@ describe("分野別の正答率", () => {
     expect(domainBreakdown([written(2, "赤は止まれ"), written(1, "赤は進め")], [freeText])).toEqual([
       { domain: "domain2", answered: 2, correct: 1, percent: 50 },
     ]);
+  });
+});
+
+describe("印の集計", () => {
+  it("同じ問題に何度印を付けても_問題の数で数え_自信なしで正解した問題を別に数える", () => {
+    const first = {
+      ...result(1, { "SAMPLE-0001": ["A"], "SAMPLE-0002": ["B"], "SAMPLE-0003": ["A"] }),
+      unsure: [true, true, false],
+      flagged: [false, true, true],
+    };
+    const second = { ...result(2, { "SAMPLE-0001": ["A"] }), unsure: [true], flagged: [true] };
+    expect(markTally([first, second], questions)).toEqual({ unsure: 2, unsureCorrect: 1, flagged: 3 });
+  });
+
+  it("印のない結果といまのデータにない問題_数えない", () => {
+    const gone = { ...result(1, { "SAMPLE-0009": ["A"] }), unsure: [true], flagged: [true] };
+    expect(markTally([result(2, { "SAMPLE-0001": ["A"] }), gone], questions)).toEqual({
+      unsure: 0,
+      unsureCorrect: 0,
+      flagged: 0,
+    });
   });
 });

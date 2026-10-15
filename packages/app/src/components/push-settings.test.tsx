@@ -46,7 +46,7 @@ describe("通知の設定", () => {
     client.subscribePush.mockResolvedValueOnce("denied");
     render(<PushSettings publicKey={KEY} />);
     await userEvent.click(await screen.findByRole("button", { name: "通知を受け取る" }));
-    expect((await screen.findByRole("status")).textContent).toContain("許可");
+    expect((await screen.findByRole("alert")).textContent).toContain("許可");
     expect(screen.getByText("この端末では、通知を受け取っていません。")).toBeTruthy();
   });
 
@@ -61,7 +61,7 @@ describe("通知の設定", () => {
     client.currentSubscription.mockResolvedValue({});
     render(<PushSettings publicKey={KEY} canSendTest />);
     await userEvent.click(await screen.findByRole("button", { name: "テスト通知を送る" }));
-    expect((await screen.findByRole("status")).textContent).toBe("テスト通知を送りました。");
+    expect((await screen.findByRole("status")).textContent).toContain("テスト通知を送りました。");
     await userEvent.click(screen.getByRole("button", { name: "通知を止める" }));
     expect(await screen.findByText("この端末では、通知を受け取っていません。")).toBeTruthy();
   });

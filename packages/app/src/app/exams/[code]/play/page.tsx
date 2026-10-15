@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { Player } from "@/components/player.tsx";
-import { findPublishedExam, listPublishedExams, loadQuestions } from "@/lib/exam-data.ts";
+import { PlayLoader } from "@/components/play-loader.tsx";
+import { findPublishedExam, listPublishedExams } from "@/lib/exam-data.ts";
 
 type Props = { params: Promise<{ code: string }> };
 
@@ -16,7 +16,6 @@ export default async function PlayPage({ params }: Props) {
   const { code } = await params;
   const exam = findPublishedExam(code);
   if (!exam) notFound();
-  const questions = await loadQuestions(exam);
-
-  return <Player exam={exam} questions={questions} />;
+  // 問題は、出題の画面を開いたあとに、出題中の分だけを取る(資格の全問を、画面の応答に入れない)
+  return <PlayLoader exam={exam} />;
 }

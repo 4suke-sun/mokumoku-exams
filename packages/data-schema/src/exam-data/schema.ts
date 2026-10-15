@@ -6,6 +6,9 @@
  * 検査メッセージに入力の値を含めない(場所と種類だけ)。custom のメッセージは、固定の文言にする。
  */
 import { z } from "zod";
+import { EXAM_CODE, normalizeKeyword, QUESTION_ID } from "./shape.ts";
+
+export { EXAM_CODE, normalizeKeyword, QUESTION_ID };
 
 /** 空白だけではない文字列。 */
 const text = z.string().regex(/\S/, "空白だけの文字列です");
@@ -21,11 +24,6 @@ export function containsUrl(value: string): boolean {
 /** 本文: 空白だけではなく、URL を含まない文字列。 */
 export const prose = text.refine((value) => !containsUrl(value), "本文に URL が含まれています");
 
-/**
- * 試験コード: `<ベンダー略称>-<試験略称>-<版>`(すべて大文字と数字)。例: `AWS-AIB-C01`。
- * 公式に版の呼び名がない試験は、版を `XX` にする。ベンダー略称は `data/vendors.json` にあり、資格のベンダーと一致する。
- */
-export const EXAM_CODE = /^[A-Z][A-Z0-9]{1,5}-[A-Z][A-Z0-9]{1,9}-[A-Z0-9]{2,4}$/;
 /** 問題 ID の接頭辞。試験コードとは別に持ち、資格どうしで重複しない(問題 ID は `<接頭辞>-<4 桁の連番>`) */
 export const ID_PREFIX = /^[A-Z][A-Z0-9]{1,15}$/;
 const DOMAIN_CODE = /^domain\d{1,2}$/;
@@ -298,7 +296,7 @@ export const ReferencesSchema = z
 
 /** 問題の種類によらない項目 */
 const questionBase = {
-  questionId: z.string().regex(/^[A-Z][A-Z0-9]{1,15}-\d{4}$/),
+  questionId: z.string().regex(QUESTION_ID),
   examCode: z.string().regex(EXAM_CODE),
   domain: z.string().regex(DOMAIN_CODE),
   difficulty: z.enum(["easy", "medium", "hard"]).optional(),
@@ -342,14 +340,6 @@ export const ChoiceQuestionSchema = z
 /** 観点名・キーワードの文字数の上限 */
 export const CRITERION_NAME_MAX = 40;
 export const KEYWORD_MAX = 40;
-
-/**
- * キーワードとの照合のために、全角・半角、大文字・小文字の違いをならし、空白を除く。
- * 判定(packages/app/src/lib/free-text.ts の normalizeForMatch)と同じならし方にする。
- */
-export function normalizeKeyword(value: string): string {
-  return value.normalize("NFKC").toLowerCase().replace(/\s+/g, "");
-}
 
 /** キーワード。ならすと空になるものは、どの回答にも含まれず判定に使えないので、止める。 */
 const KeywordSchema = z

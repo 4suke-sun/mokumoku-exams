@@ -10,11 +10,15 @@ vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
 
 const exams: ReviewExam[] = [
   {
-    examCode: "TEST",
+    examCode: "EX-TST-XX",
     name: "テスト資格",
     questions: [1, 2, 3].map((n) => ({ questionId: `TEST-000${n}`, excerpt: `問題文 ${n}`, choiceKeys: ["A", "B"] })),
   },
-  { examCode: "OTHER", name: "ほかの資格", questions: [{ questionId: "OTHER-0001", excerpt: "別", choiceKeys: [] }] },
+  {
+    examCode: "EX-OTH-XX",
+    name: "ほかの資格",
+    questions: [{ questionId: "OTHER-0001", excerpt: "別", choiceKeys: [] }],
+  },
 ];
 
 function stub(items: unknown[] | null, deleteOk = true) {
@@ -38,10 +42,10 @@ afterEach(() => {
 
 describe("ReviewView", () => {
   const items = [
-    { examCode: "TEST", questionId: "TEST-0001", streak: 1, mastered: false },
-    { examCode: "TEST", questionId: "TEST-0002", streak: 0, mastered: false },
-    { examCode: "TEST", questionId: "TEST-0003", streak: 2, mastered: true },
-    { examCode: "TEST", questionId: "TEST-0099", streak: 0, mastered: false },
+    { examCode: "EX-TST-XX", questionId: "TEST-0001", streak: 1, mastered: false },
+    { examCode: "EX-TST-XX", questionId: "TEST-0002", streak: 0, mastered: false },
+    { examCode: "EX-TST-XX", questionId: "TEST-0003", streak: 2, mastered: true },
+    { examCode: "EX-TST-XX", questionId: "TEST-0099", streak: 0, mastered: false },
   ];
 
   it("資格ごとに_未マスターの問題と連続正解の数_マスター済みの数を出す_データにない問題は出さない", async () => {
@@ -59,8 +63,8 @@ describe("ReviewView", () => {
     render(<ReviewView exams={exams} />);
     const user = userEvent.setup();
     await user.click(await screen.findByRole("button", { name: "復習する(2 問)" }));
-    expect(push).toHaveBeenCalledWith("/exams/TEST/play");
-    expect(loadSession(browserStore(), "TEST")?.questionIds).toEqual(["TEST-0001", "TEST-0002"]);
+    expect(push).toHaveBeenCalledWith("/exams/EX-TST-XX/play");
+    expect(loadSession(browserStore(), "EX-TST-XX")?.questionIds).toEqual(["TEST-0001", "TEST-0002"]);
   });
 
   it("外す_一覧から消え_外せなかったときは知らせる", async () => {
@@ -72,7 +76,7 @@ describe("ReviewView", () => {
     const sent = fetchMock.mock.calls.find(([, init]) => init?.method === "DELETE");
     const init = sent?.[1] as { body?: string } | undefined;
     expect(JSON.parse(String(init?.body))).toEqual({
-      examCode: "TEST",
+      examCode: "EX-TST-XX",
       questionId: "TEST-0002",
     });
     expect((await screen.findByRole("status")).textContent).toContain("外しました");

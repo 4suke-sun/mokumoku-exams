@@ -100,3 +100,8 @@ git commit -F .drafts/commit-msg.txt
 - コミット後、`git log -1 --format='%an <%ae>'` で、作者が noreply アドレスであることを確認する。違えば、
   `git config user.email` を直して `git commit --amend --reset-author`(push 前のローカルのみ)
 - `git commit --no-verify` は使わない。フックが止めたら、指摘を直す
+
+## 引っかかりの記録
+
+`BLOCK`・`WARN`・差し戻しなど、手戻りが出たときは、その場で受け箱へ足す(`node scripts/lessons.ts add …`。書式と種類のキーは `docs/lessons-workflow.md`)。
+同じ種類が繰り返されたものは、版の締めで Issue の候補として提案される。

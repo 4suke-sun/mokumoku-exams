@@ -17,7 +17,7 @@
 VAPID の秘密鍵は、値ではなく、置き場所(SSM パラメーター)の名前だけを渡します(「VAPID の秘密鍵」)。
 履歴のテーブルに許す操作は、`GetItem`・`PutItem`・`UpdateItem`・`Query`・`DeleteItem` だけです(テーブル 1 つに限り、スキャンやテーブルの管理はできません)。管理者の操作の記録も、このテーブルに置きます。
 Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCreateUser`・`AdminDisableUser` だけです(`<接頭辞>-auth` の UserPool 1 つに限ります)。
-デプロイの順は、auth → data → web で、push は data のあとです(`cdkd deploy --all` が依存から決めます)。
+デプロイの順は、auth → data → web で、push は data と web のあとです(web のアラームの通知先を使うため。`cdkd deploy --all` が依存から決めます)。
 
 ### 通知の送信(`<接頭辞>-push`)
 
@@ -33,25 +33,62 @@ Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCre
 配信の流れは、[アーキテクチャの計画](./architecture-plan.md) のとおりです。
 
 - `/_next/static/*` は S3 から配ります(CloudFront から S3 へは、オリジンアクセスコントロールで読みます。バケットは公開しません)。
-- `packages/app/public/` のファイル(アイコンと、通知を受け取る Service Worker)は、Lambda に載せ、Next のサーバーが配ります。
+- `packages/app/public/` のファイル(ブランドの画像、アイコン、通知を受け取る Service Worker)も、S3 から配ります(`/brand/*`・`/icons/*`・`/sw.js`)。
+  Lambda には載せません。入口の proxy を通らないので、この 3 つの経路のファイルは、ログインなしで取れます(公開してよいものだけを置きます)。
+  `public/` のほかの場所にファイルを足すときは、CloudFront の振り分け(`packages/infra/lib/web-stack.ts` の `PUBLIC_ASSET_PATHS`)にも足します。
+- 問題データ(正解と解説を含む)は、静的ファイルとしては配りません。出題・結果・ブックマークの画面は、開いたあとに、表示に要る問題だけを、
+  ログインが必要な API(`POST /api/questions`)で取ります。
 - それ以外は Lambda の Function URL へ渡します。Function URL は認証なし(`authType: NONE`)で、CloudFront が付ける合言葉のヘッダー(`x-origin-verify`)を、
   アプリ(`packages/app/src/proxy.ts`)が確かめます。合言葉のないリクエスト(Function URL への直接のアクセス)は、403 で断ります。
 - 独自ドメインは任意です。`.env` に値がなければ、CloudFront の標準のドメインで配信します(「独自ドメイン」)。
 
 ### キャッシュとセキュリティヘッダー
 
-- 動的な応答(画面と API)は、キャッシュしません。静的ファイル(`/_next/static/*`)は、ファイル名にハッシュが入るので、長くキャッシュします。
+- 動的な応答(画面と API)は、キャッシュしません。静的ファイル(`/_next/static/*`)は、ファイル名にハッシュが入るので、長くキャッシュします
+  (ブラウザには `max-age=31536000, immutable`)。
+- `public/` のブランドの画像とアイコンは、ファイル名にハッシュがないので、1 日だけキャッシュします(`max-age=86400`)。
+  Service Worker(`/sw.js`)は、更新がすぐに行き渡るよう、CloudFront でもブラウザでもキャッシュしません(`no-cache`)。
+- S3 への配置は、古いファイルを消しません(`prune: false`)。デプロイの途中や、古い画面を開いたままの人が、消えたファイルを取りに行かないためです。
+  ファイルは小さく、名前にハッシュが入るので、消さずに残しても困りません。
 - すべての応答に、次のヘッダーを付けます(アプリ側が同じヘッダーを付けても、CloudFront の設定を優先します)。
   `Strict-Transport-Security`(1 年、サブドメインを含む)、`X-Content-Type-Options: nosniff`、
   `Referrer-Policy: strict-origin-when-cross-origin`、`X-Frame-Options: DENY`。
-  `Content-Security-Policy` は、まだ付けません。
+- CSP は、まず報告だけのヘッダー(`Content-Security-Policy-Report-Only`)で、すべての応答に付けます(値は `packages/infra/lib/web-stack.ts` の `CONTENT_SECURITY_POLICY`)。
+  読み込み元は自分のオリジンだけにし、Next が埋め込むインラインのスクリプトと、インラインの `style` 属性のため、当面は `'unsafe-inline'` を許します。
+  違反は、ブラウザのコンソールで確かめます(報告の受け取り先は作りません)。
+  強制(`Content-Security-Policy`)に切り替えるのは、次がそろったときです。
+  - 主要な画面(ログイン、資格の一覧、出題、結果、学習の状況、アカウント、管理)を本番で開き、コンソールに違反が出ないこと。
+  - 通知の購読とテスト通知(Service Worker)が、報告だけの状態で問題なく動くこと。
+  - 切り替えるときは、ヘッダーの名前だけを変え、値は同じにする(値を変えるときは、また報告だけで確かめる)。
 
 ### ログと監視
 
 - アプリ(Lambda)のログは、ロググループを明示して作り、30 日で消えるようにしています。
-- Lambda のエラーと実行制限(スロットリング)に、アラームがあります(5 分間に 1 回以上で鳴ります)。通知先は SNS トピックです。
+- アプリが例外で 503 を返すとき、1 行の JSON を標準エラーに出します。対象は、履歴・通知・管理者の API が保存先などの例外で返す 503 と、
+  入口の `proxy.ts` が認証の検証に失敗して返す 503(画面の経路も含みます)です。
+  例外ではない 503(通知の鍵が設定されていないときのテスト通知)と、ログインなどの認証の API が返す 503 は、記録しません。
+  中身は、印(`"event": "api-failure"`)、経路(パスだけ。問い合わせの文字列は含めません)、返した状態、例外の名前だけです。
+  例外のメッセージ・スタック・本文・利用者の識別子・入力の値は出しません。
+- 次のアラームがあります。どれも 5 分間に 1 回以上で鳴り、通知先は `<接頭辞>-web` の SNS トピックです。
+
+  | アラーム | 数えるもの |
+  | --- | --- |
+  | アプリの Lambda のエラー | Lambda の `Errors`(関数そのものの失敗) |
+  | アプリの Lambda の実行制限 | Lambda の `Throttles` |
+  | アプリの 5xx | アプリのログのうち、失敗の記録で状態が 500 以上のもの(上の記録の対象。メトリクスフィルターで数えます。名前空間は `<接頭辞>`、メトリクスは `ApiServerErrors`) |
+  | 送信の Lambda のエラー | 毎日の通知を送る Lambda の `Errors`。1 日 1 回の実行なので、1 回の失敗が、その日の送信の失敗です(`<接頭辞>-push` を作ったときだけ) |
+
+  アプリが 5xx を返しても、Lambda の呼び出しとしては成功するので、`Errors` には数えられません。アプリの 5xx のアラームは、そのためのものです。
 - `.env` の `ALARM_EMAIL` を渡すと、そのアドレスをトピックに購読させます。デプロイの後に届く確認のメールで、購読を承認します。
   渡さないときは、トピックだけが作られ、アラームの状態は CloudWatch の画面で確かめます。
+
+### 同時実行の上限
+
+- `.env` の `APP_RESERVED_CONCURRENCY` を渡すと、アプリの Lambda に、その数の同時実行を予約します(それより多くは同時に動きません)。
+  上限に達したときの実行の制限は、実行制限のアラーム(`Throttles`)で知らせます。
+- 予約は、アカウントの同時実行の上限から差し引かれ、予約しない分を 100 以上残す必要があります(上限が既定の 1,000 なら、予約できるのは 900 まで)。上限が 100 以下のアカウント(新しいアカウントでは小さいことがある)では予約できず、
+  デプロイが失敗します。先に、Service Quotas で Lambda の同時実行の上限の引き上げを申請します(例: 上限を既定の 1,000 にすれば、予約 10 を渡せます)。
+- 渡さないときは、予約しません(アカウントの上限までは同時に動きます)。
 
 ### 独自ドメイン
 
@@ -78,7 +115,6 @@ Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCre
 次の項目は、別の段階で扱います。
 
 - CloudFront の監視(CloudFront のメトリクスは別リージョンにあるため、別の段階で扱います)
-- 通知の送信の Lambda のアラーム(失敗はログと Lambda のメトリクスで確かめます)
 - 管理者向けの多要素認証の検討
 
 ## 準備
@@ -94,6 +130,7 @@ Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCre
    | `ORIGIN_VERIFY_VALUE` | CloudFront とアプリの間の合言葉。32 文字以上のランダムな文字列を、自分で作ります |
    | `STACK_PREFIX` | (省略可)リソース名の先頭に付ける文字列。既定は `mokumoku-exams` |
    | `ALARM_EMAIL` | (省略可)アラームの通知先のメールアドレス |
+   | `APP_RESERVED_CONCURRENCY` | (省略可)アプリの Lambda の同時実行の上限(1〜1000 の整数)。渡したときだけ付けます(「同時実行の上限」) |
    | `SITE_URL` | (省略可)公開の URL の起点(`https://example.com` の形。末尾のスラッシュなし)。sitemap と robots の絶対 URL に使います。渡さないときは、sitemap は空です |
    | `VAPID_PUBLIC_KEY` | (省略可)プッシュ通知の VAPID の公開鍵。下の 2 つとそろえて渡します |
    | `VAPID_PRIVATE_KEY_PARAMETER` | (省略可)VAPID の秘密鍵を置いた SSM パラメーター(SecureString)の名前。`/` で始まる階層の名前にします。値は `.env` に書きません |
@@ -132,7 +169,7 @@ aws ssm put-parameter --type SecureString --name /<パラメーターの名前> 
 
 ```sh
 npm run build          # アプリをビルドする
-npm run build:lambda   # Lambda に載せるアセットを dist/ に作る(dist/lambda、dist/static、dist/push)
+npm run build:lambda   # Lambda に載せるアセットを dist/ に作る(dist/lambda、dist/static、dist/public、dist/push)
 npm run synth          # スタックを合成する
 npm run diff -w @mokumoku-exams/infra -- --all     # すべてのスタックの変わる内容を確かめる
 npm run deploy -w @mokumoku-exams/infra -- --all   # すべてのスタックをデプロイする

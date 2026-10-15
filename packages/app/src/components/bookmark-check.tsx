@@ -1,16 +1,19 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { BookmarkError, type Bookmarks, BookmarkToggle, useBookmarks } from "@/components/bookmark-toggle.tsx";
 import { ChoiceChip, ChoiceReview } from "@/components/choice-review.tsx";
 import { ExplanationView } from "@/components/explanation-view.tsx";
 import { QuestionChips } from "@/components/question-chips.tsx";
 import { ReferenceList } from "@/components/reference-list.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
+import { RubricView } from "@/components/rubric-view.tsx";
+import { fetchQuestions } from "@/lib/questions/client.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 
-type Props = { exam: PublishedExam; questions: Question[] };
+/** `order` は、資格の全問の ID(問題データの並び)。問題そのものは、ブックマークした分だけを、開いたあとに取る */
+type Props = { exam: PublishedExam; order: readonly string[] };
 
 /** 表示の形式。一覧は正解と解説を並べ、カードは 1 問ずつめくって確かめる。 */
 type View = "list" | "cards";
@@ -21,11 +24,32 @@ const VIEWS: { id: View; name: string }[] = [
 ];
 
 /** 資格ごとの、ブックマークした問題の見直し(一覧とカードを切り替えられる)。 */
-export function BookmarkCheck({ exam, questions }: Props) {
+export function BookmarkCheck({ exam, order }: Props) {
   const bookmarks = useBookmarks(exam.examCode);
   const [view, setView] = useState<View>("list");
+  // ブックマークした問題(読み込んだときの分)。null は読み込み中、"failed" は取れなかったとき
+  const [loaded, setLoaded] = useState<ReadonlyMap<string, Question> | "failed" | null>(null);
+  const ready = bookmarks.ids !== null;
+
+  // ブックマークを読み込めたら、その問題だけを取る(画面で付け直す問題は、読み込んだ分の中にある)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: 読み込めたときに 1 回だけ取る(付け外しのたびには取り直さない)
+  useEffect(() => {
+    if (!bookmarks.ids) return;
+    let active = true;
+    const ids = order.filter((id) => bookmarks.ids?.has(id));
+    void fetchQuestions(exam.examCode, ids).then((questions) => {
+      if (active) setLoaded(questions ? new Map(questions.map((q) => [q.questionId, q])) : "failed");
+    });
+    return () => {
+      active = false;
+    };
+  }, [exam.examCode, order, ready]);
+
   // ブックマークを外しても、見ている間は一覧に残す(押し間違えたときに、すぐ付け直せるように)
-  const shown = questions.filter((q) => bookmarks.ids?.has(q.questionId) || bookmarks.touched.has(q.questionId));
+  const shown =
+    loaded instanceof Map
+      ? order.flatMap((id) => (bookmarks.ids?.has(id) || bookmarks.touched.has(id) ? (loaded.get(id) ?? []) : []))
+      : [];
 
   return (
     <div className="space-y-4">
@@ -36,10 +60,12 @@ export function BookmarkCheck({ exam, questions }: Props) {
         </Link>
       </div>
       <BookmarkError bookmarks={bookmarks} />
-      {bookmarks.ids === null ? (
+      {bookmarks.ids === null || loaded === null ? (
         <p className="text-sm text-muted">
           ブックマークを読み込んでいます。表示されないときは、時間をおいて開き直してください。
         </p>
+      ) : loaded === "failed" ? (
+        <p className="text-sm text-muted">問題を読み込めませんでした。時間をおいて、開き直してください。</p>
       ) : shown.length === 0 ? (
         <p className="text-sm text-muted">
           ブックマークした問題はありません。出題中や結果の画面の「ブックマーク」で追加できます。
@@ -101,17 +127,7 @@ function QuestionFace({
       <RichText text={question.questionText} />
       {question.questionType === "free-text" ? (
         revealed ? (
-          <div className="space-y-1 text-sm">
-            <h3 className="font-bold">採点の観点(合格点 {question.rubric.passingPoints} 点)</h3>
-            <ul className="space-y-1">
-              {question.rubric.criteria.map((criterion) => (
-                <li key={criterion.name} className="flex justify-between gap-3 rounded border border-line p-2">
-                  <span>{criterion.name}</span>
-                  <span>{criterion.points} 点</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <RubricView rubric={question.rubric} mode="criteria" />
         ) : null
       ) : revealed ? (
         <div className="motion-correct">

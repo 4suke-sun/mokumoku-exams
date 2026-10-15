@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Notice, type NoticeKind } from "@/components/notice.tsx";
 import {
   currentSubscription,
   pushSupported,
@@ -18,7 +19,7 @@ type Status = "loading" | "unavailable" | "unsupported" | "off" | "on";
 export function PushSettings({ publicKey, canSendTest = false }: { publicKey: string | null; canSendTest?: boolean }) {
   const [status, setStatus] = useState<Status>("loading");
   const [busy, setBusy] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ kind: NoticeKind; text: string } | null>(null);
 
   useEffect(() => {
     if (!publicKey) return setStatus("unavailable");
@@ -40,13 +41,14 @@ export function PushSettings({ publicKey, canSendTest = false }: { publicKey: st
     setBusy(false);
     if (outcome === "subscribed") {
       setStatus("on");
-      setMessage("この端末で、通知を受け取るようにしました。");
+      setMessage({ kind: "success", text: "この端末で、通知を受け取るようにしました。" });
     } else if (outcome === "denied") {
-      setMessage(
-        "通知が許可されていません。ブラウザの設定で、このサイトの通知を許可してから、もう一度お試しください。",
-      );
+      setMessage({
+        kind: "error",
+        text: "通知が許可されていません。ブラウザの設定で、このサイトの通知を許可してから、もう一度お試しください。",
+      });
     } else {
-      setMessage("通知を設定できませんでした。時間をおいて、もう一度お試しください。");
+      setMessage({ kind: "error", text: "通知を設定できませんでした。時間をおいて、もう一度お試しください。" });
     }
   }
 
@@ -57,9 +59,9 @@ export function PushSettings({ publicKey, canSendTest = false }: { publicKey: st
     setBusy(false);
     if (ok) {
       setStatus("off");
-      setMessage("この端末の通知を止めました。");
+      setMessage({ kind: "success", text: "この端末の通知を止めました。" });
     } else {
-      setMessage("通知を止められませんでした。時間をおいて、もう一度お試しください。");
+      setMessage({ kind: "error", text: "通知を止められませんでした。時間をおいて、もう一度お試しください。" });
     }
   }
 
@@ -70,10 +72,10 @@ export function PushSettings({ publicKey, canSendTest = false }: { publicKey: st
     setBusy(false);
     setMessage(
       sent === null
-        ? "テスト通知を送れませんでした。時間をおいて、もう一度お試しください。"
+        ? { kind: "error", text: "テスト通知を送れませんでした。時間をおいて、もう一度お試しください。" }
         : sent > 0
-          ? "テスト通知を送りました。"
-          : "送り先の端末がありません。通知を受け取る設定を、もう一度お試しください。",
+          ? { kind: "success", text: "テスト通知を送りました。" }
+          : { kind: "info", text: "送り先の端末がありません。通知を受け取る設定を、もう一度お試しください。" },
     );
   }
 
@@ -110,11 +112,7 @@ export function PushSettings({ publicKey, canSendTest = false }: { publicKey: st
           </div>
         </>
       ) : null}
-      {message ? (
-        <p role="status" className="text-sm">
-          {message}
-        </p>
-      ) : null}
+      {message ? <Notice kind={message.kind}>{message.text}</Notice> : null}
     </div>
   );
 }

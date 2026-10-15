@@ -7,6 +7,7 @@ import { ExplanationView } from "@/components/explanation-view.tsx";
 import { QuestionChips } from "@/components/question-chips.tsx";
 import { ReferenceList } from "@/components/reference-list.tsx";
 import { RichText } from "@/components/rich-text.tsx";
+import { RubricView } from "@/components/rubric-view.tsx";
 import {
   clampPage,
   EMPTY_FILTER,
@@ -49,22 +50,6 @@ function FilterChip({ label, on, onToggle }: { label: string; on: boolean; onTog
 
 const toggled = <T,>(list: readonly T[], value: T): T[] =>
   list.includes(value) ? list.filter((v) => v !== value) : [...list, value];
-
-/** 自由記述の問題の、採点基準(観点・キーワード・配点) */
-function RubricView({ rubric }: { rubric: Extract<Question, { questionType: "free-text" }>["rubric"] }) {
-  return (
-    <div className="space-y-2 text-sm">
-      <h3 className="font-bold">採点基準(合格点 {rubric.passingPoints} 点)</h3>
-      <ul className="space-y-1">
-        {rubric.criteria.map((criterion) => (
-          <li key={criterion.name} className="rounded border border-line p-2">
-            <span className="font-bold">{criterion.name}</span>({criterion.points} 点): {criterion.keywords.join("、")}
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
 
 /**
  * 管理者が、資格の全問の正解・解説・出典をまとめて読み、校正するためのプレビュー。分野・難易度・種類・語で絞り込める。
@@ -172,7 +157,7 @@ export function QuestionPreview({ exam, questions }: Props) {
             </div>
             <RichText text={question.questionText} className="font-bold" />
             {question.questionType === "free-text" ? (
-              <RubricView rubric={question.rubric} />
+              <RubricView mode="keywords" rubric={question.rubric} />
             ) : (
               <>
                 <ChoiceReview question={question} />

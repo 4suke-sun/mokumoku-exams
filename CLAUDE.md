@@ -48,8 +48,9 @@
 - 並行する作業は、`git worktree` で作業ツリーを分ける(同じ作業ディレクトリで並行しない)。作り方、依存の扱い、並列の上限、
   直列にする条件は [CONTRIBUTING.md](CONTRIBUTING.md) の「並行する作業」。
 - テストの題は、日本語で「前提条件_期待結果」。`npm run check:test-titles` が CI で守る([CONTRIBUTING.md](CONTRIBUTING.md) の「テスト」)。
-- 失敗と対処は、1 件 1 ファイルで `docs/app/lessons/` に記録する。一般的な注意書きの形で書き、
-  出来事を語る書き方にしない。
+- 作業中の引っかかりは、まず受け箱に記録する(`node scripts/lessons.ts add`。手順は [docs/lessons-workflow.md](docs/lessons-workflow.md))。
+  同じ種類が繰り返されたものは、版の締めで Issue の候補として提案される。機械検査やルールで止められない注意書きは、
+  1 件 1 ファイルで `docs/app/lessons/` に記録する。一般的な注意書きの形で書き、出来事を語る書き方にしない。
 
 ## 書いてはいけないもの(コード・ドキュメント・コミット・Issue・PR のすべて)
 

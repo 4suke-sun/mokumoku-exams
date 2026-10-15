@@ -16,11 +16,12 @@ const env = {
 const app = new App();
 const auth = new AuthStack(app, `${config.stackPrefix}-auth`, { env, stackPrefix: config.stackPrefix });
 const data = new DataStack(app, `${config.stackPrefix}-data`, { env });
-new WebStack(app, `${config.stackPrefix}-web`, {
+const web = new WebStack(app, `${config.stackPrefix}-web`, {
   env,
   config,
   lambdaCodePath: resolve(repoRoot, "dist/lambda"),
   staticAssetsPath: resolve(repoRoot, "dist/static"),
+  publicAssetsPath: resolve(repoRoot, "dist/public"),
   userPoolClientId: auth.userPoolClient.userPoolClientId,
   userPoolId: auth.userPool.userPoolId,
   userPoolArn: auth.userPool.userPoolArn,
@@ -34,5 +35,6 @@ if (config.push) {
     push: config.push,
     pushCodePath: resolve(repoRoot, "dist/push"),
     historyTable: data.table,
+    alarmTopic: web.alarmTopic,
   });
 }

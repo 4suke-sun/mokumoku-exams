@@ -8,9 +8,8 @@
  */
 import { z } from "zod";
 import { prose } from "../exam-data/schema.ts";
+import { EXAM_CODE, QUESTION_ID } from "../exam-data/shape.ts";
 
-const EXAM_CODE = /^[A-Z][A-Z0-9]{1,5}-[A-Z][A-Z0-9]{1,9}-[A-Z0-9]{2,4}$/;
-const QUESTION_ID = /^[A-Z][A-Z0-9]{1,15}-\d{4}$/;
 const CHOICE_KEY = /^[A-Z]$/;
 
 /** 要約カード: 問題 1 問につき 1 枚 */

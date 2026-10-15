@@ -98,8 +98,19 @@ describe("proxy", () => {
     vi.stubEnv("AUTH_FAKE", "");
     vi.stubEnv("COGNITO_CLIENT_ID", "");
     vi.stubEnv("COGNITO_USER_POOL_ID", "");
-    const response = await proxy(request("/exams"));
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    const response = await proxy(request("/api/history/results?examCode=marker-7f3a"));
+    const lines = log.mock.calls.map((call) => call.map(String).join(" "));
+    log.mockRestore();
     expect(response.status).toBe(503);
+    // 経路(問い合わせを除く)・状態・例外の名前だけを記録する
+    expect(lines).toHaveLength(1);
+    expect(JSON.parse(lines[0] ?? "")).toMatchObject({
+      event: "api-failure",
+      path: "/api/history/results",
+      status: 503,
+    });
+    expect(lines.join("\n")).not.toContain("marker-7f3a");
   });
 
   it("本番で合言葉が合わない_ログインの有無にかかわらず 403 で断る", async () => {

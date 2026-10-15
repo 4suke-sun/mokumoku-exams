@@ -3,21 +3,34 @@
 import Link from "next/link";
 import { useEffect, useId, useState } from "react";
 import { EmptyState } from "@/components/empty-state.tsx";
+import { MoreResults } from "@/components/more-results.tsx";
+import { Notice, type NoticeKind } from "@/components/notice.tsx";
 import { DashboardSkeleton } from "@/components/page-skeletons.tsx";
 import { PredictionPanel } from "@/components/prediction-panel.tsx";
 import { StudyCalendar } from "@/components/study-calendar.tsx";
-import { type DashboardSummary, type DomainStat, domainBreakdown, summarize, toScored } from "@/lib/dashboard.ts";
+import {
+  type DashboardSummary,
+  type DomainStat,
+  domainBreakdown,
+  type MarkTally,
+  markTally,
+  type ScoredQuestion,
+  summarize,
+} from "@/lib/dashboard.ts";
 import { domainColorClasses } from "@/lib/domain-color.ts";
 import { formatDate } from "@/lib/format.ts";
 import { fetchBookmarks, fetchDays, fetchGoal, fetchReview, putGoal } from "@/lib/history/client.ts";
 import { loadExamResults } from "@/lib/history/load.ts";
+import { appendResults } from "@/lib/history/merge.ts";
 import { EARLIEST_GOAL_DATE, LATEST_GOAL_DATE } from "@/lib/history/schema.ts";
 import { domainSelectHref, resultDetailHref } from "@/lib/quiz.ts";
+import type { Result } from "@/lib/storage.ts";
 import { daysBetween, jstDate, type StudyDay } from "@/lib/study-days.ts";
-import type { PublishedExam, Question } from "@/lib/types.ts";
+import type { PublishedExam } from "@/lib/types.ts";
 import { useStorageOwner } from "@/lib/use-storage-owner.ts";
 
-type Props = { exam: PublishedExam; questions: Question[] };
+/** `questions` は、資格の全問の、採点に要る項目だけ(`toScored`)。問題の本文や解説は渡さない */
+type Props = { exam: PublishedExam; questions: ScoredQuestion[] };
 
 type State =
   | { status: "loading" }
@@ -26,6 +39,11 @@ type State =
       status: "ready";
       summary: DashboardSummary;
       domains: DomainStat[];
+      marks: MarkTally;
+      /** 集計に使った結果(「もっと見る」で続きを足すと、集計し直す) */
+      results: Result[];
+      /** サーバーの一覧の続きを取る位置(続きがなければ null)。続きがあるときの集計は、読み込んだ範囲の値 */
+      next: string | null;
       source: "server" | "local";
       review: number | null;
       bookmarks: number | null;
@@ -35,6 +53,16 @@ type State =
       /** 日本時間の今日 */
       today: string;
     };
+
+/** 読み込んだ結果から、まとめ・分野ごとの正答率・印の数を数える */
+function measure(results: Result[], scored: readonly ScoredQuestion[], exam: PublishedExam) {
+  return {
+    results,
+    summary: summarize(results, scored, exam),
+    domains: domainBreakdown(results, scored),
+    marks: markTally(results, scored),
+  };
+}
 
 /** 資格の学習の状況(正答率、学習量、合格予測)を表示する。 */
 export function DashboardView({ exam, questions }: Props) {
@@ -55,14 +83,13 @@ export function DashboardView({ exam, questions }: Props) {
       ]);
       if (!active) return;
       // 結果の画面と同じく、サーバーを正とし、この端末にだけ残っている記録も合わせて数える
-      const { results, source } = loaded;
-      const scored = questions.map(toScored);
+      const { results, source, next } = loaded;
       const known = new Set(questions.map((q) => q.questionId));
       const count = (ids: string[] | null) => (ids ? ids.filter((id) => known.has(id)).length : null);
       setState({
         status: "ready",
-        summary: summarize(results, scored, exam),
-        domains: domainBreakdown(results, scored),
+        ...measure(results, questions, exam),
+        next,
         source,
         review: count(review),
         bookmarks: count(bookmarks),
@@ -120,9 +147,7 @@ export function DashboardView({ exam, questions }: Props) {
     <section className="space-y-8">
       {header}
       {source === "local" ? (
-        <p role="status" className="text-sm text-muted">
-          サーバーに接続できないため、この端末に保存した記録で表示しています。
-        </p>
+        <Notice kind="info">サーバーに接続できないため、この端末に保存した記録で表示しています。</Notice>
       ) : null}
 
       {goalPanel}
@@ -143,6 +168,12 @@ export function DashboardView({ exam, questions }: Props) {
             </div>
           ))}
         </dl>
+        {state.next !== null ? (
+          <p className="text-sm text-muted">
+            直近 {summary.attempts}{" "}
+            回の結果から数えています。「これまでの結果」の「もっと見る」で、古い結果も含めて数え直します。
+          </p>
+        ) : null}
       </div>
 
       <div className="space-y-2">
@@ -160,6 +191,21 @@ export function DashboardView({ exam, questions }: Props) {
             </li>
           ))}
         </ul>
+        <MoreResults
+          examCode={exam.examCode}
+          next={state.next}
+          onMore={(more) =>
+            setState((current) =>
+              current.status === "ready"
+                ? {
+                    ...current,
+                    ...measure(appendResults(current.results, more.results), questions, exam),
+                    next: more.next,
+                  }
+                : current,
+            )
+          }
+        />
       </div>
 
       <div className="space-y-2">
@@ -167,13 +213,20 @@ export function DashboardView({ exam, questions }: Props) {
         <ul className="space-y-1 text-sm">
           <li>復習プール: {state.review === null ? "読み込めませんでした" : `${state.review} 問`}</li>
           <li>
+            自信なしの印: {state.marks.unsure} 問(うち正解 {state.marks.unsureCorrect} 問)
+          </li>
+          <li>見直しの印: {state.marks.flagged} 問</li>
+          <li>
             ブックマーク: {state.bookmarks === null ? "読み込めませんでした" : `${state.bookmarks} 問`}{" "}
             <Link href="/bookmarks" className="text-primary hover:underline">
               直前チェック(ブックマーク)へ
             </Link>
           </li>
         </ul>
-        <p className="text-sm text-muted">復習プールやブックマークの問題は、モード選択の「出題の対象」で選べます。</p>
+        <p className="text-sm text-muted">
+          復習プールやブックマークの問題は、モード選択の「出題の対象」で選べます。印の数は、読み込んだ{" "}
+          {summary.attempts} 回の結果で、印を付けた問題の数です。
+        </p>
       </div>
     </section>
   );
@@ -192,7 +245,7 @@ function GoalPanel({
   const inputId = useId();
   const [saved, setSaved] = useState<string | null>(goal?.date ?? null);
   const [draft, setDraft] = useState(goal?.date ?? "");
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ kind: NoticeKind; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
   async function save(next: string | null) {
@@ -205,10 +258,8 @@ function GoalPanel({
     }
     setMessage(
       ok
-        ? next
-          ? "目標日を保存しました。"
-          : "目標日を消しました。"
-        : "保存できませんでした。時間をおいて、やり直してください。",
+        ? { kind: "success", text: next ? "目標日を保存しました。" : "目標日を消しました。" }
+        : { kind: "error", text: "保存できませんでした。時間をおいて、やり直してください。" },
     );
   }
 
@@ -264,11 +315,7 @@ function GoalPanel({
               </button>
             ) : null}
           </div>
-          {message ? (
-            <p role="status" className="text-sm text-muted">
-              {message}
-            </p>
-          ) : null}
+          {message ? <Notice kind={message.kind}>{message.text}</Notice> : null}
         </div>
       )}
     </div>

@@ -11,6 +11,8 @@ import { buildPushAsset } from "./lib/push-asset.ts";
 
 const root = resolve(import.meta.dirname, "..");
 const outDir = resolve(root, "dist");
-const { lambdaDir, staticDir } = buildLambdaAsset({ appDir: resolve(root, "packages/app"), outDir });
+const { lambdaDir, staticDir, publicDir } = buildLambdaAsset({ appDir: resolve(root, "packages/app"), outDir });
 const pushDir = buildPushAsset({ root, outDir });
-process.stdout.write(`Lambda 用: ${lambdaDir}\n静的ファイル用: ${staticDir}\n通知の送信用: ${pushDir}\n`);
+process.stdout.write(
+  `Lambda 用: ${lambdaDir}\n静的ファイル用: ${staticDir}\npublic 用: ${publicDir}\n通知の送信用: ${pushDir}\n`,
+);

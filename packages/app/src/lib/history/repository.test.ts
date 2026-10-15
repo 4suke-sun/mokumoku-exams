@@ -38,12 +38,12 @@ describe("DynamoDB の履歴", () => {
     await repository.putResult("user-a", result("EX-SMP-XX", 1));
     await repository.putResult("user-a", result("EX-SMP-XX", 3));
     await repository.putResult("user-b", result("EX-SMP-XX", 2));
-    const found = await repository.listResults("user-a", "EX-SMP-XX");
+    const { results: found } = await repository.listResults("user-a", "EX-SMP-XX");
     expect(found.map((r) => r.finishedAt)).toEqual([
       result("EX-SMP-XX", 3).finishedAt,
       result("EX-SMP-XX", 1).finishedAt,
     ]);
-    expect(await repository.listResults("user-c", "EX-SMP-XX")).toEqual([]);
+    expect(await repository.listResults("user-c", "EX-SMP-XX")).toEqual({ results: [], next: null });
   });
 
   it("資格コードが前方一致する別の資格_混ざらない", async () => {
@@ -51,7 +51,7 @@ describe("DynamoDB の履歴", () => {
     const repository = createDynamoRepository({ tableName: "table-example", client });
     await repository.putResult("user-a", result("EXAM1", 1));
     await repository.putResult("user-a", result("EXAM10", 2));
-    expect((await repository.listResults("user-a", "EXAM1")).map((r) => r.examCode)).toEqual(["EXAM1"]);
+    expect((await repository.listResults("user-a", "EXAM1")).results.map((r) => r.examCode)).toEqual(["EXAM1"]);
   });
 
   it("同じ完了時刻の結果を繰り返し保存する_重複しない", async () => {
@@ -59,7 +59,7 @@ describe("DynamoDB の履歴", () => {
     const repository = createDynamoRepository({ tableName: "table-example", client });
     await repository.putResult("user-a", result("EX-SMP-XX", 1));
     await repository.putResult("user-a", result("EX-SMP-XX", 1));
-    expect(await repository.listResults("user-a", "EX-SMP-XX")).toHaveLength(1);
+    expect((await repository.listResults("user-a", "EX-SMP-XX")).results).toHaveLength(1);
   });
 
   it("結果は件数の上限なしで残し_一覧は新しい順にページで返す", async () => {
@@ -69,10 +69,36 @@ describe("DynamoDB の履歴", () => {
     for (let minute = 0; minute < total; minute++) await repository.putResult("user-a", result("EX-SMP-XX", minute));
     expect(items.size).toBe(total);
     const first = await repository.listResults("user-a", "EX-SMP-XX");
-    expect(first).toHaveLength(RESULTS_PAGE_SIZE);
-    expect(first[0]?.finishedAt).toBe(result("EX-SMP-XX", total - 1).finishedAt);
-    const rest = await repository.listResults("user-a", "EX-SMP-XX", { before: first.at(-1)?.finishedAt });
-    expect(rest.map((r) => r.finishedAt)).toEqual([4, 3, 2, 1, 0].map((m) => result("EX-SMP-XX", m).finishedAt));
+    expect(first.results).toHaveLength(RESULTS_PAGE_SIZE);
+    expect(first.results[0]?.finishedAt).toBe(result("EX-SMP-XX", total - 1).finishedAt);
+    expect(first.next).toBe(first.results.at(-1)?.finishedAt);
+    const rest = await repository.listResults("user-a", "EX-SMP-XX", { before: first.next ?? undefined });
+    expect(rest.results.map((r) => r.finishedAt)).toEqual(
+      [4, 3, 2, 1, 0].map((m) => result("EX-SMP-XX", m).finishedAt),
+    );
+    expect(rest.next).toBeNull();
+  });
+
+  it("ページに壊れた項目がある_続きの位置は読んだ最後の項目から決める", async () => {
+    const { items, client } = fakeTable();
+    const repository = createDynamoRepository({ tableName: "table-example", client });
+    for (let minute = 0; minute < RESULTS_PAGE_SIZE + 2; minute++)
+      await repository.putResult("user-a", result("EX-SMP-XX", minute));
+    // 最も古い側のページの境目の項目を壊す(検査で落ちる)
+    const broken = [...items.values()].find((item) => String(item.SK).endsWith(result("EX-SMP-XX", 2).finishedAt));
+    if (broken) broken.questionIds = "broken";
+    const first = await repository.listResults("user-a", "EX-SMP-XX");
+    expect(first.results).toHaveLength(RESULTS_PAGE_SIZE - 1);
+    expect(first.next).toBe(result("EX-SMP-XX", 2).finishedAt);
+  });
+
+  it("結果の一覧と 1 回分の結果_強い整合性で読む", async () => {
+    const { sent, client } = fakeTable();
+    const repository = createDynamoRepository({ tableName: "table-example", client });
+    await repository.listResults("user-a", "EX-SMP-XX");
+    await repository.getResult("user-a", "EX-SMP-XX", result("EX-SMP-XX", 1).finishedAt);
+    const inputs = sent.map((command) => (command as { input: Record<string, unknown> }).input);
+    expect(inputs.filter((input) => input.ConsistentRead === true)).toHaveLength(2);
   });
 
   it("新しく作ったときだけ true を返す", async () => {
@@ -101,7 +127,7 @@ describe("DynamoDB の履歴", () => {
       examCode: "EX-SMP-XX",
     });
     await repository.putResult("user-a", result("EX-SMP-XX", 5));
-    expect(await repository.listResults("user-a", "EX-SMP-XX")).toHaveLength(1);
+    expect((await repository.listResults("user-a", "EX-SMP-XX")).results).toHaveLength(1);
   });
 
   it("結果の保存と取得に使う操作は_保存・取得・問い合わせだけで_スキャンも削除も使わない", async () => {
@@ -146,7 +172,7 @@ describe("DynamoDB のブックマークと復習プール", () => {
       { examCode: "EX-SMP-XX", questionId: "SAMPLE-0001", streak: 2, mastered: true },
       { examCode: "EX-SMP-XX", questionId: "SAMPLE-0002", streak: 0, mastered: false },
     ]);
-    expect(await repository.listResults("user-a", "EX-SMP-XX")).toHaveLength(1);
+    expect((await repository.listResults("user-a", "EX-SMP-XX")).results).toHaveLength(1);
   });
 
   it("壊れた SK_問題 ID の形でないものは返さない", async () => {
@@ -294,7 +320,7 @@ describe("DynamoDB の日ごとの学習量と目標日", () => {
     expect(await repository.getPrefs("user-b")).toEqual({ theme: "dark", style: "rich", shuffleChoices: false });
     expect(await repository.getPrefs("user-c")).toBeNull();
     // 設定の項目は、結果などの問い合わせ(SK の前方一致)に入らない
-    expect(await repository.listResults("user-a", "EX-SMP-XX")).toEqual([]);
+    expect((await repository.listResults("user-a", "EX-SMP-XX")).results).toEqual([]);
   });
 
   it("壊れた表示の設定_保存していないものとして扱う", async () => {
@@ -339,9 +365,11 @@ describe("メモリ上の履歴", () => {
       await repository.putResult("user-a", result("EX-SMP-XX", minute));
     await repository.putResult("user-b", result("EX-SMP-XX", 0));
     const first = await repository.listResults("user-a", "EX-SMP-XX");
-    expect(first).toHaveLength(RESULTS_PAGE_SIZE);
-    expect(await repository.listResults("user-a", "EX-SMP-XX", { before: first.at(-1)?.finishedAt })).toHaveLength(1);
-    expect(await repository.listResults("user-b", "EX-SMP-XX")).toHaveLength(1);
+    expect(first.results).toHaveLength(RESULTS_PAGE_SIZE);
+    expect(first.next).toBe(first.results.at(-1)?.finishedAt);
+    const rest = await repository.listResults("user-a", "EX-SMP-XX", { before: first.next ?? undefined });
+    expect(rest).toMatchObject({ results: [{ finishedAt: result("EX-SMP-XX", 0).finishedAt }], next: null });
+    expect((await repository.listResults("user-b", "EX-SMP-XX")).results).toHaveLength(1);
   });
 
   it("表示の設定_利用者ごとに分かれ_上書きできる", async () => {
@@ -384,7 +412,7 @@ describe("getHistoryRepository", () => {
   it("手元の開発で AUTH_FAKE=1 のとき_メモリ上の保存先を返す", async () => {
     const repository = getHistoryRepository({ NODE_ENV: "development", AUTH_FAKE: "1" });
     await repository.putResult("user-a", result("EX-SMP-XX", 1));
-    expect(await repository.listResults("user-a", "EX-SMP-XX")).toHaveLength(1);
+    expect((await repository.listResults("user-a", "EX-SMP-XX")).results).toHaveLength(1);
   });
 
   it("設定が揃っていれば_DynamoDB の実装を返す", () => {

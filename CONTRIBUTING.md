@@ -24,6 +24,8 @@ npm install   # 依存を入れ、検査フック(.githooks)を有効にしま�
 | `npm run test:e2e` | 主要な画面の通し確認(Playwright)。開発サーバーを代替の認証で起動して通す。初回は `npx playwright install chromium` が必要 |
 | `npm run check:release-notes` | リリースノートとタグの対応の検査 |
 | `npm run validate:data` | 資格マスタ・問題データ・カリキュラム・使い方ページのデータの検査(仕様: `docs/data-spec.md`) |
+| `npm run lessons -- <add\|list\|repeats\|draft\|close>` | 引っかかりの受け箱(`.git` の共有領域)の記録と集計。手順は `docs/lessons-workflow.md` |
+| `npm run metrics` | 手元の計測の集計(`verify` の段階ごとの時間、サブエージェントの時間とトークン、検査の台帳の内訳)。`-- agent <役> <ミリ秒> <トークン>` で記録を足す |
 | `npm run check:lessons` | 学びの記録(`docs/app/lessons/`)の書式の検査。`-- --write` で一覧を更新 |
 | `npm run check:test-titles` | テストの題(`it` / `test`)の形の検査。`-- --write` で、直した題を基準から消す |
 | `npm run check:docs` | 文書の相対リンクの先と、`npm run <名前>` のスクリプトが実在することの検査(対象: `README.md`、`CLAUDE.md`、`CONTRIBUTING.md`、`docs/`、`.claude/skills/`、`packages/*/README.md`) |
@@ -96,6 +98,17 @@ Closes #12
 - 既存の題で規約に合わないもの(`scripts/test-title-baseline.json` に記録)は、止めません。新しい題と、変えた題が規約に合わないと止めます。
   題を直したときは、`npm run check:test-titles -- --write` で、基準から消します。`--write` で基準に足すことはできません(手で足した行は、レビューで見ます)。
 
+カバレッジ:
+
+- app のテストのカバレッジは、`npm run test:coverage -w @mokumoku-exams/app` で測ります(行・文・関数・分岐の割合)。
+- CI の `app` ジョブも同じ方法で測り、ログと、ジョブのまとめ(Summary)に値を出します。値を見るためのもので、しきい値は設けず、下がっても止めません。
+
+アクセシビリティ:
+
+- E2E は、ログイン・資格の一覧・セクションの一覧・出題・結果の画面を、axe(`@axe-core/playwright`)で自動検査します。
+- 基準は WCAG 2.1 の A と AA で、違反が 1 つでもあれば失敗にします。報告は、規則の ID と件数だけです。
+- 表示の動き(フェードイン)の途中を検査しないよう、動きを減らす設定(`prefers-reduced-motion: reduce`)で開きます。
+
 ## 検査フック
 
 コミットと push の前に、次を機械的に検査するフックが動きます。
@@ -117,6 +130,16 @@ Closes #12
 - 置き場: 主の作業ツリーの直下。`git worktree add` で作った作業ツリーでも、主の作業ツリーのリストが効きます。作業ツリーの直下にもあれば、両方の語を合わせます。
 - 書式: 1 行 1 語。`#` で始まる行はコメント、空行は無視します。語を持たない場合は、コメントだけのファイルで構いません。
 - 見つからないとき: 手元(環境変数 `CI` がない環境)では、検査が止まり、置き場と書式を案内します。CI にはリストを置かないので、空のリストで続けます。
+
+## 依存の更新
+
+依存の更新の PR は、Dependabot が週に 1 回出します(`.github/dependabot.yml`)。npm(すべてのワークスペースが共有する、リポジトリ直下のロックファイル)と
+GitHub Actions を、それぞれ 1 件の PR にまとめます。題とコミットメッセージは Conventional Commits の形(`chore(deps): …`、`ci(deps): …`)です。
+
+- 更新の PR は、そのままはマージしません。ブランチ名の規約(`<prefix>/#<Issue番号>-…`)にも、版単位の PR とリリースノートの対応にも合わないためです。
+- 次の版のブランチで、同じ更新を取り込みます(`npm update` などで同じ版にし、lint / build / test と E2E を通す)。取り込んだ版のリリースノートに書き、
+  更新の PR は、取り込んだことを書いて閉じます。
+- 急ぐ更新(脆弱性の修正など)は、Issue を立てて、Issue 単位の PR で取り込みます。
 
 ## 並行する作業(作業ツリー)
 
@@ -187,7 +210,7 @@ npm run release -- <PR の番号>           # マージから確認の一覧ま�
 - 再実行してよい作りです。タグ・Release・閉じたマイルストーン・消えたブランチは、「済み」として扱います。失敗した段階(未完了の Issue が残るマイルストーンを含む)で止まり、どの段階まで終えたかを表示します。最後の確認で `Closes` の Issue が閉じていないと表示されたときは、GitHub の反映が遅れていることがあります。時間をおいて、同じコマンドを再実行します。
 - Release は、タグの push で `release-tag.yml` が作ります(リリースノートのエントリが本文になります)。スクリプトは、作られるまで待って確かめます。タグとリリースノートは、1 対 1 で対応します。
 - スクリプトの呼び出しは、`.claude/settings.json` の確認必須(`ask`)に入っています。権限の確認を省く動作モードでは確認にならないので、人の明示の指示をスキルの中で確かめます。
-- 版の締めでは、この版で引っかかったことを振り返り、再発を防ぐ形(機械検査、共通の決まり、スキルの手順、`docs/app/lessons/`)にします(スキルの Step 4)。
+- 版の締めでは、受け箱に溜めた引っかかりから、同じ種類が繰り返されたものを Issue の候補として提案し、再発を防ぐ形(機械検査、共通の決まり、スキルの手順、`docs/app/lessons/`、`CLAUDE.md`)にします(スキルの Step 4。手順は [docs/lessons-workflow.md](docs/lessons-workflow.md))。
 
 ### リポジトリの設定
 

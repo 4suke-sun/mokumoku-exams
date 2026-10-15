@@ -7,6 +7,7 @@ import {
   QueryCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
+import { EXAM_CODE, QUESTION_ID } from "@mokumoku-exams/data-schema/exam-data/shape";
 import { type Prefs, PrefsSchema } from "@/lib/prefs.ts";
 import { RECENT_STAT_LIMIT } from "@/lib/question-stats.ts";
 import {
@@ -17,7 +18,8 @@ import {
   SectionProgressSchema,
 } from "@/lib/storage.ts";
 import { isValidDate, jstDate, type StudyDay } from "@/lib/study-days.ts";
-import { EXAM_CODE_PATTERN, MASTER_STREAK, QUESTION_ID_PATTERN } from "./schema.ts";
+import { RESULTS_PAGE_SIZE } from "./limits.ts";
+import { MASTER_STREAK } from "./schema.ts";
 
 /** 履歴の保存先。利用者の識別子(`sub`)は、検証済みのものだけを渡す。 */
 export interface HistoryRepository {
@@ -29,10 +31,16 @@ export interface HistoryRepository {
   putResult(sub: string, result: Result, tally?: DayTally): Promise<boolean>;
   /**
    * 資格の結果を新しい順に返す。`before`(完了時刻)を渡すと、それより古いものを返す。
-   * 1 回に返すのは `limit` 件まで(既定は `RESULTS_PAGE_SIZE`)。
+   * 1 回に読むのは `limit` 件まで(既定は `RESULTS_PAGE_SIZE`)。続きがあるかもしれないときは、続きを取る位置
+   * (読んだ最後の項目の完了時刻)を `next` に返す。壊れた項目を除いても、続きの位置は変わらない。
+   * 保存した直後の結果も読めるよう、強い整合性で読む。
    */
-  listResults(sub: string, examCode: string, page?: { before?: string; limit?: number }): Promise<Result[]>;
-  /** 1 回分の結果。なければ null。 */
+  listResults(
+    sub: string,
+    examCode: string,
+    page?: { before?: string; limit?: number },
+  ): Promise<{ results: Result[]; next: string | null }>;
+  /** 1 回分の結果。なければ null。強い整合性で読む。 */
   getResult(sub: string, examCode: string, finishedAt: string): Promise<Result | null>;
   /**
    * 問題ごとの解答回数と直近の正誤を更新する。同じ完了時刻の正誤は、二重に数えない。
@@ -84,8 +92,7 @@ export type ReviewChange = { wrong: readonly string[]; correct: readonly string[
 /** 復習の項目。`streak` は連続正解の数(古い保存で持たないときは 0) */
 export type ReviewItem = { examCode: string; questionId: string; streak: number; mastered: boolean };
 
-/** 結果の一覧で、1 回に返す件数 */
-export const RESULTS_PAGE_SIZE = 50;
+export { RESULTS_PAGE_SIZE };
 
 /** 1 回の結果での、1 問の正誤 */
 export type QuestionOutcome = { questionId: string; correct: boolean };
@@ -179,7 +186,7 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
   const query = (
     sub: string,
     prefix: string,
-    extra: { limit?: number; keysOnly?: boolean; newestFirst?: boolean; startAfter?: string },
+    extra: { limit?: number; keysOnly?: boolean; newestFirst?: boolean; startAfter?: string; consistent?: boolean },
   ) =>
     client.send(
       new QueryCommand({
@@ -190,6 +197,7 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
         ...(extra.limit ? { Limit: extra.limit } : {}),
         ...(extra.keysOnly ? { ProjectionExpression: "SK" } : {}),
         ...(extra.startAfter ? { ExclusiveStartKey: { PK: userKey(sub), SK: extra.startAfter } } : {}),
+        ...(extra.consistent ? { ConsistentRead: true } : {}),
       }),
     ) as Promise<QueryOutput>;
 
@@ -204,14 +212,21 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
     } while (startAfter);
     return all;
   };
-  const get = async (sub: string, sk: string) =>
-    ((await client.send(new GetCommand({ TableName: tableName, Key: { PK: userKey(sub), SK: sk } }))) as GetOutput)
-      .Item;
+  const get = async (sub: string, sk: string, consistent = false) =>
+    (
+      (await client.send(
+        new GetCommand({
+          TableName: tableName,
+          Key: { PK: userKey(sub), SK: sk },
+          ...(consistent ? { ConsistentRead: true } : {}),
+        }),
+      )) as GetOutput
+    ).Item;
 
   /** SK の接頭辞のあとに続く問題 ID を取り出す(問題 ID の形のものだけ)。 */
   const questionIdsOf = async (sub: string, prefix: string) => {
     const { Items = [] } = await query(sub, prefix, { keysOnly: true });
-    return Items.map((item) => String(item.SK).slice(prefix.length)).filter((id) => QUESTION_ID_PATTERN.test(id));
+    return Items.map((item) => String(item.SK).slice(prefix.length)).filter((id) => QUESTION_ID.test(id));
   };
   const put = (sub: string, sk: string, attributes: Record<string, unknown>) =>
     client.send(new PutCommand({ TableName: tableName, Item: { PK: userKey(sub), SK: sk, ...attributes } }));
@@ -261,16 +276,22 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
     async listResults(sub, examCode, page = {}) {
       // 完了時刻の新しい順。`before` の項目のあとから、`limit` 件まで
       const prefix = resultKeyPrefix(examCode);
-      const { Items = [] } = await query(sub, prefix, {
+      const { Items = [], LastEvaluatedKey } = await query(sub, prefix, {
         limit: page.limit ?? RESULTS_PAGE_SIZE,
         newestFirst: true,
         startAfter: page.before ? `${prefix}${page.before}` : undefined,
+        consistent: true,
       });
-      return Items.map(resultOf).filter((r): r is Result => r !== null);
+      // 件数の上限に達すると、続きがなくても `LastEvaluatedKey` が返る(そのときの続きの取得は空になる)
+      const lastKey = LastEvaluatedKey ? String(LastEvaluatedKey.SK) : null;
+      return {
+        results: Items.map(resultOf).filter((r): r is Result => r !== null),
+        next: lastKey?.startsWith(prefix) ? lastKey.slice(prefix.length) : null,
+      };
     },
 
     async getResult(sub, examCode, finishedAt) {
-      const item = await get(sub, resultKey({ examCode, finishedAt }));
+      const item = await get(sub, resultKey({ examCode, finishedAt }), true);
       const found = item ? resultOf(item) : null;
       return found && found.examCode === examCode && found.finishedAt === finishedAt ? found : null;
     },
@@ -295,7 +316,7 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
           count: isCount(item.count) ? item.count : 0,
           recent: recentOf(item.recent).map((e) => e.correct),
         }))
-        .filter((stat) => QUESTION_ID_PATTERN.test(stat.questionId));
+        .filter((stat) => QUESTION_ID.test(stat.questionId));
     },
 
     listBookmarks: (sub, examCode) => questionIdsOf(sub, bookmarkKeyPrefix(examCode)),
@@ -311,13 +332,13 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
       return (await queryAll(sub, prefix))
         .filter((item) => !reviewStateOf(item).mastered)
         .map((item) => String(item.SK).slice(prefix.length))
-        .filter((id) => QUESTION_ID_PATTERN.test(id));
+        .filter((id) => QUESTION_ID.test(id));
     },
 
     async listReviewItems(sub) {
       return (await queryAll(sub, REVIEW_PREFIX)).flatMap((item): ReviewItem[] => {
         const [examCode = "", questionId = ""] = String(item.SK).slice(REVIEW_PREFIX.length).split("#");
-        if (!QUESTION_ID_PATTERN.test(questionId) || !EXAM_CODE_PATTERN.test(examCode)) return [];
+        if (!QUESTION_ID.test(questionId) || !EXAM_CODE.test(examCode)) return [];
         return [{ examCode, questionId, ...reviewStateOf(item) }];
       });
     },
@@ -459,9 +480,11 @@ export function createMemoryRepository(): HistoryRepository {
     },
     async listResults(sub, examCode, page = {}) {
       const { before } = page;
-      return sorted(sub, examCode)
-        .filter((r) => before === undefined || r.finishedAt < before)
-        .slice(0, page.limit ?? RESULTS_PAGE_SIZE);
+      const limit = page.limit ?? RESULTS_PAGE_SIZE;
+      const rest = sorted(sub, examCode).filter((r) => before === undefined || r.finishedAt < before);
+      const results = rest.slice(0, limit);
+      // DynamoDB と同じく、上限に達したら、続きがなくても続きの位置を返す
+      return { results, next: rest.length >= limit ? (results.at(-1)?.finishedAt ?? null) : null };
     },
     async getResult(sub, examCode, finishedAt) {
       return store.get(userKey(sub))?.get(resultKey({ examCode, finishedAt })) ?? null;

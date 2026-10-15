@@ -2,6 +2,7 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { toOutline } from "@/lib/dashboard.ts";
 import {
   browserStore,
   loadResults,
@@ -15,6 +16,18 @@ import {
 } from "@/lib/storage.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 import { ResultView } from "./result-view.tsx";
+
+// 詳しく出す回の問題は、画面を開いたあとに取る。テストでは、描画に渡した問題から返す
+const served = vi.hoisted(() => ({ pool: [] as Question[] }));
+vi.mock("@/lib/questions/client.ts", () => ({
+  fetchQuestions: async (_examCode: string, ids: readonly string[]) =>
+    served.pool.filter((q) => ids.includes(q.questionId)),
+}));
+
+function renderView(pool: Question[]) {
+  served.pool = pool;
+  return render(<ResultView exam={exam} outline={pool.map(toOutline)} />);
+}
 
 const push = vi.fn();
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
@@ -71,7 +84,7 @@ function saveAnswers(answers: Record<string, string[]>) {
 
 describe("ResultView", () => {
   it("結果がない_案内を表示する", async () => {
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     expect(await screen.findByText("結果がありません")).toBeTruthy();
   });
 
@@ -79,14 +92,14 @@ describe("ResultView", () => {
     setStorageOwner("aaaaaaaaaaaaaaaa");
     saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["A"], "TEST-0003": ["B"] });
     setStorageOwner("bbbbbbbbbbbbbbbb");
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     expect(await screen.findByText("結果がありません")).toBeTruthy();
     expect(screen.queryByRole("button", { name: /アカウントに移す/ })).toBeNull();
   });
 
   it("2 問が不正解_正答率と_間違えた問題の数を表示する", async () => {
     saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["B"], "TEST-0003": ["A"] });
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     expect(await screen.findByRole("img", { name: "正答率 33.3%" })).toBeTruthy();
     expect(screen.getByRole("button", { name: "間違えた問題だけを見直す(2 問)" })).toBeTruthy();
     expect(screen.getAllByRole("listitem").length).toBeGreaterThanOrEqual(3);
@@ -94,7 +107,7 @@ describe("ResultView", () => {
 
   it("間違えた問題だけを見直す_誤答だけが元の問題番号で並び_戻せる", async () => {
     saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["B"], "TEST-0003": ["A"] });
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     const user = userEvent.setup();
 
     await user.click(await screen.findByRole("button", { name: /間違えた問題だけを見直す/ }));
@@ -110,7 +123,7 @@ describe("ResultView", () => {
 
   it("すべて正解_見直しの切り替えは出さず_その旨を表示する", async () => {
     saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["A"], "TEST-0003": ["B"] });
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     expect(await screen.findByText("すべて正解でした。見直す問題はありません。")).toBeTruthy();
     expect(screen.queryByRole("button", { name: /見直す/ })).toBeNull();
     // 3 問すべてが、一覧に並んでいる
@@ -129,7 +142,7 @@ describe("ResultView", () => {
       choiceOrder: { [shuffled.questionId]: ["B", "A"] },
       finishedAt: "2026-10-10T00:00:00.000Z",
     });
-    render(<ResultView exam={exam} questions={[shuffled]} />);
+    renderView([shuffled]);
     // 元のキーで B, A の順に並ぶので、画面では B が「A.」、A が「B.」になる
     expect(await screen.findByText("正解がBである理由は")).toBeTruthy();
     expect(screen.getByText("選択肢Aは誤り。")).toBeTruthy();
@@ -142,7 +155,7 @@ describe("ResultView", () => {
       references: [{ title: "公式の資料", url: "https://docs.aws.amazon.com/guide" }],
     } as Question;
     saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["A"], "TEST-0003": ["B"] });
-    render(<ResultView exam={exam} questions={[withReference, question(2, "A"), question(3, "B")]} />);
+    renderView([withReference, question(2, "A"), question(3, "B")]);
     const link = await screen.findByRole("link", { name: "公式の資料(外部サイト)" });
     expect(link.getAttribute("href")).toBe("https://docs.aws.amazon.com/guide");
     expect(link.getAttribute("target")).toBe("_blank");
@@ -158,7 +171,7 @@ describe("ResultView", () => {
     });
     // 新しい結果(1 問目は正解、2 問目は不正解)
     saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["B"], "TEST-0003": ["B"] });
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
 
     const first = await screen.findByRole("list", { name: "直近 2 回の正誤(新しい順)" });
     expect(Array.from(first.querySelectorAll("li")).map((li) => li.textContent)).toEqual(["○正解", "×不正解"]);
@@ -180,7 +193,7 @@ describe("ResultView の段階の確認問題", () => {
   it("直近の結果が段階の確認で合格_合格を伝え_単元へ戻れる", async () => {
     saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["A"], "TEST-0003": ["B"] });
     saveStageCheck(browserStore(), "TEST", check());
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     expect(await screen.findByText(/段階の確認問題に合格しました\(正答率 100%\)/)).toBeTruthy();
     expect(screen.getByRole("link", { name: "単元へ戻る" }).getAttribute("href")).toBe("/exams/TEST/study/basics");
   });
@@ -188,14 +201,14 @@ describe("ResultView の段階の確認問題", () => {
   it("直近の結果が段階の確認で不合格_合格の基準と今回の正答率を伝える", async () => {
     saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["B"], "TEST-0003": ["A"] });
     saveStageCheck(browserStore(), "TEST", check({ percent: 33.3, passed: false }));
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     expect(await screen.findByText(/正答率 80% 以上で合格です\(今回は 33.3%\)/)).toBeTruthy();
   });
 
   it("段階の確認の記録が直近の結果のものではない_段階の合否を出さない", async () => {
     saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["A"], "TEST-0003": ["B"] });
     saveStageCheck(browserStore(), "TEST", check({ finishedAt: "2026-10-09T00:00:00.000Z" }));
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     await screen.findByText("すべて正解でした。見直す問題はありません。");
     expect(screen.queryByText(/段階の確認問題/)).toBeNull();
   });
@@ -224,7 +237,7 @@ describe("ResultView のアカウントへの保存", () => {
     stubServer([
       serverResult("2026-10-11T00:00:00.000Z", { "TEST-0001": ["A"], "TEST-0002": ["A"], "TEST-0003": ["B"] }),
     ]);
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     expect(await screen.findByText(/3 問中 3 問が正解/)).toBeTruthy();
     expect(screen.queryByText(/この端末にだけ残っている記録/)).toBeNull();
     expect(screen.queryByText(/サーバーに接続できない/)).toBeNull();
@@ -233,7 +246,7 @@ describe("ResultView のアカウントへの保存", () => {
   it("サーバーに接続できない_この端末の記録を表示し_その旨を伝える", async () => {
     stubServer(null);
     saveAnswers({ "TEST-0001": ["A"] });
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     expect(await screen.findByText(/サーバーに接続できないため/)).toBeTruthy();
     expect(screen.getByText(/3 問中 1 問が正解/)).toBeTruthy();
   });
@@ -241,7 +254,7 @@ describe("ResultView のアカウントへの保存", () => {
   it("この端末にだけ記録がある_件数を案内し_移すとサーバーへ送って端末の記録を消す", async () => {
     const fetchMock = stubServer([]);
     saveAnswers({ "TEST-0001": ["A"] });
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     expect(await screen.findByText(/この端末にだけ残っている記録が 1 件/)).toBeTruthy();
     expect(
       screen.getByText("直近の結果は、アカウントに保存できませんでした。この端末にだけ残っています。"),
@@ -257,7 +270,7 @@ describe("ResultView のアカウントへの保存", () => {
   it("移すのに失敗した_端末の記録を残し_やり直せる", async () => {
     stubServer([], false);
     saveAnswers({ "TEST-0001": ["A"] });
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     await userEvent.setup().click(await screen.findByRole("button", { name: "アカウントに移す" }));
     expect(await screen.findByRole("alert")).toBeTruthy();
     expect(loadResults(browserStore(), "TEST")).toHaveLength(1);
@@ -267,7 +280,7 @@ describe("ResultView のアカウントへの保存", () => {
   it("サーバーに同じ完了時刻の記録がある_端末の記録は移行の対象にしない", async () => {
     stubServer([serverResult("2026-10-10T00:00:00.000Z", { "TEST-0001": ["A"] })]);
     saveAnswers({ "TEST-0001": ["A"] });
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     expect(await screen.findByText(/3 問中 1 問が正解/)).toBeTruthy();
     expect(screen.queryByText(/この端末にだけ残っている記録/)).toBeNull();
   });
@@ -298,7 +311,7 @@ describe("ResultView の自由記述", () => {
       textAnswers: { "TEST-0004": "ファイルを保存する" },
       finishedAt: "2026-10-10T00:00:00.000Z",
     });
-    render(<ResultView exam={exam} questions={[freeText]} />);
+    renderView([freeText]);
     expect(await screen.findByRole("img", { name: "正答率 100%" })).toBeTruthy();
     expect(screen.getByText("ファイルを保存する")).toBeTruthy();
     expect(screen.getByText("○ 満たしている")).toBeTruthy();
@@ -315,7 +328,7 @@ describe("ResultView の自由記述", () => {
       answers: {},
       finishedAt: "2026-10-10T00:00:00.000Z",
     });
-    render(<ResultView exam={exam} questions={[freeText]} />);
+    renderView([freeText]);
     expect(await screen.findByRole("img", { name: "正答率 0%" })).toBeTruthy();
     expect(screen.getByText("未回答")).toBeTruthy();
     expect(screen.getByText("× 不正解")).toBeTruthy();
@@ -325,7 +338,7 @@ describe("ResultView の自由記述", () => {
 describe("ResultView の解き直し", () => {
   it("間違えた問題だけで_新しい出題を始める", async () => {
     saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["B"], "TEST-0003": ["A"] });
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     const user = userEvent.setup();
     await user.click(await screen.findByRole("button", { name: "間違えた問題だけで解き直す(2 問)" }));
     expect(push).toHaveBeenCalledWith("/exams/TEST/play");
@@ -344,7 +357,7 @@ describe("ResultView の解き直し", () => {
       flagged: [false, true, false],
       timesMs: [65_000, 4_000, 0],
     });
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     const user = userEvent.setup();
     expect(await screen.findByText("自信なし")).toBeTruthy();
     expect(screen.getByText("見直し")).toBeTruthy();
@@ -355,7 +368,7 @@ describe("ResultView の解き直し", () => {
 
   it("間違いがない_解き直しのボタンを出さず_別の問題でもう一度はモード選択へ", async () => {
     saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["A"], "TEST-0003": ["B"] });
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     expect(await screen.findByText("すべて正解でした。見直す問題はありません。")).toBeTruthy();
     expect(screen.queryByRole("button", { name: /解き直す/ })).toBeNull();
     expect(screen.getByRole("link", { name: "別の問題でもう一度" }).getAttribute("href")).toBe("/exams/TEST");
@@ -376,7 +389,7 @@ describe("ResultView の過去の結果とセクション", () => {
     });
     saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["A"], "TEST-0003": ["B"] });
     window.history.replaceState(null, "", `/exams/TEST/result?at=${encodeURIComponent("2026-10-09T00:00:00.000Z")}`);
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     expect(await screen.findByText(/3 問中 1 問が正解/)).toBeTruthy();
     expect(screen.getByText(/過去の結果/)).toBeTruthy();
     expect(screen.getByRole("link", { name: "最新の結果へ" })).toBeTruthy();
@@ -385,7 +398,7 @@ describe("ResultView の過去の結果とセクション", () => {
   it("?at= の結果がない_見つからない旨を案内する", async () => {
     saveAnswers({ "TEST-0001": ["A"] });
     window.history.replaceState(null, "", "/exams/TEST/result?at=2020-01-01T00:00:00.000Z");
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     expect(await screen.findByRole("heading", { name: "その回の結果は見つかりません" })).toBeTruthy();
   });
 
@@ -394,7 +407,7 @@ describe("ResultView の過去の結果とセクション", () => {
     saveSectionCheck(browserStore(), "TEST", 0, { correct: 3, total: 3, finishedAt: "2026-10-10T00:00:00.000Z" });
     // 6 問あると、2 つ目のセクションがある
     const six = [...questions, ...[4, 5, 6].map((n) => ({ ...questions[0], questionId: `TEST-000${n}` }) as Question)];
-    render(<ResultView exam={exam} questions={six} />);
+    renderView(six);
     expect(await screen.findByText(/セクション 1 を満点で合格しました/)).toBeTruthy();
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: /次のセクションへ/ }));
@@ -419,7 +432,7 @@ describe("ResultView の分野ごとの正答数と得点のカード", () => {
       browserStore(),
       withTimes({ "TEST-0001": ["A"], "TEST-0002": ["B"], "TEST-0003": ["B"] }, [2000, 4000, 6000]),
     );
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     const bars = (await screen.findAllByRole("list", { name: "分野ごとの正答数" }))[0];
     expect(bars?.textContent).toContain("分野 1");
     expect(bars?.textContent).toContain("2 / 3 問(66.7%、平均 4 秒/問)");
@@ -429,20 +442,20 @@ describe("ResultView の分野ごとの正答数と得点のカード", () => {
 
   it("シンプル表示のために_同じ内容の表も出す", async () => {
     saveResult(browserStore(), withTimes({ "TEST-0001": ["A"] }));
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     const table = await screen.findByRole("table", { name: "分野ごとの正答数" });
     expect(table.textContent).toContain("1 / 3 問(33.3%)");
   });
 
   it("回答時間がある_平均回答時間を出す", async () => {
     saveResult(browserStore(), withTimes({ "TEST-0001": ["A"] }, [1000, 2000, 6000]));
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     expect(await screen.findByText("平均回答時間 3 秒/問")).toBeTruthy();
   });
 
   it("回答時間のない古い結果_平均を出さず_崩れずに表示する", async () => {
     saveResult(browserStore(), withTimes({ "TEST-0001": ["A"], "TEST-0002": ["A"] }));
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     expect(await screen.findByText(/3 問中 2 問が正解/)).toBeTruthy();
     expect(screen.queryByText(/平均回答時間/)).toBeNull();
     expect(screen.queryByText(/回答時間 /)).toBeNull();
@@ -450,21 +463,21 @@ describe("ResultView の分野ごとの正答数と得点のカード", () => {
 
   it("合格ラインに達している_色と文字の両方で伝える", async () => {
     saveResult(browserStore(), withTimes({ "TEST-0001": ["A"], "TEST-0002": ["A"], "TEST-0003": ["B"] }));
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     const label = await screen.findByText("合格ライン到達");
     expect(label.closest("div")?.className).toContain("bg-correct-bg");
   });
 
   it("合格ラインに達していない_色と文字の両方で伝える", async () => {
     saveResult(browserStore(), withTimes({ "TEST-0001": ["A"] }));
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     const label = await screen.findByText("合格ライン未達");
     expect(label.closest("div")?.className).toContain("bg-warn-bg");
   });
 
   it("問題ごとの結果_正誤の色の左の線を付ける", async () => {
     saveResult(browserStore(), withTimes({ "TEST-0001": ["A"], "TEST-0002": ["B"] }));
-    render(<ResultView exam={exam} questions={questions} />);
+    renderView(questions);
     await screen.findByText("問題 1");
     expect(screen.getByText("問題 1").closest("li")?.className).toContain("border-l-correct");
     expect(screen.getByText("問題 2").closest("li")?.className).toContain("border-l-incorrect");

@@ -58,9 +58,6 @@
   "packages/app/src/lib/explanation.test.ts": [
     "問題がある"
   ],
-  "packages/app/src/lib/free-text.test.ts": [
-    "同じ結果になる(ならすと空になるキーワードを、検査で止めるため)"
-  ],
   "packages/app/src/lib/history/repository.test.ts": [
     "新しく作ったときだけ true を返す"
   ],

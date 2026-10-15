@@ -4,16 +4,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Notice } from "@/components/notice.tsx";
 import { UnitPractice } from "@/components/unit-practice.tsx";
-import { newSession } from "@/lib/quiz.ts";
-import {
-  browserStore,
-  loadSession,
-  loadSettings,
-  loadStageProgress,
-  passedStages,
-  type Session,
-  saveSession,
-} from "@/lib/storage.ts";
+import { SESSION_SAVE_FAILED, startSession } from "@/lib/start-session.ts";
+import { browserStore, loadSession, loadStageProgress, passedStages, type Session } from "@/lib/storage.ts";
 import type { NextStep } from "@/lib/study-nav.ts";
 import { STAGE_PASS_PERCENT, type StageStatus, stageStatuses } from "@/lib/study-stages.ts";
 import type { ChoiceQuestion, PublishedExam } from "@/lib/types.ts";
@@ -69,16 +61,13 @@ export function StudyStart({ exam, questions, next, stages }: Props) {
       setError("出題できる問題がありません。");
       return;
     }
-    const store = browserStore();
     // 解答の表示のしかたは、モード選択で最後に選んだもの(学習モードでも、1 問ごとに確かめられる)
-    const { shuffleChoices, reveal } = loadSettings(store);
-    const session = newSession(examCode, list, { shuffleChoices }, Math.random, new Date());
-    const withReveal = reveal === "each" ? { ...session, reveal } : session;
-    if (!saveSession(store, stage ? { ...withReveal, stage } : withReveal)) {
-      setError("この端末では、出題の状態を保存できません。ブラウザの設定を確認してください。");
+    const href = startSession(browserStore(), examCode, list, stage ? { stage } : {});
+    if (!href) {
+      setError(SESSION_SAVE_FAILED);
       return;
     }
-    router.push(`/exams/${examCode}/play`);
+    router.push(href);
   }
 
   const statuses = stages ? stageStatuses(stages.list, passed) : [];

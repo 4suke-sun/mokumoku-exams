@@ -2,7 +2,7 @@ import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "
 import { dirname, join } from "node:path";
 import { z } from "zod";
 import { ISO_DATE, type LedgerFile, SHA256 } from "../collect/ledger.ts";
-import { EXAM_CODE, hostAllowedForVendor, sourceUrlReason } from "../contract.ts";
+import { EXAM_CODE, hostAllowedForVendor, QUESTION_ID, sourceUrlReason } from "../contract.ts";
 import type { FactsFile } from "../facts/schema.ts";
 import { FACT_ID } from "./schema.ts";
 import type { DraftRecord } from "./store.ts";
@@ -23,10 +23,7 @@ export const ProvenanceSourceSchema = z.strictObject({
 export const ProvenanceEntrySchema = z.strictObject({
   /** 下書きの識別子。書き出しのあと、公開した問題の ID は questionId に記録する */
   draftId: z.string().regex(/^d-[0-9a-f]{12}$/),
-  questionId: z
-    .string()
-    .regex(/^[A-Z][A-Z0-9]{1,15}-\d{4}$/)
-    .optional(),
+  questionId: z.string().regex(QUESTION_ID).optional(),
   factIds: z.array(FACT_ID).min(1).max(10),
   sources: z.array(ProvenanceSourceSchema).min(1).max(10),
 });

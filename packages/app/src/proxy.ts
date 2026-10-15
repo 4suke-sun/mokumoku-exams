@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { logApiFailure } from "@/lib/api/log.ts";
 import { isAdmin, isAdminPath } from "@/lib/auth/admin.ts";
 import { guardDeps } from "@/lib/auth/deps.ts";
 import { authenticate, isPublicPath } from "@/lib/auth/guard.ts";
@@ -31,8 +32,9 @@ export async function proxy(request: NextRequest) {
   let auth: Awaited<ReturnType<typeof authenticate>>;
   try {
     auth = await authenticate(request.headers.get("cookie"), guardDeps());
-  } catch {
+  } catch (error) {
     // 設定の不備など。通す側には倒さない
+    logApiFailure(request, 503, error);
     return new NextResponse(null, { status: 503, headers: NO_STORE });
   }
 

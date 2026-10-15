@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import type { AuthProvider } from "@/lib/auth/types.ts";
 import type { TokenVerifier } from "@/lib/auth/verify.ts";
 import { handleSubscribe, handleTestNotification, handleUnsubscribe, type PushDeps } from "./handlers.ts";
@@ -142,9 +142,18 @@ describe("購読する", () => {
         throw new Error("table-example is unavailable");
       },
     };
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
     const response = await handleSubscribe(put(subscription(), { cookie: asUser("user-a") }), deps(failing));
+    const lines = log.mock.calls.map((call) => call.map(String).join(" "));
+    log.mockRestore();
     expect(response.status).toBe(503);
     expect(await response.text()).not.toContain("table-example");
+    // 記録は、経路・状態・例外の名前だけ(原因のメッセージと利用者の識別子は出さない)
+    expect(lines.map((line) => JSON.parse(line))).toEqual([
+      { event: "api-failure", path: "/api/push/subscription", status: 503, error: "Error" },
+    ]);
+    expect(lines.join("\n")).not.toContain("table-example");
+    expect(lines.join("\n")).not.toContain("user-a");
   });
 });
 

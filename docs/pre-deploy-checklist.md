@@ -11,7 +11,7 @@
 | 項目 | 確認の方法 |
 | --- | --- |
 | 必須の値が、`.env` にそろっていて、形が合っている | `.env` を `.env.example` と見比べる。足りない、または形が違うと、`packages/infra/lib/config.ts` の検査が、変数の名前だけを示して止まる(`npm test -w @mokumoku-exams/infra` が通る) |
-| 使う機能の任意の値が、そろっている | 通知を使う環境は、`VAPID_PUBLIC_KEY`・`VAPID_PRIVATE_KEY_PARAMETER`・`VAPID_SUBJECT` の 3 つをそろえ、秘密鍵の SSM パラメーターをデプロイの前に作っておく。独自ドメインは、`DOMAIN_NAME` と `CERTIFICATE_ARN` をそろえる。一部だけ渡すと、合成の前に、変数の名前を示して止まる(まったく渡さなければ、その機能は作られない) |
+| 使う機能の任意の値が、そろっている | 通知を使う環境は、`VAPID_PUBLIC_KEY`・`VAPID_PRIVATE_KEY_PARAMETER`・`VAPID_SUBJECT` の 3 つをそろえ、秘密鍵の SSM パラメーターをデプロイの前に作っておく。独自ドメインは、`DOMAIN_NAME` と `CERTIFICATE_ARN` をそろえる。`APP_RESERVED_CONCURRENCY` を渡すときは、アカウントの Lambda の同時実行の上限に、予約しない分を 100 以上残せることを、先に Service Quotas で確かめる(足りないとデプロイが失敗する。[同時実行の上限](./app/infra.md))。一部だけ渡すと、合成の前に、変数の名前を示して止まる(まったく渡さなければ、その機能は作られない) |
 | アプリが読む値が、実行時に読まれる(Lambda の環境変数)ものと、ビルドに埋め込まれるものとで、取り違えられていない | 今の構成では、アプリが読む値(`ORIGIN_VERIFY_VALUE`、`COGNITO_USER_POOL_ID`、`HISTORY_TABLE_NAME`、`VAPID_PUBLIC_KEY` など)は、Lambda の環境変数で、実行時に読む。`NEXT_PUBLIC_` で始まる、ビルドに埋め込まれる値は使っていない。ビルドに埋め込まれる値を足したときは、値を変えるたびに `npm run build` と `npm run build:lambda` をやり直す |
 | アプリが読む環境変数が、アプリの Lambda(`<接頭辞>-web` スタックの関数 `<接頭辞>-app`)へ渡される | `npm run check:env` が通る(アプリが読む名前と、`packages/infra/lib/web-stack.ts` の `environment` を突き合わせる。Lambda が自動で与える `AWS_REGION` と、開発用の `AUTH_FAKE` は除く)。渡す側に足した変数が、アプリで使われているかは、この検査では確かめない。通知の送信の Lambda(`<接頭辞>-push` スタックの関数 `<接頭辞>-push-sender`)に渡す変数と、動的な参照(`env[変数]` など)も対象外なので、送信の Lambda を変えたときは、`packages/infra/lib/push-stack.ts` を見て確かめる |
 | 環境変数の値が、リポジトリのファイルにない | `node scripts/check-commit-secrets.ts` が通る。`.env` が追跡されていない(`git ls-files` に出ない) |
@@ -22,7 +22,7 @@
 
 | 項目 | 確認の方法 |
 | --- | --- |
-| 画面と API が、同じ配信元の同じパスの下で応答する構成のままである | CloudFront の設定(`/_next/static/*` は S3、それ以外は Lambda の Function URL)が、`packages/infra` のスナップショットテスト(`npm test -w @mokumoku-exams/infra`)の差分で意図どおりである |
+| 画面と API が、同じ配信元の同じパスの下で応答する構成のままである | CloudFront の設定(`/_next/static/*` と `public/` のファイル(`/brand/*`・`/icons/*`・`/sw.js`)は S3、それ以外は Lambda の Function URL)が、`packages/infra` のスナップショットテスト(`npm test -w @mokumoku-exams/infra`)の差分で意図どおりである |
 | 合言葉(`x-origin-verify`)の値が、3 か所でそろっている | `.env` の `ORIGIN_VERIFY_VALUE`、Lambda の環境変数、CloudFront のオリジンのヘッダーが、同じ値から作られる(スタックの単体テストが確かめる)。アプリ(`packages/app/src/proxy.ts`)が、合言葉のない要求を 403 で断る |
 
 実際に応答するかは、デプロイ後の確認で扱います。
@@ -31,7 +31,7 @@
 
 | 項目 | 確認の方法 |
 | --- | --- |
-| 認証のコードと設定が、意図どおりである(ID トークンの検証、保護する画面と API の範囲、UserPool の設定、確認コードの文面) | `npm test` が通る。特に `packages/app/src/authorization.test.ts`(画面・API・ファイルの経路の一覧)と、`packages/infra` のテスト。新しい画面・API・`public/` のファイルを足したときは、一覧に足してあり、公開するか保護するかを決めてある |
+| 認証のコードと設定が、意図どおりである(ID トークンの検証、保護する画面と API の範囲、UserPool の設定、確認コードの文面) | `npm test` が通る。特に `packages/app/src/authorization.test.ts`(画面・API・ファイルの経路の一覧)と、`packages/infra` のテスト。新しい画面・API・`public/` のファイルを足したときは、一覧に足してあり、公開するか保護するかを決めてある(`public/` の `/brand/*`・`/icons/*`・`/sw.js` は S3 から配るので、保護できない。公開してよいものだけを置き、ほかの場所に足すときは CloudFront の振り分けにも足す) |
 | Cookie と別サイトからの送信の扱いが、意図どおりである | Cookie が `HttpOnly`・`SameSite=Lax`・本番は `Secure`。状態を変える `POST` が、`Sec-Fetch-Site` で別サイトからのものを断る。詳細は[認証の仕組み](./app/auth.md)の「トークンの扱い」 |
 
 実際にサインインできるかは、デプロイ後の確認で扱います。

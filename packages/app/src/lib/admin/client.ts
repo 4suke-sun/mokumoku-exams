@@ -1,3 +1,5 @@
+import { z } from "zod";
+import { requestJson } from "@/lib/api/client.ts";
 import type { ManagedUser } from "@/lib/auth/user-admin.ts";
 import type { AdminError, AdminUserRow } from "./handlers.ts";
 
@@ -33,19 +35,18 @@ export function createdLabel(createdAt: string | null): string {
 
 export type AdminResult<T> = { ok: true; data: T } | { ok: false; message: string };
 
-async function request<T>(path: string, init?: RequestInit): Promise<AdminResult<T>> {
-  try {
-    const response = await fetch(path, { cache: "no-store", ...init });
-    const data = (await response.json().catch(() => ({}))) as Record<string, unknown>;
-    if (response.ok) return { ok: true, data: data as T };
-    return { ok: false, message: adminMessageFor(data.error) };
-  } catch {
-    return { ok: false, message: adminMessageFor("unavailable") };
-  }
+// 成功の応答の中身は、サーバーの型(AdminUserRow など)をそのまま使う。読めなければ空にする
+const AnyObject = z.record(z.string(), z.unknown()).catch({});
+
+async function request<T>(path: string, body?: unknown): Promise<AdminResult<T>> {
+  const result = await requestJson(
+    path,
+    body === undefined ? { schema: AnyObject } : { method: "POST", body, schema: AnyObject },
+  );
+  return result.ok ? { ok: true, data: result.data as T } : { ok: false, message: adminMessageFor(result.code) };
 }
 
-const postJson = <T>(path: string, body: unknown) =>
-  request<T>(path, { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
+const postJson = <T>(path: string, body: unknown) => request<T>(path, body);
 
 export const fetchUsers = () => request<{ users: AdminUserRow[] }>("/api/admin/users");
 export const inviteUser = (email: string) => postJson<{ user: ManagedUser }>("/api/admin/users", { email });

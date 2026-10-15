@@ -5,10 +5,13 @@
  * lint、型検査、CI の check ジョブと同じ check:*(scripts/lib/verify-plan.ts の CHECK_SCRIPTS)、validate:data、関係するテスト、関係する build を順に実行し、失敗した段階の名前を示して
  * 終了コード 1 で止まる。段階ごとの時間も表示する(遅い・止まる段階の切り分けのため)。
  * 関係するワークスペースは、`origin/main` との差分と、未コミット・未追跡の変更から選ぶ(CI と同じ規則)。
+ * 段階ごとの時間は、手元の計測(node scripts/metrics.ts)のために記録する。
  * E2E(npm run test:e2e)は含めない。
  */
-import { spawnSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
+import { appendFileSync } from "node:fs";
 import { git } from "./lib/git-check.ts";
+import { metricsPath, serializeMetric } from "./lib/metrics.ts";
 import { buildStages, formatResult, selectWorkspaces } from "./lib/verify-plan.ts";
 
 function changedFiles(): string[] | null {
@@ -21,6 +24,19 @@ function changedFiles(): string[] | null {
     return [...new Set(lines.filter((l) => l !== ""))];
   } catch {
     return null; // origin/main がないなど。変更が分からないときは、すべて対象にする
+  }
+}
+
+/** 段階ごとの時間を、手元の計測(.git の共有領域。リポジトリには入らない)へ足す。記録できなくても、検査の結果には影響しない。 */
+function recordTimings(stages: { name: string; ms: number; ok: boolean }[]): void {
+  try {
+    const common = execFileSync("git", ["rev-parse", "--path-format=absolute", "--git-common-dir"], {
+      encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
+    }).trim();
+    appendFileSync(metricsPath(common), serializeMetric({ type: "verify", at: new Date().toISOString(), stages }));
+  } catch {
+    // 計測は任意。記録できないときは何もしない
   }
 }
 
@@ -42,4 +58,5 @@ for (const stage of buildStages(selection)) {
   if (!ok) break;
 }
 process.stdout.write(`\n${formatResult(results)}`);
+recordTimings(results);
 process.exitCode = results.every((r) => r.ok) ? 0 : 1;

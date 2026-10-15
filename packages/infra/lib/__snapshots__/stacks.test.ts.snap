@@ -277,6 +277,33 @@ exports[`PushStack > 合成すると_スナップショットと一致する 1`]
       },
       "Type": "AWS::Lambda::Permission",
     },
+    "SenderErrorsAlarm2ED9BB62": {
+      "Properties": {
+        "AlarmActions": [
+          {
+            "Fn::ImportValue": "Alarms:ExportsOutputRefAlarmTopicD01E77F99DF7FB73",
+          },
+        ],
+        "AlarmDescription": "毎日の通知を送る Lambda でエラーが出ています",
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "Dimensions": [
+          {
+            "Name": "FunctionName",
+            "Value": {
+              "Ref": "SenderFunction5DD1AB71",
+            },
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "Errors",
+        "Namespace": "AWS/Lambda",
+        "Period": 300,
+        "Statistic": "Sum",
+        "Threshold": 1,
+        "TreatMissingData": "notBreaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
     "SenderFunction5DD1AB71": {
       "DependsOn": [
         "SenderFunctionServiceRoleDefaultPolicy06C14206",
@@ -464,6 +491,41 @@ exports[`WebStack > 合成すると_スナップショットと一致する 1`] 
   "Resources": {
     "AlarmTopicD01E77F9": {
       "Type": "AWS::SNS::Topic",
+    },
+    "ApiServerErrorsAlarm602F142D": {
+      "Properties": {
+        "AlarmActions": [
+          {
+            "Ref": "AlarmTopicD01E77F9",
+          },
+        ],
+        "AlarmDescription": "アプリが 5xx を返しています(API と、入口の認証の検証)",
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "EvaluationPeriods": 1,
+        "MetricName": "ApiServerErrors",
+        "Namespace": "test",
+        "Period": 300,
+        "Statistic": "Sum",
+        "Threshold": 1,
+        "TreatMissingData": "notBreaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "ApiServerErrorsFilter877B8DB1": {
+      "Properties": {
+        "FilterPattern": "{ ($.event = "api-failure") && ($.status >= 500) }",
+        "LogGroupName": {
+          "Ref": "AppLogGroup7D8CD952",
+        },
+        "MetricTransformations": [
+          {
+            "MetricName": "ApiServerErrors",
+            "MetricNamespace": "test",
+            "MetricValue": "1",
+          },
+        ],
+      },
+      "Type": "AWS::Logs::MetricFilter",
     },
     "AppErrorsAlarm7BC037FB": {
       "Properties": {
@@ -711,6 +773,14 @@ exports[`WebStack > 合成すると_スナップショットと一致する 1`] 
           },
           {
             "Key": "aws-cdk:cr-owned:08fb5b2d",
+            "Value": "true",
+          },
+          {
+            "Key": "aws-cdk:cr-owned:4e1fee73",
+            "Value": "true",
+          },
+          {
+            "Key": "aws-cdk:cr-owned:bf63bbfc",
             "Value": "true",
           },
         ],
@@ -1085,6 +1155,104 @@ exports[`WebStack > 合成すると_スナップショットと一致する 1`] 
       },
       "Type": "AWS::IAM::Role",
     },
+    "DeployPublicAssetsAwsCliLayerE43B5BE2": {
+      "Properties": {
+        "Content": {
+          "S3Bucket": "cdk-example-assets-123456789012-us-east-1",
+          "S3Key": "98f62bef9320f8c0a0a7be21d7c746f069131f196f51ffe3008a6bb730b368ec.zip",
+        },
+        "Description": "/opt/awscli/aws",
+      },
+      "Type": "AWS::Lambda::LayerVersion",
+    },
+    "DeployPublicAssetsCustomResource008461C4": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "DestinationBucketName": {
+          "Ref": "AssetsBucket5CB76180",
+        },
+        "DistributionId": {
+          "Ref": "Distribution830FAC52",
+        },
+        "DistributionPaths": [
+          "/brand/*",
+          "/icons/*",
+        ],
+        "Exclude": [
+          "sw.js",
+        ],
+        "OutputObjectKeys": true,
+        "Prune": false,
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536",
+            "Arn",
+          ],
+        },
+        "SourceBucketNames": [
+          "cdk-example-assets-123456789012-us-east-1",
+        ],
+        "SourceObjectKeys": [
+          "f7f0ebf2be110e9dbc9049eb464bdda299bf5b9dd73c00e917f75135fc382620.zip",
+        ],
+        "SystemMetadata": {
+          "cache-control": "max-age=86400, public",
+        },
+        "WaitForDistributionInvalidation": true,
+      },
+      "Type": "Custom::CDKBucketDeployment",
+      "UpdateReplacePolicy": "Delete",
+    },
+    "DeployServiceWorkerAwsCliLayer03649585": {
+      "Properties": {
+        "Content": {
+          "S3Bucket": "cdk-example-assets-123456789012-us-east-1",
+          "S3Key": "98f62bef9320f8c0a0a7be21d7c746f069131f196f51ffe3008a6bb730b368ec.zip",
+        },
+        "Description": "/opt/awscli/aws",
+      },
+      "Type": "AWS::Lambda::LayerVersion",
+    },
+    "DeployServiceWorkerCustomResource5B733FF8": {
+      "DeletionPolicy": "Delete",
+      "Properties": {
+        "DestinationBucketName": {
+          "Ref": "AssetsBucket5CB76180",
+        },
+        "DistributionId": {
+          "Ref": "Distribution830FAC52",
+        },
+        "DistributionPaths": [
+          "/sw.js",
+        ],
+        "Exclude": [
+          "*",
+        ],
+        "Include": [
+          "sw.js",
+        ],
+        "OutputObjectKeys": true,
+        "Prune": false,
+        "ServiceToken": {
+          "Fn::GetAtt": [
+            "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536",
+            "Arn",
+          ],
+        },
+        "SourceBucketNames": [
+          "cdk-example-assets-123456789012-us-east-1",
+        ],
+        "SourceObjectKeys": [
+          "f7f0ebf2be110e9dbc9049eb464bdda299bf5b9dd73c00e917f75135fc382620.zip",
+        ],
+        "SystemMetadata": {
+          "cache-control": "no-cache",
+        },
+        "WaitForDistributionInvalidation": true,
+      },
+      "Type": "Custom::CDKBucketDeployment",
+      "UpdateReplacePolicy": "Delete",
+    },
     "DeployStaticAssetsAwsCliLayer36E8DF0F": {
       "Properties": {
         "Content": {
@@ -1108,7 +1276,7 @@ exports[`WebStack > 合成すると_スナップショットと一致する 1`] 
           "/_next/static/*",
         ],
         "OutputObjectKeys": true,
-        "Prune": true,
+        "Prune": false,
         "ServiceToken": {
           "Fn::GetAtt": [
             "CustomCDKBucketDeployment8693BB64968944B69AAFB0CC9EB8756C81C01536",
@@ -1121,6 +1289,9 @@ exports[`WebStack > 合成すると_スナップショットと一致する 1`] 
         "SourceObjectKeys": [
           "c75c679983f0719a21a9a547606cc8e0927ac3a5a94b6377680177fa8185dfc5.zip",
         ],
+        "SystemMetadata": {
+          "cache-control": "public, max-age=31536000, immutable",
+        },
         "WaitForDistributionInvalidation": true,
       },
       "Type": "Custom::CDKBucketDeployment",
@@ -1138,6 +1309,48 @@ exports[`WebStack > 合成すると_スナップショットと一致する 1`] 
               "CachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6",
               "Compress": true,
               "PathPattern": "/_next/static/*",
+              "ResponseHeadersPolicyId": {
+                "Ref": "SecurityHeadersE66B69D3",
+              },
+              "TargetOriginId": "WebDistributionOrigin2BAFA1771",
+              "ViewerProtocolPolicy": "redirect-to-https",
+            },
+            {
+              "AllowedMethods": [
+                "GET",
+                "HEAD",
+              ],
+              "CachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6",
+              "Compress": true,
+              "PathPattern": "/brand/*",
+              "ResponseHeadersPolicyId": {
+                "Ref": "SecurityHeadersE66B69D3",
+              },
+              "TargetOriginId": "WebDistributionOrigin2BAFA1771",
+              "ViewerProtocolPolicy": "redirect-to-https",
+            },
+            {
+              "AllowedMethods": [
+                "GET",
+                "HEAD",
+              ],
+              "CachePolicyId": "658327ea-f89d-4fab-a63d-7e88639e58f6",
+              "Compress": true,
+              "PathPattern": "/icons/*",
+              "ResponseHeadersPolicyId": {
+                "Ref": "SecurityHeadersE66B69D3",
+              },
+              "TargetOriginId": "WebDistributionOrigin2BAFA1771",
+              "ViewerProtocolPolicy": "redirect-to-https",
+            },
+            {
+              "AllowedMethods": [
+                "GET",
+                "HEAD",
+              ],
+              "CachePolicyId": "4135ea2d-6df8-44a3-9df3-4b5a84be39ad",
+              "Compress": true,
+              "PathPattern": "/sw.js",
               "ResponseHeadersPolicyId": {
                 "Ref": "SecurityHeadersE66B69D3",
               },
@@ -1237,6 +1450,15 @@ exports[`WebStack > 合成すると_スナップショットと一致する 1`] 
     "SecurityHeadersE66B69D3": {
       "Properties": {
         "ResponseHeadersPolicyConfig": {
+          "CustomHeadersConfig": {
+            "Items": [
+              {
+                "Header": "Content-Security-Policy-Report-Only",
+                "Override": true,
+                "Value": "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self' data:; connect-src 'self'; worker-src 'self'; manifest-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'",
+              },
+            ],
+          },
           "Name": "WebSecurityHeaders36D129D4",
           "SecurityHeadersConfig": {
             "ContentTypeOptions": {

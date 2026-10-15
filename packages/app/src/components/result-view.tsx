@@ -9,24 +9,26 @@ import { Confetti } from "@/components/confetti.tsx";
 import { type BarRow, DomainBars } from "@/components/domain-bars.tsx";
 import { EmptyState } from "@/components/empty-state.tsx";
 import { ExplanationView } from "@/components/explanation-view.tsx";
+import { MoreResults } from "@/components/more-results.tsx";
 import { Notice } from "@/components/notice.tsx";
 import { ResultSkeleton } from "@/components/page-skeletons.tsx";
 import { QuestionChips } from "@/components/question-chips.tsx";
 import { ReferenceList } from "@/components/reference-list.tsx";
 import { RichText } from "@/components/rich-text.tsx";
+import { FreeTextScore } from "@/components/rubric-view.tsx";
 import { ScoreRing } from "@/components/score-ring.tsx";
+import type { QuestionOutline } from "@/lib/dashboard.ts";
 import { attemptDomains, averageTimeMs } from "@/lib/dashboard.ts";
 import { domainColorClasses } from "@/lib/domain-color.ts";
 import { formatAnswerTime, formatDate } from "@/lib/format.ts";
-import { judgeFreeText } from "@/lib/free-text.ts";
-import { fetchServerResult, fetchServerResults, postServerResult } from "@/lib/history/client.ts";
-import { mergeResults, pendingMigration } from "@/lib/history/merge.ts";
+import { fetchServerResult, fetchServerResultsPage, postServerResult } from "@/lib/history/client.ts";
+import { appendResults, mergeResults, pendingMigration } from "@/lib/history/merge.ts";
+import { fetchQuestions } from "@/lib/questions/client.ts";
 import {
   answerFor,
   displayLabels,
   isQuestionCorrect,
   labelKeys,
-  newSession,
   orderChoices,
   passLinePercent,
   requestedResultAt,
@@ -36,23 +38,26 @@ import {
 } from "@/lib/quiz.ts";
 import { recentOutcomes } from "@/lib/recent-outcomes.ts";
 import { sectionPassLine, sectionStatus, sectionsOf } from "@/lib/sections.ts";
+import { SESSION_SAVE_FAILED, startSession } from "@/lib/start-session.ts";
 import {
   browserStore,
   clearResults,
   loadResults,
   loadSectionProgress,
-  loadSettings,
   loadStageProgress,
   type Result,
   type SectionProgress,
   type StageCheck,
-  saveSession,
 } from "@/lib/storage.ts";
 import { STAGE_PASS_PERCENT } from "@/lib/study-stages.ts";
 import type { ChoiceQuestion, FreeTextQuestion, PublishedExam, Question } from "@/lib/types.ts";
 import { useStorageOwner } from "@/lib/use-storage-owner.ts";
 
-type Props = { exam: PublishedExam; questions: Question[] };
+/**
+ * `outline` は、資格の全問の要約(採点・分野・選択肢の記号)。詳しく出す回の問題(本文・解説)は、開いたあとに、
+ * その回の分だけを取る(資格の全問を、画面の応答に入れない)。
+ */
+type Props = { exam: PublishedExam; outline: QuestionOutline[] };
 
 type State =
   | { status: "loading" }
@@ -65,6 +70,8 @@ type State =
       source: "server" | "local";
       pending: Result[];
       target?: Result | "not-found";
+      /** サーバーの一覧の続きを取る位置(続きがなければ null) */
+      next: string | null;
     };
 
 function keysLabel(keys: readonly string[]): string {
@@ -91,7 +98,7 @@ function RecentOutcomeMarks({ outcomes }: { outcomes: readonly boolean[] }) {
   );
 }
 
-export function ResultView({ exam, questions }: Props) {
+export function ResultView({ exam, outline }: Props) {
   const router = useRouter();
   const [state, setState] = useState<State>({ status: "loading" });
   const [retryError, setRetryError] = useState<string | null>(null);
@@ -111,8 +118,9 @@ export function ResultView({ exam, questions }: Props) {
       setStageCheck(loadStageProgress(browserStore(), exam.examCode).last ?? null);
       setSectionCheck(loadSectionProgress(browserStore(), exam.examCode).last ?? null);
       const at = requestedResultAt(window.location.search);
-      const server = await fetchServerResults(exam.examCode);
+      const page = await fetchServerResultsPage(exam.examCode);
       if (!active) return;
+      const server = page?.results ?? null;
       const pending = server === null ? [] : pendingMigration(local, server);
       const results = server === null ? local : mergeResults(server, pending);
       // 1 回分を開くとき: 一覧になければ(古い結果)、アカウントから 1 件だけ取る
@@ -126,12 +134,36 @@ export function ResultView({ exam, questions }: Props) {
         }
         target ??= "not-found";
       }
-      setState({ status: "ready", results, source: server === null ? "local" : "server", pending, target });
+      setState({
+        status: "ready",
+        results,
+        source: server === null ? "local" : "server",
+        pending,
+        target,
+        next: page?.next ?? null,
+      });
     })();
     return () => {
       active = false;
     };
   }, [exam.examCode, owner]);
+
+  // 詳しく出す回(`?at=` の回、なければ最新)の問題だけを取る
+  const shown =
+    state.status === "ready" && state.target !== "not-found" ? (state.target ?? state.results[0]) : undefined;
+  const [details, setDetails] = useState<{ at: string; questions: Map<string, Question> | null } | null>(null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: 詳しく出す回が変わったときだけ取り直す
+  useEffect(() => {
+    if (!shown) return;
+    let active = true;
+    void fetchQuestions(exam.examCode, shown.questionIds).then((found) => {
+      if (!active) return;
+      setDetails({ at: shown.finishedAt, questions: found ? new Map(found.map((q) => [q.questionId, q])) : null });
+    });
+    return () => {
+      active = false;
+    };
+  }, [exam.examCode, shown?.finishedAt]);
 
   /** この端末にだけある記録を、アカウントに移す。すべて移せたときだけ、端末の記録を消す。 */
   async function migrate() {
@@ -168,9 +200,13 @@ export function ResultView({ exam, questions }: Props) {
   const latest = state.target ?? state.results[0];
   const isNewest = latest !== undefined && latest.finishedAt === state.results[0]?.finishedAt;
   const previous = state.results.filter((r) => r.finishedAt !== latest?.finishedAt);
-  const byId = new Map(questions.map((q) => [q.questionId, q]));
+  if (latest && details?.at !== latest.finishedAt) return <ResultSkeleton />;
+  if (latest && details?.questions === null) {
+    return <Notice kind="error">問題を読み込めませんでした。時間をおいて、開き直してください。</Notice>;
+  }
+  const byId = new Map(outline.map((q) => [q.questionId, q]));
   const answered = latest
-    ? latest.questionIds.map((id) => byId.get(id)).filter((q): q is Question => q !== undefined)
+    ? latest.questionIds.map((id) => details?.questions?.get(id)).filter((q): q is Question => q !== undefined)
     : [];
 
   if (!latest || answered.length === 0) {
@@ -204,22 +240,20 @@ export function ResultView({ exam, questions }: Props) {
 
   /** 間違えた問題(と自信なし)だけで、新しい出題を始める。結果は、通常の結果として保存される */
   function retry() {
-    const store = browserStore();
-    const { shuffleChoices, reveal } = loadSettings(store);
     const items = retryRows.map(({ question }) => ({
       questionId: question.questionId,
       choiceKeys: question.questionType === "free-text" ? [] : question.choices.map((c) => c.key),
     }));
-    const session = newSession(exam.examCode, items, { shuffleChoices }, Math.random, new Date());
-    if (!saveSession(store, reveal === "each" ? { ...session, reveal } : session)) {
-      setRetryError("この端末では、出題の状態を保存できません。ブラウザの設定を確認してください。");
+    const href = startSession(browserStore(), exam.examCode, items);
+    if (!href) {
+      setRetryError(SESSION_SAVE_FAILED);
       return;
     }
-    router.push(`/exams/${exam.examCode}/play`);
+    router.push(href);
   }
   const wrongCount = allRows.filter((row) => !row.correct).length;
   // 保存した結果(最大 10 回)から、問題ごとの直近の正誤を出す(新しく保存はしない)
-  const outcomes = recentOutcomes(state.results, questions);
+  const outcomes = recentOutcomes(state.results, outline);
   // 見直すときも、元の問題番号を保つ(「問題 3」は、結果の中の 3 問目のまま)
   const rows = wrongOnly ? allRows.filter((row) => !row.correct) : allRows;
   const passLine = passLinePercent(exam);
@@ -227,7 +261,7 @@ export function ResultView({ exam, questions }: Props) {
   // 回答時間のない古い結果では、平均を出さない
   const average = averageTimeMs(latest);
   const names = new Map(exam.domains.map((d) => [d.code, d.name]));
-  const domainRows: BarRow[] = attemptDomains(latest, questions, exam.domains).map((row) => {
+  const domainRows: BarRow[] = attemptDomains(latest, outline, exam.domains).map((row) => {
     const color = domainColorClasses(exam.domains, row.domain);
     const time = row.avgTimeMs === null ? "" : `、平均 ${formatAnswerTime(row.avgTimeMs)}/問`;
     return {
@@ -244,42 +278,28 @@ export function ResultView({ exam, questions }: Props) {
   const stage = stageCheck && stageCheck.finishedAt === latest.finishedAt ? stageCheck : null;
   // 直近の結果がセクションの出題のときだけ、セクションの合否と、次のセクションを出す
   const section = sectionCheck && sectionCheck.finishedAt === latest.finishedAt ? sectionCheck : null;
-  const sections = sectionsOf(questions.map((q) => q.questionId));
+  const sections = sectionsOf(outline.map((q) => q.questionId));
   const nextSection = section && section.section + 1 < sections.length ? section.section + 1 : null;
 
   /** 次のセクションの出題を始める */
   function startSection(index: number) {
     const ids = sections[index] ?? [];
-    const store = browserStore();
-    const { shuffleChoices, reveal } = loadSettings(store);
     const items = ids.flatMap((id) => {
       const question = byId.get(id);
-      return question
-        ? [
-            {
-              questionId: id,
-              choiceKeys: question.questionType === "free-text" ? [] : question.choices.map((c) => c.key),
-            },
-          ]
-        : [];
+      return question ? [{ questionId: id, choiceKeys: question.choiceKeys }] : [];
     });
-    const session = {
-      ...newSession(exam.examCode, items, { shuffleChoices }, Math.random, new Date()),
-      section: index,
-    };
-    if (!saveSession(store, reveal === "each" ? { ...session, reveal } : session)) {
-      setRetryError("この端末では、出題の状態を保存できません。ブラウザの設定を確認してください。");
+    const href = startSession(browserStore(), exam.examCode, items, { section: index });
+    if (!href) {
+      setRetryError(SESSION_SAVE_FAILED);
       return;
     }
-    router.push(`/exams/${exam.examCode}/play`);
+    router.push(href);
   }
 
   return (
     <section className="space-y-8">
       {state.source === "local" ? (
-        <p role="status" className="text-sm text-muted">
-          サーバーに接続できないため、この端末に保存した記録を表示しています。
-        </p>
+        <Notice kind="info">サーバーに接続できないため、この端末に保存した記録を表示しています。</Notice>
       ) : null}
       {state.pending.length > 0 ? (
         <div role="status" className="card space-y-2 p-4">
@@ -497,7 +517,7 @@ export function ResultView({ exam, questions }: Props) {
               <ul className="space-y-1 text-sm">
                 {previous.map((past) => {
                   const pastScore = score(
-                    past.questionIds.map((id) => byId.get(id)).filter((q): q is Question => q !== undefined),
+                    past.questionIds.map((id) => byId.get(id)).filter((q) => q !== undefined),
                     past.answers,
                     past.textAnswers,
                   );
@@ -520,6 +540,17 @@ export function ResultView({ exam, questions }: Props) {
                   );
                 })}
               </ul>
+              <MoreResults
+                examCode={exam.examCode}
+                next={state.next}
+                onMore={(more) =>
+                  setState((current) =>
+                    current.status === "ready"
+                      ? { ...current, results: appendResults(current.results, more.results), next: more.next }
+                      : current,
+                  )
+                }
+              />
             </div>
           ) : null}
         </div>
@@ -552,32 +583,13 @@ function ChoiceDetail({
 
 /** 自由記述の問題の、回答と、観点ごとの判定と点数 */
 function FreeTextDetail({ question, answer }: { question: FreeTextQuestion; answer: string }) {
-  const judgement = judgeFreeText(question.rubric, answer);
   return (
     <div className="space-y-3 text-sm">
       <div className="space-y-1">
         <h3 className="font-bold">あなたの回答</h3>
         <p className="whitespace-pre-wrap rounded border border-line p-2">{answer.trim() === "" ? "未回答" : answer}</p>
       </div>
-      <div className="space-y-1">
-        <h3 className="font-bold">観点ごとの判定</h3>
-        <ul className="space-y-1">
-          {judgement.criteria.map((criterion) => (
-            <li key={criterion.name} className="flex justify-between gap-3 rounded border border-line p-2">
-              <span className={criterion.met ? "text-correct" : "text-incorrect"}>
-                {criterion.met ? "○ 満たしている" : "× 満たしていない"}
-                <span className="ml-2 text-fg">{criterion.name}</span>
-              </span>
-              <span>
-                {criterion.met ? criterion.points : 0} / {criterion.points} 点
-              </span>
-            </li>
-          ))}
-        </ul>
-      </div>
-      <p className="text-muted">
-        得点: {judgement.earned} / {judgement.total} 点(合格点 {judgement.passingPoints} 点)
-      </p>
+      <FreeTextScore rubric={question.rubric} answer={answer} />
     </div>
   );
 }

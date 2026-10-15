@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "直前チェック(ブックマー�
 
 export default async function BookmarksPage() {
   const exams = await Promise.all(
-    listPublishedExams().map(async (exam) => ({ exam, questions: await loadQuestions(exam) })),
+    listPublishedExams().map(async (exam) => ({ exam, order: (await loadQuestions(exam)).map((q) => q.questionId) })),
   );
 
   return (
@@ -15,8 +15,8 @@ export default async function BookmarksPage() {
         <h1 className="h1">直前チェック(ブックマーク)</h1>
         <p className="text-sm text-muted">ブックマークした問題を、正解と解説つきで見直します。</p>
       </div>
-      {exams.map(({ exam, questions }) => (
-        <BookmarkCheck key={exam.examCode} exam={exam} questions={questions} />
+      {exams.map(({ exam, order }) => (
+        <BookmarkCheck key={exam.examCode} exam={exam} order={order} />
       ))}
     </section>
   );
