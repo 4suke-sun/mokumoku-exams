@@ -14,18 +14,28 @@ import {
 import { DATE_PATTERN, type StudyDay } from "@/lib/study-days.ts";
 import { RESULTS_PAGE_SIZE } from "./limits.ts";
 
-const ListSchema = z.object({ results: z.array(ResultSchema).max(RESULTS_PAGE_SIZE) });
+const ListSchema = z.object({
+  results: z.array(ResultSchema).max(RESULTS_PAGE_SIZE),
+  next: z.string().nullable().optional(),
+});
 const OneSchema = z.object({ result: ResultSchema });
 
+/** 結果の一覧の 1 ページ。`next` は、続きを取るときに渡す位置(続きがなければ null) */
+export type ResultsPage = { results: Result[]; next: string | null };
+
 /**
- * サーバーに保存した自分の結果を取得する。ログインが切れた・通信できない・サーバーが失敗したときは null
- * (呼び出し側が、この端末の記録に切り替える)。
+ * サーバーに保存した自分の結果を、新しい順に 1 ページ取得する。`before` を渡すと、その続きを取る。
+ * ログインが切れた・通信できない・サーバーが失敗したときは null(呼び出し側が、この端末の記録に切り替える)。
  */
+export async function fetchServerResultsPage(examCode: string, before?: string): Promise<ResultsPage | null> {
+  const query = `examCode=${encodeURIComponent(examCode)}${before ? `&before=${encodeURIComponent(before)}` : ""}`;
+  const result = await requestJson(`/api/history/results?${query}`, { schema: ListSchema });
+  return result.ok ? { results: result.data.results, next: result.data.next ?? null } : null;
+}
+
+/** サーバーに保存した自分の結果の、最初のページ。取得できなければ null。 */
 export async function fetchServerResults(examCode: string): Promise<Result[] | null> {
-  const result = await requestJson(`/api/history/results?examCode=${encodeURIComponent(examCode)}`, {
-    schema: ListSchema,
-  });
-  return result.ok ? result.data.results : null;
+  return (await fetchServerResultsPage(examCode))?.results ?? null;
 }
 
 /**

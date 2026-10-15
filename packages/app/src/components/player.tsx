@@ -27,6 +27,7 @@ import {
   labelKeys,
   orderChoices,
   remainingMs,
+  resultDetailHref,
   sortKeys,
   textAnswerFor,
 } from "@/lib/quiz.ts";
@@ -277,7 +278,7 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
       const asked = session.questionIds.flatMap((id) => byId.get(id) ?? []);
       recordSessionChecks(store, session, asked, result.finishedAt, putSectionProgress);
       clearSession(browserStore(), exam.examCode);
-      router.push(`/exams/${exam.examCode}/result`);
+      router.push(resultDetailHref(exam.examCode, result.finishedAt));
     } finally {
       finishing.current = false;
     }

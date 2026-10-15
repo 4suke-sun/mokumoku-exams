@@ -77,7 +77,7 @@ export function AchievementsView({ entries }: { entries: ExamEntry[] }) {
           />
         ) : (
           <ul className="motion-stagger grid gap-4 lg:grid-cols-2">
-            {attempted.map(({ entry, summary }) => {
+            {attempted.map(({ entry, summary, partial }) => {
               const best = Math.max(...summary.recent.map((r) => r.percent));
               const latest = summary.recent[0];
               return (
@@ -98,6 +98,11 @@ export function AchievementsView({ entries }: { entries: ExamEntry[] }) {
                         <dd className="text-lg font-bold">{latest?.percent ?? 0}%</dd>
                       </div>
                     </dl>
+                    {partial ? (
+                      <p className="text-xs text-muted">
+                        受験回数と最高点は、直近 {summary.attempts} 回の結果から数えています。
+                      </p>
+                    ) : null}
                     <div className="flex flex-wrap gap-x-4 gap-y-1 text-sm">
                       {latest ? (
                         <Link

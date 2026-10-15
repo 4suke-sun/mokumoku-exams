@@ -9,6 +9,7 @@ import { Confetti } from "@/components/confetti.tsx";
 import { type BarRow, DomainBars } from "@/components/domain-bars.tsx";
 import { EmptyState } from "@/components/empty-state.tsx";
 import { ExplanationView } from "@/components/explanation-view.tsx";
+import { MoreResults } from "@/components/more-results.tsx";
 import { Notice } from "@/components/notice.tsx";
 import { ResultSkeleton } from "@/components/page-skeletons.tsx";
 import { QuestionChips } from "@/components/question-chips.tsx";
@@ -19,8 +20,8 @@ import { ScoreRing } from "@/components/score-ring.tsx";
 import { attemptDomains, averageTimeMs } from "@/lib/dashboard.ts";
 import { domainColorClasses } from "@/lib/domain-color.ts";
 import { formatAnswerTime, formatDate } from "@/lib/format.ts";
-import { fetchServerResult, fetchServerResults, postServerResult } from "@/lib/history/client.ts";
-import { mergeResults, pendingMigration } from "@/lib/history/merge.ts";
+import { fetchServerResult, fetchServerResultsPage, postServerResult } from "@/lib/history/client.ts";
+import { appendResults, mergeResults, pendingMigration } from "@/lib/history/merge.ts";
 import {
   answerFor,
   displayLabels,
@@ -63,6 +64,8 @@ type State =
       source: "server" | "local";
       pending: Result[];
       target?: Result | "not-found";
+      /** サーバーの一覧の続きを取る位置(続きがなければ null) */
+      next: string | null;
     };
 
 function keysLabel(keys: readonly string[]): string {
@@ -109,8 +112,9 @@ export function ResultView({ exam, questions }: Props) {
       setStageCheck(loadStageProgress(browserStore(), exam.examCode).last ?? null);
       setSectionCheck(loadSectionProgress(browserStore(), exam.examCode).last ?? null);
       const at = requestedResultAt(window.location.search);
-      const server = await fetchServerResults(exam.examCode);
+      const page = await fetchServerResultsPage(exam.examCode);
       if (!active) return;
+      const server = page?.results ?? null;
       const pending = server === null ? [] : pendingMigration(local, server);
       const results = server === null ? local : mergeResults(server, pending);
       // 1 回分を開くとき: 一覧になければ(古い結果)、アカウントから 1 件だけ取る
@@ -124,7 +128,14 @@ export function ResultView({ exam, questions }: Props) {
         }
         target ??= "not-found";
       }
-      setState({ status: "ready", results, source: server === null ? "local" : "server", pending, target });
+      setState({
+        status: "ready",
+        results,
+        source: server === null ? "local" : "server",
+        pending,
+        target,
+        next: page?.next ?? null,
+      });
     })();
     return () => {
       active = false;
@@ -509,6 +520,17 @@ export function ResultView({ exam, questions }: Props) {
                   );
                 })}
               </ul>
+              <MoreResults
+                examCode={exam.examCode}
+                next={state.next}
+                onMore={(more) =>
+                  setState((current) =>
+                    current.status === "ready"
+                      ? { ...current, results: appendResults(current.results, more.results), next: more.next }
+                      : current,
+                  )
+                }
+              />
             </div>
           ) : null}
         </div>

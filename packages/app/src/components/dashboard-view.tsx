@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useId, useState } from "react";
 import { EmptyState } from "@/components/empty-state.tsx";
+import { MoreResults } from "@/components/more-results.tsx";
 import { Notice, type NoticeKind } from "@/components/notice.tsx";
 import { DashboardSkeleton } from "@/components/page-skeletons.tsx";
 import { PredictionPanel } from "@/components/prediction-panel.tsx";
@@ -20,8 +21,10 @@ import { domainColorClasses } from "@/lib/domain-color.ts";
 import { formatDate } from "@/lib/format.ts";
 import { fetchBookmarks, fetchDays, fetchGoal, fetchReview, putGoal } from "@/lib/history/client.ts";
 import { loadExamResults } from "@/lib/history/load.ts";
+import { appendResults } from "@/lib/history/merge.ts";
 import { EARLIEST_GOAL_DATE, LATEST_GOAL_DATE } from "@/lib/history/schema.ts";
 import { domainSelectHref, resultDetailHref } from "@/lib/quiz.ts";
+import type { Result } from "@/lib/storage.ts";
 import { daysBetween, jstDate, type StudyDay } from "@/lib/study-days.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 import { useStorageOwner } from "@/lib/use-storage-owner.ts";
@@ -36,6 +39,10 @@ type State =
       summary: DashboardSummary;
       domains: DomainStat[];
       marks: MarkTally;
+      /** 集計に使った結果(「もっと見る」で続きを足すと、集計し直す) */
+      results: Result[];
+      /** サーバーの一覧の続きを取る位置(続きがなければ null)。続きがあるときの集計は、読み込んだ範囲の値 */
+      next: string | null;
       source: "server" | "local";
       review: number | null;
       bookmarks: number | null;
@@ -45,6 +52,17 @@ type State =
       /** 日本時間の今日 */
       today: string;
     };
+
+/** 読み込んだ結果から、まとめ・分野ごとの正答率・印の数を数える */
+function measure(results: Result[], questions: readonly Question[], exam: PublishedExam) {
+  const scored = questions.map(toScored);
+  return {
+    results,
+    summary: summarize(results, scored, exam),
+    domains: domainBreakdown(results, scored),
+    marks: markTally(results, scored),
+  };
+}
 
 /** 資格の学習の状況(正答率、学習量、合格予測)を表示する。 */
 export function DashboardView({ exam, questions }: Props) {
@@ -65,15 +83,13 @@ export function DashboardView({ exam, questions }: Props) {
       ]);
       if (!active) return;
       // 結果の画面と同じく、サーバーを正とし、この端末にだけ残っている記録も合わせて数える
-      const { results, source } = loaded;
-      const scored = questions.map(toScored);
+      const { results, source, next } = loaded;
       const known = new Set(questions.map((q) => q.questionId));
       const count = (ids: string[] | null) => (ids ? ids.filter((id) => known.has(id)).length : null);
       setState({
         status: "ready",
-        summary: summarize(results, scored, exam),
-        domains: domainBreakdown(results, scored),
-        marks: markTally(results, scored),
+        ...measure(results, questions, exam),
+        next,
         source,
         review: count(review),
         bookmarks: count(bookmarks),
@@ -152,6 +168,12 @@ export function DashboardView({ exam, questions }: Props) {
             </div>
           ))}
         </dl>
+        {state.next !== null ? (
+          <p className="text-sm text-muted">
+            直近 {summary.attempts}{" "}
+            回の結果から数えています。「これまでの結果」の「もっと見る」で、古い結果も含めて数え直します。
+          </p>
+        ) : null}
       </div>
 
       <div className="space-y-2">
@@ -169,6 +191,21 @@ export function DashboardView({ exam, questions }: Props) {
             </li>
           ))}
         </ul>
+        <MoreResults
+          examCode={exam.examCode}
+          next={state.next}
+          onMore={(more) =>
+            setState((current) =>
+              current.status === "ready"
+                ? {
+                    ...current,
+                    ...measure(appendResults(current.results, more.results), questions, exam),
+                    next: more.next,
+                  }
+                : current,
+            )
+          }
+        />
       </div>
 
       <div className="space-y-2">
@@ -187,8 +224,8 @@ export function DashboardView({ exam, questions }: Props) {
           </li>
         </ul>
         <p className="text-sm text-muted">
-          復習プールやブックマークの問題は、モード選択の「出題の対象」で選べます。印の数は、読み込んだ結果(直近{" "}
-          {summary.attempts} 回)で、印を付けた問題の数です。
+          復習プールやブックマークの問題は、モード選択の「出題の対象」で選べます。印の数は、読み込んだ{" "}
+          {summary.attempts} 回の結果で、印を付けた問題の数です。
         </p>
       </div>
     </section>

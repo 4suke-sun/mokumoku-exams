@@ -17,6 +17,8 @@ import { Player } from "./player.tsx";
 
 const push = vi.fn();
 vi.mock("next/navigation", () => ({ useRouter: () => ({ push }) }));
+/** 採点のあとは、いま採点した結果を指定して、結果の画面へ移る */
+const RESULT_DETAIL = /^\/exams\/TEST\/result\?at=\d{4}-/;
 
 const exam = { examCode: "TEST", name: "テスト資格", shortName: "TEST" } as PublishedExam;
 
@@ -97,7 +99,7 @@ describe("Player のキー操作", () => {
     await screen.findByText("問題文 2");
     await user.keyboard("b{Enter}");
 
-    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
+    await waitFor(() => expect(push).toHaveBeenCalledWith(expect.stringMatching(RESULT_DETAIL)));
     // サーバーに接続できない(このテストの既定)ときは、この端末に残す
     expect(loadResults(browserStore(), "TEST")).toHaveLength(1);
   });
@@ -112,7 +114,7 @@ describe("Player のキー操作", () => {
     await screen.findByText("問題文 2");
     await user.keyboard("b{Enter}");
 
-    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
+    await waitFor(() => expect(push).toHaveBeenCalledWith(expect.stringMatching(RESULT_DETAIL)));
     const posts = fetchMock.mock.calls.filter(([url]) => url === "/api/history/results");
     expect(posts).toHaveLength(1);
     const sent = JSON.parse(posts[0]?.[1].body);
@@ -131,8 +133,11 @@ describe("Player のキー操作", () => {
     await screen.findByText("問題文 2");
     await user.keyboard("b{Enter}");
 
-    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
+    await waitFor(() => expect(push).toHaveBeenCalledWith(expect.stringMatching(RESULT_DETAIL)));
     expect(loadResults(browserStore(), "TEST")).toHaveLength(1);
+    // 結果の画面は、いま採点した結果を指定して開く(一覧の先頭に頼らない)
+    const [saved] = loadResults(browserStore(), "TEST");
+    expect(push).toHaveBeenCalledWith(`/exams/TEST/result?at=${encodeURIComponent(saved?.finishedAt ?? "")}`);
   });
 
   it("保存の途中でもう一度採点を押した_サーバーへの保存は 1 回だけ", async () => {
@@ -205,7 +210,7 @@ describe("Player の段階の確認問題", () => {
     await user.keyboard(`${keys[0]}{Enter}`);
     await screen.findByText("問題文 2");
     await user.keyboard(`${keys[1]}{Enter}`);
-    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
+    await waitFor(() => expect(push).toHaveBeenCalledWith(expect.stringMatching(RESULT_DETAIL)));
   }
 
   it("正答率が 80% 以上_その段階を合格済みにする", async () => {
@@ -271,7 +276,7 @@ describe("Player の自由記述", () => {
     expect(push).not.toHaveBeenCalled();
 
     await user.click(grade);
-    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
+    await waitFor(() => expect(push).toHaveBeenCalledWith(expect.stringMatching(RESULT_DETAIL)));
     expect(loadResults(browserStore(), "TEST")[0]?.textAnswers).toEqual({ "TEST-0003": "  Pで保存\n" });
   });
 
@@ -288,7 +293,7 @@ describe("Player の自由記述", () => {
     const user = userEvent.setup();
     await user.type(await screen.findByRole("textbox", { name: "回答" }), "設定を保存する");
     await user.click(screen.getByRole("button", { name: "採点する" }));
-    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
+    await waitFor(() => expect(push).toHaveBeenCalledWith(expect.stringMatching(RESULT_DETAIL)));
     expect(loadStageProgress(browserStore(), "TEST").last).toMatchObject({ percent: 100, passed: true });
   });
 
@@ -374,7 +379,7 @@ describe("Player の本番モード", () => {
     await user.keyboard("a");
     advance(10 * 60_000);
 
-    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
+    await waitFor(() => expect(push).toHaveBeenCalledWith(expect.stringMatching(RESULT_DETAIL)));
     const [saved] = loadResults(browserStore(), "TEST");
     expect(saved?.answers).toEqual({ "TEST-0001": ["A"] });
     expect(saved?.questionIds).toEqual(questions.map((q) => q.questionId));
@@ -384,7 +389,7 @@ describe("Player の本番モード", () => {
   it("締め切りを過ぎてから開いた_すぐに採点する", async () => {
     current = start + 11 * 60_000;
     render(<Player exam={exam} questions={questions} clock={clock} />);
-    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
+    await waitFor(() => expect(push).toHaveBeenCalledWith(expect.stringMatching(RESULT_DETAIL)));
     expect(push).toHaveBeenCalledTimes(1);
     expect(loadResults(browserStore(), "TEST")).toHaveLength(1);
   });
@@ -484,7 +489,7 @@ describe("Player の印と問題一覧", () => {
     expect(push).not.toHaveBeenCalled();
 
     await user.click(screen.getByRole("button", { name: "このまま採点する" }));
-    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
+    await waitFor(() => expect(push).toHaveBeenCalledWith(expect.stringMatching(RESULT_DETAIL)));
   });
 
   it("自信なしと見直しの印_途中保存と結果に残す_回答時間も結果に残す", async () => {
@@ -505,7 +510,7 @@ describe("Player の印と問題一覧", () => {
     await user.keyboard("a{Enter}");
     await screen.findByText("問題文 2");
     await user.keyboard("b{Enter}");
-    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
+    await waitFor(() => expect(push).toHaveBeenCalledWith(expect.stringMatching(RESULT_DETAIL)));
     const [result] = loadResults(browserStore(), "TEST");
     expect(result?.unsure).toEqual([true, false]);
     expect(result?.flagged).toEqual([true, false]);
@@ -539,7 +544,7 @@ describe("Player のセクションと直近の正誤", () => {
     await user.keyboard("a{Enter}");
     await screen.findByText("問題文 2");
     await user.keyboard("a{Enter}");
-    await waitFor(() => expect(push).toHaveBeenCalledWith("/exams/TEST/result"));
+    await waitFor(() => expect(push).toHaveBeenCalledWith(expect.stringMatching(RESULT_DETAIL)));
     expect(loadSectionProgress(browserStore(), "TEST").best["3"]).toMatchObject({ correct: 1, total: 2 });
   });
 

@@ -31,10 +31,16 @@ export interface HistoryRepository {
   putResult(sub: string, result: Result, tally?: DayTally): Promise<boolean>;
   /**
    * 資格の結果を新しい順に返す。`before`(完了時刻)を渡すと、それより古いものを返す。
-   * 1 回に返すのは `limit` 件まで(既定は `RESULTS_PAGE_SIZE`)。
+   * 1 回に読むのは `limit` 件まで(既定は `RESULTS_PAGE_SIZE`)。続きがあるかもしれないときは、続きを取る位置
+   * (読んだ最後の項目の完了時刻)を `next` に返す。壊れた項目を除いても、続きの位置は変わらない。
+   * 保存した直後の結果も読めるよう、強い整合性で読む。
    */
-  listResults(sub: string, examCode: string, page?: { before?: string; limit?: number }): Promise<Result[]>;
-  /** 1 回分の結果。なければ null。 */
+  listResults(
+    sub: string,
+    examCode: string,
+    page?: { before?: string; limit?: number },
+  ): Promise<{ results: Result[]; next: string | null }>;
+  /** 1 回分の結果。なければ null。強い整合性で読む。 */
   getResult(sub: string, examCode: string, finishedAt: string): Promise<Result | null>;
   /**
    * 問題ごとの解答回数と直近の正誤を更新する。同じ完了時刻の正誤は、二重に数えない。
@@ -180,7 +186,7 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
   const query = (
     sub: string,
     prefix: string,
-    extra: { limit?: number; keysOnly?: boolean; newestFirst?: boolean; startAfter?: string },
+    extra: { limit?: number; keysOnly?: boolean; newestFirst?: boolean; startAfter?: string; consistent?: boolean },
   ) =>
     client.send(
       new QueryCommand({
@@ -191,6 +197,7 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
         ...(extra.limit ? { Limit: extra.limit } : {}),
         ...(extra.keysOnly ? { ProjectionExpression: "SK" } : {}),
         ...(extra.startAfter ? { ExclusiveStartKey: { PK: userKey(sub), SK: extra.startAfter } } : {}),
+        ...(extra.consistent ? { ConsistentRead: true } : {}),
       }),
     ) as Promise<QueryOutput>;
 
@@ -205,9 +212,16 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
     } while (startAfter);
     return all;
   };
-  const get = async (sub: string, sk: string) =>
-    ((await client.send(new GetCommand({ TableName: tableName, Key: { PK: userKey(sub), SK: sk } }))) as GetOutput)
-      .Item;
+  const get = async (sub: string, sk: string, consistent = false) =>
+    (
+      (await client.send(
+        new GetCommand({
+          TableName: tableName,
+          Key: { PK: userKey(sub), SK: sk },
+          ...(consistent ? { ConsistentRead: true } : {}),
+        }),
+      )) as GetOutput
+    ).Item;
 
   /** SK の接頭辞のあとに続く問題 ID を取り出す(問題 ID の形のものだけ)。 */
   const questionIdsOf = async (sub: string, prefix: string) => {
@@ -262,16 +276,22 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
     async listResults(sub, examCode, page = {}) {
       // 完了時刻の新しい順。`before` の項目のあとから、`limit` 件まで
       const prefix = resultKeyPrefix(examCode);
-      const { Items = [] } = await query(sub, prefix, {
+      const { Items = [], LastEvaluatedKey } = await query(sub, prefix, {
         limit: page.limit ?? RESULTS_PAGE_SIZE,
         newestFirst: true,
         startAfter: page.before ? `${prefix}${page.before}` : undefined,
+        consistent: true,
       });
-      return Items.map(resultOf).filter((r): r is Result => r !== null);
+      // 件数の上限に達すると、続きがなくても `LastEvaluatedKey` が返る(そのときの続きの取得は空になる)
+      const lastKey = LastEvaluatedKey ? String(LastEvaluatedKey.SK) : null;
+      return {
+        results: Items.map(resultOf).filter((r): r is Result => r !== null),
+        next: lastKey?.startsWith(prefix) ? lastKey.slice(prefix.length) : null,
+      };
     },
 
     async getResult(sub, examCode, finishedAt) {
-      const item = await get(sub, resultKey({ examCode, finishedAt }));
+      const item = await get(sub, resultKey({ examCode, finishedAt }), true);
       const found = item ? resultOf(item) : null;
       return found && found.examCode === examCode && found.finishedAt === finishedAt ? found : null;
     },
@@ -460,9 +480,11 @@ export function createMemoryRepository(): HistoryRepository {
     },
     async listResults(sub, examCode, page = {}) {
       const { before } = page;
-      return sorted(sub, examCode)
-        .filter((r) => before === undefined || r.finishedAt < before)
-        .slice(0, page.limit ?? RESULTS_PAGE_SIZE);
+      const limit = page.limit ?? RESULTS_PAGE_SIZE;
+      const rest = sorted(sub, examCode).filter((r) => before === undefined || r.finishedAt < before);
+      const results = rest.slice(0, limit);
+      // DynamoDB と同じく、上限に達したら、続きがなくても続きの位置を返す
+      return { results, next: rest.length >= limit ? (results.at(-1)?.finishedAt ?? null) : null };
     },
     async getResult(sub, examCode, finishedAt) {
       return store.get(userKey(sub))?.get(resultKey({ examCode, finishedAt })) ?? null;

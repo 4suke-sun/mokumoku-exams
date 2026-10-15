@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 import { DashboardView } from "./dashboard-view.tsx";
@@ -30,12 +30,12 @@ const questions = [1, 2, 3].map(
     }) as Question,
 );
 
-function stubServer(results: unknown[]) {
+function stubServer(results: unknown[], next: string | null = null) {
   vi.stubGlobal(
     "fetch",
     vi.fn(async (url: string) => {
       const ok = (body: unknown) => ({ ok: true, status: 200, json: async () => body });
-      if (url.startsWith("/api/history/results")) return ok({ results });
+      if (url.startsWith("/api/history/results")) return ok({ results, next });
       if (url.startsWith("/api/history/review") || url.startsWith("/api/history/bookmarks"))
         return ok({ questionIds: [] });
       if (url.startsWith("/api/history/days")) return ok({ days: [] });
@@ -51,6 +51,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  cleanup();
   vi.unstubAllGlobals();
 });
 
@@ -69,5 +70,29 @@ describe("DashboardView の印の集計", () => {
     render(<DashboardView exam={exam} questions={questions} />);
     expect(await screen.findByText("自信なしの印: 2 問(うち正解 1 問)")).toBeTruthy();
     expect(screen.getByText("見直しの印: 1 問")).toBeTruthy();
+  });
+});
+
+describe("DashboardView の結果の範囲", () => {
+  const attempt = {
+    examCode: "A",
+    questionIds: ["A-0001"],
+    answers: { "A-0001": ["A"] },
+    finishedAt: "2026-10-11T00:00:00.000Z",
+  };
+
+  it("サーバーに続きがある_合計が直近の範囲の値だと書き_もっと見るを出す", async () => {
+    stubServer([attempt], attempt.finishedAt);
+    render(<DashboardView exam={exam} questions={questions} />);
+    expect(await screen.findByText(/直近 1 回の結果から数えています/)).toBeTruthy();
+    expect(screen.getByRole("button", { name: "もっと見る" })).toBeTruthy();
+  });
+
+  it("続きがない_範囲の注記ももっと見るも出さない", async () => {
+    stubServer([attempt]);
+    render(<DashboardView exam={exam} questions={questions} />);
+    expect(await screen.findByText("これまでの結果")).toBeTruthy();
+    expect(screen.queryByText(/直近 1 回の結果から数えています/)).toBeNull();
+    expect(screen.queryByRole("button", { name: "もっと見る" })).toBeNull();
   });
 });

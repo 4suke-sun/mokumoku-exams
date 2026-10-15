@@ -86,11 +86,10 @@ export async function handleListResults(request: Request, deps: HistoryDeps): Pr
   if (accepted instanceof Response) return accepted;
   const { auth, query } = accepted;
   try {
-    const results = await deps.repository.listResults(auth.user.sub, query.examCode, {
+    const { results, next } = await deps.repository.listResults(auth.user.sub, query.examCode, {
       before: query.before,
       limit: RESULTS_PAGE_SIZE,
     });
-    const next = results.length === RESULTS_PAGE_SIZE ? (results.at(-1)?.finishedAt ?? null) : null;
     return json({ results, next }, 200, auth.setCookies);
   } catch (error) {
     return unavailable(request, error);
