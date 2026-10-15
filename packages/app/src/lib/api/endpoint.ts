@@ -5,7 +5,7 @@ import { guard, json } from "@/lib/auth/handlers.ts";
 import { logApiFailure } from "./log.ts";
 
 /**
- * 履歴・管理者・通知の API の共通の入口。認証の確認、問い合わせと本文の検査、エラー応答、失敗の記録を、ここに集める。
+ * 履歴・管理者・通知・問題の API の共通の入口。認証の確認、問い合わせと本文の検査、エラー応答、失敗の記録を、ここに集める。
  *
  * エラー応答の形は `{ "error": "<種類>" }` だけ。原因・内部の情報・入力の値は返さない。
  * 種類とステータス: bad-request 400(入力が正しくない)/ self-disable 400(自分自身の無効化)/ unauthorized 401 /
@@ -100,7 +100,10 @@ export async function acceptQuery<S extends z.ZodType>(
   return query === null ? fail("bad-request", 400, auth.setCookies) : { auth, query };
 }
 
-/** 状態を変える操作の入口。JSON だけを受け付け、利用者を確かめてから、本文を読んで検査する。 */
+/**
+ * 本文を受ける操作の入口。JSON だけを受け付け、利用者を確かめてから、本文を読んで検査する。
+ * 状態を変える操作のほか、問い合わせの文字列に収まらない入力を本文で受ける読み出し(問題の取得)にも使う。
+ */
 export async function acceptBody<S extends z.ZodType>(
   request: Request,
   deps: AuthDeps,

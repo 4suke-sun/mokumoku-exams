@@ -42,7 +42,7 @@ export type InfraConfig = {
   customDomain?: CustomDomain;
   /**
    * アプリの Lambda の同時実行の上限(予約する同時実行数)。なければ付けない。
-   * アカウントの同時実行の上限から、予約していない分を 10 以上残す必要がある(docs/app/infra.md)
+   * アカウントの同時実行の上限から、予約していない分を 100 以上残す必要がある(docs/app/infra.md)
    */
   appReservedConcurrency?: number;
 };
