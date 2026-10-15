@@ -277,6 +277,33 @@ exports[`PushStack > 合成すると_スナップショットと一致する 1`]
       },
       "Type": "AWS::Lambda::Permission",
     },
+    "SenderErrorsAlarm2ED9BB62": {
+      "Properties": {
+        "AlarmActions": [
+          {
+            "Fn::ImportValue": "Alarms:ExportsOutputRefAlarmTopicD01E77F99DF7FB73",
+          },
+        ],
+        "AlarmDescription": "毎日の通知を送る Lambda でエラーが出ています",
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "Dimensions": [
+          {
+            "Name": "FunctionName",
+            "Value": {
+              "Ref": "SenderFunction5DD1AB71",
+            },
+          },
+        ],
+        "EvaluationPeriods": 1,
+        "MetricName": "Errors",
+        "Namespace": "AWS/Lambda",
+        "Period": 300,
+        "Statistic": "Sum",
+        "Threshold": 1,
+        "TreatMissingData": "notBreaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
     "SenderFunction5DD1AB71": {
       "DependsOn": [
         "SenderFunctionServiceRoleDefaultPolicy06C14206",
@@ -464,6 +491,41 @@ exports[`WebStack > 合成すると_スナップショットと一致する 1`] 
   "Resources": {
     "AlarmTopicD01E77F9": {
       "Type": "AWS::SNS::Topic",
+    },
+    "ApiServerErrorsAlarm602F142D": {
+      "Properties": {
+        "AlarmActions": [
+          {
+            "Ref": "AlarmTopicD01E77F9",
+          },
+        ],
+        "AlarmDescription": "アプリが 5xx を返しています(API と、入口の認証の検証)",
+        "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+        "EvaluationPeriods": 1,
+        "MetricName": "ApiServerErrors",
+        "Namespace": "test",
+        "Period": 300,
+        "Statistic": "Sum",
+        "Threshold": 1,
+        "TreatMissingData": "notBreaching",
+      },
+      "Type": "AWS::CloudWatch::Alarm",
+    },
+    "ApiServerErrorsFilter877B8DB1": {
+      "Properties": {
+        "FilterPattern": "{ ($.event = "api-failure") && ($.status >= 500) }",
+        "LogGroupName": {
+          "Ref": "AppLogGroup7D8CD952",
+        },
+        "MetricTransformations": [
+          {
+            "MetricName": "ApiServerErrors",
+            "MetricNamespace": "test",
+            "MetricValue": "1",
+          },
+        ],
+      },
+      "Type": "AWS::Logs::MetricFilter",
     },
     "AppErrorsAlarm7BC037FB": {
       "Properties": {

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { logApiFailure } from "@/lib/api-log.ts";
 import { authenticateAdmin } from "@/lib/auth/admin.ts";
 import type { GuardDeps } from "@/lib/auth/guard.ts";
 import { guard, json } from "@/lib/auth/handlers.ts";
@@ -39,8 +40,12 @@ export const MAX_ADMIN_BODY_BYTES = 1024;
 
 const fail = (error: AdminError, cookies: string[] = []) => json({ error }, STATUS[error], cookies);
 
-const failure = (error: unknown, cookies: string[]) =>
-  fail(error instanceof UserAdminError ? error.code : "unavailable", cookies);
+/** 操作の失敗を応答にする。503 にするもの(種類のわからない失敗を含む)は、経路・状態・例外の名前だけを記録する */
+function failure(request: Request, error: unknown, cookies: string[]): Response {
+  const code = error instanceof UserAdminError ? error.code : "unavailable";
+  if (code === "unavailable") logApiFailure(request, STATUS.unavailable, error);
+  return fail(code, cookies);
+}
 
 export const InviteSchema = z.strictObject({
   email: z.string().trim().max(254).pipe(z.email()),
@@ -95,7 +100,7 @@ export async function handleListUsers(request: Request, deps: AdminDeps): Promis
       .map((user) => ({ ...user, self: user.username === auth.user.sub }));
     return json({ users: rows }, 200, auth.setCookies);
   } catch (error) {
-    return failure(error, auth.setCookies);
+    return failure(request, error, auth.setCookies);
   }
 }
 
@@ -111,7 +116,7 @@ export async function handleInviteUser(request: Request, deps: AdminDeps): Promi
     const user = await deps.users.inviteUser(input.email);
     return json({ user }, 200, auth.setCookies);
   } catch (error) {
-    return failure(error, auth.setCookies);
+    return failure(request, error, auth.setCookies);
   }
 }
 
@@ -130,7 +135,7 @@ export async function handleDisableUser(request: Request, deps: AdminDeps): Prom
   try {
     await deps.users.disableUser(input.username);
   } catch (error) {
-    return failure(error, auth.setCookies);
+    return failure(request, error, auth.setCookies);
   }
   try {
     await deps.audit.record({
@@ -139,8 +144,8 @@ export async function handleDisableUser(request: Request, deps: AdminDeps): Prom
       target: input.username,
       action: "disable-user",
     });
-  } catch {
-    return fail("unavailable", auth.setCookies);
+  } catch (error) {
+    return failure(request, error, auth.setCookies);
   }
   return json({ status: "disabled" }, 200, auth.setCookies);
 }

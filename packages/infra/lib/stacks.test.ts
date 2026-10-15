@@ -1,6 +1,7 @@
 import { fileURLToPath } from "node:url";
-import { App, DefaultStackSynthesizer } from "aws-cdk-lib";
+import { App, DefaultStackSynthesizer, Stack } from "aws-cdk-lib";
 import { Match, Template } from "aws-cdk-lib/assertions";
+import * as sns from "aws-cdk-lib/aws-sns";
 import { describe, expect, it } from "vitest";
 import {
   ADMIN_GROUP_NAME,
@@ -19,7 +20,7 @@ import {
   PushStack,
   VAPID_PRIVATE_KEY_ACTIONS,
 } from "./push-stack.ts";
-import { ORIGIN_VERIFY_HEADER, WebStack } from "./web-stack.ts";
+import { API_FAILURE_EVENT, API_FAILURE_METRIC, ORIGIN_VERIFY_HEADER, WebStack } from "./web-stack.ts";
 
 const config: InfraConfig = {
   stackPrefix: "test",
@@ -96,6 +97,9 @@ function webTemplate(alarmEmail?: string, extra: Partial<InfraConfig> = {}): Tem
 function pushTemplate(): Template {
   const app = new App();
   const data = new DataStack(app, "Data", { env, synthesizer });
+  // 通知先は、アプリのスタックから受け取る。ここでは、トピックだけを持つスタックで代える
+  const alarms = new Stack(app, "Alarms", { env, synthesizer });
+  const alarmTopic = new sns.Topic(alarms, "AlarmTopic");
   const stack = new PushStack(app, "Push", {
     env,
     synthesizer,
@@ -103,6 +107,7 @@ function pushTemplate(): Template {
     push,
     pushCodePath: fixture("push"),
     historyTable: data.table,
+    alarmTopic,
   });
   return Template.fromStack(stack);
 }
@@ -332,9 +337,18 @@ describe("WebStack", () => {
     webTemplate().hasResourceProperties("AWS::Logs::LogGroup", { RetentionInDays: 30 });
   });
 
-  it("エラーと実行制限のアラームが_通知先のトピックにつながる", () => {
+  it("エラーと実行制限と 5xx のアラームが_通知先のトピックにつながる", () => {
     const template = webTemplate();
-    template.resourceCountIs("AWS::CloudWatch::Alarm", 2);
+    template.resourceCountIs("AWS::CloudWatch::Alarm", 3);
+    template.hasResourceProperties("AWS::CloudWatch::Alarm", {
+      MetricName: API_FAILURE_METRIC,
+      Namespace: config.stackPrefix,
+      Statistic: "Sum",
+      Period: 300,
+      Threshold: 1,
+      ComparisonOperator: "GreaterThanOrEqualToThreshold",
+      AlarmActions: [{ Ref: Match.stringLikeRegexp("AlarmTopic") }],
+    });
     for (const metricName of ["Errors", "Throttles"]) {
       template.hasResourceProperties("AWS::CloudWatch::Alarm", {
         MetricName: metricName,
@@ -342,6 +356,18 @@ describe("WebStack", () => {
         AlarmActions: [{ Ref: Match.stringLikeRegexp("AlarmTopic") }],
       });
     }
+  });
+
+  it("アプリのログ_失敗の記録のうち 5xx だけを数えるメトリクスフィルターがある", () => {
+    const template = webTemplate();
+    template.resourceCountIs("AWS::Logs::MetricFilter", 1);
+    template.hasResourceProperties("AWS::Logs::MetricFilter", {
+      LogGroupName: { Ref: Match.stringLikeRegexp("AppLogGroup") },
+      FilterPattern: `{ ($.event = "${API_FAILURE_EVENT}") && ($.status >= 500) }`,
+      MetricTransformations: [
+        { MetricNamespace: config.stackPrefix, MetricName: API_FAILURE_METRIC, MetricValue: "1" },
+      ],
+    });
   });
 
   it("公開の URL と通知の鍵は_設定したときだけ Lambda に渡す", () => {
@@ -488,6 +514,20 @@ describe("PushStack", () => {
     expect([...table[0].Action].sort()).toEqual([...PUSH_SENDER_TABLE_ACTIONS].sort());
     expect(JSON.stringify(table[0].Resource)).not.toContain("*");
     expect(statements.filter((s) => s.Resource === "*")).toEqual([]);
+  });
+
+  it("送信の Lambda のエラー_1 回でアプリと同じ通知先へ送るアラームがある", () => {
+    const template = pushTemplate();
+    template.resourceCountIs("AWS::CloudWatch::Alarm", 1);
+    template.hasResourceProperties("AWS::CloudWatch::Alarm", {
+      MetricName: "Errors",
+      Namespace: "AWS/Lambda",
+      Dimensions: [{ Name: "FunctionName", Value: { Ref: Match.stringLikeRegexp("SenderFunction") } }],
+      Statistic: "Sum",
+      Threshold: 1,
+      ComparisonOperator: "GreaterThanOrEqualToThreshold",
+      AlarmActions: [{ "Fn::ImportValue": Match.stringLikeRegexp("AlarmTopic") }],
+    });
   });
 
   it("送信の Lambda のログに_保持期間がある", () => {

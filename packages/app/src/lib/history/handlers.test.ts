@@ -1,4 +1,4 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { createFakeProvider, createFakeVerifier, FAKE_USER_EMAIL, FAKE_USER_PHRASE } from "@/lib/auth/fake.ts";
 import { withTokenCookies } from "@/lib/auth/session.ts";
 import type { AuthProvider } from "@/lib/auth/types.ts";
@@ -437,11 +437,32 @@ const failing: HistoryRepository = {
 
 describe("履歴の保存先の失敗", () => {
   it("保存先が失敗する_原因を返さず 503 にする", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
     const saved = await handlePostResult(post(body(), { cookie: asUser("a") }), deps(failing));
     expect(saved.status).toBe(503);
     expect(await saved.json()).toEqual({ error: "unavailable" });
     const listed = await handleListResults(get("examCode=EX-SMP-XX", { cookie: asUser("a") }), deps(failing));
     expect(listed.status).toBe(503);
+    log.mockRestore();
+  });
+
+  it("保存先が失敗する_経路・状態・例外の名前だけを記録し_入力と利用者の識別子は出さない", async () => {
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    const marker = "marker-7f3a";
+    const repository: HistoryRepository = {
+      ...failing,
+      async listResults() {
+        throw new Error(`failed for ${marker}`);
+      },
+    };
+    await handleListResults(get("examCode=EX-SMP-XX", { cookie: asUser("user-a") }), deps(repository));
+    const lines = log.mock.calls.map((call) => call.map(String).join(" "));
+    log.mockRestore();
+    expect(lines.map((line) => JSON.parse(line))).toEqual([
+      { event: "api-failure", path: "/api/history/results", status: 503, error: "Error" },
+    ]);
+    expect(lines.join("\n")).not.toContain(marker);
+    expect(lines.join("\n")).not.toContain("user-a");
   });
 });
 

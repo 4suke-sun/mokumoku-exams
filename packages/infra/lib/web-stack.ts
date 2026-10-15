@@ -22,6 +22,10 @@ import { grantReadVapidPrivateKey, vapidEnvironment } from "./push-stack.ts";
 
 /** アプリがオリジンの合言葉を確かめるヘッダー名(packages/app/src/lib/origin-verify.ts と同じ) */
 export const ORIGIN_VERIFY_HEADER = "x-origin-verify";
+/** アプリが API の失敗を記録するときの印(packages/app/src/lib/api-log.ts の `API_FAILURE_EVENT` と同じ) */
+export const API_FAILURE_EVENT = "api-failure";
+/** 5xx の件数のメトリクスの名前 */
+export const API_FAILURE_METRIC = "ApiServerErrors";
 /** Lambda 上でアプリが待ち受けるポート */
 const APP_PORT = "8080";
 /** アプリのログを残す期間 */
@@ -48,6 +52,8 @@ type Props = StackProps & {
 /** ホスティング。Lambda Web Adapter 上の Next.js を CloudFront の背後に置き、静的ファイルは S3 から配る。 */
 export class WebStack extends Stack {
   readonly distribution: cloudfront.Distribution;
+  /** アラームの通知先。送信のスタックのアラームも、ここへ送る */
+  readonly alarmTopic: sns.Topic;
 
   constructor(scope: Construct, id: string, props: Props) {
     super(scope, id, props);
@@ -182,6 +188,19 @@ export class WebStack extends Stack {
     // 通知先(SNS トピック)。メールの購読は、アドレスが渡されたときだけ作る
     const alarmTopic = new sns.Topic(this, "AlarmTopic");
     if (config.alarmEmail) alarmTopic.addSubscription(new subscriptions.EmailSubscription(config.alarmEmail));
+    this.alarmTopic = alarmTopic;
+
+    // アプリが 5xx を返しても、Lambda の呼び出しとしては成功するので、アプリが出す失敗の記録(1 行の JSON)の件数を数える
+    const apiFailures = new logs.MetricFilter(this, "ApiServerErrorsFilter", {
+      logGroup: appLogGroup,
+      filterPattern: logs.FilterPattern.all(
+        logs.FilterPattern.stringValue("$.event", "=", API_FAILURE_EVENT),
+        logs.FilterPattern.numberValue("$.status", ">=", 500),
+      ),
+      metricNamespace: config.stackPrefix,
+      metricName: API_FAILURE_METRIC,
+      metricValue: "1",
+    });
 
     const alarms = [
       new cloudwatch.Alarm(this, "AppErrorsAlarm", {
@@ -194,6 +213,13 @@ export class WebStack extends Stack {
       new cloudwatch.Alarm(this, "AppThrottlesAlarm", {
         alarmDescription: "アプリの Lambda が実行を制限されています",
         metric: appFunction.metricThrottles({ period: Duration.minutes(5), statistic: "Sum" }),
+        threshold: 1,
+        evaluationPeriods: 1,
+        treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,
+      }),
+      new cloudwatch.Alarm(this, "ApiServerErrorsAlarm", {
+        alarmDescription: "アプリが 5xx を返しています(API と、入口の認証の検証)",
+        metric: apiFailures.metric({ period: Duration.minutes(5), statistic: "Sum" }),
         threshold: 1,
         evaluationPeriods: 1,
         treatMissingData: cloudwatch.TreatMissingData.NOT_BREACHING,

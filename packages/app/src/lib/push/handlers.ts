@@ -1,7 +1,7 @@
 import { authenticateAdmin } from "@/lib/auth/admin.ts";
 import type { Authenticated, GuardDeps } from "@/lib/auth/guard.ts";
 import { guard, json } from "@/lib/auth/handlers.ts";
-import { authorize, fail, readJsonBody } from "@/lib/history/handlers.ts";
+import { authorize, fail, readJsonBody, unavailable } from "@/lib/history/handlers.ts";
 import type { PushRepository } from "./repository.ts";
 import {
   MAX_PUSH_BODY_BYTES,
@@ -76,8 +76,8 @@ export async function handleSubscribe(request: Request, deps: PushDeps): Promise
     const createdAt = new Date((deps.now ?? Date.now)()).toISOString();
     await deps.repository.putSubscription(auth.user.sub, { endpoint, ...keys }, createdAt);
     return json({ status: "saved" }, 200, auth.setCookies);
-  } catch {
-    return fail("unavailable", 503);
+  } catch (error) {
+    return unavailable(request, error);
   }
 }
 
@@ -92,8 +92,8 @@ export async function handleUnsubscribe(request: Request, deps: PushDeps): Promi
   try {
     await deps.repository.deleteSubscription(auth.user.sub, parsed.data.endpoint);
     return json({ status: "deleted" }, 200, auth.setCookies);
-  } catch {
-    return fail("unavailable", 503);
+  } catch (error) {
+    return unavailable(request, error);
   }
 }
 
@@ -113,7 +113,7 @@ export async function handleTestNotification(request: Request, deps: PushDeps): 
     const summary = await sendToAll(targets, TEST_MESSAGE, deps.sender);
     for (const target of summary.gone) await deps.repository.deleteSubscription(auth.user.sub, target.endpoint);
     return json({ sent: summary.sent }, 200, auth.setCookies);
-  } catch {
-    return fail("unavailable", 503);
+  } catch (error) {
+    return unavailable(request, error);
   }
 }

@@ -1,4 +1,5 @@
 import type { z } from "zod";
+import { logApiFailure } from "@/lib/api-log.ts";
 import { authenticate, type GuardDeps } from "@/lib/auth/guard.ts";
 import { guard, json } from "@/lib/auth/handlers.ts";
 import { MAX_PREFS_BODY_BYTES, PrefsSchema } from "@/lib/prefs.ts";
@@ -49,6 +50,12 @@ export type HistoryDeps = {
 export type HistoryError = "bad-request" | "unauthorized" | "not-found" | "too-large" | "unavailable";
 
 export const fail = (error: HistoryError, status: number, cookies: string[] = []) => json({ error }, status, cookies);
+
+/** 保存先などの失敗。経路・状態・例外の名前だけを記録してから、503 を返す(原因は応答に含めない) */
+export function unavailable(request: Request, error: unknown): Response {
+  logApiFailure(request, 503, error);
+  return fail("unavailable", 503);
+}
 
 /**
  * ログイン中の利用者を、サーバー側で検証して得る。利用者の識別子(`sub`)は、ここで得たものだけを使う
@@ -142,8 +149,8 @@ export async function handleListResults(request: Request, deps: HistoryDeps): Pr
     });
     const next = results.length === RESULTS_PAGE_SIZE ? (results.at(-1)?.finishedAt ?? null) : null;
     return json({ results, next }, 200, auth.setCookies);
-  } catch {
-    return fail("unavailable", 503);
+  } catch (error) {
+    return unavailable(request, error);
   }
 }
 
@@ -156,8 +163,8 @@ export async function handleGetResult(request: Request, deps: HistoryDeps): Prom
   try {
     const result = await deps.repository.getResult(auth.user.sub, query.examCode, query.finishedAt);
     return result ? json({ result }, 200, auth.setCookies) : fail("not-found", 404, auth.setCookies);
-  } catch {
-    return fail("unavailable", 503);
+  } catch (error) {
+    return unavailable(request, error);
   }
 }
 
@@ -197,8 +204,8 @@ export async function handlePostResult(request: Request, deps: HistoryDeps): Pro
     }
     if (change) await deps.repository.updateReview(auth.user.sub, result.examCode, change);
     return json({ status: "saved" }, 200, auth.setCookies);
-  } catch {
-    return fail("unavailable", 503);
+  } catch (error) {
+    return unavailable(request, error);
   }
 }
 
@@ -214,8 +221,8 @@ async function listByExam(
   if (!query) return fail("bad-request", 400, auth.setCookies);
   try {
     return json(await load(auth.user.sub, query.examCode), 200, auth.setCookies);
-  } catch {
-    return fail("unavailable", 503);
+  } catch (error) {
+    return unavailable(request, error);
   }
 }
 
@@ -251,8 +258,8 @@ export async function handlePutBookmark(request: Request, deps: HistoryDeps): Pr
     if (!questions?.some((q) => q.questionId === change.questionId)) return fail("bad-request", 400, auth.setCookies);
     await deps.repository.setBookmark(auth.user.sub, change.examCode, change.questionId, change.bookmarked);
     return json({ status: "saved" }, 200, auth.setCookies);
-  } catch {
-    return fail("unavailable", 503);
+  } catch (error) {
+    return unavailable(request, error);
   }
 }
 
@@ -270,8 +277,8 @@ export async function handleListReviewItems(request: Request, deps: HistoryDeps)
   if (!parseQuery(request, EmptyQuerySchema)) return fail("bad-request", 400, auth.setCookies);
   try {
     return json({ items: await deps.repository.listReviewItems(auth.user.sub) }, 200, auth.setCookies);
-  } catch {
-    return fail("unavailable", 503);
+  } catch (error) {
+    return unavailable(request, error);
   }
 }
 
@@ -290,8 +297,8 @@ export async function handleDeleteReview(request: Request, deps: HistoryDeps): P
   try {
     await deps.repository.removeReview(auth.user.sub, parsed.data.examCode, parsed.data.questionId);
     return json({ status: "removed" }, 200, auth.setCookies);
-  } catch {
-    return fail("unavailable", 503);
+  } catch (error) {
+    return unavailable(request, error);
   }
 }
 
@@ -322,8 +329,8 @@ export async function handlePutGoal(request: Request, deps: HistoryDeps): Promis
     if (!(await (deps.questions ?? examQuestions)(change.examCode))) return fail("bad-request", 400, auth.setCookies);
     await deps.repository.setGoal(auth.user.sub, change.examCode, change.date);
     return json({ status: "saved" }, 200, auth.setCookies);
-  } catch {
-    return fail("unavailable", 503);
+  } catch (error) {
+    return unavailable(request, error);
   }
 }
 
@@ -351,8 +358,8 @@ export async function handlePutSections(request: Request, deps: HistoryDeps): Pr
     if (!(await (deps.questions ?? examQuestions)(incoming.examCode))) return fail("bad-request", 400, auth.setCookies);
     const progress = await deps.repository.mergeSections(auth.user.sub, incoming.examCode, incoming);
     return json({ status: "saved", progress }, 200, auth.setCookies);
-  } catch {
-    return fail("unavailable", 503);
+  } catch (error) {
+    return unavailable(request, error);
   }
 }
 
@@ -370,8 +377,8 @@ export async function handleGetPrefs(request: Request, deps: HistoryDeps): Promi
       ? [...auth.setCookies, prefsSetCookie(auth.user.sub, prefs, deps.auth.secure)]
       : auth.setCookies;
     return json({ prefs }, 200, cookies);
-  } catch {
-    return fail("unavailable", 503);
+  } catch (error) {
+    return unavailable(request, error);
   }
 }
 
@@ -396,7 +403,7 @@ export async function handlePutPrefs(request: Request, deps: HistoryDeps): Promi
       ...auth.setCookies,
       prefsSetCookie(auth.user.sub, parsed.data, deps.auth.secure),
     ]);
-  } catch {
-    return fail("unavailable", 503);
+  } catch (error) {
+    return unavailable(request, error);
   }
 }

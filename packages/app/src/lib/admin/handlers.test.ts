@@ -151,9 +151,29 @@ describe("利用者の一覧", () => {
     deps.users.listUsers = async () => {
       throw new Error("detail");
     };
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
     const response = await handleListUsers(get("", { cookie: asUser(ADMIN) }), deps);
+    const lines = log.mock.calls.map((call) => call.map(String).join(" "));
+    log.mockRestore();
     expect(response.status).toBe(503);
     expect(await response.json()).toEqual({ error: "unavailable" });
+    expect(lines.map((line) => JSON.parse(line))).toEqual([
+      { event: "api-failure", path: "/api/admin/users", status: 503, error: "Error" },
+    ]);
+    expect(lines.join("\n")).not.toContain("detail");
+  });
+
+  it("種類のわかる失敗_503 でなければ記録しない", async () => {
+    const { deps } = setup();
+    deps.users.listUsers = async () => {
+      throw new UserAdminError("limit-exceeded");
+    };
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
+    const response = await handleListUsers(get("", { cookie: asUser(ADMIN) }), deps);
+    const calls = log.mock.calls.length;
+    log.mockRestore();
+    expect(response.status).toBe(429);
+    expect(calls).toBe(0);
   });
 });
 
@@ -219,7 +239,10 @@ describe("招待", () => {
     };
     await handleInviteUser(invite({ email: "secret@example.com" }, { cookie }), deps);
     await handleListUsers(get("", { cookie }), deps);
-    for (const spy of spies) expect(spy).not.toHaveBeenCalled();
+    // 失敗の記録(経路・状態・例外の名前)は出るが、メールアドレスは含まない
+    const output = spies.flatMap((spy) => spy.mock.calls.map((call) => call.map(String).join(" "))).join("\n");
+    expect(output).not.toContain("secret@example.com");
+    expect(output).not.toContain("@");
   });
 });
 
@@ -277,9 +300,15 @@ describe("無効化と操作の記録", () => {
       },
     };
     const { deps } = setup([user("user-9", "nine@example.com", null)], audit);
+    const log = vi.spyOn(console, "error").mockImplementation(() => {});
     const response = await handleDisableUser(disable({ username: "user-9" }, { cookie: asUser(ADMIN) }), deps);
+    const lines = log.mock.calls.map((call) => call.map(String).join(" "));
+    log.mockRestore();
     expect(response.status).toBe(503);
     expect(await response.json()).toEqual({ error: "unavailable" });
+    // 対象の利用者・操作した管理者は、記録に出さない
+    expect(lines).toHaveLength(1);
+    for (const value of ["user-9", "nine@example.com", ADMIN, "boom"]) expect(lines.join("\n")).not.toContain(value);
   });
 });
 
