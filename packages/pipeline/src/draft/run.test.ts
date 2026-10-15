@@ -1,8 +1,10 @@
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { CRITERION_NAME_MAX, KEYWORD_MAX } from "../contract.ts";
 import { EXIT } from "../exit-codes.ts";
 import { DraftRequestSchema } from "./request.ts";
+import { pathCode } from "./run.ts";
 import { readDrafts, readState } from "./store.ts";
 import {
   baseConfig,
@@ -161,7 +163,7 @@ describe("draft の取り込み", () => {
     expect(readRequests(root).some((q) => q.requestKey === request.requestKey)).toBe(false);
   });
 
-  it("データの契約に合わない下書き_schema-invalid で止め_何も取り込まない", async () => {
+  it("データの契約に合わない下書きと通る下書きが同じ出力にある_通る下書きは取り込み_落ちた下書きは理由コード付きの不採用にする", async () => {
     const root = setupDraftRoot();
     const request = await firstRequest(root);
     // 選択肢のキーが A から始まらない(スタイル規則と誤答の検査では止まらず、データの契約で止まる)
@@ -173,11 +175,17 @@ describe("draft の取り込み", () => {
       correctAnswers: base.correctAnswers.map(shift),
       distractors: (base.distractors ?? []).map((d) => ({ ...d, key: shift(d.key) })),
     };
-    writeOutput(root, request, [draftFor(request), bad]);
+    writeOutput(root, request, [draftFor(request), { ...bad, questionText: `別の設問として、${base.questionText}` }]);
     const r = await runMain(root, ["draft", EXAM, "--import"]);
-    expect(r.code).toBe(EXIT.checkFailed);
-    expect(r.err).toContain("schema-invalid");
-    expect(existsSync(workPath(root, "drafts.json"))).toBe(false);
+    // 1 件の不採用は、取り込みの停止(再試行)にしない
+    expect(r.code).toBe(EXIT.ok);
+    expect(r.err).not.toContain("schema-invalid");
+    const drafts = readDrafts(workPath(root, "drafts.json"), EXAM).drafts;
+    expect(drafts.map((d) => d.status).sort()).toEqual(["passed", "rejected"]);
+    const rejected = drafts.find((d) => d.status === "rejected");
+    expect(rejected?.reasons.some((x) => x.startsWith("data-invalid:"))).toBe(true);
+    // 理由コードは場所だけで、値を含めない
+    expect(rejected?.reasons.join(" ")).not.toContain("別の設問として");
   });
 
   it("依頼と違う鍵の出力_request-mismatch", async () => {
@@ -558,7 +566,7 @@ describe("draft の重複の検出", () => {
     expect((await runMain(root, ["draft", EXAM, "--check"])).code).toBe(EXIT.ok);
   });
 
-  it("捨てられた出力の下書き_後の出力の重複の比較の相手に残らない", async () => {
+  it("データの契約に落ちた下書き_後の出力の重複の比較の相手に残らない", async () => {
     const root = setupDraftRoot();
     await prepare(root);
     // 同じ種別の依頼を 2 つ取る(取り込みは、依頼の鍵の順に処理する)
@@ -566,24 +574,30 @@ describe("draft の重複の検出", () => {
     const first = requests[0] as ReturnType<typeof readRequests>[number];
     const second = requests.find((q) => q !== first && q.kind === first.kind) as typeof first;
     const base = draftFor(first);
-    // 1 つ目の出力は、通る下書きと、データの契約に合わない下書きを含み、全体が捨てられる
+    // 1 つ目の出力は、通る下書きと、データの契約に合わない下書きを含む。落ちた下書きだけが不採用になる
     const shift = (key: string) => String.fromCharCode(key.charCodeAt(0) + 1);
     const bad = {
       ...base,
-      questionText: `別の設問として、${base.questionText}`,
+      // 通る下書きとは重ならない設問文にする(後の出力が、落ちた下書きとだけ似るように)
+      questionText:
+        base.questionType === "multiple"
+          ? `監査の記録を残す仕組みについて、運用の担当者が最初に確かめるべき設定はどれか。${base.correctAnswers.length} つ選択してください。`
+          : "監査の記録を残す仕組みについて、運用の担当者が最初に確かめるべき設定はどれか。",
       choices: base.choices.map((c) => ({ ...c, key: shift(c.key) })),
       correctAnswers: base.correctAnswers.map(shift),
       distractors: (base.distractors ?? []).map((d) => ({ ...d, key: shift(d.key) })),
     };
     writeOutput(root, first, [base, bad]);
-    // 2 つ目の出力は、捨てられる下書きとほぼ同じ設問文
-    writeOutput(root, second, [draftFor(second, { questionText: base.questionText })]);
+    // 2 つ目の出力は、落ちた下書きとほぼ同じ設問文
+    writeOutput(root, second, [draftFor(second, { questionText: bad.questionText })]);
     const r = await runMain(root, ["draft", EXAM, "--import"]);
-    expect(r.err).toContain("schema-invalid");
     expect(r.out).not.toContain("duplicate-similar");
+    // 落ちた下書きの ID は、不採用の行にだけ出る(保留の比較の相手に挙がらない)
+    const rejectedId = /下書きの不採用: (\S+) data-invalid:/.exec(r.out)?.[1] as string;
+    expect(rejectedId).toBeDefined();
+    expect(r.out.split("\n").filter((line) => line.includes(rejectedId))).toHaveLength(1);
     const drafts = readDrafts(workPath(root, "drafts.json"), EXAM).drafts;
-    expect(drafts).toHaveLength(1);
-    expect(drafts[0]?.status).toBe("passed");
+    expect(drafts.filter((d) => d.status === "rejected")).toHaveLength(1);
   });
 
   it("問題データの形が違う_取り込みを止め_本文を出さない", async () => {
@@ -637,18 +651,19 @@ describe("draft の自由記述", () => {
     expect((await runMain(root, ["draft", EXAM, "--check"])).code).toBe(EXIT.ok);
   });
 
-  it("合格点が配点の合計を超える採点基準_schema-invalid で止まる", async () => {
+  it("合格点が配点の合計を超える採点基準_その下書きを data-invalid の不採用にする", async () => {
     const root = setupDraftRoot();
     const request = await freeTextRequest(root);
     const ok = freeTextDraftFor(request);
     writeOutput(root, request, [{ ...ok, rubric: { ...ok.rubric, passingPoints: 101 } }]);
     const r = await runMain(root, ["draft", EXAM, "--import"]);
-    expect(r.code).toBe(EXIT.checkFailed);
-    expect(r.err).toContain("schema-invalid");
-    expect(existsSync(workPath(root, "drafts.json"))).toBe(false);
+    expect(r.err).not.toContain("schema-invalid");
+    const record = readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0];
+    expect(record?.status).toBe("rejected");
+    expect(record?.reasons.some((x) => x.startsWith("data-invalid:"))).toBe(true);
   });
 
-  it("観点名が重複する採点基準_schema-invalid で止まる", async () => {
+  it("観点名が重複する採点基準_その下書きを data-invalid の不採用にする", async () => {
     const root = setupDraftRoot();
     const request = await freeTextRequest(root);
     const ok = freeTextDraftFor(request);
@@ -656,11 +671,36 @@ describe("draft の自由記述", () => {
     writeOutput(root, request, [
       { ...ok, rubric: { ...ok.rubric, criteria: [first, { ...first, keywords: ["別の語"] }] } },
     ]);
-    const r = await runMain(root, ["draft", EXAM, "--import"]);
-    expect(r.err).toContain("schema-invalid");
+    await runMain(root, ["draft", EXAM, "--import"]);
+    const record = readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0];
+    expect(record?.status).toBe("rejected");
+    expect(record?.reasons.some((x) => x.startsWith("data-invalid:"))).toBe(true);
   });
 
-  it("キーワードが空になる採点基準_schema-invalid で止まる", async () => {
+  it("観点名とキーワードの長さ_データの仕様の上限ちょうどは通り_超えると形の検査で出力ごと止める", async () => {
+    const root = setupDraftRoot();
+    const request = await freeTextRequest(root);
+    const ok = freeTextDraftFor(request);
+    const [first, second] = ok.rubric.criteria as [
+      (typeof ok.rubric.criteria)[number],
+      (typeof ok.rubric.criteria)[number],
+    ];
+    const at = { ...first, name: "名".repeat(CRITERION_NAME_MAX), keywords: ["語".repeat(KEYWORD_MAX)] };
+    writeOutput(root, request, [{ ...ok, rubric: { ...ok.rubric, criteria: [at, second] } }]);
+    expect((await runMain(root, ["draft", EXAM, "--import"])).code).toBe(EXIT.ok);
+
+    const root2 = setupDraftRoot();
+    const request2 = await freeTextRequest(root2);
+    const ok2 = freeTextDraftFor(request2);
+    const [a, b] = ok2.rubric.criteria as [(typeof ok2.rubric.criteria)[number], (typeof ok2.rubric.criteria)[number]];
+    const over = { ...a, name: "名".repeat(CRITERION_NAME_MAX + 1) };
+    writeOutput(root2, request2, [{ ...ok2, rubric: { ...ok2.rubric, criteria: [over, b] } }]);
+    const r = await runMain(root2, ["draft", EXAM, "--import"]);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain("output-invalid");
+  });
+
+  it("キーワードが空になる採点基準_出力の形の誤りとして止まる", async () => {
     const root = setupDraftRoot();
     const request = await freeTextRequest(root);
     const ok = freeTextDraftFor(request);
@@ -673,6 +713,7 @@ describe("draft の自由記述", () => {
     ]);
     const r = await runMain(root, ["draft", EXAM, "--import"]);
     expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain("output-invalid");
   });
 
   it("根拠の事実カードが依頼にない自由記述_不採用になり_来歴も作らない", async () => {
@@ -717,5 +758,13 @@ describe("draft の自由記述", () => {
     expect(r.out).toContain("no-url questionText");
     expect(r.out + r.err).not.toContain("secret-looking-path");
     expect(readFileSync(workPath(root, "drafts.json"), "utf8")).not.toContain("secret-looking-path");
+  });
+});
+
+describe("データの検査の場所の理由コード", () => {
+  it("場所_英小文字とハイフンの理由コードにし_場所のない誤りは root にする", () => {
+    expect(pathCode("rubric.passingPoints")).toBe("rubric-passing-points");
+    expect(pathCode("choices.0.key")).toBe("choices-0-key");
+    expect(pathCode("(全体)")).toBe("root");
   });
 });

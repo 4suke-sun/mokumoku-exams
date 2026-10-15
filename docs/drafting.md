@@ -31,7 +31,8 @@ npm run pipeline -- plan <試験コード>
 - 目標の問題数は、**本番の出題数 × 倍率**です(設定 `plan.targetMultiplier`。既定は 3)。試験ごとに `plan.overrides.<試験コード>.targetTotal` で上書きできます。
 - 目標は、分野の重みに比例して分野へ配り、分野の目標を、難易度(`easy`・`medium`・`hard`)と種別(`single`・`multiple`・`free-text`)の配分で 9 つの区分に分けます。
   配分の既定は、難易度が 3:5:2、種別が 75%:20%:5% です(`plan.difficultyMix`・`plan.typeMix`。試験ごとに上書きできます)。
-- `data/questions.<コード>.json` を読み、既存の問題の数との差(足りない分)を、区分ごとに出します。難易度のない既存の問題は、`medium` として数えます。
+- パイプラインで作る問題は、公開済みの問題に**足します**(置き換えません。[ADR 0012](./app/adr/0012-pipeline-adds-to-published-questions.md))。
+- `data/questions.<コード>.json` を読み、公開済みの問題のうち、資格の分野に属するもの(データの検査が、問題の分野が資格マスタにあることを確かめるので、実際にはすべて)を既存の数に入れ、目標との差(足りない分)を、区分ごとに出します。難易度のない既存の問題は、`medium` として数えます。
   目標を満たす分野の不足は 0 で、計画の項目も出ません。
 - 計画はスキーマで検査してから書き出し、読み込むときにも検査します。報告は、分野ごとの目標・既存・不足の件数だけです。
 
@@ -94,13 +95,20 @@ npm run pipeline -- plan <試験コード>
 | `style:<規則>` | 不採用 | 止めるスタイル規則に違反した([スタイルガイド](./question-style.md)) |
 | `distractor:<コード>` | 不採用 | 誤答の設計がない、理由や根拠が足りない |
 | `provenance:<コード>` | 不採用 | 来歴を作れない(`fact-not-found`・`fact-not-passed`・`source-not-in-ledger`) |
+| `data-invalid:<場所>` | 不採用 | 問題データに組み立てると、データの契約に合わない。場所は、項目の名前と番号をハイフンでつないだもの(例: `rubric-passing-points`、`choices-0-key`。全体なら `root`。値は含めない) |
 | `duplicate:similar-existing` / `duplicate:similar-draft` | 不採用 | 設問文が、公開済みの問題 / ほかの下書きとほぼ同じ |
 | `ambiguous:similar-to-correct` / `ambiguous:supported-by-fact` | 保留 | 正答が複数になりうる誤答の候補 |
 | `review:similar-existing` / `review:similar-draft` | 保留 | 設問文が、公開済みの問題 / ほかの下書きに近い |
 | `review:topic-existing` / `review:topic-draft` | 保留 | 論点が同じ(同じ事実カードの組か、同じ正答の組で、設問文が少し似ている) |
 
-取り込みを止める理由コード(出力のファイルを捨てて、失敗の回数を 1 増やします): `output-invalid`(形が違う)、`request-mismatch`(依頼と違う)、
-`schema-invalid`(データの契約に合わない下書きがある)。`request-invalid`(依頼のファイルが壊れている)と `request-stale`(依頼のあとに事実カードが変わった。依頼を作り直す)は、回数に数えません。
+`similar-existing` の比べる相手は、公開済みの問題のすべてです(足す方針のため、公開済みの問題を相手から外しません)。
+
+取り込みを止める理由コード(出力のファイルを捨てて、失敗の回数を 1 増やします): `output-invalid`(形が違う)、`request-mismatch`(依頼と違う)。
+`request-invalid`(依頼のファイルが壊れている)と `request-stale`(依頼のあとに事実カードが変わった。依頼を作り直す)は、回数に数えません。
+データの契約(`packages/data-schema`)に合わない下書きは、出力ごとは止めず、その下書きだけを不採用にします(上の表の `data-invalid:<場所>`)。
+
+下書きの形の上限は、採点基準の観点名とキーワードの長さだけ、データの契約と同じ値を使います(`packages/pipeline/src/contract.ts` が、データの契約の定数をそのまま渡します)。
+それ以外の上限(設問文・解説の長さ、誤答の設計の数など)は、データの契約に上限がない項目に、下書きの側で置く値です(同じ項目に上限があるものは、同じ値です)。下書きの形を通っても、データの契約の検査(本文に URL を含まない、など)に落ちたら `data-invalid` で不採用になります。
 
 - 止めた出力は、理由を添えて、同じエージェントに書き直させます。やり直せる回数は、依頼ごとに設定の `draft.maxAttempts` までです。
   超えると、`再試行の上限` を出し、その依頼を出さなくなります(終了コード 1)。

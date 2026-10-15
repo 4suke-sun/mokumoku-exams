@@ -339,10 +339,7 @@ function importStep(
       continue;
     }
     const factIds = new Set(request.facts.map((f) => f.id));
-    // この出力が捨てられたら、比較の相手に足した分も戻す
-    const poolMark = pool.length;
     const batch: DraftRecord[] = [];
-    let invalid = false;
     for (const draft of out.drafts) {
       const id = draftId(examCode, request.planItemId, draft.factIds, draft.questionText);
       const reasons: string[] = [];
@@ -370,13 +367,14 @@ function importStep(
             referenceUrls: urls,
           }),
         );
+        // 形の検査を通っても、データの検査に落ちた下書きは、その下書きだけを不採用にする(場所だけを持ち、値は含めない)
         if (problems.length > 0) {
-          invalid = true;
-          break;
+          for (const p of uniqueSorted(problems.map(pathCode))) reasons.push(`data-invalid:${p}`);
+        } else {
+          const built = buildEntry(id, draft.factIds, facts, ledger);
+          if ("reasons" in built) for (const r of built.reasons) reasons.push(`provenance:${r}`);
+          else entries.set(id, built.entry);
         }
-        const built = buildEntry(id, draft.factIds, facts, ledger);
-        if ("reasons" in built) for (const r of built.reasons) reasons.push(`provenance:${r}`);
-        else entries.set(id, built.entry);
       }
       for (const f of verdict.blockers) report(output, "下書きの不採用", `${id} ${f.rule} ${f.path}`);
       for (const f of distractors.blockers) report(output, "下書きの不採用", `${id} ${f.code} ${f.path}`);
@@ -422,11 +420,6 @@ function importStep(
       // 以降の下書きは、この下書きとも比べる
       if (held || reasons.length === 0) pool.push(candidateOf(id, "draft", draft));
     }
-    if (invalid) {
-      pool.length = poolMark;
-      fail("schema-invalid");
-      continue;
-    }
     const known = new Set([...current.drafts, ...incoming].map((d) => d.id));
     for (const record of batch) {
       if (known.has(record.id)) continue;
@@ -470,6 +463,19 @@ function importStep(
     rmSync(join(paths.outDir, file), { force: true });
   }
   return failures > 0 ? EXIT.checkFailed : EXIT.ok;
+}
+
+/**
+ * データの検査の場所(`rubric.passingPoints`、`choices.0.key` など)を、理由コードの形(英小文字・数字・ハイフン)にする。
+ * 値は含めない。場所のない誤り(全体)は `root`。
+ */
+export function pathCode(path: string): string {
+  const code = path
+    .replace(/([a-z0-9])([A-Z])/g, "$1-$2")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return code === "" ? "root" : code;
 }
 
 function checkStep(
