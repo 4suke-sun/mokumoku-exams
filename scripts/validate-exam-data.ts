@@ -18,6 +18,7 @@ if (args.length > 1) {
 const dir = args[0] ?? "data";
 
 const blocks: string[] = [];
+const warns: string[] = [];
 try {
   const readJson = (name: string): unknown => JSON.parse(readFileSync(join(dir, name), "utf8"));
   const unreadable: string[] = [];
@@ -41,9 +42,9 @@ try {
   const vendorsPath = join(dir, "vendors.json");
   const vendors = existsSync(vendorsPath) ? read("vendors.json") : null;
   if (unreadable.length === 0)
-    blocks.push(...validateDataSet(exams, questionFiles, vendors), ...validateHostVendors(vendors));
+    blocks.push(...validateDataSet(exams, questionFiles, vendors, warns), ...validateHostVendors(vendors));
 } catch {
   blocks.push(`${dir} を検査できませんでした(フォルダの読み込みに失敗)`);
 }
 
-report("問題データの検査に失敗しました。", blocks, [], "docs/data-spec.md の仕様に沿って直してください。");
+report("問題データの検査に失敗しました。", blocks, warns, "docs/data-spec.md の仕様に沿って直してください。");

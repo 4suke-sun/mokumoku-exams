@@ -4,6 +4,7 @@
  * 報告は、場所(ファイル、項目の位置、問題の ID)と種類だけにする。入力の値は含めない。
  */
 import type { ZodError } from "zod";
+import { checkAnswerBias } from "./bias.ts";
 import type { PublishedExam } from "./schema.ts";
 import { ExamsFileSchema, QuestionsFileSchema, REFERENCE_HOST_VENDORS, VendorsFileSchema } from "./schema.ts";
 import { EXAM_CODE, QUESTION_ID } from "./shape.ts";
@@ -74,8 +75,14 @@ export function validateHostVendors(
  * - exams: 資格マスタ(無ければ null)
  * - questionFiles: questions.<コード>.json の一覧
  * - vendors: ベンダーの略称の一覧(vendors.json)。資格のベンダーと試験コードの先頭が一致するかを検査する
+ * - warnings: 止めはしないが確認してほしいもの(最長の選択肢が正解の割合など)を、ここに足す
  */
-export function validateDataSet(exams: unknown | null, questionFiles: DataFile[], vendors?: unknown | null): string[] {
+export function validateDataSet(
+  exams: unknown | null,
+  questionFiles: DataFile[],
+  vendors?: unknown | null,
+  warnings: string[] = [],
+): string[] {
   const errors: string[] = [];
 
   if (exams === null) {
@@ -141,6 +148,9 @@ export function validateDataSet(exams: unknown | null, questionFiles: DataFile[]
       continue;
     }
     errors.push(...checkAgainstExam(file.name, parsed.data.questions, exam));
+    const bias = checkAnswerBias(file.name, parsed.data.questions);
+    errors.push(...bias.errors);
+    warnings.push(...bias.warnings);
   }
 
   parsedExams.data.exams.forEach((exam, i) => {
