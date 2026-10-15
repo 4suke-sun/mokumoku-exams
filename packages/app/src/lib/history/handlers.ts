@@ -1,7 +1,6 @@
-import type { z } from "zod";
-import { logApiFailure } from "@/lib/api-log.ts";
-import { authenticate, type GuardDeps } from "@/lib/auth/guard.ts";
-import { guard, json } from "@/lib/auth/handlers.ts";
+import { acceptBody, acceptQuery, fail, unavailable } from "@/lib/api/endpoint.ts";
+import type { GuardDeps } from "@/lib/auth/guard.ts";
+import { json } from "@/lib/auth/handlers.ts";
 import { MAX_PREFS_BODY_BYTES, PrefsSchema } from "@/lib/prefs.ts";
 import { prefsSetCookie } from "@/lib/prefs-cookie.ts";
 import { type GradableQuestion, isQuestionCorrect } from "@/lib/quiz.ts";
@@ -41,61 +40,6 @@ export type HistoryDeps = {
   /** 既定は data/ の問題データ */
   questions?: QuestionSource;
 };
-
-/**
- * エラー応答の形は `{ "error": "<種類>" }` だけ。原因・内部の情報・入力の値は返さない。
- * 種類とステータス: bad-request 400(入力が正しくない)/ unauthorized 401 / forbidden 403(別サイトからの送信)/
- * not-found 404(1 回分の結果がない)/ too-large 413 / bad-request 415(JSON でない形式)/ unavailable 503(保存先の失敗)。
- */
-export type HistoryError = "bad-request" | "unauthorized" | "not-found" | "too-large" | "unavailable";
-
-export const fail = (error: HistoryError, status: number, cookies: string[] = []) => json({ error }, status, cookies);
-
-/** 保存先などの失敗。経路・状態・例外の名前だけを記録してから、503 を返す(原因は応答に含めない) */
-export function unavailable(request: Request, error: unknown): Response {
-  logApiFailure(request, 503, error);
-  return fail("unavailable", 503);
-}
-
-/**
- * ログイン中の利用者を、サーバー側で検証して得る。利用者の識別子(`sub`)は、ここで得たものだけを使う
- * (リクエストの本文・パラメーターからは受け取らない)。
- */
-export async function authorize(request: Request, deps: { auth: GuardDeps }) {
-  try {
-    return await authenticate(request.headers.get("cookie"), deps.auth);
-  } catch {
-    return null;
-  }
-}
-
-/** 問い合わせを検査する。同じ名前が 2 回以上あるものは、どちらを使うか曖昧なので断る。 */
-function parseQuery<T extends z.ZodType>(request: Request, schema: T): z.infer<T> | null {
-  const entries = [...new URL(request.url).searchParams.entries()];
-  if (new Set(entries.map(([name]) => name)).size !== entries.length) return null;
-  const parsed = schema.safeParse(Object.fromEntries(entries));
-  return parsed.success ? parsed.data : null;
-}
-
-/**
- * 本文を、大きさを確かめてから JSON として読む。大きさは、読み込む前に申告で、読み込んだあとに実際の大きさで確かめる。
- * 断るときは、その応答を返す。
- */
-export async function readJsonBody(
-  request: Request,
-  maxBytes: number,
-  setCookies: string[],
-): Promise<{ body: unknown } | Response> {
-  const declared = Number(request.headers.get("content-length") ?? 0);
-  if (declared > maxBytes) return fail("too-large", 413, setCookies);
-  const text = await request.text().catch(() => "");
-  if (new TextEncoder().encode(text).length > maxBytes) return fail("too-large", 413, setCookies);
-  try {
-    return { body: JSON.parse(text) };
-  } catch {
-    return fail("bad-request", 400, setCookies);
-  }
-}
 
 /**
  * 結果を、サーバーの問題データで採点し直して、復習プールの変更にする(端末から送られた正誤は使わない)。
@@ -138,10 +82,9 @@ export function tallyOf(result: Result, questions: readonly GradableQuestion[]):
  * `next` に、次の問い合わせの `before` に渡す完了時刻を返す(なければ null)。
  */
 export async function handleListResults(request: Request, deps: HistoryDeps): Promise<Response> {
-  const auth = await authorize(request, deps);
-  if (!auth) return fail("unauthorized", 401);
-  const query = parseQuery(request, ResultsQuerySchema);
-  if (!query) return fail("bad-request", 400, auth.setCookies);
+  const accepted = await acceptQuery(request, deps, { access: "user", query: ResultsQuerySchema });
+  if (accepted instanceof Response) return accepted;
+  const { auth, query } = accepted;
   try {
     const results = await deps.repository.listResults(auth.user.sub, query.examCode, {
       before: query.before,
@@ -156,10 +99,9 @@ export async function handleListResults(request: Request, deps: HistoryDeps): Pr
 
 /** 自分の 1 回分の結果を返す。なければ 404。 */
 export async function handleGetResult(request: Request, deps: HistoryDeps): Promise<Response> {
-  const auth = await authorize(request, deps);
-  if (!auth) return fail("unauthorized", 401);
-  const query = parseQuery(request, ResultQuerySchema);
-  if (!query) return fail("bad-request", 400, auth.setCookies);
+  const accepted = await acceptQuery(request, deps, { access: "user", query: ResultQuerySchema });
+  if (accepted instanceof Response) return accepted;
+  const { auth, query } = accepted;
   try {
     const result = await deps.repository.getResult(auth.user.sub, query.examCode, query.finishedAt);
     return result ? json({ result }, 200, auth.setCookies) : fail("not-found", 404, auth.setCookies);
@@ -174,16 +116,13 @@ export async function handleGetResult(request: Request, deps: HistoryDeps): Prom
  * 公開中でない資格の結果は、保存だけする。
  */
 export async function handlePostResult(request: Request, deps: HistoryDeps): Promise<Response> {
-  const rejected = guard(request);
-  if (rejected) return rejected;
-  const auth = await authorize(request, deps);
-  if (!auth) return fail("unauthorized", 401);
-
-  const read = await readJsonBody(request, MAX_BODY_BYTES, auth.setCookies);
-  if (read instanceof Response) return read;
-  const parsed = apiResultSchema((deps.now ?? Date.now)()).safeParse(read.body);
-  if (!parsed.success) return fail("bad-request", 400, auth.setCookies);
-  const result = parsed.data;
+  const accepted = await acceptBody(request, deps, {
+    access: "user",
+    maxBytes: MAX_BODY_BYTES,
+    body: apiResultSchema((deps.now ?? Date.now)()),
+  });
+  if (accepted instanceof Response) return accepted;
+  const { auth, body: result } = accepted;
 
   try {
     const questions = await (deps.questions ?? examQuestions)(result.examCode);
@@ -215,10 +154,9 @@ async function listByExam(
   deps: HistoryDeps,
   load: (sub: string, examCode: string) => Promise<unknown>,
 ): Promise<Response> {
-  const auth = await authorize(request, deps);
-  if (!auth) return fail("unauthorized", 401);
-  const query = parseQuery(request, ListQuerySchema);
-  if (!query) return fail("bad-request", 400, auth.setCookies);
+  const accepted = await acceptQuery(request, deps, { access: "user", query: ListQuerySchema });
+  if (accepted instanceof Response) return accepted;
+  const { auth, query } = accepted;
   try {
     return json(await load(auth.user.sub, query.examCode), 200, auth.setCookies);
   } catch (error) {
@@ -242,16 +180,13 @@ export function handleListReview(request: Request, deps: HistoryDeps): Promise<R
 
 /** ブックマークを付ける・外す。問題は、公開中の資格の、いまのデータにあるものだけ。 */
 export async function handlePutBookmark(request: Request, deps: HistoryDeps): Promise<Response> {
-  const rejected = guard(request);
-  if (rejected) return rejected;
-  const auth = await authorize(request, deps);
-  if (!auth) return fail("unauthorized", 401);
-
-  const read = await readJsonBody(request, MAX_BOOKMARK_BODY_BYTES, auth.setCookies);
-  if (read instanceof Response) return read;
-  const parsed = BookmarkChangeSchema.safeParse(read.body);
-  if (!parsed.success) return fail("bad-request", 400, auth.setCookies);
-  const change = parsed.data;
+  const accepted = await acceptBody(request, deps, {
+    access: "user",
+    maxBytes: MAX_BOOKMARK_BODY_BYTES,
+    body: BookmarkChangeSchema,
+  });
+  if (accepted instanceof Response) return accepted;
+  const { auth, body: change } = accepted;
 
   try {
     const questions = await (deps.questions ?? examQuestions)(change.examCode);
@@ -272,9 +207,9 @@ export function handleListStats(request: Request, deps: HistoryDeps): Promise<Re
 
 /** 自分の、すべての資格の復習の項目(連続正解とマスター)を返す。問い合わせは受け付けない。 */
 export async function handleListReviewItems(request: Request, deps: HistoryDeps): Promise<Response> {
-  const auth = await authorize(request, deps);
-  if (!auth) return fail("unauthorized", 401);
-  if (!parseQuery(request, EmptyQuerySchema)) return fail("bad-request", 400, auth.setCookies);
+  const accepted = await acceptQuery(request, deps, { access: "user", query: EmptyQuerySchema });
+  if (accepted instanceof Response) return accepted;
+  const { auth } = accepted;
   try {
     return json({ items: await deps.repository.listReviewItems(auth.user.sub) }, 200, auth.setCookies);
   } catch (error) {
@@ -284,18 +219,16 @@ export async function handleListReviewItems(request: Request, deps: HistoryDeps)
 
 /** 自分の復習から、手で外す。外すのは、サーバー側で検証した利用者の区画の項目だけ。 */
 export async function handleDeleteReview(request: Request, deps: HistoryDeps): Promise<Response> {
-  const rejected = guard(request);
-  if (rejected) return rejected;
-  const auth = await authorize(request, deps);
-  if (!auth) return fail("unauthorized", 401);
-
-  const read = await readJsonBody(request, MAX_REVIEW_BODY_BYTES, auth.setCookies);
-  if (read instanceof Response) return read;
-  const parsed = ReviewRemovalSchema.safeParse(read.body);
-  if (!parsed.success) return fail("bad-request", 400, auth.setCookies);
+  const accepted = await acceptBody(request, deps, {
+    access: "user",
+    maxBytes: MAX_REVIEW_BODY_BYTES,
+    body: ReviewRemovalSchema,
+  });
+  if (accepted instanceof Response) return accepted;
+  const { auth, body } = accepted;
 
   try {
-    await deps.repository.removeReview(auth.user.sub, parsed.data.examCode, parsed.data.questionId);
+    await deps.repository.removeReview(auth.user.sub, body.examCode, body.questionId);
     return json({ status: "removed" }, 200, auth.setCookies);
   } catch (error) {
     return unavailable(request, error);
@@ -314,16 +247,13 @@ export function handleGetGoal(request: Request, deps: HistoryDeps): Promise<Resp
 
 /** 目標日を決める・消す。資格は、公開中のものだけ。 */
 export async function handlePutGoal(request: Request, deps: HistoryDeps): Promise<Response> {
-  const rejected = guard(request);
-  if (rejected) return rejected;
-  const auth = await authorize(request, deps);
-  if (!auth) return fail("unauthorized", 401);
-
-  const read = await readJsonBody(request, MAX_GOAL_BODY_BYTES, auth.setCookies);
-  if (read instanceof Response) return read;
-  const parsed = GoalChangeSchema.safeParse(read.body);
-  if (!parsed.success) return fail("bad-request", 400, auth.setCookies);
-  const change = parsed.data;
+  const accepted = await acceptBody(request, deps, {
+    access: "user",
+    maxBytes: MAX_GOAL_BODY_BYTES,
+    body: GoalChangeSchema,
+  });
+  if (accepted instanceof Response) return accepted;
+  const { auth, body: change } = accepted;
 
   try {
     if (!(await (deps.questions ?? examQuestions)(change.examCode))) return fail("bad-request", 400, auth.setCookies);
@@ -343,16 +273,13 @@ export function handleGetSections(request: Request, deps: HistoryDeps): Promise<
 
 /** セクションの進捗を取り込む(保存済みの進捗と 1 つにする)。資格は、公開中のものだけ。統合した進捗を返す。 */
 export async function handlePutSections(request: Request, deps: HistoryDeps): Promise<Response> {
-  const rejected = guard(request);
-  if (rejected) return rejected;
-  const auth = await authorize(request, deps);
-  if (!auth) return fail("unauthorized", 401);
-
-  const read = await readJsonBody(request, MAX_SECTIONS_BODY_BYTES, auth.setCookies);
-  if (read instanceof Response) return read;
-  const parsed = SectionsChangeSchema.safeParse(read.body);
-  if (!parsed.success) return fail("bad-request", 400, auth.setCookies);
-  const incoming = parsed.data;
+  const accepted = await acceptBody(request, deps, {
+    access: "user",
+    maxBytes: MAX_SECTIONS_BODY_BYTES,
+    body: SectionsChangeSchema,
+  });
+  if (accepted instanceof Response) return accepted;
+  const { auth, body: incoming } = accepted;
 
   try {
     if (!(await (deps.questions ?? examQuestions)(incoming.examCode))) return fail("bad-request", 400, auth.setCookies);
@@ -368,9 +295,9 @@ export async function handlePutSections(request: Request, deps: HistoryDeps): Pr
  * (別の端末でログインしたとき、次の描画から、サーバーが設定を反映できる)。
  */
 export async function handleGetPrefs(request: Request, deps: HistoryDeps): Promise<Response> {
-  const auth = await authorize(request, deps);
-  if (!auth) return fail("unauthorized", 401);
-  if ([...new URL(request.url).searchParams.keys()].length > 0) return fail("bad-request", 400, auth.setCookies);
+  const accepted = await acceptQuery(request, deps, { access: "user", query: EmptyQuerySchema });
+  if (accepted instanceof Response) return accepted;
+  const { auth } = accepted;
   try {
     const prefs = await deps.repository.getPrefs(auth.user.sub);
     const cookies = prefs
@@ -387,22 +314,17 @@ export async function handleGetPrefs(request: Request, deps: HistoryDeps): Promi
  * (本文に足すと、未知の項目として断る)。設定の Cookie も付ける。
  */
 export async function handlePutPrefs(request: Request, deps: HistoryDeps): Promise<Response> {
-  const rejected = guard(request);
-  if (rejected) return rejected;
-  const auth = await authorize(request, deps);
-  if (!auth) return fail("unauthorized", 401);
-
-  const read = await readJsonBody(request, MAX_PREFS_BODY_BYTES, auth.setCookies);
-  if (read instanceof Response) return read;
-  const parsed = PrefsSchema.safeParse(read.body);
-  if (!parsed.success) return fail("bad-request", 400, auth.setCookies);
+  const accepted = await acceptBody(request, deps, {
+    access: "user",
+    maxBytes: MAX_PREFS_BODY_BYTES,
+    body: PrefsSchema,
+  });
+  if (accepted instanceof Response) return accepted;
+  const { auth, body } = accepted;
 
   try {
-    await deps.repository.setPrefs(auth.user.sub, parsed.data);
-    return json({ status: "saved" }, 200, [
-      ...auth.setCookies,
-      prefsSetCookie(auth.user.sub, parsed.data, deps.auth.secure),
-    ]);
+    await deps.repository.setPrefs(auth.user.sub, body);
+    return json({ status: "saved" }, 200, [...auth.setCookies, prefsSetCookie(auth.user.sub, body, deps.auth.secure)]);
   } catch (error) {
     return unavailable(request, error);
   }

@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { logApiFailure } from "@/lib/api-log.ts";
+import { logApiFailure } from "@/lib/api/log.ts";
 import { isAdmin, isAdminPath } from "@/lib/auth/admin.ts";
 import { guardDeps } from "@/lib/auth/deps.ts";
 import { authenticate, isPublicPath } from "@/lib/auth/guard.ts";

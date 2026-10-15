@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { API_FAILURE_EVENT, logApiFailure } from "./api-log.ts";
+import { API_FAILURE_EVENT, logApiFailure } from "./log.ts";
 
 const MARKER = "marker-7f3a";
 

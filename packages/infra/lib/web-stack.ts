@@ -22,7 +22,7 @@ import { grantReadVapidPrivateKey, vapidEnvironment } from "./push-stack.ts";
 
 /** アプリがオリジンの合言葉を確かめるヘッダー名(packages/app/src/lib/origin-verify.ts と同じ) */
 export const ORIGIN_VERIFY_HEADER = "x-origin-verify";
-/** アプリが API の失敗を記録するときの印(packages/app/src/lib/api-log.ts の `API_FAILURE_EVENT` と同じ) */
+/** アプリが API の失敗を記録するときの印(packages/app/src/lib/api/log.ts の `API_FAILURE_EVENT` と同じ) */
 export const API_FAILURE_EVENT = "api-failure";
 /** 5xx の件数のメトリクスの名前 */
 export const API_FAILURE_METRIC = "ApiServerErrors";
