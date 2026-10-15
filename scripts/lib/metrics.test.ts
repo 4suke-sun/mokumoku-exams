@@ -44,6 +44,15 @@ describe("parseMetrics の検査", () => {
   });
 });
 
+describe("parseMetrics の verify の記録", () => {
+  it("段階の時間が負・小数・上限超え_読み込まず、正しい記録だけ残す", () => {
+    const line = (ms: number) =>
+      `${JSON.stringify({ type: "verify", at: "t", stages: [{ name: "lint", ms, ok: true }] })}\n`;
+    const text = [line(1000), line(-1), line(1.5), line(1_000_000_000_000)].join("");
+    expect(parseMetrics(text)).toHaveLength(1);
+  });
+});
+
 describe("summarizeVerify", () => {
   it("複数回の実行_段階ごとに平均・最大・失敗の回数を出し、平均の長い順に並べる", () => {
     const records = [

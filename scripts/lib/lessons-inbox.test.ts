@@ -77,7 +77,7 @@ describe("parseInbox", () => {
     expect(parseInbox(text).map((r) => r.type)).toEqual(["candidate", "closed"]);
   });
 
-  it("版の形が不正な行_読み込まない(書き込み側と同じ検査)", () => {
+  it("版の形が不正な行_読み込まない(読み込み側で版の形を検査する)", () => {
     const bad = serializeRecord(candidate({ version: "latest" }));
     expect(parseInbox(bad)).toEqual([]);
   });
