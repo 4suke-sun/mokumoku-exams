@@ -1,6 +1,6 @@
-import { normalizeKeyword } from "@mokumoku-exams/data-schema/exam-data/schema";
+import { normalizeKeyword } from "@mokumoku-exams/data-schema/exam-data/shape";
 import { describe, expect, it } from "vitest";
-import { judgeFreeText, normalizeForMatch } from "./free-text.ts";
+import { judgeFreeText } from "./free-text.ts";
 import type { Rubric } from "./types.ts";
 
 const rubric: Rubric = {
@@ -42,7 +42,7 @@ describe("judgeFreeText", () => {
 
   it("全角半角・大文字小文字・空白の違い_同じキーワードとして照合する", () => {
     expect(judgeFreeText(rubric, "ｓ３ に 保 存")).toMatchObject({ earned: 100, passed: true });
-    expect(normalizeForMatch(" Ａ b\nC ")).toBe("abc");
+    expect(normalizeKeyword(" Ａ b\nC ")).toBe("abc");
   });
 
   it("ならすと空になるキーワード_どの回答にも含まれないものとして扱う", () => {
@@ -126,13 +126,5 @@ describe("judgeFreeText(観点が 3 つの採点基準)", () => {
     expect(met("Object 　 Storage")).toEqual([true, false, false]);
     expect(met("従量\n課金")).toEqual([false, false, true]);
     expect(met("冗\t長\t化")).toEqual([false, true, false]);
-  });
-});
-
-describe("normalizeForMatch と、データの検査のならし方", () => {
-  it("同じ結果になる(ならすと空になるキーワードを、検査で止めるため)", () => {
-    for (const value of [" Ａ b\nC ", "ｵﾌﾞｼﾞｪｸﾄ", "　\t", "Object Storage", "従量 課金"]) {
-      expect(normalizeForMatch(value)).toBe(normalizeKeyword(value));
-    }
   });
 });

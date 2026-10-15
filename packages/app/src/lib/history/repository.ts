@@ -7,6 +7,7 @@ import {
   QueryCommand,
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
+import { EXAM_CODE, QUESTION_ID } from "@mokumoku-exams/data-schema/exam-data/shape";
 import { type Prefs, PrefsSchema } from "@/lib/prefs.ts";
 import { RECENT_STAT_LIMIT } from "@/lib/question-stats.ts";
 import {
@@ -17,7 +18,8 @@ import {
   SectionProgressSchema,
 } from "@/lib/storage.ts";
 import { isValidDate, jstDate, type StudyDay } from "@/lib/study-days.ts";
-import { EXAM_CODE_PATTERN, MASTER_STREAK, QUESTION_ID_PATTERN } from "./schema.ts";
+import { RESULTS_PAGE_SIZE } from "./limits.ts";
+import { MASTER_STREAK } from "./schema.ts";
 
 /** 履歴の保存先。利用者の識別子(`sub`)は、検証済みのものだけを渡す。 */
 export interface HistoryRepository {
@@ -84,8 +86,7 @@ export type ReviewChange = { wrong: readonly string[]; correct: readonly string[
 /** 復習の項目。`streak` は連続正解の数(古い保存で持たないときは 0) */
 export type ReviewItem = { examCode: string; questionId: string; streak: number; mastered: boolean };
 
-/** 結果の一覧で、1 回に返す件数 */
-export const RESULTS_PAGE_SIZE = 50;
+export { RESULTS_PAGE_SIZE };
 
 /** 1 回の結果での、1 問の正誤 */
 export type QuestionOutcome = { questionId: string; correct: boolean };
@@ -211,7 +212,7 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
   /** SK の接頭辞のあとに続く問題 ID を取り出す(問題 ID の形のものだけ)。 */
   const questionIdsOf = async (sub: string, prefix: string) => {
     const { Items = [] } = await query(sub, prefix, { keysOnly: true });
-    return Items.map((item) => String(item.SK).slice(prefix.length)).filter((id) => QUESTION_ID_PATTERN.test(id));
+    return Items.map((item) => String(item.SK).slice(prefix.length)).filter((id) => QUESTION_ID.test(id));
   };
   const put = (sub: string, sk: string, attributes: Record<string, unknown>) =>
     client.send(new PutCommand({ TableName: tableName, Item: { PK: userKey(sub), SK: sk, ...attributes } }));
@@ -295,7 +296,7 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
           count: isCount(item.count) ? item.count : 0,
           recent: recentOf(item.recent).map((e) => e.correct),
         }))
-        .filter((stat) => QUESTION_ID_PATTERN.test(stat.questionId));
+        .filter((stat) => QUESTION_ID.test(stat.questionId));
     },
 
     listBookmarks: (sub, examCode) => questionIdsOf(sub, bookmarkKeyPrefix(examCode)),
@@ -311,13 +312,13 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
       return (await queryAll(sub, prefix))
         .filter((item) => !reviewStateOf(item).mastered)
         .map((item) => String(item.SK).slice(prefix.length))
-        .filter((id) => QUESTION_ID_PATTERN.test(id));
+        .filter((id) => QUESTION_ID.test(id));
     },
 
     async listReviewItems(sub) {
       return (await queryAll(sub, REVIEW_PREFIX)).flatMap((item): ReviewItem[] => {
         const [examCode = "", questionId = ""] = String(item.SK).slice(REVIEW_PREFIX.length).split("#");
-        if (!QUESTION_ID_PATTERN.test(questionId) || !EXAM_CODE_PATTERN.test(examCode)) return [];
+        if (!QUESTION_ID.test(questionId) || !EXAM_CODE.test(examCode)) return [];
         return [{ examCode, questionId, ...reviewStateOf(item) }];
       });
     },

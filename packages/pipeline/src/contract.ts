@@ -9,6 +9,7 @@ export {
   hostAllowedForVendor,
   normalizeKeyword,
   normalizeText,
+  QUESTION_ID,
   QuestionsFileSchema,
   REFERENCE_HOST_VENDORS,
   RubricSchema,

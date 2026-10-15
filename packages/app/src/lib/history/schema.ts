@@ -1,3 +1,4 @@
+import { EXAM_CODE, QUESTION_ID } from "@mokumoku-exams/data-schema/exam-data/shape";
 import { z } from "zod";
 import {
   checkPerQuestionLengths,
@@ -6,15 +7,6 @@ import {
   SectionProgressSchema,
 } from "@/lib/storage.ts";
 import { isValidDate } from "@/lib/study-days.ts";
-
-/**
- * 資格コード(data/exams.json と同じ形: `<ベンダー略称>-<試験略称>-<版>`)。DynamoDB のキーに使うため、区切りの `#` などを含められない。
- * 以前の形(`AIB` など)は、受け付けない。
- */
-export const EXAM_CODE_PATTERN = /^[A-Z][A-Z0-9]{1,5}-[A-Z][A-Z0-9]{1,9}-[A-Z0-9]{2,4}$/;
-
-/** 問題 ID は `<問題 ID の接頭辞>-<4 桁の連番>`(接頭辞は資格マスタの `idPrefix`。docs/data-spec.md)。 */
-export const QUESTION_ID_PATTERN = /^[A-Z][A-Z0-9]{1,15}-\d{4}$/;
 
 /** 選択肢のキー。1 つの問題の選択肢は 10 個までなので、A から J。 */
 const CHOICE_KEY_PATTERN = /^[A-J]$/;
@@ -46,15 +38,11 @@ const questionKey = z.string().max(64);
 export function apiResultSchema(nowMs: number) {
   const latest = nowMs + CLOCK_SKEW_MS;
   return ResultBaseSchema.extend({
-    examCode: z.string().regex(EXAM_CODE_PATTERN),
+    examCode: z.string().regex(EXAM_CODE),
     finishedAt: z.iso
       .datetime({ precision: 3 })
       .refine((value) => value >= EARLIEST_FINISHED_AT && Date.parse(value) <= latest, "時刻が範囲の外です。"),
-    questionIds: z
-      .array(z.string().regex(QUESTION_ID_PATTERN))
-      .min(1)
-      .max(500)
-      .refine(unique, "問題 ID に重複があります。"),
+    questionIds: z.array(z.string().regex(QUESTION_ID)).min(1).max(500).refine(unique, "問題 ID に重複があります。"),
     answers: z.record(questionKey, choiceKeys),
     textAnswers: z.record(questionKey, z.string().max(MAX_TEXT_ANSWER_LENGTH)).optional(),
     choiceOrder: z.record(questionKey, choiceKeys).optional(),
@@ -72,20 +60,20 @@ export function apiResultSchema(nowMs: number) {
 /** 復習の問題に、連続でこの回数だけ正解したら、マスターにする(画面とサーバーで同じ値を使う) */
 export const MASTER_STREAK = 2;
 
-export const ListQuerySchema = z.strictObject({ examCode: z.string().regex(EXAM_CODE_PATTERN) });
+export const ListQuerySchema = z.strictObject({ examCode: z.string().regex(EXAM_CODE) });
 
 /** 完了時刻(ミリ秒つきの ISO 8601。結果のキーの一部) */
 const FINISHED_AT = z.iso.datetime({ precision: 3 });
 
 /** 結果の一覧の問い合わせ。`before` を渡すと、その完了時刻より古いものを返す(ページ分け) */
 export const ResultsQuerySchema = z.strictObject({
-  examCode: z.string().regex(EXAM_CODE_PATTERN),
+  examCode: z.string().regex(EXAM_CODE),
   before: FINISHED_AT.optional(),
 });
 
 /** 1 回分の結果の問い合わせ */
 export const ResultQuerySchema = z.strictObject({
-  examCode: z.string().regex(EXAM_CODE_PATTERN),
+  examCode: z.string().regex(EXAM_CODE),
   finishedAt: FINISHED_AT,
 });
 
@@ -94,8 +82,8 @@ export const EmptyQuerySchema = z.strictObject({});
 
 /** 復習から手で外す本文。問題 ID は、この資格のもの */
 export const ReviewRemovalSchema = z.strictObject({
-  examCode: z.string().regex(EXAM_CODE_PATTERN),
-  questionId: z.string().regex(QUESTION_ID_PATTERN),
+  examCode: z.string().regex(EXAM_CODE),
+  questionId: z.string().regex(QUESTION_ID),
 });
 
 /** 復習から外す本文の上限(資格コードと問題 ID だけなので、小さい) */
@@ -106,8 +94,8 @@ export const MAX_BOOKMARK_BODY_BYTES = 1_000;
 
 /** ブックマークを付ける・外す。問題 ID は、この資格のもの。 */
 export const BookmarkChangeSchema = z.strictObject({
-  examCode: z.string().regex(EXAM_CODE_PATTERN),
-  questionId: z.string().regex(QUESTION_ID_PATTERN),
+  examCode: z.string().regex(EXAM_CODE),
+  questionId: z.string().regex(QUESTION_ID),
   bookmarked: z.boolean(),
 });
 
@@ -120,7 +108,7 @@ export const LATEST_GOAL_DATE = "2099-12-31";
 
 /** 目標日を決める・消す。日付は実在する `YYYY-MM-DD` で、範囲の中。null で消す。 */
 export const GoalChangeSchema = z.strictObject({
-  examCode: z.string().regex(EXAM_CODE_PATTERN),
+  examCode: z.string().regex(EXAM_CODE),
   date: z
     .string()
     .refine(
@@ -135,6 +123,6 @@ export const MAX_SECTIONS_BODY_BYTES = 200_000;
 
 /** セクションの進捗を取り込む。端末に保存する形(`SectionProgressSchema`)に、資格コードの形の条件を足す。 */
 export const SectionsChangeSchema = SectionProgressSchema.refine(
-  (progress) => EXAM_CODE_PATTERN.test(progress.examCode),
+  (progress) => EXAM_CODE.test(progress.examCode),
   "資格コードが正しくありません。",
 );

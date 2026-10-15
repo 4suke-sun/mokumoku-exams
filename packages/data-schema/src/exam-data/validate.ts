@@ -6,6 +6,7 @@
 import type { ZodError } from "zod";
 import type { PublishedExam } from "./schema.ts";
 import { ExamsFileSchema, QuestionsFileSchema, REFERENCE_HOST_VENDORS, VendorsFileSchema } from "./schema.ts";
+import { EXAM_CODE, QUESTION_ID } from "./shape.ts";
 
 export interface DataFile {
   name: string;
@@ -14,8 +15,7 @@ export interface DataFile {
 
 export const EXAMS_FILE = "exams.json";
 export const VENDORS_FILE = "vendors.json";
-const QUESTIONS_FILE = /^questions\.([a-z][a-z0-9]{1,5}-[a-z][a-z0-9]{1,9}-[a-z0-9]{2,4})\.json$/;
-const QUESTION_ID = /^[A-Z][A-Z0-9]{1,15}-\d{4}$/;
+const QUESTIONS_FILE = /^questions\.(.+)\.json$/;
 
 const KIND: Record<string, string> = {
   invalid_type: "型が違います",
@@ -114,11 +114,12 @@ export function validateDataSet(exams: unknown | null, questionFiles: DataFile[]
 
   for (const file of [...questionFiles].sort((a, b) => a.name.localeCompare(b.name))) {
     const match = QUESTIONS_FILE.exec(file.name);
-    if (!match?.[1]) {
+    const fileCode = match?.[1];
+    if (fileCode === undefined || fileCode !== fileCode.toLowerCase() || !EXAM_CODE.test(fileCode.toUpperCase())) {
       errors.push(`${file.name}: ファイル名が questions.<コード(英小文字と数字)>.json の形ではありません`);
       continue;
     }
-    const code = match[1].toUpperCase();
+    const code = fileCode.toUpperCase();
     seenFiles.add(code);
 
     const parsed = QuestionsFileSchema.safeParse(file.data);

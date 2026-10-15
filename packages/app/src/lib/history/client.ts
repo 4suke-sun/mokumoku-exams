@@ -1,3 +1,4 @@
+import { EXAM_CODE } from "@mokumoku-exams/data-schema/exam-data/shape";
 import { z } from "zod";
 import {
   type KeyValueStore,
@@ -10,8 +11,9 @@ import {
   saveSectionProgress,
 } from "@/lib/storage.ts";
 import { DATE_PATTERN, type StudyDay } from "@/lib/study-days.ts";
+import { RESULTS_PAGE_SIZE } from "./limits.ts";
 
-const ListSchema = z.object({ results: z.array(ResultSchema).max(50) });
+const ListSchema = z.object({ results: z.array(ResultSchema).max(RESULTS_PAGE_SIZE) });
 const OneSchema = z.object({ result: ResultSchema });
 
 /**
@@ -224,7 +226,7 @@ const ReviewItemsSchema = z.object({
   items: z
     .array(
       z.object({
-        examCode: z.string().max(16),
+        examCode: z.string().regex(EXAM_CODE),
         questionId: z.string().max(64),
         streak: z.number().int().min(0),
         mastered: z.boolean(),

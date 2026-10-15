@@ -1,3 +1,4 @@
+import { normalizeKeyword } from "@mokumoku-exams/data-schema/exam-data/shape";
 import type { Rubric } from "./types.ts";
 
 /** 観点ごとの判定 */
@@ -14,25 +15,17 @@ export type FreeTextJudgement = {
 };
 
 /**
- * キーワードとの照合のために、全角・半角、大文字・小文字の違いをならし、空白を除く。
- * データの検査(packages/data-schema/src/exam-data/schema.ts の normalizeKeyword)と同じならし方にする。
- */
-export function normalizeForMatch(value: string): string {
-  return value.normalize("NFKC").toLowerCase().replace(/\s+/g, "");
-}
-
-/**
  * 自由記述の回答を、採点基準で判定する。外部のサービスは使わない。
  * 観点は、キーワードのどれかを回答が含めば満たす。ならすと空になるキーワードは、どの回答にも含まれないものとして扱う。
  * 画面の採点と、サーバーの採点し直し(復習プール)の両方で、この関数を使う。
  */
 export function judgeFreeText(rubric: Rubric, answer: string): FreeTextJudgement {
-  const normalized = normalizeForMatch(answer);
+  const normalized = normalizeKeyword(answer);
   const criteria = rubric.criteria.map((criterion) => ({
     name: criterion.name,
     points: criterion.points,
     met: criterion.keywords.some((keyword) => {
-      const target = normalizeForMatch(keyword);
+      const target = normalizeKeyword(keyword);
       return target !== "" && normalized.includes(target);
     }),
   }));

@@ -7,12 +7,11 @@
  */
 import { z } from "zod";
 import { prose, ReferencesSchema } from "../exam-data/schema.ts";
+import { EXAM_CODE, QUESTION_ID } from "../exam-data/shape.ts";
 
 /** 本文(題・本文・要約・図の文字)は、問題データと同じく、空白だけではなく URL を含まない文字列にする */
 const text = prose;
 
-const EXAM_CODE = /^[A-Z][A-Z0-9]{1,5}-[A-Z][A-Z0-9]{1,9}-[A-Z0-9]{2,4}$/;
-const QUESTION_ID = /^[A-Z][A-Z0-9]{1,15}-\d{4}$/;
 /** 単元と節の ID。単元の ID は URL の一部(`/exams/<資格コード>/study/<単元の ID>`)になる */
 const ID = /^[a-z][a-z0-9-]{0,31}$/;
 const DOMAIN_CODE = /^domain\d{1,2}$/;
