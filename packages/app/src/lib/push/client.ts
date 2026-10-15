@@ -1,5 +1,8 @@
 // ブラウザ側の、プッシュ通知の購読の操作。通知を受け取る Service Worker は public/sw.js。
 
+import { z } from "zod";
+import { requestJson } from "@/lib/api/client.ts";
+
 /** Service Worker の場所。範囲(scope)をサイト全体にするため、直下に置く。 */
 export const SERVICE_WORKER_PATH = "/sw.js";
 
@@ -28,14 +31,6 @@ export async function currentSubscription(): Promise<PushSubscription | null> {
   return (await registration?.pushManager.getSubscription()) ?? null;
 }
 
-async function send(method: "PUT" | "DELETE" | "POST", path: string, body: unknown): Promise<Response | null> {
-  try {
-    return await fetch(path, { method, headers: { "content-type": "application/json" }, body: JSON.stringify(body) });
-  } catch {
-    return null;
-  }
-}
-
 export type SubscribeOutcome = "subscribed" | "denied" | "failed";
 
 /**
@@ -52,8 +47,8 @@ export async function subscribePush(publicKey: string): Promise<SubscribeOutcome
       applicationServerKey: base64UrlToBytes(publicKey),
     });
     const { endpoint, keys } = subscription.toJSON();
-    const response = await send("PUT", "/api/push/subscription", { endpoint, keys });
-    if (response?.ok) return "subscribed";
+    if ((await requestJson("/api/push/subscription", { method: "PUT", body: { endpoint, keys } })).ok)
+      return "subscribed";
     await subscription.unsubscribe().catch(() => undefined);
     return "failed";
   } catch {
@@ -68,21 +63,18 @@ export async function unsubscribePush(): Promise<boolean> {
     if (!subscription) return true;
     const { endpoint } = subscription;
     if (!(await subscription.unsubscribe())) return false;
-    await send("DELETE", "/api/push/subscription", { endpoint });
+    await requestJson("/api/push/subscription", { method: "DELETE", body: { endpoint } });
     return true;
   } catch {
     return false;
   }
 }
 
+const TestResultSchema = z.object({ sent: z.number() });
+
 /** 自分の購読に、テスト通知を送る。送れた数。失敗したら null。 */
+
 export async function sendTestNotification(): Promise<number | null> {
-  const response = await send("POST", "/api/push/test", {});
-  if (!response?.ok) return null;
-  try {
-    const body = (await response.json()) as { sent?: unknown };
-    return typeof body.sent === "number" ? body.sent : null;
-  } catch {
-    return null;
-  }
+  const result = await requestJson("/api/push/test", { method: "POST", body: {}, schema: TestResultSchema });
+  return result.ok ? result.data.sent : null;
 }
