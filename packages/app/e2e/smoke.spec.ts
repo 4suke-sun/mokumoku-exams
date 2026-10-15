@@ -1,3 +1,4 @@
+import AxeBuilder from "@axe-core/playwright";
 import { type Browser, type BrowserContext, expect, type Page, test } from "@playwright/test";
 import {
   FAKE_ADMIN_EMAIL,
@@ -67,6 +68,18 @@ async function answerAndFinish(page: Page) {
       .click();
 }
 
+/** アクセシビリティの自動検査の基準(WCAG 2.1 の A と AA) */
+const A11Y_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
+
+/** 開いている画面に、自動検査で見つかる違反がないことを確かめる。違反は、規則の ID と件数だけで示す */
+async function expectAccessible(page: Page, name: string) {
+  const { violations } = await new AxeBuilder({ page }).withTags(A11Y_TAGS).analyze();
+  expect(
+    violations.map((v) => `${v.id}(${v.nodes.length} 箇所)`),
+    `${name}のアクセシビリティの違反`,
+  ).toEqual([]);
+}
+
 test("未ログイン_ログインの画面へ送られる", async ({ page }) => {
   await page.goto("/exams");
   await expect(page).toHaveURL(/\/login\?next=%2Fexams/);
@@ -113,6 +126,36 @@ test("資格の一覧から出題と結果まで_通して進める", async ({ p
 
   await expect(page).toHaveURL(/\/exams\/EX-SMP-XX\/result/);
   await expect(page.locator("main")).toContainText("正答");
+});
+
+test("主要な画面_WCAG 2.1 AA の自動検査で違反がない", async ({ page }) => {
+  // 表示の動き(フェードイン)の途中の半透明の文字を、コントラストの違反として数えないよう、動きを減らす設定で開く
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await stubHistory(page);
+  await openLogin(page);
+  await expectAccessible(page, "ログイン");
+  await login(page);
+
+  await page.goto("/exams");
+  await expect(page.getByRole("link", { name: /サンプル資格\(動作確認用\)/ }).first()).toBeVisible();
+  await expectAccessible(page, "資格の一覧");
+
+  await page.goto("/exams/EX-SMP-XX/sections");
+  const start = page.getByRole("button", { name: "セクション 1 を解く" });
+  await expect(start).toBeVisible();
+  await expectAccessible(page, "セクションの一覧");
+  // 開発サーバーが出題の画面を初めて組み立てるときは、移るまで数秒かかる。押し直しを重ねないよう、長めに待つ
+  await expect(async () => {
+    await start.click();
+    await expect(page).toHaveURL(/\/exams\/EX-SMP-XX\/play/, { timeout: 15_000 });
+  }).toPass({ timeout: 60_000 });
+  await expect(page.getByRole("progressbar", { name: "進み具合" })).toBeVisible();
+  await expectAccessible(page, "出題");
+
+  await answerAndFinish(page);
+  await expect(page).toHaveURL(/\/exams\/EX-SMP-XX\/result/);
+  await expect(page.locator("main")).toContainText("正答");
+  await expectAccessible(page, "結果");
 });
 
 test("セクションの進捗_別の端末(保存のない新しいブラウザ)でログインしても、同じ進捗が見える", async ({ browser }) => {

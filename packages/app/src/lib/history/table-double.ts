@@ -24,6 +24,21 @@ function applyUpdate(
   }
 }
 
+/**
+ * 文字列を、DynamoDB のソートキーと同じ順(UTF-8 のバイトの順)で比べる。
+ * `localeCompare` や UTF-16 の符号単位の順とは、記号や全角の文字、サロゲートペアの並びが違う。
+ */
+export function compareUtf8(a: string, b: string): number {
+  const x = new TextEncoder().encode(a);
+  const y = new TextEncoder().encode(b);
+  const length = Math.min(x.length, y.length);
+  for (let i = 0; i < length; i++) {
+    const diff = (x[i] ?? 0) - (y[i] ?? 0);
+    if (diff !== 0) return diff;
+  }
+  return x.length - y.length;
+}
+
 /** DynamoDB の Put / Get / Update / Query / Delete / Scan だけを、メモリ上で真似る。送られた命令も記録する。 */
 /**
  * `scanPageSize` と `queryPageSize` は、スキャンと問い合わせの 1 回で読む数(本物の 1MB ごとのページ分けの代わり)。
@@ -67,7 +82,7 @@ export function fakeTable(options: { scanPageSize?: number; queryPageSize?: numb
         const values = command.input.ExpressionAttributeValues as Record<string, string>;
         let found = [...items.values()]
           .filter((i) => i.PK === values[":pk"] && String(i.SK).startsWith(values[":prefix"] as string))
-          .sort((a, b) => String(a.SK).localeCompare(String(b.SK)));
+          .sort((a, b) => compareUtf8(String(a.SK), String(b.SK)));
         if (command.input.ScanIndexForward === false) found = found.reverse();
         // 続きの問い合わせ(ExclusiveStartKey の項目のあとから)と、1 回で返す数
         const start = command.input.ExclusiveStartKey as Record<string, string> | undefined;
@@ -81,7 +96,9 @@ export function fakeTable(options: { scanPageSize?: number; queryPageSize?: numb
       if (command instanceof ScanCommand) {
         // SK の接頭辞での絞り込みと、ページ分けだけを真似る(1 回で読む数は、絞り込みの前に数える)
         const values = command.input.ExpressionAttributeValues as Record<string, string>;
-        const all = [...items.values()].sort((a, b) => `${a.PK}|${a.SK}`.localeCompare(`${b.PK}|${b.SK}`));
+        const all = [...items.values()].sort(
+          (a, b) => compareUtf8(String(a.PK), String(b.PK)) || compareUtf8(String(a.SK), String(b.SK)),
+        );
         const start = command.input.ExclusiveStartKey as Record<string, string> | undefined;
         const from = start ? all.findIndex((i) => i.PK === start.PK && i.SK === start.SK) + 1 : 0;
         const size = command.input.Limit ?? options.scanPageSize;
