@@ -24,6 +24,8 @@ npm install   # 依存を入れ、検査フック(.githooks)を有効にしま�
 | `npm run test:e2e` | 主要な画面の通し確認(Playwright)。開発サーバーを代替の認証で起動して通す。初回は `npx playwright install chromium` が必要 |
 | `npm run check:release-notes` | リリースノートとタグの対応の検査 |
 | `npm run validate:data` | 資格マスタ・問題データ・カリキュラム・使い方ページのデータの検査(仕様: `docs/data-spec.md`) |
+| `npm run lessons -- <add\|list\|repeats\|draft\|close>` | 引っかかりの受け箱(`.git` の共有領域)の記録と集計。手順は `docs/lessons-workflow.md` |
+| `npm run metrics` | 手元の計測の集計(`verify` の段階ごとの時間、サブエージェントの時間とトークン、検査の台帳の内訳)。`-- agent <役> <ミリ秒> <トークン>` で記録を足す |
 | `npm run check:lessons` | 学びの記録(`docs/app/lessons/`)の書式の検査。`-- --write` で一覧を更新 |
 | `npm run check:test-titles` | テストの題(`it` / `test`)の形の検査。`-- --write` で、直した題を基準から消す |
 | `npm run check:docs` | 文書の相対リンクの先と、`npm run <名前>` のスクリプトが実在することの検査(対象: `README.md`、`CLAUDE.md`、`CONTRIBUTING.md`、`docs/`、`.claude/skills/`、`packages/*/README.md`) |
@@ -187,7 +189,7 @@ npm run release -- <PR の番号>           # マージから確認の一覧ま�
 - 再実行してよい作りです。タグ・Release・閉じたマイルストーン・消えたブランチは、「済み」として扱います。失敗した段階(未完了の Issue が残るマイルストーンを含む)で止まり、どの段階まで終えたかを表示します。最後の確認で `Closes` の Issue が閉じていないと表示されたときは、GitHub の反映が遅れていることがあります。時間をおいて、同じコマンドを再実行します。
 - Release は、タグの push で `release-tag.yml` が作ります(リリースノートのエントリが本文になります)。スクリプトは、作られるまで待って確かめます。タグとリリースノートは、1 対 1 で対応します。
 - スクリプトの呼び出しは、`.claude/settings.json` の確認必須(`ask`)に入っています。権限の確認を省く動作モードでは確認にならないので、人の明示の指示をスキルの中で確かめます。
-- 版の締めでは、この版で引っかかったことを振り返り、再発を防ぐ形(機械検査、共通の決まり、スキルの手順、`docs/app/lessons/`)にします(スキルの Step 4)。
+- 版の締めでは、受け箱に溜めた引っかかりから、同じ種類が繰り返されたものを Issue の候補として提案し、再発を防ぐ形(機械検査、共通の決まり、スキルの手順、`docs/app/lessons/`、`CLAUDE.md`)にします(スキルの Step 4。手順は [docs/lessons-workflow.md](docs/lessons-workflow.md))。
 
 ### リポジトリの設定
 

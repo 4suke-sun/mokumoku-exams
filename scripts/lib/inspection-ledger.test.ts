@@ -90,7 +90,8 @@ describe("patchIdOf", () => {
   });
 });
 
-describe("inspection-ledger コマンド", () => {
+// 子プロセスと一時のリポジトリを多く作るので、負荷の高い環境でも 30 秒の既定を超えないよう、上限を広げる
+describe("inspection-ledger コマンド", { timeout: 120_000 }, () => {
   const script = fileURLToPath(new URL("../inspection-ledger.ts", import.meta.url));
 
   function git(cwd: string, ...args: string[]): string {

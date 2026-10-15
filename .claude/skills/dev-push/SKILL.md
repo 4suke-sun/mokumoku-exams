@@ -93,3 +93,8 @@ git push -u origin "$(git branch --show-current)"
 - `--force` / `--force-with-lease` は、このスキルでは実行しない。必要なら、理由を説明して人の承認を待つ
 - push が失敗したら、原因を確認してから、1 回だけ再試行する
 - PR も出すなら、push の前に `/dev-pr` を使う(push も含めて、検査と承認が 1 回になる)。このスキルで先に push したあとに PR だけ出すときも、`/dev-pr` を使う
+
+## 引っかかりの記録
+
+`BLOCK`・`WARN`・差し戻しなど、手戻りが出たときは、その場で受け箱へ足す(`node scripts/lessons.ts add …`。書式と種類のキーは `docs/lessons-workflow.md`)。
+同じ種類が繰り返されたものは、版の締めで Issue の候補として提案される。

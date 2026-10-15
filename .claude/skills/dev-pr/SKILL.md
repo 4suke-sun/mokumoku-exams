@@ -195,3 +195,8 @@ node scripts/post-issues.ts .drafts/issues/manifest.json --seal
 6. マージは、このスキルの範囲外(人の指示があるときだけ行う)
 
 コメントやラベルなど、本文の残らない軽い操作は、機械検査のみで足りる(人の確認は省いてよい)。
+
+## 引っかかりの記録
+
+`BLOCK`・`WARN`・差し戻しなど、手戻りが出たときは、その場で受け箱へ足す(`node scripts/lessons.ts add …`。書式と種類のキーは `docs/lessons-workflow.md`)。
+同じ種類が繰り返されたものは、版の締めで Issue の候補として提案される。
