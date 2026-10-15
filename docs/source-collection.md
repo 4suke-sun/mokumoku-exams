@@ -131,7 +131,7 @@
 | `plan-not-found` | 計画ファイルがない | `packages/pipeline/plans/<コード>.json` を作る |
 | `invalid-json` / `schema` | JSON の形・項目の誤り | 「2. 資格を新しく足すときの収集の手順」の形に合わせる |
 | `exam-code-mismatch` | 中の `examCode` が、指定した資格と違う | ファイル名と `examCode` を合わせる |
-| `not-https` / `malformed` / `userinfo` / `port` | URL の形が出典に使えない | `https://` の、ユーザー情報・ポートのない URL にする |
+| `not-https` / `malformed` / `userinfo` / `port` / `query` / `fragment` | URL の形が出典に使えない | `https://` の、ユーザー情報・既定以外のポート・クエリ文字列・フラグメントのない URL にする(クエリを持つページは、計画の候補にもリダイレクト先にもできない) |
 | `host-not-allowed` | 許可ドメインにない | 許可ドメインの追加の手順を経るか、URL を外す |
 | `out-of-scope` | 収集を始める URL・`guidePages` が、どの接頭辞の中にもない | `scope.prefixes` を足すか、URL を直す |
 | `excluded-listed` | 収集を始める URL・`guidePages` が、除外に当たる | 一覧か除外の一方を直す |

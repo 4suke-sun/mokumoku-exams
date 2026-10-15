@@ -226,19 +226,30 @@ export const REFERENCE_HOST_VENDORS: Readonly<Record<string, readonly string[]>>
 };
 
 /** 出典の URL を落とす理由のコード。値は含めない */
-export type SourceUrlReason = "not-https" | "malformed" | "userinfo" | "port" | "host-not-allowed";
+export type SourceUrlReason =
+  | "not-https"
+  | "malformed"
+  | "userinfo"
+  | "port"
+  | "query"
+  | "fragment"
+  | "host-not-allowed";
 
 const SOURCE_URL_MESSAGES: Record<SourceUrlReason, string> = {
   "not-https": "https で始まる URL ではありません",
   malformed: "URL の形ではありません",
   userinfo: "ユーザー情報付きの URL です",
   port: "ポート付きの URL です",
+  query: "クエリ文字列(?…)付きの URL です",
+  fragment: "フラグメント(#…)付きの URL です",
   "host-not-allowed": "出典に許していないドメインの URL です",
 };
 
 /**
  * 出典の URL を落とす理由のコードを返す(問題がなければ null)。
- * https で、ユーザー情報とポートを持たず、ホスト名が ALLOWED_REFERENCE_HOSTS に完全一致する URL だけを許す。
+ * https で、ユーザー情報・ポート・クエリ文字列・フラグメントを持たず、ホスト名が ALLOWED_REFERENCE_HOSTS に完全一致する URL だけを許す。
+ * 出典は資料のページを指せば足りる。クエリとフラグメントは、署名や利用者を識別する値を運びうるので許さない。
+ * 空の `?` や `#` は、URL の解釈では空文字列になって見逃すので、解釈の前の文字列で確かめる。
  * ホスト名は URL の解釈で小文字になり、既定のポート(443)は取り除かれる。末尾のドットや、似せたホスト名は一致しない。
  */
 export function sourceUrlReason(value: string): SourceUrlReason | null {
@@ -252,6 +263,8 @@ export function sourceUrlReason(value: string): SourceUrlReason | null {
   if (url.protocol !== "https:") return "not-https";
   if (url.username !== "" || url.password !== "") return "userinfo";
   if (url.port !== "") return "port";
+  if (value.includes("?")) return "query";
+  if (value.includes("#")) return "fragment";
   if (!ALLOWED_REFERENCE_HOSTS.includes(url.hostname)) return "host-not-allowed";
   return null;
 }

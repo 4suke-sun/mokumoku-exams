@@ -338,7 +338,7 @@ describe("問題のスキーマ", () => {
 
   it("出典_許したドメインの https の URL を通す。題は任意", () => {
     const references = ALLOWED_REFERENCE_HOSTS.map((host, i) =>
-      i === 0 ? { url: `https://${host}/path?q=1#top` } : { title: `出典 ${i}`, url: `https://${host}/` },
+      i === 0 ? { url: `https://${host}/path/page.html` } : { title: `出典 ${i}`, url: `https://${host}/` },
     );
     expect(messages(question(1, { references }))).toEqual([]);
   });
@@ -378,6 +378,17 @@ describe("問題のスキーマ", () => {
     expect(sourceUrlReason("https://docs.aws.amazon.com:8443/")).toBe("port");
     expect(sourceUrlReason("https://docs.aws.amazon.com./")).toBe("host-not-allowed");
     expect(sourceUrlReason("https://docs-aws-amazon.com/")).toBe("host-not-allowed");
+  });
+
+  it("出典_クエリ文字列とフラグメントを持つ URL_理由コード付きで落とし_空の ? と # も落とす", () => {
+    expect(sourceUrlReason("https://docs.aws.amazon.com/x?a=1")).toBe("query");
+    expect(sourceUrlReason("https://docs.aws.amazon.com/x#top")).toBe("fragment");
+    expect(sourceUrlReason("https://docs.aws.amazon.com/x?a=1#top")).toBe("query");
+    expect(sourceUrlReason("https://docs.aws.amazon.com/x?")).toBe("query");
+    expect(sourceUrlReason("https://docs.aws.amazon.com/x#")).toBe("fragment");
+    expect(sourceUrlReason("https://docs.aws.amazon.com/x/page.html")).toBeNull();
+    // 文言は種類だけで、URL の値を含めない
+    expect(referenceUrlProblem("https://docs.aws.amazon.com/x?page=query-value")).not.toContain("query-value");
   });
 
   it("出典_ホストとベンダーの対応表_許可の一覧と同じホストを持ち、ベンダーを空にしない", () => {
