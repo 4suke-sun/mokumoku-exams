@@ -18,6 +18,9 @@ export type MetricRecord =
 
 const METRICS_FILE = "mokumoku-metrics.jsonl";
 
+/** サブエージェントの役の名前の形。書き込み(scripts/metrics.ts)と読み込み(parseMetrics)の両方で使う。 */
+export const AGENT_NAME = /^[a-z][a-z0-9-]{1,39}$/;
+
 export function metricsPath(gitCommonDir: string): string {
   return join(gitCommonDir, METRICS_FILE);
 }
@@ -26,10 +29,14 @@ export function serializeMetric(record: MetricRecord): string {
   return `${JSON.stringify(record)}\n`;
 }
 
+function isCount(value: unknown): value is number {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0 && value <= COUNT_MAX;
+}
+
 function isStage(value: unknown): value is VerifyStage {
   if (typeof value !== "object" || value === null) return false;
   const s = value as Record<string, unknown>;
-  return typeof s.name === "string" && typeof s.ms === "number" && typeof s.ok === "boolean";
+  return typeof s.name === "string" && isCount(s.ms) && typeof s.ok === "boolean";
 }
 
 /** 記録を読む。壊れた行・形の合わない行は飛ばす。 */
@@ -45,8 +52,9 @@ export function parseMetrics(text: string): MetricRecord[] {
       } else if (
         r.type === "agent" &&
         typeof r.name === "string" &&
-        typeof r.ms === "number" &&
-        typeof r.tokens === "number"
+        AGENT_NAME.test(r.name) &&
+        isCount(r.ms) &&
+        isCount(r.tokens)
       ) {
         out.push({ type: "agent", at: r.at, name: r.name, ms: r.ms, tokens: r.tokens });
       }
@@ -123,7 +131,10 @@ export function summarizeLedger(ledger: Ledger): Record<string, Record<string, n
   return out;
 }
 
-/** 非負の整数の文字列だけを数にする(空文字・負数・小数・指数表記は null)。 */
+/** 記録できる数の上限(12 桁)。書き込み(parseCount)と読み込み(isCount)の両方で使う。 */
+export const COUNT_MAX = 999_999_999_999;
+
+/** 非負の整数の文字列だけを数にする(空文字・負数・小数・指数表記・上限超えは null)。 */
 export function parseCount(value: string | undefined): number | null {
   return value !== undefined && /^\d{1,12}$/.test(value) ? Number(value) : null;
 }

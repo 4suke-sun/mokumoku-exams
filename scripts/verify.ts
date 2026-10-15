@@ -32,6 +32,7 @@ function recordTimings(stages: { name: string; ms: number; ok: boolean }[]): voi
   try {
     const common = execFileSync("git", ["rev-parse", "--path-format=absolute", "--git-common-dir"], {
       encoding: "utf8",
+      stdio: ["ignore", "pipe", "ignore"],
     }).trim();
     appendFileSync(metricsPath(common), serializeMetric({ type: "verify", at: new Date().toISOString(), stages }));
   } catch {

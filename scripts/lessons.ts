@@ -33,7 +33,10 @@ import {
 const [command, ...rest] = process.argv.slice(2);
 
 function commonDir(): string {
-  return execFileSync("git", ["rev-parse", "--path-format=absolute", "--git-common-dir"], { encoding: "utf8" }).trim();
+  return execFileSync("git", ["rev-parse", "--path-format=absolute", "--git-common-dir"], {
+    encoding: "utf8",
+    stdio: ["ignore", "pipe", "ignore"],
+  }).trim();
 }
 
 function currentBranch(): string {

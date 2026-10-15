@@ -42,6 +42,8 @@ export interface ClosedMark {
 
 export type InboxRecord = Candidate | ClosedMark;
 
+/** 版の形。ブランチ名から取れなければ `unknown`。 */
+export const VERSION_PATTERN = /^(v\d+\.\d+\.\d+|unknown)$/;
 export const KEY_PATTERN = /^[a-z0-9][a-z0-9-]{1,39}$/;
 export const TEXT_MAX = 200;
 /** 繰り返しとみなす件数の初期値 */
@@ -75,6 +77,7 @@ function toRecord(value: unknown): InboxRecord | null {
   if (
     r.type === "candidate" &&
     typeof r.version === "string" &&
+    VERSION_PATTERN.test(r.version) &&
     isOneOf(WHOS, r.who) &&
     isOneOf(CAUSES, r.cause) &&
     isOneOf(PROMOTIONS, r.promote) &&

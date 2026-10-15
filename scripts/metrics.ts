@@ -10,6 +10,7 @@ import { appendFileSync, existsSync, readFileSync } from "node:fs";
 import { ledgerPath, readLedger } from "./lib/inspection-ledger.ts";
 import { inboxPath, parseInbox, summarize } from "./lib/lessons-inbox.ts";
 import {
+  AGENT_NAME,
   formatReport,
   metricsPath,
   parseCount,
@@ -25,13 +26,14 @@ const [command, name, ms, tokens] = process.argv.slice(2);
 try {
   const common = execFileSync("git", ["rev-parse", "--path-format=absolute", "--git-common-dir"], {
     encoding: "utf8",
+    stdio: ["ignore", "pipe", "ignore"],
   }).trim();
   const path = metricsPath(common);
 
   if (command === "agent") {
     const msNum = parseCount(ms);
     const tokenNum = parseCount(tokens);
-    if (!name || !/^[a-z][a-z0-9-]{1,39}$/.test(name) || msNum === null || tokenNum === null) {
+    if (!name || !AGENT_NAME.test(name) || msNum === null || tokenNum === null) {
       process.stderr.write("使い方: node scripts/metrics.ts agent <役の名前> <ミリ秒> <トークン>\n");
       process.exitCode = 2;
     } else {

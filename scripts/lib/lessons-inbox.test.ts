@@ -77,6 +77,11 @@ describe("parseInbox", () => {
     expect(parseInbox(text).map((r) => r.type)).toEqual(["candidate", "closed"]);
   });
 
+  it("版の形が不正な行_読み込まない(書き込み側と同じ検査)", () => {
+    const bad = serializeRecord(candidate({ version: "latest" }));
+    expect(parseInbox(bad)).toEqual([]);
+  });
+
   it("書き出した行_読み戻すと同じ内容になる", () => {
     const record = candidate({ what: "禁止された語を書いた" });
     expect(parseInbox(serializeRecord(record))).toEqual([record]);

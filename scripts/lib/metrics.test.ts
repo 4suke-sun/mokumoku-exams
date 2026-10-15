@@ -29,6 +29,21 @@ describe("parseMetrics", () => {
   });
 });
 
+describe("parseMetrics の検査", () => {
+  it("役の名前が不正、または数が負・小数・上限超え_読み込まない(書き込み側と同じ検査)", () => {
+    const line = (over: Record<string, unknown>) =>
+      `${JSON.stringify({ type: "agent", at: "t", name: "inspector", ms: 1000, tokens: 2000, ...over })}\n`;
+    const text = [
+      line({}),
+      line({ name: "Bad Name" }),
+      line({ ms: -1 }),
+      line({ tokens: 1.5 }),
+      line({ ms: 1_000_000_000_000 }),
+    ].join("");
+    expect(parseMetrics(text)).toHaveLength(1);
+  });
+});
+
 describe("summarizeVerify", () => {
   it("複数回の実行_段階ごとに平均・最大・失敗の回数を出し、平均の長い順に並べる", () => {
     const records = [
