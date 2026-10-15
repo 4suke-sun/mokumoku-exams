@@ -182,8 +182,9 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
         else writeFileSync(path, data);
       },
     };
+    // 実装していないコマンドは、成功と取り違えないよう、入力の誤り(使えないコマンド)として 0 以外で終える
     report(output, "未実装", `${command.name}${context.dryRun ? "(dry-run)" : ""}`);
-    return EXIT.ok;
+    return EXIT.inputError;
   } catch (error) {
     if (error instanceof ConfigError) {
       for (const name of error.missing) report(output, "設定の欠落", name);

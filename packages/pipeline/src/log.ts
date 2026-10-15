@@ -52,7 +52,6 @@ export type Kind =
 /** 標準出力に出す種類。ほかは標準エラーに出す */
 const OUT_KINDS: ReadonlySet<Kind> = new Set<Kind>([
   "情報",
-  "未実装",
   "書き込みをしない(dry-run)",
   "取得",
   "出典の変化",

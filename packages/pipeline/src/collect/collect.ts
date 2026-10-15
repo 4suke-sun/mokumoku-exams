@@ -282,7 +282,8 @@ async function collectStep(
     report(output, "件数の上限", `maxItemsPerRun(再実行で続きから進む)`);
     return EXIT.checkFailed;
   }
-  return blocked.length > 0 ? EXIT.checkFailed : EXIT.ok;
+  // 止めた出典と、確認できない出典(取得に失敗した出典)は、失敗として数える
+  return blocked.length > 0 || changes.unconfirmed.length > 0 ? EXIT.checkFailed : EXIT.ok;
 }
 
 /** 試験ガイドが使える状態なら、エージェントへの抽出の依頼を、作業用の置き場に書く */
