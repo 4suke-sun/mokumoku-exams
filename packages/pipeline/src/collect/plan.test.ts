@@ -61,6 +61,11 @@ describe("収集の計画の検査", () => {
     expect(reasons(plan({ guidePages: ["https://docs.aws.amazon.com/guide/private/a"] }))).toContain("excluded-listed");
     expect(reasons(plan({ guidePages: [page, page] }))).toContain("duplicate");
     expect(reasons(plan({ guidePages: ["https://docs.aws.amazon.com/guide/index.html"] }))).toContain("duplicate");
+    // 試験ガイド以外の収集を始める URL とも重ねない(種別を一意に決めるため)
+    const guide = plan().sources[0] as { url: string; kind: "exam-guide" };
+    expect(reasons(plan({ sources: [guide, { url: page, kind: "official-doc" }], guidePages: [page] }))).toContain(
+      "duplicate",
+    );
   });
 
   it("範囲の判定_接頭辞の中で、除外に当たらず、出典に使える URL だけ", () => {

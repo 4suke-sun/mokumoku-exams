@@ -10,6 +10,7 @@ import { withinParaphraseLimit, withinQuoteLimit, withinQuotesTotal } from "./te
  */
 
 export const SOURCE_KINDS = ["exam-guide", "official-doc", "standard"] as const;
+export type SourceKind = (typeof SOURCE_KINDS)[number];
 /** active だけが、先の段階の根拠に使える。ほかは止める */
 export const SOURCE_STATUSES = ["active", "needs-review", "deprecated", "unreachable"] as const;
 export const CHECK_NAMES = ["official", "target", "deprecation", "freshness", "liveness"] as const;

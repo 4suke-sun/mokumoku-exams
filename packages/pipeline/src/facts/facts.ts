@@ -156,6 +156,8 @@ function requestStep(
   let limited = false;
   for (const source of [...ledger.sources].sort((a, b) => (a.url < b.url ? -1 : 1))) {
     if (source.status !== "active" || source.contentHash === null) continue;
+    // 試験ガイドのページは、分野・出題範囲の材料(台帳の guide)で、事実カードの根拠にしない
+    if (source.kind === "exam-guide") continue;
     const hash = source.contentHash;
     if (facts.extracted.some((e) => e.url === source.url && e.contentHash === hash)) {
       skipped++;

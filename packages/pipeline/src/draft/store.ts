@@ -87,15 +87,23 @@ export function writeDrafts(path: string, file: DraftsFile): void {
   renameSync(tmp, path);
 }
 
-/** 実行の状態。依頼の鍵ごとの失敗の回数、取り込み済みの鍵、計画の項目ごとの出し直しの回数 */
+/** 計画の項目が満たせない理由。事実カードがない、項目の出し直しの上限、依頼の鍵の再試行の上限 */
+export const UNMET_REASONS = ["no-facts", "max-rounds", "max-attempts"] as const;
+export type UnmetReason = (typeof UNMET_REASONS)[number];
+
+/**
+ * 実行の状態。依頼の鍵ごとの失敗の回数、取り込み済みの鍵、計画の項目ごとの出し直しの回数、
+ * 計画の項目ごとの未達の理由(理由コードの集合だけ。本文や入力値は持たない)
+ */
 export interface DraftState {
   attempts: Record<string, number>;
   done: string[];
   rounds: Record<string, number>;
+  unmet: Record<string, UnmetReason[]>;
 }
 
 export function readState(path: string): DraftState {
-  const empty: DraftState = { attempts: {}, done: [], rounds: {} };
+  const empty: DraftState = { attempts: {}, done: [], rounds: {}, unmet: {} };
   if (!existsSync(path)) return empty;
   try {
     const raw = JSON.parse(readFileSync(path, "utf8")) as Partial<DraftState> | null;
@@ -108,10 +116,24 @@ export function readState(path: string): DraftState {
       attempts: numbers(raw.attempts),
       done: Array.isArray(raw.done) ? raw.done.filter((v): v is string => typeof v === "string") : [],
       rounds: numbers(raw.rounds),
+      unmet: reasons(raw.unmet),
     };
   } catch {
     return empty;
   }
+}
+
+/** 未達の理由を読む。知らない理由コードと、理由が空の項目は捨てる(古い形の状態は、空として読む) */
+function reasons(value: unknown): Record<string, UnmetReason[]> {
+  if (typeof value !== "object" || value === null || Array.isArray(value)) return {};
+  const known = new Set<string>(UNMET_REASONS);
+  const entries = Object.entries(value).map(([id, v]): [string, UnmetReason[]] => [
+    id,
+    Array.isArray(v)
+      ? [...new Set(v.filter((r): r is UnmetReason => typeof r === "string" && known.has(r)))].sort()
+      : [],
+  ]);
+  return Object.fromEntries(entries.filter(([, v]) => v.length > 0));
 }
 
 export function writeState(path: string, state: DraftState): void {

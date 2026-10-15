@@ -178,6 +178,52 @@ export function checkProvenance(file: ProvenanceFile, facts: FactsFile, vendor: 
   return problems;
 }
 
+/**
+ * 再検証の検査(来歴と、台帳の今の状態を比べる)。下書き・問題の印は持たず、検査のたびに判定する。
+ * - 根拠の事実カードに、再検証の印がある: recheck-fact
+ * - 書き出した問題に、再検証の印がある: recheck-question
+ * - 根拠の出典が台帳にない: source-not-in-ledger
+ * - 根拠の出典の本文が、来歴を作ったときから変わった: source-changed
+ * - 根拠の出典が active でない: 台帳の検査の、合格しなかった検査の名前ごとに source-check-<名前>(名前がなければ source-<状態>)
+ */
+export function checkRecheck(file: ProvenanceFile, ledger: LedgerFile): ProvenanceProblem[] {
+  const problems: ProvenanceProblem[] = [];
+  const recheckFacts = new Set(ledger.recheck.facts);
+  const recheckQuestions = new Set(ledger.recheck.questions);
+  for (const entry of file.entries) {
+    const codes = new Set<string>();
+    if (entry.factIds.some((id) => recheckFacts.has(id))) codes.add("recheck-fact");
+    if (entry.questionId !== undefined && recheckQuestions.has(entry.questionId)) codes.add("recheck-question");
+    for (const source of entry.sources) {
+      for (const code of sourceProblems(ledger, source.url, source.contentHash)) codes.add(code);
+    }
+    for (const code of [...codes].sort()) problems.push({ draftId: entry.draftId, code });
+  }
+  return problems;
+}
+
+/** 事実カードを、下書きの根拠に使えるか。通過済みで、再検証の印がなく、根拠の出典がどれも active で本文が変わっていない */
+export function usableFact(card: FactsFile["cards"][number], ledger: LedgerFile): boolean {
+  return (
+    card.status === "passed" &&
+    !ledger.recheck.facts.includes(card.id) &&
+    card.sources.every((s) => sourceProblems(ledger, s.url, s.contentHash).length === 0)
+  );
+}
+
+/** 出典が、先の段階の根拠に使えない理由。使えるなら空 */
+export function sourceProblems(ledger: LedgerFile, url: string, contentHash: string): string[] {
+  const current = ledger.sources.find((s) => s.url === url);
+  if (current === undefined) return ["source-not-in-ledger"];
+  const codes: string[] = [];
+  if (current.contentHash !== contentHash) codes.push("source-changed");
+  if (current.status !== "active") {
+    const failed = current.checks.filter((c) => c.result !== "pass").map((c) => `source-check-${c.name}`);
+    codes.push(...(failed.length > 0 ? failed : [`source-${current.status}`]));
+  }
+  return codes;
+}
+
 /** 来歴のない下書きの ID。不採用でない下書きが対象。これが空でなければ、検証の段階へ進めない */
 export function unprovenanced(drafts: readonly DraftRecord[], file: ProvenanceFile): string[] {
   const have = new Set(file.entries.map((e) => e.draftId));

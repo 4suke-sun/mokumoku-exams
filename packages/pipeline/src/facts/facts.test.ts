@@ -143,6 +143,20 @@ describe("facts: 抽出の依頼", () => {
     expect(r.code).toBe(EXIT.checkFailed);
   });
 
+  it("試験ガイドのページとサービスの文書が混ざる台帳_サービスの文書にだけ依頼する", async () => {
+    const root = setupRoot({
+      sources: [
+        entry({ url: DOC_URL, contentHash: DOC_HASH }),
+        entry({ url: "https://docs.aws.amazon.com/guide/index.html", kind: "exam-guide", contentHash: DOC_HASH }),
+        entry({ url: "https://docs.aws.amazon.com/guide/domain1.html", kind: "exam-guide", contentHash: DOC_HASH }),
+      ],
+    });
+    const r = await run(root, ["facts", CODE]);
+    expect(r.code).toBe(EXIT.ok);
+    expect(r.out).toContain("依頼 1 件");
+    expect(readdirSync(join(workDir(root), "requests"))).toEqual([`${KEY}.json`]);
+  });
+
   it("本文がない出典と依頼できる出典が混ざる_依頼できる出典の依頼は書き_終了コード 1 で終わる", async () => {
     const root = setupRoot({
       sources: [

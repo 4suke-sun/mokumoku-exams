@@ -1,5 +1,5 @@
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { CRITERION_NAME_MAX, KEYWORD_MAX } from "../contract.ts";
 import { EXIT } from "../exit-codes.ts";
@@ -51,6 +51,56 @@ describe("draft の依頼", () => {
     expect(r.code).toBe(EXIT.checkFailed);
     expect(r.err).toContain("下書きの誤り: no-facts domain1");
     expect(readRequests(root)).toEqual([]);
+    // 未達の理由は、計画の項目ごとに理由コードだけで残る(本文や入力値は残さない)
+    const state = readState(workPath(root, "state.json"));
+    expect(Object.keys(state.unmet).length).toBeGreaterThan(0);
+    expect(Object.values(state.unmet).every((r) => r.length === 1 && r[0] === "no-facts")).toBe(true);
+    expect(readFileSync(workPath(root, "state.json"), "utf8")).not.toContain("domain1");
+  });
+
+  it("分野を 1 つに絞った依頼_その分野の依頼だけを書き_ほかの分野の no-facts で失敗しない", async () => {
+    const { card } = await import("../facts/test-helpers.ts");
+    const root = setupDraftRoot({ cards: [card({ id: "f-111111111111", domain: "domain1", claim: "架空の主張 1" })] });
+    await runMain(root, ["plan", EXAM]);
+    const all = await runMain(root, ["draft", EXAM, "--dry-run"]);
+    expect(all.err).toContain("no-facts domain2");
+    const r = await runMain(root, ["draft", EXAM, "--domain=domain1"]);
+    expect(r.code).toBe(EXIT.ok);
+    expect(r.err).not.toContain("no-facts");
+    const requests = readRequests(root);
+    expect(requests.length).toBeGreaterThan(0);
+    expect(requests.every((q) => q.domain.code === "domain1")).toBe(true);
+  });
+
+  it("資格マスタにない分野・取り込みと同時の指定_入力の誤りで終わり_値を出さない", async () => {
+    const root = setupDraftRoot();
+    await runMain(root, ["plan", EXAM]);
+    const unknown = await runMain(root, ["draft", EXAM, "--domain=domain-zz-value"]);
+    expect(unknown.code).toBe(EXIT.inputError);
+    expect(unknown.out + unknown.err).not.toContain("domain-zz-value");
+    expect((await runMain(root, ["draft", EXAM, "--domain=domain1", "--import"])).code).toBe(EXIT.inputError);
+    expect((await runMain(root, ["facts", EXAM, "--domain=domain1"])).code).toBe(EXIT.inputError);
+  });
+
+  it("前の実行の未達が解消した_次の実行で記録から外れる", async () => {
+    const root = setupDraftRoot();
+    await runMain(root, ["plan", EXAM]);
+    mkdirSync(dirname(workPath(root, "state.json")), { recursive: true });
+    writeFileSync(
+      workPath(root, "state.json"),
+      JSON.stringify({ attempts: {}, done: [], rounds: {}, unmet: { "p-gone": ["no-facts"] } }),
+    );
+    await runMain(root, ["draft", EXAM]);
+    expect(readState(workPath(root, "state.json")).unmet).toEqual({});
+  });
+
+  it("古い形の状態ファイル_未達の記録がなくても空として読む", async () => {
+    const root = setupDraftRoot();
+    mkdirSync(dirname(workPath(root, "state.json")), { recursive: true });
+    writeFileSync(workPath(root, "state.json"), JSON.stringify({ attempts: { k: 1 }, done: ["x"], rounds: {} }));
+    expect(readState(workPath(root, "state.json"))).toEqual({ attempts: { k: 1 }, done: ["x"], rounds: {}, unmet: {} });
+    writeFileSync(workPath(root, "state.json"), JSON.stringify({ unmet: { a: ["unknown", "no-facts"], b: "x" } }));
+    expect(readState(workPath(root, "state.json")).unmet).toEqual({ a: ["no-facts"] });
   });
 
   it("通過していない事実カードだけの分野_依頼を作らない", async () => {
@@ -159,8 +209,12 @@ describe("draft の取り込み", () => {
     rmSync(workPath(root, "requests", `${request.requestKey}.json`));
     const again = await runMain(root, ["draft", EXAM]);
     expect(again.code).toBe(EXIT.checkFailed);
-    expect(again.err).toContain("再試行の上限");
+    expect(again.err).toContain(`再試行の上限: ${request.planItemId} max-attempts`);
     expect(readRequests(root).some((q) => q.requestKey === request.requestKey)).toBe(false);
+    // 未達の理由は、計画の項目ごとの理由コードとして状態に残り、次の実行で報告される
+    expect(readState(workPath(root, "state.json")).unmet[request.planItemId]).toEqual(["max-attempts"]);
+    const next = await runMain(root, ["draft", EXAM]);
+    expect(next.err).toContain(`前回の未達: ${request.planItemId} max-attempts`);
   });
 
   it("データの契約に合わない下書きと通る下書きが同じ出力にある_通る下書きは取り込み_落ちた下書きは理由コード付きの不採用にする", async () => {
@@ -299,7 +353,8 @@ describe("draft の取り込み", () => {
         request = same as typeof request;
       } else {
         expect(same).toBeUndefined();
-        expect(next.err).toContain("再試行の上限");
+        expect(next.err).toContain(`再試行の上限: ${request.planItemId} max-rounds`);
+        expect(readState(workPath(root, "state.json")).unmet[request.planItemId]).toEqual(["max-rounds"]);
       }
     }
   });
@@ -362,16 +417,24 @@ describe("draft の来歴", () => {
     expect(existsSync(provenanceFile(root))).toBe(false);
   });
 
-  it("出典が台帳にない_来歴を作れず不採用になる", async () => {
+  it("出典が台帳にない_事実カードを根拠の候補にせず_依頼を出さない", async () => {
     const root = setupDraftRoot();
     const { emptyLedger, ledgerPath, writeLedger } = await import("../collect/ledger.ts");
     writeLedger(ledgerPath(join(root, baseConfig.ledgerDir), EXAM), emptyLedger(EXAM));
     await prepare(root);
+    expect(readRequests(root)).toEqual([]);
+  });
+
+  it("依頼のあとに出典が台帳から消えた_取り込まず_依頼を作り直す", async () => {
+    const root = setupDraftRoot();
+    await prepare(root);
     const request = readChoiceRequests(root)[0] as ReturnType<typeof readRequests>[number];
     writeOutput(root, request, [draftFor(request)]);
+    const { emptyLedger, ledgerPath, writeLedger } = await import("../collect/ledger.ts");
+    writeLedger(ledgerPath(join(root, baseConfig.ledgerDir), EXAM), emptyLedger(EXAM));
     const r = await runMain(root, ["draft", EXAM, "--import"]);
-    expect(r.out).toContain("provenance:source-not-in-ledger");
-    expect(readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0]?.status).toBe("rejected");
+    expect(r.err).toContain("request-stale");
+    expect(readDrafts(workPath(root, "drafts.json"), EXAM).drafts).toEqual([]);
     expect(existsSync(provenanceFile(root))).toBe(false);
   });
 
@@ -391,6 +454,74 @@ describe("draft の来歴", () => {
     const r = await runMain(root, ["draft", EXAM, "--check"]);
     expect(r.code).toBe(EXIT.checkFailed);
     expect(r.err).toContain("来歴なし: d-");
+  });
+
+  async function rewriteLedger(
+    root: string,
+    change: (l: import("../collect/ledger.ts").LedgerFile) => import("../collect/ledger.ts").LedgerFile,
+  ) {
+    const { ledgerPath, readLedger, writeLedger } = await import("../collect/ledger.ts");
+    const path = ledgerPath(join(root, baseConfig.ledgerDir), EXAM);
+    writeLedger(path, change(readLedger(path, EXAM)));
+  }
+
+  it("--check_根拠の事実カードに再検証の印がある_recheck-fact で失敗し_印を外すと通る", async () => {
+    const root = setupDraftRoot();
+    const request = await imported(root);
+    const factId = request.facts[0]?.id as string;
+    await rewriteLedger(root, (l) => ({ ...l, recheck: { facts: [factId], questions: [] } }));
+    const r = await runMain(root, ["draft", EXAM, "--check"]);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toMatch(/来歴の誤り: d-[0-9a-f]{12} recheck-fact/);
+    await rewriteLedger(root, (l) => ({ ...l, recheck: { facts: [], questions: [] } }));
+    expect((await runMain(root, ["draft", EXAM, "--check"])).code).toBe(EXIT.ok);
+  });
+
+  it("--check_根拠の出典の本文が変わった・active でない_原因ごとの理由コードで失敗する", async () => {
+    const root = setupDraftRoot();
+    await imported(root);
+    await rewriteLedger(root, (l) => ({
+      ...l,
+      sources: l.sources.map((s) => ({
+        ...s,
+        contentHash: "f".repeat(64),
+        status: "needs-review" as const,
+        checks: [{ name: "freshness" as const, result: "fail" as const, reason: "stale" }],
+      })),
+    }));
+    const r = await runMain(root, ["draft", EXAM, "--check"]);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toMatch(/来歴の誤り: d-[0-9a-f]{12} source-changed/);
+    expect(r.err).toMatch(/来歴の誤り: d-[0-9a-f]{12} source-check-freshness/);
+  });
+
+  it("再検証の印がある事実カード_下書きの依頼の根拠にしない", async () => {
+    const root = setupDraftRoot();
+    await rewriteLedger(root, (l) => ({ ...l, recheck: { facts: ["f-111111111111"], questions: [] } }));
+    const r = await prepare(root);
+    expect(r.err).toContain("no-facts domain1");
+    expect(readRequests(root).every((q) => q.facts.every((f) => f.id !== "f-111111111111"))).toBe(true);
+  });
+
+  it("根拠の出典が active でない事実カード_下書きの依頼の根拠にしない", async () => {
+    const root = setupDraftRoot();
+    await rewriteLedger(root, (l) => ({
+      ...l,
+      sources: l.sources.map((s) => ({ ...s, status: "unreachable" as const })),
+    }));
+    await prepare(root);
+    expect(readRequests(root)).toEqual([]);
+  });
+
+  it("依頼のあとに事実カードに再検証の印が付いた_取り込まず_依頼を作り直す", async () => {
+    const root = setupDraftRoot();
+    await prepare(root);
+    const request = readChoiceRequests(root)[0] as ReturnType<typeof readRequests>[number];
+    writeOutput(root, request, [draftFor(request)]);
+    await rewriteLedger(root, (l) => ({ ...l, recheck: { facts: request.facts.map((f) => f.id), questions: [] } }));
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.err).toContain("request-stale");
+    expect(readDrafts(workPath(root, "drafts.json"), EXAM).drafts).toEqual([]);
   });
 
   it("--check_存在しない事実カードを指す来歴は失敗する", async () => {

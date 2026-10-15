@@ -2,6 +2,7 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import type { Config } from "../config.ts";
 import { EXAM_CODE, ExamsFileSchema } from "../contract.ts";
+import { ProvenanceError, provenancePath, readProvenance } from "../draft/provenance.ts";
 import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { FactsError, factsPath, readFacts } from "../facts/schema.ts";
 import { type Output, report } from "../log.ts";
@@ -12,14 +13,21 @@ import {
   detectChanges,
   markRecheck,
   type Observation,
-  type Provenance,
   traceAffected,
 } from "./changes.ts";
 import { type ExamInfo, runChecks, statusFromChecks } from "./checks.ts";
 import type { FetchResult } from "./fetcher.ts";
 import { diffWithMaster, type GuideRequest, importGuide } from "./guide.ts";
 import { extractLinks, extractUpdatedDate } from "./html.ts";
-import { LedgerError, type LedgerFile, ledgerPath, readLedger, type SourceEntry, writeLedger } from "./ledger.ts";
+import {
+  LedgerError,
+  type LedgerFile,
+  ledgerPath,
+  readLedger,
+  type SourceEntry,
+  type SourceKind,
+  writeLedger,
+} from "./ledger.ts";
 import { inScope, loadPlan, type Plan, planPath } from "./plan.ts";
 
 /**
@@ -161,14 +169,29 @@ async function collectStep(
     return EXIT.checkFailed;
   }
 
+  // 来歴(下書き・問題 → 事実カード)。変化した出典を根拠にした下書き・問題を洗い出し、件数を報告する。
+  // 下書き・問題には印を持たせず、先の段階(来歴の検査)が、来歴と台帳の今の状態を比べて止める
+  const provenance: Record<string, readonly string[]> = {};
+  try {
+    const file = readProvenance(provenancePath(resolve(rootDir, config.provenanceDir), examCode), examCode);
+    for (const e of file.entries) provenance[e.questionId ?? e.draftId] = e.factIds;
+  } catch (error) {
+    if (!(error instanceof ProvenanceError)) throw error;
+    for (const p of error.paths) report(output, "来歴の誤り", p);
+    return EXIT.checkFailed;
+  }
+
   const today = deps.today();
   const cache = new BodyCache(paths.cacheDir, config.cache, deps.now);
   let ledger = initial;
   const changes: ChangeReport = { changed: [], unconfirmed: [] };
   const affected: Affected = { facts: [], questions: [] };
-  // 来歴(問題 → 事実カード)は、事実カード・作問の段階で足す
-  const provenance: Provenance = {};
-  const kindOf = new Map(plan.sources.map((s) => [s.url, s.kind]));
+  // 出典の種別は、収集のたびに計画から付ける。試験ガイドの続きのページ(guidePages)と、試験ガイドのページからたどった付属のページは、
+  // 試験ガイド(exam-guide)として扱う(事実カードの抽出の対象から外す)
+  const kindOf = new Map<string, SourceKind>([
+    ...(plan.guidePages ?? []).map((url): [string, SourceKind] => [url, "exam-guide"]),
+    ...plan.sources.map((s): [string, SourceKind] => [s.url, s.kind]),
+  ]);
   const starts = [...new Set([...plan.sources.map((s) => s.url), ...(plan.guidePages ?? [])])];
   const queue: { url: string; depth: number }[] = starts.map((url) => ({ url, depth: 0 }));
   const seen = new Set(starts);
@@ -215,7 +238,7 @@ async function collectStep(
       }
       const entry: SourceEntry = {
         url,
-        kind: kindOf.get(url) ?? before?.kind ?? "official-doc",
+        kind: kindOf.get(url) ?? "official-doc",
         target,
         fetchedAt: today,
         contentHash: fetched.ok ? fetched.hash : (before?.contentHash ?? null),
@@ -234,7 +257,8 @@ async function collectStep(
         const found = traceAffected(ledger, [url], provenance, factSources);
         affected.facts.push(...found.facts);
         affected.questions.push(...found.questions);
-        ledger = markRecheck(ledger, found);
+        // 印は事実カードにだけ付ける(下書き・問題は、来歴の検査が判定する)
+        ledger = markRecheck(ledger, { facts: found.facts, questions: [] });
       }
       writeLedger(paths.ledger, ledger);
       report(output, "取得", `${url} ${status}${fetched.ok ? "" : ` ${fetched.reason}`}`);
@@ -244,6 +268,7 @@ async function collectStep(
       for (const link of extractLinks(body.toString("utf8"), url)) {
         if (seen.has(link) || !inScope(plan, link)) continue;
         seen.add(link);
+        if (kindOf.get(url) === "exam-guide" && !kindOf.has(link)) kindOf.set(link, "exam-guide");
         queue.push({ url: link, depth: depth + 1 });
       }
     }
@@ -254,7 +279,11 @@ async function collectStep(
   for (const c of changes.unconfirmed)
     report(output, "確認できない出典", `${c.url} ${c.previousFetchedAt ?? "-"} → ${c.fetchedAt} ${c.status}`);
   if (affected.facts.length + affected.questions.length > 0) {
-    report(output, "再検証の印", `事実カード ${affected.facts.length} 件、問題 ${affected.questions.length} 件`);
+    report(
+      output,
+      "再検証の印",
+      `事実カード ${new Set(affected.facts).size} 件、根拠にした下書き・問題 ${new Set(affected.questions).size} 件`,
+    );
   }
   const blocked = ledger.sources.filter((s) => s.status !== "active");
   for (const s of blocked) {

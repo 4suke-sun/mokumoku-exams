@@ -13,12 +13,14 @@ import { checkDistractors } from "./distractors.ts";
 import {
   buildEntry,
   checkProvenance,
+  checkRecheck,
   type ProvenanceEntry,
   ProvenanceError,
   type ProvenanceFile,
   provenancePath,
   readProvenance,
   unprovenanced,
+  usableFact,
   writeProvenance,
 } from "./provenance.ts";
 import {
@@ -37,6 +39,7 @@ import {
   draftWorkDir,
   readDrafts,
   readState,
+  type UnmetReason,
   writeDrafts,
   writeState,
 } from "./store.ts";
@@ -59,6 +62,8 @@ export interface DraftOptions {
   mode: DraftMode;
   dryRun: boolean;
   output: Output;
+  /** 依頼を書く分野を 1 つに絞る(資格マスタの分野のコード)。省略すると全分野 */
+  domain?: string;
 }
 
 interface Paths {
@@ -109,6 +114,11 @@ export function runDraft(options: DraftOptions): ExitCode {
     report(output, "入力の誤り", "公開中の資格ではない");
     return EXIT.inputError;
   }
+  // 入力した文字列は出さない
+  if (options.domain !== undefined && !master.domains.some((d) => d.code === options.domain)) {
+    report(output, "入力の誤り", "資格マスタにない分野");
+    return EXIT.inputError;
+  }
   const paths = pathsFor(config, rootDir, examCode);
   let facts: FactsFile;
   let drafts: DraftsFile;
@@ -129,11 +139,11 @@ export function runDraft(options: DraftOptions): ExitCode {
   }
   switch (options.mode) {
     case "request":
-      return requestStep(options, paths, master.domains, facts, drafts);
+      return requestStep(options, paths, master.domains, facts, drafts, ledger);
     case "import":
       return importStep(options, paths, facts, drafts, ledger, provenance);
     case "check":
-      return checkStep(options, facts, drafts, provenance, master.exam.vendor);
+      return checkStep(options, facts, drafts, provenance, ledger, master.exam.vendor);
   }
 }
 
@@ -143,6 +153,7 @@ function requestStep(
   masterDomains: { code: string; name: string }[],
   facts: FactsFile,
   drafts: DraftsFile,
+  ledger: LedgerFile,
 ): ExitCode {
   const { config, rootDir, examCode, output, dryRun } = options;
   let plan: PlanFile | null;
@@ -173,22 +184,31 @@ function requestStep(
   let exhausted = 0;
   let limited = false;
   const noFacts = new Set<string>();
-  for (const item of plan.items) {
+  // 前の実行で満たせなかった計画の項目と理由。今回の実行で見た項目は、今回の判定で置き換える(解消した項目は外れる)
+  for (const [id, reasons] of Object.entries(state.unmet)) report(output, "前回の未達", `${id} ${reasons.join(",")}`);
+  const unmet: Record<string, UnmetReason[]> = {};
+  const examined = new Set<string>();
+  const items = options.domain === undefined ? plan.items : plan.items.filter((i) => i.domain === options.domain);
+  for (const item of items) {
+    examined.add(item.id);
     const have = drafts.drafts.filter((d) => d.planItemId === item.id && d.status !== "rejected").length;
     const remaining = item.count - have;
     if (remaining <= 0) {
       satisfied++;
       continue;
     }
-    const cards = facts.cards.filter((c) => c.status === "passed" && c.domain === item.domain);
+    // 再検証の印がある事実カードと、根拠の出典が active でないか本文が変わった事実カードは、根拠の候補にしない
+    const cards = facts.cards.filter((c) => c.domain === item.domain && usableFact(c, ledger));
     if (cards.length === 0) {
       if (!noFacts.has(item.domain)) report(output, "下書きの誤り", `no-facts ${item.domain}`);
       noFacts.add(item.domain);
+      unmet[item.id] = ["no-facts"];
       continue;
     }
     const round = state.rounds[item.id] ?? 0;
     if (round >= settings.maxRounds) {
-      report(output, "再試行の上限", item.id);
+      report(output, "再試行の上限", `${item.id} max-rounds`);
+      unmet[item.id] = ["max-rounds"];
       exhausted++;
       continue;
     }
@@ -200,7 +220,8 @@ function requestStep(
       continue;
     }
     if ((state.attempts[key] ?? 0) >= settings.maxAttempts) {
-      report(output, "再試行の上限", item.id);
+      report(output, "再試行の上限", `${item.id} max-attempts`);
+      unmet[item.id] = ["max-attempts"];
       exhausted++;
       continue;
     }
@@ -211,6 +232,7 @@ function requestStep(
     }
     if (requested >= config.maxItemsPerRun) {
       limited = true;
+      examined.delete(item.id);
       break;
     }
     const request: DraftRequest = {
@@ -241,7 +263,13 @@ function requestStep(
     "情報",
     `依頼 ${requested} 件、依頼済みで待っている ${pending} 件、計画を満たして飛ばした ${satisfied} 件、取り込み済みの入力で飛ばした ${cached} 件`,
   );
+  // 今回見なかった項目(件数の上限で止まった後ろの項目)は、前の記録を残す。計画にない項目は外す
+  const planIds = new Set(plan.items.map((i) => i.id));
+  for (const [id, reasons] of Object.entries(state.unmet)) {
+    if (planIds.has(id) && !examined.has(id)) unmet[id] = reasons;
+  }
   if (dryRun) report(output, "書き込みをしない(dry-run)");
+  else writeState(paths.state, { ...state, unmet });
   if (limited) report(output, "件数の上限", "maxItemsPerRun(再実行で続きから進む)");
   return limited || exhausted > 0 || noFacts.size > 0 ? EXIT.checkFailed : EXIT.ok;
 }
@@ -325,10 +353,10 @@ function importStep(
       fail("output-invalid");
       continue;
     }
-    // 依頼のあとに、事実カードが変わった(消えた、通過でなくなった、主張が変わった)。依頼を作り直す
+    // 依頼のあとに、事実カードが変わった(消えた、通過でなくなった、主張が変わった、再検証の印が付いた、出典が使えなくなった)。依頼を作り直す
     const stale = request.facts.some((f) => {
       const card = facts.cards.find((c) => c.id === f.id);
-      return card === undefined || card.status !== "passed" || card.claim !== f.claim;
+      return card === undefined || card.claim !== f.claim || !usableFact(card, ledger);
     });
     if (stale) {
       report(output, "下書きの取り込みの停止", `${key} request-stale`);
@@ -483,10 +511,12 @@ function checkStep(
   facts: FactsFile,
   drafts: DraftsFile,
   provenance: ProvenanceFile,
+  ledger: LedgerFile,
   vendor: string,
 ): ExitCode {
   const { output } = options;
-  const problems = checkProvenance(provenance, facts, vendor);
+  // 形と根拠の検査に、再検証の検査(来歴と台帳の今の状態の比較)を足す
+  const problems = [...checkProvenance(provenance, facts, vendor), ...checkRecheck(provenance, ledger)];
   for (const p of problems) report(output, "来歴の誤り", `${p.draftId} ${p.code}`);
   const missing = unprovenanced(drafts.drafts, provenance);
   for (const id of missing) report(output, "来歴なし", id);

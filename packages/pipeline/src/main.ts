@@ -65,6 +65,7 @@ function helpText(): string {
     "facts <資格コード> --report         本文を含まないレビューレポートを書く",
     "plan <資格コード>                    分野の配点から目標の問題数を出し、既存の問題との差を計画に書く",
     "draft <資格コード>                   計画の項目ごとに、選択式の下書きの依頼を書く",
+    "draft <資格コード> --domain=<分野>  依頼を書く分野を 1 つに絞る(ほかの分野は見ない)",
     "draft <資格コード> --import         エージェントが書いた下書きを検査し、取り込む",
     "draft <資格コード> --check          下書きの来歴(根拠の事実カードと出典)を検査する",
     "",
@@ -75,7 +76,9 @@ function helpText(): string {
 
 export async function main({ argv, env, output, configPath, rootDir, collectDeps }: MainOptions): Promise<ExitCode> {
   try {
-    const flags = argv.filter((a) => a.startsWith("-"));
+    // 値を取るオプションは、--domain=<分野のコード> だけ(draft の依頼で、分野を 1 つに絞る)
+    const domainArgs = argv.filter((a) => a.startsWith("--domain="));
+    const flags = argv.filter((a) => a.startsWith("-") && !a.startsWith("--domain="));
     const positional = argv.filter((a) => !a.startsWith("-"));
     const help = flags.includes("--help") || flags.includes("-h");
     const dryRun = flags.includes("--dry-run");
@@ -105,12 +108,20 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
       report(output, "不明なオプション");
       return EXIT.inputError;
     }
+    const domainCode = domainArgs[0]?.slice("--domain=".length);
+    if (
+      domainArgs.length > 1 ||
+      (domainArgs.length === 1 && (command.name !== "draft" || modes.length > 0 || !domainCode))
+    ) {
+      report(output, "不明なオプション");
+      return EXIT.inputError;
+    }
     if (help) {
       const usages: Record<string, string> = {
         collect: "使い方: collect <資格コード> [--import-guide]\n",
         facts: "使い方: facts <資格コード> [--import | --coverage | --report]\n",
         plan: "使い方: plan <資格コード>\n",
-        draft: "使い方: draft <資格コード> [--import | --check]\n",
+        draft: "使い方: draft <資格コード> [--domain=<分野のコード> | --import | --check]\n",
       };
       const usage = usages[command.name] ?? "";
       output.out(`${command.name}: ${command.summary}\n${usage}\nオプション: --dry-run, --help\n`);
@@ -172,7 +183,15 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
         return EXIT.inputError;
       }
       const mode = flags.includes("--import") ? "import" : flags.includes("--check") ? "check" : "request";
-      return runDraft({ config, rootDir, examCode, mode, dryRun, output });
+      return runDraft({
+        config,
+        rootDir,
+        examCode,
+        mode,
+        dryRun,
+        output,
+        ...(domainCode !== undefined ? { domain: domainCode } : {}),
+      });
     }
     const context: Context = {
       config,
