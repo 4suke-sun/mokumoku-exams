@@ -486,11 +486,7 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
             : `キー操作: ${isChecked ? "" : `${choiceKeysHint} / `}${enterHint} / N で${finishable ? "採点" : "次へ"} / P で前へ`}
         </p>
 
-        {timeUp ? (
-          <p role="alert" className="font-bold">
-            時間切れです。ここまでの回答で採点します。
-          </p>
-        ) : null}
+        {timeUp ? <Notice kind="error">時間切れです。ここまでの回答で採点します。</Notice> : null}
 
         {saveFailed ? (
           <Notice kind="error">この端末では、回答を保存できません。ブラウザの設定を確認してください。</Notice>

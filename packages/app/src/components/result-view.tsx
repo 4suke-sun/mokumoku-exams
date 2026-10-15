@@ -14,6 +14,7 @@ import { ResultSkeleton } from "@/components/page-skeletons.tsx";
 import { QuestionChips } from "@/components/question-chips.tsx";
 import { ReferenceList } from "@/components/reference-list.tsx";
 import { RichText } from "@/components/rich-text.tsx";
+import { RubricView } from "@/components/rubric-view.tsx";
 import { ScoreRing } from "@/components/score-ring.tsx";
 import { attemptDomains, averageTimeMs } from "@/lib/dashboard.ts";
 import { domainColorClasses } from "@/lib/domain-color.ts";
@@ -268,9 +269,7 @@ export function ResultView({ exam, questions }: Props) {
   return (
     <section className="space-y-8">
       {state.source === "local" ? (
-        <p role="status" className="text-sm text-muted">
-          サーバーに接続できないため、この端末に保存した記録を表示しています。
-        </p>
+        <Notice kind="info">サーバーに接続できないため、この端末に保存した記録を表示しています。</Notice>
       ) : null}
       {state.pending.length > 0 ? (
         <div role="status" className="card space-y-2 p-4">
@@ -550,22 +549,7 @@ function FreeTextDetail({ question, answer }: { question: FreeTextQuestion; answ
         <h3 className="font-bold">あなたの回答</h3>
         <p className="whitespace-pre-wrap rounded border border-line p-2">{answer.trim() === "" ? "未回答" : answer}</p>
       </div>
-      <div className="space-y-1">
-        <h3 className="font-bold">観点ごとの判定</h3>
-        <ul className="space-y-1">
-          {judgement.criteria.map((criterion) => (
-            <li key={criterion.name} className="flex justify-between gap-3 rounded border border-line p-2">
-              <span className={criterion.met ? "text-correct" : "text-incorrect"}>
-                {criterion.met ? "○ 満たしている" : "× 満たしていない"}
-                <span className="ml-2 text-fg">{criterion.name}</span>
-              </span>
-              <span>
-                {criterion.met ? criterion.points : 0} / {criterion.points} 点
-              </span>
-            </li>
-          ))}
-        </ul>
-      </div>
+      <RubricView rubric={question.rubric} mode="judged" judgement={judgement} />
       <p className="text-muted">
         得点: {judgement.earned} / {judgement.total} 点(合格点 {judgement.passingPoints} 点)
       </p>

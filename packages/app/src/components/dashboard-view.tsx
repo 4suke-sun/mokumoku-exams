@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useId, useState } from "react";
 import { EmptyState } from "@/components/empty-state.tsx";
+import { Notice, type NoticeKind } from "@/components/notice.tsx";
 import { DashboardSkeleton } from "@/components/page-skeletons.tsx";
 import { PredictionPanel } from "@/components/prediction-panel.tsx";
 import { StudyCalendar } from "@/components/study-calendar.tsx";
@@ -120,9 +121,7 @@ export function DashboardView({ exam, questions }: Props) {
     <section className="space-y-8">
       {header}
       {source === "local" ? (
-        <p role="status" className="text-sm text-muted">
-          サーバーに接続できないため、この端末に保存した記録で表示しています。
-        </p>
+        <Notice kind="info">サーバーに接続できないため、この端末に保存した記録で表示しています。</Notice>
       ) : null}
 
       {goalPanel}
@@ -192,7 +191,7 @@ function GoalPanel({
   const inputId = useId();
   const [saved, setSaved] = useState<string | null>(goal?.date ?? null);
   const [draft, setDraft] = useState(goal?.date ?? "");
-  const [message, setMessage] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ kind: NoticeKind; text: string } | null>(null);
   const [busy, setBusy] = useState(false);
 
   async function save(next: string | null) {
@@ -205,10 +204,8 @@ function GoalPanel({
     }
     setMessage(
       ok
-        ? next
-          ? "目標日を保存しました。"
-          : "目標日を消しました。"
-        : "保存できませんでした。時間をおいて、やり直してください。",
+        ? { kind: "success", text: next ? "目標日を保存しました。" : "目標日を消しました。" }
+        : { kind: "error", text: "保存できませんでした。時間をおいて、やり直してください。" },
     );
   }
 
@@ -264,11 +261,7 @@ function GoalPanel({
               </button>
             ) : null}
           </div>
-          {message ? (
-            <p role="status" className="text-sm text-muted">
-              {message}
-            </p>
-          ) : null}
+          {message ? <Notice kind={message.kind}>{message.text}</Notice> : null}
         </div>
       )}
     </div>

@@ -129,9 +129,7 @@ export function UnitPractice({ exam, questions, next }: Props) {
           </div>
         </div>
         {saved === "local" ? (
-          <p role="status" className="text-sm text-muted">
-            アカウントに保存できなかったため、この端末に結果を残しました。
-          </p>
+          <Notice kind="info">アカウントに保存できなかったため、この端末に結果を残しました。</Notice>
         ) : null}
         {saved === "failed" ? (
           <Notice kind="error">結果を保存できませんでした。ブラウザの設定や通信を確認してください。</Notice>

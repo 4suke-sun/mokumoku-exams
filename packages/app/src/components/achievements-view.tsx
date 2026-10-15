@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { EmptyState } from "@/components/empty-state.tsx";
+import { Notice } from "@/components/notice.tsx";
 import { ListSkeleton } from "@/components/page-skeletons.tsx";
 import { PredictionCard } from "@/components/prediction-card.tsx";
 import { StudyCalendar } from "@/components/study-calendar.tsx";
@@ -60,9 +61,7 @@ export function AchievementsView({ entries }: { entries: ExamEntry[] }) {
     <section className="space-y-8">
       {header}
       {offline ? (
-        <p role="status" className="text-sm text-muted">
-          サーバーに接続できないため、この端末に保存した記録で表示しています。
-        </p>
+        <Notice kind="info">サーバーに接続できないため、この端末に保存した記録で表示しています。</Notice>
       ) : null}
 
       <StudyCalendar days={days} today={today} scope="すべての資格の" />

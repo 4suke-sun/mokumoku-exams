@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { type FormEvent, useEffect, useState } from "react";
+import { Notice } from "@/components/notice.tsx";
 import { postJson } from "@/lib/auth/client.ts";
 import { PASSWORD_RULE_TEXT, passwordProblem } from "@/lib/auth/password.ts";
 import { changePrefs } from "@/lib/prefs-client.ts";
@@ -110,9 +111,7 @@ export function AccountView({ pushPublicKey = null }: { pushPublicKey?: string |
         />
         <FormError message={error} />
         {changed ? (
-          <p role="status" className="text-correct">
-            パスワードを変更しました。次のログインから、新しいパスワードを使ってください。
-          </p>
+          <Notice kind="success">パスワードを変更しました。次のログインから、新しいパスワードを使ってください。</Notice>
         ) : null}
         <SubmitButton busy={busy}>パスワードを変更する</SubmitButton>
       </form>

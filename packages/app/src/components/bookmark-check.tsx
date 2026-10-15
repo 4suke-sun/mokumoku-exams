@@ -8,6 +8,7 @@ import { ExplanationView } from "@/components/explanation-view.tsx";
 import { QuestionChips } from "@/components/question-chips.tsx";
 import { ReferenceList } from "@/components/reference-list.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
+import { RubricView } from "@/components/rubric-view.tsx";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 
 type Props = { exam: PublishedExam; questions: Question[] };
@@ -101,17 +102,7 @@ function QuestionFace({
       <RichText text={question.questionText} />
       {question.questionType === "free-text" ? (
         revealed ? (
-          <div className="space-y-1 text-sm">
-            <h3 className="font-bold">採点の観点(合格点 {question.rubric.passingPoints} 点)</h3>
-            <ul className="space-y-1">
-              {question.rubric.criteria.map((criterion) => (
-                <li key={criterion.name} className="flex justify-between gap-3 rounded border border-line p-2">
-                  <span>{criterion.name}</span>
-                  <span>{criterion.points} 点</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <RubricView rubric={question.rubric} mode="criteria" />
         ) : null
       ) : revealed ? (
         <div className="motion-correct">
