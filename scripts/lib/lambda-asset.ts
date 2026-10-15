@@ -17,13 +17,17 @@ type Options = {
 };
 
 /**
- * アプリのビルド成果物から、Lambda に載せるディレクトリ(lambda)と、S3 に置く静的ファイルのディレクトリ(static)を作る。
+ * アプリのビルド成果物から、Lambda に載せるディレクトリ(lambda)と、S3 に置く静的ファイルのディレクトリ(static、public)を作る。
  *
- * - lambda: `.next/standalone` と、起動用の `run.sh`(Lambda Web Adapter が起動する)。`public/*` も入れ、Next のサーバーが配る
- *   (マニフェストのアイコンや Service Worker。CloudFront は `/_next/static/*` 以外を Lambda へ渡す)
- * - static: `/_next/static/*` の配信元(CloudFront が S3 から配る)
+ * - lambda: `.next/standalone` と、起動用の `run.sh`(Lambda Web Adapter が起動する)。`public/*` は入れない
+ * - static: `/_next/static/*` の配信元(CloudFront が S3 から配る。ファイル名にハッシュが入る)
+ * - public: `public/*`(ブランドの画像、アイコン、Service Worker)の配信元(CloudFront が S3 から配る。ファイル名にハッシュがない)
  */
-export function buildLambdaAsset({ appDir, outDir }: Options): { lambdaDir: string; staticDir: string } {
+export function buildLambdaAsset({ appDir, outDir }: Options): {
+  lambdaDir: string;
+  staticDir: string;
+  publicDir: string;
+} {
   const standalone = join(appDir, ".next", "standalone");
   const nextStatic = join(appDir, ".next", "static");
   if (!existsSync(join(standalone, APP_DIR_IN_STANDALONE, "server.js")) || !existsSync(nextStatic)) {
@@ -40,8 +44,12 @@ export function buildLambdaAsset({ appDir, outDir }: Options): { lambdaDir: stri
 
   mkdirSync(join(staticDir, "_next"), { recursive: true });
   cpSync(nextStatic, join(staticDir, "_next", "static"), { recursive: true });
-  const publicDir = join(appDir, "public");
-  if (existsSync(publicDir)) cpSync(publicDir, join(lambdaDir, APP_DIR_IN_STANDALONE, "public"), { recursive: true });
+  const publicDir = join(outDir, "public");
+  mkdirSync(publicDir, { recursive: true });
+  const appPublic = join(appDir, "public");
+  if (existsSync(appPublic)) cpSync(appPublic, publicDir, { recursive: true });
+  // standalone の出力が public を含む版でも、Lambda には載せない(配信は S3 だけにする)
+  rmSync(join(lambdaDir, APP_DIR_IN_STANDALONE, "public"), { recursive: true, force: true });
 
-  return { lambdaDir, staticDir };
+  return { lambdaDir, staticDir, publicDir };
 }

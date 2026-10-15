@@ -30,6 +30,12 @@ export const API_FAILURE_METRIC = "ApiServerErrors";
 const APP_PORT = "8080";
 /** アプリのログを残す期間 */
 const LOG_RETENTION = logs.RetentionDays.ONE_MONTH;
+/** `public/*` のうち、CloudFront が S3 から配る経路。ファイル名にハッシュがないので、キャッシュは短くする */
+export const PUBLIC_ASSET_PATHS = ["/brand/*", "/icons/*"];
+/** Service Worker。更新がすぐに行き渡るよう、キャッシュしない */
+export const SERVICE_WORKER_PATH = "/sw.js";
+/** ブランドの画像とアイコンを、ブラウザが手元に置く期間(1 日) */
+const PUBLIC_ASSET_MAX_AGE = Duration.days(1);
 /** HSTS の有効期間(1 年) */
 const HSTS_MAX_AGE = Duration.days(365);
 
@@ -37,8 +43,10 @@ type Props = StackProps & {
   config: InfraConfig;
   /** `npm run build:lambda` が作る、Lambda に載せるアプリのディレクトリ */
   lambdaCodePath: string;
-  /** 同じく、S3 に置く静的ファイルのディレクトリ */
+  /** 同じく、S3 に置く静的ファイル(`/_next/static/*`。ファイル名にハッシュが入る)のディレクトリ */
   staticAssetsPath: string;
+  /** 同じく、S3 に置く `public/*`(ブランドの画像、アイコン、Service Worker)のディレクトリ */
+  publicAssetsPath: string;
   /** アプリが認証で使う Cognito のクライアント ID(AuthStack の出力) */
   userPoolClientId: string;
   /** アプリが ID トークンの検証で使う Cognito のユーザープール ID(AuthStack の出力) */
@@ -163,6 +171,26 @@ export class WebStack extends Stack {
           cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
           responseHeadersPolicy: securityHeaders,
         },
+        // `public/*` も S3 から配る(Lambda には載せない)。CloudFront の手元の期間は、オブジェクトの Cache-Control に従う
+        ...Object.fromEntries(
+          PUBLIC_ASSET_PATHS.map((path) => [
+            path,
+            {
+              origin: staticOrigin,
+              viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+              allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD,
+              cachePolicy: cloudfront.CachePolicy.CACHING_OPTIMIZED,
+              responseHeadersPolicy: securityHeaders,
+            },
+          ]),
+        ),
+        [SERVICE_WORKER_PATH]: {
+          origin: staticOrigin,
+          viewerProtocolPolicy: cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
+          allowedMethods: cloudfront.AllowedMethods.ALLOW_GET_HEAD,
+          cachePolicy: cloudfront.CachePolicy.CACHING_DISABLED,
+          responseHeadersPolicy: securityHeaders,
+        },
       },
       minimumProtocolVersion: cloudfront.SecurityPolicyProtocol.TLS_V1_2_2021,
       httpVersion: cloudfront.HttpVersion.HTTP2_AND_3,
@@ -178,11 +206,34 @@ export class WebStack extends Stack {
       new route53.AaaaRecord(this, "AliasRecordIpv6", { zone, recordName, target });
     }
 
+    // 同じバケットに 3 つの置き場を配るので、どれも、ほかの置き場のファイルを消さない(prune: false)。
+    // 古いファイルも消さずに残す(デプロイの途中や、古い画面を開いたままの人が、消えたファイルを取りに行かないように)
     new s3deploy.BucketDeployment(this, "DeployStaticAssets", {
       sources: [s3deploy.Source.asset(props.staticAssetsPath)],
       destinationBucket: assetsBucket,
+      prune: false,
+      cacheControl: [s3deploy.CacheControl.fromString("public, max-age=31536000, immutable")],
       distribution: this.distribution,
       distributionPaths: ["/_next/static/*"],
+    });
+    new s3deploy.BucketDeployment(this, "DeployPublicAssets", {
+      sources: [s3deploy.Source.asset(props.publicAssetsPath)],
+      destinationBucket: assetsBucket,
+      prune: false,
+      exclude: [SERVICE_WORKER_PATH.slice(1)],
+      cacheControl: [s3deploy.CacheControl.maxAge(PUBLIC_ASSET_MAX_AGE), s3deploy.CacheControl.setPublic()],
+      distribution: this.distribution,
+      distributionPaths: PUBLIC_ASSET_PATHS,
+    });
+    new s3deploy.BucketDeployment(this, "DeployServiceWorker", {
+      sources: [s3deploy.Source.asset(props.publicAssetsPath)],
+      destinationBucket: assetsBucket,
+      prune: false,
+      exclude: ["*"],
+      include: [SERVICE_WORKER_PATH.slice(1)],
+      cacheControl: [s3deploy.CacheControl.noCache()],
+      distribution: this.distribution,
+      distributionPaths: [SERVICE_WORKER_PATH],
     });
 
     // 通知先(SNS トピック)。メールの購読は、アドレスが渡されたときだけ作る

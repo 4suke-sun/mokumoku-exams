@@ -21,6 +21,7 @@ const web = new WebStack(app, `${config.stackPrefix}-web`, {
   config,
   lambdaCodePath: resolve(repoRoot, "dist/lambda"),
   staticAssetsPath: resolve(repoRoot, "dist/static"),
+  publicAssetsPath: resolve(repoRoot, "dist/public"),
   userPoolClientId: auth.userPoolClient.userPoolClientId,
   userPoolId: auth.userPool.userPoolId,
   userPoolArn: auth.userPool.userPoolArn,

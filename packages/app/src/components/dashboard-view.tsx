@@ -14,8 +14,8 @@ import {
   domainBreakdown,
   type MarkTally,
   markTally,
+  type ScoredQuestion,
   summarize,
-  toScored,
 } from "@/lib/dashboard.ts";
 import { domainColorClasses } from "@/lib/domain-color.ts";
 import { formatDate } from "@/lib/format.ts";
@@ -26,10 +26,11 @@ import { EARLIEST_GOAL_DATE, LATEST_GOAL_DATE } from "@/lib/history/schema.ts";
 import { domainSelectHref, resultDetailHref } from "@/lib/quiz.ts";
 import type { Result } from "@/lib/storage.ts";
 import { daysBetween, jstDate, type StudyDay } from "@/lib/study-days.ts";
-import type { PublishedExam, Question } from "@/lib/types.ts";
+import type { PublishedExam } from "@/lib/types.ts";
 import { useStorageOwner } from "@/lib/use-storage-owner.ts";
 
-type Props = { exam: PublishedExam; questions: Question[] };
+/** `questions` は、資格の全問の、採点に要る項目だけ(`toScored`)。問題の本文や解説は渡さない */
+type Props = { exam: PublishedExam; questions: ScoredQuestion[] };
 
 type State =
   | { status: "loading" }
@@ -54,8 +55,7 @@ type State =
     };
 
 /** 読み込んだ結果から、まとめ・分野ごとの正答率・印の数を数える */
-function measure(results: Result[], questions: readonly Question[], exam: PublishedExam) {
-  const scored = questions.map(toScored);
+function measure(results: Result[], scored: readonly ScoredQuestion[], exam: PublishedExam) {
   return {
     results,
     summary: summarize(results, scored, exam),

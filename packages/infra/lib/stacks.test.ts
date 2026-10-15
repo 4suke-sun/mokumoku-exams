@@ -20,7 +20,14 @@ import {
   PushStack,
   VAPID_PRIVATE_KEY_ACTIONS,
 } from "./push-stack.ts";
-import { API_FAILURE_EVENT, API_FAILURE_METRIC, ORIGIN_VERIFY_HEADER, WebStack } from "./web-stack.ts";
+import {
+  API_FAILURE_EVENT,
+  API_FAILURE_METRIC,
+  ORIGIN_VERIFY_HEADER,
+  PUBLIC_ASSET_PATHS,
+  SERVICE_WORKER_PATH,
+  WebStack,
+} from "./web-stack.ts";
 
 const config: InfraConfig = {
   stackPrefix: "test",
@@ -86,6 +93,7 @@ function webTemplate(alarmEmail?: string, extra: Partial<InfraConfig> = {}): Tem
     config: { ...config, alarmEmail, ...extra },
     lambdaCodePath: fixture("lambda"),
     staticAssetsPath: fixture("static"),
+    publicAssetsPath: fixture("public"),
     userPoolClientId: "client-example",
     userPoolId: "pool-example",
     userPoolArn: USER_POOL_ARN,
@@ -299,9 +307,32 @@ describe("WebStack", () => {
         RestrictPublicBuckets: true,
       },
     });
-    template.hasResourceProperties("AWS::CloudFront::Distribution", {
-      DistributionConfig: { CacheBehaviors: [{ PathPattern: "/_next/static/*" }] },
+    const [distribution] = Object.values(template.findResources("AWS::CloudFront::Distribution"));
+    const behaviors = distribution?.Properties.DistributionConfig.CacheBehaviors as {
+      PathPattern: string;
+      CachePolicyId: string;
+      TargetOriginId: string;
+    }[];
+    // マネージドのキャッシュポリシー: CachingOptimized / CachingDisabled
+    const OPTIMIZED = "658327ea-f89d-4fab-a63d-7e88639e58f6";
+    const DISABLED = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad";
+    expect(Object.fromEntries(behaviors.map((b) => [b.PathPattern, b.CachePolicyId]))).toEqual({
+      "/_next/static/*": OPTIMIZED,
+      ...Object.fromEntries(PUBLIC_ASSET_PATHS.map((path) => [path, OPTIMIZED])),
+      [SERVICE_WORKER_PATH]: DISABLED,
     });
+    // どれも、同じ S3 のオリジンから配る
+    expect(new Set(behaviors.map((b) => b.TargetOriginId)).size).toBe(1);
+  });
+
+  it("静的ファイルの配置_古いファイルを消さず_置き場ごとのキャッシュの期間を付ける", () => {
+    const deployments = Object.values(webTemplate().findResources("Custom::CDKBucketDeployment")).map(
+      (d) => d.Properties,
+    );
+    expect(deployments).toHaveLength(3);
+    for (const deployment of deployments) expect(deployment.Prune).toBe(false);
+    const cacheControls = deployments.map((d) => d.SystemMetadata?.["cache-control"]).sort();
+    expect(cacheControls).toEqual(["max-age=86400, public", "no-cache", "public, max-age=31536000, immutable"]);
   });
 
   it("セキュリティヘッダーが_動的な応答と静的ファイルの両方に付く", () => {

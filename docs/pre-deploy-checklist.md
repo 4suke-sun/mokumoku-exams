@@ -22,7 +22,7 @@
 
 | 項目 | 確認の方法 |
 | --- | --- |
-| 画面と API が、同じ配信元の同じパスの下で応答する構成のままである | CloudFront の設定(`/_next/static/*` は S3、それ以外は Lambda の Function URL)が、`packages/infra` のスナップショットテスト(`npm test -w @mokumoku-exams/infra`)の差分で意図どおりである |
+| 画面と API が、同じ配信元の同じパスの下で応答する構成のままである | CloudFront の設定(`/_next/static/*` と `public/` のファイル(`/brand/*`・`/icons/*`・`/sw.js`)は S3、それ以外は Lambda の Function URL)が、`packages/infra` のスナップショットテスト(`npm test -w @mokumoku-exams/infra`)の差分で意図どおりである |
 | 合言葉(`x-origin-verify`)の値が、3 か所でそろっている | `.env` の `ORIGIN_VERIFY_VALUE`、Lambda の環境変数、CloudFront のオリジンのヘッダーが、同じ値から作られる(スタックの単体テストが確かめる)。アプリ(`packages/app/src/proxy.ts`)が、合言葉のない要求を 403 で断る |
 
 実際に応答するかは、デプロイ後の確認で扱います。
@@ -31,7 +31,7 @@
 
 | 項目 | 確認の方法 |
 | --- | --- |
-| 認証のコードと設定が、意図どおりである(ID トークンの検証、保護する画面と API の範囲、UserPool の設定、確認コードの文面) | `npm test` が通る。特に `packages/app/src/authorization.test.ts`(画面・API・ファイルの経路の一覧)と、`packages/infra` のテスト。新しい画面・API・`public/` のファイルを足したときは、一覧に足してあり、公開するか保護するかを決めてある |
+| 認証のコードと設定が、意図どおりである(ID トークンの検証、保護する画面と API の範囲、UserPool の設定、確認コードの文面) | `npm test` が通る。特に `packages/app/src/authorization.test.ts`(画面・API・ファイルの経路の一覧)と、`packages/infra` のテスト。新しい画面・API・`public/` のファイルを足したときは、一覧に足してあり、公開するか保護するかを決めてある(`public/` のファイルは S3 から配るので、保護できない。公開してよいものだけを置く) |
 | Cookie と別サイトからの送信の扱いが、意図どおりである | Cookie が `HttpOnly`・`SameSite=Lax`・本番は `Secure`。状態を変える `POST` が、`Sec-Fetch-Site` で別サイトからのものを断る。詳細は[認証の仕組み](./app/auth.md)の「トークンの扱い」 |
 
 実際にサインインできるかは、デプロイ後の確認で扱います。

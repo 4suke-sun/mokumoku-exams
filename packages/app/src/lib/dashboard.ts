@@ -22,6 +22,17 @@ export function toScored(question: Question): ScoredQuestion {
       };
 }
 
+/** 結果の画面に渡す、問題の要約(採点に要るもの、分野、選択肢の記号)。問題の本文や解説は含めない。 */
+export type QuestionOutline = ScoredQuestion & { choiceKeys: string[] };
+
+/** 問題から、結果の画面に渡す要約を取り出す */
+export function toOutline(question: Question): QuestionOutline {
+  return {
+    ...toScored(question),
+    choiceKeys: question.questionType === "free-text" ? [] : question.choices.map((c) => c.key),
+  };
+}
+
 /** 1 回分の結果の正答 */
 export type AttemptSummary = { finishedAt: string; total: number; correct: number; percent: number };
 

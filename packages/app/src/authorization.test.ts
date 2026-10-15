@@ -20,6 +20,7 @@ import * as sectionsRoute from "@/app/api/history/sections/route.ts";
 import * as statsRoute from "@/app/api/history/stats/route.ts";
 import * as pushSubscriptionRoute from "@/app/api/push/subscription/route.ts";
 import * as pushTestRoute from "@/app/api/push/test/route.ts";
+import * as questionsRoute from "@/app/api/questions/route.ts";
 import type { AuditEntry } from "@/lib/admin/audit.ts";
 import { isAdminPath } from "@/lib/auth/admin.ts";
 import {
@@ -141,6 +142,7 @@ const PROTECTED_APIS = [
   "/api/history/stats",
   "/api/push/subscription",
   "/api/push/test",
+  "/api/questions",
 ];
 const PUBLIC_FILES = [
   "/brand/logo-full.png",
@@ -324,6 +326,14 @@ describe("認可: 未ログインの拒否", () => {
       401,
     );
     expect((await pushTestRoute.POST(request("/api/push/test", { method: "POST", body: {} }))).status).toBe(401);
+  });
+
+  it("問題の API 本体_入口を通らなくても未ログインを断り_問題と正解を返さない", async () => {
+    const response = await questionsRoute.POST(
+      request("/api/questions", { method: "POST", body: { examCode: "EX-SMP-XX", questionIds: ["SAMPLE-0001"] } }),
+    );
+    expect(response.status).toBe(401);
+    expect(await response.text()).not.toContain("correctAnswers");
   });
 
   it("パスワード変更の API 本体_入口を通らなくても未ログインを断る(二重の防御)", async () => {

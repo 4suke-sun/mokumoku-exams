@@ -33,14 +33,22 @@ Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCre
 配信の流れは、[アーキテクチャの計画](./architecture-plan.md) のとおりです。
 
 - `/_next/static/*` は S3 から配ります(CloudFront から S3 へは、オリジンアクセスコントロールで読みます。バケットは公開しません)。
-- `packages/app/public/` のファイル(アイコンと、通知を受け取る Service Worker)は、Lambda に載せ、Next のサーバーが配ります。
+- `packages/app/public/` のファイル(ブランドの画像、アイコン、通知を受け取る Service Worker)も、S3 から配ります(`/brand/*`・`/icons/*`・`/sw.js`)。
+  Lambda には載せません。入口の proxy を通らないので、`public/` に置いたファイルは、ログインなしで取れます(公開してよいものだけを置きます)。
+- 問題データ(正解と解説を含む)は、静的ファイルとしては配りません。出題・結果・ブックマークの画面は、開いたあとに、表示に要る問題だけを、
+  ログインが必要な API(`POST /api/questions`)で取ります。
 - それ以外は Lambda の Function URL へ渡します。Function URL は認証なし(`authType: NONE`)で、CloudFront が付ける合言葉のヘッダー(`x-origin-verify`)を、
   アプリ(`packages/app/src/proxy.ts`)が確かめます。合言葉のないリクエスト(Function URL への直接のアクセス)は、403 で断ります。
 - 独自ドメインは任意です。`.env` に値がなければ、CloudFront の標準のドメインで配信します(「独自ドメイン」)。
 
 ### キャッシュとセキュリティヘッダー
 
-- 動的な応答(画面と API)は、キャッシュしません。静的ファイル(`/_next/static/*`)は、ファイル名にハッシュが入るので、長くキャッシュします。
+- 動的な応答(画面と API)は、キャッシュしません。静的ファイル(`/_next/static/*`)は、ファイル名にハッシュが入るので、長くキャッシュします
+  (ブラウザには `max-age=31536000, immutable`)。
+- `public/` のブランドの画像とアイコンは、ファイル名にハッシュがないので、1 日だけキャッシュします(`max-age=86400`)。
+  Service Worker(`/sw.js`)は、更新がすぐに行き渡るよう、CloudFront でもブラウザでもキャッシュしません(`no-cache`)。
+- S3 への配置は、古いファイルを消しません(`prune: false`)。デプロイの途中や、古い画面を開いたままの人が、消えたファイルを取りに行かないためです。
+  ファイルは小さく、名前にハッシュが入るので、消さずに残しても困りません。
 - すべての応答に、次のヘッダーを付けます(アプリ側が同じヘッダーを付けても、CloudFront の設定を優先します)。
   `Strict-Transport-Security`(1 年、サブドメインを含む)、`X-Content-Type-Options: nosniff`、
   `Referrer-Policy: strict-origin-when-cross-origin`、`X-Frame-Options: DENY`。
@@ -145,7 +153,7 @@ aws ssm put-parameter --type SecureString --name /<パラメーターの名前> 
 
 ```sh
 npm run build          # アプリをビルドする
-npm run build:lambda   # Lambda に載せるアセットを dist/ に作る(dist/lambda、dist/static、dist/push)
+npm run build:lambda   # Lambda に載せるアセットを dist/ に作る(dist/lambda、dist/static、dist/public、dist/push)
 npm run synth          # スタックを合成する
 npm run diff -w @mokumoku-exams/infra -- --all     # すべてのスタックの変わる内容を確かめる
 npm run deploy -w @mokumoku-exams/infra -- --all   # すべてのスタックをデプロイする

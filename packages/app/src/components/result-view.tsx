@@ -17,11 +17,13 @@ import { ReferenceList } from "@/components/reference-list.tsx";
 import { RichText } from "@/components/rich-text.tsx";
 import { FreeTextScore } from "@/components/rubric-view.tsx";
 import { ScoreRing } from "@/components/score-ring.tsx";
+import type { QuestionOutline } from "@/lib/dashboard.ts";
 import { attemptDomains, averageTimeMs } from "@/lib/dashboard.ts";
 import { domainColorClasses } from "@/lib/domain-color.ts";
 import { formatAnswerTime, formatDate } from "@/lib/format.ts";
 import { fetchServerResult, fetchServerResultsPage, postServerResult } from "@/lib/history/client.ts";
 import { appendResults, mergeResults, pendingMigration } from "@/lib/history/merge.ts";
+import { fetchQuestions } from "@/lib/questions/client.ts";
 import {
   answerFor,
   displayLabels,
@@ -51,7 +53,11 @@ import { STAGE_PASS_PERCENT } from "@/lib/study-stages.ts";
 import type { ChoiceQuestion, FreeTextQuestion, PublishedExam, Question } from "@/lib/types.ts";
 import { useStorageOwner } from "@/lib/use-storage-owner.ts";
 
-type Props = { exam: PublishedExam; questions: Question[] };
+/**
+ * `outline` は、資格の全問の要約(採点・分野・選択肢の記号)。詳しく出す回の問題(本文・解説)は、開いたあとに、
+ * その回の分だけを取る(資格の全問を、画面の応答に入れない)。
+ */
+type Props = { exam: PublishedExam; outline: QuestionOutline[] };
 
 type State =
   | { status: "loading" }
@@ -92,7 +98,7 @@ function RecentOutcomeMarks({ outcomes }: { outcomes: readonly boolean[] }) {
   );
 }
 
-export function ResultView({ exam, questions }: Props) {
+export function ResultView({ exam, outline }: Props) {
   const router = useRouter();
   const [state, setState] = useState<State>({ status: "loading" });
   const [retryError, setRetryError] = useState<string | null>(null);
@@ -142,6 +148,23 @@ export function ResultView({ exam, questions }: Props) {
     };
   }, [exam.examCode, owner]);
 
+  // 詳しく出す回(`?at=` の回、なければ最新)の問題だけを取る
+  const shown =
+    state.status === "ready" && state.target !== "not-found" ? (state.target ?? state.results[0]) : undefined;
+  const [details, setDetails] = useState<{ at: string; questions: Map<string, Question> | null } | null>(null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: 詳しく出す回が変わったときだけ取り直す
+  useEffect(() => {
+    if (!shown) return;
+    let active = true;
+    void fetchQuestions(exam.examCode, shown.questionIds).then((found) => {
+      if (!active) return;
+      setDetails({ at: shown.finishedAt, questions: found ? new Map(found.map((q) => [q.questionId, q])) : null });
+    });
+    return () => {
+      active = false;
+    };
+  }, [exam.examCode, shown?.finishedAt]);
+
   /** この端末にだけある記録を、アカウントに移す。すべて移せたときだけ、端末の記録を消す。 */
   async function migrate() {
     if (state.status !== "ready" || migration === "busy") return;
@@ -177,9 +200,13 @@ export function ResultView({ exam, questions }: Props) {
   const latest = state.target ?? state.results[0];
   const isNewest = latest !== undefined && latest.finishedAt === state.results[0]?.finishedAt;
   const previous = state.results.filter((r) => r.finishedAt !== latest?.finishedAt);
-  const byId = new Map(questions.map((q) => [q.questionId, q]));
+  if (latest && details?.at !== latest.finishedAt) return <ResultSkeleton />;
+  if (latest && details?.questions === null) {
+    return <Notice kind="error">問題を読み込めませんでした。時間をおいて、開き直してください。</Notice>;
+  }
+  const byId = new Map(outline.map((q) => [q.questionId, q]));
   const answered = latest
-    ? latest.questionIds.map((id) => byId.get(id)).filter((q): q is Question => q !== undefined)
+    ? latest.questionIds.map((id) => details?.questions?.get(id)).filter((q): q is Question => q !== undefined)
     : [];
 
   if (!latest || answered.length === 0) {
@@ -226,7 +253,7 @@ export function ResultView({ exam, questions }: Props) {
   }
   const wrongCount = allRows.filter((row) => !row.correct).length;
   // 保存した結果(最大 10 回)から、問題ごとの直近の正誤を出す(新しく保存はしない)
-  const outcomes = recentOutcomes(state.results, questions);
+  const outcomes = recentOutcomes(state.results, outline);
   // 見直すときも、元の問題番号を保つ(「問題 3」は、結果の中の 3 問目のまま)
   const rows = wrongOnly ? allRows.filter((row) => !row.correct) : allRows;
   const passLine = passLinePercent(exam);
@@ -234,7 +261,7 @@ export function ResultView({ exam, questions }: Props) {
   // 回答時間のない古い結果では、平均を出さない
   const average = averageTimeMs(latest);
   const names = new Map(exam.domains.map((d) => [d.code, d.name]));
-  const domainRows: BarRow[] = attemptDomains(latest, questions, exam.domains).map((row) => {
+  const domainRows: BarRow[] = attemptDomains(latest, outline, exam.domains).map((row) => {
     const color = domainColorClasses(exam.domains, row.domain);
     const time = row.avgTimeMs === null ? "" : `、平均 ${formatAnswerTime(row.avgTimeMs)}/問`;
     return {
@@ -251,7 +278,7 @@ export function ResultView({ exam, questions }: Props) {
   const stage = stageCheck && stageCheck.finishedAt === latest.finishedAt ? stageCheck : null;
   // 直近の結果がセクションの出題のときだけ、セクションの合否と、次のセクションを出す
   const section = sectionCheck && sectionCheck.finishedAt === latest.finishedAt ? sectionCheck : null;
-  const sections = sectionsOf(questions.map((q) => q.questionId));
+  const sections = sectionsOf(outline.map((q) => q.questionId));
   const nextSection = section && section.section + 1 < sections.length ? section.section + 1 : null;
 
   /** 次のセクションの出題を始める */
@@ -259,14 +286,7 @@ export function ResultView({ exam, questions }: Props) {
     const ids = sections[index] ?? [];
     const items = ids.flatMap((id) => {
       const question = byId.get(id);
-      return question
-        ? [
-            {
-              questionId: id,
-              choiceKeys: question.questionType === "free-text" ? [] : question.choices.map((c) => c.key),
-            },
-          ]
-        : [];
+      return question ? [{ questionId: id, choiceKeys: question.choiceKeys }] : [];
     });
     const href = startSession(browserStore(), exam.examCode, items, { section: index });
     if (!href) {
@@ -497,7 +517,7 @@ export function ResultView({ exam, questions }: Props) {
               <ul className="space-y-1 text-sm">
                 {previous.map((past) => {
                   const pastScore = score(
-                    past.questionIds.map((id) => byId.get(id)).filter((q): q is Question => q !== undefined),
+                    past.questionIds.map((id) => byId.get(id)).filter((q) => q !== undefined),
                     past.answers,
                     past.textAnswers,
                   );

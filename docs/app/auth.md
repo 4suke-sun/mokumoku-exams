@@ -38,9 +38,11 @@
 `proxy.ts` が、すべてのリクエストの入り口で ID トークンをサーバー側で検証します(`lib/auth/guard.ts` の `authenticate`)。
 
 - **ログインなしで開ける経路**: `/login`、`/forgot-password`、`/_next/*`、認証の API のうち列挙した 7 つ(`login`・`new-password`・`forgot-password`・`reset-password`・`refresh`・`logout`・`session`)と、
-  ブラウザや検索エンジンが Cookie なしで取りに来るファイル(`/manifest.webmanifest`、`/robots.txt`、`/sitemap.xml`、`/sw.js`、`/icons/` の列挙した 4 つ)だけです。どのファイルも、秘密の情報を含みません。
+  ブラウザや検索エンジンが Cookie なしで取りに来るファイル(`/manifest.webmanifest`、`/robots.txt`、`/sitemap.xml`、`/sw.js`、`/icons/` の列挙した 3 つ)と、ログインの画面にも出すロゴ(`/brand/` の 2 つ)だけです。どのファイルも、秘密の情報を含みません。
   ほかは、すべて検証が通らないと開けません(`/api/auth/change-password` や、資格の一覧・ヘルプも同じです)。列挙は完全一致で、大文字小文字、末尾のスラッシュ、`..`・`%`・`\` を含むものでは広げられません。新しい認証の API とファイルは、列挙に足さない限り保護されます。
   画面・API・ファイルの経路の一覧は `packages/app/src/authorization.test.ts` に固定してあり、新しい画面や API、`public/` のファイルを足すと、一覧に足すまでテストが落ちます(公開するか、保護するかを、意識して決めるためです)。
+- **`public/` のファイルの配信**: 本番では、`public/` のファイル(`/brand/*`・`/icons/*`・`/sw.js`)は、CloudFront が S3 から配り、入口を通りません(「インフラの構築とデプロイ」)。
+  このため、`public/` に置いたファイルは、上の列挙によらず、すべてログインなしで取れます。公開してよいものだけを置きます。
 - **未ログインのとき**: 画面は `/login?next=<元の場所>` へ移します。API は `401` を返します。`next` は、このサイト内の画面だけを受け付けます(`lib/auth/redirect.ts`)。
 - **検証の内容**(`lib/auth/verify.ts`): 署名(RS256、Cognito の公開鍵)、発行元(`iss`)、クライアント(`aud`)、用途(`token_use=id`)、有効期限(`exp`)、`sub` の形、`cognito:groups` の形(文字列の配列)。
   どれか 1 つでも合わなければ拒否します。公開鍵は Cognito の JWKS から取り、メモリに 1 時間保ちます。取得できないときも、拒否します(通す側には倒しません)。

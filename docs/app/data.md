@@ -119,6 +119,7 @@
 | `PUT /api/history/sections` | セクションの進捗を取り込む(本文は `{ "examCode", "best", "last" }`。200KB まで)。保存済みの進捗と 1 つにして保存し、統合した進捗を返す |
 | `GET /api/history/prefs` | 自分の表示の設定を返す(`{ "prefs": { "theme", "style", "shuffleChoices" } }`。保存していなければ `null`)。保存済みなら、設定の Cookie も付ける。問い合わせは受け付けない |
 | `PUT /api/history/prefs` | 表示の設定を保存する(本文は `{ "theme", "style", "shuffleChoices" }`。300 バイトまで)。設定の Cookie も付ける |
+| `POST /api/questions` | 公開中の資格の問題(正解と解説を含む)を、問題 ID を指定して返す(本文は `{ "examCode", "questionIds" }`。ID は 1〜1000 個、32KB まで。返すのは `{ "questions": [...] }` で、指定の順、いまのデータにない問題は入らない)。読み出しだが、ID の一覧を本文で受けるので POST。公開中でない資格は 400。出題・結果・ブックマークの画面が、表示に要る問題だけを取るのに使う |
 | `PUT /api/push/subscription` | この端末の通知の購読を保存する(本文は `{ "endpoint", "keys": { "p256dh", "auth" } }`) |
 | `DELETE /api/push/subscription` | この端末の通知の購読を消す(本文は `{ "endpoint" }`) |
 | `POST /api/push/test` | 管理者だけ。自分の購読(すべての端末)に、テスト通知を送る(本文は `{}`)。送れた数を返す(`{ "sent": 1 }`)。管理者でなければ `403` |
