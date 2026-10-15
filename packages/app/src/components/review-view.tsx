@@ -7,8 +7,8 @@ import { Notice } from "@/components/notice.tsx";
 import { ListSkeleton } from "@/components/page-skeletons.tsx";
 import { fetchReviewItems, type ReviewItemView, removeReview } from "@/lib/history/client.ts";
 import { MASTER_STREAK } from "@/lib/history/schema.ts";
-import { newSession } from "@/lib/quiz.ts";
-import { browserStore, loadSettings, saveSession } from "@/lib/storage.ts";
+import { SESSION_SAVE_FAILED, startSession } from "@/lib/start-session.ts";
+import { browserStore } from "@/lib/storage.ts";
 
 export type ReviewExam = {
   examCode: string;
@@ -81,17 +81,12 @@ export function ReviewView({ exams }: { exams: ReviewExam[] }) {
   function start(exam: ReviewExam, waiting: readonly ReviewItemView[]) {
     const ids = new Set(waiting.map((i) => i.questionId));
     const picked = exam.questions.filter((q) => ids.has(q.questionId));
-    const store = browserStore();
-    const { shuffleChoices, reveal } = loadSettings(store);
-    const session = newSession(exam.examCode, picked, { shuffleChoices }, Math.random, new Date());
-    if (!saveSession(store, reveal === "each" ? { ...session, reveal } : session)) {
-      setMessage({
-        kind: "error",
-        text: "この端末では、出題の状態を保存できません。ブラウザの設定を確認してください。",
-      });
+    const href = startSession(browserStore(), exam.examCode, picked);
+    if (!href) {
+      setMessage({ kind: "error", text: SESSION_SAVE_FAILED });
       return;
     }
-    router.push(`/exams/${exam.examCode}/play`);
+    router.push(href);
   }
 
   return (

@@ -9,9 +9,10 @@ import { QuestionChips } from "@/components/question-chips.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
 import { ScoreRing } from "@/components/score-ring.tsx";
 import { type AnswerTimer, createTimer, elapsedTimes, setVisible, showQuestion } from "@/lib/answer-timer.ts";
+import { saveFinishedResult } from "@/lib/finish-session.ts";
 import { postServerResult } from "@/lib/history/client.ts";
 import { displayLabels, isCorrect, labelKeys, orderChoices, resultDetailHref, score, sortKeys } from "@/lib/quiz.ts";
-import { browserStore, type Result, saveResult } from "@/lib/storage.ts";
+import { browserStore, type Result } from "@/lib/storage.ts";
 import type { NextStep } from "@/lib/study-nav.ts";
 import type { ChoiceQuestion, PublishedExam } from "@/lib/types.ts";
 
@@ -219,8 +220,7 @@ export function UnitPractice({ exam, questions, next }: Props) {
       timesMs: elapsedTimes(timer.current, questions.length, Date.now()),
     };
     // アカウントに保存できたら、サーバーを正とする。できないときは、この端末に残して、あとで移せるようにする
-    const posted = await postServerResult(result);
-    const saved = posted ? "server" : saveResult(browserStore(), result) ? "local" : "failed";
+    const saved = await saveFinishedResult(browserStore(), result, postServerResult);
     setPhase({ name: "done", result, saved });
   }
 

@@ -73,7 +73,6 @@ export async function unsubscribePush(): Promise<boolean> {
 const TestResultSchema = z.object({ sent: z.number() });
 
 /** 自分の購読に、テスト通知を送る。送れた数。失敗したら null。 */
-
 export async function sendTestNotification(): Promise<number | null> {
   const result = await requestJson("/api/push/test", { method: "POST", body: {}, schema: TestResultSchema });
   return result.ok ? result.data.sent : null;

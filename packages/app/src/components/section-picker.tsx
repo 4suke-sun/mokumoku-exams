@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Notice } from "@/components/notice.tsx";
 import { syncSectionProgress } from "@/lib/history/client.ts";
-import { newSession } from "@/lib/quiz.ts";
 import {
   passedSectionCount,
   SECTION_SIZE,
@@ -14,15 +13,8 @@ import {
   sectionStatus,
   sectionsOf,
 } from "@/lib/sections.ts";
-import {
-  browserStore,
-  loadSectionProgress,
-  loadSession,
-  loadSettings,
-  type SectionProgress,
-  type Session,
-  saveSession,
-} from "@/lib/storage.ts";
+import { SESSION_SAVE_FAILED, startSession } from "@/lib/start-session.ts";
+import { browserStore, loadSectionProgress, loadSession, type SectionProgress, type Session } from "@/lib/storage.ts";
 import type { PublishedExam } from "@/lib/types.ts";
 import { useStorageOwner } from "@/lib/use-storage-owner.ts";
 
@@ -71,17 +63,12 @@ export function SectionPicker({ exam, items }: Props) {
   }, [exam.examCode, owner]);
 
   function start(index: number) {
-    const store = browserStore();
-    const { shuffleChoices, reveal } = loadSettings(store);
-    const session = {
-      ...newSession(exam.examCode, sections[index] ?? [], { shuffleChoices }, Math.random, new Date()),
-      section: index,
-    };
-    if (!saveSession(store, reveal === "each" ? { ...session, reveal } : session)) {
-      setError("この端末では、出題の状態を保存できません。ブラウザの設定を確認してください。");
+    const href = startSession(browserStore(), exam.examCode, sections[index] ?? [], { section: index });
+    if (!href) {
+      setError(SESSION_SAVE_FAILED);
       return;
     }
-    router.push(`/exams/${exam.examCode}/play`);
+    router.push(href);
   }
 
   const passed = passedSectionCount(progress.best, sections.length);

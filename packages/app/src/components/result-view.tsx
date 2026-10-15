@@ -26,7 +26,6 @@ import {
   displayLabels,
   isQuestionCorrect,
   labelKeys,
-  newSession,
   orderChoices,
   passLinePercent,
   requestedResultAt,
@@ -36,17 +35,16 @@ import {
 } from "@/lib/quiz.ts";
 import { recentOutcomes } from "@/lib/recent-outcomes.ts";
 import { sectionPassLine, sectionStatus, sectionsOf } from "@/lib/sections.ts";
+import { SESSION_SAVE_FAILED, startSession } from "@/lib/start-session.ts";
 import {
   browserStore,
   clearResults,
   loadResults,
   loadSectionProgress,
-  loadSettings,
   loadStageProgress,
   type Result,
   type SectionProgress,
   type StageCheck,
-  saveSession,
 } from "@/lib/storage.ts";
 import { STAGE_PASS_PERCENT } from "@/lib/study-stages.ts";
 import type { ChoiceQuestion, FreeTextQuestion, PublishedExam, Question } from "@/lib/types.ts";
@@ -204,18 +202,16 @@ export function ResultView({ exam, questions }: Props) {
 
   /** 間違えた問題(と自信なし)だけで、新しい出題を始める。結果は、通常の結果として保存される */
   function retry() {
-    const store = browserStore();
-    const { shuffleChoices, reveal } = loadSettings(store);
     const items = retryRows.map(({ question }) => ({
       questionId: question.questionId,
       choiceKeys: question.questionType === "free-text" ? [] : question.choices.map((c) => c.key),
     }));
-    const session = newSession(exam.examCode, items, { shuffleChoices }, Math.random, new Date());
-    if (!saveSession(store, reveal === "each" ? { ...session, reveal } : session)) {
-      setRetryError("この端末では、出題の状態を保存できません。ブラウザの設定を確認してください。");
+    const href = startSession(browserStore(), exam.examCode, items);
+    if (!href) {
+      setRetryError(SESSION_SAVE_FAILED);
       return;
     }
-    router.push(`/exams/${exam.examCode}/play`);
+    router.push(href);
   }
   const wrongCount = allRows.filter((row) => !row.correct).length;
   // 保存した結果(最大 10 回)から、問題ごとの直近の正誤を出す(新しく保存はしない)
@@ -250,8 +246,6 @@ export function ResultView({ exam, questions }: Props) {
   /** 次のセクションの出題を始める */
   function startSection(index: number) {
     const ids = sections[index] ?? [];
-    const store = browserStore();
-    const { shuffleChoices, reveal } = loadSettings(store);
     const items = ids.flatMap((id) => {
       const question = byId.get(id);
       return question
@@ -263,15 +257,12 @@ export function ResultView({ exam, questions }: Props) {
           ]
         : [];
     });
-    const session = {
-      ...newSession(exam.examCode, items, { shuffleChoices }, Math.random, new Date()),
-      section: index,
-    };
-    if (!saveSession(store, reveal === "each" ? { ...session, reveal } : session)) {
-      setRetryError("この端末では、出題の状態を保存できません。ブラウザの設定を確認してください。");
+    const href = startSession(browserStore(), exam.examCode, items, { section: index });
+    if (!href) {
+      setRetryError(SESSION_SAVE_FAILED);
       return;
     }
-    router.push(`/exams/${exam.examCode}/play`);
+    router.push(href);
   }
 
   return (

@@ -13,6 +13,7 @@ import { QuestionGrid } from "@/components/question-grid.tsx";
 import { RecentMarks, useQuestionStats } from "@/components/question-stats.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
 import { type AnswerTimer, createTimer, elapsedTimes, setVisible, showQuestion } from "@/lib/answer-timer.ts";
+import { recordSessionChecks, resultOf, saveFinishedResult } from "@/lib/finish-session.ts";
 import { judgeFreeText } from "@/lib/free-text.ts";
 import { postServerResult, putSectionProgress } from "@/lib/history/client.ts";
 import { type QuizKeyAction, type QuizKeyPhase, quizKeyAction } from "@/lib/keyboard.ts";
@@ -26,7 +27,6 @@ import {
   labelKeys,
   orderChoices,
   remainingMs,
-  score,
   sortKeys,
   textAnswerFor,
 } from "@/lib/quiz.ts";
@@ -35,14 +35,9 @@ import {
   clearSession,
   loadSession,
   MAX_TEXT_ANSWER_LENGTH,
-  type Result,
   type Session,
-  saveResult,
-  saveSectionCheck,
   saveSession,
-  saveStageCheck,
 } from "@/lib/storage.ts";
-import { isStagePassed } from "@/lib/study-stages.ts";
 import type { PublishedExam, Question } from "@/lib/types.ts";
 import { useStorageOwner } from "@/lib/use-storage-owner.ts";
 
@@ -64,11 +59,6 @@ type State = { status: "loading" } | { status: "empty" } | { status: "ready"; se
 /** 問題ごとの印の配列を、出題の数にそろえる(持たないときは、すべて false) */
 function marksOf(list: readonly boolean[] | undefined, total: number): boolean[] {
   return Array.from({ length: total }, (_, i) => list?.[i] === true);
-}
-
-/** 1 つでも印があるときだけ、配列で返す(印のない結果を小さく保つ) */
-function marksIfAny(list: readonly boolean[]): boolean[] | undefined {
-  return list.some(Boolean) ? [...list] : undefined;
 }
 
 function isVisible(): boolean {
@@ -272,50 +262,20 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
     if (finishing.current) return;
     finishing.current = true;
     try {
-      const result: Result = {
-        examCode: exam.examCode,
-        questionIds: session.questionIds,
-        answers: session.answers,
-        textAnswers: session.textAnswers,
-        finishedAt: clock().toISOString(),
-        choiceOrder: session.choiceOrder,
+      const result = resultOf(session, {
+        finishedAt: clock(),
         timesMs: elapsedTimes(timer.current, total, clock().getTime()),
-        unsure: marksIfAny(unsure),
-        flagged: marksIfAny(flagged),
-      };
-      // アカウントに保存できたら、サーバーを正とする。保存できないとき(通信の失敗など)は、この端末に残して、あとで移せるようにする
-      const posted = await postServerResult(result);
-      if (!posted && !saveResult(browserStore(), result)) {
+        unsure,
+        flagged,
+      });
+      const store = browserStore();
+      if ((await saveFinishedResult(store, result, postServerResult)) === "failed") {
         // 結果を残せないときは、回答を消さずに、この画面にとどまる
         setSaveFailed(true);
         return;
       }
-      if (session.stage) {
-        // 段階の確認問題: 正答率で合否を決め、到達の状態を端末に残す(残せなくても、結果は保存済みなので先へ進む)
-        const asked = session.questionIds.flatMap((id) => byId.get(id) ?? []);
-        const { percent } = score(asked, session.answers, session.textAnswers);
-        saveStageCheck(browserStore(), exam.examCode, {
-          ...session.stage,
-          percent,
-          passed: isStagePassed(percent),
-          finishedAt: result.finishedAt,
-        });
-      }
-      if (session.section !== undefined) {
-        // セクションの出題: 正答数を、そのセクションの記録に残す(残せなくても、結果は保存済みなので先へ進む)
-        const asked = session.questionIds.flatMap((id) => byId.get(id) ?? []);
-        const { correct, total } = score(asked, session.answers, session.textAnswers);
-        if (total > 0) {
-          const record = { correct, total, finishedAt: result.finishedAt };
-          saveSectionCheck(browserStore(), exam.examCode, session.section, record);
-          // サーバーにも残す(別の端末で開いても、同じ進捗になる)。残せなくても、端末には残っていて、次に一覧を開いたときに取り込む
-          void putSectionProgress({
-            examCode: exam.examCode,
-            best: { [String(session.section)]: record },
-            last: { ...record, section: session.section },
-          });
-        }
-      }
+      const asked = session.questionIds.flatMap((id) => byId.get(id) ?? []);
+      recordSessionChecks(store, session, asked, result.finishedAt, putSectionProgress);
       clearSession(browserStore(), exam.examCode);
       router.push(`/exams/${exam.examCode}/result`);
     } finally {
