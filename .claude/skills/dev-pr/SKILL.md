@@ -6,8 +6,8 @@ description: PR・Issue の起票や編集の前に、タイトルと本文を .
 # /dev-pr — 漏えいを確認してから PR・Issue を出す
 
 PR・Issue のタイトルと本文は、リモートに残る。編集履歴も、あとから消せない。「出してから直す」は前提にしない。
-PR ができると、ブランチの全コミットが参照として保持される。フック(`scripts/check-pr-secrets.ts`)は正規表現で
-拾えるものを止める。このスキルは、**文脈で判断するもの**を確認する(フックとの二重防御)。
+PR ができると、ブランチの全コミットが参照として保持される。機械検査(`scripts/check-pr-secrets.ts`。Step 2 で手で実行する)は正規表現で
+拾えるものを止める。このスキルは、**文脈で判断するもの**を確認する(機械検査との二重防御)。
 
 PR を出すときは、push も含めて、検査を 1 回、人の承認を 1 回にまとめる(範囲の全コミット・作者・ブランチ名と、PR の下書きを、
 まとめて検査する)。push は、承認のあとに行う。commit のときに検査した差分は、台帳に記録されていれば、読み直さない
@@ -27,20 +27,42 @@ PR・Issue の本文は自由度が高いので、作成役は `commit-writer`(H
 ## Step 0. 前提の確認
 
 1. PR の場合: PR の範囲(`git log --oneline origin/main..HEAD`)が空でないか。検査と承認は、この範囲の全体に対して行う。
-   push は、Step 6 で承認のあとに行う(先に `/dev-push` はしない)。リモートに同名のブランチがあり、
-   `git log --oneline @{upstream}..HEAD` が空なら、push は飛ばす
+   push は、Step 6 で承認のあとに行う(先に `/dev-push` はしない。push を飛ばす条件も Step 6 に書く)
 2. PR の場合: ブランチが `main` でないこと(`git branch --show-current`)。
    `git remote get-url origin` が、意図したリポジトリであること
 3. PR の場合: 対応する Issue があるか(ブランチ名が `<prefix>/#<番号>-…` か)
 4. 版を切る PR の場合: `data/release-notes.json` に、その版のエントリがあるか
 5. タイトルが Conventional Commits か(`feat:` / `fix:` / `chore:` など)
 
+Issue の場合は、さらに次を確かめる(決まりは `CONTRIBUTING.md` の「Issue」):
+
+6. **重複の検索**: 起票の前に、メインのセッションが似た題の Issue を検索し、候補(番号・題・状態・マイルストーン)を人に見せる。
+   「重複」と決めるのは人。作成役と検査役は、重複を探さず、決めない:
+
+   ```sh
+   gh issue list --state all --search "<題の語>" --limit 20 --json number,title,state,milestone
+   ```
+
+7. **版とマイルストーン**: 版の番号は、本文に書かず、マイルストーン(`vX.Y.Z`)だけで持つ。「対象バージョン」の行を書かない。
+   版が決まっている Issue にはその版のマイルストーンを、未定の Issue にはマイルストーンなしでラベル `later` を付ける。
+   新しいマイルストーンが要るときは、説明に、その版の主題と、前の版から何を前提にするかを書く。
+
 ## Step 1. 作成役: 下書きを書く
 
 下書きの置き場所(gitignore 済み):
 
 - PR: `.drafts/pr-<ブランチ名>.md`(1 行目がタイトル、空行を挟んで本文)
-- Issue: `.drafts/issues/<番号>-<slug>.md`(1 行目が `# タイトル`)
+- Issue: 新規は `.drafts/issues/<slug>.md`(番号は投稿まで決まらない)、既存の Issue の編集は `.drafts/issues/<番号>-<slug>.md`。1 行目が `# タイトル`、2 行目が空行、3 行目以降が本文
+- 複数の Issue をまとめて起票・編集するときは、一覧(マニフェスト) `.drafts/issues/manifest.json` も書く(メインのセッションが書いてよい)。
+  1 行が 1 件で、`action`(`create` / `edit`)、`file`(下書きのファイル名)、編集なら `number`、`milestone`、`labels` を持つ:
+
+  ```json
+  [
+    { "action": "create", "file": "example.md", "milestone": "v0.99.0", "labels": ["chore"] },
+    { "action": "create", "file": "later-example.md", "labels": ["feat", "later"] },
+    { "action": "edit", "file": "123-existing.md", "number": 123, "milestone": "v0.99.0" }
+  ]
+  ```
 
 作成役に依頼する内容:
 
@@ -62,6 +84,14 @@ printf 'refs/heads/%s %s refs/heads/%s %s\n' "$(git branch --show-current)" "$(g
 ```
 
 範囲の作者が、GitHub の noreply アドレスであることも確かめる(`git log --format='%h %ae' origin/main..HEAD`)。
+
+PR の下書きに `Closes` がある場合は、`Closes` の Issue と、マイルストーン・リリースノートの最新の版の対応も確かめる(`gh` で読むだけ。CI の PR でも同じ検査が動く):
+
+```sh
+node scripts/check-pr-closes.ts --body-file <下書きファイル>
+```
+
+`Closes` の Issue がどれもマイルストーンを持たない PR(Issue 単位の PR・hotfix)は、検査されない。止められたら、`Closes` の Issue、マイルストーン、`data/release-notes.json` の最新の版をそろえる。
 
 ## Step 3. 検査役: 確認する
 
@@ -107,6 +137,7 @@ PR の差分に次のパスが含まれるときは、`inspector-deep`(Sonnet)�
 - 下書きの全文(タイトルと本文)
 - 差分の要約と、push する範囲のコミット一覧、作者アドレスの確認結果(PR の場合)
 - この承認は、push と PR の作成の両方に対するもの(PR の場合)
+- 一覧(マニフェスト)から Issue を投稿するときは、一覧の内容(各行の `action`・`number`・`milestone`・`labels`)と、`--dry-run` の出力も見せる(封印は、下書きとこれらの項目を覆う)
 - 機械検査と検査役の判定(場所と種類のみ。値は引用しない)
 
 承認の時点で、下書きのハッシュと、PR の場合は範囲の末尾のコミットとコミット数を控える
@@ -117,11 +148,17 @@ shasum -a 256 <下書きファイル>
 git rev-parse HEAD && git rev-list --count origin/main..HEAD
 ```
 
+一覧から Issue を投稿するときは(承認の前に見せる `--dry-run` のコマンドは、Step 6)、承認の直後に、一覧へ封印(下書きのハッシュと、一覧の項目 action・number・milestone・labels のハッシュ)を記録する。投稿は、封印と一致する下書きだけを行う:
+
+```sh
+node scripts/post-issues.ts .drafts/issues/manifest.json --seal
+```
+
 ## Step 6. 投稿
 
 1. 投稿の直前に、もう一度ハッシュ(PR の場合は、範囲の末尾のコミットとコミット数も)を取り、Step 5 の値と**一致する**ことを確認する。
    一致しなければ、push も投稿もせず、`.claude/skills/dev-commit/reconfirm.md` のとおりやり直す
-2. PR の場合: まず push する(承認済みの範囲)。`--force` 系は使わない:
+2. PR の場合: まず push する(承認済みの範囲)。リモートに同名のブランチがあり、upstream が設定されていて、`git log --oneline @{upstream}..HEAD` が空なら、push は飛ばす(すでに push 済み)。upstream がない、または `@{upstream}` を解決できないときは、push する。`--force` 系は使わない:
 
    ```sh
    git push -u origin "$(git branch --show-current)"
@@ -136,7 +173,24 @@ git rev-parse HEAD && git rev-list --count origin/main..HEAD
    gh issue create --title "$(head -n 1 <下書き> | sed 's/^# //')" --body-file <(tail -n +3 <下書き>)
    ```
 
-4. `gh pr create` の前には、フック(`scripts/check-pr-secrets.ts`)も動く。止められたら、指摘を直す
+   Issue を一覧(マニフェスト)から投稿するときは、スクリプトを使う。投稿(フラグなし)では、封印(承認の時点のハッシュ)と一致しない下書き、
+   題が Conventional Commits の形でない下書き、本文に版の番号の行がある下書き、マイルストーンもラベル `later` もない新規の Issue は、
+   投稿せずに止まる:
+
+   ```sh
+   node scripts/post-issues.ts .drafts/issues/manifest.json --dry-run   # 検査して、投稿する内容の概要(新規か編集か、ファイル、マイルストーン、ラベル)を表示する(何も投稿しない。封印は求めない。承認の前に見せる)
+   node scripts/post-issues.ts .drafts/issues/manifest.json             # 投稿し、結果(番号・題・URL)を一覧に書き戻して表示する
+   ```
+
+   投稿の結果の一覧(番号・題・URL)は、人に報告する。一覧は `.drafts/`(gitignore 済み)に残る。
+
+   - 投稿の前に、ラベル(`later` を含む)とマイルストーンが GitHub にあることを確かめる(なければ、`gh label create <名前>`、
+     マイルストーンは `gh api repos/{owner}/{repo}/milestones -f title=vX.Y.Z -f description=<主題と前提>` で作る。作成は人の確認を取る)
+   - 途中で失敗したときは、投稿済みの行に結果が書き戻されている。原因を直して、同じコマンドを再実行する(投稿済みの行は飛ばす)。
+     下書きや一覧の項目を直したときは、検査と承認をやり直し、`--reseal` で封印し直す
+   - 既存の Issue の編集では、ラベルは追加だけ。マイルストーンを付けるときは、ラベル `later` を外す
+
+4. `gh pr create` の前に動くフックはない。下書きの機械検査(`scripts/check-pr-secrets.ts`)は、Step 2 で承認の前に済ませてある
 5. 作ったら、CI の結果を確認する。**最新のコミットの CI が通るまで、マージしない**
 6. マージは、このスキルの範囲外(人の指示があるときだけ行う)
 

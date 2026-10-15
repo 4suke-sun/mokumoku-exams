@@ -154,7 +154,7 @@ describe("results", () => {
     ]);
   });
 
-  it(`${MAX_RESULTS} 件を超えた古い結果は捨てる`, () => {
+  it(`結果が${MAX_RESULTS}件を超える_古い結果は捨てる`, () => {
     const store = memoryStore();
     for (let i = 0; i < MAX_RESULTS + 3; i++) saveResult(store, result(i));
     const results = loadResults(store, "TEST");

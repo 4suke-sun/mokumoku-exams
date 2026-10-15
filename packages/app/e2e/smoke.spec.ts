@@ -125,8 +125,13 @@ test("セクションの進捗_別の端末(保存のない新しいブラウザ
     await start.click();
     await expect(page).toHaveURL(/\/exams\/EX-SMP-XX\/play/, { timeout: 3_000 });
   }).toPass();
+  // 進捗の保存は、結果の画面へ移るときに、待たずに送られる。保存が終わる前に最初のブラウザを閉じると、送信が切れる
+  const saved = page.waitForResponse(
+    (response) => response.request().method() === "PUT" && new URL(response.url()).pathname === "/api/history/sections",
+  );
   await answerAndFinish(page);
   await expect(page).toHaveURL(/\/exams\/EX-SMP-XX\/result/);
+  await saved;
   await first.close();
 
   // 端末の保存(localStorage)を持たない、別のブラウザの状態

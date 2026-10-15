@@ -9,7 +9,7 @@
 | 項目 | 確認の方法 |
 | --- | --- |
 | 全履歴の追加行・ファイル名・メッセージ・作者に、認証情報や環境固有の値がない | すべてのブランチを対象に、`node scripts/check-push-secrets.ts` を実行する(下の「全履歴の検査」)。終了コードが 0 |
-| 個人固有の語(拒否リスト)が、履歴のどこにもない | `.pr-secrets-denylist` の語を、全履歴の差分・コミットメッセージ・タグのメッセージに対して `git log --all -p` と `grep -F -f` で数える。0 件。語は報告に書かない |
+| 個人固有の語(拒否リスト)が、履歴のどこにもない | `.pr-secrets-denylist` の語を、全履歴の差分・コミットメッセージに対して `git log --all -p` と `grep -F -f` で数える(タグは軽量タグで、タグ自体のメッセージはない)。0 件。語は報告に書かない |
 | アクセスキー・秘密鍵の形の文字列がない | `git log --all -p` の出力に、`AKIA`・`ASIA`・`-----BEGIN … PRIVATE KEY` の形が 0 件 |
 | メールアドレスが、GitHub の noreply と `example.com` だけ | 追加行のメールアドレスを集計して確かめる |
 | アカウント ID・ARN・配信のドメインが、プレースホルダーだけ | 追加行の 12 桁の数字、`arn:aws:…:<12 桁>:`、`cloudfront.net` などのドメインを集計して確かめる。実値がなく、`123456789012`・`xxxx.cloudfront.net` のような例だけ |
@@ -68,8 +68,29 @@ done | node scripts/check-push-secrets.ts
 | 管理者の経路が、管理者以外に開かない | `src/authorization.test.ts` が通る。デプロイした環境でも、管理者以外で `/admin` がホームへ戻る |
 | ログイン後の主要な流れが、実機で動く | デプロイした環境で、ログイン → 出題 → 結果 → 実績を、一通り操作する |
 
-## 6. 公開の手順
+## 6. GitHub のリポジトリの設定
+
+プランごとの対応は、GitHub の現行の案内で確かめます([ルールセット](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets)、[Secret scanning](https://docs.github.com/code-security/secret-scanning/about-secret-scanning)、[GitHub のセキュリティ機能](https://docs.github.com/en/code-security/getting-started/github-security-features))。
+現在のプランでは、非公開のリポジトリでルールセットが効かないため、公開のあとに有効にして確かめる項目が多くあります。
+
+| 項目 | 確認の方法 | 確かめる時期 |
+| --- | --- | --- |
+| `main` のルールセットで、PR を必須にしている | 設定の Rules で、`main` を対象に「Require a pull request before merging」が有効。`main` へ直接 push すると拒否される | 公開のあと |
+| 必須のステータスチェックが、`ci-ok` だけ | 同じルールセットで、必須のチェックが `ci-ok` だけ(ほかのジョブは、変更がないと動かないため、必須にしない。`.github/workflows/ci.yml` の `ci-ok` のコメント) | 公開のあと |
+| `main` の force push と削除を禁止している | 同じルールセットで、「Block force pushes」と、削除の制限が有効 | 公開のあと |
+| `v*` のタグの更新と削除を禁止している | タグを対象にしたルールセットで、更新と削除の制限が有効。タグの作成は許す(`.github/workflows/release-tag.yml` が、タグの push で Release を作るため) | 公開のあと |
+| secret scanning と push protection が有効 | 設定の Code security で、どちらも有効 | 公開のあと(公開リポジトリでは無料) |
+| 依存の脆弱性の通知(Dependabot alerts)が有効 | 設定の Code security で有効 | 非公開の間でも確かめられる |
+| ルールセットの回避を、管理者に許すかを決めている | 回避の設定(bypass)を確かめる。許す場合は、その理由を記録する | 公開のあと |
+| 承認の数を求めるかを決めている | 承認を求めると、作者は自分の PR をマージできない。一人で開発する間は、求めない | 公開のあと |
+
+## 7. 公開の手順
 
 1. 上の項目がすべて確かめられていることを、PR またはコメントに記録する(値は書かず、場所と種類だけ)。
 2. リポジトリの可視性を切り替える前に、最後にもう一度、「全履歴の検査」を実行する。
 3. 切り替えたあと、公開の画面で、Issue・PR・リリースの本文を、第三者の目で見直す。
+4. 切り替えたあと、「6. GitHub のリポジトリの設定」の項目を有効にし、確認の方法どおりに確かめる。
+5. 設定を有効にしたあとに、ブランチ保護が使えない前提の記述を直す。
+    - `CONTRIBUTING.md` の「Pull Request」の節: 「ブランチ保護(PR の必須化)が使えない」と、`main` への push のあとに CI が検知する、という説明を、ルールセットで PR を必須にした、という説明に変える。
+    - `docs/known-issues.md`: 「`main` への強制 push のあとは、新しいコミットの中身を CI が検査できない」の「状態」を、ルールセットで強制 push を禁止した前提に合わせて直す(解決済みにして、更新ルールどおりに取り除く)。
+    - `.github/workflows/ci.yml` の、`main` への push の機密検査の説明(ブランチ保護が使えない間の検知)。
