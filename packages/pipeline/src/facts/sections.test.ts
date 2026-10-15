@@ -28,6 +28,19 @@ describe("節への分割", () => {
     expect(findSection(html, "no-such-heading")).toBeNull();
   });
 
+  it("見出しに data-id のような属性だけがある_id として読まず、見出しの文で探す", () => {
+    const html = '<h2 data-id="ams#c3">Intro</h2><p>本文</p><h2 id="real"><a data-name="x">Next</a></h2><p>次</p>';
+    expect(findSection(html, "ams#c3")).toBeNull();
+    expect(findSection(html, "Intro")?.text).toBe("本文");
+    expect(findSection(html, "real")?.text).toBe("次");
+  });
+
+  it("見出しの文に文字参照がある_文字に戻した見出しの文で節を探せる", () => {
+    const html = "<h2>Generative AI&nbsp;</h2><p>本文</p><h2>Other &amp; more</h2><p>次</p>";
+    expect(findSection(html, "Generative AI")?.text).toBe("本文");
+    expect(findSection(html, "Other & more")?.text).toBe("次");
+  });
+
   it("見出しの中のアンカー要素の ID も読む", () => {
     const sections = parseSections('<h2><a id="inner-id"></a>Title</h2><p>body</p>');
     expect(sections[0]?.id).toBe("inner-id");

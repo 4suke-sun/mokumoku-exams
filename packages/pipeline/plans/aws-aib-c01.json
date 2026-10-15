@@ -4,6 +4,38 @@
     {
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01.html",
       "kind": "exam-guide"
+    },
+    {
+      "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/what-is/machine-learning/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/what-is/generative-ai/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/what-is/ai-agents/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
+      "kind": "official-doc"
     }
   ],
   "guidePages": [
@@ -13,7 +45,17 @@
     "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
   ],
   "scope": {
-    "prefixes": ["https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/"],
+    "prefixes": [
+      "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/",
+      "https://aws.amazon.com/what-is/artificial-intelligence/",
+      "https://aws.amazon.com/what-is/machine-learning/",
+      "https://aws.amazon.com/what-is/generative-ai/",
+      "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/",
+      "https://aws.amazon.com/what-is/ai-agents/",
+      "https://aws.amazon.com/what-is/prompt-engineering/",
+      "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+      "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
+    ],
     "maxDepth": 1
   },
   "exclude": [

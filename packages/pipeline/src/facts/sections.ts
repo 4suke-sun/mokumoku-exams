@@ -14,7 +14,8 @@ export interface Section {
 }
 
 const HEADING = /<h([1-6])\b([^>]*)>([\s\S]*?)<\/h\1>/gi;
-const ID_ATTR = /\b(?:id|name)\s*=\s*(?:"([^"]*)"|'([^']*)')/i;
+// 属性の名前が id か name そのもの(data-id などは含めない)。属性の前には空白がある
+const ID_ATTR = /(?:^|\s)(?:id|name)\s*=\s*(?:"([^"]*)"|'([^']*)')/i;
 
 function headingId(attrs: string, inner: string): string | null {
   const own = ID_ATTR.exec(attrs);

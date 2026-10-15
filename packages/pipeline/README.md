@@ -47,3 +47,5 @@ npm test -w @mokumoku-exams/pipeline
 | `plans/` | 収集の計画(資格ごとの JSON) | する |
 | `provenance/` | 問題の来歴(資格ごとの JSON。下書きの ID、事実カードの ID、出典の URL・取得日・本文のハッシュ) | する |
 | `pipeline-work/`(リポジトリ直下) | 取得した本文、段階の成果物 | しない(gitignore。混入はコミット前・push 前の検査が止める) |
+
+`ledger/`、`facts/`、`provenance/` の JSON は、CLI が書き、読み込むたびにスキーマで検査します。手で整形しないので、整形(Biome)の対象から外しています(`biome.json`)。
