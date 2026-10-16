@@ -11,7 +11,7 @@
 - 管理者の画面(利用者の招待・無効化、全問のプレビュー)
 
 資格と問題のデータは、リポジトリ直下の `data/` の JSON です。仕様は [docs/data-spec.md](./docs/data-spec.md)、資格の足し方は
-[docs/adding-an-exam.md](./docs/adding-an-exam.md) にあります。
+[docs/adding-an-exam.md](./docs/adding-an-exam.md)、作問パイプラインで問題を作る手順は [docs/question-production.md](./docs/question-production.md) にあります。
 
 ## 構成
 

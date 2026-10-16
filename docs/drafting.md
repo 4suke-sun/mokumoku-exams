@@ -139,7 +139,7 @@ npm run pipeline -- export <試験コード>
 | `provenance:<コード>` | 不採用 | 来歴を作れない(`fact-not-found`・`fact-not-passed`・`source-not-in-ledger`) |
 | `data-invalid:<場所>` | 不採用 | 問題データに組み立てると、データの契約に合わない。場所は、項目の名前と番号をハイフンでつないだもの(例: `rubric-passing-points`、`choices-0-key`。全体なら `root`。値は含めない) |
 | `long-copy` | 不採用 | 設問文・選択肢・解説・誤答の理由が、根拠の出典の本文を長く写している |
-| `review:copy-unchecked` | 保留 | 根拠の出典の本文がキャッシュになく、写しを確かめられない(収集をやり直してから、取り込み直すか、人が確かめる) |
+| `review:copy-unchecked` | 保留 | 根拠の出典の本文がキャッシュになく、写しを確かめられない(人が出典の本文と照らして確かめる。機械の検査をやり直すときは、収集をやり直してから、下の「下書きをやり直すとき」の手順で作り直す) |
 | `duplicate:similar-existing` / `duplicate:similar-draft` | 不採用 | 設問文が、公開済みの問題 / ほかの下書きとほぼ同じ |
 | `ambiguous:similar-to-correct` / `ambiguous:supported-by-fact` | 保留 | 正答が複数になりうる誤答の候補 |
 | `review:similar-existing` / `review:similar-draft` | 保留 | 設問文が、公開済みの問題 / ほかの下書きに近い |
