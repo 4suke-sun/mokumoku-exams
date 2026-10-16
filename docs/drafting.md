@@ -14,7 +14,10 @@
 | `pipeline-work/draft/<コード>/out/<鍵>.json` | エージェントが書いた下書き | しない |
 | `pipeline-work/draft/<コード>/drafts.json` | 取り込んだ下書き(通過・保留。不採用は本文を持たない) | しない |
 | `pipeline-work/draft/<コード>/state.json` | 失敗の回数、取り込み済みの依頼の鍵、出し直しの回数、計画の項目ごとの未達の理由(理由コードだけ) | しない |
+| `pipeline-work/draft/<コード>/review.md` | 人の確認用の表(下書きの全件) | しない |
+| `pipeline-work/draft/<コード>/review-sheet.json` | 判断を書き込むシート | しない |
 | `packages/pipeline/provenance/<コード>.json` | 問題の来歴(下書きの ID、根拠の事実カードの ID、出典の URL、取得日、本文のハッシュ) | する |
+| `packages/pipeline/decisions/<コード>.json` | 人の判断の記録(対象の ID、判断、理由コード。[人の判断の記録](./human-decisions.md)) | する |
 
 `<コード>` は、試験コードを英小文字にしたものです。置き場所は `packages/pipeline/pipeline.config.json` で決まります。
 
@@ -80,7 +83,19 @@ npm run pipeline -- plan <試験コード>
    あわせて、来歴と台帳の今の状態を比べ、再検証が要るものを原因ごとの理由コードで失敗にします(`recheck-fact`・`source-changed`・`source-check-<検査の名前>` など。
    一覧は[出典の収集](./source-collection.md)の「5. 出典の本文が変わったときの再検証」)。
    **不採用でない下書きに来歴がなければ、先へ進めません**(`来歴なし`、終了コード 1)。検証の段階は、この検査を通った下書きだけを扱います。
-5. **来歴をコミットする。** `packages/pipeline/provenance/` の来歴だけをコミットします(`/dev-commit`)。`pipeline-work/` の中身はコミットしません。
+5. **人が確かめる。** 通過と保留の下書きの全件を、人が確かめます。
+
+   ```sh
+   npm run pipeline -- draft <試験コード> --review
+   npm run pipeline -- draft <試験コード> --decide
+   ```
+
+   `--review` は、作業用の置き場に、確認用の表(`review.md`)と、判断を書き込むシート(`review-sheet.json`)を書きます。
+   表は、下書きごとに、分野・難易度・種別、設問文、選択肢と正答(自由記述は観点と合格点)、解説、根拠にした事実カードの主張と節、出典の URL、保留・不採用の理由コード、警告を載せます。取得した本文は載せません。
+   シートの各行の `decision` に `approve`(承認)・`release`(保留の解除)・`reject`(却下)を、`reason` に理由コードを書き、`--decide` で[人の判断の記録](./human-decisions.md)に取り込みます。
+   空の行は取り込みません。理由のない判断、知らない下書き、保留でない下書きの解除があると、行の番号と種類を出して、何も取り込みません。
+   `--review`・`--decide`・`--check` は、確認の済み(承認・却下)と未済の件数を報告します。
+6. **来歴と判断の記録をコミットする。** `packages/pipeline/provenance/` の来歴と、`packages/pipeline/decisions/` の人の判断の記録だけをコミットします(`/dev-commit`)。`pipeline-work/` の中身はコミットしません。
 
 どのコマンドも `--dry-run` を受け付けます。書き込みをせず、検査と報告だけを行います。
 
@@ -152,7 +167,8 @@ npm run pipeline -- plan <試験コード>
 - **版・リージョンの適用範囲**: 事実カードの適用範囲(`scope`)と、設問文が言う範囲が合っているか。特定の版やリージョンの話を、一般の話のように書いていないか。
 - **自由記述**: 観点が主張の要素に対応しているか。キーワードが広すぎて、無関係な回答にも当たらないか。合格点が妥当か。
 
-保留を解く手順(保留の下書きを通過に変える操作)は、検証の段階で扱います。それまでは、保留の下書きは先へ進めません。
+保留の下書きは、人が確かめるまで先へ進めません。確かめた結果は、[人の判断の記録](./human-decisions.md)に、下書きごとに
+`release`(保留を解いて通過にする)、`approve`(承認)、`reject`(却下)で書きます。次に `draft` を実行したとき(どのモードでも)に反映されます。
 
 ## 6. 規約
 

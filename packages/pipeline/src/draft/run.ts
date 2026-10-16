@@ -4,6 +4,16 @@ import { loadExam } from "../collect/collect.ts";
 import { LedgerError, type LedgerFile, ledgerPath, readLedger } from "../collect/ledger.ts";
 import type { Config } from "../config.ts";
 import { EXAM_CODE } from "../contract.ts";
+import {
+  DecisionsError,
+  type DecisionsFile,
+  decisionsPath,
+  draftDecision,
+  orphanDecisions,
+  readDecisions,
+  upsertDecisions,
+  writeDecisions,
+} from "../decisions/decisions.ts";
 import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { FactsError, type FactsFile, factsPath, readFacts } from "../facts/schema.ts";
 import { type Output, report } from "../log.ts";
@@ -31,8 +41,17 @@ import {
   selectFacts,
   styleRuleSummaries,
 } from "./request.ts";
+import {
+  buildReviewSheet,
+  decisionsFromSheet,
+  type ReviewSheet,
+  ReviewSheetSchema,
+  renderDraftReview,
+  reviewCounts,
+} from "./review.ts";
 import { assembleQuestion, DISTRACTOR_TYPES, draftId, isChoiceDraft, schemaProblems } from "./schema.ts";
 import {
+  applyDraftDecisions,
   type DraftRecord,
   DraftsError,
   type DraftsFile,
@@ -53,7 +72,7 @@ import { evaluateStyle, STYLE_VERSION } from "./style.ts";
  * モデルは呼ばない。下書きはエージェント(question-drafter)が書く(ADR 0009)。data/ は変えない。
  */
 
-export type DraftMode = "request" | "import" | "check";
+export type DraftMode = "request" | "import" | "check" | "review" | "decide";
 
 export interface DraftOptions {
   config: Config;
@@ -75,6 +94,9 @@ interface Paths {
   outDir: string;
   drafts: string;
   state: string;
+  decisions: string;
+  reviewMd: string;
+  reviewSheet: string;
 }
 
 function pathsFor(config: Config, rootDir: string, examCode: string): Paths {
@@ -89,6 +111,9 @@ function pathsFor(config: Config, rootDir: string, examCode: string): Paths {
     outDir: join(dir, "out"),
     drafts: join(dir, "drafts.json"),
     state: join(dir, "state.json"),
+    decisions: decisionsPath(resolve(rootDir, config.decisionsDir), examCode),
+    reviewMd: join(dir, "review.md"),
+    reviewSheet: join(dir, "review-sheet.json"),
   };
 }
 
@@ -124,7 +149,9 @@ export function runDraft(options: DraftOptions): ExitCode {
   let drafts: DraftsFile;
   let ledger: LedgerFile;
   let provenance: ProvenanceFile;
+  let decisions: DecisionsFile;
   try {
+    decisions = readDecisions(paths.decisions, examCode);
     facts = readFacts(paths.facts, examCode);
     drafts = readDrafts(paths.drafts, examCode);
     ledger = readLedger(paths.ledger, examCode);
@@ -134,8 +161,19 @@ export function runDraft(options: DraftOptions): ExitCode {
     else if (error instanceof DraftsError) for (const p of error.paths) report(output, "下書きの誤り", p);
     else if (error instanceof LedgerError) for (const p of error.paths) report(output, "台帳の誤り", p);
     else if (error instanceof ProvenanceError) for (const p of error.paths) report(output, "来歴の誤り", p);
+    else if (error instanceof DecisionsError) for (const p of error.paths) report(output, "判断の記録の誤り", p);
     else throw error;
     return EXIT.checkFailed;
+  }
+  // 人の判断(保留の解除・承認・却下)を、下書きの状態に反映する。対象がなくなった判断は、黙って捨てずに報告する
+  const decided = applyDraftDecisions(drafts, (id) => draftDecision(decisions, id));
+  if (decided.changed > 0) {
+    report(output, "判断の反映", `下書き ${decided.changed} 件`);
+    drafts = decided.file;
+    if (!options.dryRun) writeDrafts(paths.drafts, drafts);
+  }
+  for (const d of orphanDecisions(decisions, { draftIds: drafts.drafts.map((x) => x.id) })) {
+    if (d.target === "draft") report(output, "判断の対象なし", `draft ${d.id}`);
   }
   switch (options.mode) {
     case "request":
@@ -143,8 +181,81 @@ export function runDraft(options: DraftOptions): ExitCode {
     case "import":
       return importStep(options, paths, facts, drafts, ledger, provenance);
     case "check":
-      return checkStep(options, facts, drafts, provenance, ledger, master.exam.vendor);
+      return checkStep(options, facts, drafts, provenance, ledger, master.exam.vendor, decisions);
+    case "review":
+      return reviewStep(options, paths, facts, drafts, provenance, decisions);
+    case "decide":
+      return decideStep(options, paths, drafts, decisions);
   }
+}
+
+/** 確認用の表と、判断を書き込むシートを、作業用の置き場に出す */
+function reviewStep(
+  options: DraftOptions,
+  paths: Paths,
+  facts: FactsFile,
+  drafts: DraftsFile,
+  provenance: ProvenanceFile,
+  decisions: DecisionsFile,
+): ExitCode {
+  const { rootDir, examCode, output, dryRun } = options;
+  const counts = reviewCounts(drafts, decisions);
+  if (!dryRun) {
+    mkdirSync(dirname(paths.reviewMd), { recursive: true });
+    writeFileSync(paths.reviewMd, renderDraftReview(examCode, drafts, facts, provenance, decisions));
+    writeJson(paths.reviewSheet, buildReviewSheet(examCode, drafts, decisions));
+    report(output, "レビューレポート", relative(rootDir, paths.reviewMd));
+    report(output, "レビューレポート", relative(rootDir, paths.reviewSheet));
+  } else {
+    report(output, "書き込みをしない(dry-run)");
+  }
+  reportReviewCounts(output, counts);
+  return EXIT.ok;
+}
+
+function reportReviewCounts(output: DraftOptions["output"], counts: ReturnType<typeof reviewCounts>): void {
+  report(
+    output,
+    "情報",
+    `人の確認: 対象 ${counts.total} 件、承認 ${counts.approved} 件、却下 ${counts.rejected} 件、未済 ${counts.pending} 件`,
+  );
+}
+
+/** 判断を書き込んだシートを検査し、人の判断の記録に取り込む */
+function decideStep(options: DraftOptions, paths: Paths, drafts: DraftsFile, decisions: DecisionsFile): ExitCode {
+  const { examCode, output, dryRun } = options;
+  if (!existsSync(paths.reviewSheet)) {
+    report(output, "入力の誤り", "判断のシートがない(draft --review を先に実行する)");
+    return EXIT.inputError;
+  }
+  let sheet: ReviewSheet;
+  try {
+    const parsed = ReviewSheetSchema.safeParse(JSON.parse(readFileSync(paths.reviewSheet, "utf8")));
+    if (!parsed.success) {
+      for (const i of parsed.error.issues) report(output, "判断のシートの誤り", i.path.join(".") || "(全体)");
+      return EXIT.checkFailed;
+    }
+    sheet = parsed.data;
+  } catch {
+    report(output, "判断のシートの誤り", "(JSON の形)");
+    return EXIT.checkFailed;
+  }
+  if (sheet.examCode !== examCode) {
+    report(output, "判断のシートの誤り", "examCode");
+    return EXIT.checkFailed;
+  }
+  const result = decisionsFromSheet(sheet, drafts);
+  for (const p of result.problems) report(output, "判断のシートの誤り", `items.${p.index} ${p.code}`);
+  if (result.problems.length > 0) return EXIT.checkFailed;
+  const next = upsertDecisions(decisions, result.decisions);
+  if (!dryRun) writeDecisions(paths.decisions, next);
+  else report(output, "書き込みをしない(dry-run)");
+  report(output, "情報", `判断の取り込み: ${result.decisions.length} 件、未記入 ${result.skipped} 件`);
+  // 取り込んだ判断を、下書きの状態にも反映して数える
+  const applied = applyDraftDecisions(drafts, (id) => draftDecision(next, id));
+  if (applied.changed > 0 && !dryRun) writeDrafts(paths.drafts, applied.file);
+  reportReviewCounts(output, reviewCounts(applied.file, next));
+  return EXIT.ok;
 }
 
 function requestStep(
@@ -513,8 +624,11 @@ function checkStep(
   provenance: ProvenanceFile,
   ledger: LedgerFile,
   vendor: string,
+  decisions: DecisionsFile,
 ): ExitCode {
   const { output } = options;
+  // 人の確認の済み・未済を報告する(未済は失敗にしない)
+  reportReviewCounts(output, reviewCounts(drafts, decisions));
   // 形と根拠の検査に、再検証の検査(来歴と台帳の今の状態の比較)を足す
   const problems = [...checkProvenance(provenance, facts, vendor), ...checkRecheck(provenance, ledger)];
   for (const p of problems) report(output, "来歴の誤り", `${p.draftId} ${p.code}`);

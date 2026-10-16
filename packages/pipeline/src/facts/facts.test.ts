@@ -6,6 +6,7 @@ import { BodyCache } from "../collect/cache.ts";
 import { Fetcher, sha256 } from "../collect/fetcher.ts";
 import { emptyLedger, type LedgerFile, ledgerPath, readLedger, writeLedger } from "../collect/ledger.ts";
 import { entry, fakeNet, testFetchConfig } from "../collect/test-helpers.ts";
+import { decisionsPath, writeDecisions } from "../decisions/decisions.ts";
 import { EXIT } from "../exit-codes.ts";
 import { main } from "../main.ts";
 import { requestKey } from "./extract.ts";
@@ -293,6 +294,50 @@ describe("facts --import", () => {
     expect(r2.facts().cards.map((c) => c.status)).toEqual(["passed", "passed"]);
   });
 
+  it("矛盾で保留のカードに人が保留の解除を記録した_次の取り込みで保留に戻らず、却下は再抽出しても不採用のまま", async () => {
+    const root = setupRoot();
+    await run(root, ["facts", CODE]);
+    const other = {
+      ...good,
+      claim: good.claim.replace("100", "5"),
+      anchor: { heading: "quotas", quote: "as large as 5 TB" },
+    };
+    writeOut(root, [good, other]);
+    const first = await run(root, ["facts", CODE, "--import"]);
+    const [a, b] = first.facts().cards.map((c) => c.id) as [string, string];
+    const path = decisionsPath(join(root, config.decisionsDir), CODE);
+    writeDecisions(path, {
+      examCode: CODE,
+      decisions: [
+        { target: "fact", id: a, decision: "release", reason: "not-a-conflict" },
+        { target: "fact", id: b, decision: "reject", reason: "wrong-number" },
+      ],
+    });
+    // 依頼がなくても、取り込みは判断を反映する
+    const second = await run(root, ["facts", CODE, "--import"]);
+    expect(second.out).toContain("判断の反映");
+    const status = (r: typeof second) => Object.fromEntries(r.facts().cards.map((c) => [c.id, c.status]));
+    expect(status(second)).toEqual({ [a]: "passed", [b]: "rejected" });
+    expect(second.facts().cards.find((c) => c.id === b)?.reasons).toEqual(["human-rejected"]);
+    // 同じ出典を抽出し直しても(同じ内容なら同じ ID)、判断が引き継がれる
+    const facts = readFacts(factsPath(join(root, config.factsDir), CODE), CODE);
+    writeFileSync(factsPath(join(root, config.factsDir), CODE), JSON.stringify({ ...facts, extracted: [] }));
+    await run(root, ["facts", CODE]);
+    writeOut(root, [good, other]);
+    const third = await run(root, ["facts", CODE, "--import"]);
+    expect(status(third)).toEqual({ [a]: "passed", [b]: "rejected" });
+  });
+
+  it("対象のカードがない判断_黙って捨てずに報告する", async () => {
+    const root = setupRoot();
+    writeDecisions(decisionsPath(join(root, config.decisionsDir), CODE), {
+      examCode: CODE,
+      decisions: [{ target: "fact", id: "f-aaaaaaaaaaaa", decision: "release", reason: "ok" }],
+    });
+    const r = await run(root, ["facts", CODE, "--import"]);
+    expect(r.err + r.out).toContain("判断の対象なし: fact f-aaaaaaaaaaaa");
+  });
+
   it("出力の形が違う・依頼と合わない_取り込みを止め、理由コードを出す。上限まで試すと再試行をやめる", async () => {
     const root = setupRoot();
     const opts = { facts: { ...config.facts, maxAttempts: 2 } };
@@ -448,6 +493,21 @@ describe("facts --report", () => {
     }
     await run(root, ["facts", CODE, "--report"]);
     expect(readFileSync(join(workDir(root), "review.md"), "utf8")).toBe(md);
+  });
+
+  it("全件の表_通過・保留のカードの主張と出典の URL が載り、不採用のカードと出典の本文は載らない", async () => {
+    const root = setupRoot();
+    await run(root, ["facts", CODE]);
+    writeOut(root, [good, rate, { ...good, claim: "Widget Store では、バケットは 200 個まで。" }]);
+    await run(root, ["facts", CODE, "--import"]);
+    const r = await run(root, ["facts", CODE, "--report"]);
+    expect(r.out).toContain("レビューレポート: pipeline-work/facts/aws-aib-c01/cards.md");
+    const md = readFileSync(join(workDir(root), "cards.md"), "utf8");
+    expect(md).toContain("通過と保留のカード 2 件");
+    expect(md).toContain(good.claim);
+    expect(md).toContain(DOC_URL);
+    expect(md).not.toContain("200 個まで");
+    expect(md).not.toContain("up to 100 buckets");
   });
 
   it("dry-run_書き込まない", async () => {

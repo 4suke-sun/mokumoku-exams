@@ -13,7 +13,8 @@
       "!scripts/test-title-baseline.json",
       "!packages/pipeline/ledger",
       "!packages/pipeline/facts",
-      "!packages/pipeline/provenance"
+      "!packages/pipeline/provenance",
+      "!packages/pipeline/decisions"
     ]
   },
   "formatter": {

@@ -6,6 +6,14 @@ import { loadExam } from "../collect/collect.ts";
 import { LedgerError, type LedgerFile, ledgerPath, readLedger, writeLedger } from "../collect/ledger.ts";
 import type { Config } from "../config.ts";
 import { EXAM_CODE } from "../contract.ts";
+import {
+  DecisionsError,
+  type DecisionsFile,
+  decisionsPath,
+  factDecision,
+  orphanDecisions,
+  readDecisions,
+} from "../decisions/decisions.ts";
 import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { type Output, report } from "../log.ts";
 import { computeCoverage } from "./coverage.ts";
@@ -13,7 +21,7 @@ import { detectConflicts, mergeDuplicates } from "./dedupe.ts";
 import { buildCards, FactsOutputSchema, type FactsRequest, requestKey } from "./extract.ts";
 import { checkGrounding } from "./grounding.ts";
 import { COPY_PLACEHOLDER, hasLongCopy } from "./overlap.ts";
-import { buildReview, renderReview } from "./review.ts";
+import { buildReview, renderCardTable, renderReview } from "./review.ts";
 import {
   checkFactsContext,
   type FactCard,
@@ -58,6 +66,7 @@ interface Paths {
   stateFile: string;
   reviewJson: string;
   reviewMd: string;
+  cardsMd: string;
 }
 
 function pathsFor(config: Config, rootDir: string, examCode: string): Paths {
@@ -71,6 +80,7 @@ function pathsFor(config: Config, rootDir: string, examCode: string): Paths {
     stateFile: join(work, "state.json"),
     reviewJson: join(work, "review.json"),
     reviewMd: join(work, "review.md"),
+    cardsMd: join(work, "cards.md"),
   };
 }
 
@@ -112,12 +122,15 @@ export async function runFacts(options: FactsOptions): Promise<ExitCode> {
   const paths = pathsFor(config, rootDir, examCode);
   let ledger: LedgerFile;
   let facts: FactsFile;
+  let decisions: DecisionsFile;
   try {
     ledger = readLedger(paths.ledger, examCode);
     facts = readFacts(paths.facts, examCode);
+    decisions = readDecisions(decisionsPath(resolve(rootDir, config.decisionsDir), examCode), examCode);
   } catch (error) {
     if (error instanceof LedgerError) for (const p of error.paths) report(output, "台帳の誤り", p);
     else if (error instanceof FactsError) for (const p of error.paths) report(output, "事実カードの誤り", p);
+    else if (error instanceof DecisionsError) for (const p of error.paths) report(output, "判断の記録の誤り", p);
     else throw error;
     return EXIT.checkFailed;
   }
@@ -126,7 +139,7 @@ export async function runFacts(options: FactsOptions): Promise<ExitCode> {
     case "request":
       return requestStep(options, paths, ledger, facts, master.domains);
     case "import":
-      return importStep(options, paths, ledger, facts, domains);
+      return importStep(options, paths, ledger, facts, domains, decisions);
     case "coverage":
       return coverageStep(options, ledger, facts, domains);
     case "report":
@@ -208,6 +221,7 @@ function importStep(
   initialLedger: LedgerFile,
   facts: FactsFile,
   domains: string[],
+  decisions: DecisionsFile,
 ): ExitCode {
   const { config, examCode, output, deps, dryRun } = options;
   const cache = new BodyCache(paths.cacheDir, config.cache, deps.now);
@@ -316,10 +330,20 @@ function importStep(
   );
   const merged = mergeDuplicates(pool);
   const pairs = detectConflicts(merged.cards);
-  const held = new Set(pairs.flatMap((p) => [p.a, p.b]));
-  const cards = merged.cards.map((c) =>
-    held.has(c.id) ? { ...c, status: "held" as const, reasons: ["conflict"] } : c,
-  );
+  const conflicted = new Set(pairs.flatMap((p) => [p.a, p.b]));
+  // 人の判断を反映する。却下したカードは、再抽出しても不採用のまま。保留を解いたカードは、保留にしない
+  const cards = merged.cards.map((c) => {
+    const decision = factDecision(decisions, c.id);
+    if (decision === "reject") return { ...c, status: "rejected" as const, reasons: ["human-rejected"] };
+    if (conflicted.has(c.id) && decision !== "release") {
+      return { ...c, status: "held" as const, reasons: ["conflict"] };
+    }
+    return c;
+  });
+  const held = new Set(cards.filter((c) => c.status === "held").map((c) => c.id));
+  for (const d of orphanDecisions(decisions, { factIds: cards.map((c) => c.id) })) {
+    if (d.target === "fact") report(output, "判断の対象なし", `fact ${d.id}`);
+  }
 
   const rejectedNow = incoming.filter((c) => c.status === "rejected");
   const reasonCounts = new Map<string, number>();
@@ -327,7 +351,9 @@ function importStep(
   for (const [reason, n] of [...reasonCounts].sort(([a], [b]) => (a < b ? -1 : 1))) {
     report(output, "事実カードの不採用", `${reason} ${n} 件`);
   }
-  for (const p of pairs) report(output, "事実カードの保留", `conflict ${p.a} ${p.b}`);
+  for (const p of pairs) {
+    if (held.has(p.a) || held.has(p.b)) report(output, "事実カードの保留", `conflict ${p.a} ${p.b}`);
+  }
   report(
     output,
     "情報",
@@ -356,8 +382,15 @@ function importStep(
     for (const p of unexpected) report(output, "事実カードの誤り", p);
     return EXIT.checkFailed;
   }
-  // 取り込めたものがなければ、事実カードの台帳は変えない(失敗の回数だけ記録する)
-  if (extracted.length > 0) writeFacts(paths.facts, next);
+  // 取り込めたものがなく、人の判断でも状態が変わらなければ、事実カードの台帳は変えない(失敗の回数だけ記録する)
+  const statusOf = (list: readonly FactCard[]) =>
+    list
+      .map((c) => `${c.id} ${c.status}`)
+      .sort()
+      .join("\n");
+  const decided = statusOf(cards) !== statusOf(facts.cards);
+  if (decided) report(output, "判断の反映", "事実カードの状態を、人の判断の記録に合わせた");
+  if (extracted.length > 0 || decided) writeFacts(paths.facts, next);
   writeJson(paths.stateFile, state);
   if (removedIds.length > 0) {
     writeLedger(paths.ledger, clearRecheck(initialLedger, { facts: removedIds }));
@@ -407,5 +440,8 @@ function reportStep(options: FactsOptions, paths: Paths, facts: FactsFile, domai
   mkdirSync(dirname(paths.reviewMd), { recursive: true });
   writeFileSync(paths.reviewMd, renderReview(review));
   report(output, "レビューレポート", relative(rootDir, paths.reviewMd));
+  // 人が全件を確かめるための表(通過・保留のカード)
+  writeFileSync(paths.cardsMd, renderCardTable(examCode, facts.cards));
+  report(output, "レビューレポート", relative(rootDir, paths.cardsMd));
   return EXIT.ok;
 }

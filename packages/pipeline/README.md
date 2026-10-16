@@ -27,7 +27,7 @@ npm test -w @mokumoku-exams/pipeline
   - `collect`: 一次情報の収集と台帳。手順は [一次情報の収集と台帳の運用](../../docs/source-collection.md)
   - `facts`: 出典から事実カードを作る。手順は [事実カードの作法と運用手順](../../docs/fact-cards.md)
   - `plan`: 分野の配点から目標の問題数を出し、既存の問題との差を計画にする。手順は [出題計画と下書きの手順](../../docs/drafting.md)
-  - `draft`: 計画と事実カードから、選択式と自由記述の問題の下書きを作る(依頼 → エージェント → `--import` → `--check`)。依頼は `--domain=<分野のコード>` で 1 分野に絞れる。
+  - `draft`: 計画と事実カードから、選択式と自由記述の問題の下書きを作る(依頼 → エージェント → `--import` → `--check` → 人の確認 `--review`・`--decide`)。依頼は `--domain=<分野のコード>` で 1 分野に絞れる。
     手順は [出題計画と下書きの手順](../../docs/drafting.md)、作り方の決まりは [作問のスタイルガイド](../../docs/question-style.md)
 - どのコマンドも `--help` と `--dry-run` を受け付けます。`--dry-run` では、書き込みと外部への通信をしません。
 - 設定は `pipeline.config.json`(コミットする、環境値を含まない)に書きます。環境値は `packages/pipeline/.env`(gitignore)に書き、
@@ -46,6 +46,7 @@ npm test -w @mokumoku-exams/pipeline
 | `facts/` | 事実カードの台帳(資格ごとの JSON) | する |
 | `plans/` | 収集の計画(資格ごとの JSON) | する |
 | `provenance/` | 問題の来歴(資格ごとの JSON。下書きの ID、事実カードの ID、出典の URL・取得日・本文のハッシュ) | する |
+| `decisions/` | 人の判断の記録(資格ごとの JSON。対象の ID か出典の URL と本文のハッシュ、判断、理由コード。[人の判断の記録](../../docs/human-decisions.md)) | する |
 | `pipeline-work/`(リポジトリ直下) | 取得した本文、段階の成果物 | しない(gitignore。混入はコミット前・push 前の検査が止める) |
 
-`ledger/`、`facts/`、`provenance/` の JSON は、CLI が書き、読み込むたびにスキーマで検査します。手で整形しないので、整形(Biome)の対象から外しています(`biome.json`)。
+`ledger/`、`facts/`、`provenance/`、`decisions/` の JSON は、CLI が書き、読み込むたびにスキーマで検査します。手で整形しないので、整形(Biome)の対象から外しています(`biome.json`)。

@@ -27,12 +27,23 @@ export interface MainOptions {
   collectDeps?: CollectDeps;
 }
 
-const KNOWN_FLAGS = ["--help", "-h", "--dry-run", "--import-guide", "--import", "--coverage", "--report", "--check"];
+const KNOWN_FLAGS = [
+  "--help",
+  "-h",
+  "--dry-run",
+  "--import-guide",
+  "--import",
+  "--coverage",
+  "--report",
+  "--check",
+  "--review",
+  "--decide",
+];
 /** コマンドごとに、受け付ける動作のオプション(同時には 1 つだけ) */
 const MODE_FLAGS: Record<string, readonly string[]> = {
   collect: ["--import-guide"],
   facts: ["--import", "--coverage", "--report"],
-  draft: ["--import", "--check"],
+  draft: ["--import", "--check", "--review", "--decide"],
 };
 
 function defaultCollectDeps(config: Config): CollectDeps {
@@ -68,6 +79,8 @@ function helpText(): string {
     "draft <資格コード> --domain=<分野>  依頼を書く分野を 1 つに絞る(ほかの分野は見ない)",
     "draft <資格コード> --import         エージェントが書いた下書きを検査し、取り込む",
     "draft <資格コード> --check          下書きの来歴(根拠の事実カードと出典)を検査する",
+    "draft <資格コード> --review         人が全件を確かめるための表と、判断を書き込むシートを出す",
+    "draft <資格コード> --decide         判断を書き込んだシートを、人の判断の記録に取り込む",
     "",
     "終了コード: 0 成功 / 1 検査の失敗 / 2 入力の誤り / 3 内部の誤り",
     "",
@@ -121,7 +134,7 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
         collect: "使い方: collect <資格コード> [--import-guide]\n",
         facts: "使い方: facts <資格コード> [--import | --coverage | --report]\n",
         plan: "使い方: plan <資格コード>\n",
-        draft: "使い方: draft <資格コード> [--domain=<分野のコード> | --import | --check]\n",
+        draft: "使い方: draft <資格コード> [--domain=<分野のコード> | --import | --check | --review | --decide]\n",
       };
       const usage = usages[command.name] ?? "";
       output.out(`${command.name}: ${command.summary}\n${usage}\nオプション: --dry-run, --help\n`);
@@ -182,7 +195,15 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
         report(output, "入力の誤り", "資格コードの指定がない");
         return EXIT.inputError;
       }
-      const mode = flags.includes("--import") ? "import" : flags.includes("--check") ? "check" : "request";
+      const mode = flags.includes("--import")
+        ? "import"
+        : flags.includes("--check")
+          ? "check"
+          : flags.includes("--review")
+            ? "review"
+            : flags.includes("--decide")
+              ? "decide"
+              : "request";
       return runDraft({
         config,
         rootDir,

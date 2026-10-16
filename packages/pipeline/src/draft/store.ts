@@ -140,3 +140,27 @@ export function writeState(path: string, state: DraftState): void {
   mkdirSync(dirname(path), { recursive: true });
   writeFileSync(path, `${JSON.stringify({ ...state, done: [...new Set(state.done)].sort() }, null, 2)}\n`);
 }
+
+/**
+ * 人の判断を、下書きの状態に反映する。却下した下書きは不採用にし、本文を持たない(ほかの不採用と同じ)。
+ * 保留の解除と承認は、保留の下書きを通過にする。
+ */
+export function applyDraftDecisions(
+  file: DraftsFile,
+  decisionOf: (id: string) => "approve" | "release" | "reject" | undefined,
+): { file: DraftsFile; changed: number } {
+  let changed = 0;
+  const drafts = file.drafts.map((d): DraftRecord => {
+    const decision = decisionOf(d.id);
+    if (decision === "reject" && d.status !== "rejected") {
+      changed++;
+      return { ...d, status: "rejected", reasons: ["human-rejected"], draft: null };
+    }
+    if ((decision === "release" || decision === "approve") && d.status === "held") {
+      changed++;
+      return { ...d, status: "passed", reasons: [] };
+    }
+    return d;
+  });
+  return { file: { ...file, drafts }, changed };
+}
