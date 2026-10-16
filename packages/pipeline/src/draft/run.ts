@@ -1,9 +1,10 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
+import { BodyCache } from "../collect/cache.ts";
 import { loadExam } from "../collect/collect.ts";
 import { LedgerError, type LedgerFile, ledgerPath, readLedger } from "../collect/ledger.ts";
 import type { Config } from "../config.ts";
-import { EXAM_CODE } from "../contract.ts";
+import { checkAnswerBias, EXAM_CODE } from "../contract.ts";
 import {
   DecisionsError,
   type DecisionsFile,
@@ -18,7 +19,8 @@ import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { FactsError, type FactsFile, factsPath, readFacts } from "../facts/schema.ts";
 import { type Output, report } from "../log.ts";
 import { PlanError, type PlanFile, planPath, readPlan } from "../plan/schema.ts";
-import { candidateOf, findDuplicates, readPublishedCandidates } from "./dedupe.ts";
+import { copyCheck } from "./copy.ts";
+import { candidateOf, findDuplicates, readPublishedCandidates, readPublishedChoices } from "./dedupe.ts";
 import { checkDistractors } from "./distractors.ts";
 import {
   buildEntry,
@@ -399,6 +401,8 @@ function importStep(
 ): ExitCode {
   const { config, rootDir, examCode, output, dryRun } = options;
   const state = readState(paths.state);
+  // 取得した本文の作業用キャッシュ(下書きの写しの検査に使う。本文を書き足さない。読むと更新時刻が変わり、壊れた本文は消える)
+  const cache = new BodyCache(join(resolve(rootDir, config.workDir), "cache"), config.cache, Date.now);
   const requestFiles = existsSync(paths.requestsDir)
     ? readdirSync(paths.requestsDir)
         .filter((f) => f.endsWith(".json"))
@@ -482,6 +486,7 @@ function importStep(
     for (const draft of out.drafts) {
       const id = draftId(examCode, request.planItemId, draft.factIds, draft.questionText);
       const reasons: string[] = [];
+      let copied: ReturnType<typeof copyCheck> = "ok";
       if (draft.questionType !== request.kind) reasons.push("kind-mismatch");
       if (!draft.factIds.every((f) => factIds.has(f))) reasons.push("fact-not-in-request");
       const verdict = evaluateStyle(draft);
@@ -510,9 +515,15 @@ function importStep(
         if (problems.length > 0) {
           for (const p of uniqueSorted(problems.map(pathCode))) reasons.push(`data-invalid:${p}`);
         } else {
-          const built = buildEntry(id, draft.factIds, facts, ledger);
-          if ("reasons" in built) for (const r of built.reasons) reasons.push(`provenance:${r}`);
-          else entries.set(id, built.entry);
+          copied = copyCheck(draft, facts, cache);
+          if (copied === "copy") {
+            // 根拠の出典の本文を長く写した下書きは、本文を残さずに不採用にする
+            reasons.push("long-copy");
+          } else {
+            const built = buildEntry(id, draft.factIds, facts, ledger);
+            if ("reasons" in built) for (const r of built.reasons) reasons.push(`provenance:${r}`);
+            else entries.set(id, built.entry);
+          }
         }
       }
       for (const f of verdict.blockers) report(output, "下書きの不採用", `${id} ${f.rule} ${f.path}`);
@@ -535,8 +546,14 @@ function importStep(
       for (const w of warnings) report(output, "下書きの警告", `${id} ${w.rule} ${w.path}`);
       // 正答が複数になりうる候補は、モデルによる検査(検証の段階)で確かめるまで、先へ進めない
       const holdDups = dups.filter((d) => d.level === "hold");
-      const held = reasons.length === 0 && (distractors.ambiguous.length > 0 || holdDups.length > 0);
+      const held =
+        reasons.length === 0 && (distractors.ambiguous.length > 0 || holdDups.length > 0 || copied === "unchecked");
       if (held) {
+        // 根拠の出典の本文がキャッシュにないと、写しを確かめられない。確かめるまで先へ進めない
+        if (copied === "unchecked") {
+          reasons.push("review:copy-unchecked");
+          report(output, "下書きの保留", `${id} review-copy-unchecked`);
+        }
         for (const f of distractors.ambiguous) {
           reasons.push(`ambiguous:${f.code}`);
           report(output, "下書きの保留", `${id} ambiguous:${f.code} ${f.path}`);
@@ -596,6 +613,15 @@ function importStep(
     });
   }
   if (incoming.length > 0) writeDrafts(paths.drafts, next);
+  // 正解の偏り: 選択式の下書き(通過・保留)と公開済みの問題を合わせて、データの検査と同じ指標としきい値で数える。報告だけで止めない
+  const choiceDrafts = next.drafts.flatMap((d) =>
+    d.status !== "rejected" && d.draft !== null && isChoiceDraft(d.draft) ? [d.draft] : [],
+  );
+  const bias = checkAnswerBias("下書きと公開済みの問題", [
+    ...readPublishedChoices(config, rootDir, examCode),
+    ...choiceDrafts,
+  ]);
+  for (const message of [...bias.errors, ...bias.warnings]) report(output, "正解の偏り", message);
   writeState(paths.state, state);
   for (const file of doneFiles) {
     rmSync(join(paths.requestsDir, file), { force: true });

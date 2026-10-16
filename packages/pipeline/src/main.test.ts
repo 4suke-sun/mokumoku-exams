@@ -36,6 +36,10 @@ async function run(argv: string[], { config = validConfig as unknown, env = {} a
 }
 
 describe("コマンドの体系", () => {
+  it("解説を別の段階にしない_コマンドの一覧に explain がない", () => {
+    expect(COMMANDS.map((c) => c.name)).not.toContain("explain");
+  });
+
   it("引数なし_ヘルプを出して成功する", async () => {
     const r = await run([]);
     expect(r.code).toBe(EXIT.ok);

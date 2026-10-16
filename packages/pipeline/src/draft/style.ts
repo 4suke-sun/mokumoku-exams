@@ -1,4 +1,4 @@
-import { containsUrl } from "../contract.ts";
+import { containsUrl, HEADING_KINDS, normalizeHeading } from "../contract.ts";
 import { compact } from "../text.ts";
 import { type ChoiceDraft, type Draft, isChoiceDraft } from "./schema.ts";
 import { similarity } from "./similarity.ts";
@@ -9,7 +9,7 @@ import { similarity } from "./similarity.ts";
  */
 
 /** 規則の集合を変えたら上げる。下書きの依頼の鍵に入るので、上げると依頼のキャッシュが切れる */
-export const STYLE_VERSION = 1;
+export const STYLE_VERSION = 2;
 
 export type Severity = "block" | "warn";
 
@@ -208,6 +208,68 @@ export const STYLE_RULES: readonly StyleRule[] = [
     severity: "warn",
     summary: "総合解説は、正答の理由が分かる長さ(30 文字以上)で書く",
     check: (d) => (length(d.explanation) < 30 ? ["explanation"] : []),
+  },
+  {
+    name: "explanation-heading",
+    appliesTo: "both",
+    severity: "block",
+    summary:
+      "解説の見出し(`## ` の行)は、決まった名前(問われている要件・正解の決め手・前提知識・解くための考え方・まとめ・他の選択肢が誤りである理由。表の別名も可)を使う",
+    check: (d) =>
+      [...d.explanation.matchAll(/^##\s+(.+)$/gm)].some(
+        (m) => !Object.hasOwn(HEADING_KINDS, normalizeHeading(m[1] ?? "")),
+      )
+        ? ["explanation"]
+        : [],
+  },
+  {
+    name: "explanation-key-reference",
+    appliesTo: "choice",
+    severity: "block",
+    summary:
+      "解説で選択肢を記号で指すときは、その問題の記号だけを使う。選択肢ではない大文字 1 文字を、前後に英数字なしで書かない",
+    check: onChoice((d) => {
+      const keys = new Set(d.choices.map((c) => c.key));
+      const paths: string[] = [];
+      const fields = [
+        { path: "explanation", text: d.explanation },
+        ...d.choices.map((c, i) => ({ path: `choices.${i}.explanation`, text: c.explanation ?? "" })),
+        ...(d.distractors ?? []).map((x, i) => ({ path: `distractors.${i}.reason`, text: x.reason })),
+      ];
+      for (const f of fields) {
+        const letters = [...f.text.normalize("NFKC").matchAll(/(?<![A-Za-z0-9])[A-Z](?![A-Za-z0-9])/g)].map(
+          (m) => m[0],
+        );
+        if (letters.some((l) => !keys.has(l))) paths.push(f.path);
+      }
+      return paths;
+    }),
+  },
+  {
+    name: "choice-explanation-missing",
+    appliesTo: "choice",
+    severity: "block",
+    summary: "誤答のすべてに、誤りである理由を書く(誤答の設計の理由が、その選択肢の解説になる)",
+    check: onChoice((d) =>
+      d.choices.flatMap((c, i) => {
+        if (d.correctAnswers.includes(c.key)) return [];
+        const reason = c.explanation ?? d.distractors?.find((x) => x.key === c.key)?.reason;
+        return reason === undefined || reason.trim() === "" ? [`choices.${i}.explanation`] : [];
+      }),
+    ),
+  },
+  {
+    name: "choice-explanation-markup",
+    appliesTo: "choice",
+    severity: "block",
+    summary: "選択肢ごとの解説に、見出しと箇条書きを使わない(使える記法は、太字 `**…**`・コード `` `…` ``・改行)",
+    check: onChoice((d) => {
+      const markup = /^[ \t]*(#{1,6}[ \t]|[-*+][ \t]|\d+\.[ \t])/m;
+      return [
+        ...d.choices.flatMap((c, i) => (markup.test(c.explanation ?? "") ? [`choices.${i}.explanation`] : [])),
+        ...(d.distractors ?? []).flatMap((x, i) => (markup.test(x.reason) ? [`distractors.${i}.reason`] : [])),
+      ];
+    }),
   },
   {
     name: "rubric-criteria-count",

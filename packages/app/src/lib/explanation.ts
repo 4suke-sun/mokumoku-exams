@@ -1,25 +1,16 @@
 // 解説を、見出しごとのカードに分ける(docs/data-spec.md の「解説の見出し」)。
 // 見出しは、`## ` で始まる行か、段落がちょうど決まった見出しの名前だけのもの(末尾のコロンの有無は問わない)。
-// 表記ゆれは、データを直さず、ここの対応表で吸収する。本文は欠けさせない(分けられないものは、普通の段落のまま出す)。
+// 表記ゆれは、データを直さず、データの契約の対応表(別名)で吸収する。本文は欠けさせない(分けられないものは、普通の段落のまま出す)。
 
-/** 解説のカードの種類 */
-export type ExplanationKind = "requirement" | "answer" | "knowledge" | "approach" | "summary" | "wrong" | "other";
+// 見出しの名前と種類の対応は、作問パイプラインと同じ一覧を、データの契約から読む
+import {
+  type ExplanationKind,
+  HEADING_KINDS,
+  headingKind,
+  normalizeHeading,
+} from "@mokumoku-exams/data-schema/exam-data/explanation";
 
-/** 見出しの名前(コロンと前後の空白を除いたもの)と、種類の対応 */
-export const HEADING_KINDS: Readonly<Record<string, ExplanationKind>> = {
-  問われている要件: "requirement",
-  要件: "requirement",
-  正解の決め手: "answer",
-  正解の理由: "answer",
-  理由: "answer",
-  前提知識: "knowledge",
-  解くための考え方: "approach",
-  考え方: "approach",
-  まとめ: "summary",
-  他の選択肢が誤りである理由: "wrong",
-  他の選択肢が誤りの理由: "wrong",
-  誤りの選択肢: "wrong",
-};
+export { type ExplanationKind, HEADING_KINDS, headingKind, normalizeHeading };
 
 /** 見出しの前の段落に付ける題 */
 export const INTRO_TITLE = "問われている要件";
@@ -31,20 +22,6 @@ export type ExplanationBlock =
   | { type: "choice"; choiceKey: string; choiceText: string; reason: string };
 
 export type ExplanationSection = { kind: ExplanationKind; title: string; blocks: ExplanationBlock[] };
-
-/** 見出しの名前をそろえる(前後の空白と、末尾の半角・全角のコロンを除く) */
-export function normalizeHeading(text: string): string {
-  return text
-    .trim()
-    .replace(/[:：]\s*$/, "")
-    .trim();
-}
-
-/** 段落が、決まった見出しの名前だけか。そうなら種類を返す */
-export function headingKind(paragraph: string): ExplanationKind | null {
-  const name = normalizeHeading(paragraph);
-  return Object.hasOwn(HEADING_KINDS, name) ? (HEADING_KINDS[name] ?? null) : null;
-}
 
 /**
  * 段落に分ける。空行で区切り、コードの範囲(```)の中の空行では区切らない。`## ` の行は、それだけで 1 つの段落にする。

@@ -1,10 +1,11 @@
 import { cpSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
+import { BodyCache } from "../collect/cache.ts";
 import { emptyLedger, ledgerPath, writeLedger } from "../collect/ledger.ts";
 import { entry } from "../collect/test-helpers.ts";
 import { emptyFacts, type FactCard, factsPath, writeFacts } from "../facts/schema.ts";
-import { card, DOC_HASH, DOC_URL } from "../facts/test-helpers.ts";
+import { card, DOC_HASH, DOC_URL, factsFixture } from "../facts/test-helpers.ts";
 import { main } from "../main.ts";
 import type { DraftRequest } from "./request.ts";
 import type { ChoiceDraft, Draft, FreeTextDraft } from "./schema.ts";
@@ -133,6 +134,10 @@ export function setupDraftRoot(options: { cards?: FactCard[]; questions?: unknow
     ...emptyLedger(EXAM),
     sources: [entry({ url: DOC_URL, contentHash: DOC_HASH, fetchedAt: "2026-10-01" })],
   });
+  // 根拠の出典の本文が、作業用のキャッシュにある(下書きの写しの検査に使う)
+  new BodyCache(join(root, baseConfig.workDir, "cache"), baseConfig.cache).write(
+    Buffer.from(factsFixture("service-doc.html")),
+  );
   return root;
 }
 

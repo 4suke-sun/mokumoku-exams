@@ -22,7 +22,7 @@ npm test -w @mokumoku-exams/pipeline
 
 ## コマンドと設定
 
-- コマンドは段階ごとにあります(`collect` `facts` `plan` `draft` `verify` `explain` `export` `run`)。
+- コマンドは段階ごとにあります(`collect` `facts` `plan` `draft` `verify` `export` `run`。解説は `draft` で書きます。ADR 0013)。
   実装済みは次の 4 つです。ほかは未実装で、「未実装」を標準エラーに出し、終了コード 2(入力の誤り)で終わります(`--dry-run` を付けても同じ。`--help` は 0)。
   - `collect`: 一次情報の収集と台帳。手順は [一次情報の収集と台帳の運用](../../docs/source-collection.md)
   - `facts`: 出典から事実カードを作る。手順は [事実カードの作法と運用手順](../../docs/fact-cards.md)

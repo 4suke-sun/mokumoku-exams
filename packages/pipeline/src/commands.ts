@@ -10,7 +10,6 @@ export const COMMANDS: readonly CommandSpec[] = [
   { name: "plan", summary: "出題の計画を立てる" },
   { name: "draft", summary: "問題の下書きを作る" },
   { name: "verify", summary: "下書きを検証する" },
-  { name: "explain", summary: "解説と出典を付ける" },
   { name: "export", summary: "公開データの差分として書き出す" },
   { name: "run", summary: "実行を管理する(見積もり、記録、再開)" },
 ];

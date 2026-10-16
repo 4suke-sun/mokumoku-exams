@@ -575,7 +575,11 @@ describe("draft の誤答の検査", () => {
     expect(r.out).toContain("distractor-missing");
     const record = readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0];
     expect(record?.status).toBe("rejected");
-    expect(record?.reasons).toEqual(["distractor:distractor-missing"]);
+    // 誤答の設計がないと、誤答の選択肢の解説もない
+    expect([...(record?.reasons ?? [])].sort()).toEqual([
+      "distractor:distractor-missing",
+      "style:choice-explanation-missing",
+    ]);
     expect(record?.draft).toBeNull();
   });
 
