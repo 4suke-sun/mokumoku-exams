@@ -440,7 +440,7 @@ function reportStep(options: FactsOptions, paths: Paths, facts: FactsFile, domai
   mkdirSync(dirname(paths.reviewMd), { recursive: true });
   writeFileSync(paths.reviewMd, renderReview(review));
   report(output, "レビューレポート", relative(rootDir, paths.reviewMd));
-  // 人が全件を確かめるための表(通過・保留のカード)
+  // 人が通過・保留のカードをすべて確かめるための表
   writeFileSync(paths.cardsMd, renderCardTable(examCode, facts.cards));
   report(output, "レビューレポート", relative(rootDir, paths.cardsMd));
   return EXIT.ok;

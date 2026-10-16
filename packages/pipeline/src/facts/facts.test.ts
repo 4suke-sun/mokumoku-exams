@@ -495,7 +495,7 @@ describe("facts --report", () => {
     expect(readFileSync(join(workDir(root), "review.md"), "utf8")).toBe(md);
   });
 
-  it("全件の表_通過・保留のカードの主張と出典の URL が載り、不採用のカードと出典の本文は載らない", async () => {
+  it("通過・保留のカードの表_通過・保留のカードの主張と出典の URL が載り、不採用のカードと出典の本文は載らない", async () => {
     const root = setupRoot();
     await run(root, ["facts", CODE]);
     writeOut(root, [good, rate, { ...good, claim: "Widget Store では、バケットは 200 個まで。" }]);

@@ -141,13 +141,13 @@ function cell(text: string): string {
 }
 
 /**
- * 人が事実カードの全件を確かめるための表(通過・保留のカード)。主張(出典の言い換え)、根拠の節、出典の URL、版・リージョン、確度、状態、理由コードを載せる。
+ * 人が通過・保留の事実カードをすべて確かめるための表。主張(出典の言い換え)、根拠の節、出典の URL、版・リージョン、確度、状態、理由コードを載せる。
  * 取得した本文の写しは載せない。
  */
 export function renderCardTable(examCode: string, cards: readonly FactCard[]): string {
   const rows = cards.filter((c) => c.status !== "rejected");
   const lines = [
-    `# 事実カードの全件(${examCode})`,
+    `# 事実カードの一覧(通過・保留、${examCode})`,
     "",
     `通過と保留のカード ${rows.length} 件。保留を解く・却下するときは、人の判断の記録に書く。`,
     "",

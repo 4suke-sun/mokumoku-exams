@@ -14,7 +14,7 @@
 | `pipeline-work/draft/<コード>/out/<鍵>.json` | エージェントが書いた下書き | しない |
 | `pipeline-work/draft/<コード>/drafts.json` | 取り込んだ下書き(通過・保留。不採用は本文を持たない) | しない |
 | `pipeline-work/draft/<コード>/state.json` | 失敗の回数、取り込み済みの依頼の鍵、出し直しの回数、計画の項目ごとの未達の理由(理由コードだけ) | しない |
-| `pipeline-work/draft/<コード>/review.md` | 人の確認用の表(下書きの全件) | しない |
+| `pipeline-work/draft/<コード>/review.md` | 人の確認用の表(通過・保留の下書きと、人が却下した下書き) | しない |
 | `pipeline-work/draft/<コード>/review-sheet.json` | 判断を書き込むシート | しない |
 | `pipeline-work/export/<コード>/report.md` | 書き出しの差分レポート(件数と種類だけ) | しない |
 | `packages/pipeline/provenance/<コード>.json` | 問題の来歴(下書きの ID、根拠の事実カードの ID、出典の URL、取得日、本文のハッシュ。書き出したあとは、問題の ID) | する |
@@ -88,7 +88,7 @@ npm run pipeline -- plan <試験コード>
    あわせて、来歴と台帳の今の状態を比べ、再検証が要るものを原因ごとの理由コードで失敗にします(`recheck-fact`・`source-changed`・`source-check-<検査の名前>` など。
    一覧は[出典の収集](./source-collection.md)の「5. 出典の本文が変わったときの再検証」)。
    **不採用でない下書きに来歴がなければ、先へ進めません**(`来歴なし`、終了コード 1)。検証の段階は、この検査を通った下書きだけを扱います。
-5. **人が確かめる。** 通過と保留の下書きの全件を、人が確かめます。
+5. **人が確かめる。** 通過・保留の下書きを、すべて人が確かめます(人が却下した下書きも、確認済みとして表に載ります)。
 
    ```sh
    npm run pipeline -- draft <試験コード> --review

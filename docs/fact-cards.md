@@ -86,7 +86,7 @@
 
    `pipeline-work/facts/<コード>/review.md`(と `review.json`)に、件数、分野別の件数、理由の種類ごとの件数、抜き取りの表が書かれます。本文は含みません。
    抜き取りは、分野ごとに最大 `facts.samplePerDomain` 件で、乱数の種 `facts.sampleSeed` が同じなら、同じ入力から同じカードが選ばれます。
-   あわせて、`pipeline-work/facts/<コード>/cards.md` に、通過と保留のカードの全件の表(ID、分野、主張、根拠の節、出典の URL、版、リージョン、確度、状態、理由コード)が書かれます。
+   あわせて、`pipeline-work/facts/<コード>/cards.md` に、通過と保留のカードをすべて載せた表(ID、分野、主張、根拠の節、出典の URL、版、リージョン、確度、状態、理由コード)が書かれます。
    保留を解く・却下するときは、[人の判断の記録](./human-decisions.md)に書きます。
 6. **台帳をコミットする。** 事実カードの台帳と、人の判断の記録(`packages/pipeline/decisions/`。書いたときだけ)だけをコミットします(`/dev-commit`)。`pipeline-work/` の中身はコミットしません。
 
