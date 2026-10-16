@@ -29,6 +29,7 @@
     "check:env": "node scripts/check-env-contract.ts",
     "check:pr-closes": "node scripts/check-pr-closes.ts",
     "check:boundary": "node scripts/check-pipeline-boundary.ts",
+    "check:retired-ids": "node scripts/check-retired-ids.ts",
     "validate:data": "node scripts/validate-exam-data.ts && node scripts/validate-curriculum-data.ts && node scripts/validate-summary-data.ts && node scripts/validate-help-data.ts",
     "build:lambda": "node scripts/build-lambda-asset.ts",
     "synth": "npm run synth -w @mokumoku-exams/infra"

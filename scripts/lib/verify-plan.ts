@@ -46,6 +46,7 @@ export const CHECK_SCRIPTS = [
   "check:docs",
   "check:env",
   "check:boundary",
+  "check:retired-ids",
 ];
 
 const WORKSPACE_NAMES: Record<keyof Selection, string> = {

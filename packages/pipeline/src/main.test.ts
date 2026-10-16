@@ -50,7 +50,7 @@ describe("コマンドの体系", () => {
     expect((await run([name, "--help"])).code).toBe(EXIT.ok);
   });
 
-  it.each(COMMANDS.filter((c) => !["collect", "facts", "plan", "draft"].includes(c.name)).map((c) => c.name))(
+  it.each(COMMANDS.filter((c) => !["collect", "facts", "plan", "draft", "export"].includes(c.name)).map((c) => c.name))(
     "%s_未実装_--dry-run の有無によらず入力の誤りで終わり_報告は標準エラーに出す",
     async (name) => {
       for (const args of [[name], [name, "--dry-run"]]) {

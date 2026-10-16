@@ -172,7 +172,18 @@ function checkAgainstExam(
 ): string[] {
   const errors: string[] = [];
   const domains = new Set(exam.domains.map((d) => d.code));
+  const retired = new Set(exam.retiredQuestionIds ?? []);
+  for (const id of retired) {
+    if (!id.startsWith(`${exam.idPrefix}-`)) {
+      errors.push(
+        `${EXAMS_FILE}: ${exam.examCode}.retiredQuestionIds(${id}): ID の接頭辞が、資格マスタの idPrefix と一致しません`,
+      );
+    }
+  }
   questions.forEach((q, i) => {
+    if (retired.has(q.questionId)) {
+      errors.push(`${file}: questions[${i}](${q.questionId}).questionId: 退役した問題 ID を、再び使っています`);
+    }
     if (!q.questionId.startsWith(`${exam.idPrefix}-`)) {
       errors.push(
         `${file}: questions[${i}](${q.questionId}).questionId: ID の接頭辞が、資格マスタの idPrefix と一致しません`,

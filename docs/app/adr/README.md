@@ -38,3 +38,4 @@
 - [0011 データの契約を共有パッケージ(`packages/data-schema`)に置く](./0011-data-contract-shared-package.md)
 - [0012 パイプラインで作る問題は、公開済みの問題に足す](./0012-pipeline-adds-to-published-questions.md)
 - [0013 解説は下書きの段階で書き、別の段階を持たない](./0013-explanation-in-draft-stage.md)
+- [0014 書き出しは作業ツリーの `data/` に書き、人が PR の差分で確かめる](./0014-export-writes-working-tree-data.md)

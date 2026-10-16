@@ -11,7 +11,7 @@
 - `packages/pipeline` は、`packages/app`・`packages/infra`・`packages/data-schema` と並ぶワークスペースです。
 - pipeline は、app など他のワークスペースの内部を import しません。共有してよいのは `packages/data-schema`(データの契約)だけです。
   `npm run check:boundary` が CI で検査します。
-- 公開した問題の正は `data/` です。pipeline は読み取り専用で参照し、追加・更新を差分として出します。
+- 公開した問題の正は `data/` です。pipeline は、書き出し(`export`)の段階だけ、作業ツリーの `data/` に追加の分を書きます。ほかの段階は読み取るだけです。取り込みは、その差分を通常の PR で確かめて行います(ADR 0014)。
 
 ## 2. 検査と承認の流れ
 
