@@ -25,7 +25,7 @@ describe("findDuplicates", () => {
   it("既存の問題とほぼ同じ設問文_重複として落とす", () => {
     const near = "Widget Store で、1 つのアカウントがリージョンごとに作れるバケットの上限数はいくつですか。";
     expect(findDuplicates(target(), [existing("AIB-0001", near)], thresholds)).toEqual([
-      { level: "duplicate", kind: "similar", other: "AIB-0001", source: "existing", score: 0.93 },
+      { level: "duplicate", kind: "similar", other: "AIB-0001", source: "existing", score: 0.92 },
     ]);
   });
 
@@ -47,7 +47,7 @@ describe("findDuplicates", () => {
     const sibling: Candidate = { ...target(BASE.replace("どれ", "いくつ")), ref: "d-222222222222" };
     const found = findDuplicates(target(), [sibling], thresholds);
     expect(found).toEqual([
-      { level: "duplicate", kind: "similar", other: "d-222222222222", source: "draft", score: 0.93 },
+      { level: "duplicate", kind: "similar", other: "d-222222222222", source: "draft", score: 0.92 },
     ]);
   });
 

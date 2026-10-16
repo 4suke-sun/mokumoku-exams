@@ -4,7 +4,7 @@ import type { Config } from "../config.ts";
 import { normalizeText, QuestionsFileSchema } from "../contract.ts";
 import { compact } from "../text.ts";
 import { type Draft, isChoiceDraft } from "./schema.ts";
-import { similarity } from "./similarity.ts";
+import { stemSimilarity } from "./similarity.ts";
 
 /**
  * 重複の検出。公開済みの問題(data/、読み取り専用)と下書き、下書き同士を、設問文の類似度と論点で比べる。
@@ -70,7 +70,8 @@ export function findDuplicates(
   const findings: DuplicateFinding[] = [];
   for (const other of others) {
     if (other.ref === target.ref) continue;
-    const score = similarity(target.text, other.text);
+    // 設問文は、末尾の決まり文句を外して比べる(共通の言い回しで、別の論点の設問が似て見えないように)
+    const score = stemSimilarity(target.text, other.text);
     const round = Math.round(score * 100) / 100;
     if (score >= thresholds.duplicate) {
       findings.push({ level: "duplicate", kind: "similar", other: other.ref, source: other.source, score: round });

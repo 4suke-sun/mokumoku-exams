@@ -47,12 +47,14 @@ describe("コマンドの体系", () => {
   });
 
   it.each(COMMANDS.filter((c) => !["collect", "facts", "plan", "draft"].includes(c.name)).map((c) => c.name))(
-    "%s_未実装で、--dry-run を受け付ける",
+    "%s_未実装_--dry-run の有無によらず入力の誤りで終わり_報告は標準エラーに出す",
     async (name) => {
-      const r = await run([name, "--dry-run"]);
-      expect(r.code).toBe(EXIT.ok);
-      expect(r.out).toContain("未実装");
-      expect(r.out).toContain("dry-run");
+      for (const args of [[name], [name, "--dry-run"]]) {
+        const r = await run(args);
+        expect(r.code, args.join(" ")).toBe(EXIT.inputError);
+        expect(r.err).toContain("未実装");
+        expect(r.out).not.toContain("未実装");
+      }
     },
   );
 });
@@ -86,8 +88,9 @@ describe("終了コード", () => {
 
   it("想定外の例外_内部の誤りで、クラス名だけを出し、メッセージを出さない", async () => {
     let err = "";
+    // 引数なしは、コマンドの一覧を標準出力に書く。その書き込みで例外を起こす
     const code = await main({
-      argv: ["verify"],
+      argv: [],
       env: {},
       output: {
         out: () => {
@@ -136,8 +139,7 @@ describe("設定", () => {
   });
 
   it("環境値_作業用の置き場を上書きできる。報告に値を出さない", async () => {
-    const r = await run(["verify"], { env: { PIPELINE_WORK_DIR: "custom-dir-value" } });
-    expect(r.code).toBe(EXIT.ok);
+    const r = await run(["plan", "EX-SMP-XX", "--dry-run"], { env: { PIPELINE_WORK_DIR: "custom-dir-value" } });
     expect(r.out + r.err).not.toContain("custom-dir-value");
   });
 });

@@ -2,11 +2,13 @@
 export {
   ALLOWED_REFERENCE_HOSTS,
   ChoiceQuestionSchema,
+  CRITERION_NAME_MAX,
   containsUrl,
   EXAM_CODE,
   ExamsFileSchema,
   FreeTextQuestionSchema,
   hostAllowedForVendor,
+  KEYWORD_MAX,
   normalizeKeyword,
   normalizeText,
   QUESTION_ID,

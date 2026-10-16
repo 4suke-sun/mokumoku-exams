@@ -47,4 +47,6 @@
 - [0005 Next.js の proxy で返すリダイレクトは、絶対 URL にする](./0005-proxy-redirect-absolute-url.md)
 - [0006 ログインの直後の画面の移動は、ページごと読み込み直す](./0006-reload-after-sign-in.md)
 - [0007 ブラウザの自動操作では、画面が React の受け持ちになるまで待ってから押す](./0007-wait-for-hydration-in-e2e.md)
+- [0008 事実カードのアンカーは、HTML の見出しの要素から取る](./0008-anchor-from-html-headings.md)
+- [0009 設問文の重複の比較では、共通の決まり文句を外してから比べる](./0009-strip-stem-boilerplate.md)
 <!-- lessons:end -->

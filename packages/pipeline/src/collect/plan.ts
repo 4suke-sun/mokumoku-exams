@@ -95,7 +95,8 @@ export function checkPlan(raw: unknown, examCode: string): { plan: Plan | null; 
   (plan.guidePages ?? []).forEach((url, i) => {
     const path = `guidePages.${i}`;
     if (guideUrl === undefined) problems.push({ path, reason: "no-exam-guide" });
-    if (url === guideUrl) problems.push({ path, reason: "duplicate" });
+    // 収集を始める URL と重ねない(種別を一意に決めるため。試験ガイドとの重複も含む)
+    if (plan.sources.some((s) => s.url === url)) problems.push({ path, reason: "duplicate" });
     if (!startsWithAny(url, plan.scope.prefixes)) problems.push({ path, reason: "out-of-scope" });
     if (startsWithAny(url, plan.exclude)) problems.push({ path, reason: "excluded-listed" });
   });

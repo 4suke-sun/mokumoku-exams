@@ -1,10 +1,18 @@
 import { z } from "zod";
 import { sha256 } from "../collect/fetcher.ts";
-import { ChoiceQuestionSchema, FreeTextQuestionSchema, normalizeText } from "../contract.ts";
+import {
+  ChoiceQuestionSchema,
+  CRITERION_NAME_MAX,
+  FreeTextQuestionSchema,
+  KEYWORD_MAX,
+  normalizeText,
+} from "../contract.ts";
 
 /**
  * 選択式(単一・複数)の問題の下書き。エージェントが書く形。
- * 形の検査は緩くしておき(本文の URL などは、スタイル規則が止める)、データの契約との適合は、組み立てた問題で確かめる。
+ * 上限は、データの契約が持つものはその値を使い(観点名とキーワード)、二重に持たない。データの契約にない上限(設問文、総合解説、
+ * 選択肢、補足、誤答の理由、適用範囲の言い表し)は、下書きだけの上限としてここで持つ(docs/drafting.md)。
+ * 形の検査を通っても、組み立てた問題がデータの検査に落ちることはありうる。その下書きだけを不採用にし、同じ出力の他の下書きは取り込む。
  */
 
 export const FACT_ID = z.string().regex(/^f-[0-9a-f]{12}$/);
@@ -65,8 +73,8 @@ export type ChoiceDraft = z.infer<typeof ChoiceDraftSchema>;
 
 /** 採点基準の観点。回答がキーワードのどれかを含めば、観点を満たし、配点を得る */
 export const DraftCriterionSchema = z.strictObject({
-  name: text(100),
-  keywords: z.array(text(100)).min(1).max(20),
+  name: text(CRITERION_NAME_MAX),
+  keywords: z.array(text(KEYWORD_MAX)).min(1).max(20),
   points: z.number().int().min(1).max(1000),
 });
 

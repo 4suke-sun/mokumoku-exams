@@ -140,6 +140,39 @@ describe("collect", () => {
     expect(r.ledger().sources[0]?.claims).toHaveLength(1);
   });
 
+  it("本文が変わった出典_来歴をたどって根拠にした下書きの件数を報告し_下書きには印を持たせない", async () => {
+    const root = setupRoot({ ...plan, scope: { prefixes: [BASE], maxDepth: 0 } });
+    const before = {
+      ...emptyLedger(CODE),
+      sources: [
+        entry({
+          url: GUIDE,
+          kind: "exam-guide",
+          fetchedAt: "2026-09-01",
+          contentHash: "0".repeat(64),
+          claims: [{ id: "c1", paraphrase: "言い換え", quotes: [], factRefs: ["f-aaaaaaaaaaaa"] }],
+        }),
+      ],
+    };
+    mkdirSync(join(root, config.ledgerDir), { recursive: true });
+    writeFileSync(join(root, config.ledgerDir, "aws-aib-c01.json"), serializeLedger(before));
+    const source = { url: GUIDE, fetchedAt: "2026-09-01", contentHash: "0".repeat(64) };
+    mkdirSync(join(root, config.provenanceDir), { recursive: true });
+    writeFileSync(
+      join(root, config.provenanceDir, "aws-aib-c01.json"),
+      JSON.stringify({
+        examCode: CODE,
+        entries: [
+          { draftId: "d-aaaaaaaaaaaa", factIds: ["f-aaaaaaaaaaaa"], sources: [source] },
+          { draftId: "d-bbbbbbbbbbbb", factIds: ["f-bbbbbbbbbbbb"], sources: [source] },
+        ],
+      }),
+    );
+    const r = await run(root, ["collect", CODE]);
+    expect(r.out + r.err).toContain("再検証の印: 事実カード 1 件、根拠にした下書き・問題 1 件");
+    expect(r.ledger().recheck).toEqual({ facts: ["f-aaaaaaaaaaaa"], questions: [] });
+  });
+
   it("本文が変わった出典を根拠にした事実カード_台帳の主張がなくても、再検証の印を付ける", async () => {
     const root = setupRoot({ ...plan, scope: { prefixes: [BASE], maxDepth: 0 } });
     mkdirSync(join(root, config.ledgerDir), { recursive: true });
@@ -238,6 +271,44 @@ describe("collect --import-guide", () => {
     expect(r.out).toContain("試験ガイドの差分: マスタにない分野 domain5");
     expect(r.out).toContain("試験ガイドの差分: 配点のずれ domain1 ガイド 0.2 マスタ 0.24");
     expect(readFileSync(join(root, "data/exams.json"), "utf8")).toBe(masterBefore);
+  });
+
+  it("試験ガイドからたどったページと続きのページ_試験ガイドの種別になり、サービスの文書からたどったページは公式文書になる", async () => {
+    const DOC = `${BASE}doc/service.html`;
+    const THREE = `${BASE}detail/three.html`;
+    const root = setupRoot({
+      ...plan,
+      sources: [...plan.sources, { url: DOC, kind: "official-doc" }],
+      guidePages: [TWO],
+    });
+    const r = await run(root, ["collect", CODE], {
+      ...routes,
+      [DOC]: { body: fixture("doc.html") },
+      [THREE]: { status: 404 },
+    });
+    const kinds = Object.fromEntries(r.ledger().sources.map((s) => [s.url, s.kind]));
+    // ONE は試験ガイドからたどった付属のページ、TWO は続きのページ。THREE はサービスの文書からたどったページ
+    expect(kinds).toEqual({
+      [GUIDE]: "exam-guide",
+      [ONE]: "exam-guide",
+      [TWO]: "exam-guide",
+      [DOC]: "official-doc",
+      [THREE]: "official-doc",
+    });
+  });
+
+  it("前の台帳と計画で種別が違う_収集のたびに計画から付け直す", async () => {
+    const root = setupRoot({ ...plan, scope: { prefixes: [BASE], maxDepth: 0 }, guidePages: [ONE] });
+    mkdirSync(join(root, config.ledgerDir), { recursive: true });
+    writeFileSync(
+      join(root, config.ledgerDir, "aws-aib-c01.json"),
+      serializeLedger({
+        ...emptyLedger(CODE),
+        sources: [entry({ url: ONE, kind: "official-doc", fetchedAt: "2026-09-01" })],
+      }),
+    );
+    const r = await run(root, ["collect", CODE]);
+    expect(r.ledger().sources.find((s) => s.url === ONE)?.kind).toBe("exam-guide");
   });
 
   it("試験ガイドの続きのページ_深さ 0 でも取得し、依頼と取り込みに含める。ページが変わると依頼し直す", async () => {

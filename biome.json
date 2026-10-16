@@ -7,7 +7,14 @@
   },
   "files": {
     "ignoreUnknown": true,
-    "includes": ["**", "!package-lock.json", "!scripts/test-title-baseline.json"]
+    "includes": [
+      "**",
+      "!package-lock.json",
+      "!scripts/test-title-baseline.json",
+      "!packages/pipeline/ledger",
+      "!packages/pipeline/facts",
+      "!packages/pipeline/provenance"
+    ]
   },
   "formatter": {
     "enabled": true,

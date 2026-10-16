@@ -152,9 +152,12 @@ function requestStep(
   let requested = 0;
   let skipped = 0;
   let exhausted = 0;
+  let missingBody = 0;
   let limited = false;
   for (const source of [...ledger.sources].sort((a, b) => (a.url < b.url ? -1 : 1))) {
     if (source.status !== "active" || source.contentHash === null) continue;
+    // 試験ガイドのページは、分野・出題範囲の材料(台帳の guide)で、事実カードの根拠にしない
+    if (source.kind === "exam-guide") continue;
     const hash = source.contentHash;
     if (facts.extracted.some((e) => e.url === source.url && e.contentHash === hash)) {
       skipped++;
@@ -162,6 +165,7 @@ function requestStep(
     }
     if (!cache.has(hash)) {
       report(output, "事実カードの本文なし", source.url);
+      missingBody++;
       continue;
     }
     const key = requestKey(source.url, hash);
@@ -194,7 +198,8 @@ function requestStep(
   report(output, "情報", `依頼 ${requested} 件、抽出済みで飛ばした ${skipped} 件`);
   if (dryRun) report(output, "書き込みをしない(dry-run)");
   if (limited) report(output, "件数の上限", "maxItemsPerRun(再実行で続きから進む)");
-  return limited || exhausted > 0 ? EXIT.checkFailed : EXIT.ok;
+  // 本文がない出典は、依頼を書けなかった失敗として数える(ほかの出典の依頼は書く)
+  return limited || exhausted > 0 || missingBody > 0 ? EXIT.checkFailed : EXIT.ok;
 }
 
 function importStep(

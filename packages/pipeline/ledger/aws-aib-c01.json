@@ -140,15 +140,260 @@
         }
       ],
       "claims": [],
-      "contentHash": "ba51eb011206c99d22f4c298de01551f92687659dce8f242e2d9eea5612dab74",
-      "fetchedAt": "2026-10-13",
+      "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+      "fetchedAt": "2026-10-15",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-12",
+      "updatedAt": "2026-10-08",
+      "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+      "fetchedAt": "2026-10-15",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "updatedAt": "2026-10-08",
+      "url": "https://aws.amazon.com/what-is/ai-agents/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+      "fetchedAt": "2026-10-15",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "updatedAt": "2026-10-08",
+      "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+      "fetchedAt": "2026-10-15",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "updatedAt": "2026-10-08",
+      "url": "https://aws.amazon.com/what-is/generative-ai/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+      "fetchedAt": "2026-10-15",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "updatedAt": "2026-10-08",
+      "url": "https://aws.amazon.com/what-is/machine-learning/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+      "fetchedAt": "2026-10-15",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "updatedAt": "2026-10-08",
+      "url": "https://aws.amazon.com/what-is/prompt-engineering/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+      "fetchedAt": "2026-10-15",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "updatedAt": "2026-10-08",
+      "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "ba51eb011206c99d22f4c298de01551f92687659dce8f242e2d9eea5612dab74",
+      "fetchedAt": "2026-10-15",
+      "kind": "exam-guide",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "updatedAt": "2026-10-15",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain1.html"
     },
     {
@@ -176,14 +421,14 @@
       ],
       "claims": [],
       "contentHash": "8384e336b329bb95e346ddaa827f161cb480908890537ebcf48ad91c57d0af26",
-      "fetchedAt": "2026-10-13",
-      "kind": "official-doc",
+      "fetchedAt": "2026-10-15",
+      "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-12",
+      "updatedAt": "2026-10-15",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.html"
     },
     {
@@ -211,14 +456,14 @@
       ],
       "claims": [],
       "contentHash": "01e3457cb68f733e1ee96c0d77578b6193d55b9376aeb909bda188d22592a75d",
-      "fetchedAt": "2026-10-13",
-      "kind": "official-doc",
+      "fetchedAt": "2026-10-15",
+      "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-12",
+      "updatedAt": "2026-10-15",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain3.html"
     },
     {
@@ -246,14 +491,14 @@
       ],
       "claims": [],
       "contentHash": "0f3084e3ee1ad8fe7db9f476466419137ba8fc765d515b3c2099182e8b194c83",
-      "fetchedAt": "2026-10-13",
-      "kind": "official-doc",
+      "fetchedAt": "2026-10-15",
+      "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-12",
+      "updatedAt": "2026-10-15",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
     },
     {
@@ -281,14 +526,14 @@
       ],
       "claims": [],
       "contentHash": "557fe833dbbc7017d752a9fef5b17b0d5357838a0dc4aef42edbdbf6544b9407",
-      "fetchedAt": "2026-10-13",
+      "fetchedAt": "2026-10-15",
       "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-12",
+      "updatedAt": "2026-10-15",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01.html"
     },
     {
@@ -316,14 +561,14 @@
       ],
       "claims": [],
       "contentHash": "6ce3fd5e152df46abba7f03ff1efff3b8c146f15aeccac7a2783822a29fa2d43",
-      "fetchedAt": "2026-10-13",
-      "kind": "official-doc",
+      "fetchedAt": "2026-10-15",
+      "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-12",
+      "updatedAt": "2026-10-15",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-in-scope-services.html"
     },
     {
@@ -351,14 +596,14 @@
       ],
       "claims": [],
       "contentHash": "b02df633777fa7477749250060012717035561bce4228312fdc103fa32ed4881",
-      "fetchedAt": "2026-10-13",
-      "kind": "official-doc",
+      "fetchedAt": "2026-10-15",
+      "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-12",
+      "updatedAt": "2026-10-15",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-out-of-scope-services.html"
     },
     {
@@ -386,15 +631,50 @@
       ],
       "claims": [],
       "contentHash": "b12e2724789c8ed07a2b94414d9f529b1d293eea01b242cc30b3da0b98ed13a3",
-      "fetchedAt": "2026-10-13",
+      "fetchedAt": "2026-10-15",
+      "kind": "exam-guide",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "updatedAt": "2026-10-15",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-technologies-concepts.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+      "fetchedAt": "2026-10-15",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-12",
-      "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-technologies-concepts.html"
+      "updatedAt": "2026-10-15",
+      "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
     }
   ]
 }
