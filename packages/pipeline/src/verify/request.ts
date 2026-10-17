@@ -17,7 +17,7 @@ const ChoiceKey = z.string().regex(/^[A-Z]$/);
 const common = {
   examCode: z.string().min(1),
   requestKey: KEY,
-  draftId: z.string().regex(/^d-[0-9a-f]{12}$/),
+  draftId: z.string().regex(/^[de]-[0-9a-f]{12}$/),
   /** 根拠の節(見出しと本文)と下書きの内容のハッシュ。依頼のあとに節か下書きが変わったかを確かめる */
   evidenceHash: z.string().regex(/^[0-9a-f]{64}$/),
   /** 根拠の節。事実カードの出典のアンカー(見出し)から、取得した本文を切り出したもの */

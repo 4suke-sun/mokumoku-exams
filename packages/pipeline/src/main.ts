@@ -5,6 +5,7 @@ import { defaultDeps, Fetcher } from "./collect/fetcher.ts";
 import { COMMANDS } from "./commands.ts";
 import { type Config, ConfigError, loadConfig } from "./config.ts";
 import { runDraft } from "./draft/run.ts";
+import { runEval } from "./eval/run.ts";
 import { EXIT, type ExitCode } from "./exit-codes.ts";
 import { runExport } from "./export/export.ts";
 import { type FactsMode, runFacts } from "./facts/facts.ts";
@@ -52,6 +53,7 @@ const MODE_FLAGS: Record<string, readonly string[]> = {
   facts: ["--import", "--coverage", "--report"],
   draft: ["--import", "--check", "--review", "--decide"],
   verify: ["--import"],
+  eval: ["--import"],
 };
 
 function defaultCollectDeps(config: Config): CollectDeps {
@@ -93,6 +95,8 @@ function helpText(): string {
     "draft <資格コード> --decide         判断を書き込んだシートを、人の判断の記録に取り込む",
     "verify <資格コード>                 下書きごとに、根拠の節だけを読んで正誤を再導出する検証の依頼を書く",
     "verify <資格コード> --import       検証役の出力を、下書きの宣言と照合して取り込む",
+    "eval <資格コード>                   人が承認した下書きから評価用のデータを作り、検証役の評価の依頼を書く",
+    "eval <資格コード> --import         検証役の出力を期待する判定と照合し、検出率・誤検出率などのレポートを書く",
     "reasons <資格コード>                不採用と差し戻しの理由を、理由コード・論点・段階ごとに集計し、下書きの指示の改善に使える形で書く。記録は変えない",
     "status <資格コード>                 段階ごとの状態(依頼待ち・取り込み待ち・通過・保留・不採用の件数、役のモデル)を表示する。読むだけ",
     "export <資格コード>                 承認し、検証を通った下書きを、data/ の問題データに書き出す",
@@ -131,6 +135,7 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
       command?.name === "verify" ||
       command?.name === "status" ||
       command?.name === "reasons" ||
+      command?.name === "eval" ||
       command?.name === "export";
     const maxArgs = takesExam ? 2 : 1;
     if (positional.length > maxArgs || command === undefined) {
@@ -160,6 +165,7 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
         verify: "使い方: verify <資格コード> [--import]\n",
         status: "使い方: status <資格コード>\n",
         reasons: "使い方: reasons <資格コード>\n",
+        eval: "使い方: eval <資格コード> [--import]\n",
         draft: "使い方: draft <資格コード> [--domain=<分野のコード> | --import | --check | --review | --decide]\n",
       };
       const usage = usages[command.name] ?? "";
@@ -232,6 +238,22 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
         return EXIT.inputError;
       }
       return runExport({ config, rootDir, examCode, dryRun, output });
+    }
+    if (command.name === "eval") {
+      const examCode = positional[1];
+      if (examCode === undefined) {
+        report(output, "入力の誤り", "資格コードの指定がない");
+        return EXIT.inputError;
+      }
+      return runEval({
+        config,
+        rootDir,
+        examCode,
+        mode: flags.includes("--import") ? "import" : "request",
+        dryRun,
+        output,
+        today: () => new Date().toISOString().slice(0, 10),
+      });
     }
     if (command.name === "reasons") {
       const examCode = positional[1];

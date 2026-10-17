@@ -82,6 +82,21 @@ export const ConfigSchema = z.strictObject({
     /** 依頼 1 件の取り込みを、形の検査に通らずにやり直せる回数の上限 */
     maxAttempts: z.number().int().positive(),
   }),
+  /** 検証役の評価 */
+  eval: z.strictObject({
+    /** 評価用のデータを作る乱数の種(同じ種なら同じデータ) */
+    seed: z.number().int().min(0),
+    /** 仕込む誤りの種類ごとの件数の目安 */
+    perKind: z.number().int().min(1).max(50),
+    /** 依頼 1 件の取り込みを、形の検査に通らずにやり直せる回数の上限 */
+    maxAttempts: z.number().int().positive(),
+    /** 指標の目標(docs/evaluation.md) */
+    targets: z.strictObject({
+      detectionOverall: z.number().min(0).max(1),
+      detectionPerKind: z.number().min(0).max(1),
+      falsePositiveMax: z.number().min(0).max(1),
+    }),
+  }),
   /** 検証 */
   verify: z.strictObject({
     /** 依頼 1 件の取り込みを、形の検査に通らずにやり直せる回数の上限 */

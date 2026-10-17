@@ -36,6 +36,16 @@
     "maxPerItem": 5,
     "maxAttempts": 3
   },
+  "eval": {
+    "seed": 1,
+    "perKind": 3,
+    "maxAttempts": 3,
+    "targets": {
+      "detectionOverall": 0.9,
+      "detectionPerKind": 0.8,
+      "falsePositiveMax": 0.2
+    }
+  },
   "verify": {
     "maxAttempts": 3
   },
