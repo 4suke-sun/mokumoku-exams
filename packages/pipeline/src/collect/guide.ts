@@ -12,6 +12,9 @@ import { withinParaphraseLimit } from "./text-limits.ts";
 const Paraphrase = z.string().min(1).refine(withinParaphraseLimit);
 const Sha256 = z.string().regex(/^[0-9a-f]{64}$/);
 
+/** 試験の本番の値(件数・分・点数)。正の整数 */
+const ExamNumber = z.number().int().min(1);
+
 /** エージェントが書く抽出の結果 */
 export const GuideExtractSchema = z.strictObject({
   examCode: z.string().min(1),
@@ -35,6 +38,16 @@ export const GuideExtractSchema = z.strictObject({
     )
     .min(1)
     .max(20),
+  /** 出題数(試験ガイドが示す、受験者が解く問題の総数)。示さないときは持たない */
+  questionCount: ExamNumber.optional(),
+  /** 採点対象の問題数(ガイドが、総数と分けて示すとき) */
+  scoredQuestionCount: ExamNumber.optional(),
+  /** 試験時間(分) */
+  timeMinutes: ExamNumber.optional(),
+  /** 合格点 */
+  passingScore: ExamNumber.optional(),
+  /** スコアの上限(満点) */
+  totalScore: ExamNumber.optional(),
 });
 
 export type GuideExtract = z.infer<typeof GuideExtractSchema>;
@@ -67,6 +80,7 @@ export type GuideStopReason =
   | "body-not-cached"
   | "domain-numbering"
   | "weight-sum-mismatch"
+  | "exam-values-invalid"
   | "verbatim-copy";
 
 /**
@@ -102,6 +116,18 @@ export function importGuide(
   const bodies = [extract.contentHash, ...extract.pages.map((p) => p.contentHash)].map(readBody);
   if (bodies.some((b) => b === null)) return { ok: false, reason: "body-not-cached" };
 
+  // 本番の値は、形だけを検査する(数値は本文の写しではないので、写しの検査の対象にしない)
+  if (
+    (extract.passingScore !== undefined &&
+      extract.totalScore !== undefined &&
+      extract.passingScore > extract.totalScore) ||
+    (extract.scoredQuestionCount !== undefined &&
+      extract.questionCount !== undefined &&
+      extract.scoredQuestionCount > extract.questionCount)
+  ) {
+    return { ok: false, reason: "exam-values-invalid" };
+  }
+
   const numbers = extract.domains.map((d) => d.number).sort((a, b) => a - b);
   if (numbers.some((n, i) => n !== i + 1)) return { ok: false, reason: "domain-numbering" };
   const sum = extract.domains.reduce((s, d) => s + d.weightPercent, 0);
@@ -121,6 +147,7 @@ export function importGuide(
       pages: extract.pages,
       importedAt: today,
       ...(agent !== undefined ? { agent } : {}),
+      ...examValues(extract),
       domains: [...extract.domains]
         .sort((a, b) => a.number - b.number)
         .map((d) => ({
@@ -133,6 +160,36 @@ export function importGuide(
   };
 }
 
+/** 台帳に持つ、試験ガイドが示した本番の値(数値だけ)。どれも示さなければ持たない */
+function examValues(extract: GuideExtract): { exam?: NonNullable<GuideRecord["exam"]> } {
+  const exam = {
+    ...(extract.questionCount !== undefined ? { questionCount: extract.questionCount } : {}),
+    ...(extract.scoredQuestionCount !== undefined ? { scoredQuestionCount: extract.scoredQuestionCount } : {}),
+    ...(extract.timeMinutes !== undefined ? { timeMinutes: extract.timeMinutes } : {}),
+    ...(extract.passingScore !== undefined ? { passingScore: extract.passingScore } : {}),
+    ...(extract.totalScore !== undefined ? { totalScore: extract.totalScore } : {}),
+  };
+  return Object.keys(exam).length > 0 ? { exam } : {};
+}
+
+/** 資格マスタの本番の値。持たない項目(準備中の資格など)は null */
+export interface MasterExamValues {
+  officialQuestionCount: number | null;
+  officialTimeMinutes: number | null;
+  passingScore: number | null;
+  totalScore: number | null;
+}
+
+/** 突き合わせる本番の値の項目と、資格マスタの項目の対応 */
+const EXAM_ITEMS = [
+  { label: "出題数", guide: "questionCount", master: "officialQuestionCount" },
+  { label: "試験時間", guide: "timeMinutes", master: "officialTimeMinutes" },
+  { label: "合格点", guide: "passingScore", master: "passingScore" },
+  { label: "満点", guide: "totalScore", master: "totalScore" },
+] as const;
+
+export type ExamItemLabel = (typeof EXAM_ITEMS)[number]["label"];
+
 export interface GuideDiff {
   /** 試験ガイドにあって、マスタにない分野 */
   missingInMaster: string[];
@@ -140,15 +197,38 @@ export interface GuideDiff {
   extraInMaster: string[];
   /** 配点のずれ */
   weightMismatch: { code: string; guide: number; master: number }[];
+  /** 本番の値の食い違い(ガイドとマスタの両方に値がある) */
+  examMismatch: { item: ExamItemLabel; guide: number; master: number }[];
+  /** マスタに値がない項目の、ガイドの値 */
+  examMissingInMaster: { item: ExamItemLabel; guide: number }[];
 }
 
 /** 配点を同じとみなす幅(割合) */
 const WEIGHT_TOLERANCE = 0.005;
 
-export function diffWithMaster(guide: GuideRecord, master: readonly { code: string; weight: number }[]): GuideDiff {
+export function diffWithMaster(
+  guide: GuideRecord,
+  master: readonly { code: string; weight: number }[],
+  masterExam?: MasterExamValues,
+): GuideDiff {
   const masterByCode = new Map(master.map((d) => [d.code, d.weight]));
   const guideCodes = new Set(guide.domains.map((d) => d.code));
-  const diff: GuideDiff = { missingInMaster: [], extraInMaster: [], weightMismatch: [] };
+  const diff: GuideDiff = {
+    missingInMaster: [],
+    extraInMaster: [],
+    weightMismatch: [],
+    examMismatch: [],
+    examMissingInMaster: [],
+  };
+  // 本番の値: ガイドが示した項目だけを比べる。マスタに値がなければ、ガイドの値を報告する
+  for (const item of EXAM_ITEMS) {
+    const fromGuide = guide.exam?.[item.guide];
+    if (fromGuide === undefined) continue;
+    const fromMaster = masterExam?.[item.master] ?? null;
+    if (fromMaster === null) diff.examMissingInMaster.push({ item: item.label, guide: fromGuide });
+    else if (fromMaster !== fromGuide)
+      diff.examMismatch.push({ item: item.label, guide: fromGuide, master: fromMaster });
+  }
   for (const d of guide.domains) {
     const weight = masterByCode.get(d.code);
     if (weight === undefined) diff.missingInMaster.push(d.code);

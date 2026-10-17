@@ -12,6 +12,13 @@ export interface ExamMaster {
   domains: { code: string; name: string; weight: number }[];
   /** 本番の出題数。持たない資格(出題数を持たない準備中の資格)は null */
   officialQuestionCount: number | null;
+  /** 本番モードの値。持たない資格(準備中の資格など)は、項目ごとに null */
+  examValues: {
+    officialQuestionCount: number | null;
+    officialTimeMinutes: number | null;
+    passingScore: number | null;
+    totalScore: number | null;
+  };
 }
 
 /** 資格マスタから、検査に使う資格の情報と分野を読む。資格がなければ null */
@@ -26,6 +33,12 @@ export function loadExam(config: Config, rootDir: string, examCode: string): Exa
     exam: { examCode: exam.examCode, vendor: exam.vendor, ...(edition !== undefined ? { edition } : {}) },
     domains,
     officialQuestionCount: "officialQuestionCount" in exam ? (exam.officialQuestionCount ?? null) : null,
+    examValues: {
+      officialQuestionCount: "officialQuestionCount" in exam ? (exam.officialQuestionCount ?? null) : null,
+      officialTimeMinutes: "officialTimeMinutes" in exam ? exam.officialTimeMinutes : null,
+      passingScore: "passingScore" in exam ? exam.passingScore : null,
+      totalScore: "totalScore" in exam ? exam.totalScore : null,
+    },
   };
 }
 

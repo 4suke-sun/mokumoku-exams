@@ -94,6 +94,16 @@ export const GuideRecordSchema = z.strictObject({
     .max(20)
     .default([]),
   importedAt: ISO_DATE,
+  /** 試験ガイドが示した本番の値(数値だけ。ガイドが示さない項目は持たない) */
+  exam: z
+    .strictObject({
+      questionCount: z.number().int().positive().optional(),
+      scoredQuestionCount: z.number().int().positive().optional(),
+      timeMinutes: z.number().int().positive().optional(),
+      passingScore: z.number().int().positive().optional(),
+      totalScore: z.number().int().positive().optional(),
+    })
+    .optional(),
   /** 抽出に使ったエージェントの定義(役・モデルの ID・定義のハッシュ。古い記録にはない) */
   agent: AgentStampSchema.optional(),
   domains: z.array(GuideDomainSchema).min(1).max(20),

@@ -290,13 +290,15 @@ describe("collect --import-guide", () => {
     return root;
   }
 
-  function writeExtract(root: string, domains: unknown) {
+  function writeExtract(root: string, domains: unknown, extra: Record<string, unknown> = {}) {
     const hash = sha256(Buffer.from(fixture("guide.html")));
     writeFileSync(
       join(root, config.workDir, "guide/aws-aib-c01.extract.json"),
-      JSON.stringify({ examCode: CODE, sourceUrl: GUIDE, contentHash: hash, domains }),
+      JSON.stringify({ examCode: CODE, sourceUrl: GUIDE, contentHash: hash, domains, ...extra }),
     );
   }
+
+  const oneDomain = [{ number: 1, name: "分野 1", weightPercent: 100, scope: [] }];
 
   it("検査を通った抽出_台帳に取り込み、マスタとの差分を報告する。マスタは書き換えない", async () => {
     const root = await collected();
@@ -392,6 +394,72 @@ describe("collect --import-guide", () => {
     const changed = { ...routes, [ONE]: { body: fixture("guide.html").replace("Synthetic", "Changed") } };
     const again = await run(root, ["collect", CODE], changed, {}, "2026-10-15");
     expect(again.out).toContain("試験ガイドの抽出の依頼");
+  });
+
+  it("ガイドが本番の値を示す_台帳に数値を記録し、マスタとの食い違いを項目の名前と両方の値で報告する(終了コードは 0)", async () => {
+    const root = await collected();
+    // マスタ(AIB): 出題数 85、試験時間 170、合格点 700、満点 1000
+    writeExtract(root, oneDomain, {
+      questionCount: 85,
+      scoredQuestionCount: 65,
+      timeMinutes: 180,
+      passingScore: 700,
+      totalScore: 1000,
+    });
+    const r = await run(root, ["collect", CODE, "--import-guide"]);
+    expect(r.code).toBe(EXIT.ok);
+    expect(r.ledger().guide?.exam).toEqual({
+      questionCount: 85,
+      scoredQuestionCount: 65,
+      timeMinutes: 180,
+      passingScore: 700,
+      totalScore: 1000,
+    });
+    expect(r.out).toContain("試験ガイドの差分: 試験時間のずれ ガイド 180 マスタ 170");
+    expect(r.out).not.toContain("出題数のずれ");
+    expect(r.out).not.toContain("合格点のずれ");
+    expect(r.out).toContain("ガイドが示す採点対象の問題数 65");
+  });
+
+  it("マスタに本番の値がない資格(準備中)_ガイドの値を、マスタにない項目として報告する", async () => {
+    const root = await collected();
+    const path = join(root, "data/exams.json");
+    const exams = JSON.parse(readFileSync(path, "utf8"));
+    exams.exams = exams.exams.map((e: { examCode: string }) =>
+      e.examCode === CODE
+        ? {
+            examCode: CODE,
+            status: "coming-soon",
+            vendor: "AWS",
+            name: "準備中",
+            shortName: "準備中",
+            domains: [{ code: "domain1", name: "分野 1", weight: 1 }],
+          }
+        : e,
+    );
+    writeFileSync(path, JSON.stringify(exams));
+    writeExtract(root, oneDomain, { questionCount: 65, timeMinutes: 130 });
+    const r = await run(root, ["collect", CODE, "--import-guide"]);
+    expect(r.code).toBe(EXIT.ok);
+    expect(r.out).toContain("試験ガイドの差分: マスタにない項目 出題数 ガイド 65");
+    expect(r.out).toContain("試験ガイドの差分: マスタにない項目 試験時間 ガイド 130");
+  });
+
+  it("ガイドが本番の値を示さない_台帳に持たず、本番の値の差分も出さない", async () => {
+    const root = await collected();
+    writeExtract(root, oneDomain);
+    const r = await run(root, ["collect", CODE, "--import-guide"]);
+    expect(r.ledger().guide?.exam).toBeUndefined();
+    expect(r.out).not.toMatch(/のずれ ガイド \d+ マスタ|マスタにない項目/);
+  });
+
+  it("合格点が満点を超える抽出_取り込みで止まり、台帳に入れない", async () => {
+    const root = await collected();
+    writeExtract(root, oneDomain, { passingScore: 1001, totalScore: 1000 });
+    const r = await run(root, ["collect", CODE, "--import-guide"]);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain("試験ガイドの取り込みの停止: exam-values-invalid");
+    expect(r.ledger().guide).toBeNull();
   });
 
   it("試験ガイドの依頼と取り込み_定義の記録を依頼と台帳に残し、定義が変わると出し直す", async () => {
