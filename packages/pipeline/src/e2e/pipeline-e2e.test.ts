@@ -12,6 +12,7 @@ import { requestKey } from "../facts/extract.ts";
 import { factsPath, readFacts } from "../facts/schema.ts";
 import { factsFixture } from "../facts/test-helpers.ts";
 import { main } from "../main.ts";
+import { installAgentDefinitions, repoDefinitionHash } from "../shared/test-helpers.ts";
 
 /**
  * 収集から書き出しまでの通し。ネットワークとモデルを使わない(取得は固定の応答、エージェントの出力はテストがファイルとして書く)。
@@ -52,6 +53,7 @@ function setupRoot(plan: unknown) {
   const root = mkdtempSync(join(tmpdir(), "pipeline-e2e-"));
   mkdirSync(join(root, "data"));
   cpSync(join(repoRoot, "data/exams.json"), join(root, "data/exams.json"));
+  installAgentDefinitions(root);
   cpSync(join(repoRoot, "data/questions.ex-smp-xx.json"), join(root, "data/questions.ex-smp-xx.json"));
   writeFileSync(
     join(root, "data/questions.aws-aib-c01.json"),
@@ -150,7 +152,7 @@ function writeFacts(root: string, cards: unknown[]) {
   const dir = work(root, "facts/aws-aib-c01/out");
   mkdirSync(dir, { recursive: true });
   writeFileSync(
-    join(dir, `${requestKey(DOC, hash)}.json`),
+    join(dir, `${requestKey(DOC, hash, repoDefinitionHash("fact-extractor"))}.json`),
     JSON.stringify({ examCode: CODE, sourceUrl: DOC, contentHash: hash, cards }),
   );
 }

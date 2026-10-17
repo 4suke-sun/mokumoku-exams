@@ -1,11 +1,9 @@
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { BodyCache } from "../collect/cache.ts";
 import { clearRecheck } from "../collect/changes.ts";
-import { loadExam } from "../collect/collect.ts";
 import { LedgerError, type LedgerFile, ledgerPath, readLedger, writeLedger } from "../collect/ledger.ts";
 import type { Config } from "../config.ts";
-import { EXAM_CODE } from "../contract.ts";
 import {
   DecisionsError,
   type DecisionsFile,
@@ -16,6 +14,18 @@ import {
 } from "../decisions/decisions.ts";
 import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { type Output, report } from "../log.ts";
+import { type AgentStamp, readAgentStampOrReport, sameDefinition } from "../shared/agents.ts";
+import { prepareExam } from "../shared/exam.ts";
+import { writeJson } from "../shared/fs.ts";
+import {
+  cleanupImported,
+  definitionChanged,
+  discardStale,
+  type FlowContext,
+  failOutput,
+  listRequestFiles,
+  reportStop,
+} from "../shared/request-flow.ts";
 import { computeCoverage } from "./coverage.ts";
 import { detectConflicts, mergeDuplicates } from "./dedupe.ts";
 import { buildCards, FactsOutputSchema, type FactsRequest, requestKey } from "./extract.ts";
@@ -97,28 +107,11 @@ function readState(path: string): State {
   }
 }
 
-function writeJson(path: string, data: unknown): void {
-  mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, `${JSON.stringify(data, null, 2)}\n`);
-}
-
 export async function runFacts(options: FactsOptions): Promise<ExitCode> {
   const { config, rootDir, examCode, output } = options;
-  if (!EXAM_CODE.test(examCode)) {
-    report(output, "入力の誤り", "資格コードの形");
-    return EXIT.inputError;
-  }
-  let master: ReturnType<typeof loadExam>;
-  try {
-    master = loadExam(config, rootDir, examCode);
-  } catch {
-    report(output, "資格マスタの誤り", config.examsFile);
-    return EXIT.inputError;
-  }
-  if (master === null) {
-    report(output, "入力の誤り", "資格マスタにない資格コード");
-    return EXIT.inputError;
-  }
+  const exam = prepareExam(options);
+  if (!exam.ok) return exam.exit;
+  const master = exam.master;
   const paths = pathsFor(config, rootDir, examCode);
   let ledger: LedgerFile;
   let facts: FactsFile;
@@ -135,11 +128,16 @@ export async function runFacts(options: FactsOptions): Promise<ExitCode> {
     return EXIT.checkFailed;
   }
   const domains = master.domains.map((d) => d.code);
+  const stamp =
+    options.mode === "request" || options.mode === "import"
+      ? readAgentStampOrReport(output, rootDir, "fact-extractor")
+      : null;
+  if ((options.mode === "request" || options.mode === "import") && stamp === null) return EXIT.checkFailed;
   switch (options.mode) {
     case "request":
-      return requestStep(options, paths, ledger, facts, master.domains);
+      return requestStep(options, paths, ledger, facts, master.domains, stamp as AgentStamp);
     case "import":
-      return importStep(options, paths, ledger, facts, domains, decisions);
+      return importStep(options, paths, ledger, facts, domains, decisions, stamp as AgentStamp);
     case "coverage":
       return coverageStep(options, ledger, facts, domains);
     case "report":
@@ -153,6 +151,7 @@ function requestStep(
   ledger: LedgerFile,
   facts: FactsFile,
   masterDomains: { code: string; name: string }[],
+  stamp: AgentStamp,
 ): ExitCode {
   const { config, rootDir, examCode, output, deps, dryRun } = options;
   const cache = new BodyCache(paths.cacheDir, config.cache, deps.now);
@@ -172,7 +171,7 @@ function requestStep(
     // 試験ガイドのページは、分野・出題範囲の材料(台帳の guide)で、事実カードの根拠にしない
     if (source.kind === "exam-guide") continue;
     const hash = source.contentHash;
-    if (facts.extracted.some((e) => e.url === source.url && e.contentHash === hash)) {
+    if (facts.extracted.some((e) => e.url === source.url && e.contentHash === hash && sameDefinition(e.agent, stamp))) {
       skipped++;
       continue;
     }
@@ -181,7 +180,7 @@ function requestStep(
       missingBody++;
       continue;
     }
-    const key = requestKey(source.url, hash);
+    const key = requestKey(source.url, hash, stamp.definitionHash);
     if ((state[key] ?? 0) >= config.facts.maxAttempts) {
       report(output, "再試行の上限", source.url);
       exhausted++;
@@ -202,6 +201,7 @@ function requestStep(
         ...(source.target.region !== undefined ? { region: source.target.region } : {}),
       },
       domains,
+      agent: stamp,
     };
     const requestPath = join(paths.requestsDir, `${key}.json`);
     if (!dryRun) writeJson(requestPath, request);
@@ -222,18 +222,16 @@ function importStep(
   facts: FactsFile,
   domains: string[],
   decisions: DecisionsFile,
+  stamp: AgentStamp,
 ): ExitCode {
   const { config, examCode, output, deps, dryRun } = options;
+  const ctx: FlowContext = { output, stopLabel: "事実カードの取り込みの停止", dryRun };
   const cache = new BodyCache(paths.cacheDir, config.cache, deps.now);
   const state = readState(paths.stateFile);
-  const requestFiles = existsSync(paths.requestsDir)
-    ? readdirSync(paths.requestsDir)
-        .filter((f) => f.endsWith(".json"))
-        .sort()
-    : [];
+  const requestFiles = listRequestFiles(paths.requestsDir);
 
   const incoming: FactCard[] = [];
-  const extracted: { url: string; contentHash: string }[] = [];
+  const extracted: FactsFile["extracted"] = [];
   const doneFiles: string[] = [];
   let failures = 0;
 
@@ -246,19 +244,22 @@ function importStep(
     }
     let request: FactsRequest;
     try {
-      request = JSON.parse(readFileSync(join(paths.requestsDir, file), "utf8")) as FactsRequest;
+      const raw = JSON.parse(readFileSync(join(paths.requestsDir, file), "utf8")) as unknown;
+      if (raw === null || typeof raw !== "object") throw new Error("request-invalid");
+      request = raw as FactsRequest;
     } catch {
-      report(output, "事実カードの取り込みの停止", `${key} request-invalid`);
+      reportStop(ctx, key, "request-invalid");
       failures++;
       continue;
     }
+    // 依頼のあとにエージェントの定義が変わった(記録のない古い依頼を含む)。出力の形を見る前に、依頼を作り直す
+    if (definitionChanged(request, stamp)) {
+      discardStale(ctx, key, join(paths.requestsDir, file), outPath);
+      continue;
+    }
     const fail = (reason: string) => {
-      report(output, "事実カードの取り込みの停止", `${key} ${reason}`);
+      failOutput(ctx, key, reason, outPath, state);
       failures++;
-      if (!dryRun) {
-        state[key] = (state[key] ?? 0) + 1;
-        rmSync(outPath, { force: true });
-      }
     };
     let raw: unknown;
     try {
@@ -278,13 +279,9 @@ function importStep(
       continue;
     }
     const source = initialLedger.sources.find((s) => s.url === request.sourceUrl);
+    // 収集が進んで、依頼のもとにした本文が古くなった。依頼を作り直す
     if (source?.status !== "active" || source.contentHash !== request.contentHash) {
-      // 収集が進んで、依頼のもとにした本文が古くなった。依頼を作り直す
-      report(output, "事実カードの取り込みの停止", `${key} request-stale`);
-      if (!dryRun) {
-        rmSync(join(paths.requestsDir, file), { force: true });
-        rmSync(outPath, { force: true });
-      }
+      discardStale(ctx, key, join(paths.requestsDir, file), outPath);
       continue;
     }
     const body = cache.has(request.contentHash) ? (cache.read(request.contentHash)?.toString("utf8") ?? null) : null;
@@ -306,7 +303,7 @@ function importStep(
         reasons: [...reasons],
       });
     }
-    extracted.push({ url: source.url, contentHash: request.contentHash });
+    extracted.push({ url: source.url, contentHash: request.contentHash, agent: stamp });
     doneFiles.push(file);
   }
 
@@ -395,10 +392,7 @@ function importStep(
   if (removedIds.length > 0) {
     writeLedger(paths.ledger, clearRecheck(initialLedger, { facts: removedIds }));
   }
-  for (const file of doneFiles) {
-    rmSync(join(paths.requestsDir, file), { force: true });
-    rmSync(join(paths.outDir, file), { force: true });
-  }
+  cleanupImported(doneFiles, paths.requestsDir, paths.outDir);
   return failures > 0 ? EXIT.checkFailed : EXIT.ok;
 }
 

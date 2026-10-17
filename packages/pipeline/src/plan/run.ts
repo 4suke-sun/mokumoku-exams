@@ -1,10 +1,10 @@
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
-import { loadExam } from "../collect/collect.ts";
 import type { Config } from "../config.ts";
-import { EXAM_CODE, QuestionsFileSchema } from "../contract.ts";
+import { QuestionsFileSchema } from "../contract.ts";
 import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { type Output, report } from "../log.ts";
+import { prepareExam } from "../shared/exam.ts";
 import { buildPlan, type ExistingQuestion, resolveSettings } from "./plan.ts";
 import { PlanError, planPath, writePlan } from "./schema.ts";
 
@@ -42,25 +42,9 @@ export function readExistingQuestions(
 /** plan コマンド: 分野の配点から目標の問題数を出し、既存の問題との差を、作業用の置き場に書く。data/ は変えない */
 export function runPlan(options: PlanOptions): ExitCode {
   const { config, rootDir, examCode, output, dryRun } = options;
-  if (!EXAM_CODE.test(examCode)) {
-    report(output, "入力の誤り", "資格コードの形");
-    return EXIT.inputError;
-  }
-  let master: ReturnType<typeof loadExam>;
-  try {
-    master = loadExam(config, rootDir, examCode);
-  } catch {
-    report(output, "資格マスタの誤り", config.examsFile);
-    return EXIT.inputError;
-  }
-  if (master === null) {
-    report(output, "入力の誤り", "資格マスタにない資格コード");
-    return EXIT.inputError;
-  }
-  if (master.officialQuestionCount === null || master.domains.length === 0) {
-    report(output, "入力の誤り", "公開中の資格ではない");
-    return EXIT.inputError;
-  }
+  const exam = prepareExam(options, { production: true });
+  if (!exam.ok) return exam.exit;
+  const master = exam.master;
   const existing = readExistingQuestions(config, rootDir, examCode);
   if (existing === "invalid") {
     report(output, "問題データの誤り", `questions.${examCode.toLowerCase()}.json`);

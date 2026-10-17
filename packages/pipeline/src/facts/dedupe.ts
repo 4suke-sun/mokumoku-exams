@@ -1,3 +1,4 @@
+import { jaccard } from "../shared/similarity.ts";
 import { compact } from "../text.ts";
 import { extractNumbers, extractTerms } from "./grounding.ts";
 import type { Confidence, FactCard } from "./schema.ts";
@@ -50,22 +51,8 @@ export function mergeDuplicates(cards: readonly FactCard[]): { cards: FactCard[]
   return { cards: keep, merged };
 }
 
-function bigrams(text: string): Set<string> {
-  const chars = [...compact(text)];
-  const out = new Set<string>();
-  for (let i = 0; i + 1 < chars.length; i++) out.add((chars[i] as string) + (chars[i + 1] as string));
-  return out;
-}
-
-/** 主張どうしの似かた(文字 2 つ組の Jaccard 係数) */
-export function similarity(a: string, b: string): number {
-  const x = bigrams(a);
-  const y = bigrams(b);
-  if (x.size === 0 || y.size === 0) return 0;
-  let both = 0;
-  for (const g of x) if (y.has(g)) both++;
-  return both / (x.size + y.size - both);
-}
+/** 主張どうしの似かた(文字 2 つ組の Jaccard 係数。`shared/similarity.ts`) */
+export const similarity = jaccard;
 
 /** 矛盾とみなす主張の似かたの下限 */
 export const CONFLICT_MIN_SIMILARITY = 0.5;

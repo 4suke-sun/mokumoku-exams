@@ -54,7 +54,8 @@ export type Kind =
   | "下書きの保留"
   | "下書きの誤り"
   | "来歴の誤り"
-  | "来歴なし";
+  | "来歴なし"
+  | "エージェントの定義の誤り";
 
 /** 標準出力に出す種類。ほかは標準エラーに出す */
 const OUT_KINDS: ReadonlySet<Kind> = new Set<Kind>([

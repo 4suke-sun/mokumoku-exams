@@ -7,6 +7,7 @@ import { entry } from "../collect/test-helpers.ts";
 import { emptyFacts, type FactCard, factsPath, writeFacts } from "../facts/schema.ts";
 import { card, DOC_HASH, DOC_URL, factsFixture } from "../facts/test-helpers.ts";
 import { main } from "../main.ts";
+import { installAgentDefinitions } from "../shared/test-helpers.ts";
 import type { DraftRequest } from "./request.ts";
 import type { ChoiceDraft, Draft, FreeTextDraft } from "./schema.ts";
 import { draftWorkDir } from "./store.ts";
@@ -116,6 +117,7 @@ export function setupDraftRoot(options: { cards?: FactCard[]; questions?: unknow
   const root = mkdtempSync(join(tmpdir(), "pipeline-draft-"));
   mkdirSync(join(root, "data"));
   cpSync(join(repoRoot, "data/exams.json"), join(root, "data/exams.json"));
+  installAgentDefinitions(root);
   if (options.questions !== undefined) {
     writeFileSync(join(root, "data/questions.aws-aib-c01.json"), JSON.stringify(options.questions));
   }

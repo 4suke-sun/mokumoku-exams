@@ -6,6 +6,8 @@ import { decisionsPath, writeDecisions } from "../decisions/decisions.ts";
 import { EXIT } from "../exit-codes.ts";
 import { factsPath, writeFacts } from "../facts/schema.ts";
 import { main } from "../main.ts";
+import { readAgentStamp } from "../shared/agents.ts";
+import { installAgentDefinitions } from "../shared/test-helpers.ts";
 import { Fetcher, sha256 } from "./fetcher.ts";
 import { emptyLedger, readLedger, serializeLedger } from "./ledger.ts";
 import { entry, type FakeResponse, fakeNet, fixture, ROBOTS_OK, testFetchConfig } from "./test-helpers.ts";
@@ -39,6 +41,7 @@ function setupRoot(planContent: unknown = plan) {
   const root = mkdtempSync(join(tmpdir(), "pipeline-collect-"));
   mkdirSync(join(root, "data"));
   cpSync(join(repoRoot, "data/exams.json"), join(root, "data/exams.json"));
+  installAgentDefinitions(root);
   mkdirSync(join(root, config.plansDir), { recursive: true });
   writeFileSync(join(root, config.plansDir, "aws-aib-c01.json"), JSON.stringify(planContent));
   return root;
@@ -365,6 +368,43 @@ describe("collect --import-guide", () => {
     const changed = { ...routes, [ONE]: { body: fixture("guide.html").replace("Synthetic", "Changed") } };
     const again = await run(root, ["collect", CODE], changed, {}, "2026-10-15");
     expect(again.out).toContain("試験ガイドの抽出の依頼");
+  });
+
+  it("試験ガイドの依頼と取り込み_定義の記録を依頼と台帳に残し、定義が変わると出し直す", async () => {
+    const root = await collected();
+    const requestPath = join(root, config.workDir, "guide/aws-aib-c01.request.json");
+    const stamp = readAgentStamp(root, "guide-extractor");
+    expect(JSON.parse(readFileSync(requestPath, "utf8")).agent).toEqual(stamp);
+    writeExtract(root, [{ number: 1, name: "分野 1", weightPercent: 100, scope: [] }]);
+    const imported = await run(root, ["collect", CODE, "--import-guide"]);
+    expect(imported.ledger().guide?.agent).toEqual(stamp);
+    expect((await run(root, ["collect", CODE])).out).not.toContain("試験ガイドの抽出の依頼");
+    const path = join(root, ".claude", "agents", "guide-extractor.md");
+    writeFileSync(path, `${readFileSync(path, "utf8")}\n- 追加した指示\n`);
+    const again = await run(root, ["collect", CODE], routes, {}, "2026-10-14");
+    expect(again.out).toContain("試験ガイドの抽出の依頼");
+    expect(JSON.parse(readFileSync(requestPath, "utf8")).agent.definitionHash).not.toBe(stamp.definitionHash);
+  });
+
+  it("依頼のあとに定義が変わった_抽出を取り込まず、依頼を作り直す", async () => {
+    const root = await collected();
+    writeExtract(root, [{ number: 1, name: "分野 1", weightPercent: 100, scope: [] }]);
+    const path = join(root, ".claude", "agents", "guide-extractor.md");
+    writeFileSync(path, `${readFileSync(path, "utf8")}\n- 追加した指示\n`);
+    const r = await run(root, ["collect", CODE, "--import-guide"]);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain("試験ガイドの取り込みの停止: guide request-stale");
+    expect(r.ledger().guide).toBeNull();
+  });
+
+  it("依頼のファイルが壊れている_request-invalid で止め、抽出を取り込まない", async () => {
+    const root = await collected();
+    writeExtract(root, [{ number: 1, name: "分野 1", weightPercent: 100, scope: [] }]);
+    writeFileSync(join(root, config.workDir, "guide/aws-aib-c01.request.json"), "{壊れた");
+    const r = await run(root, ["collect", CODE, "--import-guide"]);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain("試験ガイドの取り込みの停止: guide request-invalid");
+    expect(r.ledger().guide).toBeNull();
   });
 
   it("配点の合計が合わない・抽出がない_取り込みを止め、理由コードを出す", async () => {

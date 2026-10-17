@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { AgentStamp } from "../shared/agents.ts";
 import { normalize } from "../text.ts";
 import type { GuideRecord, LedgerFile } from "./ledger.ts";
 import { withinParaphraseLimit } from "./text-limits.ts";
@@ -49,6 +50,8 @@ export interface GuideRequest {
   pages: { url: string; contentHash: string; bodyPath: string }[];
   /** 抽出の結果を書く場所。リポジトリ直下からの相対パス */
   outputPath: string;
+  /** 依頼を出した時点の、エージェントの定義(役・モデルの ID・定義のハッシュ) */
+  agent: AgentStamp;
 }
 
 /** 配点の合計の許容の幅(%)。ガイドの表記の丸めを許す */
@@ -79,6 +82,7 @@ export function importGuide(
   pageUrls: readonly string[],
   readBody: (hash: string) => string | null,
   today: string,
+  agent?: AgentStamp,
 ): { ok: true; guide: GuideRecord } | { ok: false; reason: GuideStopReason } {
   const parsed = GuideExtractSchema.safeParse(raw);
   if (!parsed.success) return { ok: false, reason: "extract-invalid" };
@@ -118,6 +122,7 @@ export function importGuide(
       contentHash: extract.contentHash,
       pages: extract.pages,
       importedAt: today,
+      ...(agent !== undefined ? { agent } : {}),
       domains: [...extract.domains]
         .sort((a, b) => a.number - b.number)
         .map((d) => ({

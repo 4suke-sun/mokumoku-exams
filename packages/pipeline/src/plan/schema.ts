@@ -1,7 +1,9 @@
-import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { z } from "zod";
 import { EXAM_CODE } from "../contract.ts";
+import { PathsError } from "../shared/errors.ts";
+import { writeFileAtomic } from "../shared/fs.ts";
 
 /**
  * 出題計画(ADR 0007)。分野の配点から目標の問題数を出し、既存の問題との差分(足りない分)を、
@@ -77,11 +79,9 @@ export type PlanItem = z.infer<typeof PlanItemSchema>;
 export type PlanFile = z.infer<typeof PlanFileSchema>;
 
 /** 出題計画の検査の誤り。場所(項目のパス)だけを持ち、値は持たない */
-export class PlanError extends Error {
-  readonly paths: string[];
+export class PlanError extends PathsError {
   constructor(paths: string[]) {
-    super("出題計画の誤り");
-    this.paths = paths;
+    super("出題計画の誤り", paths);
   }
 }
 
@@ -115,8 +115,5 @@ export function readPlan(path: string): PlanFile | null {
 /** 書く。一時ファイルに書いてから置き換えるので、途中で止まっても壊れたファイルを残さない */
 export function writePlan(path: string, plan: PlanFile): void {
   const text = serializePlan(plan);
-  mkdirSync(dirname(path), { recursive: true });
-  const tmp = `${path}.${process.pid}.tmp`;
-  writeFileSync(tmp, text);
-  renameSync(tmp, path);
+  writeFileAtomic(path, text);
 }

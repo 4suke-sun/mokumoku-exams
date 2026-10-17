@@ -3,6 +3,7 @@ import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { CRITERION_NAME_MAX, KEYWORD_MAX } from "../contract.ts";
 import { EXIT } from "../exit-codes.ts";
+import { readAgentStamp } from "../shared/agents.ts";
 import { DraftRequestSchema } from "./request.ts";
 import { pathCode } from "./run.ts";
 import { readDrafts, readState } from "./store.ts";
@@ -285,6 +286,72 @@ describe("draft の取り込み", () => {
     const r = await runMain(root, ["draft", EXAM, "--import"]);
     expect(r.err).toContain("request-stale");
     expect(existsSync(workPath(root, "requests", `${request.requestKey}.json`))).toBe(false);
+  });
+
+  it("依頼を書く_役の名前・モデルの ID・定義のハッシュを依頼に書く", async () => {
+    const root = setupDraftRoot();
+    const request = await firstRequest(root);
+    expect(request.agent).toEqual(readAgentStamp(root, "question-drafter"));
+    expect(request.agent?.model).toMatch(/^claude-/);
+  });
+
+  it("取り込んだ結果_どの定義・モデルで作ったかを下書きの状態に残す", async () => {
+    const root = setupDraftRoot();
+    const request = await firstRequest(root);
+    writeOutput(root, request, [draftFor(request)]);
+    await runMain(root, ["draft", EXAM, "--import"]);
+    expect(readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0]?.agent).toEqual(request.agent);
+  });
+
+  it("定義の指示を変えた_依頼の鍵が変わり、取り込み済みの入力も出し直す。変えなければ同じ鍵", async () => {
+    const root = setupDraftRoot();
+    const request = await firstRequest(root);
+    expect((await runMain(root, ["draft", EXAM])).code).toBe(EXIT.ok);
+    expect(readRequests(root).find((q) => q.planItemId === request.planItemId)?.requestKey).toBe(request.requestKey);
+    const path = join(root, ".claude", "agents", "question-drafter.md");
+    writeFileSync(path, `${readFileSync(path, "utf8")}\n- 追加した指示\n`);
+    await runMain(root, ["draft", EXAM]);
+    const fresh = readRequests(root).find(
+      (q) => q.planItemId === request.planItemId && q.agent?.definitionHash !== request.agent?.definitionHash,
+    );
+    expect(fresh).toBeDefined();
+    expect(fresh?.requestKey).not.toBe(request.requestKey);
+  });
+
+  it("依頼のあとに定義が変わった_取り込まず、依頼を捨てる(失敗の回数には数えない)", async () => {
+    const root = setupDraftRoot();
+    const request = await firstRequest(root);
+    writeOutput(root, request, [draftFor(request)]);
+    const path = join(root, ".claude", "agents", "question-drafter.md");
+    writeFileSync(path, `${readFileSync(path, "utf8")}\n- 追加した指示\n`);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.err).toContain(`${request.requestKey} request-stale`);
+    expect(readState(workPath(root, "state.json")).attempts[request.requestKey]).toBeUndefined();
+    expect(existsSync(workPath(root, "requests", `${request.requestKey}.json`))).toBe(false);
+    expect(existsSync(join(root, request.outputPath))).toBe(false);
+  });
+
+  it("定義が変わったあとの出力が形に合わない_失敗に数えず、request-stale で依頼を捨てる", async () => {
+    const root = setupDraftRoot();
+    const request = await firstRequest(root);
+    writeRaw(root, request, JSON.stringify({ unexpected: true }));
+    const path = join(root, ".claude", "agents", "question-drafter.md");
+    writeFileSync(path, `${readFileSync(path, "utf8")}\n- 追加した指示\n`);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.err).toContain(`${request.requestKey} request-stale`);
+    expect(r.err).not.toContain("output-invalid");
+    expect(readState(workPath(root, "state.json")).attempts[request.requestKey]).toBeUndefined();
+  });
+
+  it("定義の記録がない古い依頼_request-stale で捨てる", async () => {
+    const root = setupDraftRoot();
+    const request = await firstRequest(root);
+    writeOutput(root, request, [draftFor(request)]);
+    const { agent: _agent, ...legacy } = request;
+    writeFileSync(workPath(root, "requests", `${request.requestKey}.json`), JSON.stringify(legacy));
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.err).toContain(`${request.requestKey} request-stale`);
+    expect(readDrafts(workPath(root, "drafts.json"), EXAM).drafts).toEqual([]);
   });
 
   it("止める規則に違反する下書き_不採用になり_本文を保存せず_報告にも出さない", async () => {

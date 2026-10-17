@@ -1,4 +1,4 @@
-import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
+import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -9,6 +9,8 @@ import { entry, fakeNet, testFetchConfig } from "../collect/test-helpers.ts";
 import { decisionsPath, writeDecisions } from "../decisions/decisions.ts";
 import { EXIT } from "../exit-codes.ts";
 import { main } from "../main.ts";
+import { readAgentStamp } from "../shared/agents.ts";
+import { installAgentDefinitions, repoDefinitionHash } from "../shared/test-helpers.ts";
 import { requestKey } from "./extract.ts";
 import { COPY_PLACEHOLDER } from "./overlap.ts";
 import { type FactsFile, factsPath, readFacts } from "./schema.ts";
@@ -17,7 +19,8 @@ import { DOC_HASH, DOC_URL, factsFixture } from "./test-helpers.ts";
 const CODE = "AWS-AIB-C01";
 const repoRoot = resolve(import.meta.dirname, "../../../..");
 const config = JSON.parse(readFileSync(resolve(import.meta.dirname, "../../pipeline.config.json"), "utf8"));
-const KEY = requestKey(DOC_URL, DOC_HASH);
+const FACT_AGENT = readAgentStamp(repoRoot, "fact-extractor");
+const KEY = requestKey(DOC_URL, DOC_HASH, repoDefinitionHash("fact-extractor"));
 
 const guide = {
   sourceUrl: "https://docs.aws.amazon.com/guide/index.html",
@@ -34,6 +37,7 @@ function setupRoot(ledgerOverrides: Partial<LedgerFile> = {}) {
   const root = mkdtempSync(join(tmpdir(), "pipeline-facts-"));
   mkdirSync(join(root, "data"));
   cpSync(join(repoRoot, "data/exams.json"), join(root, "data/exams.json"));
+  installAgentDefinitions(root);
   const ledger: LedgerFile = {
     ...emptyLedger(CODE),
     guide,
@@ -244,7 +248,7 @@ describe("facts --import", () => {
     const committed = readFileSync(factsPath(join(root, config.factsDir), CODE), "utf8");
     expect(committed).not.toContain("Synthetic");
     expect(committed).not.toContain("Encryption at rest is enabled");
-    expect(r.facts().extracted).toEqual([{ url: DOC_URL, contentHash: DOC_HASH }]);
+    expect(r.facts().extracted).toEqual([{ url: DOC_URL, contentHash: DOC_HASH, agent: FACT_AGENT }]);
   });
 
   it("同じ入力で再実行_抽出済みなので、依頼を出さない(モデルを呼ばない)", async () => {
@@ -402,7 +406,7 @@ describe("facts --import", () => {
       recheck: { facts: [keep?.id ?? "", drop?.id ?? ""], questions: [] },
     });
     await run(root, ["facts", CODE], {}, "2026-10-14");
-    const key = requestKey(DOC_URL, hash);
+    const key = requestKey(DOC_URL, hash, repoDefinitionHash("fact-extractor"));
     writeOut(
       root,
       [
@@ -421,7 +425,7 @@ describe("facts --import", () => {
     expect(file.cards).toHaveLength(1);
     expect(file.cards[0]?.claim).toContain("150");
     expect(file.cards[0]?.sources[0]?.contentHash).toBe(hash);
-    expect(file.extracted).toEqual([{ url: DOC_URL, contentHash: hash }]);
+    expect(file.extracted).toEqual([{ url: DOC_URL, contentHash: hash, agent: FACT_AGENT }]);
     expect(r.ledger().recheck.facts).toEqual([]);
   });
 
@@ -515,5 +519,94 @@ describe("facts --report", () => {
     const r = await run(root, ["facts", CODE, "--report", "--dry-run"]);
     expect(r.code).toBe(EXIT.ok);
     expect(existsSync(join(workDir(root), "review.md"))).toBe(false);
+  });
+});
+
+/** 作業ディレクトリの定義の指示に 1 行足す(指示が変わった状態にする) */
+function changeDefinition(root: string, role: "fact-extractor" | "guide-extractor" | "question-drafter") {
+  const path = join(root, ".claude", "agents", `${role}.md`);
+  writeFileSync(path, `${readFileSync(path, "utf8")}\n- 追加した指示\n`);
+}
+
+describe("facts: エージェントの定義の記録", () => {
+  it("依頼を書く_役の名前・モデルの ID・定義のハッシュを依頼に書き、指示の本文は書かない", async () => {
+    const root = setupRoot();
+    await run(root, ["facts", CODE]);
+    const text = readFileSync(join(workDir(root), "requests", `${KEY}.json`), "utf8");
+    expect(JSON.parse(text).agent).toEqual(FACT_AGENT);
+    expect(FACT_AGENT.model).toMatch(/^claude-/);
+    expect(text).not.toContain("作成役");
+  });
+
+  it("定義の指示を変えた_依頼の鍵が変わり、取り込み済みの出典も出し直す", async () => {
+    const root = setupRoot();
+    await run(root, ["facts", CODE]);
+    writeOut(root, [good]);
+    await run(root, ["facts", CODE, "--import"]);
+    expect((await run(root, ["facts", CODE])).out).toContain("依頼 0 件、抽出済みで飛ばした 1 件");
+    changeDefinition(root, "fact-extractor");
+    const again = await run(root, ["facts", CODE]);
+    expect(again.out).toContain("依頼 1 件");
+    expect(again.out).not.toContain(KEY);
+  });
+
+  it("定義の説明だけを変えた_鍵は変わらず、出し直さない", async () => {
+    const root = setupRoot();
+    const path = join(root, ".claude", "agents", "fact-extractor.md");
+    await run(root, ["facts", CODE]);
+    writeOut(root, [good]);
+    await run(root, ["facts", CODE, "--import"]);
+    writeFileSync(path, readFileSync(path, "utf8").replace(/^description: .*$/m, "description: 言い回しを直した説明"));
+    expect((await run(root, ["facts", CODE])).out).toContain("依頼 0 件、抽出済みで飛ばした 1 件");
+  });
+
+  it("依頼のあとに定義が変わった_取り込まず、依頼を作り直す(失敗の回数には数えない)", async () => {
+    const root = setupRoot();
+    await run(root, ["facts", CODE]);
+    writeOut(root, [good]);
+    changeDefinition(root, "fact-extractor");
+    const r = await run(root, ["facts", CODE, "--import"]);
+    expect(r.err).toContain(`事実カードの取り込みの停止: ${KEY} request-stale`);
+    expect(r.facts().cards).toEqual([]);
+    expect(existsSync(outFile(root))).toBe(false);
+    expect(existsSync(join(workDir(root), "requests", `${KEY}.json`))).toBe(false);
+  });
+
+  it("定義が変わったあとの出力が形に合わない_失敗に数えず、request-stale で依頼を捨てる", async () => {
+    const root = setupRoot();
+    await run(root, ["facts", CODE]);
+    mkdirSync(join(workDir(root), "out"), { recursive: true });
+    writeFileSync(outFile(root), "壊れた出力");
+    changeDefinition(root, "fact-extractor");
+    const r = await run(root, ["facts", CODE, "--import"]);
+    expect(r.err).toContain(`${KEY} request-stale`);
+    expect(r.err).not.toContain("extract-invalid");
+  });
+
+  it("依頼のファイルが JSON の null_request-invalid で止め、取り込まない", async () => {
+    const root = setupRoot();
+    await run(root, ["facts", CODE]);
+    writeOut(root, [good]);
+    writeFileSync(join(workDir(root), "requests", `${KEY}.json`), "null");
+    const r = await run(root, ["facts", CODE, "--import"]);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain(`${KEY} request-invalid`);
+  });
+
+  it("取り込んだ結果_どの定義・モデルで作ったかがたどれ、指示の本文は持たない", async () => {
+    const root = setupRoot();
+    await run(root, ["facts", CODE]);
+    writeOut(root, [good]);
+    const r = await run(root, ["facts", CODE, "--import"]);
+    expect(r.facts().extracted[0]?.agent).toEqual(FACT_AGENT);
+    expect(readFileSync(factsPath(join(root, config.factsDir), CODE), "utf8")).not.toContain("作成役");
+  });
+
+  it("定義のファイルがない_役の名前だけを報告して止まる", async () => {
+    const root = setupRoot();
+    rmSync(join(root, ".claude", "agents", "fact-extractor.md"));
+    const r = await run(root, ["facts", CODE]);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain("エージェントの定義の誤り: fact-extractor");
   });
 });
