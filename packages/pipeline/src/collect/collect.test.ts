@@ -103,6 +103,30 @@ describe("collect", () => {
     expect(request.bodyPath).toMatch(/^pipeline-work\/cache\/[0-9a-f]{64}\.body$/);
   });
 
+  it("版を持つ準備中の資格_出典の対象に、資格マスタの版を付ける", async () => {
+    const root = setupRoot();
+    const path = join(root, "data/exams.json");
+    const exams = JSON.parse(readFileSync(path, "utf8"));
+    exams.exams = exams.exams.map((e: { examCode: string }) =>
+      e.examCode === CODE
+        ? {
+            examCode: CODE,
+            status: "coming-soon",
+            vendor: "AWS",
+            name: "準備中",
+            shortName: "準備中",
+            edition: "C01",
+            idPrefix: "AIB",
+          }
+        : e,
+    );
+    writeFileSync(path, JSON.stringify(exams));
+    const r = await run(root, ["collect", CODE]);
+    const targets = r.ledger().sources.map((s) => s.target.edition);
+    expect(targets.length).toBeGreaterThan(0);
+    expect(targets.every((e) => e === "C01")).toBe(true);
+  });
+
   it("途中で止まった実行_再実行で、今日取得済みのものを飛ばして続きから進む", async () => {
     const root = setupRoot();
     const all = { ...routes, [TWO]: { body: fixture("doc.html") } };

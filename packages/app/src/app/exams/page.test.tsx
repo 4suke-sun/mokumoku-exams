@@ -58,6 +58,11 @@ const exams = [
     shortName: "近日",
     level: "Associate",
     note: "来春に公開します。",
+    // パイプラインに通すための項目を持っていても、一覧の表示は変わらない
+    edition: "S01",
+    officialQuestionCount: 65,
+    idPrefix: "SOON",
+    domains: [{ code: "domain1", name: "架空の分野名", weight: 1 }],
   },
 ] as unknown as Exam[];
 
@@ -109,6 +114,14 @@ describe("資格の一覧", () => {
     expect(screen.queryByRole("link", { name: /近日の資格/ })).toBeNull();
     const card = screen.getByText("近日の資格").closest("li");
     expect(card?.className).toContain("bg-surface/60");
+  });
+
+  it("分野・版・出題数・接頭辞を持つ近日公開の資格_それらを一覧に出さない", () => {
+    render(<ExamsPage />);
+    const card = screen.getByText("近日の資格").closest("li");
+    expect(card?.textContent).not.toContain("架空の分野名");
+    expect(card?.textContent).not.toContain("S01");
+    expect(card?.textContent).not.toContain("65");
   });
 
   it("略称のない資格_資格コードの先頭の 4 文字をタイルに出す", () => {

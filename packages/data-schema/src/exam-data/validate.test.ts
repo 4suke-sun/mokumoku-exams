@@ -131,6 +131,77 @@ describe("資格マスタのスキーマ", () => {
   });
 });
 
+describe("準備中の資格に持てる、パイプライン用の項目", () => {
+  const domains = [
+    { code: "domain1", name: "分野 1", weight: 0.6 },
+    { code: "domain2", name: "分野 2", weight: 0.4 },
+  ];
+  const pipelineItems = { edition: "L01", officialQuestionCount: 50, idPrefix: "LATER", domains };
+
+  it("版・分野・本番の出題数・接頭辞を持つ準備中の資格_受け付ける。どれも任意で、一部だけでもよい", () => {
+    expect(ExamsFileSchema.safeParse(exams([comingSoon(pipelineItems)])).success).toBe(true);
+    expect(ExamsFileSchema.safeParse(exams([comingSoon({ domains })])).success).toBe(true);
+    expect(ExamsFileSchema.safeParse(exams([comingSoon({ edition: "L01" })])).success).toBe(true);
+  });
+
+  it("分野の重みの合計が 1 でない準備中の資格_公開中と同じ許容誤差(0.005)で落とす", () => {
+    const withTotal = (total: number) =>
+      ExamsFileSchema.safeParse(
+        exams([
+          comingSoon({
+            domains: [
+              { code: "domain1", name: "分野 1", weight: 0.5 },
+              { code: "domain2", name: "分野 2", weight: total - 0.5 },
+            ],
+          }),
+        ]),
+      ).success;
+    expect(withTotal(1)).toBe(true);
+    expect(withTotal(1.005)).toBe(true);
+    expect(withTotal(1.006)).toBe(false);
+    expect(withTotal(0.994)).toBe(false);
+  });
+
+  it("分野のコードが重複する準備中の資格_落とす", () => {
+    const dup = [
+      { code: "domain1", name: "分野 1", weight: 0.5 },
+      { code: "domain1", name: "分野 2", weight: 0.5 },
+    ];
+    expect(ExamsFileSchema.safeParse(exams([comingSoon({ domains: dup })])).success).toBe(false);
+  });
+
+  it("接頭辞の形が違う・本番の出題数が正の整数でない準備中の資格_落とす", () => {
+    expect(ExamsFileSchema.safeParse(exams([comingSoon({ idPrefix: "lower" })])).success).toBe(false);
+    expect(ExamsFileSchema.safeParse(exams([comingSoon({ officialQuestionCount: 0 })])).success).toBe(false);
+    expect(ExamsFileSchema.safeParse(exams([comingSoon({ officialQuestionCount: 1.5 })])).success).toBe(false);
+  });
+
+  it("接頭辞が公開中の資格と重複する準備中の資格_公開中と準備中をまたいで落とす。準備中どうしも落とす", () => {
+    expect(ExamsFileSchema.safeParse(exams([published(), comingSoon({ idPrefix: "SAMPLE" })])).success).toBe(false);
+    expect(
+      ExamsFileSchema.safeParse(
+        exams([comingSoon({ idPrefix: "LATER" }), comingSoon({ examCode: "EX-LT2-XX", idPrefix: "LATER" })]),
+      ).success,
+    ).toBe(false);
+    expect(ExamsFileSchema.safeParse(exams([published(), comingSoon({ idPrefix: "LATER" })])).success).toBe(true);
+  });
+
+  it("準備中の資格_問題データ・info・カリキュラム・要約カードは、これまでどおり持てない", () => {
+    expect(
+      ExamsFileSchema.safeParse(exams([comingSoon({ ...pipelineItems, info: { checkedAt: "2026-10-01" } })])).success,
+    ).toBe(false);
+    expect(
+      ExamsFileSchema.safeParse(exams([comingSoon({ ...pipelineItems, retiredQuestionIds: ["LATER-0001"] })])).success,
+    ).toBe(false);
+    const files = [{ name: "questions.ex-ltr-xx.json", data: { examCode: "EX-LTR-XX", questions: [question(1)] } }];
+    expect(validateDataSet(exams([comingSoon(pipelineItems)]), files)).not.toEqual([]);
+  });
+
+  it("新しい項目を持つ準備中の資格_データの検査は、問題のファイルを求めない", () => {
+    expect(validateDataSet(exams([published(), comingSoon(pipelineItems)]), files())).toEqual([]);
+  });
+});
+
 describe("退役した問題 ID", () => {
   it("退役した ID を問題が使っていない_通す", () => {
     expect(validateDataSet(exams([published({ retiredQuestionIds: ["SAMPLE-0009"] })]), files())).toEqual([]);

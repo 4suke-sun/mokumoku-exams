@@ -10,7 +10,7 @@ import { type Output, report } from "../log.ts";
 export interface ExamMaster {
   exam: ExamInfo;
   domains: { code: string; name: string; weight: number }[];
-  /** 本番の出題数。公開中でない資格は null */
+  /** 本番の出題数。持たない資格(出題数を持たない準備中の資格)は null */
   officialQuestionCount: number | null;
 }
 
@@ -21,11 +21,11 @@ export function loadExam(config: Config, rootDir: string, examCode: string): Exa
   const exam = parsed.data.exams.find((e) => e.examCode === examCode);
   if (!exam) return null;
   const edition = "edition" in exam ? exam.edition : undefined;
-  const domains = "domains" in exam ? exam.domains : [];
+  const domains = "domains" in exam ? (exam.domains ?? []) : [];
   return {
     exam: { examCode: exam.examCode, vendor: exam.vendor, ...(edition !== undefined ? { edition } : {}) },
     domains,
-    officialQuestionCount: "officialQuestionCount" in exam ? exam.officialQuestionCount : null,
+    officialQuestionCount: "officialQuestionCount" in exam ? (exam.officialQuestionCount ?? null) : null,
   };
 }
 
@@ -34,7 +34,7 @@ export type ExamPreamble<M extends ExamMaster = ExamMaster> = { ok: true; master
 
 /**
  * 各コマンドの前置き: 資格コードの形を検査し、資格マスタを読み、なければ入力の誤りとして報告する。
- * `production` を指定すると、本番の出題数と分野を持つ(公開中の)資格だけを通す。入力した文字列は出さない。
+ * `production` を指定すると、本番の出題数と分野を持つ資格だけを通す。足りない項目は、項目を示して止まる。入力した文字列は出さない。
  */
 export function prepareExam(
   input: { config: Config; rootDir: string; examCode: string; output: Output },
@@ -64,9 +64,14 @@ export function prepareExam(
     report(output, "入力の誤り", "資格マスタにない資格コード");
     return { ok: false, exit: EXIT.inputError };
   }
-  if (condition.production && (master.officialQuestionCount === null || master.domains.length === 0)) {
-    report(output, "入力の誤り", "公開中の資格ではない");
-    return { ok: false, exit: EXIT.inputError };
+  // 出題計画と下書きは、分野と本番の出題数を持つ資格(公開中の資格と、これらを持つ準備中の資格)だけを受ける
+  if (condition.production) {
+    const missing = [
+      ...(master.domains.length === 0 ? ["資格マスタに分野がない"] : []),
+      ...(master.officialQuestionCount === null ? ["資格マスタに本番の出題数がない"] : []),
+    ];
+    for (const reason of missing) report(output, "入力の誤り", reason);
+    if (missing.length > 0) return { ok: false, exit: EXIT.inputError };
   }
   return { ok: true, master };
 }

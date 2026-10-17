@@ -33,13 +33,15 @@
 
 ## 3. 手順
 
-1. **近日公開として載せる**(任意)。`data/exams.json` の `exams` に、`examCode`(`<ベンダー略称>-<試験略称>-<版>`。版がなければ `XX`)・`status: "coming-soon"`・`vendor`・`name`・`shortName`(と任意の `note`)だけの 1 件を足します。
+1. **近日公開として載せる**(任意)。`data/exams.json` の `exams` に、`examCode`(`<ベンダー略称>-<試験略称>-<版>`。版がなければ `XX`)・`status: "coming-soon"`・`vendor`・`name`・`shortName`(と任意の `note`)の 1 件を足します。
+   作問パイプラインで問題を作るときは、公開にする前から、`edition`・`domains`(分野のコード・名前・重み。重みの合計は 1)・`officialQuestionCount`・`idPrefix`(ほかの資格と重複しないもの)も持たせます。
+   値は公式の試験ガイドをもとに書きます。分野を持たない、または本番の出題数を持たない資格は、パイプラインの出題計画・下書き・検証が、足りない項目を示して止まります。
 2. **出典のドメインを足す**(出典を付けるとき)。`packages/data-schema/src/exam-data/schema.ts` の `ALLOWED_REFERENCE_HOSTS` に、その資格のベンダーの公式ドキュメントのホスト名(完全一致)を足し、`REFERENCE_HOST_VENDORS` に、そのホストを出典にしてよいベンダーを足し、仕様の「3.1 出典」の表にも足します。すでにあれば、足しません。足す手順と確認は、[出典と権利の方針](./source-policy.md)に従います。
 3. **問題を書く**。パイプラインで作るときは、[問題を作る手順書](./question-production.md)に従います(書き出しは公開中の資格にだけ行えるので、手順 4 の公開の形を作業ツリーで先に作り、書き出した問題と一緒にコミットします。順序は手順書の「2」)。手で書くときは、`data/questions.<コード>.json` を作り、[問題データの仕様](./data-spec.md) の「3. 問題」の形で書きます。
    選択式(択一・複数選択)の問題数は、本番モードの出題数(`officialQuestionCount`)以上にします(自由記述は数えません)。
    出典の URL は `references` に書き、本文には書きません。
 4. **公開にする**。資格マスタの 1 件を `status: "published"` にし、`edition`・`category`・`passingScore`・`totalScore`・
-   `officialQuestionCount`・`officialTimeMinutes`・`domains`・`idPrefix` を足します。公式の情報があれば、`level`・`abbr`・`info` も足します
+   `officialQuestionCount`・`officialTimeMinutes`・`domains`・`idPrefix` のうち、手順 1 でまだ持たせていないものを足します。公式の情報があれば、`level`・`abbr`・`info` も足します
    (`info.guideUrl` のドメインも、手順 2 の許可の一覧に足します)。
 5. **カリキュラムを書く**(任意)。`data/curriculum.<コード>.json` を、仕様の「11. カリキュラムのデータ」の形で作ります。
 6. **検査する**。次の「4. 検査」を通します。
