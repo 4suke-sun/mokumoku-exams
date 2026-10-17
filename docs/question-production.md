@@ -90,7 +90,7 @@
 | コマンド | `collect <試験コード> --dry-run`(計画の検査)→ `collect <試験コード>` → `collect <試験コード> --import-guide`(試験ガイドの取り込み) |
 | 入力 | 収集の計画、許可ドメインの一覧、資格マスタ |
 | 出力 | 出典の台帳 `packages/pipeline/ledger/<コード>.json`(コミットする)、本文のキャッシュ `pipeline-work/cache/`(コミットしない) |
-| エージェント | `guide-extractor`(`pipeline-work/guide/<コード>.request.json` を渡す) |
+| エージェント | `guide-extractor`(`pipeline-work/guide/<コード>.request.json` を渡す)。任意で、出典の候補を挙げる `source-scout`(`collect <試験コード> --candidates` と `--import-candidates`。[収集の手順](./source-collection.md)の「2」の手順 5 に続く「出典の候補を挙げる(任意)」) |
 | 関門 | https で許可ドメインの URL か、取得できたか、日付・版・リージョンの検査に合格したか(合格した出典だけが `active`) |
 | 止まったとき | 表示の種類と理由コードで、[収集](./source-collection.md)の「6. 止まったときの対処」を引きます |
 

@@ -40,3 +40,4 @@
 - [0013 解説は下書きの段階で書き、別の段階を持たない](./0013-explanation-in-draft-stage.md)
 - [0014 書き出しは作業ツリーの `data/` に書き、人が PR の差分で確かめる](./0014-export-writes-working-tree-data.md)
 - [0015 作問パイプラインの役のモデルを表で固定し、検証役は下書きの役と別のモデルにする](./0015-pipeline-agent-roles-and-models.md)
+- [0016 作問パイプラインの役のモデルの表に、出典の候補を挙げる役を足す](./0016-pipeline-source-scout-role.md)

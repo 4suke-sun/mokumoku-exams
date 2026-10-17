@@ -126,6 +126,9 @@ export function runStatus(options: StatusOptions): ExitCode {
     line(`事実カードの理由 ${reason} ${n} 件`);
   }
 
+  const candidateQueue = queue(join(work, "candidates", code, "requests"), join(work, "candidates", code, "out"));
+  line(`出典の候補 依頼待ち ${candidateQueue.waiting} 件、取り込み待ち ${candidateQueue.toImport} 件`);
+
   line(plan === null ? "出題計画 なし" : `出題計画 項目 ${plan.items.length} 件`);
 
   const draftQueue = queue(join(draftWorkDir(work, examCode), "requests"), join(draftWorkDir(work, examCode), "out"));
@@ -152,6 +155,7 @@ export function runStatus(options: StatusOptions): ExitCode {
   }
 
   const waitingByRole: Record<PipelineRole, number> = {
+    "source-scout": candidateQueue.waiting,
     "guide-extractor": guide.waiting,
     "fact-extractor": factQueue.waiting,
     "question-drafter": draftQueue.waiting,

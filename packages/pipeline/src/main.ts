@@ -1,4 +1,5 @@
 import { writeFileSync } from "node:fs";
+import { runCandidates } from "./collect/candidates.ts";
 import { type CollectDeps, runCollect } from "./collect/collect.ts";
 import { defaultDeps, Fetcher } from "./collect/fetcher.ts";
 import { COMMANDS } from "./commands.ts";
@@ -35,6 +36,8 @@ export const KNOWN_FLAGS = [
   "-h",
   "--dry-run",
   "--import-guide",
+  "--candidates",
+  "--import-candidates",
   "--import",
   "--coverage",
   "--report",
@@ -44,7 +47,7 @@ export const KNOWN_FLAGS = [
 ];
 /** コマンドごとに、受け付ける動作のオプション(同時には 1 つだけ) */
 const MODE_FLAGS: Record<string, readonly string[]> = {
-  collect: ["--import-guide"],
+  collect: ["--import-guide", "--candidates", "--import-candidates"],
   facts: ["--import", "--coverage", "--report"],
   draft: ["--import", "--check", "--review", "--decide"],
   verify: ["--import"],
@@ -74,6 +77,8 @@ function helpText(): string {
     "",
     "collect <資格コード>                 計画に沿って一次情報を集め、台帳に記録する",
     "collect <資格コード> --import-guide  エージェントが抽出した試験ガイドを検査し、台帳に取り込む",
+    "collect <資格コード> --candidates   出題範囲の項目ごとに、公式の文書を出典の候補として挙げる依頼を書く",
+    "collect <資格コード> --import-candidates  エージェントが挙げた候補を検査し、候補の一覧を書く(計画には入れない)",
     "facts <資格コード>                   出典ごとに、事実カードの抽出の依頼を書く",
     "facts <資格コード> --import         エージェントが抽出した事実カードを検査し、取り込む",
     "facts <資格コード> --coverage       分野ごとの件数と、試験ガイドの範囲に対する抜けを報告する",
@@ -145,7 +150,7 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
     }
     if (help) {
       const usages: Record<string, string> = {
-        collect: "使い方: collect <資格コード> [--import-guide]\n",
+        collect: "使い方: collect <資格コード> [--import-guide | --candidates | --import-candidates]\n",
         facts: "使い方: facts <資格コード> [--import | --coverage | --report]\n",
         plan: "使い方: plan <資格コード>\n",
         export: "使い方: export <資格コード>\n",
@@ -163,6 +168,16 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
       if (examCode === undefined) {
         report(output, "入力の誤り", "資格コードの指定がない");
         return EXIT.inputError;
+      }
+      if (flags.includes("--candidates") || flags.includes("--import-candidates")) {
+        return runCandidates({
+          config,
+          rootDir,
+          examCode,
+          mode: flags.includes("--import-candidates") ? "import" : "request",
+          dryRun,
+          output,
+        });
       }
       return await runCollect({
         config,
