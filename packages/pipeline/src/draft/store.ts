@@ -1,8 +1,12 @@
-import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { z } from "zod";
 import { EXAM_CODE } from "../contract.ts";
 import { DIFFICULTIES } from "../plan/schema.ts";
+import { AgentStampSchema } from "../shared/agents.ts";
+import { PathsError } from "../shared/errors.ts";
+import { writeFileAtomic, writeJson } from "../shared/fs.ts";
+import { VerificationSchema } from "../verify/schema.ts";
 import { DraftSchema } from "./schema.ts";
 
 /**
@@ -28,6 +32,10 @@ export const DraftRecordSchema = z.strictObject({
   warnings: z.array(z.strictObject({ rule: REASON, path: z.string().max(60) })).max(80),
   /** 不採用のときは null */
   draft: DraftSchema.nullable(),
+  /** この下書きを作ったエージェントの定義(役・モデルの ID・定義のハッシュ。古い記録にはない) */
+  agent: AgentStampSchema.optional(),
+  /** 検証の段階の結果(検証前はない)。検証を通った合格は、verdict が pass のもの */
+  verification: VerificationSchema.optional(),
 });
 
 export const DraftsFileSchema = z.strictObject({
@@ -39,11 +47,9 @@ export type DraftRecord = z.infer<typeof DraftRecordSchema>;
 export type DraftsFile = z.infer<typeof DraftsFileSchema>;
 
 /** 下書きの置き場の誤り。場所(項目のパス)だけを持ち、値は持たない */
-export class DraftsError extends Error {
-  readonly paths: string[];
+export class DraftsError extends PathsError {
   constructor(paths: string[]) {
-    super("下書きの誤り");
-    this.paths = paths;
+    super("下書きの誤り", paths);
   }
 }
 
@@ -81,10 +87,7 @@ export function readDrafts(path: string, examCode: string): DraftsFile {
 export function writeDrafts(path: string, file: DraftsFile): void {
   const sorted = { ...file, drafts: [...file.drafts].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0)) };
   const text = `${JSON.stringify(parseDrafts(sorted), null, 2)}\n`;
-  mkdirSync(dirname(path), { recursive: true });
-  const tmp = `${path}.${process.pid}.tmp`;
-  writeFileSync(tmp, text);
-  renameSync(tmp, path);
+  writeFileAtomic(path, text);
 }
 
 /** 計画の項目が満たせない理由。事実カードがない、項目の出し直しの上限、依頼の鍵の再試行の上限 */
@@ -137,8 +140,7 @@ function reasons(value: unknown): Record<string, UnmetReason[]> {
 }
 
 export function writeState(path: string, state: DraftState): void {
-  mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, `${JSON.stringify({ ...state, done: [...new Set(state.done)].sort() }, null, 2)}\n`);
+  writeJson(path, { ...state, done: [...new Set(state.done)].sort() });
 }
 
 /**

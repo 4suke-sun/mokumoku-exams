@@ -1,9 +1,12 @@
-import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { z } from "zod";
 import { ID, Paraphrase, REASON, REGION, SHA256, SourceUrl } from "../collect/ledger.ts";
 import { withinQuoteLimit } from "../collect/text-limits.ts";
 import { EXAM_CODE } from "../contract.ts";
+import { AgentStampSchema } from "../shared/agents.ts";
+import { PathsError } from "../shared/errors.ts";
+import { writeFileAtomic } from "../shared/fs.ts";
 
 /**
  * 事実カード(ADR 0007・0008)。出典から取り出した主張を、1 件ずつ検査できる形で持つ。
@@ -57,7 +60,8 @@ export const FactCardSchema = z.strictObject({
 export const FactsFileSchema = z.strictObject({
   examCode: z.string().regex(EXAM_CODE),
   /** 抽出を済ませた出典と本文のハッシュ。同じ入力では、再び抽出を依頼しない */
-  extracted: z.array(z.strictObject({ url: SourceUrl, contentHash: SHA256 })),
+  /** 抽出済みの出典。agent は、抽出に使ったエージェントの定義(古い記録にはない) */
+  extracted: z.array(z.strictObject({ url: SourceUrl, contentHash: SHA256, agent: AgentStampSchema.optional() })),
   cards: z.array(FactCardSchema),
 });
 
@@ -66,11 +70,9 @@ export type FactCard = z.infer<typeof FactCardSchema>;
 export type FactsFile = z.infer<typeof FactsFileSchema>;
 
 /** 事実カードの検査の誤り。場所(項目のパス)だけを持ち、値は持たない */
-export class FactsError extends Error {
-  readonly paths: string[];
+export class FactsError extends PathsError {
   constructor(paths: string[]) {
-    super("事実カードの誤り");
-    this.paths = paths;
+    super("事実カードの誤り", paths);
   }
 }
 
@@ -164,8 +166,5 @@ export function readFacts(path: string, examCode: string): FactsFile {
 /** 書く。一時ファイルに書いてから置き換えるので、途中で止まっても壊れたファイルを残さない */
 export function writeFacts(path: string, file: FactsFile): void {
   const text = serializeFacts(file);
-  mkdirSync(dirname(path), { recursive: true });
-  const tmp = `${path}.${process.pid}.tmp`;
-  writeFileSync(tmp, text);
-  renameSync(tmp, path);
+  writeFileAtomic(path, text);
 }

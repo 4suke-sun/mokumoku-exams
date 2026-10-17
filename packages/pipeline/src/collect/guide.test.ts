@@ -66,7 +66,14 @@ describe("試験ガイドの取り込み", () => {
     [
       "本文の写し",
       extract({
-        domains: [{ number: 1, name: "a", weightPercent: 100, scope: ["Synthetic exam guide for tests"] }],
+        domains: [
+          {
+            number: 1,
+            name: "a",
+            weightPercent: 100,
+            scope: ["Synthetic exam guide for tests Domain 1: Alpha topics"],
+          },
+        ],
       }),
       "verbatim-copy",
     ],
@@ -133,7 +140,14 @@ describe("試験ガイドの続きのページ", () => {
   it("言い換えがページの本文の写し_止める", () => {
     const copied = extract({
       pages,
-      domains: [{ number: 1, name: "a", weightPercent: 100, scope: ["Synthetic text without an update date"] }],
+      domains: [
+        {
+          number: 1,
+          name: "a",
+          weightPercent: 100,
+          scope: ["Synthetic text without an update date. Feature X is deprecated in favor"],
+        },
+      ],
     });
     expect(importGuide(copied, withPage, [PAGE], read, "2026-10-13")).toEqual({ ok: false, reason: "verbatim-copy" });
   });

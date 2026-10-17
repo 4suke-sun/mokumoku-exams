@@ -2,6 +2,7 @@ import { z } from "zod";
 import { sha256 } from "../collect/fetcher.ts";
 import type { FactCard } from "../facts/schema.ts";
 import { DIFFICULTIES } from "../plan/schema.ts";
+import { AgentStampSchema } from "../shared/agents.ts";
 import { DISTRACTOR_TYPES, DraftSchema, FACT_ID } from "./schema.ts";
 import { STYLE_RULES, STYLE_VERSION } from "./style.ts";
 
@@ -34,6 +35,8 @@ export const DraftRequestSchema = z.strictObject({
   styleRules: z.array(z.strictObject({ name: z.string(), severity: z.enum(["block", "warn"]), summary: z.string() })),
   /** 結果を書く場所。リポジトリ直下からの相対パス */
   outputPath: z.string().min(1),
+  /** 依頼を出した時点の、エージェントの定義(役・モデルの ID・定義のハッシュ) */
+  agent: AgentStampSchema.optional(),
 });
 
 export type DraftRequest = z.infer<typeof DraftRequestSchema>;
@@ -59,7 +62,7 @@ export function styleRuleSummaries(kind: DraftRequest["kind"]): DraftRequest["st
 }
 
 /**
- * 依頼の鍵。入力(計画の項目、書かせる数、出し直しの回数、事実カードの ID と主張、規則と依頼の版)から決まる。
+ * 依頼の鍵。入力(計画の項目、書かせる数、出し直しの回数、事実カードの ID と主張、規則と依頼の版、エージェントの定義のハッシュ)から決まる。
  * 同じ入力では同じ鍵になり、取り込み済みの鍵は、再び依頼しない。
  */
 export function requestKey(input: {
@@ -68,6 +71,8 @@ export function requestKey(input: {
   count: number;
   round: number;
   facts: readonly { id: string; claim: string }[];
+  /** エージェントの定義のハッシュ。定義が変わると鍵が変わる */
+  definitionHash: string;
 }): string {
   const canonical = JSON.stringify({
     examCode: input.examCode,
@@ -77,6 +82,7 @@ export function requestKey(input: {
     facts: input.facts.map((f) => [f.id, sha256(Buffer.from(f.claim))]),
     styleVersion: STYLE_VERSION,
     requestVersion: REQUEST_VERSION,
+    definitionHash: input.definitionHash,
   });
   return sha256(Buffer.from(canonical)).slice(0, 16);
 }

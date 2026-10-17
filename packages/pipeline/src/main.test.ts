@@ -49,18 +49,6 @@ describe("コマンドの体系", () => {
   it.each(COMMANDS.map((c) => c.name))("%s_--help を受け付ける", async (name) => {
     expect((await run([name, "--help"])).code).toBe(EXIT.ok);
   });
-
-  it.each(COMMANDS.filter((c) => !["collect", "facts", "plan", "draft", "export"].includes(c.name)).map((c) => c.name))(
-    "%s_未実装_--dry-run の有無によらず入力の誤りで終わり_報告は標準エラーに出す",
-    async (name) => {
-      for (const args of [[name], [name, "--dry-run"]]) {
-        const r = await run(args);
-        expect(r.code, args.join(" ")).toBe(EXIT.inputError);
-        expect(r.err).toContain("未実装");
-        expect(r.out).not.toContain("未実装");
-      }
-    },
-  );
 });
 
 describe("終了コード", () => {
@@ -78,6 +66,7 @@ describe("終了コード", () => {
 
   it("対応しないコマンドの動作のオプション_入力の誤り", async () => {
     expect((await run(["verify", "--import-guide"])).code).toBe(EXIT.inputError);
+    expect((await run(["verify", "AWS-AIB-C01", "--review"])).code).toBe(EXIT.inputError);
     expect((await run(["facts", "--import-guide"])).code).toBe(EXIT.inputError);
     expect((await run(["collect", "--coverage"])).code).toBe(EXIT.inputError);
     expect((await run(["facts", "--import", "--report"])).code).toBe(EXIT.inputError);

@@ -1,9 +1,11 @@
-import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { z } from "zod";
 import { ISO_DATE, type LedgerFile, SHA256 } from "../collect/ledger.ts";
 import { EXAM_CODE, hostAllowedForVendor, QUESTION_ID, sourceUrlReason } from "../contract.ts";
 import type { FactsFile } from "../facts/schema.ts";
+import { PathsError } from "../shared/errors.ts";
+import { writeFileAtomic } from "../shared/fs.ts";
 import { FACT_ID } from "./schema.ts";
 import type { DraftRecord } from "./store.ts";
 
@@ -37,11 +39,9 @@ export type ProvenanceEntry = z.infer<typeof ProvenanceEntrySchema>;
 export type ProvenanceFile = z.infer<typeof ProvenanceFileSchema>;
 
 /** 来歴の読み込みの誤り。場所(項目のパス)だけを持ち、値は持たない */
-export class ProvenanceError extends Error {
-  readonly paths: string[];
+export class ProvenanceError extends PathsError {
   constructor(paths: string[]) {
-    super("来歴の誤り");
-    this.paths = paths;
+    super("来歴の誤り", paths);
   }
 }
 
@@ -97,10 +97,7 @@ export function readProvenance(path: string, examCode: string): ProvenanceFile {
 
 export function writeProvenance(path: string, file: ProvenanceFile): void {
   const text = serializeProvenance(file);
-  mkdirSync(dirname(path), { recursive: true });
-  const tmp = `${path}.${process.pid}.tmp`;
-  writeFileSync(tmp, text);
-  renameSync(tmp, path);
+  writeFileAtomic(path, text);
 }
 
 /** 来歴の項目を作る。作れない理由があれば、理由コードを返す */

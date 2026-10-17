@@ -1,10 +1,9 @@
-import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import { BodyCache } from "../collect/cache.ts";
-import { loadExam } from "../collect/collect.ts";
 import { LedgerError, type LedgerFile, ledgerPath, readLedger } from "../collect/ledger.ts";
 import type { Config } from "../config.ts";
-import { checkAnswerBias, EXAM_CODE } from "../contract.ts";
+import { checkAnswerBias } from "../contract.ts";
 import {
   DecisionsError,
   type DecisionsFile,
@@ -19,6 +18,18 @@ import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { FactsError, type FactsFile, factsPath, readFacts } from "../facts/schema.ts";
 import { type Output, report } from "../log.ts";
 import { PlanError, type PlanFile, planPath, readPlan } from "../plan/schema.ts";
+import { type AgentStamp, readAgentStampOrReport } from "../shared/agents.ts";
+import { prepareExam } from "../shared/exam.ts";
+import { writeJson } from "../shared/fs.ts";
+import {
+  cleanupImported,
+  definitionChanged,
+  discardStale,
+  type FlowContext,
+  failOutput,
+  listRequestFiles,
+  reportStop,
+} from "../shared/request-flow.ts";
 import { copyCheck } from "./copy.ts";
 import { candidateOf, findDuplicates, readPublishedCandidates, readPublishedChoices } from "./dedupe.ts";
 import { checkDistractors } from "./distractors.ts";
@@ -119,28 +130,11 @@ function pathsFor(config: Config, rootDir: string, examCode: string): Paths {
   };
 }
 
-function writeJson(path: string, data: unknown): void {
-  mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, `${JSON.stringify(data, null, 2)}\n`);
-}
-
 export function runDraft(options: DraftOptions): ExitCode {
   const { config, rootDir, examCode, output } = options;
-  if (!EXAM_CODE.test(examCode)) {
-    report(output, "入力の誤り", "資格コードの形");
-    return EXIT.inputError;
-  }
-  let master: ReturnType<typeof loadExam>;
-  try {
-    master = loadExam(config, rootDir, examCode);
-  } catch {
-    report(output, "資格マスタの誤り", config.examsFile);
-    return EXIT.inputError;
-  }
-  if (master === null || master.officialQuestionCount === null) {
-    report(output, "入力の誤り", "公開中の資格ではない");
-    return EXIT.inputError;
-  }
+  const exam = prepareExam(options, { production: true });
+  if (!exam.ok) return exam.exit;
+  const master = exam.master;
   // 入力した文字列は出さない
   if (options.domain !== undefined && !master.domains.some((d) => d.code === options.domain)) {
     report(output, "入力の誤り", "資格マスタにない分野");
@@ -177,11 +171,14 @@ export function runDraft(options: DraftOptions): ExitCode {
   for (const d of orphanDecisions(decisions, { draftIds: drafts.drafts.map((x) => x.id) })) {
     if (d.target === "draft") report(output, "判断の対象なし", `draft ${d.id}`);
   }
+  const needsAgent = options.mode === "request" || options.mode === "import";
+  const stamp = needsAgent ? readAgentStampOrReport(output, rootDir, "question-drafter") : null;
+  if (needsAgent && stamp === null) return EXIT.checkFailed;
   switch (options.mode) {
     case "request":
-      return requestStep(options, paths, master.domains, facts, drafts, ledger);
+      return requestStep(options, paths, master.domains, facts, drafts, ledger, stamp as AgentStamp);
     case "import":
-      return importStep(options, paths, facts, drafts, ledger, provenance);
+      return importStep(options, paths, facts, drafts, ledger, provenance, stamp as AgentStamp);
     case "check":
       return checkStep(options, facts, drafts, provenance, ledger, master.exam.vendor, decisions);
     case "review":
@@ -267,6 +264,7 @@ function requestStep(
   facts: FactsFile,
   drafts: DraftsFile,
   ledger: LedgerFile,
+  stamp: AgentStamp,
 ): ExitCode {
   const { config, rootDir, examCode, output, dryRun } = options;
   let plan: PlanFile | null;
@@ -327,7 +325,14 @@ function requestStep(
     }
     const selected = selectFacts(cards, usage, settings.maxFactsPerRequest);
     const count = Math.min(remaining, settings.maxPerRequest);
-    const key = requestKey({ examCode, planItemId: item.id, count, round, facts: selected });
+    const key = requestKey({
+      examCode,
+      planItemId: item.id,
+      count,
+      round,
+      facts: selected,
+      definitionHash: stamp.definitionHash,
+    });
     if (state.done.includes(key)) {
       cached++;
       continue;
@@ -364,6 +369,7 @@ function requestStep(
       styleVersion: STYLE_VERSION,
       styleRules: styleRuleSummaries(item.kind),
       outputPath: relative(rootDir, join(paths.outDir, `${key}.json`)),
+      agent: stamp,
     };
     if (!dryRun) writeJson(requestPath, request);
     // 同じ実行の次の依頼は、まだ使われていない事実カードを先に選ぶ(同じ根拠の下書きが並ばないようにする)
@@ -398,16 +404,14 @@ function importStep(
   current: DraftsFile,
   ledger: LedgerFile,
   provenance: ProvenanceFile,
+  stamp: AgentStamp,
 ): ExitCode {
   const { config, rootDir, examCode, output, dryRun } = options;
+  const ctx: FlowContext = { output, stopLabel: "下書きの取り込みの停止", dryRun };
   const state = readState(paths.state);
   // 取得した本文の作業用キャッシュ(下書きの写しの検査に使う。本文を書き足さない。読むと更新時刻が変わり、壊れた本文は消える)
   const cache = new BodyCache(join(resolve(rootDir, config.workDir), "cache"), config.cache, Date.now);
-  const requestFiles = existsSync(paths.requestsDir)
-    ? readdirSync(paths.requestsDir)
-        .filter((f) => f.endsWith(".json"))
-        .sort()
-    : [];
+  const requestFiles = listRequestFiles(paths.requestsDir);
   const published = readPublishedCandidates(config, rootDir, examCode);
   if (published === "invalid") {
     report(output, "問題データの誤り", `questions.${examCode.toLowerCase()}.json`);
@@ -439,17 +443,18 @@ function importStep(
       if (!parsed.success || parsed.data.requestKey !== key) throw new Error("request-invalid");
       request = parsed.data;
     } catch {
-      report(output, "下書きの取り込みの停止", `${key} request-invalid`);
+      reportStop(ctx, key, "request-invalid");
       failures++;
       continue;
     }
+    // 依頼のあとにエージェントの定義が変わった(記録のない古い依頼を含む)。出力の形を見る前に、依頼を作り直す
+    if (definitionChanged(request, stamp)) {
+      discardStale(ctx, key, join(paths.requestsDir, file), outPath);
+      continue;
+    }
     const fail = (reason: string) => {
-      report(output, "下書きの取り込みの停止", `${key} ${reason}`);
+      failOutput(ctx, key, reason, outPath, state.attempts);
       failures++;
-      if (!dryRun) {
-        state.attempts[key] = (state.attempts[key] ?? 0) + 1;
-        rmSync(outPath, { force: true });
-      }
     };
     let out: ReturnType<typeof DraftsOutputSchema.parse>;
     try {
@@ -474,11 +479,7 @@ function importStep(
       return card === undefined || card.claim !== f.claim || !usableFact(card, ledger);
     });
     if (stale) {
-      report(output, "下書きの取り込みの停止", `${key} request-stale`);
-      if (!dryRun) {
-        rmSync(join(paths.requestsDir, file), { force: true });
-        rmSync(outPath, { force: true });
-      }
+      discardStale(ctx, key, join(paths.requestsDir, file), outPath);
       continue;
     }
     const factIds = new Set(request.facts.map((f) => f.id));
@@ -572,6 +573,7 @@ function importStep(
         reasons: uniqueSorted(reasons),
         warnings,
         draft: held || reasons.length === 0 ? draft : null,
+        agent: stamp,
       });
       // 以降の下書きは、この下書きとも比べる
       if (held || reasons.length === 0) pool.push(candidateOf(id, "draft", draft));
@@ -623,10 +625,7 @@ function importStep(
   ]);
   for (const message of [...bias.errors, ...bias.warnings]) report(output, "正解の偏り", message);
   writeState(paths.state, state);
-  for (const file of doneFiles) {
-    rmSync(join(paths.requestsDir, file), { force: true });
-    rmSync(join(paths.outDir, file), { force: true });
-  }
+  cleanupImported(doneFiles, paths.requestsDir, paths.outDir);
   return failures > 0 ? EXIT.checkFailed : EXIT.ok;
 }
 

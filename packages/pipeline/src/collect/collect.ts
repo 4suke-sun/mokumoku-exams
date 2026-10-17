@@ -1,7 +1,6 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join, relative, resolve } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { join, relative, resolve } from "node:path";
 import type { Config } from "../config.ts";
-import { EXAM_CODE, ExamsFileSchema } from "../contract.ts";
 import {
   DecisionsError,
   type DecisionsFile,
@@ -14,6 +13,10 @@ import { ProvenanceError, provenancePath, readProvenance } from "../draft/proven
 import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { FactsError, factsPath, readFacts } from "../facts/schema.ts";
 import { type Output, report } from "../log.ts";
+import { type AgentStamp, readAgentStampOrReport, sameDefinition } from "../shared/agents.ts";
+import { prepareExam } from "../shared/exam.ts";
+import { writeJson } from "../shared/fs.ts";
+import { definitionChanged, discardStale, type FlowContext, readJsonFile, reportStop } from "../shared/request-flow.ts";
 import { BodyCache } from "./cache.ts";
 import {
   type Affected,
@@ -81,53 +84,11 @@ function pathsFor(config: Config, rootDir: string, examCode: string): Paths {
   };
 }
 
-/** 資格マスタから、検査に使う資格の情報と分野を読む。資格がなければ null */
-export function loadExam(
-  config: Config,
-  rootDir: string,
-  examCode: string,
-): {
-  exam: ExamInfo;
-  domains: { code: string; name: string; weight: number }[];
-  /** 本番の出題数。公開中でない資格は null */
-  officialQuestionCount: number | null;
-} | null {
-  const parsed = ExamsFileSchema.safeParse(JSON.parse(readFileSync(resolve(rootDir, config.examsFile), "utf8")));
-  if (!parsed.success) throw new LedgerError(["(資格マスタ)"]);
-  const exam = parsed.data.exams.find((e) => e.examCode === examCode);
-  if (!exam) return null;
-  const edition = "edition" in exam ? exam.edition : undefined;
-  const domains = "domains" in exam ? exam.domains : [];
-  return {
-    exam: { examCode: exam.examCode, vendor: exam.vendor, ...(edition !== undefined ? { edition } : {}) },
-    domains,
-    officialQuestionCount: "officialQuestionCount" in exam ? exam.officialQuestionCount : null,
-  };
-}
-
-function writeJson(path: string, data: unknown): void {
-  mkdirSync(dirname(path), { recursive: true });
-  writeFileSync(path, `${JSON.stringify(data, null, 2)}\n`);
-}
-
 export async function runCollect(options: CollectOptions): Promise<ExitCode> {
   const { config, rootDir, examCode, output } = options;
-  // 入力した文字列は出さない
-  if (!EXAM_CODE.test(examCode)) {
-    report(output, "入力の誤り", "資格コードの形");
-    return EXIT.inputError;
-  }
-  let master: ReturnType<typeof loadExam>;
-  try {
-    master = loadExam(config, rootDir, examCode);
-  } catch {
-    report(output, "資格マスタの誤り", config.examsFile);
-    return EXIT.inputError;
-  }
-  if (master === null) {
-    report(output, "入力の誤り", "資格マスタにない資格コード");
-    return EXIT.inputError;
-  }
+  const exam = prepareExam(options);
+  if (!exam.ok) return exam.exit;
+  const master = exam.master;
   const paths = pathsFor(config, rootDir, examCode);
   let ledger: LedgerFile;
   try {
@@ -163,6 +124,8 @@ async function collectStep(
     report(output, "書き込みをしない(dry-run)");
     return EXIT.ok;
   }
+  const stamp = readAgentStampOrReport(output, rootDir, "guide-extractor");
+  if (stamp === null) return EXIT.checkFailed;
 
   // 事実カードの根拠にした出典。本文が変わったら、そのカードに再検証の印を付ける
   const factSources: Record<string, string[]> = {};
@@ -334,7 +297,7 @@ async function collectStep(
     sources: ledger.sources.map((s) => ({ url: s.url, status: s.status, checks: s.checks })),
   });
 
-  writeGuideRequest(plan, ledger, cache, paths, rootDir, output);
+  writeGuideRequest(plan, ledger, cache, paths, rootDir, output, stamp);
   cache.sweep();
 
   report(output, "情報", `取得 ${fetchedCount} 件、再開で飛ばした ${resumedCount} 件、止めた出典 ${blocked.length} 件`);
@@ -354,6 +317,7 @@ function writeGuideRequest(
   paths: Paths,
   rootDir: string,
   output: Output,
+  stamp: AgentStamp,
 ): void {
   const ready = (url: string | undefined) => {
     const s = ledger.sources.find((e) => e.url === url);
@@ -373,6 +337,7 @@ function writeGuideRequest(
   const imported = ledger.guide;
   if (
     imported?.contentHash === source.contentHash &&
+    sameDefinition(imported.agent, stamp) &&
     imported.pages.length === readyPages.length &&
     readyPages.every((p) => imported.pages.some((q) => q.url === p.url && q.contentHash === p.contentHash))
   ) {
@@ -386,6 +351,7 @@ function writeGuideRequest(
     bodyPath: bodyPath(source.contentHash),
     pages: readyPages.map((p) => ({ ...p, bodyPath: bodyPath(p.contentHash) })),
     outputPath: relative(rootDir, join(paths.guideDir, `${code}.extract.json`)),
+    agent: stamp,
   };
   const requestPath = join(paths.guideDir, `${code}.request.json`);
   writeJson(requestPath, request);
@@ -398,8 +364,11 @@ function importGuideStep(
   ledger: LedgerFile,
   masterDomains: { code: string; weight: number }[],
 ): ExitCode {
-  const { config, examCode, output, deps, dryRun } = options;
+  const { config, rootDir, examCode, output, deps, dryRun } = options;
+  const stamp = readAgentStampOrReport(output, rootDir, "guide-extractor");
+  if (stamp === null) return EXIT.checkFailed;
   const extractPath = join(paths.guideDir, `${examCode.toLowerCase()}.extract.json`);
+  const requestPath = join(paths.guideDir, `${examCode.toLowerCase()}.request.json`);
   if (!existsSync(extractPath)) {
     report(output, "試験ガイドの取り込みの停止", "extract-not-found");
     return EXIT.checkFailed;
@@ -411,6 +380,19 @@ function importGuideStep(
     report(output, "試験ガイドの取り込みの停止", "extract-invalid");
     return EXIT.checkFailed;
   }
+  // 依頼のあとに、エージェントの定義が変わった。取り込まず、依頼を作り直す
+  const ctx: FlowContext = { output, stopLabel: "試験ガイドの取り込みの停止", dryRun };
+  if (existsSync(requestPath)) {
+    const request = readJsonFile(requestPath);
+    if (request === null || typeof request !== "object") {
+      reportStop(ctx, "guide", "request-invalid");
+      return EXIT.checkFailed;
+    }
+    if (definitionChanged(request as { agent?: AgentStamp }, stamp)) {
+      discardStale(ctx, "guide", requestPath, extractPath);
+      return EXIT.checkFailed;
+    }
+  }
   const { plan, problems } = loadPlan(paths.plan, examCode);
   if (plan === null) {
     for (const p of problems) report(output, "計画の誤り", `${p.path} ${p.reason}`);
@@ -418,7 +400,7 @@ function importGuideStep(
   }
   const cache = new BodyCache(paths.cacheDir, config.cache, deps.now);
   const readBody = (hash: string) => cache.read(hash)?.toString("utf8") ?? null;
-  const result = importGuide(raw, ledger, plan.guidePages ?? [], readBody, deps.today());
+  const result = importGuide(raw, ledger, plan.guidePages ?? [], readBody, deps.today(), stamp);
   if (!result.ok) {
     report(output, "試験ガイドの取り込みの停止", result.reason);
     return EXIT.checkFailed;

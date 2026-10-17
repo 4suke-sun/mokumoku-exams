@@ -1,7 +1,10 @@
-import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { z } from "zod";
 import { EXAM_CODE, sourceUrlReason } from "../contract.ts";
+import { AgentStampSchema } from "../shared/agents.ts";
+import { PathsError } from "../shared/errors.ts";
+import { writeFileAtomic } from "../shared/fs.ts";
 import { withinParaphraseLimit, withinQuoteLimit, withinQuotesTotal } from "./text-limits.ts";
 
 /**
@@ -91,6 +94,8 @@ export const GuideRecordSchema = z.strictObject({
     .max(20)
     .default([]),
   importedAt: ISO_DATE,
+  /** 抽出に使ったエージェントの定義(役・モデルの ID・定義のハッシュ。古い記録にはない) */
+  agent: AgentStampSchema.optional(),
   domains: z.array(GuideDomainSchema).min(1).max(20),
 });
 
@@ -110,11 +115,9 @@ export type GuideRecord = z.infer<typeof GuideRecordSchema>;
 export type LedgerFile = z.infer<typeof LedgerFileSchema>;
 
 /** 台帳の検査の誤り。場所(項目のパス)だけを持ち、値は持たない */
-export class LedgerError extends Error {
-  readonly paths: string[];
+export class LedgerError extends PathsError {
   constructor(paths: string[]) {
-    super("台帳の誤り");
-    this.paths = paths;
+    super("台帳の誤り", paths);
   }
 }
 
@@ -192,10 +195,7 @@ export function readLedger(path: string, examCode: string): LedgerFile {
 /** 台帳を書く。一時ファイルに書いてから置き換えるので、途中で止まっても壊れたファイルを残さない */
 export function writeLedger(path: string, ledger: LedgerFile): void {
   const text = serializeLedger(ledger);
-  mkdirSync(dirname(path), { recursive: true });
-  const tmp = `${path}.${process.pid}.tmp`;
-  writeFileSync(tmp, text);
-  renameSync(tmp, path);
+  writeFileAtomic(path, text);
 }
 
 /** 先の段階の根拠に使える出典(状態が active のもの)だけを返す */

@@ -2,6 +2,7 @@ import { z } from "zod";
 import { sha256 } from "../collect/fetcher.ts";
 import { Paraphrase, REGION, SHA256 } from "../collect/ledger.ts";
 import { withinQuoteLimit } from "../collect/text-limits.ts";
+import type { AgentStamp } from "../shared/agents.ts";
 import { compact } from "../text.ts";
 import { CONFIDENCES, type FactCard } from "./schema.ts";
 
@@ -51,11 +52,13 @@ export interface FactsRequest {
   target: { edition?: string; region?: string };
   /** 分野。scope は、試験ガイドの出題範囲の項目(添字が scopeItems の値) */
   domains: { code: string; name: string; scope: string[] }[];
+  /** 依頼を出した時点の、エージェントの定義(役・モデルの ID・定義のハッシュ) */
+  agent: AgentStamp;
 }
 
-/** 依頼と結果のファイル名。出典と本文のハッシュから決まる */
-export function requestKey(url: string, contentHash: string): string {
-  return sha256(Buffer.from(`${url}\n${contentHash}`)).slice(0, 16);
+/** 依頼と結果のファイル名。出典・本文のハッシュ・エージェントの定義のハッシュから決まる(定義が変わると鍵が変わる) */
+export function requestKey(url: string, contentHash: string, definitionHash: string): string {
+  return sha256(Buffer.from(`${url}\n${contentHash}\n${definitionHash}`)).slice(0, 16);
 }
 
 /** カードの ID。出典・見出し・主張・分野から決まるので、同じ抽出なら同じ ID になる */

@@ -12,6 +12,7 @@ import { requestKey } from "../facts/extract.ts";
 import { factsPath, readFacts } from "../facts/schema.ts";
 import { factsFixture } from "../facts/test-helpers.ts";
 import { main } from "../main.ts";
+import { installAgentDefinitions, repoDefinitionHash } from "../shared/test-helpers.ts";
 
 /**
  * 収集から書き出しまでの通し。ネットワークとモデルを使わない(取得は固定の応答、エージェントの出力はテストがファイルとして書く)。
@@ -52,6 +53,7 @@ function setupRoot(plan: unknown) {
   const root = mkdtempSync(join(tmpdir(), "pipeline-e2e-"));
   mkdirSync(join(root, "data"));
   cpSync(join(repoRoot, "data/exams.json"), join(root, "data/exams.json"));
+  installAgentDefinitions(root);
   cpSync(join(repoRoot, "data/questions.ex-smp-xx.json"), join(root, "data/questions.ex-smp-xx.json"));
   writeFileSync(
     join(root, "data/questions.aws-aib-c01.json"),
@@ -150,9 +152,48 @@ function writeFacts(root: string, cards: unknown[]) {
   const dir = work(root, "facts/aws-aib-c01/out");
   mkdirSync(dir, { recursive: true });
   writeFileSync(
-    join(dir, `${requestKey(DOC, hash)}.json`),
+    join(dir, `${requestKey(DOC, hash, repoDefinitionHash("fact-extractor"))}.json`),
     JSON.stringify({ examCode: CODE, sourceUrl: DOC, contentHash: hash, cards }),
   );
+}
+
+/** エージェントの代わりに、検証役の出力を書く。再導出は下書きの宣言どおりに、解説の確認は指摘なしにする */
+function stubVerifier(root: string) {
+  const dir = work(root, "verify/aws-aib-c01");
+  const draftsFile = readDrafts(join(draftWorkDir(work(root), CODE), "drafts.json"), CODE).drafts;
+  mkdirSync(join(dir, "out"), { recursive: true });
+  for (const file of existsSync(join(dir, "requests")) ? readdirSync(join(dir, "requests")) : []) {
+    const request = JSON.parse(readFileSync(join(dir, "requests", file), "utf8"));
+    const outPath = join(dir, "out", file);
+    if (existsSync(outPath)) continue;
+    const base = { examCode: CODE, requestKey: request.requestKey, draftId: request.draftId, check: request.check };
+    if (request.check === "rederive") {
+      const draft = draftsFile.find((d) => d.id === request.draftId)?.draft;
+      const correct = draft !== null && draft !== undefined && "correctAnswers" in draft ? draft.correctAnswers : [];
+      writeFileSync(
+        outPath,
+        JSON.stringify({
+          ...base,
+          judgements: request.choices.map((c: { key: string }) => ({
+            key: c.key,
+            judgement: correct.includes(c.key) ? "correct" : "incorrect",
+            evidence: { heading: request.sections[0].heading, summary: "節の内容と整合する(言い換え)" },
+          })),
+        }),
+      );
+    } else {
+      writeFileSync(outPath, JSON.stringify({ ...base, findings: [] }));
+    }
+  }
+}
+
+/** 検証: 再導出 → 取り込み → 解説の確認 → 取り込み */
+async function verifyAll(root: string) {
+  for (let round = 0; round < 2; round++) {
+    expect((await run(root, ["verify", CODE])).code).toBe(EXIT.ok);
+    stubVerifier(root);
+    expect((await run(root, ["verify", CODE, "--import"])).code).toBe(EXIT.ok);
+  }
 }
 
 /** 人の確認: 表とシートを出し、シートの全件を承認して取り込む */
@@ -181,7 +222,9 @@ async function throughDrafts(root: string, cards: unknown[] = [goodCard, encrypt
   expect((await run(root, ["plan", CODE])).code).toBe(EXIT.ok);
   await run(root, ["draft", CODE, "--domain=domain1"]);
   stubAgent(root);
-  return run(root, ["draft", CODE, "--import"]);
+  const imported = await run(root, ["draft", CODE, "--import"]);
+  await verifyAll(root);
+  return imported;
 }
 
 describe("収集から書き出しまでの通し", () => {

@@ -32,6 +32,9 @@
     "maxRounds": 3,
     "similarity": { "duplicate": 0.85, "hold": 0.6 }
   },
+  "verify": {
+    "maxAttempts": 3
+  },
   "plan": {
     "targetMultiplier": 3,
     "difficultyMix": { "easy": 0.3, "medium": 0.5, "hard": 0.2 },

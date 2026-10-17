@@ -1,9 +1,11 @@
-import { existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import { existsSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { z } from "zod";
 import { REASON, SHA256 } from "../collect/ledger.ts";
 import { EXAM_CODE, sourceUrlReason } from "../contract.ts";
 import { FACT_ID } from "../draft/schema.ts";
+import { PathsError } from "../shared/errors.ts";
+import { writeFileAtomic } from "../shared/fs.ts";
 
 /**
  * 人の判断の記録。資格ごとに 1 つの JSON をコミットし、各段階が読む。
@@ -58,11 +60,9 @@ export type FactDecision = z.infer<typeof FactDecisionSchema>["decision"];
 export type DraftDecision = z.infer<typeof DraftDecisionSchema>["decision"];
 
 /** 記録の読み込みの誤り。場所(項目のパス)だけを持ち、値は持たない */
-export class DecisionsError extends Error {
-  readonly paths: string[];
+export class DecisionsError extends PathsError {
   constructor(paths: string[]) {
-    super("判断の記録の誤り");
-    this.paths = paths;
+    super("判断の記録の誤り", paths);
   }
 }
 
@@ -107,10 +107,7 @@ export function readDecisions(path: string, examCode: string): DecisionsFile {
 export function writeDecisions(path: string, file: DecisionsFile): void {
   const sorted = { ...file, decisions: [...file.decisions].sort((a, b) => byString(targetKey(a), targetKey(b))) };
   const text = `${JSON.stringify(parseDecisions(sorted), null, 2)}\n`;
-  mkdirSync(dirname(path), { recursive: true });
-  const tmp = `${path}.${process.pid}.tmp`;
-  writeFileSync(tmp, text);
-  renameSync(tmp, path);
+  writeFileAtomic(path, text);
 }
 
 /** 判断を足す。同じ対象の判断は、新しいもので置き換える */
