@@ -1,5 +1,6 @@
 ---
 name: dev-release
+disable-model-invocation: true
 description: 版の PR をマージし、タグ・Release・マイルストーン・ブランチの削除までを、リポジトリのスクリプト(scripts/release.ts)で行う。人の明示の指示があるときだけ使う。マージ・タグ・削除は、人の指示ごとに行う。
 ---
 
@@ -7,6 +8,8 @@ description: 版の PR をマージし、タグ・Release・マイルストー�
 
 手順の本体は `scripts/release.ts` にある。このスキルは、**人の明示の指示の確認**と、**スクリプトの呼び出し**、**版の締めの振り返り**だけを担う。
 手順そのものは、このスキルに書き写さない。
+
+このスキルは、モデルが自分の判断では起動しない(`disable-model-invocation: true`)。マージ・タグ・削除は取り消せないので、人が `/dev-release` と打ったときだけ動く。
 
 ## 守ること
 
