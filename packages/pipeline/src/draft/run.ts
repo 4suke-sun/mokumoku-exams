@@ -1,14 +1,26 @@
 import { existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
+import { BodyCache } from "../collect/cache.ts";
 import { loadExam } from "../collect/collect.ts";
 import { LedgerError, type LedgerFile, ledgerPath, readLedger } from "../collect/ledger.ts";
 import type { Config } from "../config.ts";
-import { EXAM_CODE } from "../contract.ts";
+import { checkAnswerBias, EXAM_CODE } from "../contract.ts";
+import {
+  DecisionsError,
+  type DecisionsFile,
+  decisionsPath,
+  draftDecision,
+  orphanDecisions,
+  readDecisions,
+  upsertDecisions,
+  writeDecisions,
+} from "../decisions/decisions.ts";
 import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { FactsError, type FactsFile, factsPath, readFacts } from "../facts/schema.ts";
 import { type Output, report } from "../log.ts";
 import { PlanError, type PlanFile, planPath, readPlan } from "../plan/schema.ts";
-import { candidateOf, findDuplicates, readPublishedCandidates } from "./dedupe.ts";
+import { copyCheck } from "./copy.ts";
+import { candidateOf, findDuplicates, readPublishedCandidates, readPublishedChoices } from "./dedupe.ts";
 import { checkDistractors } from "./distractors.ts";
 import {
   buildEntry,
@@ -31,8 +43,17 @@ import {
   selectFacts,
   styleRuleSummaries,
 } from "./request.ts";
+import {
+  buildReviewSheet,
+  decisionsFromSheet,
+  type ReviewSheet,
+  ReviewSheetSchema,
+  renderDraftReview,
+  reviewCounts,
+} from "./review.ts";
 import { assembleQuestion, DISTRACTOR_TYPES, draftId, isChoiceDraft, schemaProblems } from "./schema.ts";
 import {
+  applyDraftDecisions,
   type DraftRecord,
   DraftsError,
   type DraftsFile,
@@ -53,7 +74,7 @@ import { evaluateStyle, STYLE_VERSION } from "./style.ts";
  * モデルは呼ばない。下書きはエージェント(question-drafter)が書く(ADR 0009)。data/ は変えない。
  */
 
-export type DraftMode = "request" | "import" | "check";
+export type DraftMode = "request" | "import" | "check" | "review" | "decide";
 
 export interface DraftOptions {
   config: Config;
@@ -75,6 +96,9 @@ interface Paths {
   outDir: string;
   drafts: string;
   state: string;
+  decisions: string;
+  reviewMd: string;
+  reviewSheet: string;
 }
 
 function pathsFor(config: Config, rootDir: string, examCode: string): Paths {
@@ -89,6 +113,9 @@ function pathsFor(config: Config, rootDir: string, examCode: string): Paths {
     outDir: join(dir, "out"),
     drafts: join(dir, "drafts.json"),
     state: join(dir, "state.json"),
+    decisions: decisionsPath(resolve(rootDir, config.decisionsDir), examCode),
+    reviewMd: join(dir, "review.md"),
+    reviewSheet: join(dir, "review-sheet.json"),
   };
 }
 
@@ -124,7 +151,9 @@ export function runDraft(options: DraftOptions): ExitCode {
   let drafts: DraftsFile;
   let ledger: LedgerFile;
   let provenance: ProvenanceFile;
+  let decisions: DecisionsFile;
   try {
+    decisions = readDecisions(paths.decisions, examCode);
     facts = readFacts(paths.facts, examCode);
     drafts = readDrafts(paths.drafts, examCode);
     ledger = readLedger(paths.ledger, examCode);
@@ -134,8 +163,19 @@ export function runDraft(options: DraftOptions): ExitCode {
     else if (error instanceof DraftsError) for (const p of error.paths) report(output, "下書きの誤り", p);
     else if (error instanceof LedgerError) for (const p of error.paths) report(output, "台帳の誤り", p);
     else if (error instanceof ProvenanceError) for (const p of error.paths) report(output, "来歴の誤り", p);
+    else if (error instanceof DecisionsError) for (const p of error.paths) report(output, "判断の記録の誤り", p);
     else throw error;
     return EXIT.checkFailed;
+  }
+  // 人の判断(保留の解除・承認・却下)を、下書きの状態に反映する。対象がなくなった判断は、黙って捨てずに報告する
+  const decided = applyDraftDecisions(drafts, (id) => draftDecision(decisions, id));
+  if (decided.changed > 0) {
+    report(output, "判断の反映", `下書き ${decided.changed} 件`);
+    drafts = decided.file;
+    if (!options.dryRun) writeDrafts(paths.drafts, drafts);
+  }
+  for (const d of orphanDecisions(decisions, { draftIds: drafts.drafts.map((x) => x.id) })) {
+    if (d.target === "draft") report(output, "判断の対象なし", `draft ${d.id}`);
   }
   switch (options.mode) {
     case "request":
@@ -143,8 +183,81 @@ export function runDraft(options: DraftOptions): ExitCode {
     case "import":
       return importStep(options, paths, facts, drafts, ledger, provenance);
     case "check":
-      return checkStep(options, facts, drafts, provenance, ledger, master.exam.vendor);
+      return checkStep(options, facts, drafts, provenance, ledger, master.exam.vendor, decisions);
+    case "review":
+      return reviewStep(options, paths, facts, drafts, provenance, decisions);
+    case "decide":
+      return decideStep(options, paths, drafts, decisions);
   }
+}
+
+/** 確認用の表と、判断を書き込むシートを、作業用の置き場に出す */
+function reviewStep(
+  options: DraftOptions,
+  paths: Paths,
+  facts: FactsFile,
+  drafts: DraftsFile,
+  provenance: ProvenanceFile,
+  decisions: DecisionsFile,
+): ExitCode {
+  const { rootDir, examCode, output, dryRun } = options;
+  const counts = reviewCounts(drafts, decisions);
+  if (!dryRun) {
+    mkdirSync(dirname(paths.reviewMd), { recursive: true });
+    writeFileSync(paths.reviewMd, renderDraftReview(examCode, drafts, facts, provenance, decisions));
+    writeJson(paths.reviewSheet, buildReviewSheet(examCode, drafts, decisions));
+    report(output, "レビューレポート", relative(rootDir, paths.reviewMd));
+    report(output, "レビューレポート", relative(rootDir, paths.reviewSheet));
+  } else {
+    report(output, "書き込みをしない(dry-run)");
+  }
+  reportReviewCounts(output, counts);
+  return EXIT.ok;
+}
+
+function reportReviewCounts(output: DraftOptions["output"], counts: ReturnType<typeof reviewCounts>): void {
+  report(
+    output,
+    "情報",
+    `人の確認: 対象 ${counts.total} 件、承認 ${counts.approved} 件、却下 ${counts.rejected} 件、未済 ${counts.pending} 件`,
+  );
+}
+
+/** 判断を書き込んだシートを検査し、人の判断の記録に取り込む */
+function decideStep(options: DraftOptions, paths: Paths, drafts: DraftsFile, decisions: DecisionsFile): ExitCode {
+  const { examCode, output, dryRun } = options;
+  if (!existsSync(paths.reviewSheet)) {
+    report(output, "入力の誤り", "判断のシートがない(draft --review を先に実行する)");
+    return EXIT.inputError;
+  }
+  let sheet: ReviewSheet;
+  try {
+    const parsed = ReviewSheetSchema.safeParse(JSON.parse(readFileSync(paths.reviewSheet, "utf8")));
+    if (!parsed.success) {
+      for (const i of parsed.error.issues) report(output, "判断のシートの誤り", i.path.join(".") || "(全体)");
+      return EXIT.checkFailed;
+    }
+    sheet = parsed.data;
+  } catch {
+    report(output, "判断のシートの誤り", "(JSON の形)");
+    return EXIT.checkFailed;
+  }
+  if (sheet.examCode !== examCode) {
+    report(output, "判断のシートの誤り", "examCode");
+    return EXIT.checkFailed;
+  }
+  const result = decisionsFromSheet(sheet, drafts);
+  for (const p of result.problems) report(output, "判断のシートの誤り", `items.${p.index} ${p.code}`);
+  if (result.problems.length > 0) return EXIT.checkFailed;
+  const next = upsertDecisions(decisions, result.decisions);
+  if (!dryRun) writeDecisions(paths.decisions, next);
+  else report(output, "書き込みをしない(dry-run)");
+  report(output, "情報", `判断の取り込み: ${result.decisions.length} 件、未記入 ${result.skipped} 件`);
+  // 取り込んだ判断を、下書きの状態にも反映して数える
+  const applied = applyDraftDecisions(drafts, (id) => draftDecision(next, id));
+  if (applied.changed > 0 && !dryRun) writeDrafts(paths.drafts, applied.file);
+  reportReviewCounts(output, reviewCounts(applied.file, next));
+  return EXIT.ok;
 }
 
 function requestStep(
@@ -288,6 +401,8 @@ function importStep(
 ): ExitCode {
   const { config, rootDir, examCode, output, dryRun } = options;
   const state = readState(paths.state);
+  // 取得した本文の作業用キャッシュ(下書きの写しの検査に使う。本文を書き足さない。読むと更新時刻が変わり、壊れた本文は消える)
+  const cache = new BodyCache(join(resolve(rootDir, config.workDir), "cache"), config.cache, Date.now);
   const requestFiles = existsSync(paths.requestsDir)
     ? readdirSync(paths.requestsDir)
         .filter((f) => f.endsWith(".json"))
@@ -371,6 +486,7 @@ function importStep(
     for (const draft of out.drafts) {
       const id = draftId(examCode, request.planItemId, draft.factIds, draft.questionText);
       const reasons: string[] = [];
+      let copied: ReturnType<typeof copyCheck> = "ok";
       if (draft.questionType !== request.kind) reasons.push("kind-mismatch");
       if (!draft.factIds.every((f) => factIds.has(f))) reasons.push("fact-not-in-request");
       const verdict = evaluateStyle(draft);
@@ -399,9 +515,15 @@ function importStep(
         if (problems.length > 0) {
           for (const p of uniqueSorted(problems.map(pathCode))) reasons.push(`data-invalid:${p}`);
         } else {
-          const built = buildEntry(id, draft.factIds, facts, ledger);
-          if ("reasons" in built) for (const r of built.reasons) reasons.push(`provenance:${r}`);
-          else entries.set(id, built.entry);
+          copied = copyCheck(draft, facts, cache);
+          if (copied === "copy") {
+            // 根拠の出典の本文を長く写した下書きは、本文を残さずに不採用にする
+            reasons.push("long-copy");
+          } else {
+            const built = buildEntry(id, draft.factIds, facts, ledger);
+            if ("reasons" in built) for (const r of built.reasons) reasons.push(`provenance:${r}`);
+            else entries.set(id, built.entry);
+          }
         }
       }
       for (const f of verdict.blockers) report(output, "下書きの不採用", `${id} ${f.rule} ${f.path}`);
@@ -424,8 +546,14 @@ function importStep(
       for (const w of warnings) report(output, "下書きの警告", `${id} ${w.rule} ${w.path}`);
       // 正答が複数になりうる候補は、モデルによる検査(検証の段階)で確かめるまで、先へ進めない
       const holdDups = dups.filter((d) => d.level === "hold");
-      const held = reasons.length === 0 && (distractors.ambiguous.length > 0 || holdDups.length > 0);
+      const held =
+        reasons.length === 0 && (distractors.ambiguous.length > 0 || holdDups.length > 0 || copied === "unchecked");
       if (held) {
+        // 根拠の出典の本文がキャッシュにないと、写しを確かめられない。確かめるまで先へ進めない
+        if (copied === "unchecked") {
+          reasons.push("review:copy-unchecked");
+          report(output, "下書きの保留", `${id} review-copy-unchecked`);
+        }
         for (const f of distractors.ambiguous) {
           reasons.push(`ambiguous:${f.code}`);
           report(output, "下書きの保留", `${id} ambiguous:${f.code} ${f.path}`);
@@ -485,6 +613,15 @@ function importStep(
     });
   }
   if (incoming.length > 0) writeDrafts(paths.drafts, next);
+  // 正解の偏り: 選択式の下書き(通過・保留)と公開済みの問題を合わせて、データの検査と同じ指標としきい値で数える。報告だけで止めない
+  const choiceDrafts = next.drafts.flatMap((d) =>
+    d.status !== "rejected" && d.draft !== null && isChoiceDraft(d.draft) ? [d.draft] : [],
+  );
+  const bias = checkAnswerBias("下書きと公開済みの問題", [
+    ...readPublishedChoices(config, rootDir, examCode),
+    ...choiceDrafts,
+  ]);
+  for (const message of [...bias.errors, ...bias.warnings]) report(output, "正解の偏り", message);
   writeState(paths.state, state);
   for (const file of doneFiles) {
     rmSync(join(paths.requestsDir, file), { force: true });
@@ -513,8 +650,11 @@ function checkStep(
   provenance: ProvenanceFile,
   ledger: LedgerFile,
   vendor: string,
+  decisions: DecisionsFile,
 ): ExitCode {
   const { output } = options;
+  // 人の確認の済み・未済を報告する(未済は失敗にしない)
+  reportReviewCounts(output, reviewCounts(drafts, decisions));
   // 形と根拠の検査に、再検証の検査(来歴と台帳の今の状態の比較)を足す
   const problems = [...checkProvenance(provenance, facts, vendor), ...checkRecheck(provenance, ledger)];
   for (const p of problems) report(output, "来歴の誤り", `${p.draftId} ${p.code}`);

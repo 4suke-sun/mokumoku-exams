@@ -1,6 +1,6 @@
 # 作問パイプラインの進め方
 
-`packages/pipeline` を開発するときの手順です。このリポジトリの規約(`CLAUDE.md`)は、pipeline の変更にもそのまま及びます。
+`packages/pipeline` を開発するときの手順です。パイプラインで問題を作る手順は[問題を作る手順書](./question-production.md)にあります。このリポジトリの規約(`CLAUDE.md`)は、pipeline の変更にもそのまま及びます。
 設計の判断は [ADR 0005〜0011](./app/adr/README.md)、出典の扱いは[出典と権利の方針](./source-policy.md)、
 収集の段階の手順は[一次情報の収集と台帳の運用](./source-collection.md)、
 事実カードの段階の手順は[事実カードの作法と運用手順](./fact-cards.md)、
@@ -11,7 +11,7 @@
 - `packages/pipeline` は、`packages/app`・`packages/infra`・`packages/data-schema` と並ぶワークスペースです。
 - pipeline は、app など他のワークスペースの内部を import しません。共有してよいのは `packages/data-schema`(データの契約)だけです。
   `npm run check:boundary` が CI で検査します。
-- 公開した問題の正は `data/` です。pipeline は読み取り専用で参照し、追加・更新を差分として出します。
+- 公開した問題の正は `data/` です。pipeline は、書き出し(`export`)の段階だけ、作業ツリーの `data/` に追加の分を書きます。ほかの段階は読み取るだけです。取り込みは、その差分を通常の PR で確かめて行います(ADR 0014)。
 
 ## 2. 検査と承認の流れ
 

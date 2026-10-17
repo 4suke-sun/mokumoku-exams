@@ -7,6 +7,8 @@
     "./exam-data/schema": "./src/exam-data/schema.ts",
     "./exam-data/shape": "./src/exam-data/shape.ts",
     "./exam-data/validate": "./src/exam-data/validate.ts",
+    "./exam-data/explanation": "./src/exam-data/explanation.ts",
+    "./exam-data/bias": "./src/exam-data/bias.ts",
     "./curriculum-data/schema": "./src/curriculum-data/schema.ts",
     "./curriculum-data/validate": "./src/curriculum-data/validate.ts",
     "./summary-data/schema": "./src/summary-data/schema.ts",
@@ -19,6 +21,6 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "zod": "4.6.6"
+    "zod": "4.6.7"
   }
 }

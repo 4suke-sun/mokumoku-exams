@@ -119,3 +119,24 @@ export function readPublishedCandidates(config: Config, rootDir: string, examCod
         }),
   }));
 }
+
+/** 公開済みの選択式の問題の、正解の偏りの検査に使う項目だけ(種別・選択肢・正答)。ファイルがないか形が違えば空 */
+export function readPublishedChoices(
+  config: Config,
+  rootDir: string,
+  examCode: string,
+): { questionType: string; choices: { key: string; text: string }[]; correctAnswers: string[] }[] {
+  const file = resolve(rootDir, dirname(config.examsFile), `questions.${examCode.toLowerCase()}.json`);
+  if (!existsSync(file)) return [];
+  try {
+    const parsed = QuestionsFileSchema.safeParse(JSON.parse(readFileSync(file, "utf8")));
+    if (!parsed.success) return [];
+    return parsed.data.questions.flatMap((q) =>
+      q.questionType === "free-text"
+        ? []
+        : [{ questionType: q.questionType, choices: q.choices, correctAnswers: q.correctAnswers }],
+    );
+  } catch {
+    return [];
+  }
+}

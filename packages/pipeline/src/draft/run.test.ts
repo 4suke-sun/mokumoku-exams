@@ -575,7 +575,11 @@ describe("draft の誤答の検査", () => {
     expect(r.out).toContain("distractor-missing");
     const record = readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0];
     expect(record?.status).toBe("rejected");
-    expect(record?.reasons).toEqual(["distractor:distractor-missing"]);
+    // 誤答の設計がないと、誤答の選択肢の解説もない
+    expect([...(record?.reasons ?? [])].sort()).toEqual([
+      "distractor:distractor-missing",
+      "style:choice-explanation-missing",
+    ]);
     expect(record?.draft).toBeNull();
   });
 
@@ -614,6 +618,50 @@ describe("draft の誤答の検査", () => {
     expect(again.code).toBe(EXIT.ok);
     const same = readRequests(root).find((q) => q.planItemId === request.planItemId);
     if (same) expect(same.count).toBe(request.count - 1);
+  });
+
+  it("保留の下書きに人が保留の解除を記録した_通過になり、却下を記録すると本文を持たない不採用になる", async () => {
+    const root = setupDraftRoot();
+    const request = await requestOf(root);
+    const base = draftFor(request);
+    const correctKey = base.correctAnswers[0];
+    const long = "リージョンごとに数えられる上限として、アカウントに定められている数";
+    const tweaked = base.choices.map((c, i) => {
+      if (c.key === correctKey) return { ...c, text: long };
+      if (i === base.choices.length - 1) return { ...c, text: `${long}です` };
+      return c;
+    });
+    writeOutput(root, request, [{ ...base, choices: tweaked }]);
+    await runMain(root, ["draft", EXAM, "--import"]);
+    const id = readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0]?.id as string;
+    const { decisionsPath, writeDecisions } = await import("../decisions/decisions.ts");
+    const path = decisionsPath(join(root, baseConfig.decisionsDir), EXAM);
+    writeDecisions(path, {
+      examCode: EXAM,
+      decisions: [{ target: "draft", id, decision: "release", reason: "not-ambiguous" }],
+    });
+    const released = await runMain(root, ["draft", EXAM, "--check"]);
+    expect(released.out).toContain("判断の反映: 下書き 1 件");
+    expect(readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0]?.status).toBe("passed");
+    writeDecisions(path, {
+      examCode: EXAM,
+      decisions: [{ target: "draft", id, decision: "reject", reason: "wrong-answer" }],
+    });
+    await runMain(root, ["draft", EXAM, "--check"]);
+    const rejected = readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0];
+    expect(rejected).toMatchObject({ status: "rejected", reasons: ["human-rejected"], draft: null });
+  });
+
+  it("対象の下書きがない判断_黙って捨てずに報告する", async () => {
+    const root = setupDraftRoot();
+    await prepare(root);
+    const { decisionsPath, writeDecisions } = await import("../decisions/decisions.ts");
+    writeDecisions(decisionsPath(join(root, baseConfig.decisionsDir), EXAM), {
+      examCode: EXAM,
+      decisions: [{ target: "draft", id: "d-aaaaaaaaaaaa", decision: "approve", reason: "reviewed" }],
+    });
+    const r = await runMain(root, ["draft", EXAM, "--check"]);
+    expect(r.err).toContain("判断の対象なし: draft d-aaaaaaaaaaaa");
   });
 });
 

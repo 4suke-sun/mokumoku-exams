@@ -134,3 +134,31 @@ export function renderReview(report: ReviewReport): string {
   ];
   return lines.join("\n");
 }
+
+/** Markdown の表の 1 マスに入れる。縦棒と改行を、表を壊さない形にする */
+function cell(text: string): string {
+  return text.replace(/\|/g, "\\|").replace(/\r?\n/g, "<br>");
+}
+
+/**
+ * 人が通過・保留の事実カードをすべて確かめるための表。主張(出典の言い換え)、根拠の節、出典の URL、版・リージョン、確度、状態、理由コードを載せる。
+ * 取得した本文の写しは載せない。
+ */
+export function renderCardTable(examCode: string, cards: readonly FactCard[]): string {
+  const rows = cards.filter((c) => c.status !== "rejected");
+  const lines = [
+    `# 事実カードの一覧(通過・保留、${examCode})`,
+    "",
+    `通過と保留のカード ${rows.length} 件。保留を解く・却下するときは、人の判断の記録に書く。`,
+    "",
+    "| ID | 分野 | 主張 | 根拠の節 | 出典 | 版 | リージョン | 確度 | 状態 | 理由 |",
+    "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+  ];
+  for (const c of rows) {
+    const source = c.sources[0];
+    lines.push(
+      `| ${c.id} | ${c.domain} | ${cell(c.claim)} | ${cell(source?.section ?? "-")} | ${cell(c.sources.map((s) => s.url).join(" "))} | ${c.scope.edition ?? "-"} | ${c.scope.region ?? "-"} | ${c.confidence} | ${c.status} | ${c.reasons.join(", ") || "-"} |`,
+    );
+  }
+  return `${lines.join("\n")}\n`;
+}

@@ -23,6 +23,8 @@ export const ConfigSchema = z.strictObject({
   factsDir: z.string().min(1),
   /** 問題の来歴の置き場(資格ごとの JSON。コミットする) */
   provenanceDir: z.string().min(1),
+  /** 人の判断の記録の置き場(資格ごとの JSON。コミットする) */
+  decisionsDir: z.string().min(1),
   /** 収集の計画の置き場(資格ごとの JSON。コミットする) */
   plansDir: z.string().min(1),
   /** 資格マスタ(読み取り専用で参照する) */

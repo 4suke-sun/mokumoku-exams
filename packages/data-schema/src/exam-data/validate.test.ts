@@ -131,6 +131,24 @@ describe("資格マスタのスキーマ", () => {
   });
 });
 
+describe("退役した問題 ID", () => {
+  it("退役した ID を問題が使っていない_通す", () => {
+    expect(validateDataSet(exams([published({ retiredQuestionIds: ["SAMPLE-0009"] })]), files())).toEqual([]);
+  });
+
+  it("退役した ID を問題が再び使う_止める", () => {
+    const errors = validateDataSet(exams([published({ retiredQuestionIds: ["SAMPLE-0002"] })]), files());
+    expect(errors.some((e) => e.includes("退役した問題 ID を、再び使っています"))).toBe(true);
+  });
+
+  it("退役した ID の接頭辞が資格の idPrefix と違う・形が違う_止める", () => {
+    const wrongPrefix = validateDataSet(exams([published({ retiredQuestionIds: ["OTHER-0001"] })]), files());
+    expect(wrongPrefix.some((e) => e.includes("retiredQuestionIds"))).toBe(true);
+    const wrongShape = validateDataSet(exams([published({ retiredQuestionIds: ["SAMPLE-1"] })]), files());
+    expect(wrongShape.length).toBeGreaterThan(0);
+  });
+});
+
 describe("資格マスタのレベル・略称・資格の情報", () => {
   const info = (overrides: Record<string, unknown> = {}) => ({ checkedAt: "2026-10-12", ...overrides });
   const errors = (list: unknown[]) => validateDataSet(exams(list), files());

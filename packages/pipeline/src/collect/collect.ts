@@ -2,6 +2,14 @@ import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import type { Config } from "../config.ts";
 import { EXAM_CODE, ExamsFileSchema } from "../contract.ts";
+import {
+  DecisionsError,
+  type DecisionsFile,
+  decisionsPath,
+  orphanDecisions,
+  readDecisions,
+  sourceAccepted,
+} from "../decisions/decisions.ts";
 import { ProvenanceError, provenancePath, readProvenance } from "../draft/provenance.ts";
 import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { FactsError, factsPath, readFacts } from "../facts/schema.ts";
@@ -169,6 +177,16 @@ async function collectStep(
     return EXIT.checkFailed;
   }
 
+  // 人の判断の記録(日付が古いだけで止まった出典の受け入れ)
+  let decisions: DecisionsFile;
+  try {
+    decisions = readDecisions(decisionsPath(resolve(rootDir, config.decisionsDir), examCode), examCode);
+  } catch (error) {
+    if (!(error instanceof DecisionsError)) throw error;
+    for (const p of error.paths) report(output, "判断の記録の誤り", p);
+    return EXIT.checkFailed;
+  }
+
   // 来歴(下書き・問題 → 事実カード)。変化した出典を根拠にした下書き・問題を洗い出し、件数を報告する。
   // 下書き・問題には印を持たせず、先の段階(来歴の検査)が、来歴と台帳の今の状態を比べて止める
   const provenance: Record<string, readonly string[]> = {};
@@ -231,7 +249,16 @@ async function collectStep(
         today,
         freshnessDays: config.checks.freshnessDays,
       });
-      const status = statusFromChecks(outcomes);
+      let status = statusFromChecks(outcomes);
+      // 日付が古いだけで止まった出典は、人が同じ本文のハッシュで受け入れていれば、根拠に使える。本文が変わると、再び止まる
+      if (
+        status !== "active" &&
+        fetched.ok &&
+        sourceAccepted(decisions, url, fetched.hash) &&
+        outcomes.every((o) => o.result === "pass" || (o.name === "freshness" && o.reason === "stale"))
+      ) {
+        status = "active";
+      }
       if (fetched.ok) {
         cache.write(fetched.body);
         body = fetched.body;
@@ -284,6 +311,10 @@ async function collectStep(
       "再検証の印",
       `事実カード ${new Set(affected.facts).size} 件、根拠にした下書き・問題 ${new Set(affected.questions).size} 件`,
     );
+  }
+  // 対象がなくなった受け入れ(出典の本文が変わった、台帳から消えた)は、黙って捨てずに報告する
+  for (const d of orphanDecisions(decisions, { sources: ledger.sources })) {
+    if (d.target === "source") report(output, "判断の対象なし", `source ${d.url}`);
   }
   const blocked = ledger.sources.filter((s) => s.status !== "active");
   for (const s of blocked) {

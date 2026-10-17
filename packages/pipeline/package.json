@@ -10,6 +10,6 @@
   },
   "dependencies": {
     "@mokumoku-exams/data-schema": "*",
-    "zod": "4.6.6"
+    "zod": "4.6.7"
   }
 }

@@ -113,6 +113,8 @@ export const PublishedExamSchema = z
     status: z.literal("published"),
     /** 問題 ID の接頭辞(問題 ID は `<接頭辞>-<4 桁の連番>`)。資格どうしで重複しない */
     idPrefix: z.string().regex(ID_PREFIX),
+    /** 退役した問題 ID(削除した問題の ID)。再び使わない。採番は、これも含めた最大の番号の次から */
+    retiredQuestionIds: z.array(z.string().regex(QUESTION_ID)).optional(),
     edition: prose,
     category: prose,
     passingScore: z.number().positive(),

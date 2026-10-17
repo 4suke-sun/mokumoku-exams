@@ -200,6 +200,72 @@ describe("スタイル規則", () => {
     });
   });
 
+  const rulesOf = (d: Draft) => checkStyle(d).map((f) => `${f.rule} ${f.path}`);
+
+  it("解説の見出し_表の名前とその別名は通り、表にない名前は止める", () => {
+    const ok = choiceDraft({
+      explanation: "## 正解の決め手\nバケットは 100 個までです。\n\n## 他の選択肢が誤りの理由\nほかは数値が違います。",
+    });
+    expect(rulesOf(ok).filter((r) => r.startsWith("explanation-heading"))).toEqual([]);
+    const bad = choiceDraft({ explanation: "## 答えのポイント\nバケットは 100 個までと定められています。" });
+    expect(rulesOf(bad)).toContain("explanation-heading explanation");
+  });
+
+  it("解説の記号_問題の記号は通り、存在しない記号と単独の大文字は止める", () => {
+    const ok = choiceDraft({
+      explanation: "正解は B です。A は小さすぎ、C は大きすぎます。AWS の上限とは別の話です。",
+    });
+    expect(rulesOf(ok).filter((r) => r.startsWith("explanation-key-reference"))).toEqual([]);
+    const bad = choiceDraft({ explanation: "正解は E です。上限は 100 個と定められています。" });
+    expect(rulesOf(bad)).toContain("explanation-key-reference explanation");
+    const badReason = choiceDraft({
+      distractors: choiceDraft().distractors?.map((d, i) =>
+        i === 0 ? { ...d, reason: "選択肢 X と混同した誤りです" } : d,
+      ),
+    });
+    expect(rulesOf(badReason)).toContain("explanation-key-reference distractors.0.reason");
+  });
+
+  it("誤答の選択肢の解説_誤答の理由か選択肢の解説があれば通り、どちらもなければ止める", () => {
+    expect(rulesOf(choiceDraft()).filter((r) => r.startsWith("choice-explanation-missing"))).toEqual([]);
+    const withChoiceText = choiceDraft({
+      distractors: undefined,
+      choices: choiceDraft().choices.map((c) => ({ ...c, explanation: `${c.text} についての説明です` })),
+    });
+    expect(rulesOf(withChoiceText).filter((r) => r.startsWith("choice-explanation-missing"))).toEqual([]);
+    const none = choiceDraft({ distractors: undefined });
+    expect(rulesOf(none)).toEqual(
+      expect.arrayContaining([
+        "choice-explanation-missing choices.0.explanation",
+        "choice-explanation-missing choices.2.explanation",
+        "choice-explanation-missing choices.3.explanation",
+      ]),
+    );
+  });
+
+  it("選択肢ごとの解説の記法_太字とコードは通り、見出しと箇条書きは止める", () => {
+    const ok = choiceDraft({
+      distractors: choiceDraft().distractors?.map((d) => ({
+        ...d,
+        reason: `**${d.reason}**。\`limit\` を見落としています`,
+      })),
+    });
+    expect(rulesOf(ok).filter((r) => r.startsWith("choice-explanation-markup"))).toEqual([]);
+    const bad = choiceDraft({
+      choices: choiceDraft().choices.map((c, i) => (i === 0 ? { ...c, explanation: "- 数値が違う\n- 上限は 100" } : c)),
+    });
+    expect(rulesOf(bad)).toContain("choice-explanation-markup choices.0.explanation");
+    // 字下げした見出しは止め、記号だけの行(空白が続かない)は止めない
+    const indented = choiceDraft({
+      choices: choiceDraft().choices.map((c, i) => (i === 0 ? { ...c, explanation: "  ### 補足\n数値が違う" } : c)),
+    });
+    expect(rulesOf(indented)).toContain("choice-explanation-markup choices.0.explanation");
+    const bare = choiceDraft({
+      choices: choiceDraft().choices.map((c, i) => (i === 0 ? { ...c, explanation: "数値が違う\n-\n上限は 100" } : c)),
+    });
+    expect(rulesOf(bare).filter((r) => r.startsWith("choice-explanation-markup"))).toEqual([]);
+  });
+
   it("違反の報告_本文が含まれない", () => {
     const d = choiceDraft({ questionText: "秘密めいた本文 https://example.com が URL を含む。" });
     const serialized = JSON.stringify(checkStyle(d));

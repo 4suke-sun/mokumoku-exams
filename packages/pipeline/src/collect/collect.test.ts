@@ -2,6 +2,7 @@ import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, 
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import { decisionsPath, writeDecisions } from "../decisions/decisions.ts";
 import { EXIT } from "../exit-codes.ts";
 import { factsPath, writeFacts } from "../facts/schema.ts";
 import { main } from "../main.ts";
@@ -171,6 +172,27 @@ describe("collect", () => {
     const r = await run(root, ["collect", CODE]);
     expect(r.out + r.err).toContain("再検証の印: 事実カード 1 件、根拠にした下書き・問題 1 件");
     expect(r.ledger().recheck).toEqual({ facts: ["f-aaaaaaaaaaaa"], questions: [] });
+  });
+
+  it("日付が古いだけの出典に人が受け入れを記録した_根拠に使える状態になり、本文が変わると再び止まる", async () => {
+    const root = setupRoot({ ...plan, scope: { prefixes: [BASE], maxDepth: 0 } });
+    const strict = { checks: { ...config.checks, freshnessDays: 30 } };
+    const before = await run(root, ["collect", CODE], routes, strict);
+    expect(before.ledger().sources[0]?.status).not.toBe("active");
+    expect(before.err).toContain(`出典の検査: ${GUIDE} freshness fail stale`);
+    const hash = sha256(Buffer.from(fixture("guide.html")));
+    writeDecisions(decisionsPath(join(root, config.decisionsDir), CODE), {
+      examCode: CODE,
+      decisions: [{ target: "source", url: GUIDE, contentHash: hash, decision: "accept", reason: "stale-but-correct" }],
+    });
+    const accepted = await run(root, ["collect", CODE], routes, strict, "2026-10-14");
+    expect(accepted.ledger().sources[0]?.status).toBe("active");
+    // 検査の記録は不合格のまま残る(受け入れたことは、判断の記録が持つ)
+    expect(accepted.ledger().sources[0]?.checks.find((c) => c.name === "freshness")?.result).toBe("fail");
+    const changed = { ...routes, [GUIDE]: { body: fixture("guide.html").replace("Synthetic", "Changed") } };
+    const after = await run(root, ["collect", CODE], changed, strict, "2026-10-15");
+    expect(after.ledger().sources[0]?.status).not.toBe("active");
+    expect(after.err).toContain(`判断の対象なし: source ${GUIDE}`);
   });
 
   it("本文が変わった出典を根拠にした事実カード_台帳の主張がなくても、再検証の印を付ける", async () => {

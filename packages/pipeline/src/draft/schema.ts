@@ -135,9 +135,14 @@ export function assembleQuestion(
     ...(draft.supplement !== undefined ? { supplement: draft.supplement } : {}),
     ...(context.referenceUrls.length > 0 ? { references: context.referenceUrls.map((url) => ({ url })) } : {}),
   };
-  return isChoiceDraft(draft)
-    ? { ...common, choices: draft.choices, correctAnswers: draft.correctAnswers }
-    : { ...common, rubric: draft.rubric };
+  if (!isChoiceDraft(draft)) return { ...common, rubric: draft.rubric };
+  // 誤答の選択肢の解説は、誤答の設計の理由を使う(選択肢に解説が書かれていれば、それを優先する)
+  const choices = draft.choices.map((c) => {
+    if (c.explanation !== undefined) return c;
+    const reason = draft.distractors?.find((d) => d.key === c.key)?.reason;
+    return reason !== undefined ? { ...c, explanation: reason } : c;
+  });
+  return { ...common, choices, correctAnswers: draft.correctAnswers };
 }
 
 /** 組み立てた問題が、データの契約を通るか。通らなければ、問題の項目の場所(値は含めない)を返す */

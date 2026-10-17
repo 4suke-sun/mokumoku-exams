@@ -2,12 +2,13 @@
 
 問題を、品質と費用を管理しながら作るための道具です。判断の理由は、`docs/app/adr/` の ADR 0005〜0011 にあります。
 
+問題を作る手順(収集から書き出し、PR を出すときの確認まで)は、[問題を作る手順書](../../docs/question-production.md)にあります。
 出典と権利の扱いは、[出典と権利の方針](../../docs/source-policy.md)に従います。
 
 ## 境界
 
 - `packages/app` の内部は import しません。共有するのは契約(データの仕様、スキーマと検査、出典に許すドメインの一覧)だけです。
-- 公開した問題の正は `data/` です。pipeline は読み取り専用で参照し、追加・更新を差分として出します。
+- 公開した問題の正は `data/` です。pipeline は、書き出し(`export`)の段階だけ、作業ツリーの `data/` に追加の分を書きます。ほかの段階は読み取るだけです。取り込みは、その差分を通常の PR で確かめて行います(ADR 0014)。
 - 一次情報の本文はコミットしません。台帳には、リンク、取得日、本文のハッシュ、言い換えだけを持ちます。
 
 ## 実行方法
@@ -22,13 +23,14 @@ npm test -w @mokumoku-exams/pipeline
 
 ## コマンドと設定
 
-- コマンドは段階ごとにあります(`collect` `facts` `plan` `draft` `verify` `explain` `export` `run`)。
-  実装済みは次の 4 つです。ほかは未実装で、「未実装」を標準エラーに出し、終了コード 2(入力の誤り)で終わります(`--dry-run` を付けても同じ。`--help` は 0)。
+- コマンドは段階ごとにあります(`collect` `facts` `plan` `draft` `verify` `export` `run`。解説は `draft` で書きます。ADR 0013)。
+  実装済みは次の 5 つです。ほかは未実装で、「未実装」を標準エラーに出し、終了コード 2(入力の誤り)で終わります(`--dry-run` を付けても同じ。`--help` は 0)。
   - `collect`: 一次情報の収集と台帳。手順は [一次情報の収集と台帳の運用](../../docs/source-collection.md)
   - `facts`: 出典から事実カードを作る。手順は [事実カードの作法と運用手順](../../docs/fact-cards.md)
   - `plan`: 分野の配点から目標の問題数を出し、既存の問題との差を計画にする。手順は [出題計画と下書きの手順](../../docs/drafting.md)
-  - `draft`: 計画と事実カードから、選択式と自由記述の問題の下書きを作る(依頼 → エージェント → `--import` → `--check`)。依頼は `--domain=<分野のコード>` で 1 分野に絞れる。
+  - `draft`: 計画と事実カードから、選択式と自由記述の問題の下書きを作る(依頼 → エージェント → `--import` → `--check` → 人の確認 `--review`・`--decide`)。依頼は `--domain=<分野のコード>` で 1 分野に絞れる。
     手順は [出題計画と下書きの手順](../../docs/drafting.md)、作り方の決まりは [作問のスタイルガイド](../../docs/question-style.md)
+  - `export`: 人が承認し、来歴の検査を通った下書きを、`data/questions.<コード>.json` に追加する。手順は [出題計画と下書きの手順](../../docs/drafting.md) の「書き出し」
 - どのコマンドも `--help` と `--dry-run` を受け付けます。`--dry-run` では、書き込みと外部への通信をしません。
 - 設定は `pipeline.config.json`(コミットする、環境値を含まない)に書きます。環境値は `packages/pipeline/.env`(gitignore)に書き、
   `.env.example` にはプレースホルダーだけを置きます。環境値は、設定ファイルの値を上書きします。
@@ -46,6 +48,7 @@ npm test -w @mokumoku-exams/pipeline
 | `facts/` | 事実カードの台帳(資格ごとの JSON) | する |
 | `plans/` | 収集の計画(資格ごとの JSON) | する |
 | `provenance/` | 問題の来歴(資格ごとの JSON。下書きの ID、事実カードの ID、出典の URL・取得日・本文のハッシュ) | する |
+| `decisions/` | 人の判断の記録(資格ごとの JSON。対象の ID か出典の URL と本文のハッシュ、判断、理由コード。[人の判断の記録](../../docs/human-decisions.md)) | する |
 | `pipeline-work/`(リポジトリ直下) | 取得した本文、段階の成果物 | しない(gitignore。混入はコミット前・push 前の検査が止める) |
 
-`ledger/`、`facts/`、`provenance/` の JSON は、CLI が書き、読み込むたびにスキーマで検査します。手で整形しないので、整形(Biome)の対象から外しています(`biome.json`)。
+`ledger/`、`facts/`、`provenance/`、`decisions/` の JSON は、CLI が書き、読み込むたびにスキーマで検査します。手で整形しないので、整形(Biome)の対象から外しています(`biome.json`)。
