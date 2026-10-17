@@ -24,7 +24,8 @@ async function withDraft(kind: "choice" | "free-text" = "choice") {
   await runMain(root, ["plan", EXAM]);
   await runMain(root, ["draft", EXAM]);
   const requests = readRequests(root);
-  const request = requests.find((q) => (kind === "choice" ? q.kind !== "free-text" : q.kind === "free-text"));
+  // 依頼の鍵の順は定義のハッシュで変わるので、種別で選ぶ(選択式は単一選択)
+  const request = requests.find((q) => (kind === "choice" ? q.kind === "single" : q.kind === "free-text"));
   if (!request) throw new Error("依頼がない");
   writeOutput(root, request, [kind === "choice" ? draftFor(request) : freeTextDraftFor(request)]);
   expect((await runMain(root, ["draft", EXAM, "--import"])).code).toBe(EXIT.ok);

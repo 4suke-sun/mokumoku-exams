@@ -61,7 +61,9 @@ function retire(root: string, ids: string[]) {
 async function prepared(root: string, approve = true, verified = true) {
   await runMain(root, ["plan", EXAM]);
   await runMain(root, ["draft", EXAM]);
-  const request = readChoiceRequests(root)[0] as ReturnType<typeof readChoiceRequests>[number];
+  const request = readChoiceRequests(root).find((q) => q.kind === "single") as ReturnType<
+    typeof readChoiceRequests
+  >[number];
   writeOutput(root, request, [draftFor(request)]);
   await runMain(root, ["draft", EXAM, "--import"]);
   const id = readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0]?.id as string;
