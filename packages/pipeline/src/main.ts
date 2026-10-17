@@ -10,6 +10,7 @@ import { runExport } from "./export/export.ts";
 import { type FactsMode, runFacts } from "./facts/facts.ts";
 import { type Output, report, reportInternalError } from "./log.ts";
 import { runPlan } from "./plan/run.ts";
+import { runReasons } from "./reasons/run.ts";
 import { runStatus } from "./status/run.ts";
 import { runVerify } from "./verify/run.ts";
 
@@ -92,6 +93,7 @@ function helpText(): string {
     "draft <資格コード> --decide         判断を書き込んだシートを、人の判断の記録に取り込む",
     "verify <資格コード>                 下書きごとに、根拠の節だけを読んで正誤を再導出する検証の依頼を書く",
     "verify <資格コード> --import       検証役の出力を、下書きの宣言と照合して取り込む",
+    "reasons <資格コード>                不採用と差し戻しの理由を、理由コード・論点・段階ごとに集計し、下書きの指示の改善に使える形で書く。記録は変えない",
     "status <資格コード>                 段階ごとの状態(依頼待ち・取り込み待ち・通過・保留・不採用の件数、役のモデル)を表示する。読むだけ",
     "export <資格コード>                 承認し、検証を通った下書きを、data/ の問題データに書き出す",
     "",
@@ -128,6 +130,7 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
       command?.name === "draft" ||
       command?.name === "verify" ||
       command?.name === "status" ||
+      command?.name === "reasons" ||
       command?.name === "export";
     const maxArgs = takesExam ? 2 : 1;
     if (positional.length > maxArgs || command === undefined) {
@@ -156,6 +159,7 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
         export: "使い方: export <資格コード>\n",
         verify: "使い方: verify <資格コード> [--import]\n",
         status: "使い方: status <資格コード>\n",
+        reasons: "使い方: reasons <資格コード>\n",
         draft: "使い方: draft <資格コード> [--domain=<分野のコード> | --import | --check | --review | --decide]\n",
       };
       const usage = usages[command.name] ?? "";
@@ -228,6 +232,14 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
         return EXIT.inputError;
       }
       return runExport({ config, rootDir, examCode, dryRun, output });
+    }
+    if (command.name === "reasons") {
+      const examCode = positional[1];
+      if (examCode === undefined) {
+        report(output, "入力の誤り", "資格コードの指定がない");
+        return EXIT.inputError;
+      }
+      return runReasons({ config, rootDir, examCode, dryRun, output });
     }
     if (command.name === "status") {
       const examCode = positional[1];

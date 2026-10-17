@@ -69,7 +69,8 @@ export type Kind =
   | "候補の取り込みの停止"
   | "候補の不採用"
   | "候補"
-  | "候補のない項目";
+  | "候補のない項目"
+  | "理由の集計";
 
 /** 標準出力に出す種類。ほかは標準エラーに出す */
 const OUT_KINDS: ReadonlySet<Kind> = new Set<Kind>([
@@ -102,6 +103,7 @@ const OUT_KINDS: ReadonlySet<Kind> = new Set<Kind>([
   "候補の不採用",
   "候補",
   "候補のない項目",
+  "理由の集計",
 ]);
 
 export interface Output {
