@@ -75,6 +75,13 @@ export const ConfigSchema = z.strictObject({
       .strictObject({ duplicate: z.number().min(0).max(1), hold: z.number().min(0).max(1) })
       .refine((v) => v.hold < v.duplicate, "保留のしきい値は、重複のしきい値より小さくする"),
   }),
+  /** 出典の候補の提案 */
+  candidates: z.strictObject({
+    /** 出題範囲の項目 1 つあたりの候補の数の上限 */
+    maxPerItem: z.number().int().min(1).max(20),
+    /** 依頼 1 件の取り込みを、形の検査に通らずにやり直せる回数の上限 */
+    maxAttempts: z.number().int().positive(),
+  }),
   /** 検証 */
   verify: z.strictObject({
     /** 依頼 1 件の取り込みを、形の検査に通らずにやり直せる回数の上限 */

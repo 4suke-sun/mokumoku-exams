@@ -28,7 +28,7 @@ import {
 } from "./changes.ts";
 import { type ExamInfo, runChecks, statusFromChecks } from "./checks.ts";
 import type { FetchResult } from "./fetcher.ts";
-import { diffWithMaster, type GuideRequest, importGuide } from "./guide.ts";
+import { diffWithMaster, type GuideRequest, importGuide, type MasterExamValues } from "./guide.ts";
 import { extractLinks, extractUpdatedDate } from "./html.ts";
 import {
   LedgerError,
@@ -99,7 +99,7 @@ export async function runCollect(options: CollectOptions): Promise<ExitCode> {
     return EXIT.checkFailed;
   }
   return options.importGuide
-    ? importGuideStep(options, paths, ledger, master.domains)
+    ? importGuideStep(options, paths, ledger, master.domains, master.examValues)
     : collectStep(options, paths, ledger, master.exam);
 }
 
@@ -363,6 +363,7 @@ function importGuideStep(
   paths: Paths,
   ledger: LedgerFile,
   masterDomains: { code: string; weight: number }[],
+  masterExam: MasterExamValues,
 ): ExitCode {
   const { config, rootDir, examCode, output, deps, dryRun } = options;
   const stamp = readAgentStampOrReport(output, rootDir, "guide-extractor");
@@ -405,18 +406,37 @@ function importGuideStep(
     report(output, "試験ガイドの取り込みの停止", result.reason);
     return EXIT.checkFailed;
   }
-  const diff = diffWithMaster(result.guide, masterDomains);
+  const diff = diffWithMaster(result.guide, masterDomains, masterExam);
   for (const code of diff.missingInMaster) report(output, "試験ガイドの差分", `マスタにない分野 ${code}`);
   for (const code of diff.extraInMaster) report(output, "試験ガイドの差分", `ガイドにない分野 ${code}`);
   for (const w of diff.weightMismatch) {
     report(output, "試験ガイドの差分", `配点のずれ ${w.code} ガイド ${w.guide} マスタ ${w.master}`);
+  }
+  // 本番の値(出題数・試験時間・合格点・満点): 食い違いは、項目の名前とガイド・マスタの値を報告する。報告だけで、0 で終わる
+  for (const m of diff.examMismatch) {
+    report(output, "試験ガイドの差分", `${m.item}のずれ ガイド ${m.guide} マスタ ${m.master}`);
+  }
+  for (const m of diff.examMissingInMaster) {
+    report(output, "試験ガイドの差分", `マスタにない項目 ${m.item} ガイド ${m.guide}`);
+  }
+  if (result.guide.exam?.scoredQuestionCount !== undefined) {
+    report(
+      output,
+      "情報",
+      `ガイドが示す採点対象の問題数 ${result.guide.exam.scoredQuestionCount}(出題数とは突き合わせない)`,
+    );
   }
   if (dryRun) {
     report(output, "書き込みをしない(dry-run)");
     return EXIT.ok;
   }
   writeLedger(paths.ledger, { ...ledger, guide: result.guide });
-  const total = diff.missingInMaster.length + diff.extraInMaster.length + diff.weightMismatch.length;
+  const total =
+    diff.missingInMaster.length +
+    diff.extraInMaster.length +
+    diff.weightMismatch.length +
+    diff.examMismatch.length +
+    diff.examMissingInMaster.length;
   report(output, "情報", `試験ガイドを台帳に取り込んだ(マスタとの差分 ${total} 件。マスタは書き換えない)`);
   return EXIT.ok;
 }

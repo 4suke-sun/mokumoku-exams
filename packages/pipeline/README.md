@@ -26,6 +26,7 @@ npm test -w @mokumoku-exams/pipeline
 - コマンドは段階ごとにあります(`collect` `facts` `plan` `draft` `verify` `export`)と、状態を表示する `status` です。解説は `draft` で書きます(ADR 0013)。
   どれも実装済みです。実装していないコマンドを足したときは、「未実装」を標準エラーに出し、終了コード 2(入力の誤り)で終わります(`--help` は 0)。
   - `collect`: 一次情報の収集と台帳。手順は [一次情報の収集と台帳の運用](../../docs/source-collection.md)
+  - `collect <資格コード> --candidates` / `--import-candidates`: 出題範囲の項目ごとに、公式の文書を出典の候補として挙げる(依頼 → エージェント `source-scout` → 取り込み)。候補は提案で、計画には自動で入らない。手順は [一次情報の収集と台帳の運用](../../docs/source-collection.md)
   - `facts`: 出典から事実カードを作る。手順は [事実カードの作法と運用手順](../../docs/fact-cards.md)
   - `plan`: 分野の配点から目標の問題数を出し、既存の問題との差を計画にする。手順は [出題計画と下書きの手順](../../docs/drafting.md)
   - `draft`: 計画と事実カードから、選択式と自由記述の問題の下書きを作る(依頼 → エージェント → `--import` → `--check` → 人の確認 `--review`・`--decide`)。依頼は `--domain=<分野のコード>` で 1 分野に絞れる。
@@ -41,7 +42,7 @@ npm test -w @mokumoku-exams/pipeline
 - 共通部品(`src/shared/`): 依頼 → 取り込みの流れ(依頼の一覧、失敗の回数、`request-stale`、後始末。`request-flow.ts`)、
   資格コードの検査と資格マスタの読み込み(`exam.ts`)、書き出し(`fs.ts`)、項目のパスだけを持つ誤りの基底(`errors.ts`)、
   文字の 2 つ組の類似度(`similarity.ts`)、本文の写しの検出(`copy.ts`。試験ガイド・事実カード・下書きが同じ関数を使う)、エージェントの定義の読み込み(`agents.ts`)。段階ごとに違う検査は、各段階に残します。
-- エージェントの定義: 役(`guide-extractor` `fact-extractor` `question-drafter` `question-verifier`)と `.claude/agents/<役>.md` の対応は `src/shared/agents.ts` が持ちます。
+- エージェントの定義: 役(`guide-extractor` `fact-extractor` `question-drafter` `question-verifier` `source-scout`)と `.claude/agents/<役>.md` の対応は `src/shared/agents.ts` が持ちます。
   依頼のファイルに、役の名前・モデルの ID・定義のハッシュ(`agent`)を書き、依頼の鍵にハッシュを入れます。ハッシュは、モデルの ID と指示の本文から決め、
   説明文(`description`)の直しでは変わりません。取り込んだ結果(試験ガイドの `guide.agent`、事実カードの `extracted[].agent`、下書きの `agent`)にも同じ記録が残ります。
 - ログの作法: 出力は「種類」と「場所(項目名や位置)」だけです。環境値・鍵・本文、入力した引数の文字列は出しません。

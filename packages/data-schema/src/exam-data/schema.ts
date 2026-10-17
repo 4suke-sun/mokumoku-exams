@@ -106,6 +106,22 @@ export const ExamInfoSchema = z.strictObject({
     .optional(),
 });
 
+/** 分野のコードの重複と、重みの合計(1。許容誤差 0.005)を検査する。公開中と、分野を持つ準備中の資格で共通 */
+function checkDomains(domains: readonly { code: string; weight: number }[], ctx: z.RefinementCtx): void {
+  const codes = domains.map((d) => d.code);
+  if (new Set(codes).size !== codes.length) {
+    ctx.addIssue({ code: "custom", path: ["domains"], message: "分野のコードが重複しています" });
+  }
+  const total = domains.reduce((sum, d) => sum + d.weight, 0);
+  if (Math.abs(total - 1) > 0.005) {
+    ctx.addIssue({
+      code: "custom",
+      path: ["domains"],
+      message: "分野の重みの合計が 1 ではありません(許容誤差 0.005)",
+    });
+  }
+}
+
 /** 公開中の資格: 出題に必要な情報がすべてそろっている。 */
 export const PublishedExamSchema = z
   .strictObject({
@@ -128,26 +144,27 @@ export const PublishedExamSchema = z
     if (exam.passingScore > exam.totalScore) {
       ctx.addIssue({ code: "custom", path: ["passingScore"], message: "合格点が満点を超えています" });
     }
-    const codes = exam.domains.map((d) => d.code);
-    if (new Set(codes).size !== codes.length) {
-      ctx.addIssue({ code: "custom", path: ["domains"], message: "分野のコードが重複しています" });
-    }
-    const total = exam.domains.reduce((sum, d) => sum + d.weight, 0);
-    if (Math.abs(total - 1) > 0.005) {
-      ctx.addIssue({
-        code: "custom",
-        path: ["domains"],
-        message: "分野の重みの合計が 1 ではありません(許容誤差 0.005)",
-      });
-    }
+    checkDomains(exam.domains, ctx);
   });
 
-/** 近日公開の資格: 一覧に表示するための最小限の情報だけを持つ。問題データは持たない。 */
-export const ComingSoonExamSchema = z.strictObject({
-  ...examBase,
-  status: z.literal("coming-soon"),
-  note: prose.optional(),
-});
+/**
+ * 近日公開の資格: 一覧に表示するための最小限の情報を持つ。問題データ・`info`・カリキュラム・要約カードは持たない。
+ * 問題を作る前に作問パイプラインへ通すために、版・分野・本番の出題数・問題 ID の接頭辞を、任意の項目として持てる
+ * (形は公開中の資格と同じ。アプリの一覧は、これらを使わない)。
+ */
+export const ComingSoonExamSchema = z
+  .strictObject({
+    ...examBase,
+    status: z.literal("coming-soon"),
+    note: prose.optional(),
+    edition: prose.optional(),
+    officialQuestionCount: z.int().positive().optional(),
+    idPrefix: z.string().regex(ID_PREFIX).optional(),
+    domains: z.array(DomainSchema).min(1).optional(),
+  })
+  .superRefine((exam, ctx) => {
+    if (exam.domains !== undefined) checkDomains(exam.domains, ctx);
+  });
 
 /** ベンダーの略称の一覧(`data/vendors.json`)。資格の試験コードの先頭は、資格のベンダーの略称と一致する */
 export const VendorsFileSchema = z
@@ -189,7 +206,8 @@ export const ExamsFileSchema = z.strictObject({ exams: z.array(ExamSchema).min(1
   });
   const prefixes = new Set<string>();
   file.exams.forEach((exam, i) => {
-    if (exam.status !== "published") return;
+    // 公開中と準備中をまたいで、接頭辞の重複を検査する
+    if (exam.idPrefix === undefined) return;
     if (prefixes.has(exam.idPrefix)) {
       ctx.addIssue({ code: "custom", path: ["exams", i, "idPrefix"], message: "問題 ID の接頭辞が重複しています" });
     }

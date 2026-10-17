@@ -8,7 +8,13 @@ import { type Output, report } from "../log.ts";
  * パイプラインの役と、エージェントの定義(`.claude/agents/<役>.md`)の対応(ADR 0009)。
  * 役の一覧はここだけに持つ。段階はこの表を通して、モデルの ID と定義のハッシュを読む。
  */
-export const PIPELINE_ROLES = ["guide-extractor", "fact-extractor", "question-drafter", "question-verifier"] as const;
+export const PIPELINE_ROLES = [
+  "guide-extractor",
+  "fact-extractor",
+  "question-drafter",
+  "question-verifier",
+  "source-scout",
+] as const;
 export type PipelineRole = (typeof PIPELINE_ROLES)[number];
 
 /** 依頼と取り込んだ結果に残す記録。役の名前、モデルの完全な ID、定義のハッシュだけを持ち、指示の本文は持たない */

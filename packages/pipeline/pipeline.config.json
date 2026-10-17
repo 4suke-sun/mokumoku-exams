@@ -32,6 +32,10 @@
     "maxRounds": 3,
     "similarity": { "duplicate": 0.85, "hold": 0.6 }
   },
+  "candidates": {
+    "maxPerItem": 5,
+    "maxAttempts": 3
+  },
   "verify": {
     "maxAttempts": 3
   },

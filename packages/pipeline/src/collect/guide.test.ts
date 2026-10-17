@@ -166,6 +166,8 @@ describe("資格マスタとの突き合わせ", () => {
       missingInMaster: ["domain2"],
       extraInMaster: ["domain3"],
       weightMismatch: [{ code: "domain1", guide: 0.6, master: 0.5 }],
+      examMismatch: [],
+      examMissingInMaster: [],
     });
     expect(
       diffWithMaster(r.guide, [
@@ -176,6 +178,94 @@ describe("資格マスタとの突き合わせ", () => {
       missingInMaster: [],
       extraInMaster: [],
       weightMismatch: [],
+      examMismatch: [],
+      examMissingInMaster: [],
     });
+  });
+});
+
+const master = [
+  { code: "domain1", weight: 0.6 },
+  { code: "domain2", weight: 0.4 },
+];
+const values = { officialQuestionCount: 65, officialTimeMinutes: 130, passingScore: 700, totalScore: 1000 };
+const full = { questionCount: 65, scoredQuestionCount: 50, timeMinutes: 130, passingScore: 700, totalScore: 1000 };
+
+function imported(overrides: Partial<GuideExtract>) {
+  const r = importGuide(extract(overrides), ledger, [], () => body, "2026-10-13");
+  if (!r.ok) throw new Error(`取り込めない: ${r.reason}`);
+  return r.guide;
+}
+
+describe("試験ガイドの本番の値(出題数・試験時間・合格点・満点)", () => {
+  it("ガイドが示す値_台帳に数値だけを持つ。示さない項目は持たない", () => {
+    expect(imported(full).exam).toEqual(full);
+    expect(imported({ timeMinutes: 90 }).exam).toEqual({ timeMinutes: 90 });
+    expect(imported({}).exam).toBeUndefined();
+  });
+
+  it("値の形が違う_0 以下・小数・文字は、取り込みで止まる", () => {
+    for (const bad of [0, -1, 1.5, "65"]) {
+      expect(importGuide(extract({ questionCount: bad as number }), ledger, [], () => body, "2026-10-13")).toEqual({
+        ok: false,
+        reason: "extract-invalid",
+      });
+    }
+  });
+
+  it("合格点が満点を超える・採点対象が総数を超える_取り込みで止まる(境界: ちょうどは通る)", () => {
+    const run = (o: Partial<GuideExtract>) => importGuide(extract(o), ledger, [], () => body, "2026-10-13");
+    expect(run({ passingScore: 1001, totalScore: 1000 })).toEqual({ ok: false, reason: "exam-values-invalid" });
+    expect(run({ passingScore: 1000, totalScore: 1000 }).ok).toBe(true);
+    expect(run({ scoredQuestionCount: 66, questionCount: 65 })).toEqual({ ok: false, reason: "exam-values-invalid" });
+    expect(run({ scoredQuestionCount: 65, questionCount: 65 }).ok).toBe(true);
+    // 片方だけ示すときは、比べない
+    expect(run({ passingScore: 5000 }).ok).toBe(true);
+  });
+
+  it("本番の値は数値_本文の写しの検査の対象にしない", () => {
+    expect(importGuide(extract({ questionCount: 85 }), ledger, [], () => "questionCount 85", "2026-10-13").ok).toBe(
+      true,
+    );
+  });
+
+  it("マスタと一致_差分なし", () => {
+    const d = diffWithMaster(imported(full), master, values);
+    expect(d.examMismatch).toEqual([]);
+    expect(d.examMissingInMaster).toEqual([]);
+  });
+
+  it("マスタと食い違う_項目の名前と、ガイド・マスタの両方の値を出す", () => {
+    const d = diffWithMaster(imported(full), master, { ...values, officialQuestionCount: 85, passingScore: 720 });
+    expect(d.examMismatch).toEqual([
+      { item: "出題数", guide: 65, master: 85 },
+      { item: "合格点", guide: 700, master: 720 },
+    ]);
+  });
+
+  it("ガイドが項目を示さない_その項目は比べない(マスタの値だけがあっても、差分にしない)", () => {
+    const d = diffWithMaster(imported({ questionCount: 65 }), master, { ...values, officialQuestionCount: 65 });
+    expect(d.examMismatch).toEqual([]);
+    expect(d.examMissingInMaster).toEqual([]);
+  });
+
+  it("マスタに値がない(準備中の資格など)_ガイドの値を報告する", () => {
+    const none = { officialQuestionCount: null, officialTimeMinutes: null, passingScore: null, totalScore: null };
+    expect(diffWithMaster(imported(full), master, none).examMissingInMaster).toEqual([
+      { item: "出題数", guide: 65 },
+      { item: "試験時間", guide: 130 },
+      { item: "合格点", guide: 700 },
+      { item: "満点", guide: 1000 },
+    ]);
+    // マスタの値を渡さないときも、同じ
+    expect(diffWithMaster(imported({ timeMinutes: 90 }), master).examMissingInMaster).toEqual([
+      { item: "試験時間", guide: 90 },
+    ]);
+  });
+
+  it("採点対象の問題数_出題数とは突き合わせない", () => {
+    const d = diffWithMaster(imported({ scoredQuestionCount: 50 }), master, values);
+    expect(d.examMismatch).toEqual([]);
+    expect(d.examMissingInMaster).toEqual([]);
   });
 });

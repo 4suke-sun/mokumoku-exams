@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { PIPELINE_ROLES, readAgentStamp } from "./agents.ts";
 
 const repoRoot = resolve(import.meta.dirname, "../../../..");
-const ADR = resolve(repoRoot, "docs/app/adr/0015-pipeline-agent-roles-and-models.md");
+const ADR = resolve(repoRoot, "docs/app/adr/0016-pipeline-source-scout-role.md");
 
 /** ADR の表のモデルの表記と、エージェントの定義の完全な ID の対応 */
 const MODEL_IDS: Record<string, string> = {
@@ -28,7 +28,7 @@ function adrModels(): Map<string, string> {
 }
 
 describe("パイプラインの役のモデル", () => {
-  it("すべての役が ADR 0015 の表にあり_定義の model: と表のモデルが一致する", () => {
+  it("すべての役が ADR 0016 の表にあり_定義の model: と表のモデルが一致する", () => {
     const table = adrModels();
     expect([...table.keys()].sort()).toEqual([...PIPELINE_ROLES].sort());
     for (const role of PIPELINE_ROLES) {
