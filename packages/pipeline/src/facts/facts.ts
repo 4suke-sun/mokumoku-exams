@@ -15,6 +15,7 @@ import {
 import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { type Output, report } from "../log.ts";
 import { type AgentStamp, readAgentStampOrReport, sameDefinition } from "../shared/agents.ts";
+import { detectCopy } from "../shared/copy.ts";
 import { prepareExam } from "../shared/exam.ts";
 import { writeJson } from "../shared/fs.ts";
 import {
@@ -30,7 +31,7 @@ import { computeCoverage } from "./coverage.ts";
 import { detectConflicts, mergeDuplicates } from "./dedupe.ts";
 import { buildCards, FactsOutputSchema, type FactsRequest, requestKey } from "./extract.ts";
 import { checkGrounding } from "./grounding.ts";
-import { COPY_PLACEHOLDER, hasLongCopy } from "./overlap.ts";
+import { COPY_PLACEHOLDER } from "./overlap.ts";
 import { buildReview, renderCardTable, renderReview } from "./review.ts";
 import {
   checkFactsContext,
@@ -292,7 +293,7 @@ function importStep(
       if (!domains.includes(card.domain)) reasons.add("unknown-domain");
       const size = guide?.find((g) => g.code === card.domain)?.scope.length;
       if (size !== undefined && card.scopeItems.some((n) => n >= size)) reasons.add("scope-item-out-of-range");
-      if (body !== null && hasLongCopy(card.claim, body)) reasons.add("long-copy");
+      if (body !== null && detectCopy(card.claim, [body]) !== null) reasons.add("long-copy");
       const evidence = card.sources[0] as FactCard["sources"][number];
       for (const r of checkGrounding(card.claim, evidence, source, body)) reasons.add(r);
       incoming.push({

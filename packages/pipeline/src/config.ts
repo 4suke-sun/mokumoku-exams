@@ -75,6 +75,11 @@ export const ConfigSchema = z.strictObject({
       .strictObject({ duplicate: z.number().min(0).max(1), hold: z.number().min(0).max(1) })
       .refine((v) => v.hold < v.duplicate, "保留のしきい値は、重複のしきい値より小さくする"),
   }),
+  /** 検証 */
+  verify: z.strictObject({
+    /** 依頼 1 件の取り込みを、形の検査に通らずにやり直せる回数の上限 */
+    maxAttempts: z.number().int().positive(),
+  }),
   /** 出題計画。目標の問題数と、難易度・種別の配分(試験ごとに overrides で上書きする) */
   plan: z.strictObject({
     /** 目標の問題数 = 本番の出題数 × この倍率(問題の蓄えを、1 回の出題より多くする) */

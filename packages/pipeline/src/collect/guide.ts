@@ -1,6 +1,6 @@
 import { z } from "zod";
 import type { AgentStamp } from "../shared/agents.ts";
-import { normalize } from "../text.ts";
+import { detectCopy } from "../shared/copy.ts";
 import type { GuideRecord, LedgerFile } from "./ledger.ts";
 import { withinParaphraseLimit } from "./text-limits.ts";
 
@@ -56,8 +56,6 @@ export interface GuideRequest {
 
 /** 配点の合計の許容の幅(%)。ガイドの表記の丸めを許す */
 const WEIGHT_SUM_TOLERANCE = 0.5;
-/** 本文と一致したら写しとみなす、言い換えの長さ(文字) */
-const VERBATIM_MIN_CHARS = 30;
 
 export type GuideStopReason =
   | "extract-invalid"
@@ -109,9 +107,9 @@ export function importGuide(
   const sum = extract.domains.reduce((s, d) => s + d.weightPercent, 0);
   if (Math.abs(sum - 100) > WEIGHT_SUM_TOLERANCE) return { ok: false, reason: "weight-sum-mismatch" };
 
-  const plains = bodies.map((b) => normalize(b ?? ""));
-  const texts = extract.domains.flatMap((d) => [d.name, ...d.scope]).map(normalize);
-  if (texts.some((t) => t.length >= VERBATIM_MIN_CHARS && plains.some((p) => p.includes(t)))) {
+  const plains = bodies.map((b) => b ?? "");
+  const texts = extract.domains.flatMap((d) => [d.name, ...d.scope]);
+  if (texts.some((t) => detectCopy(t, plains) !== null)) {
     return { ok: false, reason: "verbatim-copy" };
   }
 

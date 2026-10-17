@@ -6,6 +6,7 @@ import { DIFFICULTIES } from "../plan/schema.ts";
 import { AgentStampSchema } from "../shared/agents.ts";
 import { PathsError } from "../shared/errors.ts";
 import { writeFileAtomic, writeJson } from "../shared/fs.ts";
+import { VerificationSchema } from "../verify/schema.ts";
 import { DraftSchema } from "./schema.ts";
 
 /**
@@ -33,6 +34,8 @@ export const DraftRecordSchema = z.strictObject({
   draft: DraftSchema.nullable(),
   /** この下書きを作ったエージェントの定義(役・モデルの ID・定義のハッシュ。古い記録にはない) */
   agent: AgentStampSchema.optional(),
+  /** 検証の段階の結果(検証前はない)。検証を通った合格は、verdict が pass のもの */
+  verification: VerificationSchema.optional(),
 });
 
 export const DraftsFileSchema = z.strictObject({

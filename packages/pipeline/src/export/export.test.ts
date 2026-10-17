@@ -8,6 +8,7 @@ import {
   baseConfig,
   draftFor,
   EXAM,
+  markVerified,
   readChoiceRequests,
   runMain,
   setupDraftRoot,
@@ -57,13 +58,14 @@ function retire(root: string, ids: string[]) {
 }
 
 /** 計画 → 依頼 → 取り込みまで進め、通過した下書きを 1 件作る。approve なら承認も記録する */
-async function prepared(root: string, approve = true) {
+async function prepared(root: string, approve = true, verified = true) {
   await runMain(root, ["plan", EXAM]);
   await runMain(root, ["draft", EXAM]);
   const request = readChoiceRequests(root)[0] as ReturnType<typeof readChoiceRequests>[number];
   writeOutput(root, request, [draftFor(request)]);
   await runMain(root, ["draft", EXAM, "--import"]);
   const id = readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0]?.id as string;
+  if (verified) markVerified(root, id);
   if (approve) {
     writeDecisions(decisionsPath(join(root, baseConfig.decisionsDir), EXAM), {
       examCode: EXAM,
@@ -114,6 +116,24 @@ describe("export", () => {
     expect(readFileSync(questionsFile(root), "utf8")).toBe(before);
   });
 
+  it("検証を通っていない下書き_承認があっても書き出さず、検証前に数える", async () => {
+    const root = exportRoot();
+    await prepared(root, true, false);
+    const before = readFileSync(questionsFile(root), "utf8");
+    const r = await runMain(root, ["export", EXAM]);
+    expect(r.code).toBe(EXIT.ok);
+    expect(r.out).toContain("追加 0 件、承認待ち 0 件、検証前・検証で止まった 1 件");
+    expect(readFileSync(questionsFile(root), "utf8")).toBe(before);
+  });
+
+  it("検証が保留の下書き_人が承認していれば書き出す(人の判断を優先する)", async () => {
+    const root = exportRoot();
+    const id = await prepared(root, true, false);
+    markVerified(root, id, "hold");
+    const r = await runMain(root, ["export", EXAM]);
+    expect(r.out).toContain("追加 1 件");
+  });
+
   it("退役した ID がある_退役した番号も使用済みとして、その次から採番する", async () => {
     const root = exportRoot();
     retire(root, ["AIB-0095"]);
@@ -155,7 +175,7 @@ describe("export", () => {
     const facts = provenanceOf(root).entries[0]?.factIds ?? [];
     writeLedger(path, { ...readLedger(path, EXAM), recheck: { facts, questions: [] } });
     const r = await runMain(root, ["export", EXAM]);
-    expect(r.out).toContain("追加 0 件、承認待ち 0 件、来歴の検査で止めた 1 件");
+    expect(r.out).toContain("承認待ち 0 件、検証前・検証で止まった 0 件、来歴の検査で止めた 1 件");
   });
 
   it("dry-run_件数だけを報告し、書き込まない", async () => {

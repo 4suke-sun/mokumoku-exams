@@ -26,6 +26,7 @@ import { applyDraftDecisions, type DraftRecord, DraftsError, draftWorkDir, readD
 import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { FactsError, type FactsFile, factsPath, readFacts } from "../facts/schema.ts";
 import { type Output, report } from "../log.ts";
+import { isVerified } from "../verify/schema.ts";
 
 /**
  * export コマンド: 人が承認し、来歴の検査を通った下書きを、data/questions.<コード>.json に追加する(ADR 0014)。
@@ -46,14 +47,15 @@ export interface ExportOptions {
 
 const MAX_REFERENCES = 10;
 
-/** 書き出しの対象を選ぶ。承認され、通過で、来歴があり、来歴の検査を通り、まだ書き出していない下書き */
+/** 書き出しの対象を選ぶ。承認され、通過で、検証を通り(検証が保留でも、人が承認していれば通す)、来歴があり、来歴の検査を通り、まだ書き出していない下書き */
 export function selectExportable(
   drafts: readonly DraftRecord[],
   decisions: DecisionsFile,
   provenance: ProvenanceFile,
   blockedDraftIds: ReadonlySet<string>,
-): { ready: DraftRecord[]; notApproved: number; blocked: number; exported: number } {
+): { ready: DraftRecord[]; notApproved: number; unverified: number; blocked: number; exported: number } {
   let notApproved = 0;
+  let unverified = 0;
   let blocked = 0;
   let exported = 0;
   const ready: DraftRecord[] = [];
@@ -68,13 +70,17 @@ export function selectExportable(
       notApproved++;
       continue;
     }
+    if (!isVerified(d.verification, draftDecision(decisions, d.id))) {
+      unverified++;
+      continue;
+    }
     if (entry === undefined || blockedDraftIds.has(d.id)) {
       blocked++;
       continue;
     }
     ready.push(d);
   }
-  return { ready, notApproved, blocked, exported };
+  return { ready, notApproved, unverified, blocked, exported };
 }
 
 /** 出典の URL を、来歴から選ぶ。出典に使えない URL と、ベンダーに許されないホストを落とし、重ねず、10 件まで */
@@ -198,7 +204,7 @@ export function runExport(options: ExportOptions): ExitCode {
   report(
     output,
     "情報",
-    `書き出し: 追加 ${added.length} 件、承認待ち ${selection.notApproved} 件、来歴の検査で止めた ${selection.blocked} 件、書き出し済み ${selection.exported} 件`,
+    `書き出し: 追加 ${added.length} 件、承認待ち ${selection.notApproved} 件、検証前・検証で止まった ${selection.unverified} 件、来歴の検査で止めた ${selection.blocked} 件、書き出し済み ${selection.exported} 件`,
   );
   if (dryRun) {
     report(output, "書き込みをしない(dry-run)");

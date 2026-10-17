@@ -11,5 +11,5 @@ export const COMMANDS: readonly CommandSpec[] = [
   { name: "draft", summary: "問題の下書きを作る" },
   { name: "verify", summary: "下書きを検証する" },
   { name: "export", summary: "承認した下書きを data/ に書き出す" },
-  { name: "run", summary: "実行を管理する(見積もり、記録、再開)" },
+  { name: "status", summary: "段階ごとの状態を表示する(読むだけ)" },
 ];

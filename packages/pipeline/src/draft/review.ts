@@ -84,6 +84,16 @@ export function renderDraftReview(
     const entry = provenance.entries.find((e) => e.draftId === record.id);
     for (const s of entry?.sources ?? []) lines.push(`| 出典 | ${cell(s.url)} |`);
     if (record.reasons.length > 0) lines.push(`| 保留・不採用の理由 | ${cell(record.reasons.join(", "))} |`);
+    const v = record.verification;
+    lines.push(`| 検証 | ${v === undefined ? "未" : (v.verdict ?? "解説の確認待ち")} |`);
+    if (v !== undefined && v.findings.length > 0) {
+      lines.push(`| 検証の指摘 | ${cell(v.findings.map((f) => `${f.code} ${f.where}`).join(", "))} |`);
+    }
+    if (v?.checks.rederive !== undefined) {
+      lines.push(
+        `| 再導出の判定 | ${cell(v.checks.rederive.choices.map((c) => `${c.key}:${c.judgement}`).join(" "))} |`,
+      );
+    }
     if (record.warnings.length > 0) {
       lines.push(`| 警告 | ${cell(record.warnings.map((w) => `${w.rule} ${w.path}`).join(", "))} |`);
     }

@@ -157,6 +157,45 @@ function writeFacts(root: string, cards: unknown[]) {
   );
 }
 
+/** エージェントの代わりに、検証役の出力を書く。再導出は下書きの宣言どおりに、解説の確認は指摘なしにする */
+function stubVerifier(root: string) {
+  const dir = work(root, "verify/aws-aib-c01");
+  const draftsFile = readDrafts(join(draftWorkDir(work(root), CODE), "drafts.json"), CODE).drafts;
+  mkdirSync(join(dir, "out"), { recursive: true });
+  for (const file of existsSync(join(dir, "requests")) ? readdirSync(join(dir, "requests")) : []) {
+    const request = JSON.parse(readFileSync(join(dir, "requests", file), "utf8"));
+    const outPath = join(dir, "out", file);
+    if (existsSync(outPath)) continue;
+    const base = { examCode: CODE, requestKey: request.requestKey, draftId: request.draftId, check: request.check };
+    if (request.check === "rederive") {
+      const draft = draftsFile.find((d) => d.id === request.draftId)?.draft;
+      const correct = draft !== null && draft !== undefined && "correctAnswers" in draft ? draft.correctAnswers : [];
+      writeFileSync(
+        outPath,
+        JSON.stringify({
+          ...base,
+          judgements: request.choices.map((c: { key: string }) => ({
+            key: c.key,
+            judgement: correct.includes(c.key) ? "correct" : "incorrect",
+            evidence: { heading: request.sections[0].heading, summary: "節の内容と整合する(言い換え)" },
+          })),
+        }),
+      );
+    } else {
+      writeFileSync(outPath, JSON.stringify({ ...base, findings: [] }));
+    }
+  }
+}
+
+/** 検証: 再導出 → 取り込み → 解説の確認 → 取り込み */
+async function verifyAll(root: string) {
+  for (let round = 0; round < 2; round++) {
+    expect((await run(root, ["verify", CODE])).code).toBe(EXIT.ok);
+    stubVerifier(root);
+    expect((await run(root, ["verify", CODE, "--import"])).code).toBe(EXIT.ok);
+  }
+}
+
 /** 人の確認: 表とシートを出し、シートの全件を承認して取り込む */
 async function approveAll(root: string) {
   await run(root, ["draft", CODE, "--review"]);
@@ -183,7 +222,9 @@ async function throughDrafts(root: string, cards: unknown[] = [goodCard, encrypt
   expect((await run(root, ["plan", CODE])).code).toBe(EXIT.ok);
   await run(root, ["draft", CODE, "--domain=domain1"]);
   stubAgent(root);
-  return run(root, ["draft", CODE, "--import"]);
+  const imported = await run(root, ["draft", CODE, "--import"]);
+  await verifyAll(root);
+  return imported;
 }
 
 describe("収集から書き出しまでの通し", () => {

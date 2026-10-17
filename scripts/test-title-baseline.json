@@ -203,9 +203,6 @@
   "packages/pipeline/src/facts/grounding.test.ts": [
     "下の深さの見出しの内容も、上の節の範囲で確かめられる"
   ],
-  "packages/pipeline/src/facts/overlap.test.ts": [
-    "上限を指定できる"
-  ],
   "packages/pipeline/src/facts/review.test.ts": [
     "分野ごとに最大の件数を選び、偏らない。通過したカードだけが対象",
     "入力の並びが違っても同じ抜き取り",

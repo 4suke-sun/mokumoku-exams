@@ -23,14 +23,16 @@ npm test -w @mokumoku-exams/pipeline
 
 ## コマンドと設定
 
-- コマンドは段階ごとにあります(`collect` `facts` `plan` `draft` `verify` `export` `run`。解説は `draft` で書きます。ADR 0013)。
-  実装済みは次の 5 つです。ほかは未実装で、「未実装」を標準エラーに出し、終了コード 2(入力の誤り)で終わります(`--dry-run` を付けても同じ。`--help` は 0)。
+- コマンドは段階ごとにあります(`collect` `facts` `plan` `draft` `verify` `export`)と、状態を表示する `status` です。解説は `draft` で書きます(ADR 0013)。
+  どれも実装済みです。実装していないコマンドを足したときは、「未実装」を標準エラーに出し、終了コード 2(入力の誤り)で終わります(`--help` は 0)。
   - `collect`: 一次情報の収集と台帳。手順は [一次情報の収集と台帳の運用](../../docs/source-collection.md)
   - `facts`: 出典から事実カードを作る。手順は [事実カードの作法と運用手順](../../docs/fact-cards.md)
   - `plan`: 分野の配点から目標の問題数を出し、既存の問題との差を計画にする。手順は [出題計画と下書きの手順](../../docs/drafting.md)
   - `draft`: 計画と事実カードから、選択式と自由記述の問題の下書きを作る(依頼 → エージェント → `--import` → `--check` → 人の確認 `--review`・`--decide`)。依頼は `--domain=<分野のコード>` で 1 分野に絞れる。
     手順は [出題計画と下書きの手順](../../docs/drafting.md)、作り方の決まりは [作問のスタイルガイド](../../docs/question-style.md)
-  - `export`: 人が承認し、来歴の検査を通った下書きを、`data/questions.<コード>.json` に追加する。手順は [出題計画と下書きの手順](../../docs/drafting.md) の「書き出し」
+  - `verify`: 下書きを、根拠にした出典の節だけから検証する(依頼 → エージェント `question-verifier` → `--import`)。選択肢ごとの正誤の再導出と、解説の確認。手順は [出題計画と下書きの手順](../../docs/drafting.md) の「検証」
+  - `status`: 段階ごとの状態を表示する。依頼待ち・取り込み待ち・通過・保留・不採用・書き出し済みの件数、理由コードごとの件数、再検証の印、計画の項目ごとの未達の理由、役のモデルと定義のハッシュ、依頼待ちの件数 × 役のモデルの見積もり。読むだけで、何も書かない。`pipeline-run` スキルが、止まったときに人に見せる
+  - `export`: 人が承認し、検証と来歴の検査を通った下書きを、`data/questions.<コード>.json` に追加する。手順は [出題計画と下書きの手順](../../docs/drafting.md) の「書き出し」
 - どのコマンドも `--help` と `--dry-run` を受け付けます。`--dry-run` では、書き込みと外部への通信をしません。
 - 設定は `pipeline.config.json`(コミットする、環境値を含まない)に書きます。環境値は `packages/pipeline/.env`(gitignore)に書き、
   `.env.example` にはプレースホルダーだけを置きます。環境値は、設定ファイルの値を上書きします。
@@ -38,8 +40,8 @@ npm test -w @mokumoku-exams/pipeline
   本文がない出典、再試行の上限、件数の上限など)。試験ガイドと資格マスタの差分、カバレッジの抜けは、確かめてほしい情報として報告し、0 で終わります。
 - 共通部品(`src/shared/`): 依頼 → 取り込みの流れ(依頼の一覧、失敗の回数、`request-stale`、後始末。`request-flow.ts`)、
   資格コードの検査と資格マスタの読み込み(`exam.ts`)、書き出し(`fs.ts`)、項目のパスだけを持つ誤りの基底(`errors.ts`)、
-  文字の 2 つ組の類似度(`similarity.ts`)、エージェントの定義の読み込み(`agents.ts`)。段階ごとに違う検査は、各段階に残します。
-- エージェントの定義: 役(`guide-extractor` `fact-extractor` `question-drafter`)と `.claude/agents/<役>.md` の対応は `src/shared/agents.ts` が持ちます。
+  文字の 2 つ組の類似度(`similarity.ts`)、本文の写しの検出(`copy.ts`。試験ガイド・事実カード・下書きが同じ関数を使う)、エージェントの定義の読み込み(`agents.ts`)。段階ごとに違う検査は、各段階に残します。
+- エージェントの定義: 役(`guide-extractor` `fact-extractor` `question-drafter` `question-verifier`)と `.claude/agents/<役>.md` の対応は `src/shared/agents.ts` が持ちます。
   依頼のファイルに、役の名前・モデルの ID・定義のハッシュ(`agent`)を書き、依頼の鍵にハッシュを入れます。ハッシュは、モデルの ID と指示の本文から決め、
   説明文(`description`)の直しでは変わりません。取り込んだ結果(試験ガイドの `guide.agent`、事実カードの `extracted[].agent`、下書きの `agent`)にも同じ記録が残ります。
 - ログの作法: 出力は「種類」と「場所(項目名や位置)」だけです。環境値・鍵・本文、入力した引数の文字列は出しません。

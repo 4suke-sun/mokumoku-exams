@@ -1,10 +1,10 @@
 import type { BodyCache } from "../collect/cache.ts";
-import { hasLongCopy } from "../facts/overlap.ts";
 import type { FactsFile } from "../facts/schema.ts";
+import { detectCopy } from "../shared/copy.ts";
 import { type Draft, isChoiceDraft } from "./schema.ts";
 
 /**
- * 下書きが、根拠の出典の本文を長く写していないか(事実カードの主張と同じ検査。facts/overlap.ts の hasLongCopy)。
+ * 下書きが、根拠の出典の本文を長く写していないか(試験ガイド・事実カードの主張と同じ関数。shared/copy.ts の detectCopy)。
  * キャッシュにある本文のどれかを長く写していれば "copy"(本文がない出典があっても、写しは写しとして落とす)。
  * 写しが見つからず、本文がキャッシュにない出典があれば、確かめきれないので "unchecked"(取り込みは保留にする)。
  */
@@ -30,6 +30,6 @@ export function copyCheck(draft: Draft, facts: FactsFile, cache: BodyCache): "co
         ]
       : []),
   ];
-  if (texts.some((t) => t !== "" && bodies.some((b) => hasLongCopy(t, b)))) return "copy";
+  if (texts.some((t) => t !== "" && detectCopy(t, bodies) !== null)) return "copy";
   return missing ? "unchecked" : "ok";
 }
