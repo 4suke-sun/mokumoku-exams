@@ -82,6 +82,38 @@ export const ConfigSchema = z.strictObject({
     /** 依頼 1 件の取り込みを、形の検査に通らずにやり直せる回数の上限 */
     maxAttempts: z.number().int().positive(),
   }),
+  /** 人の確認(全件の確認と、リスクの高いものを優先した抜き取りの切り替え) */
+  review: z.strictObject({
+    /** full は通過したものを全件確認する。sample は、検証役の評価が目標を満たしたときだけ、抜き取りにする */
+    mode: z.enum(["full", "sample"]),
+    /** 抜き取りの率(0〜1)。通過したものの件数に対する、確認する件数の割合の下限 */
+    rate: z.number().min(0).max(1),
+    /** 抜き取りの乱数の種(同じ入力・率・種から、同じものが選ばれる) */
+    seed: z.number().int().min(0),
+    /** 重複の類似度が、保留のしきい値からこの幅以内なら「保留に近い」 */
+    nearHoldMargin: z.number().min(0).max(1),
+    /** この点数以上のものは、率にかかわらず全件を確認する */
+    highRiskScore: z.number().int().min(1).max(4),
+    /** 抜き取りで人が却下した割合が、これを超えたら全件の確認へ戻す */
+    maxRejectRate: z.number().min(0).max(1),
+    /** 戻すかを判断するのに必要な、人の判断の最小の件数 */
+    minDecisions: z.number().int().positive(),
+  }),
+  /** 検証役の評価 */
+  eval: z.strictObject({
+    /** 評価用のデータを作る乱数の種(同じ種なら同じデータ) */
+    seed: z.number().int().min(0),
+    /** 仕込む誤りの種類ごとの件数の目安 */
+    perKind: z.number().int().min(1).max(50),
+    /** 依頼 1 件の取り込みを、形の検査に通らずにやり直せる回数の上限 */
+    maxAttempts: z.number().int().positive(),
+    /** 指標の目標(docs/evaluation.md) */
+    targets: z.strictObject({
+      detectionOverall: z.number().min(0).max(1),
+      detectionPerKind: z.number().min(0).max(1),
+      falsePositiveMax: z.number().min(0).max(1),
+    }),
+  }),
   /** 検証 */
   verify: z.strictObject({
     /** 依頼 1 件の取り込みを、形の検査に通らずにやり直せる回数の上限 */

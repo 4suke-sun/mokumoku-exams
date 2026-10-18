@@ -14,8 +14,8 @@ import {
   writeOutput,
 } from "../draft/test-helpers.ts";
 import { EXIT } from "../exit-codes.ts";
+import { judgeRederive } from "./check.ts";
 import { type VerifyRequest, VerifyRequestSchema } from "./request.ts";
-import { judgeRederive } from "./run.ts";
 import { heavier, isVerified, VERIFY_CODES, VerificationSchema } from "./schema.ts";
 
 /** 計画 → 依頼 → 下書きの取り込みまで進め、通過した選択式の下書きを 1 件作る */

@@ -31,6 +31,7 @@ import {
   readJsonFile,
   reportStop,
 } from "../shared/request-flow.ts";
+import { buildVerifyRequest, checkExplanationOutput, checkRederiveOutput } from "./check.ts";
 import {
   collectSections,
   draftTexts,
@@ -41,7 +42,7 @@ import {
   VerifyRequestSchema,
   verifyKey,
 } from "./request.ts";
-import { type Judgement, type Verdict, type Verification, type VerifyCode, verifyReason } from "./schema.ts";
+import { type Verdict, type Verification, type VerifyCode, verifyReason } from "./schema.ts";
 
 /**
  * verify コマンド: 下書きを、根拠にした出典の節だけを根拠に、検証役が確かめる(ADR 0007・0009)。
@@ -265,31 +266,17 @@ function requestStep(ctx: Context): ExitCode {
       limited = true;
       break;
     }
-    const base = {
+    const request = buildVerifyRequest({
+      check,
       examCode,
-      requestKey: key,
+      key,
       draftId: record.id,
-      evidenceHash: evidence,
+      draft,
       sections: found.sections,
+      evidence,
       outputPath: relative(rootDir, join(paths.outDir, `${key}.json`)),
-      agent: stamp,
-      questionText: draft.questionText,
-      choices: draft.choices.map((c) => ({ key: c.key, text: c.text })),
-    };
-    const request: VerifyRequest =
-      check === "rederive"
-        ? { ...base, check, kind: draft.questionType }
-        : {
-            ...base,
-            check,
-            correctAnswers: draft.correctAnswers,
-            explanation: draft.explanation,
-            choiceExplanations: draft.choices.flatMap((c) =>
-              c.explanation !== undefined ? [{ key: c.key, text: c.explanation }] : [],
-            ),
-            distractorReasons: (draft.distractors ?? []).map((d) => ({ key: d.key, reason: d.reason })),
-            locations: explanationLocations(draft),
-          };
+      stamp,
+    });
     if (!dryRun) writeJson(requestPath, request);
     report(output, "検証の依頼", relative(rootDir, requestPath));
     requested++;
@@ -300,30 +287,6 @@ function requestStep(ctx: Context): ExitCode {
   if (limited) report(output, "件数の上限", "maxItemsPerRun(再実行で続きから進む)");
   // 節を取り出せない下書きは、依頼を出さず止める(通す側に倒さない)
   return limited || exhausted > 0 || missingSection > 0 ? EXIT.checkFailed : EXIT.ok;
-}
-
-function explanationLocations(draft: Extract<DraftRecord["draft"], { questionType: "single" | "multiple" }>): string[] {
-  return [
-    "explanation",
-    ...draft.choices.flatMap((c) => (c.explanation !== undefined ? [`choices.${c.key}.explanation`] : [])),
-    ...(draft.distractors ?? []).map((d) => `distractors.${d.key}.reason`),
-  ];
-}
-
-/** 再導出の出力を、下書きの宣言と照合する */
-export function judgeRederive(
-  correct: readonly string[],
-  judgements: readonly { key: string; judgement: Judgement; evidenceFound: boolean }[],
-): { codes: VerifyCode[]; keys: string[] } {
-  const codes: VerifyCode[] = [];
-  for (const j of judgements) {
-    const declared = correct.includes(j.key);
-    if (j.judgement === "unknown") codes.push("undetermined");
-    else if (declared && j.judgement === "incorrect") codes.push("answer-mismatch");
-    else if (!declared && j.judgement === "correct") codes.push("distractor-correct");
-    if (j.judgement !== "unknown" && !j.evidenceFound) codes.push("evidence-not-found");
-  }
-  return { codes: [...new Set(codes)].sort() as VerifyCode[], keys: judgements.map((j) => j.key) };
 }
 
 function importStep(ctx: Context): ExitCode {
@@ -374,8 +337,6 @@ function importStep(ctx: Context): ExitCode {
       failures++;
     };
     const raw = readJsonFile(outPath);
-    const headings = new Set(request.sections.map((s) => s.heading));
-    const sectionTexts = request.sections.map((s) => s.text);
     let verification: Verification;
     if (request.check === "rederive") {
       const parsed = RederiveOutputSchema.safeParse(raw);
@@ -383,42 +344,20 @@ function importStep(ctx: Context): ExitCode {
         fail("output-invalid");
         continue;
       }
-      const out = parsed.data;
-      if (out.examCode !== request.examCode || out.requestKey !== key || out.draftId !== request.draftId) {
-        fail("request-mismatch");
-        continue;
-      }
-      const requestKeys = request.choices.map((c) => c.key).sort();
-      const outKeys = out.judgements.map((j) => j.key).sort();
-      const summaryCopied = out.judgements.some(
-        (j) => j.evidence !== null && detectCopy(j.evidence.summary, sectionTexts) !== null,
-      );
-      if (JSON.stringify(requestKeys) !== JSON.stringify(outKeys) || summaryCopied) {
-        fail("output-invalid");
-        continue;
-      }
       const correct = record?.draft && isChoiceDraft(record.draft) ? record.draft.correctAnswers : [];
-      const judged = judgeRederive(
-        correct,
-        out.judgements.map((j) => ({
-          key: j.key,
-          judgement: j.judgement,
-          evidenceFound: j.evidence !== null && headings.has(j.evidence.heading),
-        })),
-      );
-      const result = judged.codes.length === 0 ? "pass" : "hold";
+      const checked = checkRederiveOutput(request, parsed.data, correct);
+      if (!checked.ok) {
+        fail(checked.reason);
+        continue;
+      }
+      const result = checked.codes.length === 0 ? "pass" : "hold";
       verification = {
         verdict: result === "pass" ? null : "hold",
-        reasons: codesToReasons(judged.codes),
+        reasons: codesToReasons(checked.codes),
         findings: [],
         checks: {
           copy: { result: "pass" },
-          rederive: {
-            result,
-            choices: [...out.judgements]
-              .sort((a, b) => (a.key < b.key ? -1 : 1))
-              .map((j) => ({ key: j.key, judgement: j.judgement })),
-          },
+          rederive: { result, choices: checked.choices },
         },
         evidenceHash: request.evidenceHash,
         agent: stamp,
@@ -429,18 +368,13 @@ function importStep(ctx: Context): ExitCode {
         fail("output-invalid");
         continue;
       }
-      const out = parsed.data;
-      if (out.examCode !== request.examCode || out.requestKey !== key || out.draftId !== request.draftId) {
-        fail("request-mismatch");
-        continue;
-      }
-      const allowed = new Set(request.locations);
-      if (out.findings.some((f) => !allowed.has(f.where))) {
-        fail("output-invalid");
+      const checked = checkExplanationOutput(request, parsed.data);
+      if (!checked.ok) {
+        fail(checked.reason);
         continue;
       }
       const before = record?.verification as Verification;
-      const findings = [...out.findings].sort((a, b) => (a.where + a.code < b.where + b.code ? -1 : 1));
+      const findings = checked.findings;
       const hold = findings.length > 0;
       verification = {
         ...before,

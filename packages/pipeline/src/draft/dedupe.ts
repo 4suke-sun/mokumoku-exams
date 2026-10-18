@@ -84,6 +84,16 @@ export function findDuplicates(
   return findings;
 }
 
+/** 1 件と、ほかの候補との、設問文の最大の類似度(小数 2 桁)。比べる相手がなければ 0。自分自身は比べない */
+export function maxSimilarity(target: Candidate, others: readonly Candidate[]): number {
+  let best = 0;
+  for (const other of others) {
+    if (other.ref === target.ref) continue;
+    best = Math.max(best, stemSimilarity(target.text, other.text));
+  }
+  return Math.round(best * 100) / 100;
+}
+
 /** 同じ事実カードの組を根拠にするか、同じ正答の組を持つ */
 function sameTopic(a: Candidate, b: Candidate): boolean {
   if (a.factKey !== undefined && a.factKey !== "" && a.factKey === b.factKey) return true;

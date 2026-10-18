@@ -14,6 +14,8 @@ import {
 } from "../decisions/decisions.ts";
 import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { type Output, report } from "../log.ts";
+import { loadPlan } from "../sampling/load.ts";
+import { readSampling, samplingPath } from "../sampling/store.ts";
 import { type AgentStamp, readAgentStampOrReport, sameDefinition } from "../shared/agents.ts";
 import { detectCopy } from "../shared/copy.ts";
 import { prepareExam } from "../shared/exam.ts";
@@ -436,7 +438,17 @@ function reportStep(options: FactsOptions, paths: Paths, facts: FactsFile, domai
   writeFileSync(paths.reviewMd, renderReview(review));
   report(output, "レビューレポート", relative(rootDir, paths.reviewMd));
   // 人が通過・保留のカードをすべて確かめるための表
-  writeFileSync(paths.cardsMd, renderCardTable(examCode, facts.cards));
+  // 抜き取りのとき、確認しないと決めた通過のカードは、表に載せない
+  let skipped = new Set<string>();
+  try {
+    // 記録(`draft --review` が書いたもの)があれば、そのとおりにする。なければ、求める
+    const record = readSampling(samplingPath(resolve(rootDir, config.decisionsDir), examCode), examCode);
+    const plan = record ?? loadPlan(config, rootDir, examCode).plan;
+    if (plan.mode === "sample") skipped = new Set(plan.fact.notReviewed);
+  } catch {
+    // 下書きなどが読めないときは、全件を載せる(表は、確認の材料を減らさない側に倒す)
+  }
+  writeFileSync(paths.cardsMd, renderCardTable(examCode, facts.cards, skipped));
   report(output, "レビューレポート", relative(rootDir, paths.cardsMd));
   return EXIT.ok;
 }

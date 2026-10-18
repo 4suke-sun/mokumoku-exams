@@ -34,6 +34,8 @@ export const DraftRecordSchema = z.strictObject({
   draft: DraftSchema.nullable(),
   /** この下書きを作ったエージェントの定義(役・モデルの ID・定義のハッシュ。古い記録にはない) */
   agent: AgentStampSchema.optional(),
+  /** 設問文の、公開済みの問題やほかの下書きとの最大の類似度(0〜1、小数 2 桁)。人の確認の抜き取りで、保留に近いかを見る。古い記録にはない */
+  similarity: z.number().min(0).max(1).optional(),
   /** 検証の段階の結果(検証前はない)。検証を通った合格は、verdict が pass のもの */
   verification: VerificationSchema.optional(),
 });

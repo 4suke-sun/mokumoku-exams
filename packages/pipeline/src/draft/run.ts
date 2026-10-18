@@ -18,6 +18,9 @@ import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { FactsError, type FactsFile, factsPath, readFacts } from "../facts/schema.ts";
 import { type Output, report } from "../log.ts";
 import { PlanError, type PlanFile, planPath, readPlan } from "../plan/schema.ts";
+import { planFor, recordedOrComputed } from "../sampling/load.ts";
+import type { SamplingPlan } from "../sampling/plan.ts";
+import { recordOf, writeSampling } from "../sampling/store.ts";
 import { type AgentStamp, readAgentStampOrReport } from "../shared/agents.ts";
 import { prepareExam } from "../shared/exam.ts";
 import { writeJson } from "../shared/fs.ts";
@@ -31,7 +34,7 @@ import {
   reportStop,
 } from "../shared/request-flow.ts";
 import { copyCheck } from "./copy.ts";
-import { candidateOf, findDuplicates, readPublishedCandidates, readPublishedChoices } from "./dedupe.ts";
+import { candidateOf, findDuplicates, maxSimilarity, readPublishedCandidates, readPublishedChoices } from "./dedupe.ts";
 import { checkDistractors } from "./distractors.ts";
 import {
   buildEntry,
@@ -184,7 +187,7 @@ export function runDraft(options: DraftOptions): ExitCode {
     case "review":
       return reviewStep(options, paths, facts, drafts, provenance, decisions);
     case "decide":
-      return decideStep(options, paths, drafts, decisions);
+      return decideStep(options, paths, facts, drafts, provenance, decisions);
   }
 }
 
@@ -197,19 +200,33 @@ function reviewStep(
   provenance: ProvenanceFile,
   decisions: DecisionsFile,
 ): ExitCode {
-  const { rootDir, examCode, output, dryRun } = options;
-  const counts = reviewCounts(drafts, decisions);
+  const { config, rootDir, examCode, output, dryRun } = options;
+  const { plan, paths: samplingPaths } = planFor(config, rootDir, examCode, { facts, drafts, provenance, decisions });
+  const counts = reviewCounts(drafts, decisions, plan);
   if (!dryRun) {
     mkdirSync(dirname(paths.reviewMd), { recursive: true });
-    writeFileSync(paths.reviewMd, renderDraftReview(examCode, drafts, facts, provenance, decisions));
-    writeJson(paths.reviewSheet, buildReviewSheet(examCode, drafts, decisions));
+    writeFileSync(paths.reviewMd, renderDraftReview(examCode, drafts, facts, provenance, decisions, plan));
+    writeJson(paths.reviewSheet, buildReviewSheet(examCode, drafts, decisions, plan));
+    // 抜き取りの結果(率、種、確認した件数、確認しなかった件数)を、人の判断の記録のそばに残す
+    writeSampling(samplingPaths.record, recordOf(examCode, plan));
     report(output, "レビューレポート", relative(rootDir, paths.reviewMd));
     report(output, "レビューレポート", relative(rootDir, paths.reviewSheet));
+    report(output, "レビューレポート", relative(rootDir, samplingPaths.record));
   } else {
     report(output, "書き込みをしない(dry-run)");
   }
+  reportSampling(output, plan);
   reportReviewCounts(output, counts);
   return EXIT.ok;
+}
+
+/** 抜き取りの状態を報告する。件数と理由コードだけ */
+function reportSampling(output: DraftOptions["output"], plan: SamplingPlan): void {
+  const text =
+    plan.mode === "sample"
+      ? `抜き取り(率 ${plan.rate}、種 ${plan.seed}): 確認する下書き ${plan.draft.reviewed.length} 件、確認しない ${plan.draft.notReviewed.length} 件、確認する事実カード ${plan.fact.reviewed.length} 件、確認しない ${plan.fact.notReviewed.length} 件`
+      : `全件の確認(理由 ${plan.fallback ?? "-"})`;
+  report(output, "情報", text);
 }
 
 function reportReviewCounts(output: DraftOptions["output"], counts: ReturnType<typeof reviewCounts>): void {
@@ -221,8 +238,15 @@ function reportReviewCounts(output: DraftOptions["output"], counts: ReturnType<t
 }
 
 /** 判断を書き込んだシートを検査し、人の判断の記録に取り込む */
-function decideStep(options: DraftOptions, paths: Paths, drafts: DraftsFile, decisions: DecisionsFile): ExitCode {
-  const { examCode, output, dryRun } = options;
+function decideStep(
+  options: DraftOptions,
+  paths: Paths,
+  facts: FactsFile,
+  drafts: DraftsFile,
+  provenance: ProvenanceFile,
+  decisions: DecisionsFile,
+): ExitCode {
+  const { config, rootDir, examCode, output, dryRun } = options;
   if (!existsSync(paths.reviewSheet)) {
     report(output, "入力の誤り", "判断のシートがない(draft --review を先に実行する)");
     return EXIT.inputError;
@@ -253,7 +277,14 @@ function decideStep(options: DraftOptions, paths: Paths, drafts: DraftsFile, dec
   // 取り込んだ判断を、下書きの状態にも反映して数える
   const applied = applyDraftDecisions(drafts, (id) => draftDecision(next, id));
   if (applied.changed > 0 && !dryRun) writeDrafts(paths.drafts, applied.file);
-  reportReviewCounts(output, reviewCounts(applied.file, next));
+  // 数えるときは、記録した抜き取りの計画(確認しないと決めたもの)を使う。判断が増えても、確認の対象は変わらない
+  const plan = recordedOrComputed(config, rootDir, examCode, {
+    facts,
+    drafts: applied.file,
+    provenance,
+    decisions: next,
+  });
+  reportReviewCounts(output, reviewCounts(applied.file, next, plan));
   return EXIT.ok;
 }
 
@@ -574,6 +605,7 @@ function importStep(
         warnings,
         draft: held || reasons.length === 0 ? draft : null,
         agent: stamp,
+        similarity: maxSimilarity(candidateOf(id, "draft", draft), pool),
       });
       // 以降の下書きは、この下書きとも比べる
       if (held || reasons.length === 0) pool.push(candidateOf(id, "draft", draft));
@@ -651,9 +683,11 @@ function checkStep(
   vendor: string,
   decisions: DecisionsFile,
 ): ExitCode {
-  const { output } = options;
+  const { config, rootDir, examCode, output } = options;
   // 人の確認の済み・未済を報告する(未済は失敗にしない)
-  reportReviewCounts(output, reviewCounts(drafts, decisions));
+  const plan = recordedOrComputed(config, rootDir, examCode, { facts, drafts, provenance, decisions });
+  reportSampling(output, plan);
+  reportReviewCounts(output, reviewCounts(drafts, decisions, plan));
   // 形と根拠の検査に、再検証の検査(来歴と台帳の今の状態の比較)を足す
   const problems = [...checkProvenance(provenance, facts, vendor), ...checkRecheck(provenance, ledger)];
   for (const p of problems) report(output, "来歴の誤り", `${p.draftId} ${p.code}`);

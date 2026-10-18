@@ -2,6 +2,7 @@ import { z } from "zod";
 import { REASON } from "../collect/ledger.ts";
 import { type Decision, type DecisionsFile, DRAFT_ID, draftDecision } from "../decisions/decisions.ts";
 import type { FactsFile } from "../facts/schema.ts";
+import type { SamplingPlan } from "../sampling/plan.ts";
 import type { ProvenanceFile } from "./provenance.ts";
 import type { DraftRecord, DraftsFile } from "./store.ts";
 
@@ -20,12 +21,18 @@ export interface ReviewCounts {
 }
 
 /** 確認の対象: 不採用でない下書き(人が却下したものは、確認済みとして数える) */
-export function reviewTargets(drafts: DraftsFile, decisions: DecisionsFile): DraftRecord[] {
-  return drafts.drafts.filter((d) => d.status !== "rejected" || draftDecision(decisions, d.id) === "reject");
+export function reviewTargets(drafts: DraftsFile, decisions: DecisionsFile, plan?: SamplingPlan): DraftRecord[] {
+  // 抜き取りのとき、通過した下書きのうち確認しないものは、対象にしない(人がすでに判断したものは、確認済みとして残す)
+  const skipped = plan?.mode === "sample" ? new Set(plan.draft.notReviewed) : new Set<string>();
+  return drafts.drafts.filter(
+    (d) =>
+      (d.status !== "rejected" || draftDecision(decisions, d.id) === "reject") &&
+      (!skipped.has(d.id) || draftDecision(decisions, d.id) !== undefined),
+  );
 }
 
-export function reviewCounts(drafts: DraftsFile, decisions: DecisionsFile): ReviewCounts {
-  const targets = reviewTargets(drafts, decisions);
+export function reviewCounts(drafts: DraftsFile, decisions: DecisionsFile, plan?: SamplingPlan): ReviewCounts {
+  const targets = reviewTargets(drafts, decisions, plan);
   const approved = targets.filter((d) => draftDecision(decisions, d.id) === "approve").length;
   const rejected = targets.filter((d) => draftDecision(decisions, d.id) === "reject").length;
   return { total: targets.length, approved, rejected, pending: targets.length - approved - rejected };
@@ -43,16 +50,22 @@ export function renderDraftReview(
   facts: FactsFile,
   provenance: ProvenanceFile,
   decisions: DecisionsFile,
+  plan?: SamplingPlan,
 ): string {
-  const counts = reviewCounts(drafts, decisions);
+  const counts = reviewCounts(drafts, decisions, plan);
   const lines = [
     `# 下書きの確認(${examCode})`,
     "",
     `対象 ${counts.total} 件(承認 ${counts.approved} 件、却下 ${counts.rejected} 件、未済 ${counts.pending} 件)。`,
+    ...(plan?.mode === "sample"
+      ? [
+          `抜き取りで確認する(率 ${plan.rate}、種 ${plan.seed})。通過した下書き ${plan.draft.eligible} 件のうち、確認するもの ${plan.draft.reviewed.length} 件、確認しないもの ${plan.draft.notReviewed.length} 件。保留は全件を確認する。`,
+        ]
+      : []),
     "判断は、同じ置き場の review-sheet.json に書き、`draft <試験コード> --decide` で取り込む。",
     "",
   ];
-  for (const record of reviewTargets(drafts, decisions)) {
+  for (const record of reviewTargets(drafts, decisions, plan)) {
     const d = record.draft;
     const decision = draftDecision(decisions, record.id) ?? "未済";
     lines.push(`## ${record.id}`, "", "| 項目 | 内容 |", "| --- | --- |");
@@ -117,10 +130,15 @@ export const ReviewSheetSchema = z.strictObject({
 export type ReviewSheet = z.infer<typeof ReviewSheetSchema>;
 
 /** シートを作る。判断がすでにあるものは、その判断を書いておく(書き換えれば、新しい判断で置き換わる) */
-export function buildReviewSheet(examCode: string, drafts: DraftsFile, decisions: DecisionsFile): ReviewSheet {
+export function buildReviewSheet(
+  examCode: string,
+  drafts: DraftsFile,
+  decisions: DecisionsFile,
+  plan?: SamplingPlan,
+): ReviewSheet {
   return {
     examCode,
-    items: reviewTargets(drafts, decisions).map((d) => {
+    items: reviewTargets(drafts, decisions, plan).map((d) => {
       const existing = decisions.decisions.find((x) => x.target === "draft" && x.id === d.id);
       return {
         id: d.id,
