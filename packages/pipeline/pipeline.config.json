@@ -36,6 +36,15 @@
     "maxPerItem": 5,
     "maxAttempts": 3
   },
+  "review": {
+    "mode": "full",
+    "rate": 0.3,
+    "seed": 1,
+    "nearHoldMargin": 0.15,
+    "highRiskScore": 2,
+    "maxRejectRate": 0.2,
+    "minDecisions": 5
+  },
   "eval": {
     "seed": 1,
     "perKind": 3,

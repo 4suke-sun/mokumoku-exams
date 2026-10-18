@@ -47,7 +47,8 @@ describe("スキルと文書に書いた名前", () => {
     const text = readFileSync(file, "utf8");
     for (const m of text.matchAll(/`([a-z][A-Za-z]*(?:\.[A-Za-z]+)*)`/g)) {
       const token = m[1] as string;
-      const dotted = token.includes(".") && topLevel.has(token.split(".")[0] as string);
+      // `review.md` のようなファイル名は、設定の項目ではない
+      const dotted = token.includes(".") && !/\.(md|json)$/.test(token) && topLevel.has(token.split(".")[0] as string);
       const camel = /^[a-z]+[A-Z][A-Za-z]*$/.test(token) && !token.includes(".") && /^(max|retention|per)/.test(token);
       if (dotted || camel) expect(paths.has(token), `${file}: ${token}`).toBe(true);
     }

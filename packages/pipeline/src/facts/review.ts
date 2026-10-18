@@ -144,12 +144,17 @@ function cell(text: string): string {
  * 人が通過・保留の事実カードをすべて確かめるための表。主張(出典の言い換え)、根拠の節、出典の URL、版・リージョン、確度、状態、理由コードを載せる。
  * 取得した本文の写しは載せない。
  */
-export function renderCardTable(examCode: string, cards: readonly FactCard[]): string {
-  const rows = cards.filter((c) => c.status !== "rejected");
+export function renderCardTable(
+  examCode: string,
+  cards: readonly FactCard[],
+  /** 抜き取りで確認しないと決めた通過のカードの ID。表に出さない(保留のカードは、全件を出す) */
+  skipped: ReadonlySet<string> = new Set(),
+): string {
+  const rows = cards.filter((c) => c.status !== "rejected" && !skipped.has(c.id));
   const lines = [
     `# 事実カードの一覧(通過・保留、${examCode})`,
     "",
-    `通過と保留のカード ${rows.length} 件。保留を解く・却下するときは、人の判断の記録に書く。`,
+    `${skipped.size > 0 ? `抜き取りで確認するカードと、保留のカード ${rows.length} 件(確認しない通過のカード ${skipped.size} 件は載せない)。` : `通過と保留のカード ${rows.length} 件。`}保留を解く・却下するときは、人の判断の記録に書く。`,
     "",
     "| ID | 分野 | 主張 | 根拠の節 | 出典 | 版 | リージョン | 確度 | 状態 | 理由 |",
     "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",

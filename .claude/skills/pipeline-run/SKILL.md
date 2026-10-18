@@ -81,7 +81,7 @@ description: 作問パイプラインを、収集から検証・人の確認ま�
 検証まで済んだら、人の確認で止まる。
 
 1. `npm run pipeline -- draft <資格コード> --review` を呼び、確認用の表(`pipeline-work/draft/<コード>/review.md`)と、判断を書き込むシート(`review-sheet.json`)の場所を示す。
-2. 人に、通過・保留の下書きの判断(`approve` / `release` / `reject`)をシートに書き、`draft <資格コード> --decide` で取り込むよう求める。保留の理由コード(`verify:*`・`review:*`・`ambiguous:*`)と、検証の指摘の場所は、表に載る。
+2. 人に、通過・保留の下書きの判断(`approve` / `release` / `reject`)をシートに書き、`draft <資格コード> --decide` で取り込むよう求める。保留の理由コード(`verify:*`・`review:*`・`ambiguous:*`)と、検証の指摘の場所は、表に載る。抜き取りに切り替えているときは、通過の下書きのうち選んだものだけが載る(手順書の「8.1」)。
 3. 判断が記録されたら(`--review` の「未済」が 0 件になったら)、書き出しへ進む: `npm run pipeline -- export <資格コード>`。作業ツリーの `data/` に追加の分だけを書く(ADR 0014)。コミットはしない。
 4. 書き出したら、`data/` の差分と、差分レポートの場所(`pipeline-work/export/<コード>/report.md`)を示して終わる。
 

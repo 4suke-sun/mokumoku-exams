@@ -26,6 +26,8 @@ import { applyDraftDecisions, type DraftRecord, DraftsError, draftWorkDir, readD
 import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { FactsError, type FactsFile, factsPath, readFacts } from "../facts/schema.ts";
 import { type Output, report } from "../log.ts";
+import { readSampling, SamplingError, samplingPath } from "../sampling/store.ts";
+import { readAgentStamp } from "../shared/agents.ts";
 import { isVerified } from "../verify/schema.ts";
 
 /**
@@ -53,6 +55,8 @@ export function selectExportable(
   decisions: DecisionsFile,
   provenance: ProvenanceFile,
   blockedDraftIds: ReadonlySet<string>,
+  /** 抜き取りで確認しないと記録した下書きの ID。検証を通っていれば、承認なしで書き出してよい(人が却下したものは除く) */
+  autoAccepted: ReadonlySet<string> = new Set(),
 ): { ready: DraftRecord[]; notApproved: number; unverified: number; blocked: number; exported: number } {
   let notApproved = 0;
   let unverified = 0;
@@ -66,10 +70,11 @@ export function selectExportable(
       exported++;
       continue;
     }
-    if (draftDecision(decisions, d.id) !== "approve") {
+    if (draftDecision(decisions, d.id) !== "approve" && !autoAccepted.has(d.id)) {
       notApproved++;
       continue;
     }
+    // 承認なしで書き出せるのは、検証の判定が合格のものだけ(人の承認で通す検証の保留は、承認があるときだけ)
     if (!isVerified(d.verification, draftDecision(decisions, d.id))) {
       unverified++;
       continue;
@@ -179,7 +184,21 @@ export function runExport(options: ExportOptions): ExitCode {
   // 来歴の検査(形と根拠、再検証の印、出典の状態)に落ちた下書きは、書き出さない
   const problems = [...checkProvenance(provenance, facts, exam.vendor), ...checkRecheck(provenance, ledger)];
   const blockedIds = new Set(problems.map((p) => p.draftId));
-  const selection = selectExportable(drafts, decisions, provenance, blockedIds);
+  // 抜き取りで確認しないと記録した下書きは、承認なしで書き出せる。記録のあとに検証役の定義が変わっていれば、その記録は使わない
+  let sampling: ReturnType<typeof readSampling>;
+  try {
+    sampling = readSampling(samplingPath(resolve(rootDir, config.decisionsDir), examCode), examCode);
+  } catch (error) {
+    if (!(error instanceof SamplingError)) throw error;
+    for (const p of error.paths) report(output, "抜き取りの記録の誤り", p);
+    return EXIT.checkFailed;
+  }
+  const autoAccepted =
+    sampling?.mode === "sample" &&
+    sampling.evalDefinitionHash === readAgentStamp(rootDir, "question-verifier").definitionHash
+      ? new Set(sampling.draft.notReviewed)
+      : new Set<string>();
+  const selection = selectExportable(drafts, decisions, provenance, blockedIds, autoAccepted);
 
   const original = existsSync(paths.questions) ? readFileSync(paths.questions, "utf8") : null;
   const current = original === null ? { examCode, questions: [] as unknown[] } : JSON.parse(original);
