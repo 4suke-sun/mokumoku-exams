@@ -250,6 +250,7 @@ describe("ModeSelect の難易度と解答回数と条件の保存", () => {
       count: 1,
       preferFewer: false,
       reveal: "end",
+      includeFreeText: false,
     });
     vi.stubGlobal(
       "fetch",

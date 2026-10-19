@@ -117,6 +117,7 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
   const [mode, setMode] = useState<SettingsMode | null>(null);
   const [difficulties, setDifficulties] = useState<Difficulty[]>([]);
   const [preferFewer, setPreferFewer] = useState(false);
+  const [includeFreeText, setIncludeFreeText] = useState(false);
   const answerCounts = useAnswerCounts(exam.examCode);
   const owner = useStorageOwner();
   // 取得できなかったときは null(その対象は選べない)
@@ -141,6 +142,7 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
       setDifficulties(conditions.difficulties);
       setCount(conditions.count);
       setPreferFewer(conditions.preferFewer);
+      setIncludeFreeText(conditions.includeFreeText);
     }
     // 学習の状況の「この分野を解く」から来たときは、その分野を選んでおく(`?domain=`)。ほかは前回の分野
     const codes = exam.domains.map((d) => d.code);
@@ -169,7 +171,7 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
 
   // 対象と難易度で絞ってから、分野で絞る
   const activeTarget = activeTargetOf(mode, target);
-  const targeted = targetQuestions(pool, { mode, target, lists, difficulties });
+  const targeted = targetQuestions(pool, { mode, target, lists, difficulties, includeFreeText });
   const perDomain = domainCounts(targeted);
 
   const available = inDomains(targeted, domains).length;
@@ -237,6 +239,7 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
       count: Math.max(1, effectiveCount),
       preferFewer,
       reveal,
+      includeFreeText,
     });
     const session = newSession(exam.examCode, picked, { shuffleChoices }, Math.random, new Date());
     begin(reveal === "each" ? { ...session, reveal } : session);
@@ -251,7 +254,7 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
       emoji: "📝",
       tone: "tone-primary",
       description: "分野と問題数を選んで、1 問ずつ解きます。",
-      meta: `${pool.length} 問`,
+      meta: `${inTarget(pool, "normal", "all", lists, includeFreeText).length} 問`,
       kind: "select",
       mode: "normal",
     },
@@ -286,7 +289,11 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
       emoji: "⭐",
       tone: "tone-violet",
       description: "ブックマークした問題を、正解と解説つきで見直します。",
-      meta: lists.bookmarks === null ? undefined : `ブックマーク ${inTarget(pool, mode, "bookmarks", lists).length} 問`,
+      // 直前チェックは、選んだモードによらず、自由記述を含むすべてのブックマークを見直すので、モードで絞らずに数える
+      meta:
+        lists.bookmarks === null
+          ? undefined
+          : `ブックマーク ${inTarget(pool, null, "bookmarks", lists, true).length} 問`,
       kind: "link",
       href: "/bookmarks",
     },
@@ -306,7 +313,7 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
       name: "セクションで解く",
       emoji: "🧩",
       tone: "tone-domain-3",
-      description: "全問を 5 問ずつに分けて、順に解きます。5 問中 4 問の正解で合格です。",
+      description: "選択式の問題を 5 問ずつに分けて、順に解きます。5 問中 4 問の正解で合格です。",
       kind: "link",
       href: `/exams/${exam.examCode}/sections`,
     },
@@ -473,7 +480,7 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
                     <span>
                       {item.name}
                       <span className="ml-2 text-sm text-muted">
-                        ({inTarget(pool, mode, item.id, lists).length} 問)
+                        ({inTarget(pool, mode, item.id, lists, includeFreeText).length} 問)
                       </span>
                       {waiting ? <span className="ml-2 chip tone-warn">復習の待ちがあります</span> : null}
                       <span className="block text-sm text-muted">
@@ -532,6 +539,23 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
               })}
             </div>
           </fieldset>
+
+          {mode === "normal" ? (
+            <label className="flex items-center gap-3 rounded-md border border-line bg-surface p-3">
+              <input
+                type="checkbox"
+                className="size-5"
+                checked={includeFreeText}
+                onChange={(event) => setIncludeFreeText(event.target.checked)}
+              />
+              <span>
+                自由記述の問題を含める
+                <span className="block text-sm text-muted">
+                  本番の試験は選択式だけです。オンにすると、自由記述の問題も出題します。
+                </span>
+              </span>
+            </label>
+          ) : null}
 
           <label className="flex items-center gap-3 rounded-md border border-line bg-surface p-3">
             <input
@@ -595,7 +619,7 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
             >
               {counts.map((n) => (
                 <option key={n} value={n}>
-                  {n === available ? `全問(${n} 問)` : `${n} 問`}
+                  {n === available ? `すべて(${n} 問)` : `${n} 問`}
                 </option>
               ))}
             </select>

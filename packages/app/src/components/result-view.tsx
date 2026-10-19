@@ -37,7 +37,7 @@ import {
   textAnswerFor,
 } from "@/lib/quiz.ts";
 import { recentOutcomes } from "@/lib/recent-outcomes.ts";
-import { sectionPassLine, sectionStatus, sectionsOf } from "@/lib/sections.ts";
+import { sectionPassLine, sectionStatus, sectionsOf, sectionTargets } from "@/lib/sections.ts";
 import { SESSION_SAVE_FAILED, startSession } from "@/lib/start-session.ts";
 import {
   browserStore,
@@ -278,7 +278,7 @@ export function ResultView({ exam, outline }: Props) {
   const stage = stageCheck && stageCheck.finishedAt === latest.finishedAt ? stageCheck : null;
   // 直近の結果がセクションの出題のときだけ、セクションの合否と、次のセクションを出す
   const section = sectionCheck && sectionCheck.finishedAt === latest.finishedAt ? sectionCheck : null;
-  const sections = sectionsOf(outline.map((q) => q.questionId));
+  const sections = sectionsOf(sectionTargets(outline).map((q) => q.questionId));
   const nextSection = section && section.section + 1 < sections.length ? section.section + 1 : null;
 
   /** 次のセクションの出題を始める */

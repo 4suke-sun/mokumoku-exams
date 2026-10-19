@@ -27,7 +27,8 @@ export function activeTargetOf(mode: SettingsMode | null, target: Target): Targe
 export type TargetLists = { review: readonly string[] | null; bookmarks: readonly string[] | null };
 
 /**
- * 対象で絞る。自由記述のモードは、自由記述の問題だけから出題する。
+ * 対象で絞る。自由記述のモードは、自由記述の問題だけから出題する。復習のモードは、種類で絞らない。
+ * 通常出題(モードを選ぶ前の `null` を含む)は、`includeFreeText` のときだけ自由記述の問題を含める(既定は選択式だけ)。
  * 対象の一覧(復習プール・ブックマーク)にあっても、いまのデータにない問題 ID は、ここで落ちる。
  */
 export function inTarget<P extends PickItem>(
@@ -35,8 +36,14 @@ export function inTarget<P extends PickItem>(
   mode: SettingsMode | null,
   target: Target,
   lists: TargetLists,
+  includeFreeText = false,
 ): P[] {
-  const base = mode === "free-text" ? pool.filter((p) => p.questionType === "free-text") : pool;
+  const base =
+    mode === "free-text"
+      ? pool.filter((p) => p.questionType === "free-text")
+      : mode === "review" || includeFreeText
+        ? pool
+        : pool.filter((p) => p.questionType !== "free-text");
   if (target === "all") return [...base];
   const ids = new Set(lists[target] ?? []);
   return base.filter((p) => ids.has(p.questionId));
@@ -45,10 +52,16 @@ export function inTarget<P extends PickItem>(
 /** モードで決まる対象で絞り、難易度で絞る。難易度を選んだときは、難易度のない問題を出さない。 */
 export function targetQuestions<P extends PickItem>(
   pool: readonly P[],
-  options: { mode: SettingsMode | null; target: Target; lists: TargetLists; difficulties: readonly Difficulty[] },
+  options: {
+    mode: SettingsMode | null;
+    target: Target;
+    lists: TargetLists;
+    difficulties: readonly Difficulty[];
+    includeFreeText: boolean;
+  },
 ): P[] {
-  const { mode, target, lists, difficulties } = options;
-  return inTarget(pool, mode, activeTargetOf(mode, target), lists).filter(
+  const { mode, target, lists, difficulties, includeFreeText } = options;
+  return inTarget(pool, mode, activeTargetOf(mode, target), lists, includeFreeText).filter(
     (p) => difficulties.length === 0 || (p.difficulty !== undefined && difficulties.includes(p.difficulty)),
   );
 }

@@ -49,7 +49,7 @@ describe("SectionPicker", () => {
     expect(cards).toHaveLength(2);
     expect(within(cards[0] as HTMLElement).getByText("満点")).toBeTruthy();
     expect(within(cards[1] as HTMLElement).getByText("未達")).toBeTruthy();
-    expect(within(cards[1] as HTMLElement).getByText(/問題 6〜7\(2 問、2 問の正解で合格\)/)).toBeTruthy();
+    expect(within(cards[1] as HTMLElement).getByText(/2 問\(2 問の正解で合格\)/)).toBeTruthy();
   });
 
   it("いちばん良い記録を残す_あとで点が下がっても合格のまま", async () => {

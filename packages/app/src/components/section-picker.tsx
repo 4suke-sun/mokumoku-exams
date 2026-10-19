@@ -5,14 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Notice } from "@/components/notice.tsx";
 import { syncSectionProgress } from "@/lib/history/client.ts";
-import {
-  passedSectionCount,
-  SECTION_SIZE,
-  type SectionStatus,
-  sectionPassLine,
-  sectionStatus,
-  sectionsOf,
-} from "@/lib/sections.ts";
+import { passedSectionCount, type SectionStatus, sectionPassLine, sectionStatus, sectionsOf } from "@/lib/sections.ts";
 import { SESSION_SAVE_FAILED, startSession } from "@/lib/start-session.ts";
 import { browserStore, loadSectionProgress, loadSession, type SectionProgress, type Session } from "@/lib/storage.ts";
 import type { PublishedExam } from "@/lib/types.ts";
@@ -22,7 +15,7 @@ type Item = { questionId: string; choiceKeys: string[] };
 
 type Props = {
   exam: PublishedExam;
-  /** 資格のすべての問題(データの並び) */
+  /** 資格の選択式の問題(データの並び。自由記述は含めない) */
   items: Item[];
 };
 
@@ -81,7 +74,8 @@ export function SectionPicker({ exam, items }: Props) {
         </Link>
         <h1 className="h1">セクションで解く</h1>
         <p className="text-sm text-muted">
-          {exam.name}。全問を 5 問ずつに分けて、順に解きます。5 問中 4 問(8 割)の正解で合格です。
+          {exam.name}。選択式の問題を 5 問ずつに分けて、順に解きます(自由記述の問題は含めません)。5 問中 4 問(8
+          割)の正解で合格です。
         </p>
       </div>
 
@@ -108,7 +102,6 @@ export function SectionPicker({ exam, items }: Props) {
           const key = String(index);
           const record = Object.hasOwn(progress.best, key) ? progress.best[key] : undefined;
           const status = STATUS[sectionStatus(record)];
-          const from = index * SECTION_SIZE + 1;
           return (
             <li key={key} className="card space-y-2 p-4">
               <div className="flex items-center justify-between gap-2">
@@ -119,8 +112,7 @@ export function SectionPicker({ exam, items }: Props) {
                 </span>
               </div>
               <p className="text-sm text-muted">
-                問題 {from}〜{from + section.length - 1}({section.length} 問、{sectionPassLine(section.length)}{" "}
-                問の正解で合格)
+                {section.length} 問({sectionPassLine(section.length)} 問の正解で合格)
                 {record ? ` / これまでの最高 ${record.correct} 問` : null}
               </p>
               <button

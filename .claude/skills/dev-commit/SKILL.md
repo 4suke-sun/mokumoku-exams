@@ -21,12 +21,17 @@ description: git commit の前に、ステージした差分とコミットメ�
 
 作成役と検査役は、別々に起動する。同じサブエージェントに書かせて確かめさせない。
 
-## Step 0. ステージの確認
+## Step 0. ステージの確認と、同じ記述の洗い出し
 
 1. `git status --short` と `git diff --cached --stat` を見る。**何もステージされていなければ、ここで止める。**
 2. ステージは、意図したパスだけを指定して行う。`git add -A` / `git add .` は使わない
 3. ブランチが `main` なら、コミットしない(ブランチを切ってから)。ブランチ名は `<prefix>/#<Issue番号>-…`
 4. `git config user.email` が、GitHub の noreply アドレス(`…@users.noreply.github.com`)であることを確認する
+5. 仕様・名前・数・振る舞いを変える差分では、検査に出す前に、同じことを書いている箇所を洗い出して、同じ差分でまとめて直す。
+   変えた語(関数・設定・項目の名前、理由コード、画面の文言、旧い前提を表す語)で、リポジトリの全体を検索する(`git grep --untracked`。未追跡の新しいファイルも含める。
+   文書、`CLAUDE.md`、スキルとエージェントの定義、コードとコメント、画面の文言、`data/` のヘルプの本文などを含む)。
+   検索した語と、直さないと決めた箇所の理由は、検査役への依頼に書く。
+   検査で 1 か所を指摘されたときも、同じ語で検索し直して、残りをまとめて直してから再検査に出す
 
 ## Step 1. 機械的な検査
 
@@ -59,6 +64,7 @@ node scripts/prepare-inspection.ts --cached
 - 作業ディレクトリ
 - 「`.claude/skills/dev-commit/checklist.md` を読み、その項目に沿って、`.drafts/inspect/` のファイルと
   `.drafts/commit-msg.txt` を確認する」
+- Step 0 の 5 で検索した語と、直さないと決めた箇所(場所と理由)。検査役は、渡された語でリポジトリを検索して確かめてよい
 - 「報告は、チェックリストの『報告のしかた(必ず守る)』に従う(値を引用しない。最後に `判定: OK/WARN/BLOCK`)」
 
 検査が終わったら、書き出したファイルを消す: `node scripts/prepare-inspection.ts --clean`
@@ -74,7 +80,7 @@ node scripts/prepare-inspection.ts --cached
 
 | 判定 | 動き |
 |---|---|
-| `BLOCK` | **コミットしない。** 指摘(場所と種類)を人に見せ、直し方を提案する。直したら(メッセージ案だけなら、案を直接直す)、`.claude/skills/dev-commit/reconfirm.md` のとおり Step 1 からやり直す |
+| `BLOCK` | **コミットしない。** 指摘(場所と種類)を人に見せ、直し方を提案する。直したら(メッセージ案だけなら、案を直接直す)、`.claude/skills/dev-commit/reconfirm.md` のとおり Step 1 からやり直す。差分を直したときは、先に Step 0 の 5 の検索をやり直す |
 | `WARN` | 指摘を人に見せ、コミットしてよいか聞く |
 | `OK` | Step 5 へ(人の確認は要らない) |
 

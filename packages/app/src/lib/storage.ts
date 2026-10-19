@@ -477,6 +477,8 @@ export const ConditionsSchema = z.strictObject({
   count: z.int().min(1).max(1000),
   preferFewer: z.boolean(),
   reveal: z.enum(REVEAL_CHOICES),
+  /** 通常出題に自由記述の問題を含めるか。この項目より前に保存した条件は、含めないとして読む */
+  includeFreeText: z.boolean().default(false),
 });
 export type Conditions = z.infer<typeof ConditionsSchema>;
 

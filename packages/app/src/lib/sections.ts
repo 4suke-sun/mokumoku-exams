@@ -1,6 +1,8 @@
+import { isOfficialTarget } from "./quiz.ts";
 import type { SectionRecord } from "./storage.ts";
+import type { Question } from "./types.ts";
 
-// 5 問ずつのセクションで解くモード。全問を、データの並びのまま 5 問ずつに分ける。
+// 5 問ずつのセクションで解くモード。選択式の問題を、データの並びのまま 5 問ずつに分ける。
 
 /** 1 セクションの問題数 */
 export const SECTION_SIZE = 5;
@@ -12,6 +14,16 @@ export function sectionsOf<T>(items: readonly T[], size: number = SECTION_SIZE):
   const sections: T[][] = [];
   for (let i = 0; i < items.length; i += size) sections.push(items.slice(i, i + size));
   return sections;
+}
+
+/**
+ * セクションで出題する問題。選択式(択一・複数選択)の問題だけで、自由記述は含めない。
+ * セクションの記録は番号で持つので、区切りを計算するところは、すべてこれを通す。
+ */
+export function sectionTargets<T extends { questionType: Question["questionType"] }>(
+  items: readonly T[],
+): (T & { questionType: "single" | "multiple" })[] {
+  return items.filter((item): item is T & { questionType: "single" | "multiple" } => isOfficialTarget(item));
 }
 
 /** セクションの合格に要る正答数(8 割の切り上げ) */
