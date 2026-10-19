@@ -4,7 +4,18 @@ import type { Exam, ExamsFile, PublishedExam, Question, QuestionsFile } from "./
 // リポジトリ直下の data/ の静的な JSON を読む。形は `npm run validate:data` が検査している。
 // サーバー側(ビルド時を含む)だけで使う。
 
-const exams = (examsFile as ExamsFile).exams;
+/** 動作確認用の架空の資格のベンダー(`docs/data-spec.md` の「9. サンプルデータ」) */
+const SAMPLE_VENDOR = "Example";
+
+/**
+ * 画面に出す資格。動作確認用の架空の資格は、本番のビルドでは出さず、開発・テスト・E2E でだけ出す。
+ * `showSamples` を引数にして、本番と開発の両方の振る舞いを単体テストで確かめる。
+ */
+export function visibleExams(all: readonly Exam[], showSamples: boolean): Exam[] {
+  return all.filter((exam) => showSamples || exam.vendor !== SAMPLE_VENDOR);
+}
+
+const exams = visibleExams((examsFile as ExamsFile).exams, process.env.NODE_ENV !== "production");
 
 export function listExams(): readonly Exam[] {
   return exams;
