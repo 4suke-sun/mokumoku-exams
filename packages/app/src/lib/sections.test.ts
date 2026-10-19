@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { passedSectionCount, sectionPassLine, sectionStatus, sectionsOf } from "./sections.ts";
+import { passedSectionCount, sectionPassLine, sectionStatus, sectionsOf, sectionTargets } from "./sections.ts";
 
 describe("sectionsOf", () => {
   it("5 問ずつに分ける", () => {
@@ -15,6 +15,28 @@ describe("sectionsOf", () => {
       [6, 7],
     ]);
     expect(sectionsOf([])).toEqual([]);
+  });
+});
+
+describe("sectionTargets", () => {
+  it("自由記述を含む問題_選択式だけをデータの並びのまま残す", () => {
+    const items = [
+      { questionId: "Q1", questionType: "single" as const },
+      { questionId: "Q2", questionType: "free-text" as const },
+      { questionId: "Q3", questionType: "multiple" as const },
+    ];
+    expect(sectionTargets(items).map((q) => q.questionId)).toEqual(["Q1", "Q3"]);
+  });
+
+  it("選択式 6 問と自由記述 1 問_自由記述を除いて 5 問と 1 問に分ける", () => {
+    const items = ["single", "single", "free-text", "multiple", "single", "single", "single"].map((type, i) => ({
+      questionId: `Q${i + 1}`,
+      questionType: type as "single" | "multiple" | "free-text",
+    }));
+    expect(sectionsOf(sectionTargets(items).map((q) => q.questionId))).toEqual([
+      ["Q1", "Q2", "Q4", "Q5", "Q6"],
+      ["Q7"],
+    ]);
   });
 });
 

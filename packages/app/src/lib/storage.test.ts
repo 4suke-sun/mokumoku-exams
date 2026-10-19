@@ -427,6 +427,7 @@ describe("端末の記録の持ち主の照合", () => {
       count: 10,
       preferFewer: false,
       reveal: "end",
+      includeFreeText: false,
     });
     saveSession(b, { ...session, index: 0 });
     expect(loadSession(a, "TEST")?.index).toBe(1);
@@ -500,5 +501,31 @@ describe("端末の記録の持ち主の照合", () => {
     expect([...device.data.keys()].sort()).toEqual(
       [`mokumoku:v1:${A}:sections:AWS-AIB-C01`, `mokumoku:v1:${B}:sections:AIB`].sort(),
     );
+  });
+});
+
+describe("出題の条件", () => {
+  const conditions = {
+    target: "all" as const,
+    domains: ["D1"],
+    difficulties: [],
+    count: 10,
+    preferFewer: true,
+    reveal: "end" as const,
+  };
+
+  it("自由記述を含めるかを保存する_読み直すと同じ値になる", () => {
+    const store = memoryStore();
+    saveConditions(store, "TEST", { ...conditions, includeFreeText: true });
+    expect(loadConditions(store, "TEST")?.includeFreeText).toBe(true);
+  });
+
+  it("自由記述の項目がない保存済みの条件_含めないとして読み_ほかの値は保つ", () => {
+    const store = memoryStore();
+    saveConditions(store, "TEST", { ...conditions, includeFreeText: true });
+    const [key, value] = [...store.data.entries()][0] as [string, string];
+    const { includeFreeText: _, ...legacy } = JSON.parse(value);
+    store.setItem(key, JSON.stringify(legacy));
+    expect(loadConditions(store, "TEST")).toEqual({ ...conditions, includeFreeText: false });
   });
 });

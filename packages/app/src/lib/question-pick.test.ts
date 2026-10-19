@@ -25,13 +25,27 @@ describe("出題の対象の絞り込み", () => {
   });
 
   it("対象の一覧_いまのデータにない問題は落とし_読み込めない一覧は空にする", () => {
-    expect(ids(inTarget(pool, "normal", "review", lists))).toEqual(["Q2", "Q3"]);
+    expect(ids(inTarget(pool, "normal", "review", lists, true))).toEqual(["Q2", "Q3"]);
     expect(ids(inTarget(pool, "normal", "bookmarks", lists))).toEqual([]);
     expect(ids(inTarget(pool, "free-text", "all", lists))).toEqual(["Q3"]);
   });
 
+  it("通常出題_既定は選択式だけにし_自由記述を含めると自由記述も対象にする", () => {
+    expect(ids(inTarget(pool, "normal", "all", lists))).toEqual(["Q1", "Q2", "Q4"]);
+    expect(ids(inTarget(pool, "normal", "review", lists))).toEqual(["Q2"]);
+    expect(ids(inTarget(pool, "normal", "all", lists, true))).toEqual(["Q1", "Q2", "Q3", "Q4"]);
+    const options = { mode: "normal" as const, target: "all" as const, lists, difficulties: [] };
+    expect(ids(targetQuestions(pool, { ...options, includeFreeText: false }))).toEqual(["Q1", "Q2", "Q4"]);
+    expect(ids(targetQuestions(pool, { ...options, includeFreeText: true }))).toEqual(["Q1", "Q2", "Q3", "Q4"]);
+  });
+
+  it("復習と自由記述のモード_自由記述を含めるかの選択に左右されない", () => {
+    expect(ids(inTarget(pool, "review", "review", lists))).toEqual(["Q2", "Q3"]);
+    expect(ids(inTarget(pool, "free-text", "all", lists))).toEqual(["Q3"]);
+  });
+
   it("難易度を選ぶ_その難易度の問題だけにし_難易度のない問題は出さない", () => {
-    const options = { mode: "normal" as const, target: "all" as const, lists };
+    const options = { mode: "normal" as const, target: "all" as const, lists, includeFreeText: true };
     expect(ids(targetQuestions(pool, { ...options, difficulties: [] }))).toEqual(["Q1", "Q2", "Q3", "Q4"]);
     expect(ids(targetQuestions(pool, { ...options, difficulties: ["easy", "hard"] }))).toEqual(["Q1", "Q2"]);
   });
