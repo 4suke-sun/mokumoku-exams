@@ -1,0 +1,621 @@
+{
+  "examCode": "AWS-CLF-C02",
+  "sources": [
+    {
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02.html",
+      "kind": "exam-guide"
+    },
+    {
+      "url": "https://aws.amazon.com/about-aws/global-infrastructure/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/amplify/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/appstream2/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/architecture/well-architected/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/artifact/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/athena/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/autoscaling/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/aws-cost-management/aws-billing/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/aws-cost-management/aws-cost-and-usage-reporting/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/aws-cost-management/aws-cost-explorer/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/backup/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/certificate-manager/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/cli/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/cloud-adoption-framework/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/cloud-migration/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/cloudformation/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/cloudtrail/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/cloudwatch/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/codedeploy/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/cognito/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/compliance/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/compliance/programs/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/compliance/shared-responsibility-model/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/config/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/connect/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/detective/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/developer/tools/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/directconnect/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/disaster-recovery/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/dms/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/dynamodb/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/ebs/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/ec2/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/ec2/autoscaling/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/ec2/dedicated-hosts/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/ec2/instance-types/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/ec2/pricing/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/ec2/pricing/reserved-instances/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/ec2/spot/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/economics/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/ecs/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/efs/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/eks/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/elasticache/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/elasticloadbalancing/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/fargate/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/guardduty/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/hybrid/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/iam/features/mfa/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/iam/identity-center/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/inspector/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/iot-core/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/kms/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/lambda/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/license-manager/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/machine-learning/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/macie/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/marketplace",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/organizations/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/partners/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/premiumsupport/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/premiumsupport/plans/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/premiumsupport/technology/trusted-advisor/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/pricing/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/rds/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/route53/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/s3/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/s3/pricing/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/s3/storage-classes/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/sagemaker/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/savingsplans/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/security-hub/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/security/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/shield/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/sns/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/sqs/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/storagegateway/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/vpc/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/vpn/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/waf/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/what-is-cloud-computing/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/workspaces/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/xray/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_passwords_account-policy.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/root-user-tasks.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/consolidated-billing.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/emr/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/glue/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/kinesis/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/opensearch-service/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/quicksight/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/redshift/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/eventbridge/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/step-functions/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/ses/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/batch/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/elasticbeanstalk/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/lightsail/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/outposts/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/ecr/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/rds/aurora/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/documentdb/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/neptune/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/codebuild/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/codepipeline/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/comprehend/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/lex/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/polly/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/q/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/rekognition/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/textract/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/transcribe/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/translate/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/compute-optimizer/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/controltower/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/premiumsupport/technology/aws-health-dashboard/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/servicecatalog/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/systems-manager/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/well-architected-tool/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/console/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/application-discovery/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/application-migration-service/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/migration-evaluator/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/migration-hub/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/dms/schema-conversion-tool/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/api-gateway/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/cloudfront/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/global-accelerator/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/privatelink/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/transit-gateway/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/cloudhsm/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/directoryservice/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/firewall-manager/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/secrets-manager/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/ram/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/fsx/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/s3/storage-classes/glacier/",
+      "kind": "official-doc"
+    }
+  ],
+  "guidePages": [
+    "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02-domain1.html",
+    "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02-domain2.html",
+    "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02-domain3.html",
+    "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02-domain4.html"
+  ],
+  "scope": {
+    "prefixes": [
+      "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/",
+      "https://aws.amazon.com/",
+      "https://docs.aws.amazon.com/IAM/latest/UserGuide/",
+      "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/",
+      "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/",
+      "https://docs.aws.amazon.com/vpc/latest/userguide/",
+      "https://docs.aws.amazon.com/wellarchitected/latest/framework/",
+      "https://docs.aws.amazon.com/whitepapers/latest/"
+    ],
+    "maxDepth": 0
+  },
+  "exclude": []
+}

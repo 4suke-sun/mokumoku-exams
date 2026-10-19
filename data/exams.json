@@ -88,6 +88,55 @@
       },
       "previousCodes": ["AIB"],
       "idPrefix": "AIB"
+    },
+    {
+      "examCode": "AWS-CLF-C02",
+      "status": "published",
+      "vendor": "AWS",
+      "edition": "C02",
+      "name": "AWS Certified Cloud Practitioner",
+      "shortName": "Cloud Practitioner",
+      "level": "Foundational",
+      "abbr": "CLF",
+      "category": "Cloud",
+      "passingScore": 700,
+      "totalScore": 1000,
+      "officialQuestionCount": 65,
+      "officialTimeMinutes": 90,
+      "domains": [
+        {
+          "code": "domain1",
+          "name": "クラウドのコンセプト",
+          "weight": 0.24
+        },
+        {
+          "code": "domain2",
+          "name": "セキュリティとコンプライアンス",
+          "weight": 0.3
+        },
+        {
+          "code": "domain3",
+          "name": "クラウドテクノロジーとサービス",
+          "weight": 0.34
+        },
+        {
+          "code": "domain4",
+          "name": "請求、料金、サポート",
+          "weight": 0.12
+        }
+      ],
+      "info": {
+        "checkedAt": "2026-10-19",
+        "format": "択一選択式と複数選択式",
+        "languages": ["日本語", "英語"],
+        "fee": {
+          "amount": 100,
+          "currency": "USD"
+        },
+        "validityYears": 3,
+        "guideUrl": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02.html"
+      },
+      "idPrefix": "CLF"
     }
   ]
 }

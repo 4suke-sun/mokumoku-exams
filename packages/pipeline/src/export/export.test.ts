@@ -44,6 +44,7 @@ function publishedSet(count: number) {
 function exportRoot() {
   const root = setupDraftRoot({ questions: { examCode: EXAM, questions: publishedSet(90) } });
   cpSync(join(repoRoot, "data/questions.ex-smp-xx.json"), join(root, "data/questions.ex-smp-xx.json"));
+  cpSync(join(repoRoot, "data/questions.aws-clf-c02.json"), join(root, "data/questions.aws-clf-c02.json"));
   return root;
 }
 
