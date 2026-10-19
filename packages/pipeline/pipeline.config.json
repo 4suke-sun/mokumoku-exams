@@ -62,7 +62,7 @@
     "targetMultiplier": 3,
     "difficultyMix": { "easy": 0.3, "medium": 0.5, "hard": 0.2 },
     "typeMix": { "single": 0.75, "multiple": 0.2, "free-text": 0.05 },
-    "overrides": {}
+    "overrides": { "AWS-CLF-C02": { "targetTotal": 200 } }
   },
   "checks": {
     "freshnessDays": 365

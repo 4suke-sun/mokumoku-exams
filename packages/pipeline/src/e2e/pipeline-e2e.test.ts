@@ -55,6 +55,7 @@ function setupRoot(plan: unknown) {
   cpSync(join(repoRoot, "data/exams.json"), join(root, "data/exams.json"));
   installAgentDefinitions(root);
   cpSync(join(repoRoot, "data/questions.ex-smp-xx.json"), join(root, "data/questions.ex-smp-xx.json"));
+  cpSync(join(repoRoot, "data/questions.aws-clf-c02.json"), join(root, "data/questions.aws-clf-c02.json"));
   writeFileSync(
     join(root, "data/questions.aws-aib-c01.json"),
     JSON.stringify({ examCode: CODE, questions: published(90) }),

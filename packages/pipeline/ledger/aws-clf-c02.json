@@ -1,0 +1,5488 @@
+{
+  "examCode": "AWS-CLF-C02",
+  "guide": {
+    "agent": {
+      "definitionHash": "247c589606569d96f1af5ad352dac95317fff8f6abed0965bb4dd1412067e7fd",
+      "model": "claude-haiku-5-5",
+      "role": "guide-extractor"
+    },
+    "contentHash": "9b1cd1a7576b5559a457ee546754d7867f7bd6a801acb8fb988f9a6789c2f3f1",
+    "domains": [
+      {
+        "code": "domain1",
+        "name": "クラウドの基礎知識",
+        "scope": [
+          "クラウドを採用すると得られる価値を、自分の言葉で説明する",
+          "拠点の世界的な広がりが、展開の速さと到達範囲にもたらす効果を捉える",
+          "可用性、伸縮性、機動力が事業にもたらす効果を捉える",
+          "Well-Architected の各柱が何を重視するかを押さえ、柱どうしの違いを見分ける",
+          "クラウドへの移行の進め方と、移行を助ける公開資料を把握する",
+          "AWS CAF の構成要素と、それが事業にもたらす効果を理解する",
+          "移行の手法を、データベースの複製などの場面に合わせて選ぶ",
+          "固定費と変動費の違い、オンプレミスで生じる費用の内訳を理解する",
+          "ライセンスを持ち込む方式と、利用料に含まれる方式の違いを理解する",
+          "リソースの規模を需要に合わせて調整する考え方を理解する",
+          "作業の自動化がもたらす利点を見分ける",
+          "規模が大きくなることで単価が下がる仕組みを理解する"
+        ],
+        "weight": 0.24
+      },
+      {
+        "code": "domain2",
+        "name": "セキュリティとコンプライアンス",
+        "scope": [
+          "責任共有モデルの構成要素を見分け、AWS と利用者それぞれの責任を説明する",
+          "使うサービスの種類によって、責任の分担が変わることを説明する",
+          "クラウドで暗号化を使う利点と、ガバナンスやコンプライアンスの基本的な考え方を理解する",
+          "AWS の認証資料の入手先と、業界や地域ごとに異なる要件を捉える",
+          "転送中と保管時の暗号化を見分け、セキュリティ関連ログの保存先と確認先を特定する",
+          "利用者がリソースを守るために使えるサービス（脆弱性の検査、脅威の検出、DDoS 対策など）を挙げる",
+          "監視、監査、構成の記録、アクセスのレポートを担うサービスを認識する",
+          "IAM の役割、ルートユーザーの保護、最小権限の原則を理解する",
+          "アクセスキー、パスワードポリシー、認証情報の保管の仕組みを理解する",
+          "多要素認証などの認証方式と、フェデレーションを含む ID 管理の種類を見分ける",
+          "ルートユーザーにしかできない作業と、ルートユーザーを守る手段を理解する",
+          "AWS が提供する防御の機能、Marketplace のサードパーティ製品、セキュリティ情報の所在を把握する",
+          "セキュリティ上の問題を見つけるためのサービスの用途を理解する"
+        ],
+        "weight": 0.3
+      },
+      {
+        "code": "domain3",
+        "name": "クラウドの技術とサービス",
+        "scope": [
+          "AWS を操作する方法（コンソール、API、SDK、CLI、コードによる構成管理）を目的に応じて選ぶ",
+          "一度きりの作業か、繰り返し行う手順かを判断し、クラウド・ハイブリッド・オンプレミスの展開を見分ける",
+          "リージョン、アベイラビリティーゾーン、エッジロケーションの関係を説明する",
+          "複数のアベイラビリティーゾーンを使って可用性を高める方法を理解する",
+          "災害復旧、事業継続、低遅延、データの所在要件から、複数リージョンの利用を判断する",
+          "仮想サーバーのタイプの用途と、コンテナやサーバーレスの実行基盤の使い分けを理解する",
+          "負荷に応じて台数を増減させる仕組みと、トラフィックを振り分ける役割を理解する",
+          "自前で運用するデータベースと、AWS が運用を担うデータベースを使い分ける",
+          "リレーショナル、キーバリュー型、インメモリの各データベースの用途を見分け、移行ツールを認識する",
+          "仮想ネットワークの部品と、その通信を制御する仕組みを理解する",
+          "DNS の役割と、社内からクラウドへ接続する方法の違いを理解する",
+          "オブジェクトストレージの用途と、保存クラスの違いを理解する",
+          "ブロック型、ファイル型、キャッシュ型のストレージの用途を見分ける",
+          "保存データの世代管理と、バックアップを一元化する仕組みの利用場面を理解する",
+          "AI と機械学習のサービスが担う作業と、データ分析のサービスの用途を理解する",
+          "通知やメッセージを届けるサービスと、業務アプリケーション向けのサービスを選ぶ",
+          "支援の選び方と、アプリを開発・配置・調査するためのツールを識別する",
+          "仮想デスクトップや画面の配信、フロントエンドの配信、IoT 機器の管理に使うサービスを識別する"
+        ],
+        "weight": 0.34
+      },
+      {
+        "code": "domain4",
+        "name": "請求、料金、サポート",
+        "scope": [
+          "コンピューティングの購入方式（オンデマンド、予約、スポット、節約プランなど）を場面ごとに使い分ける",
+          "予約の柔軟性と、複数アカウントをまとめて管理する場合の扱いを説明する",
+          "ストレージの種類と階層ごとの料金、通信量による料金の違いを理解する",
+          "請求と料金の情報の入手先、複数アカウントの請求の一本化とコストの配分を理解する",
+          "コスト配分タグの種類と、詳細な請求レポートとのつながりを理解する",
+          "予算の管理と費用の分析に使うツール、料金の見積もりに使うツールの用途を理解する",
+          "公式サイト上の資料、ブログ、ドキュメントの探し方を理解する",
+          "サポートの段階の違いと、コミュニティや技術的な支援の選択肢を理解する",
+          "環境の状態を確認し、コストの最適化に役立てるツールの役割を理解する",
+          "不正利用の通報を扱う組織の役割と、パートナー企業の役割を理解する",
+          "パートナーになる利点と、Marketplace で得られる主な機能を理解する"
+        ],
+        "weight": 0.12
+      }
+    ],
+    "exam": {
+      "passingScore": 700,
+      "questionCount": 65,
+      "scoredQuestionCount": 50,
+      "totalScore": 1000
+    },
+    "importedAt": "2026-10-18",
+    "pages": [
+      {
+        "contentHash": "646ed6dc7ad5fc48ac3e3a9196b18a2feba2466177be4c6f1c9558995fdd195a",
+        "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02-domain1.html"
+      },
+      {
+        "contentHash": "43fd7dd2c245399c95d5e0911b8dd096376a20a6262893c770d37382384f45c7",
+        "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02-domain2.html"
+      },
+      {
+        "contentHash": "e077ee8bda94c9a5d361217929696edffd4f85fccbea22f64229f748ae4087f1",
+        "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02-domain3.html"
+      },
+      {
+        "contentHash": "fa1898495daa2145949511c9d4d63b390f20e7f8ce1cd3e49109e4cb548c830a",
+        "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02-domain4.html"
+      }
+    ],
+    "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02.html"
+  },
+  "recheck": {
+    "facts": [],
+    "questions": []
+  },
+  "sources": [
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "6329ef34923129621e68eeb3c3ca6305a0e8d70b079a72303c51828fd2152d92",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/about-aws/global-infrastructure/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "bc9cbe44acbf139a6b678f65071512ab14f52e1472f5b522d54bc9a777fc4027",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "7e8bcca981ae0642eb573cc78cdb66fe90de103819d123efa1d7fae9d4124125",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/amplify/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "c043ba883a0f921dba1e87abf1ddc91aa24c36825c5c48d5a0e6b93ffed69f4e",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/api-gateway/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "7120ab5db57b3e8df39826a6d7ce398c880a237cc45c9d39b00e825bf9a7a15b",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/application-discovery/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "e0a0f2f7cdffe509e5ff218288b2fe8da8b3f2f9093ba4c95d4c8d75197f72c3",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/application-migration-service/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "7060bd723c1a27d3682c9d653bf7d27d3ad7a84df706db4a141330f41c03b150",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/appstream2/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "1906898c63619945c84bac70b6c5228d4f8734ce790d007e41146384e881bf8a",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/architecture/well-architected/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "72840e1989a7d860d8777bbf1500cd2fcfeee8bc67d96d712186ecc69c159b82",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/artifact/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "681183effda8237ecb663693f67597e3456cbd91f5efb0f8e5f5e1e66df0e8e0",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/athena/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "4bb0e7e5f532e97988713b75877fd548961be20e0ceae70b239b2835b87fe3f5",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/autoscaling/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "89321f532fae05542a97bc094df7ae66434b78ae7ddd62b3775a5bed78ce83ba",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/aws-cost-management/aws-billing/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "df14ec83ba0cbc592ad43086441ea6c2a85f5580bdebfba08bba92cb4b5a07cc",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "7b4b98f21eb2d367a6f393f85927914088812da1650644f79c0073af1f58c62b",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/aws-cost-management/aws-cost-and-usage-reporting/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "d40f893881d6914704b6b2ede9878e2795d90ecee5678996323780652710dcc2",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/aws-cost-management/aws-cost-explorer/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/backup/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "ed5a9a76d71d572b4004dea788db43a6c39ba700769992faac9475b3be647477",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/batch/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "19dac666e633fec34db7f27eff0f322a34a34c8123fb15e9827b9097964dc49a",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/certificate-manager/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "e977c049e8ae2e3045c195619d1cb0cbc050abdcf6d974a3d5721309df889742",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/cli/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "64b8db2bebd45677f1a941f54674ac73056f5589c0ba4ccc07dad91355ec444f",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/cloud-adoption-framework/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "4e2a8a0dfcc51446a4f7bdf1a006c0098dbcbefe131b96d23e9bb90e012a72c5",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/cloud-migration/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "f470c153cc0d5c8033701b10f126634aea94938113b386c5d5e1665859f3b907",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/cloudformation/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "821427d5feb78b90fb4cfd05a9c043cb87bb1041182a44eb007db7726abdf3a2",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/cloudfront/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "964951e62fb0417f4bc258044e70841672e43d67c3289e07c33a44668a0e5a53",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/cloudhsm/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "c7a6ad086fd327aa3692274bff545dd1a0dec913887558ea19acc57b8f0308be",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/cloudtrail/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "4167b0163af282b43aecf19ca32400fedd69f9858677e77299ceec545d9afe5a",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/cloudwatch/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "65d7b4f240b2043e29815e285d5e70db6ab5bd8e5e218a0e0a420fa36da22e50",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/codebuild/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "a99e7b9176bbf01e5bc3f5baffdc6ee492eb3e4fd2b1b96474dba07ecec99711",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/codedeploy/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "5da630823d693dcf7dd2d68cb53fc85ac53b3820acf6726ad85760d775befa8e",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/codepipeline/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "1d556907a62d479f1dcbb50a49eb6bb6a38ecbf64d61cc8eaed094ec6dfc7f87",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/cognito/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "d6685677a13070205a2e781ee930eee053f0974edf0f932692d47b5d53f07117",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/compliance/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "31b0b5dd6c2543c6711b2e4c41856e9a58723ba553b300955ff0831bf15140df",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/compliance/programs/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "af3aa2211d96228039f360fb759f53ecb6e462ab51c891ef07b0505960a7d236",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/compliance/shared-responsibility-model/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "70657b4ce04d7a666608cb8cc844eb380093caae35c2d2f70bde96e8744a3707",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/comprehend/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "ad3e15242204dfd39417aae1d85d4ae62bdee7852a5c68b93c30f903472ea9f9",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/compute-optimizer/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "0054ea68e9f1fb7b07c1f4a862e4a3ae51ef96eac1fc6645866a3dcc7a90c023",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/config/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "63c81431d0263d43ac9a51c5671fb422e04f39aa00417ce7ec4f34cf9af5e8e9",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/connect/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "a4a10edb292445ae1db9e24b54fb7a159d7f8ef58e283c7e208b4035f21610d0",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/console/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "39ff7bf11d118980345647b6d9bf3cadcb01b33c62edd099fadcb4de3f1b9ddf",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/controltower/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "f03e97fb9cd1d65709b692482a6d5b53da3f03d7c6e6ce74f66a3e54939faa62",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/detective/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "reason": "no-body",
+          "result": "unknown"
+        },
+        {
+          "name": "freshness",
+          "reason": "no-body",
+          "result": "unknown"
+        },
+        {
+          "name": "liveness",
+          "reason": "redirect-not-allowed",
+          "result": "fail"
+        }
+      ],
+      "claims": [],
+      "contentHash": null,
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "unreachable",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": null,
+      "url": "https://aws.amazon.com/developer/tools/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "60e58f04279989e3766b8b47e14b8df1d39d9fcd15b0f4b8bdfb6c7faf1f1643",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/directconnect/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "a9e8804c5fadf2f616ee1eff3916edfdcc06586242a2236dec0738379ad790a0",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/directoryservice/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "04df2b40166a0fbd4ca92171c79f27d6785e13dd606b2b19210419428c8920d5",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/disaster-recovery/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "c5760e4a7285bdd75936f1fbc37fe5da678235557a5486e944b6d288202d58d9",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/dms/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "4491a092e678035f026611802a848b5ba9ea2400136a0c8eae65ef09c0c31aab",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/dms/schema-conversion-tool/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "363aeb2c8cae4a3597f9e1de87061c96626c2ae1a44af790da5ea170ed26c68d",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/documentdb/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "c3639d16596e65425f9514b32b6adaafffe9a6cec9dc94e9e237a4825e37fe97",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/dynamodb/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "6d1375bd018e9556112ca019cbc90614ea55b8b69525bc085bccd044cd747180",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/ebs/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "ee0ac3189da097043f4c0bd6ef0ece6be8627c41fdefcb57bf6fa98115a2230f",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/ec2/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "919a5dae0f6eb873822dae8f0dc29afd6043158b7ea780d064f58b500e4b3434",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/ec2/autoscaling/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "1edf73f7e7b6f2adc44f75100c55a98be378b8bf16d73aae89fa818a43075b87",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/ec2/dedicated-hosts/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "02168680f33076793c9fe6eede365ccd94813e523182a05eec3273f05e09dc91",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/ec2/instance-types/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "16a67d5ae58676d109baf8ff7bd6f5ac5881511628fbde67f8085ffca0bc0ff3",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/ec2/pricing/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "87574fb741c3a9e499af1627525c8918c6be1c87ee7f234f7eed5d655d7d9dca",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/ec2/pricing/reserved-instances/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "6cab3d5c7f142d0fe45a9c35260a9a20549741fe1c6031181040c22ad08d297a",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/ec2/spot/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "10d06770825b6e8b30122119f3ea2b7029133ad1bd2bb62500cb1e5ad0bae16c",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/economics/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "8ac1cca2fd08e5038228fbdb19c00c5e254b81f5be49161646bbedcaa7ecd878",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/ecr/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "7b0cc6721617394a7ce79552e6a54bf55282593b9b82a913d07d455012e57384",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/ecs/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "8ff650a55c7e5853f7f36a90aa72db2bfe74e999fbb0e22f8b5f15f98e0ca177",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/efs/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "1a8f996cf1a08fc3967c83e79996cdd6bc3ef67dc4e35935f613daed5bd5880e",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/eks/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "d275782782cc99a124b320ba3c53e5df7fb5bfa6678896b41e32742c28b41064",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/elasticache/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "69df100f85e28f55279cedc09b1b704573c4845d88f7c637731a3185419015cd",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/elasticbeanstalk/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "a32a5b3d6a4bb34abbad3aa6bf1c246af46bb01b48605c5675a24749241dffc9",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/elasticloadbalancing/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "8adf5f06e1ca0c647de7121e9a852e3fb1740fd04fa515cc38ba983e901c794d",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/emr/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "befea5bfcfff88e6a6301f046353fa0b73e7f3ab0170ca67e0e6908b7650ea54",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/eventbridge/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "e3379aa6293718f423e11130613ce465ce1eb6efcd35e136714b2d62a93a4ce8",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/fargate/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "ebf6709b15f3d0edf1f52f3ef72e92069fd80f9acd8868a1617edce136182376",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/firewall-manager/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "24f406b6fcc8ee0c8fc567c5ee2f66f27d79a2282508b672f631b20ca252c026",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/fsx/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "e83cd4ef4a7312fda43f40c2db5c6232861ba009125e08e739f40f0245ff0e9d",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/global-accelerator/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "a2712c15eeaa535f17e9db6b964c5102d98569509f4c57dd18a4dc9e7b46bbff",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/glue/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "8f8f2bd1c575de7ace6f499016d76c6d92cb110ce05e66bee7fc42497deae406",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/guardduty/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "a0863f56bfb45bdbb5e8d79d8d5a3569e0ed8c1fa90684a221eb3513efa8095a",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/hybrid/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "c695abe043375a667bf88a0668aeeaad8fe48631e85fe7803dc76bc42a7c5f7e",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/iam/features/mfa/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "6f711ed66d2c5f54b8b733f54ea6b82fa62c73476944db43d26b7a1399542ad0",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/iam/identity-center/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "02b944d96de093c2f43f7ee7d60597b540b14d7c0dee22ed8033b7c4f98d34d1",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/inspector/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "de152a13a1025d026346bf40a6d4a15d86468ebfdc3d5736d90f56e59ab8ef28",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/iot-core/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "242f88ffbd224bb91164055322b3fd0ebb3507d75d0cc8710599fdef6d01fa38",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/kinesis/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "7096901fcd1d29ac2cefc278ffe6792d34a40e76911478270d3145561890d1b0",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/kms/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "d165baf4403ed97a398f29adba4d99dcbc5bcd45b0904f5d572c6fb36fb2dc62",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/lambda/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "668e31ebb530f8c5dda8f817d977f1b5a1233ed6c5d640189e3360b8a9f186a0",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/lex/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "2da7023d2f11d7cc27019971cef62eab593b5c8145ec2cf40433ff7b9c793aab",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/license-manager/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "dec118ceb4251eac9bdc964991b1ca8fcdb4c6c3ef2aa29c514a9f7b3ea427b9",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/lightsail/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "3a721c3389e267bc5e943813e511bf83a61dfc3d99ec8e05d3dd4b79f4c41cf9",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/machine-learning/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "6f0d53b3f4abd20f71268e159a4ab9ecc6e61f4505eb31941b535b41a62a8c13",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/macie/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "fed1f6d367af1e2f3942884451a698f326cbbdd29e98499a7b76331a79404f07",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": null,
+      "url": "https://aws.amazon.com/marketplace"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "3771ee53f8378aa2b00bfd3ceb88608feb01ef067ae4374e0ac44f8b98bd0513",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/migration-evaluator/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "70568f53a19add6688d7ea917d08e8996aceb5a87785c8da66a8d1ff1d2513d1",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/migration-hub/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "7122427cd670cc27c7958aa09247ee83b3040f85e2c5f61870a829cc642bbca5",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/neptune/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "021d2169a3d38cd0bcf939b3de31cf4c3148b4537a793d4dac841354df90ed7e",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/opensearch-service/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "f0ba8e7f2317048aaea4f74b624cd267346685963c1cee18449268e2cd255120",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/organizations/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "055d4607bbbe24573bdf43f706779fd8cd5ddefb003847be4b484a9fd6eaddce",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/outposts/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "3f7a09d749ed82de3963e14e8e6b4cca561f60aba51a7772f9441a1b4f5526e4",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/partners/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "91d55be03ad69f5904db12c9650c3b32a1ba49a2ac9b862c053f79dd526fb2a2",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/polly/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "d3d51dc00c4362b4bcf4aeae403feed0f65de7a42abdd3f6b6573ecca85934bb",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/premiumsupport/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "9bb6291d2665b6246eb8ad119b35f5c0f1f0467858c475905c88821367342b70",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/premiumsupport/plans/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "94e1649a41c0f132a5398d5efccb096b60d1620e540dfddd66ee5ecb446ffe8d",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/premiumsupport/technology/aws-health-dashboard/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "54662198773a9e54cb8f3b3aa512c52b8f7bc730709bcdba93841c1d49a5ce87",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/premiumsupport/technology/trusted-advisor/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "c1d646e3db5ceffc5b7728af9f7967bd26a9cdef6a9b547b3f4012ba06512869",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/pricing/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "7f638d807bdf4155b9c4b994f07ee29c1c2b88a7dfce5964bfc5fd67b4c6de25",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/privatelink/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "899d7ce9ccf8106f4fa3c634215e26c305d0fd0995a92d6aa30d1bb3b0572f6a",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/q/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "5cc80ba26f988e8e1e380dcda7bf454e2fa4e92d7aa50f163b97e236e8d30ad6",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/quicksight/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "74b7b3cb346baea7848990ee3c45b8eba0a73e63da9ea9e34fadc2f6d482a9fb",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/ram/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "f9a8e9a30e35a744e37defb6c936fc480aaca8d85a603e072adba3926164499f",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/rds/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "aa3d245565a5c0996c05b5c06023aad01ba1f283c91b0c15d8784c2a20e589b8",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/rds/aurora/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "4bcac576c2470e7656cde80f13bee4973577665e4b8a825ea3e56b6301c73b61",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/redshift/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "30e50643e4bab74494814ab65b14cd388c02c05bd0c3c84ac839be13d7ca77a1",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/rekognition/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "3074f506b4d10fbb4bf10a798f4e4d901534bcf6c72d656aaf4d28630d6eb5ab",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/route53/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "52b0a08a58ba75c3ca676329dd460a55d9420868351bce0dd3458ff104d5a55f",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/s3/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "678c2d9e89184eec1d13b586a927fec33a5f221f8c83689557bebb2065b52d18",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/s3/pricing/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "c76b9edd0c0c8b1d646413e48ebf104b0357a3d1f0d68b88d380955572b4f711",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/s3/storage-classes/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "0a162bb13ddd805009cd97fced74c7f36515cd9b112eb5fbf0a163393e49b7eb",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/s3/storage-classes/glacier/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "73281c7316284ff08dbb99e1499cadd3a69f921c43d1a0f3bf856546d8e67d52",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/sagemaker/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "e7e2c7535e92a73fd1e5f203515ba495b4c49bcdef3b1ecc927eb0eda64e35a1",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/savingsplans/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "8a6aa71af6ba7e2ab8531d2a7506c6fcd1c2fba2feef52b8ba6e88ade2d0ddd8",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/secrets-manager/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "5b4bf363b25e5c94044acd2d64f81798f14dde9938fbde67a21fc0197412f8d5",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/security-hub/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "ed441e6e7af5a2188a32baa6a4bf4f0e141173eaae8671094fc4a8bb9934466b",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/security/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "be2bdaff22d43c99664f7652500c0358e11c1427855f749842281a38d625aff3",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/servicecatalog/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "9fa1fc9428bcd19a5bb9dad64540393bdb85bc8e7bd68e54c3d261537beec6b1",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/ses/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "5371099e32ed259c1050ed3e8a44e8515d9142046ce9fc98fbd390b0c91c2f47",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/shield/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "da1984fc5cf8d036f9877be93307e48835ec522c3944c1cd7ad42f4bc0ec8d39",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/sns/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "b1465089f9fcfd7e07a9369afbaa754897115b6496451fdd9b59cf7d215ffc54",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/sqs/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "ca59c80cf08bd896f34bfa286b9a84b6405f1cb15e5d43f9b170e29bb883b12a",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/step-functions/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "c24a1db4c72d00c08d98c22ef3e2388199be00f71c63723bb2eb327b971ccfb4",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/storagegateway/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "bad42dad8b553a6dd084efa74af2247cf104d86d7106756d1dc99410996d8f88",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/systems-manager/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "ac87cd3cfefea4036c0d83012e3c5fafd3538eb4e2fa1e950b461a315660b195",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/textract/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "5021a12d754d0ed9bbaab426b49c6763b2842c72f2a2024d0eb76635358c1839",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/transcribe/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "099e378c50431156c1ef13d5c0eb9a2725899dd41ea9721729efb00d7e6bac4c",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/transit-gateway/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "2363d8a67d72a173b6bdab7dc8ac3e2daf0473c04fe96051b35e9af7f3cae00b",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/translate/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "0375bbc6aabf8decd103ae0541f81e98edfb0a0b45277c9610bccfbe4d45ae79",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/vpc/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "f3cd9f8ae8f290a975e320983b10d626385ecf8572c62790a2655f1285ac4ed7",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/vpn/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "15bb51164b9f7b8984e9aa68799c0129deebd788b2f55a7ea7cb56e2340ff0b6",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/waf/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "04d64a02930b5cf1a10a348416153bc0512765ff66c6f1200cab4ce4c2c36874",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/well-architected-tool/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "614895974e219e2d5dda714be6d5d9d1ceeeb3a793f76971447585f0745c5123",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/what-is-cloud-computing/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "eb4934d10703139495569256e5321ad6add3a29481324b2a0509ce4808c833d7",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/workspaces/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "6bb445d747a4e7bb6b6ed8a129f9d16cf24cfe637692339b76465a6dcb366865",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://aws.amazon.com/xray/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "8b97534d790da8647c2b58e497060630ce5f2b01ce46e2d2deac2070ada0f338",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-17",
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "956a404cf47b245c86a9bfc5950ae11311d57c7ef6c7dbcde5b382c5311fc3c3",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-17",
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_passwords_account-policy.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "54238dd000fdf39a1a046a3a7cb0940a2fbea85e1f088d9a610de269bc558011",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-17",
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "0b05ce16085793e6747bd721df75ec0dd278b22df6ff7450dc92fb22e9edf605",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-17",
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "reason": "no-body",
+          "result": "unknown"
+        },
+        {
+          "name": "freshness",
+          "reason": "no-body",
+          "result": "unknown"
+        },
+        {
+          "name": "liveness",
+          "reason": "redirect-not-allowed",
+          "result": "fail"
+        }
+      ],
+      "claims": [],
+      "contentHash": null,
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "unreachable",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": null,
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/root-user-tasks.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "646ed6dc7ad5fc48ac3e3a9196b18a2feba2466177be4c6f1c9558995fdd195a",
+      "fetchedAt": "2026-10-18",
+      "kind": "exam-guide",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02-domain1.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "43fd7dd2c245399c95d5e0911b8dd096376a20a6262893c770d37382384f45c7",
+      "fetchedAt": "2026-10-18",
+      "kind": "exam-guide",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02-domain2.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "e077ee8bda94c9a5d361217929696edffd4f85fccbea22f64229f748ae4087f1",
+      "fetchedAt": "2026-10-18",
+      "kind": "exam-guide",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02-domain3.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "fa1898495daa2145949511c9d4d63b390f20e7f8ce1cd3e49109e4cb548c830a",
+      "fetchedAt": "2026-10-18",
+      "kind": "exam-guide",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02-domain4.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "9b1cd1a7576b5559a457ee546754d7867f7bd6a801acb8fb988f9a6789c2f3f1",
+      "fetchedAt": "2026-10-18",
+      "kind": "exam-guide",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "42572664207975b7ff29fa601919c473e2aff79656d6e17ca8eeaee918fb47d7",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-17",
+      "url": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/consolidated-billing.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "be92f8450ab41911b493b59ea29571131095d86b22aef55bfbbfa23ec5a11255",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-17",
+      "url": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "9a8c040ee80ae28f3ce1c87b7e258935640d1ca86557b1ec53515bd10d29049e",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "229e4d45835eab1cd2f035ee6c549dd2dec86e7f6b9aa0123e02bd8aa20bd320",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-17",
+      "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "00307549a1ed178139a39148be987336b304cce5866159938af78b5780ed507a",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-17",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "77981a878dade34d751d1487eb527fc7fcf0d836ae8eb0ece65bf488b606c03b",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "5dcda2793e6e987b7ca2a2d5fd5a120ab975f005f1a6cad760c966e3b333a262",
+      "fetchedAt": "2026-10-18",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "updatedAt": "2026-10-16",
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/welcome.html"
+    }
+  ]
+}
