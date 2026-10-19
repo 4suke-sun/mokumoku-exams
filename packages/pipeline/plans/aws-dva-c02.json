@@ -1,0 +1,546 @@
+{
+  "examCode": "AWS-DVA-C02",
+  "sources": [
+    {
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/developer-associate-02.html",
+      "kind": "exam-guide"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/chapter-layers.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/capacity-mode.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LSI.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Scan.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAX.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-caching.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/stage-variables.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/serv-side-encryption.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/cors.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventNotifications.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-fifo-queues.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-short-and-long-polling.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/sns/latest/dg/welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/sns/latest/dg/sns-message-filtering.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-rules.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/streams/latest/dev/introduction.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/streams/latest/dev/key-concepts.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/STS/latest/APIReference/welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/appconfig/latest/userguide/what-is-appconfig.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/cdk/v2/guide/home.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/codebuild/latest/userguide/welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/deployment-configurations.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/codeartifact/latest/ug/welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/xray/latest/devguide/aws-xray.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Embedded_Metric_Format.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/Welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonECR/latest/userguide/what-is-ecr.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/WhatIs.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/Strategies.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/CHAP_AuroraOverview.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/appsync/latest/devguide/what-is-appsync.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/amplify/latest/userguide/welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/cloudshell/latest/userguide/welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/what-is.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/waf/latest/developerguide/what-is-aws-waf.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/ebs/latest/userguide/what-is-ebs.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/efs/latest/ug/whatisefs.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/athena/latest/ug/what-is.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/what-is.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/sdkref/latest/guide/feature-retry-behavior.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/testing-guide.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/using-sam-cli-local-invoke.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-local-generate-event.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/privateca/latest/userguide/PcaWelcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/mask-sensitive-log-data.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/specifying-conditions.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-integrate-with-cognito.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-stages.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/canary-release.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/q-in-IDE-chat.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-changesets.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs-view.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/codeguru/latest/profiler-ug/what-is-codeguru-profiler.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/compute-optimizer/latest/ug/what-is-compute-optimizer.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AnalyzingLogData.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/kms/latest/developerguide/data-keys.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/how-it-works.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-working-with-lambda-triggers.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-post-authentication.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/MonitoringLogData.html",
+      "kind": "official-doc"
+    }
+  ],
+  "guidePages": [
+    "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/developer-associate-02-domain1.html",
+    "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/developer-associate-02-domain2.html",
+    "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/developer-associate-02-domain3.html",
+    "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/developer-associate-02-domain4.html",
+    "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/dva-02-in-scope-services.html",
+    "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/dva-02-out-of-scope-services.html",
+    "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/dva-technologies-concepts.html"
+  ],
+  "scope": {
+    "prefixes": [
+      "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/",
+      "https://docs.aws.amazon.com/"
+    ],
+    "maxDepth": 0
+  },
+  "exclude": []
+}
