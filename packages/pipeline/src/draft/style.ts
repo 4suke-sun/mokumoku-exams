@@ -9,7 +9,7 @@ import { similarity } from "./similarity.ts";
  */
 
 /** 規則の集合を変えたら上げる。下書きの依頼の鍵に入るので、上げると依頼のキャッシュが切れる */
-export const STYLE_VERSION = 2;
+export const STYLE_VERSION = 3;
 
 export type Severity = "block" | "warn";
 
@@ -227,7 +227,7 @@ export const STYLE_RULES: readonly StyleRule[] = [
     appliesTo: "choice",
     severity: "block",
     summary:
-      "解説で選択肢を記号で指すときは、その問題の記号だけを使う。選択肢ではない大文字 1 文字を、前後に英数字なしで書かない",
+      "解説で選択肢を記号で指すときは、その問題の記号だけを使う。選択肢ではない大文字 1 文字を、前後に英数字なしで書かない(ハイフンで語につながるものは除く)",
     check: onChoice((d) => {
       const keys = new Set(d.choices.map((c) => c.key));
       const paths: string[] = [];
@@ -237,9 +237,10 @@ export const STYLE_RULES: readonly StyleRule[] = [
         ...(d.distractors ?? []).map((x, i) => ({ path: `distractors.${i}.reason`, text: x.reason })),
       ];
       for (const f of fields) {
-        const letters = [...f.text.normalize("NFKC").matchAll(/(?<![A-Za-z0-9])[A-Z](?![A-Za-z0-9])/g)].map(
-          (m) => m[0],
-        );
+        // アプリの relabelText と同じ境目で拾う(ハイフンで語につながる「X-Ray」などは、記号とみなさない)
+        const letters = [
+          ...f.text.normalize("NFKC").matchAll(/(?<![A-Za-z0-9]|[A-Za-z0-9]-)[A-Z](?![A-Za-z0-9]|-[A-Za-z0-9])/g),
+        ].map((m) => m[0]);
         if (letters.some((l) => !keys.has(l))) paths.push(f.path);
       }
       return paths;
