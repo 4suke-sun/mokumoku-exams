@@ -204,11 +204,15 @@ export function labelKeys(keys: readonly string[], labels: ReadonlyMap<string, s
 
 /**
  * 解説などの文章で、選択肢を記号で指している箇所(「選択肢B」「正解がBである」「（A）」など)を、表示用の記号に置き換える。
- * 前後が英数字につながる大文字(「AI」「S3」など)は、選択肢の記号ではないので置き換えない。並びが元のままなら、文章を変えない。
+ * 前後が英数字につながる大文字(「AI」「S3」など)と、ハイフンで語につながる大文字(「X-Ray」など)は、選択肢の記号ではないので置き換えない。
+ * 並びが元のままなら、文章を変えない。
  */
 export function relabelText(text: string, labels: ReadonlyMap<string, string>): string {
   if ([...labels].every(([key, shown]) => key === shown)) return text;
-  return text.replace(/(?<![A-Za-z0-9])[A-Z](?![A-Za-z0-9])/g, (letter) => labels.get(letter) ?? letter);
+  return text.replace(
+    /(?<![A-Za-z0-9]|[A-Za-z0-9]-)[A-Z](?![A-Za-z0-9]|-[A-Za-z0-9])/g,
+    (letter) => labels.get(letter) ?? letter,
+  );
 }
 
 /** 回答済みの問題数と、出題数。自由記述は、空白でない文章があれば回答済み。 */
