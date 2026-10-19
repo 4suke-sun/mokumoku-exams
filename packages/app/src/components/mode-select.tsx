@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useId, useState } from "react";
+import { formatCheckedDate } from "@/components/exam-info.tsx";
 import { Notice } from "@/components/notice.tsx";
 import { domainColorClasses } from "@/lib/domain-color.ts";
 import { fetchBookmarks, fetchReview } from "@/lib/history/client.ts";
@@ -356,6 +357,12 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
             この資格の問題は {pool.length} 問で、本番の {exam.officialQuestionCount} 問に届いていません。
             本番モードは、いまある問題から出題します。
           </p>
+        ) : null}
+        {exam.info?.lastExamDate ? (
+          <Notice kind="info">
+            この版({exam.edition ?? exam.examCode})の試験は、{formatCheckedDate(exam.info.lastExamDate)}
+            まで受験できます。それ以降は新しい版に切り替わります。
+          </Notice>
         ) : null}
         <div className="flex flex-wrap gap-4 pt-1 text-sm">
           <Link href={`/exams/${exam.examCode}/info`} className="text-primary hover:underline">

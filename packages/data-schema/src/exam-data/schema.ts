@@ -95,6 +95,8 @@ export const ExamInfoSchema = z.strictObject({
     .optional(),
   /** 認定の有効期間(年) */
   validityYears: z.int().min(1).max(10).optional(),
+  /** この版の試験を受験できる最終日。公式に告知されている資格だけが持つ */
+  lastExamDate: DATE.optional(),
   /** 公式の試験ガイドの URL。出典と同じく、許したドメインの https の URL だけ */
   guideUrl: z
     .string()

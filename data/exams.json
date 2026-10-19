@@ -137,6 +137,56 @@
         "guideUrl": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02.html"
       },
       "idPrefix": "CLF"
+    },
+    {
+      "examCode": "AWS-DVA-C02",
+      "status": "published",
+      "vendor": "AWS",
+      "edition": "C02",
+      "name": "AWS Certified Developer - Associate",
+      "shortName": "Developer",
+      "level": "Associate",
+      "abbr": "DVA",
+      "category": "Developer",
+      "passingScore": 720,
+      "totalScore": 1000,
+      "officialQuestionCount": 65,
+      "officialTimeMinutes": 130,
+      "domains": [
+        {
+          "code": "domain1",
+          "name": "AWS のサービスによる開発",
+          "weight": 0.32
+        },
+        {
+          "code": "domain2",
+          "name": "セキュリティ",
+          "weight": 0.26
+        },
+        {
+          "code": "domain3",
+          "name": "デプロイ",
+          "weight": 0.24
+        },
+        {
+          "code": "domain4",
+          "name": "トラブルシューティングと最適化",
+          "weight": 0.18
+        }
+      ],
+      "info": {
+        "checkedAt": "2026-10-20",
+        "format": "択一選択式と複数選択式",
+        "languages": ["日本語", "英語"],
+        "fee": {
+          "amount": 150,
+          "currency": "USD"
+        },
+        "validityYears": 3,
+        "lastExamDate": "2026-11-30",
+        "guideUrl": "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/developer-associate-02.html"
+      },
+      "idPrefix": "DVA"
     }
   ]
 }

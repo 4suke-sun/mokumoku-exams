@@ -460,8 +460,8 @@ describe("表示用の記号", () => {
     );
   });
 
-  it("英数字につながる大文字と_選択肢にない記号は_置き換えない", () => {
-    expect(relabelText("AI と Amazon S3、トップP", labels)).toBe("AI と Amazon S3、トップP");
+  it("英数字かハイフンで語につながる大文字と_選択肢にない記号は_置き換えない", () => {
+    expect(relabelText("AI と Amazon S3、トップP、B-tree、Q-A", labels)).toBe("AI と Amazon S3、トップP、B-tree、Q-A");
   });
 
   it("並びが元のままなら_文章を変えない", () => {

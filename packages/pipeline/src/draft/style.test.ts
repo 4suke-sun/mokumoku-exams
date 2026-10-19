@@ -213,7 +213,7 @@ describe("スタイル規則", () => {
 
   it("解説の記号_問題の記号は通り、存在しない記号と単独の大文字は止める", () => {
     const ok = choiceDraft({
-      explanation: "正解は B です。A は小さすぎ、C は大きすぎます。AWS の上限とは別の話です。",
+      explanation: "正解は B です。A は小さすぎ、C は大きすぎます。AWS の上限とは別の話で、X-Ray とも関係しません。",
     });
     expect(rulesOf(ok).filter((r) => r.startsWith("explanation-key-reference"))).toEqual([]);
     const bad = choiceDraft({ explanation: "正解は E です。上限は 100 個と定められています。" });

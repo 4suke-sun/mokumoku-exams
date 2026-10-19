@@ -382,6 +382,23 @@ describe("ModeSelect の見出しの導線", () => {
     expect((await screen.findByRole("link", { name: "試験の情報" })).getAttribute("href")).toBe("/exams/TEST/info");
     vi.unstubAllGlobals();
   });
+
+  it("受験できる最終日がある資格_版と最終日のお知らせを出し_ない資格には出さない", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({ ok: false, status: 503, json: async () => ({}) })),
+    );
+    const dated = { ...exam, edition: "C02", info: { checkedAt: "2026-10-20", lastExamDate: "2026-11-30" } };
+    const { unmount } = render(<ModeSelect exam={dated as PublishedExam} pool={pool} />);
+    expect(
+      (await screen.findByText(/この版\(C02\)の試験は、2026 年 11 月 30 日まで受験できます/)).closest("[data-kind]"),
+    ).toHaveProperty("dataset.kind", "info");
+    unmount();
+    render(<ModeSelect exam={exam} pool={pool} />);
+    await screen.findByRole("link", { name: "試験の情報" });
+    expect(screen.queryByText(/まで受験できます/)).toBeNull();
+    vi.unstubAllGlobals();
+  });
 });
 
 describe("ModeSelect の見出し", () => {

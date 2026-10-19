@@ -31,6 +31,7 @@ const full = {
     languages: ["日本語", "英語"],
     fee: { amount: 15000, currency: "JPY", note: "税別" },
     validityYears: 3,
+    lastExamDate: "2026-11-30",
     guideUrl: "https://docs.aws.amazon.com/guide.html",
   },
 } as PublishedExam;
@@ -51,12 +52,13 @@ describe("ExamInfo", () => {
     expect(value("受験できる言語")).toBe("日本語、英語");
     expect(value("受験料")).toBe("15,000 JPY(税別)");
     expect(value("認定の有効期間")).toBe("3 年");
+    expect(value("受験できる最終日")).toBe("2026 年 11 月 30 日");
     expect(value("レベル")).toBe("Associate");
   });
 
   it("情報を持たない資格_持たない項目は出さず_空欄にもしない", () => {
     render_(base);
-    for (const label of ["出題形式", "受験できる言語", "受験料", "認定の有効期間", "レベル"]) {
+    for (const label of ["出題形式", "受験できる言語", "受験料", "認定の有効期間", "受験できる最終日", "レベル"]) {
       expect(screen.queryByText(label)).toBeNull();
     }
     // 持っている項目(資格マスタの値)は、そのまま出る
