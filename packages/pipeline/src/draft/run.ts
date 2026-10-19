@@ -50,9 +50,12 @@ import {
   writeProvenance,
 } from "./provenance.ts";
 import {
+  assignAnswerPositions,
   type DraftRequest,
   DraftRequestSchema,
   DraftsOutputSchema,
+  factSource,
+  positionKey,
   requestKey,
   selectFacts,
   styleRuleSummaries,
@@ -318,6 +321,23 @@ function requestStep(
     if (d.draft === null) continue;
     for (const id of d.draft.factIds) usage.set(id, (usage.get(id) ?? 0) + 1);
   }
+  // 出典ごとに、根拠にされた回数を数える(不採用の下書きは数えない)。使われていない出典の事実カードを先に選ぶため
+  const cardById = new Map(facts.cards.map((c) => [c.id, c]));
+  const sourceUsage = new Map<string, number>();
+  // 選択式の種別ごとに、正答の位置(記号の組)の使われた回数を数える。依頼で、少ない位置を正答の位置に指定するため
+  const positionCounts = { single: new Map<string, number>(), multiple: new Map<string, number>() };
+  for (const d of drafts.drafts) {
+    if (d.draft === null || d.status === "rejected") continue;
+    for (const id of d.draft.factIds) {
+      const card = cardById.get(id);
+      if (card !== undefined) sourceUsage.set(factSource(card), (sourceUsage.get(factSource(card)) ?? 0) + 1);
+    }
+    if (isChoiceDraft(d.draft)) {
+      const counts = positionCounts[d.draft.questionType];
+      const key = positionKey(d.draft.correctAnswers);
+      counts.set(key, (counts.get(key) ?? 0) + 1);
+    }
+  }
   const settings = config.draft;
   let requested = 0;
   let satisfied = 0;
@@ -354,7 +374,7 @@ function requestStep(
       exhausted++;
       continue;
     }
-    const selected = selectFacts(cards, usage, settings.maxFactsPerRequest);
+    const selected = selectFacts(cards, usage, settings.maxFactsPerRequest, sourceUsage);
     const count = Math.min(remaining, settings.maxPerRequest);
     const key = requestKey({
       examCode,
@@ -396,6 +416,9 @@ function requestStep(
       kind: item.kind,
       count,
       facts: selected.map((c) => ({ id: c.id, claim: c.claim, confidence: c.confidence, scope: c.scope })),
+      ...(item.kind === "free-text"
+        ? {}
+        : { answerPositions: assignAnswerPositions(item.kind, count, positionCounts[item.kind]) }),
       distractorTypes: [...DISTRACTOR_TYPES],
       styleVersion: STYLE_VERSION,
       styleRules: styleRuleSummaries(item.kind),
@@ -404,7 +427,10 @@ function requestStep(
     };
     if (!dryRun) writeJson(requestPath, request);
     // 同じ実行の次の依頼は、まだ使われていない事実カードを先に選ぶ(同じ根拠の下書きが並ばないようにする)
-    for (const c of selected.slice(0, count)) usage.set(c.id, (usage.get(c.id) ?? 0) + 1);
+    for (const c of selected.slice(0, count)) {
+      usage.set(c.id, (usage.get(c.id) ?? 0) + 1);
+      sourceUsage.set(factSource(c), (sourceUsage.get(factSource(c)) ?? 0) + 1);
+    }
     report(output, "下書きの依頼", relative(rootDir, requestPath));
     requested++;
   }

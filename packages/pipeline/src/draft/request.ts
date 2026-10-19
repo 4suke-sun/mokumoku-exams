@@ -7,7 +7,7 @@ import { DISTRACTOR_TYPES, DraftSchema, FACT_ID } from "./schema.ts";
 import { STYLE_RULES, STYLE_VERSION } from "./style.ts";
 
 /** 依頼の形が変わったら上げる。鍵に入るので、上げると依頼のキャッシュが切れる */
-export const REQUEST_VERSION = 3;
+export const REQUEST_VERSION = 4;
 
 /** エージェントへの依頼(作業用の置き場に書く)。事実カードの主張は、言い換えた短い文 */
 export const DraftRequestSchema = z.strictObject({
@@ -29,6 +29,11 @@ export const DraftRequestSchema = z.strictObject({
       }),
     )
     .min(1),
+  /** 選択式の下書きごとに、正答を置く記号(書かせる数と同じ長さ)。正答の位置の偏りを防ぐ。自由記述にはない */
+  answerPositions: z
+    .array(z.array(z.string().regex(/^[A-Z]$/)).min(1))
+    .min(1)
+    .optional(),
   /** 誤答の型の一覧。誤答ごとに型を選ぶ */
   distractorTypes: z.array(z.enum(DISTRACTOR_TYPES)).min(1),
   styleVersion: z.number().int(),
@@ -89,17 +94,81 @@ export function requestKey(input: {
 
 const CONFIDENCE_ORDER = { high: 0, medium: 1, low: 2 } as const;
 
+/** 事実カードの出典の URL(先頭の出典)。出典の偏りを数える単位 */
+export function factSource(card: FactCard): string {
+  return card.sources[0]?.url ?? "";
+}
+
 /**
  * 依頼に載せる事実カードを選ぶ。通過したカードのうち、まだ下書きの根拠にされていないものを先に、
- * 確度の高いものを先に、ID の順に並べ、上限まで取る。同じ入力なら同じ選び方になる。
+ * 根拠にされた回数の少ない出典のものを先に、確度の高いものを先に、ID の順に並べる。
+ * そのうえで、同じ出典のカードが続かないよう、出典を 1 巡ずつ回して上限まで取る。同じ入力なら同じ選び方になる。
  */
-export function selectFacts(cards: readonly FactCard[], usage: ReadonlyMap<string, number>, max: number): FactCard[] {
-  return [...cards]
-    .sort(
-      (a, b) =>
-        (usage.get(a.id) ?? 0) - (usage.get(b.id) ?? 0) ||
-        CONFIDENCE_ORDER[a.confidence] - CONFIDENCE_ORDER[b.confidence] ||
-        (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
-    )
-    .slice(0, max);
+export function selectFacts(
+  cards: readonly FactCard[],
+  usage: ReadonlyMap<string, number>,
+  max: number,
+  sourceUsage: ReadonlyMap<string, number> = new Map(),
+): FactCard[] {
+  const sorted = [...cards].sort(
+    (a, b) =>
+      (usage.get(a.id) ?? 0) - (usage.get(b.id) ?? 0) ||
+      (sourceUsage.get(factSource(a)) ?? 0) - (sourceUsage.get(factSource(b)) ?? 0) ||
+      CONFIDENCE_ORDER[a.confidence] - CONFIDENCE_ORDER[b.confidence] ||
+      (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),
+  );
+  const selected: FactCard[] = [];
+  let rest = sorted;
+  while (selected.length < max && rest.length > 0) {
+    const seen = new Set<string>();
+    const next: FactCard[] = [];
+    for (const card of rest) {
+      const source = factSource(card);
+      if (selected.length < max && !seen.has(source)) {
+        seen.add(source);
+        selected.push(card);
+      } else {
+        next.push(card);
+      }
+    }
+    rest = next;
+  }
+  return selected;
+}
+
+/** 選択式の種別ごとの、正答の位置に使う記号(単一は 4 択、複数は 5 択から 2 つ) */
+const POSITION_LETTERS = { single: ["A", "B", "C", "D"], multiple: ["A", "B", "C", "D", "E"] } as const;
+
+/** 正答の位置の組を数える鍵(記号を順に並べて連ねる) */
+export function positionKey(letters: readonly string[]): string {
+  return [...letters].sort().join("");
+}
+
+/**
+ * 依頼の下書きごとに、正答を置く記号を決める。これまでの下書きで使われた回数(組、次に記号)の少ないものを先に、記号の順に選ぶ。
+ * 選んだ分は counts に足すので、同じ実行の次の依頼は、残りの少ない位置から選ぶ。
+ */
+export function assignAnswerPositions(
+  kind: "single" | "multiple",
+  count: number,
+  counts: Map<string, number>,
+): string[][] {
+  const letters = POSITION_LETTERS[kind];
+  const candidates: string[][] =
+    kind === "single" ? letters.map((l) => [l]) : letters.flatMap((a, i) => letters.slice(i + 1).map((b) => [a, b]));
+  const letterCount = (l: string) =>
+    [...counts.entries()].reduce((sum, [key, n]) => (key.includes(l) ? sum + n : sum), 0);
+  const result: string[][] = [];
+  for (let i = 0; i < count; i++) {
+    const scored = candidates.map((c) => ({
+      c,
+      pair: counts.get(positionKey(c)) ?? 0,
+      letters: c.reduce((sum, l) => sum + letterCount(l), 0),
+    }));
+    scored.sort((a, b) => a.pair - b.pair || a.letters - b.letters || positionKey(a.c).localeCompare(positionKey(b.c)));
+    const chosen = scored[0]?.c ?? [letters[0]];
+    result.push(chosen);
+    counts.set(positionKey(chosen), (counts.get(positionKey(chosen)) ?? 0) + 1);
+  }
+  return result;
 }
