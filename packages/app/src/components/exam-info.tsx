@@ -44,6 +44,7 @@ export function ExamInfo({ exam, questionCount, choiceCount, unitCount }: Props)
     ...(info?.languages ? [{ label: "受験できる言語", value: info.languages.join("、") }] : []),
     ...(info?.fee ? [{ label: "受験料", value: formatFee(info.fee) }] : []),
     ...(info?.validityYears ? [{ label: "認定の有効期間", value: `${info.validityYears} 年` }] : []),
+    ...(info?.lastExamDate ? [{ label: "受験できる最終日", value: formatCheckedDate(info.lastExamDate) }] : []),
     ...(exam.level ? [{ label: "レベル", value: exam.level }] : []),
   ];
   const domainRows = exam.domains.map((domain) => {

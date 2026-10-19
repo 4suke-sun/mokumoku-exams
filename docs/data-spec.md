@@ -132,6 +132,7 @@
 | `info.languages` | 配列 | 任意 | 受験できる言語。1〜10 件の文字列で、各 20 文字以内 |
 | `info.fee` | オブジェクト | 任意 | 受験料。`amount`(正の数)と `currency`(大文字 3 文字の通貨コード)が必須。`note`(任意、80 文字以内)に、価格の補足を書く |
 | `info.validityYears` | 整数 | 任意 | 認定の有効期間(年)。1〜10 |
+| `info.lastExamDate` | 文字列 | 任意 | この版の試験を受験できる最終日。`YYYY-MM-DD` で、実在する日付。公式に告知されている資格だけが持つ。出題を選ぶ画面にお知らせを、情報ページに「受験できる最終日」を出す |
 | `info.guideUrl` | 文字列 | 任意 | 公式の試験ガイドの URL。出典と同じく、許したドメインの `https` の URL だけ(「3.1 出典」)。ユーザー情報・既定以外のポート・クエリ文字列(`?…`)・フラグメント(`#…`)付きは不可 |
 
 - 試験の問題数・制限時間・合格点・分野と配点は、`officialQuestionCount`・`officialTimeMinutes`・`passingScore`・`totalScore`・`domains` を使います(`info` では重ねて持たない)。

@@ -305,10 +305,13 @@ describe("資格マスタのレベル・略称・資格の情報", () => {
     }
   });
 
-  it("有効期間・言語・出題形式_範囲と長さを止める", () => {
+  it("有効期間・言語・出題形式・最終日_範囲と長さと実在しない日付を止める", () => {
     const withInfo = (value: Record<string, unknown>) => errors([published({ info: info(value) })]);
     expect(withInfo({ validityYears: 3 })).toEqual([]);
+    expect(withInfo({ lastExamDate: "2026-11-30" })).toEqual([]);
     for (const bad of [
+      { lastExamDate: "2026-02-30" },
+      { lastExamDate: "2026/11/30" },
       { validityYears: 0 },
       { validityYears: 11 },
       { validityYears: 2.5 },
