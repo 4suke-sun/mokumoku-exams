@@ -14,4 +14,5 @@ export const COMMANDS: readonly CommandSpec[] = [
   { name: "eval", summary: "検証役の見落としと誤検出を測る" },
   { name: "reasons", summary: "不採用と差し戻しの理由を集計する(記録は変えない)" },
   { name: "status", summary: "段階ごとの状態を表示する(読むだけ)" },
+  { name: "score", summary: "公開している問題の書き方を、点数票で採点する(読むだけ)" },
 ];

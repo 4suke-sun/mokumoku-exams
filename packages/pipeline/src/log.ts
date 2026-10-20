@@ -76,6 +76,7 @@ export type Kind =
   | "評価の取り込みの停止"
   | "評価の指標"
   | "評価の節なし"
+  | "点数票"
   | "評価用データの誤り"
   | "抜き取りの記録の誤り";
 
@@ -113,6 +114,7 @@ const OUT_KINDS: ReadonlySet<Kind> = new Set<Kind>([
   "理由の集計",
   "評価の依頼",
   "評価の指標",
+  "点数票",
 ]);
 
 export interface Output {
