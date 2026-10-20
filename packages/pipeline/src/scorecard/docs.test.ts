@@ -10,7 +10,8 @@ const read = (name: string) => readFileSync(resolve(docsDir, name), "utf8");
 const clf = resolveProfile("AWS-CLF-C02");
 const dva = resolveProfile("AWS-DVA-C02");
 const aib = resolveProfile("AWS-AIB-C01");
-if (clf === null || dva === null || aib === null) throw new Error("帯がない");
+const dea = resolveProfile("DBX-DEA-2605");
+if (clf === null || dva === null || aib === null || dea === null) throw new Error("帯がない");
 
 describe("点数票の文書と実装の一致", () => {
   const text = read("scorecard.md");
@@ -29,6 +30,7 @@ describe("点数票の文書と実装の一致", () => {
     ["AWS-CLF-C02", clf],
     ["AWS-DVA-C02", dva],
     ["AWS-AIB-C01", aib],
+    ["DBX-DEA-2605", dea],
   ] as const)("資格別の配点 %s_文書の表が実装と同じ", (code, profile) => {
     const p = profile.points;
     const row = [
@@ -51,6 +53,7 @@ describe("資格別の文書と帯の一致", () => {
     ["aws-clf.md", clf],
     ["aws-dva.md", dva],
     ["aws-aib.md", aib],
+    ["dbx-dea.md", dea],
   ] as const)("%s_帯の値が実装と同じ", (file, profile) => {
     const doc = read(file);
     const { full, partial } = profile.stemLength;
@@ -71,7 +74,15 @@ describe("資格別の文書と帯の一致", () => {
 
   it("書き方の文書_README から資格別の文書と点数票へたどれる", () => {
     const readme = read("README.md");
-    for (const name of ["aws-common.md", "aws-clf.md", "aws-dva.md", "aws-aib.md", "scorecard.md"])
+    for (const name of [
+      "aws-common.md",
+      "aws-clf.md",
+      "aws-dva.md",
+      "aws-aib.md",
+      "dbx-common.md",
+      "dbx-dea.md",
+      "scorecard.md",
+    ])
       expect(readme).toContain(`./${name}`);
   });
 });

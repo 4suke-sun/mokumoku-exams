@@ -64,7 +64,8 @@ describe("出題スタイルの指針の文書", () => {
     expect(styleGuidePaths("AWS-CLF-C02")).toEqual(["docs/exam-style/aws-common.md", "docs/exam-style/aws-clf.md"]);
     expect(styleGuidePaths("AWS-DVA-C02")).toEqual(["docs/exam-style/aws-common.md", "docs/exam-style/aws-dva.md"]);
     expect(styleGuidePaths("AWS-AIB-C01")).toEqual(["docs/exam-style/aws-common.md", "docs/exam-style/aws-aib.md"]);
-    for (const code of ["AWS-CLF-C02", "AWS-DVA-C02", "AWS-AIB-C01"]) {
+    expect(styleGuidePaths("DBX-DEA-2605")).toEqual(["docs/exam-style/dbx-common.md", "docs/exam-style/dbx-dea.md"]);
+    for (const code of ["AWS-CLF-C02", "AWS-DVA-C02", "AWS-AIB-C01", "DBX-DEA-2605"]) {
       for (const path of styleGuidePaths(code) ?? []) {
         expect(existsSync(resolve(repoRoot, path)), path).toBe(true);
       }
