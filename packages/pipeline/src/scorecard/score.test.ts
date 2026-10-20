@@ -13,7 +13,8 @@ import {
 
 const clf = resolveProfile("AWS-CLF-C02");
 const dva = resolveProfile("AWS-DVA-C02");
-if (clf === null || dva === null) throw new Error("帯がない");
+const aib = resolveProfile("AWS-AIB-C01");
+if (clf === null || dva === null || aib === null) throw new Error("帯がない");
 
 /** 架空のサービス名と状況で作る、Cloud Practitioner の形の設問 */
 const SHORT: ScoreInput = {
@@ -65,8 +66,18 @@ describe("資格ごとの帯", () => {
     expect(clf.points.questionParagraph).toBe(0);
   });
 
+  it("AI Business Strategist の帯_単一選択だけで_書き出しの語を資格別に持つ", () => {
+    expect(aib.stemLength.full).toEqual([120, 300]);
+    expect(aib.batch.multiShare).toEqual([0, 0]);
+    expect(aib.separateQuestionParagraph).toBe(true);
+    expect(aib.openers).not.toEqual(clf.openers);
+    expect(aib.openers.some((o) => new RegExp(`^(?:${o})`).test("ある小売企業が小規模なチームを設立しました。"))).toBe(
+      true,
+    );
+  });
+
   it("帯のない資格_null を返す", () => {
-    expect(resolveProfile("AWS-AIB-C01")).toBeNull();
+    expect(resolveProfile("EX-SMP-XX")).toBeNull();
     expect(resolveProfile("ZZZ-XXX-01")).toBeNull();
   });
 

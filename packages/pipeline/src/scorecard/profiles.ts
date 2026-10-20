@@ -106,6 +106,7 @@ export interface ExamOverride {
   optionMaxLength?: readonly [number, number];
   lengthRatio?: readonly [number, number];
   similarityMax?: number;
+  openers?: readonly string[];
   separateQuestionParagraph?: boolean;
   points?: Partial<BPoints>;
   batch?: Partial<BatchBands>;
@@ -127,6 +128,27 @@ export const EXAM_OVERRIDES: Readonly<Record<string, ExamOverride>> = {
       situationShare: [0.9, 1],
       stemMedian: [180, 290],
       stemP90Max: 370,
+      nameShare: null,
+      phraseShare: null,
+      sentenceShare: [0.8, 1],
+      openerTopMax: 0.45,
+      openerPrefixChars: 8,
+    },
+  },
+  // AI Business Strategist: 設問は中くらいの長さで、状況の段落と問いの段落を分ける。単一選択だけで、選択肢は短い文が並行する
+  "AWS-AIB-C01": {
+    stemLength: { full: [120, 300], partial: [90, 360] },
+    contextSentences: [2, 6],
+    optionMaxLength: [100, 140],
+    lengthRatio: [2.5, 3.5],
+    openers: ["ある.{0,20}?(企業|会社|銀行|組織|団体|機関|法人|メーカー|社)", "あなた"],
+    separateQuestionParagraph: true,
+    points: { contextRequirement: 6, optionLength: 3, opener: 3, questionEnding: 3, questionParagraph: 5 },
+    batch: {
+      multiShare: [0, 0],
+      situationShare: [0.9, 1],
+      stemMedian: [160, 240],
+      stemP90Max: 300,
       nameShare: null,
       phraseShare: null,
       sentenceShare: [0.8, 1],

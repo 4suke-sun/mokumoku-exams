@@ -47,7 +47,7 @@ describe("score コマンド", () => {
   });
 
   it("点数票の帯がない資格_入力の誤りとして終わる", async () => {
-    const r = await run(["score", "AWS-AIB-C01"]);
+    const r = await run(["score", "EX-SMP-XX"]);
     expect(r.code).toBe(EXIT.inputError);
     expect(r.err).toContain("点数票の帯がない資格");
   });
