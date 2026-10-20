@@ -1,0 +1,5010 @@
+{
+  "examCode": "AWS-CLF-C02",
+  "entries": [
+    {
+      "draftId": "d-00098387aae7",
+      "questionId": "CLF-0001",
+      "factIds": [
+        "f-7d77b3a0db17",
+        "f-8b0ea564c9d9",
+        "f-b6e2d15ee833",
+        "f-c4d4a6c5d09c",
+        "f-e367d4f00ed1"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/artifact/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "72840e1989a7d860d8777bbf1500cd2fcfeee8bc67d96d712186ecc69c159b82"
+        },
+        {
+          "url": "https://aws.amazon.com/backup/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985"
+        },
+        {
+          "url": "https://aws.amazon.com/certificate-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "19dac666e633fec34db7f27eff0f322a34a34c8123fb15e9827b9097964dc49a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-029847f5d9f5",
+      "questionId": "CLF-0002",
+      "factIds": [
+        "f-053212ddb652",
+        "f-09d20194186d",
+        "f-09f2cc8f1b84",
+        "f-0a6455369f35"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/fsx/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "24f406b6fcc8ee0c8fc567c5ee2f66f27d79a2282508b672f631b20ca252c026"
+        },
+        {
+          "url": "https://aws.amazon.com/iam/identity-center/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6f711ed66d2c5f54b8b733f54ea6b82fa62c73476944db43d26b7a1399542ad0"
+        },
+        {
+          "url": "https://aws.amazon.com/ram/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "74b7b3cb346baea7848990ee3c45b8eba0a73e63da9ea9e34fadc2f6d482a9fb"
+        },
+        {
+          "url": "https://aws.amazon.com/vpn/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "f3cd9f8ae8f290a975e320983b10d626385ecf8572c62790a2655f1285ac4ed7"
+        }
+      ]
+    },
+    {
+      "draftId": "d-04dd0c674d26",
+      "questionId": "CLF-0003",
+      "factIds": [
+        "f-70961479a2aa",
+        "f-8b0ea564c9d9",
+        "f-9da9f429f7aa",
+        "f-b9915d8c3d80"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/artifact/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "72840e1989a7d860d8777bbf1500cd2fcfeee8bc67d96d712186ecc69c159b82"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudtrail/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c7a6ad086fd327aa3692274bff545dd1a0dec913887558ea19acc57b8f0308be"
+        }
+      ]
+    },
+    {
+      "draftId": "d-04eb25d57d65",
+      "questionId": "CLF-0004",
+      "factIds": [
+        "f-197411cf8457",
+        "f-2e2344bb1da9",
+        "f-32eca9a6e072",
+        "f-354085286450",
+        "f-4f46204adf2c"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/codebuild/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "65d7b4f240b2043e29815e285d5e70db6ab5bd8e5e218a0e0a420fa36da22e50"
+        },
+        {
+          "url": "https://aws.amazon.com/firewall-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "ebf6709b15f3d0edf1f52f3ef72e92069fd80f9acd8868a1617edce136182376"
+        },
+        {
+          "url": "https://aws.amazon.com/iam/features/mfa/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c695abe043375a667bf88a0668aeeaad8fe48631e85fe7803dc76bc42a7c5f7e"
+        },
+        {
+          "url": "https://aws.amazon.com/kms/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7096901fcd1d29ac2cefc278ffe6792d34a40e76911478270d3145561890d1b0"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "54238dd000fdf39a1a046a3a7cb0940a2fbea85e1f088d9a610de269bc558011"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0556d7025668",
+      "questionId": "CLF-0005",
+      "factIds": [
+        "f-344507cfeabe",
+        "f-566e89791825",
+        "f-6a556e92cd52",
+        "f-6c0e99798ae2"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-billing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "89321f532fae05542a97bc094df7ae66434b78ae7ddd62b3775a5bed78ce83ba"
+        },
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "df14ec83ba0cbc592ad43086441ea6c2a85f5580bdebfba08bba92cb4b5a07cc"
+        },
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-cost-and-usage-reporting/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7b4b98f21eb2d367a6f393f85927914088812da1650644f79c0073af1f58c62b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0699c4c65c32",
+      "questionId": "CLF-0006",
+      "factIds": [
+        "f-4de1abcf98cf",
+        "f-8b0ea564c9d9"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/artifact/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "72840e1989a7d860d8777bbf1500cd2fcfeee8bc67d96d712186ecc69c159b82"
+        }
+      ]
+    },
+    {
+      "draftId": "d-07f7a10cb7d8",
+      "questionId": "CLF-0007",
+      "factIds": [
+        "f-2db10ebc9d69",
+        "f-44cc57f141a8"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6329ef34923129621e68eeb3c3ca6305a0e8d70b079a72303c51828fd2152d92"
+        },
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "bc9cbe44acbf139a6b678f65071512ab14f52e1472f5b522d54bc9a777fc4027"
+        }
+      ]
+    },
+    {
+      "draftId": "d-090de3f02b68",
+      "questionId": "CLF-0008",
+      "factIds": [
+        "f-354085286450"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "54238dd000fdf39a1a046a3a7cb0940a2fbea85e1f088d9a610de269bc558011"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0a2c6d2625ba",
+      "questionId": "CLF-0009",
+      "factIds": [
+        "f-4e51f1756212",
+        "f-7def35e446bf"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/athena/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "681183effda8237ecb663693f67597e3456cbd91f5efb0f8e5f5e1e66df0e8e0"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0a4161bc1bc3",
+      "questionId": "CLF-0010",
+      "factIds": [
+        "f-14b88530bf12",
+        "f-16163d787c65",
+        "f-17fc0fe61797",
+        "f-3786dd21ff4b"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/directconnect/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "60e58f04279989e3766b8b47e14b8df1d39d9fcd15b0f4b8bdfb6c7faf1f1643"
+        },
+        {
+          "url": "https://aws.amazon.com/redshift/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4bcac576c2470e7656cde80f13bee4973577665e4b8a825ea3e56b6301c73b61"
+        },
+        {
+          "url": "https://aws.amazon.com/s3/storage-classes/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c76b9edd0c0c8b1d646413e48ebf104b0357a3d1f0d68b88d380955572b4f711"
+        },
+        {
+          "url": "https://aws.amazon.com/ses/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "9fa1fc9428bcd19a5bb9dad64540393bdb85bc8e7bd68e54c3d261537beec6b1"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0a448d1a320d",
+      "questionId": "CLF-0011",
+      "factIds": [
+        "f-42874d5116ae",
+        "f-b6e2d15ee833"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/backup/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0a758339a932",
+      "questionId": "CLF-0012",
+      "factIds": [
+        "f-19bf0866c045",
+        "f-3f7ffae99930",
+        "f-6c0e99798ae2",
+        "f-8984aad4e80c"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-billing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "89321f532fae05542a97bc094df7ae66434b78ae7ddd62b3775a5bed78ce83ba"
+        },
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "df14ec83ba0cbc592ad43086441ea6c2a85f5580bdebfba08bba92cb4b5a07cc"
+        },
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-cost-and-usage-reporting/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7b4b98f21eb2d367a6f393f85927914088812da1650644f79c0073af1f58c62b"
+        },
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-cost-explorer/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "d40f893881d6914704b6b2ede9878e2795d90ecee5678996323780652710dcc2"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0b5d505b6eba",
+      "questionId": "CLF-0013",
+      "factIds": [
+        "f-097acda24def",
+        "f-0ae84f1e694b",
+        "f-0c3efd5d76c2",
+        "f-0d03db218e36",
+        "f-0f7b923ad9c4"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/cloudfront/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "821427d5feb78b90fb4cfd05a9c043cb87bb1041182a44eb007db7726abdf3a2"
+        },
+        {
+          "url": "https://aws.amazon.com/outposts/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "055d4607bbbe24573bdf43f706779fd8cd5ddefb003847be4b484a9fd6eaddce"
+        },
+        {
+          "url": "https://aws.amazon.com/privatelink/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7f638d807bdf4155b9c4b994f07ee29c1c2b88a7dfce5964bfc5fd67b4c6de25"
+        },
+        {
+          "url": "https://aws.amazon.com/rekognition/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "30e50643e4bab74494814ab65b14cd388c02c05bd0c3c84ac839be13d7ca77a1"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0b9f3d30ae9b",
+      "questionId": "CLF-0014",
+      "factIds": [
+        "f-663fa6af69fa"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/cloudwatch/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4167b0163af282b43aecf19ca32400fedd69f9858677e77299ceec545d9afe5a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0dc74c8af181",
+      "questionId": "CLF-0015",
+      "factIds": [
+        "f-9de1325ea5bc",
+        "f-a5c7c44c4548"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/architecture/well-architected/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "1906898c63619945c84bac70b6c5228d4f8734ce790d007e41146384e881bf8a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0dd4ddb635fe",
+      "questionId": "CLF-0016",
+      "factIds": [
+        "f-92cdf3a20009"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/autoscaling/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4bb0e7e5f532e97988713b75877fd548961be20e0ceae70b239b2835b87fe3f5"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0fe70a6cc781",
+      "questionId": "CLF-0017",
+      "factIds": [
+        "f-0515ef6bf8be",
+        "f-0ac44d5a8371",
+        "f-0ba3fdb37e99",
+        "f-138c8db260e1",
+        "f-1f319cf85ace"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/controltower/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "39ff7bf11d118980345647b6d9bf3cadcb01b33c62edd099fadcb4de3f1b9ddf"
+        },
+        {
+          "url": "https://aws.amazon.com/ec2/pricing/reserved-instances/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "87574fb741c3a9e499af1627525c8918c6be1c87ee7f234f7eed5d655d7d9dca"
+        },
+        {
+          "url": "https://aws.amazon.com/ec2/spot/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6cab3d5c7f142d0fe45a9c35260a9a20549741fe1c6031181040c22ad08d297a"
+        },
+        {
+          "url": "https://aws.amazon.com/s3/pricing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "678c2d9e89184eec1d13b586a927fec33a5f221f8c83689557bebb2065b52d18"
+        }
+      ]
+    },
+    {
+      "draftId": "d-11419c8fc928",
+      "questionId": "CLF-0018",
+      "factIds": [
+        "f-204646266229",
+        "f-459751300f2b"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/backup/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985"
+        }
+      ]
+    },
+    {
+      "draftId": "d-118d07d032ec",
+      "questionId": "CLF-0019",
+      "factIds": [
+        "f-0b310aa4ec26",
+        "f-0c2f0ceb819c",
+        "f-14e4127e9d47",
+        "f-1768266eb3c6"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/compliance/shared-responsibility-model/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "af3aa2211d96228039f360fb759f53ecb6e462ab51c891ef07b0505960a7d236"
+        },
+        {
+          "url": "https://aws.amazon.com/economics/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "10d06770825b6e8b30122119f3ea2b7029133ad1bd2bb62500cb1e5ad0bae16c"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is-cloud-computing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "614895974e219e2d5dda714be6d5d9d1ceeeb3a793f76971447585f0745c5123"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "00307549a1ed178139a39148be987336b304cce5866159938af78b5780ed507a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-12214d75e361",
+      "questionId": "CLF-0020",
+      "factIds": [
+        "f-18a7faaf9e59",
+        "f-1aa9a83a5ca7",
+        "f-204646266229"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/backup/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985"
+        }
+      ]
+    },
+    {
+      "draftId": "d-1394de245952",
+      "questionId": "CLF-0021",
+      "factIds": [
+        "f-459751300f2b",
+        "f-54e80cb32b58",
+        "f-562da9500363"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/autoscaling/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4bb0e7e5f532e97988713b75877fd548961be20e0ceae70b239b2835b87fe3f5"
+        },
+        {
+          "url": "https://aws.amazon.com/backup/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudwatch/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4167b0163af282b43aecf19ca32400fedd69f9858677e77299ceec545d9afe5a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-13f526b0461b",
+      "questionId": "CLF-0022",
+      "factIds": [
+        "f-32735f33368e",
+        "f-3e6295c8f0ad",
+        "f-76123bf888aa",
+        "f-c4d4a6c5d09c"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/artifact/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "72840e1989a7d860d8777bbf1500cd2fcfeee8bc67d96d712186ecc69c159b82"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudtrail/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c7a6ad086fd327aa3692274bff545dd1a0dec913887558ea19acc57b8f0308be"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudwatch/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4167b0163af282b43aecf19ca32400fedd69f9858677e77299ceec545d9afe5a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-14d1a8736bc7",
+      "questionId": "CLF-0023",
+      "factIds": [
+        "f-19d76ffb4390",
+        "f-19f50b90204e",
+        "f-1aa9a83a5ca7",
+        "f-27f406f58ddb"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/appstream2/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7060bd723c1a27d3682c9d653bf7d27d3ad7a84df706db4a141330f41c03b150"
+        },
+        {
+          "url": "https://aws.amazon.com/athena/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "681183effda8237ecb663693f67597e3456cbd91f5efb0f8e5f5e1e66df0e8e0"
+        },
+        {
+          "url": "https://aws.amazon.com/backup/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudwatch/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4167b0163af282b43aecf19ca32400fedd69f9858677e77299ceec545d9afe5a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-158c31532792",
+      "questionId": "CLF-0024",
+      "factIds": [
+        "f-19f50b90204e",
+        "f-1aa9a83a5ca7",
+        "f-204646266229",
+        "f-27f406f58ddb",
+        "f-42d0c41ecd7d",
+        "f-459751300f2b"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/appstream2/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7060bd723c1a27d3682c9d653bf7d27d3ad7a84df706db4a141330f41c03b150"
+        },
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-cost-explorer/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "d40f893881d6914704b6b2ede9878e2795d90ecee5678996323780652710dcc2"
+        },
+        {
+          "url": "https://aws.amazon.com/backup/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudwatch/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4167b0163af282b43aecf19ca32400fedd69f9858677e77299ceec545d9afe5a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-16119dd41b70",
+      "questionId": "CLF-0025",
+      "factIds": [
+        "f-01e8121d91e1",
+        "f-03356a1f9d69",
+        "f-06424424b752",
+        "f-06c9dd76557f"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/rekognition/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "30e50643e4bab74494814ab65b14cd388c02c05bd0c3c84ac839be13d7ca77a1"
+        },
+        {
+          "url": "https://aws.amazon.com/storagegateway/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c24a1db4c72d00c08d98c22ef3e2388199be00f71c63723bb2eb327b971ccfb4"
+        },
+        {
+          "url": "https://aws.amazon.com/transcribe/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "5021a12d754d0ed9bbaab426b49c6763b2842c72f2a2024d0eb76635358c1839"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "229e4d45835eab1cd2f035ee6c549dd2dec86e7f6b9aa0123e02bd8aa20bd320"
+        }
+      ]
+    },
+    {
+      "draftId": "d-1b091b37fdef",
+      "questionId": "CLF-0026",
+      "factIds": [
+        "f-07291649da9f",
+        "f-09d20194186d"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/dms/schema-conversion-tool/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4491a092e678035f026611802a848b5ba9ea2400136a0c8eae65ef09c0c31aab"
+        },
+        {
+          "url": "https://aws.amazon.com/fsx/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "24f406b6fcc8ee0c8fc567c5ee2f66f27d79a2282508b672f631b20ca252c026"
+        }
+      ]
+    },
+    {
+      "draftId": "d-1b0fce333062",
+      "questionId": "CLF-0027",
+      "factIds": [
+        "f-0a0523ff3540",
+        "f-0ae84f1e694b",
+        "f-0c3efd5d76c2"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/hybrid/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "a0863f56bfb45bdbb5e8d79d8d5a3569e0ed8c1fa90684a221eb3513efa8095a"
+        },
+        {
+          "url": "https://aws.amazon.com/outposts/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "055d4607bbbe24573bdf43f706779fd8cd5ddefb003847be4b484a9fd6eaddce"
+        }
+      ]
+    },
+    {
+      "draftId": "d-1b9277adc04e",
+      "questionId": "CLF-0028",
+      "factIds": [
+        "f-2bc420ab5535",
+        "f-2db10ebc9d69",
+        "f-44cc57f141a8"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6329ef34923129621e68eeb3c3ca6305a0e8d70b079a72303c51828fd2152d92"
+        },
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "bc9cbe44acbf139a6b678f65071512ab14f52e1472f5b522d54bc9a777fc4027"
+        },
+        {
+          "url": "https://aws.amazon.com/athena/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "681183effda8237ecb663693f67597e3456cbd91f5efb0f8e5f5e1e66df0e8e0"
+        }
+      ]
+    },
+    {
+      "draftId": "d-1ce03263e4b0",
+      "questionId": "CLF-0029",
+      "factIds": [
+        "f-160ea9e29106",
+        "f-37d88ac8eb65"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/certificate-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "19dac666e633fec34db7f27eff0f322a34a34c8123fb15e9827b9097964dc49a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-1d2df281e37d",
+      "questionId": "CLF-0030",
+      "factIds": [
+        "f-562da9500363"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/autoscaling/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4bb0e7e5f532e97988713b75877fd548961be20e0ceae70b239b2835b87fe3f5"
+        }
+      ]
+    },
+    {
+      "draftId": "d-1dbd17a9cf62",
+      "questionId": "CLF-0031",
+      "factIds": [
+        "f-03356a1f9d69",
+        "f-06424424b752",
+        "f-06c9dd76557f",
+        "f-08bbc855e7b6",
+        "f-0912d1b3d990"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/api-gateway/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c043ba883a0f921dba1e87abf1ddc91aa24c36825c5c48d5a0e6b93ffed69f4e"
+        },
+        {
+          "url": "https://aws.amazon.com/emr/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "8adf5f06e1ca0c647de7121e9a852e3fb1740fd04fa515cc38ba983e901c794d"
+        },
+        {
+          "url": "https://aws.amazon.com/storagegateway/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c24a1db4c72d00c08d98c22ef3e2388199be00f71c63723bb2eb327b971ccfb4"
+        },
+        {
+          "url": "https://aws.amazon.com/transcribe/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "5021a12d754d0ed9bbaab426b49c6763b2842c72f2a2024d0eb76635358c1839"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "229e4d45835eab1cd2f035ee6c549dd2dec86e7f6b9aa0123e02bd8aa20bd320"
+        }
+      ]
+    },
+    {
+      "draftId": "d-210bd4a92e05",
+      "questionId": "CLF-0032",
+      "factIds": [
+        "f-51d33b566e3a"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "df14ec83ba0cbc592ad43086441ea6c2a85f5580bdebfba08bba92cb4b5a07cc"
+        }
+      ]
+    },
+    {
+      "draftId": "d-21594bca4745",
+      "questionId": "CLF-0033",
+      "factIds": [
+        "f-ee9edb8637fa",
+        "f-f3ad204801a3"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6329ef34923129621e68eeb3c3ca6305a0e8d70b079a72303c51828fd2152d92"
+        },
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "bc9cbe44acbf139a6b678f65071512ab14f52e1472f5b522d54bc9a777fc4027"
+        }
+      ]
+    },
+    {
+      "draftId": "d-22ef26017c39",
+      "questionId": "CLF-0034",
+      "factIds": [
+        "f-354085286450"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "54238dd000fdf39a1a046a3a7cb0940a2fbea85e1f088d9a610de269bc558011"
+        }
+      ]
+    },
+    {
+      "draftId": "d-2458b6c11df4",
+      "questionId": "CLF-0035",
+      "factIds": [
+        "f-108a41f9783a",
+        "f-4e51f1756212",
+        "f-540f1de9e18d",
+        "f-8d59ff8bf1ac"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6329ef34923129621e68eeb3c3ca6305a0e8d70b079a72303c51828fd2152d92"
+        },
+        {
+          "url": "https://aws.amazon.com/amplify/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7e8bcca981ae0642eb573cc78cdb66fe90de103819d123efa1d7fae9d4124125"
+        },
+        {
+          "url": "https://aws.amazon.com/athena/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "681183effda8237ecb663693f67597e3456cbd91f5efb0f8e5f5e1e66df0e8e0"
+        },
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-cost-and-usage-reporting/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7b4b98f21eb2d367a6f393f85927914088812da1650644f79c0073af1f58c62b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-249ea7582322",
+      "questionId": "CLF-0036",
+      "factIds": [
+        "f-5a6a0d80cb37",
+        "f-5d144e4a8ebb",
+        "f-715cdfe2d51d",
+        "f-8070fa0877f5"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/appstream2/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7060bd723c1a27d3682c9d653bf7d27d3ad7a84df706db4a141330f41c03b150"
+        },
+        {
+          "url": "https://aws.amazon.com/architecture/well-architected/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "1906898c63619945c84bac70b6c5228d4f8734ce790d007e41146384e881bf8a"
+        },
+        {
+          "url": "https://aws.amazon.com/cloud-adoption-framework/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "64b8db2bebd45677f1a941f54674ac73056f5589c0ba4ccc07dad91355ec444f"
+        },
+        {
+          "url": "https://aws.amazon.com/cloud-migration/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4e2a8a0dfcc51446a4f7bdf1a006c0098dbcbefe131b96d23e9bb90e012a72c5"
+        }
+      ]
+    },
+    {
+      "draftId": "d-254381d0a1a9",
+      "questionId": "CLF-0037",
+      "factIds": [
+        "f-02c02389b0d2",
+        "f-0ac44d5a8371",
+        "f-0ba3fdb37e99",
+        "f-138c8db260e1",
+        "f-1f319cf85ace"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/ec2/pricing/reserved-instances/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "87574fb741c3a9e499af1627525c8918c6be1c87ee7f234f7eed5d655d7d9dca"
+        },
+        {
+          "url": "https://aws.amazon.com/ec2/spot/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6cab3d5c7f142d0fe45a9c35260a9a20549741fe1c6031181040c22ad08d297a"
+        },
+        {
+          "url": "https://aws.amazon.com/pricing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c1d646e3db5ceffc5b7728af9f7967bd26a9cdef6a9b547b3f4012ba06512869"
+        },
+        {
+          "url": "https://aws.amazon.com/s3/pricing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "678c2d9e89184eec1d13b586a927fec33a5f221f8c83689557bebb2065b52d18"
+        }
+      ]
+    },
+    {
+      "draftId": "d-259c79c84e90",
+      "questionId": "CLF-0038",
+      "factIds": [
+        "f-0ecf4e40f8f1",
+        "f-0f134d9fac4d",
+        "f-10eddf2a42cb"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/compliance/shared-responsibility-model/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "af3aa2211d96228039f360fb759f53ecb6e462ab51c891ef07b0505960a7d236"
+        }
+      ]
+    },
+    {
+      "draftId": "d-2642d2f91831",
+      "questionId": "CLF-0039",
+      "factIds": [
+        "f-14b88530bf12",
+        "f-16163d787c65",
+        "f-17fc0fe61797",
+        "f-399fd4c74aff"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/directconnect/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "60e58f04279989e3766b8b47e14b8df1d39d9fcd15b0f4b8bdfb6c7faf1f1643"
+        },
+        {
+          "url": "https://aws.amazon.com/s3/storage-classes/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c76b9edd0c0c8b1d646413e48ebf104b0357a3d1f0d68b88d380955572b4f711"
+        },
+        {
+          "url": "https://aws.amazon.com/s3/storage-classes/glacier/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "0a162bb13ddd805009cd97fced74c7f36515cd9b112eb5fbf0a163393e49b7eb"
+        },
+        {
+          "url": "https://aws.amazon.com/ses/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "9fa1fc9428bcd19a5bb9dad64540393bdb85bc8e7bd68e54c3d261537beec6b1"
+        }
+      ]
+    },
+    {
+      "draftId": "d-2c176d38bc37",
+      "questionId": "CLF-0040",
+      "factIds": [
+        "f-12224ce0d37d"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-billing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "89321f532fae05542a97bc094df7ae66434b78ae7ddd62b3775a5bed78ce83ba"
+        }
+      ]
+    },
+    {
+      "draftId": "d-2c8458de6308",
+      "questionId": "CLF-0041",
+      "factIds": [
+        "f-048ff23627a0",
+        "f-09d20194186d",
+        "f-09f2cc8f1b84",
+        "f-0a6455369f35",
+        "f-0e5057531355"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/cognito/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "1d556907a62d479f1dcbb50a49eb6bb6a38ecbf64d61cc8eaed094ec6dfc7f87"
+        },
+        {
+          "url": "https://aws.amazon.com/fsx/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "24f406b6fcc8ee0c8fc567c5ee2f66f27d79a2282508b672f631b20ca252c026"
+        },
+        {
+          "url": "https://aws.amazon.com/guardduty/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "8f8f2bd1c575de7ace6f499016d76c6d92cb110ce05e66bee7fc42497deae406"
+        },
+        {
+          "url": "https://aws.amazon.com/iam/identity-center/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6f711ed66d2c5f54b8b733f54ea6b82fa62c73476944db43d26b7a1399542ad0"
+        },
+        {
+          "url": "https://aws.amazon.com/ram/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "74b7b3cb346baea7848990ee3c45b8eba0a73e63da9ea9e34fadc2f6d482a9fb"
+        }
+      ]
+    },
+    {
+      "draftId": "d-2d46b568ec6a",
+      "questionId": "CLF-0042",
+      "factIds": [
+        "f-11ad45d5e214",
+        "f-1536ec535d8c",
+        "f-6d1e8d205ffc",
+        "f-7cd4e2ca2002"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/ebs/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6d1375bd018e9556112ca019cbc90614ea55b8b69525bc085bccd044cd747180"
+        },
+        {
+          "url": "https://aws.amazon.com/global-accelerator/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "e83cd4ef4a7312fda43f40c2db5c6232861ba009125e08e739f40f0245ff0e9d"
+        },
+        {
+          "url": "https://aws.amazon.com/glue/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "a2712c15eeaa535f17e9db6b964c5102d98569509f4c57dd18a4dc9e7b46bbff"
+        },
+        {
+          "url": "https://aws.amazon.com/step-functions/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "ca59c80cf08bd896f34bfa286b9a84b6405f1cb15e5d43f9b170e29bb883b12a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-2d50426504f4",
+      "questionId": "CLF-0043",
+      "factIds": [
+        "f-798a3284a00c"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/cloudwatch/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4167b0163af282b43aecf19ca32400fedd69f9858677e77299ceec545d9afe5a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-2e7d1717829c",
+      "questionId": "CLF-0044",
+      "factIds": [
+        "f-03356a1f9d69",
+        "f-06424424b752",
+        "f-06c9dd76557f",
+        "f-08bbc855e7b6",
+        "f-096d457fa523"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/api-gateway/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c043ba883a0f921dba1e87abf1ddc91aa24c36825c5c48d5a0e6b93ffed69f4e"
+        },
+        {
+          "url": "https://aws.amazon.com/storagegateway/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c24a1db4c72d00c08d98c22ef3e2388199be00f71c63723bb2eb327b971ccfb4"
+        },
+        {
+          "url": "https://aws.amazon.com/transcribe/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "5021a12d754d0ed9bbaab426b49c6763b2842c72f2a2024d0eb76635358c1839"
+        },
+        {
+          "url": "https://aws.amazon.com/translate/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "2363d8a67d72a173b6bdab7dc8ac3e2daf0473c04fe96051b35e9af7f3cae00b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "229e4d45835eab1cd2f035ee6c549dd2dec86e7f6b9aa0123e02bd8aa20bd320"
+        }
+      ]
+    },
+    {
+      "draftId": "d-30ce2c80daaa",
+      "questionId": "CLF-0045",
+      "factIds": [
+        "f-14e4127e9d47"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is-cloud-computing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "614895974e219e2d5dda714be6d5d9d1ceeeb3a793f76971447585f0745c5123"
+        }
+      ]
+    },
+    {
+      "draftId": "d-320f231663a8",
+      "questionId": "CLF-0046",
+      "factIds": [
+        "f-1db27241b696",
+        "f-3964a8fb1bc0",
+        "f-48f1d3095ec3"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/shield/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "5371099e32ed259c1050ed3e8a44e8515d9142046ce9fc98fbd390b0c91c2f47"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "8b97534d790da8647c2b58e497060630ce5f2b01ce46e2d2deac2070ada0f338"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_passwords_account-policy.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "956a404cf47b245c86a9bfc5950ae11311d57c7ef6c7dbcde5b382c5311fc3c3"
+        }
+      ]
+    },
+    {
+      "draftId": "d-34f00f5312d2",
+      "questionId": "CLF-0047",
+      "factIds": [
+        "f-663fa6af69fa"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/cloudwatch/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4167b0163af282b43aecf19ca32400fedd69f9858677e77299ceec545d9afe5a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-35f03cdcfbe1",
+      "questionId": "CLF-0048",
+      "factIds": [
+        "f-0263b9546346",
+        "f-0da568ab929b",
+        "f-14e4127e9d47"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/ecs/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7b0cc6721617394a7ce79552e6a54bf55282593b9b82a913d07d455012e57384"
+        },
+        {
+          "url": "https://aws.amazon.com/lightsail/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "dec118ceb4251eac9bdc964991b1ca8fcdb4c6c3ef2aa29c514a9f7b3ea427b9"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is-cloud-computing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "614895974e219e2d5dda714be6d5d9d1ceeeb3a793f76971447585f0745c5123"
+        }
+      ]
+    },
+    {
+      "draftId": "d-3665d7038ea7",
+      "questionId": "CLF-0049",
+      "factIds": [
+        "f-566e89791825",
+        "f-6a556e92cd52",
+        "f-846dd67bc8b5",
+        "f-985bc832356e"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-billing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "89321f532fae05542a97bc094df7ae66434b78ae7ddd62b3775a5bed78ce83ba"
+        },
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "df14ec83ba0cbc592ad43086441ea6c2a85f5580bdebfba08bba92cb4b5a07cc"
+        },
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-cost-and-usage-reporting/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7b4b98f21eb2d367a6f393f85927914088812da1650644f79c0073af1f58c62b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-3b7ecd34467a",
+      "questionId": "CLF-0050",
+      "factIds": [
+        "f-00c0919c024d",
+        "f-01e8121d91e1",
+        "f-06424424b752",
+        "f-06c9dd76557f"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/rekognition/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "30e50643e4bab74494814ab65b14cd388c02c05bd0c3c84ac839be13d7ca77a1"
+        },
+        {
+          "url": "https://aws.amazon.com/route53/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "3074f506b4d10fbb4bf10a798f4e4d901534bcf6c72d656aaf4d28630d6eb5ab"
+        },
+        {
+          "url": "https://aws.amazon.com/storagegateway/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c24a1db4c72d00c08d98c22ef3e2388199be00f71c63723bb2eb327b971ccfb4"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "229e4d45835eab1cd2f035ee6c549dd2dec86e7f6b9aa0123e02bd8aa20bd320"
+        }
+      ]
+    },
+    {
+      "draftId": "d-3bbdff758fa6",
+      "questionId": "CLF-0051",
+      "factIds": [
+        "f-0515ef6bf8be",
+        "f-0ac44d5a8371",
+        "f-11120225bc37",
+        "f-138c8db260e1"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/batch/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "ed5a9a76d71d572b4004dea788db43a6c39ba700769992faac9475b3be647477"
+        },
+        {
+          "url": "https://aws.amazon.com/controltower/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "39ff7bf11d118980345647b6d9bf3cadcb01b33c62edd099fadcb4de3f1b9ddf"
+        },
+        {
+          "url": "https://aws.amazon.com/ec2/pricing/reserved-instances/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "87574fb741c3a9e499af1627525c8918c6be1c87ee7f234f7eed5d655d7d9dca"
+        },
+        {
+          "url": "https://aws.amazon.com/ec2/spot/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6cab3d5c7f142d0fe45a9c35260a9a20549741fe1c6031181040c22ad08d297a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-3c7d09855d37",
+      "questionId": "CLF-0052",
+      "factIds": [
+        "f-0ed54cfb15b4",
+        "f-1774badca889",
+        "f-6a556e92cd52"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-billing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "89321f532fae05542a97bc094df7ae66434b78ae7ddd62b3775a5bed78ce83ba"
+        },
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-cost-explorer/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "d40f893881d6914704b6b2ede9878e2795d90ecee5678996323780652710dcc2"
+        }
+      ]
+    },
+    {
+      "draftId": "d-3c7d7a8ea395",
+      "questionId": "CLF-0053",
+      "factIds": [
+        "f-40a2b88db7af",
+        "f-441fe1aa4b1c",
+        "f-586a0bf0a1a3",
+        "f-6c43625c03f0"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/fargate/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "e3379aa6293718f423e11130613ce465ce1eb6efcd35e136714b2d62a93a4ce8"
+        },
+        {
+          "url": "https://aws.amazon.com/license-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "2da7023d2f11d7cc27019971cef62eab593b5c8145ec2cf40433ff7b9c793aab"
+        },
+        {
+          "url": "https://aws.amazon.com/organizations/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "f0ba8e7f2317048aaea4f74b624cd267346685963c1cee18449268e2cd255120"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/welcome.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "5dcda2793e6e987b7ca2a2d5fd5a120ab975f005f1a6cad760c966e3b333a262"
+        }
+      ]
+    },
+    {
+      "draftId": "d-3f1e1e4193f3",
+      "questionId": "CLF-0054",
+      "factIds": [
+        "f-3fcaf8cb1b67",
+        "f-40a2b88db7af",
+        "f-441fe1aa4b1c",
+        "f-586a0bf0a1a3"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/eks/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "1a8f996cf1a08fc3967c83e79996cdd6bc3ef67dc4e35935f613daed5bd5880e"
+        },
+        {
+          "url": "https://aws.amazon.com/fargate/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "e3379aa6293718f423e11130613ce465ce1eb6efcd35e136714b2d62a93a4ce8"
+        },
+        {
+          "url": "https://aws.amazon.com/license-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "2da7023d2f11d7cc27019971cef62eab593b5c8145ec2cf40433ff7b9c793aab"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/welcome.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "5dcda2793e6e987b7ca2a2d5fd5a120ab975f005f1a6cad760c966e3b333a262"
+        }
+      ]
+    },
+    {
+      "draftId": "d-3fe1a99aebd3",
+      "questionId": "CLF-0055",
+      "factIds": [
+        "f-42d0c41ecd7d",
+        "f-459751300f2b"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-cost-explorer/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "d40f893881d6914704b6b2ede9878e2795d90ecee5678996323780652710dcc2"
+        },
+        {
+          "url": "https://aws.amazon.com/backup/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985"
+        }
+      ]
+    },
+    {
+      "draftId": "d-40c3cdd65aa8",
+      "questionId": "CLF-0056",
+      "factIds": [
+        "f-79a52f9b977c",
+        "f-9da9f429f7aa"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/cloudtrail/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c7a6ad086fd327aa3692274bff545dd1a0dec913887558ea19acc57b8f0308be"
+        }
+      ]
+    },
+    {
+      "draftId": "d-40e4de5ad5a0",
+      "questionId": "CLF-0057",
+      "factIds": [
+        "f-7658e17c1670",
+        "f-7c58849cad99"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/backup/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985"
+        }
+      ]
+    },
+    {
+      "draftId": "d-415d56031cfb",
+      "questionId": "CLF-0058",
+      "factIds": [
+        "f-a5ed37ce1b19",
+        "f-baadcc02508e",
+        "f-bd1e15f92227",
+        "f-cfa7b9b9a23d"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "bc9cbe44acbf139a6b678f65071512ab14f52e1472f5b522d54bc9a777fc4027"
+        },
+        {
+          "url": "https://aws.amazon.com/athena/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "681183effda8237ecb663693f67597e3456cbd91f5efb0f8e5f5e1e66df0e8e0"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudformation/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "f470c153cc0d5c8033701b10f126634aea94938113b386c5d5e1665859f3b907"
+        }
+      ]
+    },
+    {
+      "draftId": "d-423d9cede35d",
+      "questionId": "CLF-0059",
+      "factIds": [
+        "f-5a6a0d80cb37",
+        "f-8d7020a35480"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/cloud-migration/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4e2a8a0dfcc51446a4f7bdf1a006c0098dbcbefe131b96d23e9bb90e012a72c5"
+        }
+      ]
+    },
+    {
+      "draftId": "d-42c2a81ffd8d",
+      "questionId": "CLF-0060",
+      "factIds": [
+        "f-ea619374929b"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/architecture/well-architected/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "1906898c63619945c84bac70b6c5228d4f8734ce790d007e41146384e881bf8a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-446f40e506df",
+      "questionId": "CLF-0061",
+      "factIds": [
+        "f-1310b953bb4f"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/appstream2/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7060bd723c1a27d3682c9d653bf7d27d3ad7a84df706db4a141330f41c03b150"
+        }
+      ]
+    },
+    {
+      "draftId": "d-44ad529ad20b",
+      "questionId": "CLF-0062",
+      "factIds": [
+        "f-3786dd21ff4b"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/redshift/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4bcac576c2470e7656cde80f13bee4973577665e4b8a825ea3e56b6301c73b61"
+        }
+      ]
+    },
+    {
+      "draftId": "d-45595370e346",
+      "questionId": "CLF-0063",
+      "factIds": [
+        "f-03b7664c8a88",
+        "f-3e6295c8f0ad",
+        "f-4de1abcf98cf",
+        "f-fefeabfc253b"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/artifact/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "72840e1989a7d860d8777bbf1500cd2fcfeee8bc67d96d712186ecc69c159b82"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudtrail/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c7a6ad086fd327aa3692274bff545dd1a0dec913887558ea19acc57b8f0308be"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudwatch/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4167b0163af282b43aecf19ca32400fedd69f9858677e77299ceec545d9afe5a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-46656a8e89fc",
+      "questionId": "CLF-0064",
+      "factIds": [
+        "f-42d0c41ecd7d",
+        "f-5cb68a9a17f4",
+        "f-5ff9fb55f316"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-cost-explorer/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "d40f893881d6914704b6b2ede9878e2795d90ecee5678996323780652710dcc2"
+        },
+        {
+          "url": "https://aws.amazon.com/cli/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "e977c049e8ae2e3045c195619d1cb0cbc050abdcf6d974a3d5721309df889742"
+        }
+      ]
+    },
+    {
+      "draftId": "d-495f425b7b85",
+      "questionId": "CLF-0065",
+      "factIds": [
+        "f-19bf0866c045",
+        "f-344507cfeabe",
+        "f-3f7ffae99930",
+        "f-6a556e92cd52"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-billing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "89321f532fae05542a97bc094df7ae66434b78ae7ddd62b3775a5bed78ce83ba"
+        },
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "df14ec83ba0cbc592ad43086441ea6c2a85f5580bdebfba08bba92cb4b5a07cc"
+        },
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-cost-explorer/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "d40f893881d6914704b6b2ede9878e2795d90ecee5678996323780652710dcc2"
+        }
+      ]
+    },
+    {
+      "draftId": "d-49b372a4538b",
+      "questionId": "CLF-0066",
+      "factIds": [
+        "f-14e4127e9d47",
+        "f-1768266eb3c6",
+        "f-1773aee44128",
+        "f-1a8b8f5d8204",
+        "f-1e4fd4e94589"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/codepipeline/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "5da630823d693dcf7dd2d68cb53fc85ac53b3820acf6726ad85760d775befa8e"
+        },
+        {
+          "url": "https://aws.amazon.com/economics/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "10d06770825b6e8b30122119f3ea2b7029133ad1bd2bb62500cb1e5ad0bae16c"
+        },
+        {
+          "url": "https://aws.amazon.com/textract/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "ac87cd3cfefea4036c0d83012e3c5fafd3538eb4e2fa1e950b461a315660b195"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is-cloud-computing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "614895974e219e2d5dda714be6d5d9d1ceeeb3a793f76971447585f0745c5123"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "77981a878dade34d751d1487eb527fc7fcf0d836ae8eb0ece65bf488b606c03b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-4a2a903eaf5f",
+      "questionId": "CLF-0067",
+      "factIds": [
+        "f-3074e6126741",
+        "f-40a2b88db7af",
+        "f-441fe1aa4b1c",
+        "f-586a0bf0a1a3"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/fargate/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "e3379aa6293718f423e11130613ce465ce1eb6efcd35e136714b2d62a93a4ce8"
+        },
+        {
+          "url": "https://aws.amazon.com/license-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "2da7023d2f11d7cc27019971cef62eab593b5c8145ec2cf40433ff7b9c793aab"
+        },
+        {
+          "url": "https://aws.amazon.com/rds/aurora/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "aa3d245565a5c0996c05b5c06023aad01ba1f283c91b0c15d8784c2a20e589b8"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/welcome.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "5dcda2793e6e987b7ca2a2d5fd5a120ab975f005f1a6cad760c966e3b333a262"
+        }
+      ]
+    },
+    {
+      "draftId": "d-4b5d32e46208",
+      "questionId": "CLF-0068",
+      "factIds": [
+        "f-0d057b27888d",
+        "f-1ac5800a5819",
+        "f-1efa18ed6e2e",
+        "f-21620960244a"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/cloud-adoption-framework/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "64b8db2bebd45677f1a941f54674ac73056f5589c0ba4ccc07dad91355ec444f"
+        },
+        {
+          "url": "https://aws.amazon.com/efs/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "8ff650a55c7e5853f7f36a90aa72db2bfe74e999fbb0e22f8b5f15f98e0ca177"
+        },
+        {
+          "url": "https://aws.amazon.com/pricing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c1d646e3db5ceffc5b7728af9f7967bd26a9cdef6a9b547b3f4012ba06512869"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "9a8c040ee80ae28f3ce1c87b7e258935640d1ca86557b1ec53515bd10d29049e"
+        }
+      ]
+    },
+    {
+      "draftId": "d-4bbf41e3c4ab",
+      "questionId": "CLF-0069",
+      "factIds": [
+        "f-50d43191d515",
+        "f-66e7d4d343cb",
+        "f-715cdfe2d51d",
+        "f-8d7020a35480"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/appstream2/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7060bd723c1a27d3682c9d653bf7d27d3ad7a84df706db4a141330f41c03b150"
+        },
+        {
+          "url": "https://aws.amazon.com/architecture/well-architected/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "1906898c63619945c84bac70b6c5228d4f8734ce790d007e41146384e881bf8a"
+        },
+        {
+          "url": "https://aws.amazon.com/cloud-adoption-framework/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "64b8db2bebd45677f1a941f54674ac73056f5589c0ba4ccc07dad91355ec444f"
+        },
+        {
+          "url": "https://aws.amazon.com/cloud-migration/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4e2a8a0dfcc51446a4f7bdf1a006c0098dbcbefe131b96d23e9bb90e012a72c5"
+        }
+      ]
+    },
+    {
+      "draftId": "d-5098be874fb6",
+      "questionId": "CLF-0070",
+      "factIds": [
+        "f-defc5c2f2a65"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "bc9cbe44acbf139a6b678f65071512ab14f52e1472f5b522d54bc9a777fc4027"
+        }
+      ]
+    },
+    {
+      "draftId": "d-50ec72634a1d",
+      "questionId": "CLF-0071",
+      "factIds": [
+        "f-8d7020a35480",
+        "f-8da0f9e8bdb7"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/cloud-migration/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4e2a8a0dfcc51446a4f7bdf1a006c0098dbcbefe131b96d23e9bb90e012a72c5"
+        }
+      ]
+    },
+    {
+      "draftId": "d-526e688daba1",
+      "questionId": "CLF-0072",
+      "factIds": [
+        "f-42874d5116ae",
+        "f-52592cf9f548",
+        "f-663fa6af69fa",
+        "f-76123bf888aa",
+        "f-79a52f9b977c"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/artifact/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "72840e1989a7d860d8777bbf1500cd2fcfeee8bc67d96d712186ecc69c159b82"
+        },
+        {
+          "url": "https://aws.amazon.com/backup/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudtrail/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c7a6ad086fd327aa3692274bff545dd1a0dec913887558ea19acc57b8f0308be"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudwatch/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4167b0163af282b43aecf19ca32400fedd69f9858677e77299ceec545d9afe5a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-556c8e7f3b28",
+      "questionId": "CLF-0073",
+      "factIds": [
+        "f-347b18109951",
+        "f-589b88857d66",
+        "f-68faaa218d16",
+        "f-775ea9aff1d2"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/license-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "2da7023d2f11d7cc27019971cef62eab593b5c8145ec2cf40433ff7b9c793aab"
+        },
+        {
+          "url": "https://aws.amazon.com/neptune/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7122427cd670cc27c7958aa09247ee83b3040f85e2c5f61870a829cc642bbca5"
+        },
+        {
+          "url": "https://aws.amazon.com/secrets-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "8a6aa71af6ba7e2ab8531d2a7506c6fcd1c2fba2feef52b8ba6e88ade2d0ddd8"
+        },
+        {
+          "url": "https://aws.amazon.com/security-hub/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "5b4bf363b25e5c94044acd2d64f81798f14dde9938fbde67a21fc0197412f8d5"
+        }
+      ]
+    },
+    {
+      "draftId": "d-562cd3e5a4a4",
+      "questionId": "CLF-0074",
+      "factIds": [
+        "f-2eb9897c36da",
+        "f-372722302d06",
+        "f-54d348e8d4e5",
+        "f-76fd9dca79b1"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/premiumsupport/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "d3d51dc00c4362b4bcf4aeae403feed0f65de7a42abdd3f6b6573ecca85934bb"
+        },
+        {
+          "url": "https://aws.amazon.com/premiumsupport/plans/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "9bb6291d2665b6246eb8ad119b35f5c0f1f0467858c475905c88821367342b70"
+        },
+        {
+          "url": "https://aws.amazon.com/premiumsupport/technology/trusted-advisor/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "54662198773a9e54cb8f3b3aa512c52b8f7bc730709bcdba93841c1d49a5ce87"
+        },
+        {
+          "url": "https://aws.amazon.com/savingsplans/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "e7e2c7535e92a73fd1e5f203515ba495b4c49bcdef3b1ecc927eb0eda64e35a1"
+        }
+      ]
+    },
+    {
+      "draftId": "d-57c058b85258",
+      "questionId": "CLF-0075",
+      "factIds": [
+        "f-40a2b88db7af",
+        "f-441fe1aa4b1c",
+        "f-586a0bf0a1a3",
+        "f-6c43625c03f0",
+        "f-71294ab45380"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/fargate/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "e3379aa6293718f423e11130613ce465ce1eb6efcd35e136714b2d62a93a4ce8"
+        },
+        {
+          "url": "https://aws.amazon.com/lambda/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "d165baf4403ed97a398f29adba4d99dcbc5bcd45b0904f5d572c6fb36fb2dc62"
+        },
+        {
+          "url": "https://aws.amazon.com/license-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "2da7023d2f11d7cc27019971cef62eab593b5c8145ec2cf40433ff7b9c793aab"
+        },
+        {
+          "url": "https://aws.amazon.com/organizations/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "f0ba8e7f2317048aaea4f74b624cd267346685963c1cee18449268e2cd255120"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/welcome.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "5dcda2793e6e987b7ca2a2d5fd5a120ab975f005f1a6cad760c966e3b333a262"
+        }
+      ]
+    },
+    {
+      "draftId": "d-596f91c7d724",
+      "questionId": "CLF-0076",
+      "factIds": [
+        "f-9306afec269b",
+        "f-ac3d5907163f"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6329ef34923129621e68eeb3c3ca6305a0e8d70b079a72303c51828fd2152d92"
+        },
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "bc9cbe44acbf139a6b678f65071512ab14f52e1472f5b522d54bc9a777fc4027"
+        }
+      ]
+    },
+    {
+      "draftId": "d-59ffb3930d38",
+      "questionId": "CLF-0077",
+      "factIds": [
+        "f-227337ff63dd",
+        "f-2c80653d2824",
+        "f-2e2344bb1da9",
+        "f-589b88857d66"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/kms/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7096901fcd1d29ac2cefc278ffe6792d34a40e76911478270d3145561890d1b0"
+        },
+        {
+          "url": "https://aws.amazon.com/secrets-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "8a6aa71af6ba7e2ab8531d2a7506c6fcd1c2fba2feef52b8ba6e88ade2d0ddd8"
+        },
+        {
+          "url": "https://aws.amazon.com/security/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "ed441e6e7af5a2188a32baa6a4bf4f0e141173eaae8671094fc4a8bb9934466b"
+        },
+        {
+          "url": "https://aws.amazon.com/vpc/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "0375bbc6aabf8decd103ae0541f81e98edfb0a0b45277c9610bccfbe4d45ae79"
+        }
+      ]
+    },
+    {
+      "draftId": "d-5a8ac46bbc03",
+      "questionId": "CLF-0078",
+      "factIds": [
+        "f-372722302d06",
+        "f-3f2e542017df",
+        "f-40f82b5058f9"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/ec2/pricing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "16a67d5ae58676d109baf8ff7bd6f5ac5881511628fbde67f8085ffca0bc0ff3"
+        },
+        {
+          "url": "https://aws.amazon.com/premiumsupport/technology/trusted-advisor/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "54662198773a9e54cb8f3b3aa512c52b8f7bc730709bcdba93841c1d49a5ce87"
+        },
+        {
+          "url": "https://aws.amazon.com/savingsplans/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "e7e2c7535e92a73fd1e5f203515ba495b4c49bcdef3b1ecc927eb0eda64e35a1"
+        }
+      ]
+    },
+    {
+      "draftId": "d-5ab877142824",
+      "questionId": "CLF-0079",
+      "factIds": [
+        "f-10475256fda9",
+        "f-10db9ffacc73",
+        "f-113a42f7b9ca",
+        "f-12cc7d17f85c"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/eventbridge/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "befea5bfcfff88e6a6301f046353fa0b73e7f3ab0170ca67e0e6908b7650ea54"
+        },
+        {
+          "url": "https://aws.amazon.com/privatelink/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7f638d807bdf4155b9c4b994f07ee29c1c2b88a7dfce5964bfc5fd67b4c6de25"
+        },
+        {
+          "url": "https://aws.amazon.com/storagegateway/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c24a1db4c72d00c08d98c22ef3e2388199be00f71c63723bb2eb327b971ccfb4"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "0b05ce16085793e6747bd721df75ec0dd278b22df6ff7450dc92fb22e9edf605"
+        }
+      ]
+    },
+    {
+      "draftId": "d-5fa991d05c15",
+      "questionId": "CLF-0080",
+      "factIds": [
+        "f-8d59ff8bf1ac",
+        "f-a5ed37ce1b19"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6329ef34923129621e68eeb3c3ca6305a0e8d70b079a72303c51828fd2152d92"
+        },
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "bc9cbe44acbf139a6b678f65071512ab14f52e1472f5b522d54bc9a777fc4027"
+        }
+      ]
+    },
+    {
+      "draftId": "d-62400899b073",
+      "questionId": "CLF-0081",
+      "factIds": [
+        "f-02c02389b0d2",
+        "f-0ac44d5a8371",
+        "f-11120225bc37",
+        "f-138c8db260e1"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/batch/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "ed5a9a76d71d572b4004dea788db43a6c39ba700769992faac9475b3be647477"
+        },
+        {
+          "url": "https://aws.amazon.com/ec2/pricing/reserved-instances/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "87574fb741c3a9e499af1627525c8918c6be1c87ee7f234f7eed5d655d7d9dca"
+        },
+        {
+          "url": "https://aws.amazon.com/ec2/spot/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6cab3d5c7f142d0fe45a9c35260a9a20549741fe1c6031181040c22ad08d297a"
+        },
+        {
+          "url": "https://aws.amazon.com/pricing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c1d646e3db5ceffc5b7728af9f7967bd26a9cdef6a9b547b3f4012ba06512869"
+        }
+      ]
+    },
+    {
+      "draftId": "d-62ba3ec5b32c",
+      "questionId": "CLF-0082",
+      "factIds": [
+        "f-70961479a2aa"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/artifact/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "72840e1989a7d860d8777bbf1500cd2fcfeee8bc67d96d712186ecc69c159b82"
+        }
+      ]
+    },
+    {
+      "draftId": "d-62f0f0906371",
+      "questionId": "CLF-0083",
+      "factIds": [
+        "f-023a4105eb4a",
+        "f-06424424b752",
+        "f-06c9dd76557f",
+        "f-08bbc855e7b6",
+        "f-096d457fa523"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/api-gateway/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c043ba883a0f921dba1e87abf1ddc91aa24c36825c5c48d5a0e6b93ffed69f4e"
+        },
+        {
+          "url": "https://aws.amazon.com/dynamodb/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c3639d16596e65425f9514b32b6adaafffe9a6cec9dc94e9e237a4825e37fe97"
+        },
+        {
+          "url": "https://aws.amazon.com/storagegateway/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c24a1db4c72d00c08d98c22ef3e2388199be00f71c63723bb2eb327b971ccfb4"
+        },
+        {
+          "url": "https://aws.amazon.com/translate/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "2363d8a67d72a173b6bdab7dc8ac3e2daf0473c04fe96051b35e9af7f3cae00b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "229e4d45835eab1cd2f035ee6c549dd2dec86e7f6b9aa0123e02bd8aa20bd320"
+        }
+      ]
+    },
+    {
+      "draftId": "d-65222e16be76",
+      "questionId": "CLF-0084",
+      "factIds": [
+        "f-03b7664c8a88",
+        "f-6a6d0899b552"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/cloudtrail/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c7a6ad086fd327aa3692274bff545dd1a0dec913887558ea19acc57b8f0308be"
+        }
+      ]
+    },
+    {
+      "draftId": "d-65e9a9450b87",
+      "questionId": "CLF-0085",
+      "factIds": [
+        "f-3b38d4df5f19",
+        "f-ea7fb8993ff4"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/ec2/pricing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "16a67d5ae58676d109baf8ff7bd6f5ac5881511628fbde67f8085ffca0bc0ff3"
+        },
+        {
+          "url": "https://aws.amazon.com/opensearch-service/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "021d2169a3d38cd0bcf939b3de31cf4c3148b4537a793d4dac841354df90ed7e"
+        }
+      ]
+    },
+    {
+      "draftId": "d-66c8c80ee972",
+      "questionId": "CLF-0086",
+      "factIds": [
+        "f-0c2f0ceb819c",
+        "f-1773aee44128",
+        "f-18ccbcf6c6c9",
+        "f-1a137b716891"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/compliance/shared-responsibility-model/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "af3aa2211d96228039f360fb759f53ecb6e462ab51c891ef07b0505960a7d236"
+        },
+        {
+          "url": "https://aws.amazon.com/compute-optimizer/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "ad3e15242204dfd39417aae1d85d4ae62bdee7852a5c68b93c30f903472ea9f9"
+        },
+        {
+          "url": "https://aws.amazon.com/ec2/dedicated-hosts/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "1edf73f7e7b6f2adc44f75100c55a98be378b8bf16d73aae89fa818a43075b87"
+        },
+        {
+          "url": "https://aws.amazon.com/textract/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "ac87cd3cfefea4036c0d83012e3c5fafd3538eb4e2fa1e950b461a315660b195"
+        }
+      ]
+    },
+    {
+      "draftId": "d-676621e80fbd",
+      "questionId": "CLF-0087",
+      "factIds": [
+        "f-589b88857d66",
+        "f-8adb2c53d905",
+        "f-908900cd8ade",
+        "f-ac64d9bafceb"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/comprehend/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "70657b4ce04d7a666608cb8cc844eb380093caae35c2d2f70bde96e8744a3707"
+        },
+        {
+          "url": "https://aws.amazon.com/s3/storage-classes/glacier/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "0a162bb13ddd805009cd97fced74c7f36515cd9b112eb5fbf0a163393e49b7eb"
+        },
+        {
+          "url": "https://aws.amazon.com/secrets-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "8a6aa71af6ba7e2ab8531d2a7506c6fcd1c2fba2feef52b8ba6e88ade2d0ddd8"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "be92f8450ab41911b493b59ea29571131095d86b22aef55bfbbfa23ec5a11255"
+        }
+      ]
+    },
+    {
+      "draftId": "d-6c4dfbfefb6e",
+      "questionId": "CLF-0088",
+      "factIds": [
+        "f-4f46204adf2c"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/iam/features/mfa/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c695abe043375a667bf88a0668aeeaad8fe48631e85fe7803dc76bc42a7c5f7e"
+        }
+      ]
+    },
+    {
+      "draftId": "d-6e922f49811f",
+      "questionId": "CLF-0089",
+      "factIds": [
+        "f-0244977a0e7c",
+        "f-0b310aa4ec26",
+        "f-0bce28a03f29",
+        "f-0c2f0ceb819c"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/compliance/shared-responsibility-model/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "af3aa2211d96228039f360fb759f53ecb6e462ab51c891ef07b0505960a7d236"
+        },
+        {
+          "url": "https://aws.amazon.com/compute-optimizer/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "ad3e15242204dfd39417aae1d85d4ae62bdee7852a5c68b93c30f903472ea9f9"
+        },
+        {
+          "url": "https://aws.amazon.com/well-architected-tool/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "04d64a02930b5cf1a10a348416153bc0512765ff66c6f1200cab4ce4c2c36874"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "00307549a1ed178139a39148be987336b304cce5866159938af78b5780ed507a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-70055bc9a50f",
+      "questionId": "CLF-0090",
+      "factIds": [
+        "f-6a556e92cd52",
+        "f-798a3284a00c",
+        "f-8984aad4e80c",
+        "f-89ef3f0c40e1",
+        "f-9b16dadf6177",
+        "f-9d16514eb4bb"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-billing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "89321f532fae05542a97bc094df7ae66434b78ae7ddd62b3775a5bed78ce83ba"
+        },
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "df14ec83ba0cbc592ad43086441ea6c2a85f5580bdebfba08bba92cb4b5a07cc"
+        },
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-cost-and-usage-reporting/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7b4b98f21eb2d367a6f393f85927914088812da1650644f79c0073af1f58c62b"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudwatch/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4167b0163af282b43aecf19ca32400fedd69f9858677e77299ceec545d9afe5a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-7033d92cc77e",
+      "questionId": "CLF-0091",
+      "factIds": [
+        "f-44cc57f141a8",
+        "f-459751300f2b",
+        "f-577c1ace7897"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "bc9cbe44acbf139a6b678f65071512ab14f52e1472f5b522d54bc9a777fc4027"
+        },
+        {
+          "url": "https://aws.amazon.com/backup/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985"
+        }
+      ]
+    },
+    {
+      "draftId": "d-73001612e7c4",
+      "questionId": "CLF-0092",
+      "factIds": [
+        "f-01b44a7bf18c",
+        "f-1efa18ed6e2e",
+        "f-1f6b9cc2d495",
+        "f-2172b00fee91",
+        "f-2426cdf43913"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/dms/schema-conversion-tool/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4491a092e678035f026611802a848b5ba9ea2400136a0c8eae65ef09c0c31aab"
+        },
+        {
+          "url": "https://aws.amazon.com/ec2/dedicated-hosts/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "1edf73f7e7b6f2adc44f75100c55a98be378b8bf16d73aae89fa818a43075b87"
+        },
+        {
+          "url": "https://aws.amazon.com/s3/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "52b0a08a58ba75c3ca676329dd460a55d9420868351bce0dd3458ff104d5a55f"
+        },
+        {
+          "url": "https://aws.amazon.com/servicecatalog/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "be2bdaff22d43c99664f7652500c0358e11c1427855f749842281a38d625aff3"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "9a8c040ee80ae28f3ce1c87b7e258935640d1ca86557b1ec53515bd10d29049e"
+        }
+      ]
+    },
+    {
+      "draftId": "d-76e900bead7a",
+      "questionId": "CLF-0093",
+      "factIds": [
+        "f-9306afec269b",
+        "f-9d059eb695a5",
+        "f-bd1e15f92227"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "bc9cbe44acbf139a6b678f65071512ab14f52e1472f5b522d54bc9a777fc4027"
+        }
+      ]
+    },
+    {
+      "draftId": "d-7869e9d83b75",
+      "questionId": "CLF-0094",
+      "factIds": [
+        "f-1774badca889",
+        "f-19bf0866c045",
+        "f-2a5aa76df301",
+        "f-344507cfeabe",
+        "f-798a3284a00c"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-billing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "89321f532fae05542a97bc094df7ae66434b78ae7ddd62b3775a5bed78ce83ba"
+        },
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "df14ec83ba0cbc592ad43086441ea6c2a85f5580bdebfba08bba92cb4b5a07cc"
+        },
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-cost-explorer/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "d40f893881d6914704b6b2ede9878e2795d90ecee5678996323780652710dcc2"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudwatch/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4167b0163af282b43aecf19ca32400fedd69f9858677e77299ceec545d9afe5a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-79c27f1f5476",
+      "questionId": "CLF-0095",
+      "factIds": [
+        "f-1b38a66f6040"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_passwords_account-policy.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "956a404cf47b245c86a9bfc5950ae11311d57c7ef6c7dbcde5b382c5311fc3c3"
+        }
+      ]
+    },
+    {
+      "draftId": "d-7a204f8bd54b",
+      "questionId": "CLF-0096",
+      "factIds": [
+        "f-116460524242",
+        "f-17b372cab978",
+        "f-197411cf8457",
+        "f-2e2344bb1da9"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/detective/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "f03e97fb9cd1d65709b692482a6d5b53da3f03d7c6e6ce74f66a3e54939faa62"
+        },
+        {
+          "url": "https://aws.amazon.com/firewall-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "ebf6709b15f3d0edf1f52f3ef72e92069fd80f9acd8868a1617edce136182376"
+        },
+        {
+          "url": "https://aws.amazon.com/inspector/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "02b944d96de093c2f43f7ee7d60597b540b14d7c0dee22ed8033b7c4f98d34d1"
+        },
+        {
+          "url": "https://aws.amazon.com/kms/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7096901fcd1d29ac2cefc278ffe6792d34a40e76911478270d3145561890d1b0"
+        }
+      ]
+    },
+    {
+      "draftId": "d-7a2257d6d30e",
+      "questionId": "CLF-0097",
+      "factIds": [
+        "f-19d76ffb4390"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/athena/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "681183effda8237ecb663693f67597e3456cbd91f5efb0f8e5f5e1e66df0e8e0"
+        }
+      ]
+    },
+    {
+      "draftId": "d-7a64967c7360",
+      "questionId": "CLF-0098",
+      "factIds": [
+        "f-a5ed37ce1b19",
+        "f-baadcc02508e",
+        "f-bd1e15f92227",
+        "f-caed92206211",
+        "f-d6c3758e5d8c"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "bc9cbe44acbf139a6b678f65071512ab14f52e1472f5b522d54bc9a777fc4027"
+        },
+        {
+          "url": "https://aws.amazon.com/autoscaling/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4bb0e7e5f532e97988713b75877fd548961be20e0ceae70b239b2835b87fe3f5"
+        },
+        {
+          "url": "https://aws.amazon.com/backup/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudformation/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "f470c153cc0d5c8033701b10f126634aea94938113b386c5d5e1665859f3b907"
+        }
+      ]
+    },
+    {
+      "draftId": "d-7b6592482839",
+      "questionId": "CLF-0099",
+      "factIds": [
+        "f-03b7664c8a88",
+        "f-2de88288921b",
+        "f-ff144705414b"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/backup/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985"
+        },
+        {
+          "url": "https://aws.amazon.com/certificate-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "19dac666e633fec34db7f27eff0f322a34a34c8123fb15e9827b9097964dc49a"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudtrail/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c7a6ad086fd327aa3692274bff545dd1a0dec913887558ea19acc57b8f0308be"
+        }
+      ]
+    },
+    {
+      "draftId": "d-7cde8d1bc80f",
+      "questionId": "CLF-0100",
+      "factIds": [
+        "f-048ff23627a0",
+        "f-053212ddb652",
+        "f-055c3bb87925",
+        "f-07291649da9f",
+        "f-0c3a83d50aab"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/cognito/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "1d556907a62d479f1dcbb50a49eb6bb6a38ecbf64d61cc8eaed094ec6dfc7f87"
+        },
+        {
+          "url": "https://aws.amazon.com/config/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "0054ea68e9f1fb7b07c1f4a862e4a3ae51ef96eac1fc6645866a3dcc7a90c023"
+        },
+        {
+          "url": "https://aws.amazon.com/dms/schema-conversion-tool/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4491a092e678035f026611802a848b5ba9ea2400136a0c8eae65ef09c0c31aab"
+        },
+        {
+          "url": "https://aws.amazon.com/vpn/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "f3cd9f8ae8f290a975e320983b10d626385ecf8572c62790a2655f1285ac4ed7"
+        },
+        {
+          "url": "https://aws.amazon.com/waf/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "15bb51164b9f7b8984e9aa68799c0129deebd788b2f55a7ea7cb56e2340ff0b6"
+        }
+      ]
+    },
+    {
+      "draftId": "d-7ce9550fe45f",
+      "questionId": "CLF-0101",
+      "factIds": [
+        "f-330b0e0a6b8f"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/architecture/well-architected/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "1906898c63619945c84bac70b6c5228d4f8734ce790d007e41146384e881bf8a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-7f285dc8b0d8",
+      "questionId": "CLF-0102",
+      "factIds": [
+        "f-0e92627d4e83"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6329ef34923129621e68eeb3c3ca6305a0e8d70b079a72303c51828fd2152d92"
+        }
+      ]
+    },
+    {
+      "draftId": "d-8092804ec5e0",
+      "questionId": "CLF-0103",
+      "factIds": [
+        "f-071241e6d70e",
+        "f-15dc5399900f",
+        "f-2de88288921b",
+        "f-ff144705414b"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/backup/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985"
+        },
+        {
+          "url": "https://aws.amazon.com/certificate-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "19dac666e633fec34db7f27eff0f322a34a34c8123fb15e9827b9097964dc49a"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudwatch/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4167b0163af282b43aecf19ca32400fedd69f9858677e77299ceec545d9afe5a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-818d3758ac64",
+      "questionId": "CLF-0104",
+      "factIds": [
+        "f-15dc5399900f",
+        "f-2de88288921b",
+        "f-4de1abcf98cf",
+        "f-fefeabfc253b",
+        "f-ff144705414b"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/artifact/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "72840e1989a7d860d8777bbf1500cd2fcfeee8bc67d96d712186ecc69c159b82"
+        },
+        {
+          "url": "https://aws.amazon.com/backup/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985"
+        },
+        {
+          "url": "https://aws.amazon.com/certificate-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "19dac666e633fec34db7f27eff0f322a34a34c8123fb15e9827b9097964dc49a"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudwatch/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4167b0163af282b43aecf19ca32400fedd69f9858677e77299ceec545d9afe5a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-82fca65a50eb",
+      "questionId": "CLF-0105",
+      "factIds": [
+        "f-3666328ab8bf",
+        "f-51d33b566e3a"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/architecture/well-architected/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "1906898c63619945c84bac70b6c5228d4f8734ce790d007e41146384e881bf8a"
+        },
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "df14ec83ba0cbc592ad43086441ea6c2a85f5580bdebfba08bba92cb4b5a07cc"
+        }
+      ]
+    },
+    {
+      "draftId": "d-87931d817e43",
+      "questionId": "CLF-0106",
+      "factIds": [
+        "f-0210207aeafe",
+        "f-02562d909614"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/sqs/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b1465089f9fcfd7e07a9369afbaa754897115b6496451fdd9b59cf7d215ffc54"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "8b97534d790da8647c2b58e497060630ce5f2b01ce46e2d2deac2070ada0f338"
+        }
+      ]
+    },
+    {
+      "draftId": "d-8be522919dec",
+      "questionId": "CLF-0107",
+      "factIds": [
+        "f-39a4fa01db42",
+        "f-50d43191d515",
+        "f-5d144e4a8ebb",
+        "f-66e7d4d343cb",
+        "f-8d7020a35480"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/appstream2/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7060bd723c1a27d3682c9d653bf7d27d3ad7a84df706db4a141330f41c03b150"
+        },
+        {
+          "url": "https://aws.amazon.com/cloud-adoption-framework/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "64b8db2bebd45677f1a941f54674ac73056f5589c0ba4ccc07dad91355ec444f"
+        },
+        {
+          "url": "https://aws.amazon.com/cloud-migration/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4e2a8a0dfcc51446a4f7bdf1a006c0098dbcbefe131b96d23e9bb90e012a72c5"
+        }
+      ]
+    },
+    {
+      "draftId": "d-8c610a8643fa",
+      "questionId": "CLF-0108",
+      "factIds": [
+        "f-053212ddb652",
+        "f-077908c50917",
+        "f-09d20194186d",
+        "f-09f2cc8f1b84",
+        "f-0a6455369f35"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/fsx/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "24f406b6fcc8ee0c8fc567c5ee2f66f27d79a2282508b672f631b20ca252c026"
+        },
+        {
+          "url": "https://aws.amazon.com/iam/identity-center/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6f711ed66d2c5f54b8b733f54ea6b82fa62c73476944db43d26b7a1399542ad0"
+        },
+        {
+          "url": "https://aws.amazon.com/quicksight/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "5cc80ba26f988e8e1e380dcda7bf454e2fa4e92d7aa50f163b97e236e8d30ad6"
+        },
+        {
+          "url": "https://aws.amazon.com/ram/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "74b7b3cb346baea7848990ee3c45b8eba0a73e63da9ea9e34fadc2f6d482a9fb"
+        },
+        {
+          "url": "https://aws.amazon.com/vpn/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "f3cd9f8ae8f290a975e320983b10d626385ecf8572c62790a2655f1285ac4ed7"
+        }
+      ]
+    },
+    {
+      "draftId": "d-8cf5b52f9ffc",
+      "questionId": "CLF-0109",
+      "factIds": [
+        "f-01cd21d5a95d",
+        "f-2cdc4cad2814",
+        "f-917aef7758b3",
+        "f-e3be594981f1"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/efs/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "8ff650a55c7e5853f7f36a90aa72db2bfe74e999fbb0e22f8b5f15f98e0ca177"
+        },
+        {
+          "url": "https://aws.amazon.com/premiumsupport/technology/aws-health-dashboard/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "94e1649a41c0f132a5398d5efccb096b60d1620e540dfddd66ee5ecb446ffe8d"
+        },
+        {
+          "url": "https://aws.amazon.com/s3/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "52b0a08a58ba75c3ca676329dd460a55d9420868351bce0dd3458ff104d5a55f"
+        },
+        {
+          "url": "https://aws.amazon.com/s3/pricing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "678c2d9e89184eec1d13b586a927fec33a5f221f8c83689557bebb2065b52d18"
+        }
+      ]
+    },
+    {
+      "draftId": "d-8f7f8bee6252",
+      "questionId": "CLF-0110",
+      "factIds": [
+        "f-92cdf3a20009",
+        "f-a9189fa2d274"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/autoscaling/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4bb0e7e5f532e97988713b75877fd548961be20e0ceae70b239b2835b87fe3f5"
+        }
+      ]
+    },
+    {
+      "draftId": "d-8fa9f63d46b5",
+      "questionId": "CLF-0111",
+      "factIds": [
+        "f-0c5fa352c724"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/elasticbeanstalk/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "69df100f85e28f55279cedc09b1b704573c4845d88f7c637731a3185419015cd"
+        }
+      ]
+    },
+    {
+      "draftId": "d-92bafddb3820",
+      "questionId": "CLF-0112",
+      "factIds": [
+        "f-17fc0fe61797",
+        "f-399fd4c74aff"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/s3/storage-classes/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c76b9edd0c0c8b1d646413e48ebf104b0357a3d1f0d68b88d380955572b4f711"
+        },
+        {
+          "url": "https://aws.amazon.com/s3/storage-classes/glacier/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "0a162bb13ddd805009cd97fced74c7f36515cd9b112eb5fbf0a163393e49b7eb"
+        }
+      ]
+    },
+    {
+      "draftId": "d-977f5b5e41ea",
+      "questionId": "CLF-0113",
+      "factIds": [
+        "f-3f63c73a1bd4",
+        "f-447c011b48fe",
+        "f-562b439dd3c2",
+        "f-664e4c690594"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/ec2/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "ee0ac3189da097043f4c0bd6ef0ece6be8627c41fdefcb57bf6fa98115a2230f"
+        },
+        {
+          "url": "https://aws.amazon.com/fargate/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "e3379aa6293718f423e11130613ce465ce1eb6efcd35e136714b2d62a93a4ce8"
+        },
+        {
+          "url": "https://aws.amazon.com/lambda/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "d165baf4403ed97a398f29adba4d99dcbc5bcd45b0904f5d572c6fb36fb2dc62"
+        },
+        {
+          "url": "https://aws.amazon.com/sagemaker/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "73281c7316284ff08dbb99e1499cadd3a69f921c43d1a0f3bf856546d8e67d52"
+        }
+      ]
+    },
+    {
+      "draftId": "d-97e37b1f8fae",
+      "questionId": "CLF-0114",
+      "factIds": [
+        "f-3666328ab8bf",
+        "f-5a6a0d80cb37",
+        "f-715cdfe2d51d",
+        "f-8070fa0877f5"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/architecture/well-architected/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "1906898c63619945c84bac70b6c5228d4f8734ce790d007e41146384e881bf8a"
+        },
+        {
+          "url": "https://aws.amazon.com/cloud-adoption-framework/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "64b8db2bebd45677f1a941f54674ac73056f5589c0ba4ccc07dad91355ec444f"
+        },
+        {
+          "url": "https://aws.amazon.com/cloud-migration/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4e2a8a0dfcc51446a4f7bdf1a006c0098dbcbefe131b96d23e9bb90e012a72c5"
+        }
+      ]
+    },
+    {
+      "draftId": "d-99d62f2fcdfa",
+      "questionId": "CLF-0115",
+      "factIds": [
+        "f-6a6d0899b552"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/cloudtrail/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c7a6ad086fd327aa3692274bff545dd1a0dec913887558ea19acc57b8f0308be"
+        }
+      ]
+    },
+    {
+      "draftId": "d-9afa0e062f82",
+      "questionId": "CLF-0116",
+      "factIds": [
+        "f-441fe1aa4b1c",
+        "f-586a0bf0a1a3",
+        "f-5db9f8b079ad"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/license-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "2da7023d2f11d7cc27019971cef62eab593b5c8145ec2cf40433ff7b9c793aab"
+        },
+        {
+          "url": "https://aws.amazon.com/migration-evaluator/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "3771ee53f8378aa2b00bfd3ceb88608feb01ef067ae4374e0ac44f8b98bd0513"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/welcome.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "5dcda2793e6e987b7ca2a2d5fd5a120ab975f005f1a6cad760c966e3b333a262"
+        }
+      ]
+    },
+    {
+      "draftId": "d-9c551c580192",
+      "questionId": "CLF-0117",
+      "factIds": [
+        "f-023a4105eb4a",
+        "f-03356a1f9d69",
+        "f-06424424b752",
+        "f-07c50aa1e860",
+        "f-096d457fa523"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/dynamodb/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c3639d16596e65425f9514b32b6adaafffe9a6cec9dc94e9e237a4825e37fe97"
+        },
+        {
+          "url": "https://aws.amazon.com/privatelink/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7f638d807bdf4155b9c4b994f07ee29c1c2b88a7dfce5964bfc5fd67b4c6de25"
+        },
+        {
+          "url": "https://aws.amazon.com/transcribe/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "5021a12d754d0ed9bbaab426b49c6763b2842c72f2a2024d0eb76635358c1839"
+        },
+        {
+          "url": "https://aws.amazon.com/translate/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "2363d8a67d72a173b6bdab7dc8ac3e2daf0473c04fe96051b35e9af7f3cae00b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "229e4d45835eab1cd2f035ee6c549dd2dec86e7f6b9aa0123e02bd8aa20bd320"
+        }
+      ]
+    },
+    {
+      "draftId": "d-9e3b2c50a0bd",
+      "questionId": "CLF-0118",
+      "factIds": [
+        "f-2de88288921b",
+        "f-42874d5116ae"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/backup/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985"
+        }
+      ]
+    },
+    {
+      "draftId": "d-9e869aff6ac1",
+      "questionId": "CLF-0119",
+      "factIds": [
+        "f-89ef3f0c40e1"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-billing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "89321f532fae05542a97bc094df7ae66434b78ae7ddd62b3775a5bed78ce83ba"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a0a83087710b",
+      "questionId": "CLF-0120",
+      "factIds": [
+        "f-66e7d4d343cb",
+        "f-8e4cbe26f939",
+        "f-92cdf3a20009",
+        "f-9c330e746639"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "bc9cbe44acbf139a6b678f65071512ab14f52e1472f5b522d54bc9a777fc4027"
+        },
+        {
+          "url": "https://aws.amazon.com/appstream2/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7060bd723c1a27d3682c9d653bf7d27d3ad7a84df706db4a141330f41c03b150"
+        },
+        {
+          "url": "https://aws.amazon.com/autoscaling/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4bb0e7e5f532e97988713b75877fd548961be20e0ceae70b239b2835b87fe3f5"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a1bf1e3afbe6",
+      "questionId": "CLF-0121",
+      "factIds": [
+        "f-046af9f82beb",
+        "f-11ad45d5e214",
+        "f-6066483fba0c",
+        "f-936fc44a23f5"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/ecr/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "8ac1cca2fd08e5038228fbdb19c00c5e254b81f5be49161646bbedcaa7ecd878"
+        },
+        {
+          "url": "https://aws.amazon.com/ecs/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7b0cc6721617394a7ce79552e6a54bf55282593b9b82a913d07d455012e57384"
+        },
+        {
+          "url": "https://aws.amazon.com/global-accelerator/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "e83cd4ef4a7312fda43f40c2db5c6232861ba009125e08e739f40f0245ff0e9d"
+        },
+        {
+          "url": "https://aws.amazon.com/rds/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "f9a8e9a30e35a744e37defb6c936fc480aaca8d85a603e072adba3926164499f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a2957c449a77",
+      "questionId": "CLF-0122",
+      "factIds": [
+        "f-2e2344bb1da9",
+        "f-354085286450",
+        "f-3feab6170b7f",
+        "f-4f46204adf2c",
+        "f-7f044b9e66bb"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/directconnect/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "60e58f04279989e3766b8b47e14b8df1d39d9fcd15b0f4b8bdfb6c7faf1f1643"
+        },
+        {
+          "url": "https://aws.amazon.com/iam/features/mfa/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c695abe043375a667bf88a0668aeeaad8fe48631e85fe7803dc76bc42a7c5f7e"
+        },
+        {
+          "url": "https://aws.amazon.com/kms/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7096901fcd1d29ac2cefc278ffe6792d34a40e76911478270d3145561890d1b0"
+        },
+        {
+          "url": "https://aws.amazon.com/polly/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "91d55be03ad69f5904db12c9650c3b32a1ba49a2ac9b862c053f79dd526fb2a2"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "54238dd000fdf39a1a046a3a7cb0940a2fbea85e1f088d9a610de269bc558011"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a3991d0a9fb4",
+      "questionId": "CLF-0123",
+      "factIds": [
+        "f-00c0919c024d",
+        "f-06424424b752",
+        "f-06c9dd76557f",
+        "f-08bbc855e7b6"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/api-gateway/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c043ba883a0f921dba1e87abf1ddc91aa24c36825c5c48d5a0e6b93ffed69f4e"
+        },
+        {
+          "url": "https://aws.amazon.com/route53/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "3074f506b4d10fbb4bf10a798f4e4d901534bcf6c72d656aaf4d28630d6eb5ab"
+        },
+        {
+          "url": "https://aws.amazon.com/storagegateway/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c24a1db4c72d00c08d98c22ef3e2388199be00f71c63723bb2eb327b971ccfb4"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "229e4d45835eab1cd2f035ee6c549dd2dec86e7f6b9aa0123e02bd8aa20bd320"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a5aedda2df35",
+      "questionId": "CLF-0124",
+      "factIds": [
+        "f-76123bf888aa",
+        "f-7d77b3a0db17",
+        "f-b9915d8c3d80",
+        "f-cf3f42cbe81d",
+        "f-f61812b37598"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/backup/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985"
+        },
+        {
+          "url": "https://aws.amazon.com/certificate-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "19dac666e633fec34db7f27eff0f322a34a34c8123fb15e9827b9097964dc49a"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudtrail/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c7a6ad086fd327aa3692274bff545dd1a0dec913887558ea19acc57b8f0308be"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a647aae4268f",
+      "questionId": "CLF-0125",
+      "factIds": [
+        "f-a5ed37ce1b19",
+        "f-baadcc02508e",
+        "f-cfa7b9b9a23d"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "bc9cbe44acbf139a6b678f65071512ab14f52e1472f5b522d54bc9a777fc4027"
+        },
+        {
+          "url": "https://aws.amazon.com/athena/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "681183effda8237ecb663693f67597e3456cbd91f5efb0f8e5f5e1e66df0e8e0"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudformation/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "f470c153cc0d5c8033701b10f126634aea94938113b386c5d5e1665859f3b907"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a76f86729f5f",
+      "questionId": "CLF-0126",
+      "factIds": [
+        "f-42874d5116ae",
+        "f-52592cf9f548",
+        "f-663fa6af69fa",
+        "f-79a52f9b977c",
+        "f-8b0ea564c9d9"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/artifact/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "72840e1989a7d860d8777bbf1500cd2fcfeee8bc67d96d712186ecc69c159b82"
+        },
+        {
+          "url": "https://aws.amazon.com/backup/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudtrail/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c7a6ad086fd327aa3692274bff545dd1a0dec913887558ea19acc57b8f0308be"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudwatch/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4167b0163af282b43aecf19ca32400fedd69f9858677e77299ceec545d9afe5a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a793d25146af",
+      "questionId": "CLF-0127",
+      "factIds": [
+        "f-79a52f9b977c",
+        "f-8b0ea564c9d9",
+        "f-9da9f429f7aa",
+        "f-b6e2d15ee833"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/artifact/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "72840e1989a7d860d8777bbf1500cd2fcfeee8bc67d96d712186ecc69c159b82"
+        },
+        {
+          "url": "https://aws.amazon.com/backup/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudtrail/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c7a6ad086fd327aa3692274bff545dd1a0dec913887558ea19acc57b8f0308be"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a8dda113e718",
+      "questionId": "CLF-0128",
+      "factIds": [
+        "f-06eaadf8ce5f",
+        "f-096d457fa523",
+        "f-0ae84f1e694b",
+        "f-0c3efd5d76c2",
+        "f-0ce9c86ec1e6"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/outposts/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "055d4607bbbe24573bdf43f706779fd8cd5ddefb003847be4b484a9fd6eaddce"
+        },
+        {
+          "url": "https://aws.amazon.com/translate/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "2363d8a67d72a173b6bdab7dc8ac3e2daf0473c04fe96051b35e9af7f3cae00b"
+        },
+        {
+          "url": "https://aws.amazon.com/workspaces/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "eb4934d10703139495569256e5321ad6add3a29481324b2a0509ce4808c833d7"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "229e4d45835eab1cd2f035ee6c549dd2dec86e7f6b9aa0123e02bd8aa20bd320"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a8fd4945931a",
+      "questionId": "CLF-0129",
+      "factIds": [
+        "f-e367d4f00ed1",
+        "f-ff144705414b"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/certificate-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "19dac666e633fec34db7f27eff0f322a34a34c8123fb15e9827b9097964dc49a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-aa1c292720ad",
+      "questionId": "CLF-0130",
+      "factIds": [
+        "f-b6e2d15ee833",
+        "f-cf3f42cbe81d",
+        "f-f61812b37598"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/backup/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985"
+        }
+      ]
+    },
+    {
+      "draftId": "d-aaab0c05d1c5",
+      "questionId": "CLF-0131",
+      "factIds": [
+        "f-51d33b566e3a"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "df14ec83ba0cbc592ad43086441ea6c2a85f5580bdebfba08bba92cb4b5a07cc"
+        }
+      ]
+    },
+    {
+      "draftId": "d-aacdf4541ed7",
+      "questionId": "CLF-0132",
+      "factIds": [
+        "f-2db10ebc9d69",
+        "f-44cc57f141a8"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6329ef34923129621e68eeb3c3ca6305a0e8d70b079a72303c51828fd2152d92"
+        },
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "bc9cbe44acbf139a6b678f65071512ab14f52e1472f5b522d54bc9a777fc4027"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ab522670efb6",
+      "questionId": "CLF-0133",
+      "factIds": [
+        "f-03b7664c8a88",
+        "f-0707ffd8938f",
+        "f-4de1abcf98cf",
+        "f-ff144705414b"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/artifact/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "72840e1989a7d860d8777bbf1500cd2fcfeee8bc67d96d712186ecc69c159b82"
+        },
+        {
+          "url": "https://aws.amazon.com/certificate-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "19dac666e633fec34db7f27eff0f322a34a34c8123fb15e9827b9097964dc49a"
+        },
+        {
+          "url": "https://aws.amazon.com/cli/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "e977c049e8ae2e3045c195619d1cb0cbc050abdcf6d974a3d5721309df889742"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudtrail/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c7a6ad086fd327aa3692274bff545dd1a0dec913887558ea19acc57b8f0308be"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ad199ffabc08",
+      "questionId": "CLF-0134",
+      "factIds": [
+        "f-2a5aa76df301",
+        "f-344507cfeabe",
+        "f-3f7ffae99930",
+        "f-6a556e92cd52"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-billing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "89321f532fae05542a97bc094df7ae66434b78ae7ddd62b3775a5bed78ce83ba"
+        },
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "df14ec83ba0cbc592ad43086441ea6c2a85f5580bdebfba08bba92cb4b5a07cc"
+        },
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-cost-explorer/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "d40f893881d6914704b6b2ede9878e2795d90ecee5678996323780652710dcc2"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ad2d61f1f79d",
+      "questionId": "CLF-0135",
+      "factIds": [
+        "f-344507cfeabe"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "df14ec83ba0cbc592ad43086441ea6c2a85f5580bdebfba08bba92cb4b5a07cc"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ae0de593f9be",
+      "questionId": "CLF-0136",
+      "factIds": [
+        "f-071241e6d70e",
+        "f-15dc5399900f",
+        "f-2de88288921b",
+        "f-4de1abcf98cf",
+        "f-ff144705414b"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/artifact/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "72840e1989a7d860d8777bbf1500cd2fcfeee8bc67d96d712186ecc69c159b82"
+        },
+        {
+          "url": "https://aws.amazon.com/backup/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985"
+        },
+        {
+          "url": "https://aws.amazon.com/certificate-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "19dac666e633fec34db7f27eff0f322a34a34c8123fb15e9827b9097964dc49a"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudwatch/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4167b0163af282b43aecf19ca32400fedd69f9858677e77299ceec545d9afe5a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ae5c2c2dd05a",
+      "questionId": "CLF-0137",
+      "factIds": [
+        "f-3feab6170b7f"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/polly/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "91d55be03ad69f5904db12c9650c3b32a1ba49a2ac9b862c053f79dd526fb2a2"
+        }
+      ]
+    },
+    {
+      "draftId": "d-b228edec55b6",
+      "questionId": "CLF-0138",
+      "factIds": [
+        "f-95a534ca47a9",
+        "f-9de1325ea5bc",
+        "f-a5c7c44c4548"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/architecture/well-architected/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "1906898c63619945c84bac70b6c5228d4f8734ce790d007e41146384e881bf8a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-b32b06df7a21",
+      "questionId": "CLF-0139",
+      "factIds": [
+        "f-4b8ec557859b",
+        "f-532d388b9dc7",
+        "f-562b439dd3c2",
+        "f-664e4c690594",
+        "f-c6d49dc897ee"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/connect/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "63c81431d0263d43ac9a51c5671fb422e04f39aa00417ce7ec4f34cf9af5e8e9"
+        },
+        {
+          "url": "https://aws.amazon.com/fargate/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "e3379aa6293718f423e11130613ce465ce1eb6efcd35e136714b2d62a93a4ce8"
+        },
+        {
+          "url": "https://aws.amazon.com/iot-core/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "de152a13a1025d026346bf40a6d4a15d86468ebfdc3d5736d90f56e59ab8ef28"
+        },
+        {
+          "url": "https://aws.amazon.com/sagemaker/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "73281c7316284ff08dbb99e1499cadd3a69f921c43d1a0f3bf856546d8e67d52"
+        },
+        {
+          "url": "https://aws.amazon.com/sns/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "da1984fc5cf8d036f9877be93307e48835ec522c3944c1cd7ad42f4bc0ec8d39"
+        }
+      ]
+    },
+    {
+      "draftId": "d-b3940dfde0fa",
+      "questionId": "CLF-0140",
+      "factIds": [
+        "f-031db3626971",
+        "f-055c3bb87925",
+        "f-06bb85f33fff",
+        "f-09d20194186d",
+        "f-0e5057531355"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/config/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "0054ea68e9f1fb7b07c1f4a862e4a3ae51ef96eac1fc6645866a3dcc7a90c023"
+        },
+        {
+          "url": "https://aws.amazon.com/elasticloadbalancing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "a32a5b3d6a4bb34abbad3aa6bf1c246af46bb01b48605c5675a24749241dffc9"
+        },
+        {
+          "url": "https://aws.amazon.com/fsx/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "24f406b6fcc8ee0c8fc567c5ee2f66f27d79a2282508b672f631b20ca252c026"
+        },
+        {
+          "url": "https://aws.amazon.com/guardduty/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "8f8f2bd1c575de7ace6f499016d76c6d92cb110ce05e66bee7fc42497deae406"
+        },
+        {
+          "url": "https://aws.amazon.com/macie/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6f0d53b3f4abd20f71268e159a4ab9ecc6e61f4505eb31941b535b41a62a8c13"
+        }
+      ]
+    },
+    {
+      "draftId": "d-b51b3b27ea6f",
+      "questionId": "CLF-0141",
+      "factIds": [
+        "f-3786dd21ff4b",
+        "f-399fd4c74aff",
+        "f-3e1445311ebf",
+        "f-664e4c690594"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/redshift/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4bcac576c2470e7656cde80f13bee4973577665e4b8a825ea3e56b6301c73b61"
+        },
+        {
+          "url": "https://aws.amazon.com/s3/storage-classes/glacier/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "0a162bb13ddd805009cd97fced74c7f36515cd9b112eb5fbf0a163393e49b7eb"
+        },
+        {
+          "url": "https://aws.amazon.com/sagemaker/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "73281c7316284ff08dbb99e1499cadd3a69f921c43d1a0f3bf856546d8e67d52"
+        },
+        {
+          "url": "https://aws.amazon.com/systems-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "bad42dad8b553a6dd084efa74af2247cf104d86d7106756d1dc99410996d8f88"
+        }
+      ]
+    },
+    {
+      "draftId": "d-b5685d2cce50",
+      "questionId": "CLF-0142",
+      "factIds": [
+        "f-372722302d06",
+        "f-3f2e542017df",
+        "f-76fd9dca79b1",
+        "f-777e342c9457"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/ec2/pricing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "16a67d5ae58676d109baf8ff7bd6f5ac5881511628fbde67f8085ffca0bc0ff3"
+        },
+        {
+          "url": "https://aws.amazon.com/premiumsupport/plans/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "9bb6291d2665b6246eb8ad119b35f5c0f1f0467858c475905c88821367342b70"
+        },
+        {
+          "url": "https://aws.amazon.com/premiumsupport/technology/trusted-advisor/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "54662198773a9e54cb8f3b3aa512c52b8f7bc730709bcdba93841c1d49a5ce87"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/consolidated-billing.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "42572664207975b7ff29fa601919c473e2aff79656d6e17ca8eeaee918fb47d7"
+        }
+      ]
+    },
+    {
+      "draftId": "d-b6f0224c0a32",
+      "questionId": "CLF-0143",
+      "factIds": [
+        "f-00c0919c024d",
+        "f-06424424b752",
+        "f-06c9dd76557f",
+        "f-08bbc855e7b6"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/api-gateway/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c043ba883a0f921dba1e87abf1ddc91aa24c36825c5c48d5a0e6b93ffed69f4e"
+        },
+        {
+          "url": "https://aws.amazon.com/route53/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "3074f506b4d10fbb4bf10a798f4e4d901534bcf6c72d656aaf4d28630d6eb5ab"
+        },
+        {
+          "url": "https://aws.amazon.com/storagegateway/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c24a1db4c72d00c08d98c22ef3e2388199be00f71c63723bb2eb327b971ccfb4"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "229e4d45835eab1cd2f035ee6c549dd2dec86e7f6b9aa0123e02bd8aa20bd320"
+        }
+      ]
+    },
+    {
+      "draftId": "d-b9655e77854d",
+      "questionId": "CLF-0144",
+      "factIds": [
+        "f-3074e6126741"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/rds/aurora/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "aa3d245565a5c0996c05b5c06023aad01ba1f283c91b0c15d8784c2a20e589b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ba4998dd4c4f",
+      "questionId": "CLF-0145",
+      "factIds": [
+        "f-02edf59157bf",
+        "f-1c0703c1fd8a",
+        "f-d5a0680077b1",
+        "f-dc1504fb0747"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/amplify/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7e8bcca981ae0642eb573cc78cdb66fe90de103819d123efa1d7fae9d4124125"
+        },
+        {
+          "url": "https://aws.amazon.com/autoscaling/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4bb0e7e5f532e97988713b75877fd548961be20e0ceae70b239b2835b87fe3f5"
+        },
+        {
+          "url": "https://aws.amazon.com/backup/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985"
+        }
+      ]
+    },
+    {
+      "draftId": "d-bb81239c55f2",
+      "questionId": "CLF-0146",
+      "factIds": [
+        "f-92cf21cc3481",
+        "f-9de1325ea5bc",
+        "f-a5c7c44c4548",
+        "f-a6bdf57bc573",
+        "f-a9189fa2d274",
+        "f-b68f305b16f2"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/architecture/well-architected/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "1906898c63619945c84bac70b6c5228d4f8734ce790d007e41146384e881bf8a"
+        },
+        {
+          "url": "https://aws.amazon.com/autoscaling/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4bb0e7e5f532e97988713b75877fd548961be20e0ceae70b239b2835b87fe3f5"
+        },
+        {
+          "url": "https://aws.amazon.com/cloud-adoption-framework/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "64b8db2bebd45677f1a941f54674ac73056f5589c0ba4ccc07dad91355ec444f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-bbf3a5b87f39",
+      "questionId": "CLF-0147",
+      "factIds": [
+        "f-9da9f429f7aa",
+        "f-b9915d8c3d80"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/cloudtrail/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c7a6ad086fd327aa3692274bff545dd1a0dec913887558ea19acc57b8f0308be"
+        }
+      ]
+    },
+    {
+      "draftId": "d-bc107ba359c8",
+      "questionId": "CLF-0148",
+      "factIds": [
+        "f-02562d909614",
+        "f-048ff23627a0",
+        "f-053212ddb652",
+        "f-07291649da9f"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/cognito/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "1d556907a62d479f1dcbb50a49eb6bb6a38ecbf64d61cc8eaed094ec6dfc7f87"
+        },
+        {
+          "url": "https://aws.amazon.com/dms/schema-conversion-tool/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4491a092e678035f026611802a848b5ba9ea2400136a0c8eae65ef09c0c31aab"
+        },
+        {
+          "url": "https://aws.amazon.com/sqs/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b1465089f9fcfd7e07a9369afbaa754897115b6496451fdd9b59cf7d215ffc54"
+        },
+        {
+          "url": "https://aws.amazon.com/vpn/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "f3cd9f8ae8f290a975e320983b10d626385ecf8572c62790a2655f1285ac4ed7"
+        }
+      ]
+    },
+    {
+      "draftId": "d-bed4f5aa47d7",
+      "questionId": "CLF-0149",
+      "factIds": [
+        "f-14f9825ce92a",
+        "f-153aaa2798f8",
+        "f-15c936021a8f",
+        "f-171c1071c4b6",
+        "f-18e451d9482b"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/compliance/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "d6685677a13070205a2e781ee930eee053f0974edf0f932692d47b5d53f07117"
+        },
+        {
+          "url": "https://aws.amazon.com/compliance/programs/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "31b0b5dd6c2543c6711b2e4c41856e9a58723ba553b300955ff0831bf15140df"
+        },
+        {
+          "url": "https://aws.amazon.com/dms/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c5760e4a7285bdd75936f1fbc37fe5da678235557a5486e944b6d288202d58d9"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "0b05ce16085793e6747bd721df75ec0dd278b22df6ff7450dc92fb22e9edf605"
+        }
+      ]
+    },
+    {
+      "draftId": "d-bf06a99f4e4f",
+      "questionId": "CLF-0150",
+      "factIds": [
+        "f-1916df21954e",
+        "f-1919becb3b72",
+        "f-1d485ec0c06f",
+        "f-2739be43bac6"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/documentdb/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "363aeb2c8cae4a3597f9e1de87061c96626c2ae1a44af790da5ea170ed26c68d"
+        },
+        {
+          "url": "https://aws.amazon.com/eventbridge/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "befea5bfcfff88e6a6301f046353fa0b73e7f3ab0170ca67e0e6908b7650ea54"
+        },
+        {
+          "url": "https://aws.amazon.com/servicecatalog/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "be2bdaff22d43c99664f7652500c0358e11c1427855f749842281a38d625aff3"
+        },
+        {
+          "url": "https://aws.amazon.com/workspaces/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "eb4934d10703139495569256e5321ad6add3a29481324b2a0509ce4808c833d7"
+        }
+      ]
+    },
+    {
+      "draftId": "d-bf5e7bde496b",
+      "questionId": "CLF-0151",
+      "factIds": [
+        "f-2db10ebc9d69"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6329ef34923129621e68eeb3c3ca6305a0e8d70b079a72303c51828fd2152d92"
+        }
+      ]
+    },
+    {
+      "draftId": "d-c00e3dda2d9e",
+      "questionId": "CLF-0152",
+      "factIds": [
+        "f-02b530c71155",
+        "f-0310f8a57288",
+        "f-11dc1d70f80b",
+        "f-2e2344bb1da9"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/kms/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7096901fcd1d29ac2cefc278ffe6792d34a40e76911478270d3145561890d1b0"
+        },
+        {
+          "url": "https://aws.amazon.com/organizations/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "f0ba8e7f2317048aaea4f74b624cd267346685963c1cee18449268e2cd255120"
+        },
+        {
+          "url": "https://aws.amazon.com/premiumsupport/technology/aws-health-dashboard/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "94e1649a41c0f132a5398d5efccb096b60d1620e540dfddd66ee5ecb446ffe8d"
+        },
+        {
+          "url": "https://aws.amazon.com/shield/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "5371099e32ed259c1050ed3e8a44e8515d9142046ce9fc98fbd390b0c91c2f47"
+        }
+      ]
+    },
+    {
+      "draftId": "d-c010de9a7346",
+      "questionId": "CLF-0153",
+      "factIds": [
+        "f-02c02389b0d2",
+        "f-0515ef6bf8be",
+        "f-05c90f20df91"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/controltower/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "39ff7bf11d118980345647b6d9bf3cadcb01b33c62edd099fadcb4de3f1b9ddf"
+        },
+        {
+          "url": "https://aws.amazon.com/premiumsupport/plans/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "9bb6291d2665b6246eb8ad119b35f5c0f1f0467858c475905c88821367342b70"
+        },
+        {
+          "url": "https://aws.amazon.com/pricing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c1d646e3db5ceffc5b7728af9f7967bd26a9cdef6a9b547b3f4012ba06512869"
+        }
+      ]
+    },
+    {
+      "draftId": "d-c301c0e474bd",
+      "questionId": "CLF-0154",
+      "factIds": [
+        "f-053212ddb652",
+        "f-055c3bb87925",
+        "f-07291649da9f",
+        "f-09f2cc8f1b84",
+        "f-0a6455369f35"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/config/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "0054ea68e9f1fb7b07c1f4a862e4a3ae51ef96eac1fc6645866a3dcc7a90c023"
+        },
+        {
+          "url": "https://aws.amazon.com/dms/schema-conversion-tool/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4491a092e678035f026611802a848b5ba9ea2400136a0c8eae65ef09c0c31aab"
+        },
+        {
+          "url": "https://aws.amazon.com/iam/identity-center/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6f711ed66d2c5f54b8b733f54ea6b82fa62c73476944db43d26b7a1399542ad0"
+        },
+        {
+          "url": "https://aws.amazon.com/ram/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "74b7b3cb346baea7848990ee3c45b8eba0a73e63da9ea9e34fadc2f6d482a9fb"
+        },
+        {
+          "url": "https://aws.amazon.com/vpn/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "f3cd9f8ae8f290a975e320983b10d626385ecf8572c62790a2655f1285ac4ed7"
+        }
+      ]
+    },
+    {
+      "draftId": "d-c35bd7451544",
+      "questionId": "CLF-0155",
+      "factIds": [
+        "f-1da9ed2499b7"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/elasticache/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "d275782782cc99a124b320ba3c53e5df7fb5bfa6678896b41e32742c28b41064"
+        }
+      ]
+    },
+    {
+      "draftId": "d-c3e4daba329e",
+      "questionId": "CLF-0156",
+      "factIds": [
+        "f-03356a1f9d69",
+        "f-06424424b752",
+        "f-06c9dd76557f",
+        "f-0912d1b3d990",
+        "f-096d457fa523"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/emr/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "8adf5f06e1ca0c647de7121e9a852e3fb1740fd04fa515cc38ba983e901c794d"
+        },
+        {
+          "url": "https://aws.amazon.com/storagegateway/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c24a1db4c72d00c08d98c22ef3e2388199be00f71c63723bb2eb327b971ccfb4"
+        },
+        {
+          "url": "https://aws.amazon.com/transcribe/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "5021a12d754d0ed9bbaab426b49c6763b2842c72f2a2024d0eb76635358c1839"
+        },
+        {
+          "url": "https://aws.amazon.com/translate/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "2363d8a67d72a173b6bdab7dc8ac3e2daf0473c04fe96051b35e9af7f3cae00b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "229e4d45835eab1cd2f035ee6c549dd2dec86e7f6b9aa0123e02bd8aa20bd320"
+        }
+      ]
+    },
+    {
+      "draftId": "d-c69384449145",
+      "questionId": "CLF-0157",
+      "factIds": [
+        "f-17fce76273b7",
+        "f-212ac003433d",
+        "f-31c11ddf8c93",
+        "f-4b8ec557859b"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/comprehend/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "70657b4ce04d7a666608cb8cc844eb380093caae35c2d2f70bde96e8744a3707"
+        },
+        {
+          "url": "https://aws.amazon.com/q/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "899d7ce9ccf8106f4fa3c634215e26c305d0fd0995a92d6aa30d1bb3b0572f6a"
+        },
+        {
+          "url": "https://aws.amazon.com/secrets-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "8a6aa71af6ba7e2ab8531d2a7506c6fcd1c2fba2feef52b8ba6e88ade2d0ddd8"
+        },
+        {
+          "url": "https://aws.amazon.com/sns/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "da1984fc5cf8d036f9877be93307e48835ec522c3944c1cd7ad42f4bc0ec8d39"
+        }
+      ]
+    },
+    {
+      "draftId": "d-c810b781814c",
+      "questionId": "CLF-0158",
+      "factIds": [
+        "f-0912d1b3d990",
+        "f-096d457fa523",
+        "f-0d03db218e36",
+        "f-0f7b923ad9c4"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/cloudfront/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "821427d5feb78b90fb4cfd05a9c043cb87bb1041182a44eb007db7726abdf3a2"
+        },
+        {
+          "url": "https://aws.amazon.com/emr/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "8adf5f06e1ca0c647de7121e9a852e3fb1740fd04fa515cc38ba983e901c794d"
+        },
+        {
+          "url": "https://aws.amazon.com/rekognition/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "30e50643e4bab74494814ab65b14cd388c02c05bd0c3c84ac839be13d7ca77a1"
+        },
+        {
+          "url": "https://aws.amazon.com/translate/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "2363d8a67d72a173b6bdab7dc8ac3e2daf0473c04fe96051b35e9af7f3cae00b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-c9b64fb65e15",
+      "questionId": "CLF-0159",
+      "factIds": [
+        "f-a6bdf57bc573"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/cloud-adoption-framework/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "64b8db2bebd45677f1a941f54674ac73056f5589c0ba4ccc07dad91355ec444f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ca71f10f711d",
+      "questionId": "CLF-0160",
+      "factIds": [
+        "f-1773aee44128"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/textract/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "ac87cd3cfefea4036c0d83012e3c5fafd3538eb4e2fa1e950b461a315660b195"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ca810b178010",
+      "questionId": "CLF-0161",
+      "factIds": [
+        "f-6a6d0899b552",
+        "f-79a52f9b977c"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/cloudtrail/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c7a6ad086fd327aa3692274bff545dd1a0dec913887558ea19acc57b8f0308be"
+        }
+      ]
+    },
+    {
+      "draftId": "d-cd79dfc2d9dc",
+      "questionId": "CLF-0162",
+      "factIds": [
+        "f-d6d833ffa61b"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6329ef34923129621e68eeb3c3ca6305a0e8d70b079a72303c51828fd2152d92"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ce14279bb56a",
+      "questionId": "CLF-0163",
+      "factIds": [
+        "f-4de1abcf98cf",
+        "f-52592cf9f548"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/artifact/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "72840e1989a7d860d8777bbf1500cd2fcfeee8bc67d96d712186ecc69c159b82"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ceb814e57d2e",
+      "questionId": "CLF-0164",
+      "factIds": [
+        "f-38bef3d62b43",
+        "f-40a2b88db7af",
+        "f-441fe1aa4b1c",
+        "f-586a0bf0a1a3"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/ec2/autoscaling/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "919a5dae0f6eb873822dae8f0dc29afd6043158b7ea780d064f58b500e4b3434"
+        },
+        {
+          "url": "https://aws.amazon.com/fargate/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "e3379aa6293718f423e11130613ce465ce1eb6efcd35e136714b2d62a93a4ce8"
+        },
+        {
+          "url": "https://aws.amazon.com/license-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "2da7023d2f11d7cc27019971cef62eab593b5c8145ec2cf40433ff7b9c793aab"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/welcome.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "5dcda2793e6e987b7ca2a2d5fd5a120ab975f005f1a6cad760c966e3b333a262"
+        }
+      ]
+    },
+    {
+      "draftId": "d-cecbfbf99c72",
+      "questionId": "CLF-0165",
+      "factIds": [
+        "f-32eca9a6e072",
+        "f-589b88857d66",
+        "f-771b7d9460b6",
+        "f-7f044b9e66bb",
+        "f-82c38ab6cd9a"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/codebuild/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "65d7b4f240b2043e29815e285d5e70db6ab5bd8e5e218a0e0a420fa36da22e50"
+        },
+        {
+          "url": "https://aws.amazon.com/directconnect/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "60e58f04279989e3766b8b47e14b8df1d39d9fcd15b0f4b8bdfb6c7faf1f1643"
+        },
+        {
+          "url": "https://aws.amazon.com/ec2/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "ee0ac3189da097043f4c0bd6ef0ece6be8627c41fdefcb57bf6fa98115a2230f"
+        },
+        {
+          "url": "https://aws.amazon.com/global-accelerator/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "e83cd4ef4a7312fda43f40c2db5c6232861ba009125e08e739f40f0245ff0e9d"
+        },
+        {
+          "url": "https://aws.amazon.com/secrets-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "8a6aa71af6ba7e2ab8531d2a7506c6fcd1c2fba2feef52b8ba6e88ade2d0ddd8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d1cdc38951be",
+      "questionId": "CLF-0166",
+      "factIds": [
+        "f-002f72087b28"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/pricing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c1d646e3db5ceffc5b7728af9f7967bd26a9cdef6a9b547b3f4012ba06512869"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d38d33a50c39",
+      "questionId": "CLF-0167",
+      "factIds": [
+        "f-3c4cba484679",
+        "f-3fcaf8cb1b67",
+        "f-40a2b88db7af",
+        "f-73e5e708ef88"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/ec2/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "ee0ac3189da097043f4c0bd6ef0ece6be8627c41fdefcb57bf6fa98115a2230f"
+        },
+        {
+          "url": "https://aws.amazon.com/eks/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "1a8f996cf1a08fc3967c83e79996cdd6bc3ef67dc4e35935f613daed5bd5880e"
+        },
+        {
+          "url": "https://aws.amazon.com/fargate/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "e3379aa6293718f423e11130613ce465ce1eb6efcd35e136714b2d62a93a4ce8"
+        },
+        {
+          "url": "https://aws.amazon.com/transit-gateway/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "099e378c50431156c1ef13d5c0eb9a2725899dd41ea9721729efb00d7e6bac4c"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d39579cde2d5",
+      "questionId": "CLF-0168",
+      "factIds": [
+        "f-3e1445311ebf",
+        "f-3f63c73a1bd4",
+        "f-447c011b48fe",
+        "f-562b439dd3c2"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/ec2/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "ee0ac3189da097043f4c0bd6ef0ece6be8627c41fdefcb57bf6fa98115a2230f"
+        },
+        {
+          "url": "https://aws.amazon.com/fargate/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "e3379aa6293718f423e11130613ce465ce1eb6efcd35e136714b2d62a93a4ce8"
+        },
+        {
+          "url": "https://aws.amazon.com/lambda/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "d165baf4403ed97a398f29adba4d99dcbc5bcd45b0904f5d572c6fb36fb2dc62"
+        },
+        {
+          "url": "https://aws.amazon.com/systems-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "bad42dad8b553a6dd084efa74af2247cf104d86d7106756d1dc99410996d8f88"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d3fcb3a1b9dc",
+      "questionId": "CLF-0169",
+      "factIds": [
+        "f-40a2b88db7af",
+        "f-586a0bf0a1a3",
+        "f-6c43625c03f0",
+        "f-73e5e708ef88",
+        "f-ac1bf7d8f1c4"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/ec2/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "ee0ac3189da097043f4c0bd6ef0ece6be8627c41fdefcb57bf6fa98115a2230f"
+        },
+        {
+          "url": "https://aws.amazon.com/fargate/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "e3379aa6293718f423e11130613ce465ce1eb6efcd35e136714b2d62a93a4ce8"
+        },
+        {
+          "url": "https://aws.amazon.com/license-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "2da7023d2f11d7cc27019971cef62eab593b5c8145ec2cf40433ff7b9c793aab"
+        },
+        {
+          "url": "https://aws.amazon.com/organizations/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "f0ba8e7f2317048aaea4f74b624cd267346685963c1cee18449268e2cd255120"
+        },
+        {
+          "url": "https://aws.amazon.com/ses/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "9fa1fc9428bcd19a5bb9dad64540393bdb85bc8e7bd68e54c3d261537beec6b1"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d6d49337faaf",
+      "questionId": "CLF-0170",
+      "factIds": [
+        "f-11d6a3b55128",
+        "f-183a8b6a3b3c",
+        "f-3f5d97c0bd56",
+        "f-6066483fba0c"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/application-migration-service/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "e0a0f2f7cdffe509e5ff218288b2fe8da8b3f2f9093ba4c95d4c8d75197f72c3"
+        },
+        {
+          "url": "https://aws.amazon.com/machine-learning/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "3a721c3389e267bc5e943813e511bf83a61dfc3d99ec8e05d3dd4b79f4c41cf9"
+        },
+        {
+          "url": "https://aws.amazon.com/rds/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "f9a8e9a30e35a744e37defb6c936fc480aaca8d85a603e072adba3926164499f"
+        },
+        {
+          "url": "https://aws.amazon.com/transit-gateway/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "099e378c50431156c1ef13d5c0eb9a2725899dd41ea9721729efb00d7e6bac4c"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d6f7319723c6",
+      "questionId": "CLF-0171",
+      "factIds": [
+        "f-097acda24def",
+        "f-0ae84f1e694b",
+        "f-0c3efd5d76c2",
+        "f-0de167a4c1bb"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/ec2/instance-types/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "02168680f33076793c9fe6eede365ccd94813e523182a05eec3273f05e09dc91"
+        },
+        {
+          "url": "https://aws.amazon.com/outposts/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "055d4607bbbe24573bdf43f706779fd8cd5ddefb003847be4b484a9fd6eaddce"
+        },
+        {
+          "url": "https://aws.amazon.com/privatelink/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7f638d807bdf4155b9c4b994f07ee29c1c2b88a7dfce5964bfc5fd67b4c6de25"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d7c34aa83775",
+      "questionId": "CLF-0172",
+      "factIds": [
+        "f-105e1b24d83c",
+        "f-11ad45d5e214",
+        "f-3f5d97c0bd56",
+        "f-936fc44a23f5"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/application-migration-service/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "e0a0f2f7cdffe509e5ff218288b2fe8da8b3f2f9093ba4c95d4c8d75197f72c3"
+        },
+        {
+          "url": "https://aws.amazon.com/disaster-recovery/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "04df2b40166a0fbd4ca92171c79f27d6785e13dd606b2b19210419428c8920d5"
+        },
+        {
+          "url": "https://aws.amazon.com/ecr/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "8ac1cca2fd08e5038228fbdb19c00c5e254b81f5be49161646bbedcaa7ecd878"
+        },
+        {
+          "url": "https://aws.amazon.com/global-accelerator/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "e83cd4ef4a7312fda43f40c2db5c6232861ba009125e08e739f40f0245ff0e9d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-db4c5d84f090",
+      "questionId": "CLF-0173",
+      "factIds": [
+        "f-03b7664c8a88",
+        "f-0707ffd8938f",
+        "f-071241e6d70e",
+        "f-15dc5399900f",
+        "f-70961479a2aa",
+        "f-e367d4f00ed1"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/artifact/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "72840e1989a7d860d8777bbf1500cd2fcfeee8bc67d96d712186ecc69c159b82"
+        },
+        {
+          "url": "https://aws.amazon.com/certificate-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "19dac666e633fec34db7f27eff0f322a34a34c8123fb15e9827b9097964dc49a"
+        },
+        {
+          "url": "https://aws.amazon.com/cli/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "e977c049e8ae2e3045c195619d1cb0cbc050abdcf6d974a3d5721309df889742"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudtrail/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c7a6ad086fd327aa3692274bff545dd1a0dec913887558ea19acc57b8f0308be"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudwatch/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4167b0163af282b43aecf19ca32400fedd69f9858677e77299ceec545d9afe5a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-db90b57cc25d",
+      "questionId": "CLF-0174",
+      "factIds": [
+        "f-09f2cc8f1b84",
+        "f-0a6455369f35",
+        "f-0ec6012dd666",
+        "f-0fab7bfa000e",
+        "f-0fae27429717"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/cloudhsm/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "964951e62fb0417f4bc258044e70841672e43d67c3289e07c33a44668a0e5a53"
+        },
+        {
+          "url": "https://aws.amazon.com/guardduty/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "8f8f2bd1c575de7ace6f499016d76c6d92cb110ce05e66bee7fc42497deae406"
+        },
+        {
+          "url": "https://aws.amazon.com/iam/identity-center/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6f711ed66d2c5f54b8b733f54ea6b82fa62c73476944db43d26b7a1399542ad0"
+        },
+        {
+          "url": "https://aws.amazon.com/ram/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "74b7b3cb346baea7848990ee3c45b8eba0a73e63da9ea9e34fadc2f6d482a9fb"
+        }
+      ]
+    },
+    {
+      "draftId": "d-dcfa6087c0ca",
+      "questionId": "CLF-0175",
+      "factIds": [
+        "f-014a8c2cc3da",
+        "f-0263b9546346",
+        "f-08f644312561"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/dms/schema-conversion-tool/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4491a092e678035f026611802a848b5ba9ea2400136a0c8eae65ef09c0c31aab"
+        },
+        {
+          "url": "https://aws.amazon.com/lightsail/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "dec118ceb4251eac9bdc964991b1ca8fcdb4c6c3ef2aa29c514a9f7b3ea427b9"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "9a8c040ee80ae28f3ce1c87b7e258935640d1ca86557b1ec53515bd10d29049e"
+        }
+      ]
+    },
+    {
+      "draftId": "d-e1aece2419d6",
+      "questionId": "CLF-0176",
+      "factIds": [
+        "f-8d59ff8bf1ac",
+        "f-9306afec269b",
+        "f-9d059eb695a5"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6329ef34923129621e68eeb3c3ca6305a0e8d70b079a72303c51828fd2152d92"
+        },
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "bc9cbe44acbf139a6b678f65071512ab14f52e1472f5b522d54bc9a777fc4027"
+        }
+      ]
+    },
+    {
+      "draftId": "d-e310d9c8fb65",
+      "questionId": "CLF-0177",
+      "factIds": [
+        "f-715cdfe2d51d",
+        "f-8070fa0877f5",
+        "f-95a534ca47a9",
+        "f-9de1325ea5bc"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/architecture/well-architected/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "1906898c63619945c84bac70b6c5228d4f8734ce790d007e41146384e881bf8a"
+        },
+        {
+          "url": "https://aws.amazon.com/cloud-adoption-framework/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "64b8db2bebd45677f1a941f54674ac73056f5589c0ba4ccc07dad91355ec444f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-e3799da3af59",
+      "questionId": "CLF-0178",
+      "factIds": [
+        "f-9306afec269b"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "bc9cbe44acbf139a6b678f65071512ab14f52e1472f5b522d54bc9a777fc4027"
+        }
+      ]
+    },
+    {
+      "draftId": "d-e3cf36792af8",
+      "questionId": "CLF-0179",
+      "factIds": [
+        "f-664e4c690594"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/sagemaker/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "73281c7316284ff08dbb99e1499cadd3a69f921c43d1a0f3bf856546d8e67d52"
+        }
+      ]
+    },
+    {
+      "draftId": "d-e59a04a94d93",
+      "questionId": "CLF-0180",
+      "factIds": [
+        "f-0912d1b3d990",
+        "f-096d457fa523",
+        "f-0b8955424074",
+        "f-0ce9c86ec1e6",
+        "f-0d03db218e36"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/emr/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "8adf5f06e1ca0c647de7121e9a852e3fb1740fd04fa515cc38ba983e901c794d"
+        },
+        {
+          "url": "https://aws.amazon.com/rekognition/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "30e50643e4bab74494814ab65b14cd388c02c05bd0c3c84ac839be13d7ca77a1"
+        },
+        {
+          "url": "https://aws.amazon.com/route53/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "3074f506b4d10fbb4bf10a798f4e4d901534bcf6c72d656aaf4d28630d6eb5ab"
+        },
+        {
+          "url": "https://aws.amazon.com/translate/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "2363d8a67d72a173b6bdab7dc8ac3e2daf0473c04fe96051b35e9af7f3cae00b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "229e4d45835eab1cd2f035ee6c549dd2dec86e7f6b9aa0123e02bd8aa20bd320"
+        }
+      ]
+    },
+    {
+      "draftId": "d-e633bc689e16",
+      "questionId": "CLF-0181",
+      "factIds": [
+        "f-02d5cab22034"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/architecture/well-architected/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "1906898c63619945c84bac70b6c5228d4f8734ce790d007e41146384e881bf8a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-e79ca871a1d0",
+      "questionId": "CLF-0182",
+      "factIds": [
+        "f-3f2e542017df",
+        "f-54d348e8d4e5",
+        "f-5ab8a05b9dc0",
+        "f-5f741ae460e0"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/ec2/pricing/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "16a67d5ae58676d109baf8ff7bd6f5ac5881511628fbde67f8085ffca0bc0ff3"
+        },
+        {
+          "url": "https://aws.amazon.com/ecs/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7b0cc6721617394a7ce79552e6a54bf55282593b9b82a913d07d455012e57384"
+        },
+        {
+          "url": "https://aws.amazon.com/premiumsupport/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "d3d51dc00c4362b4bcf4aeae403feed0f65de7a42abdd3f6b6573ecca85934bb"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/consolidated-billing.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "42572664207975b7ff29fa601919c473e2aff79656d6e17ca8eeaee918fb47d7"
+        }
+      ]
+    },
+    {
+      "draftId": "d-e97c242d9306",
+      "questionId": "CLF-0183",
+      "factIds": [
+        "f-25aacc82487c"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/documentdb/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "363aeb2c8cae4a3597f9e1de87061c96626c2ae1a44af790da5ea170ed26c68d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ea1c2bab58f6",
+      "questionId": "CLF-0184",
+      "factIds": [
+        "f-8d59ff8bf1ac",
+        "f-9306afec269b"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6329ef34923129621e68eeb3c3ca6305a0e8d70b079a72303c51828fd2152d92"
+        },
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "bc9cbe44acbf139a6b678f65071512ab14f52e1472f5b522d54bc9a777fc4027"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ecbc7de2cf36",
+      "questionId": "CLF-0185",
+      "factIds": [
+        "f-0ecf4e40f8f1",
+        "f-0f134d9fac4d",
+        "f-10eddf2a42cb"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/compliance/shared-responsibility-model/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "af3aa2211d96228039f360fb759f53ecb6e462ab51c891ef07b0505960a7d236"
+        }
+      ]
+    },
+    {
+      "draftId": "d-edda41664de0",
+      "questionId": "CLF-0186",
+      "factIds": [
+        "f-9306afec269b",
+        "f-9d059eb695a5"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "bc9cbe44acbf139a6b678f65071512ab14f52e1472f5b522d54bc9a777fc4027"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f0f233793c10",
+      "questionId": "CLF-0187",
+      "factIds": [
+        "f-116460524242",
+        "f-17b372cab978",
+        "f-2c80653d2824",
+        "f-32eca9a6e072"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/codebuild/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "65d7b4f240b2043e29815e285d5e70db6ab5bd8e5e218a0e0a420fa36da22e50"
+        },
+        {
+          "url": "https://aws.amazon.com/detective/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "f03e97fb9cd1d65709b692482a6d5b53da3f03d7c6e6ce74f66a3e54939faa62"
+        },
+        {
+          "url": "https://aws.amazon.com/inspector/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "02b944d96de093c2f43f7ee7d60597b540b14d7c0dee22ed8033b7c4f98d34d1"
+        },
+        {
+          "url": "https://aws.amazon.com/vpc/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "0375bbc6aabf8decd103ae0541f81e98edfb0a0b45277c9610bccfbe4d45ae79"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f108d6a77c34",
+      "questionId": "CLF-0188",
+      "factIds": [
+        "f-4b8ec557859b",
+        "f-5b4202f7dcba",
+        "f-664e4c690594",
+        "f-c6d49dc897ee"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/iot-core/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "de152a13a1025d026346bf40a6d4a15d86468ebfdc3d5736d90f56e59ab8ef28"
+        },
+        {
+          "url": "https://aws.amazon.com/neptune/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7122427cd670cc27c7958aa09247ee83b3040f85e2c5f61870a829cc642bbca5"
+        },
+        {
+          "url": "https://aws.amazon.com/sagemaker/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "73281c7316284ff08dbb99e1499cadd3a69f921c43d1a0f3bf856546d8e67d52"
+        },
+        {
+          "url": "https://aws.amazon.com/sns/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "da1984fc5cf8d036f9877be93307e48835ec522c3944c1cd7ad42f4bc0ec8d39"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f1bfa6a02304",
+      "questionId": "CLF-0189",
+      "factIds": [
+        "f-08bbc855e7b6",
+        "f-0b8955424074",
+        "f-0ce9c86ec1e6",
+        "f-0de167a4c1bb"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/api-gateway/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c043ba883a0f921dba1e87abf1ddc91aa24c36825c5c48d5a0e6b93ffed69f4e"
+        },
+        {
+          "url": "https://aws.amazon.com/ec2/instance-types/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "02168680f33076793c9fe6eede365ccd94813e523182a05eec3273f05e09dc91"
+        },
+        {
+          "url": "https://aws.amazon.com/route53/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "3074f506b4d10fbb4bf10a798f4e4d901534bcf6c72d656aaf4d28630d6eb5ab"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "229e4d45835eab1cd2f035ee6c549dd2dec86e7f6b9aa0123e02bd8aa20bd320"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f2b85de87848",
+      "questionId": "CLF-0190",
+      "factIds": [
+        "f-0ae6c80f8708"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/lex/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "668e31ebb530f8c5dda8f817d977f1b5a1233ed6c5d640189e3360b8a9f186a0"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f37f2e4be43b",
+      "questionId": "CLF-0191",
+      "factIds": [
+        "f-9306afec269b",
+        "f-a272687226f6",
+        "f-bd1e15f92227",
+        "f-cfa7b9b9a23d"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "bc9cbe44acbf139a6b678f65071512ab14f52e1472f5b522d54bc9a777fc4027"
+        },
+        {
+          "url": "https://aws.amazon.com/athena/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "681183effda8237ecb663693f67597e3456cbd91f5efb0f8e5f5e1e66df0e8e0"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f43d58edb54f",
+      "questionId": "CLF-0192",
+      "factIds": [
+        "f-03b7664c8a88",
+        "f-0707ffd8938f",
+        "f-4de1abcf98cf",
+        "f-ff144705414b"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/artifact/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "72840e1989a7d860d8777bbf1500cd2fcfeee8bc67d96d712186ecc69c159b82"
+        },
+        {
+          "url": "https://aws.amazon.com/certificate-manager/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "19dac666e633fec34db7f27eff0f322a34a34c8123fb15e9827b9097964dc49a"
+        },
+        {
+          "url": "https://aws.amazon.com/cli/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "e977c049e8ae2e3045c195619d1cb0cbc050abdcf6d974a3d5721309df889742"
+        },
+        {
+          "url": "https://aws.amazon.com/cloudtrail/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "c7a6ad086fd327aa3692274bff545dd1a0dec913887558ea19acc57b8f0308be"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f644dbf25c9b",
+      "questionId": "CLF-0193",
+      "factIds": [
+        "f-01282a23069d",
+        "f-14f9825ce92a",
+        "f-15c936021a8f",
+        "f-171c1071c4b6"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/compliance/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "d6685677a13070205a2e781ee930eee053f0974edf0f932692d47b5d53f07117"
+        },
+        {
+          "url": "https://aws.amazon.com/compliance/programs/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "31b0b5dd6c2543c6711b2e4c41856e9a58723ba553b300955ff0831bf15140df"
+        },
+        {
+          "url": "https://aws.amazon.com/directoryservice/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "a9e8804c5fadf2f616ee1eff3916edfdcc06586242a2236dec0738379ad790a0"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "0b05ce16085793e6747bd721df75ec0dd278b22df6ff7450dc92fb22e9edf605"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f6b42c842c08",
+      "questionId": "CLF-0194",
+      "factIds": [
+        "f-54e80cb32b58"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/cloudwatch/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4167b0163af282b43aecf19ca32400fedd69f9858677e77299ceec545d9afe5a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f7f9a3a361db",
+      "questionId": "CLF-0195",
+      "factIds": [
+        "f-a272687226f6"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "bc9cbe44acbf139a6b678f65071512ab14f52e1472f5b522d54bc9a777fc4027"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f9fea5df3609",
+      "questionId": "CLF-0196",
+      "factIds": [
+        "f-02edf59157bf",
+        "f-1c0703c1fd8a",
+        "f-d5a0680077b1",
+        "f-dc1504fb0747"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/amplify/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "7e8bcca981ae0642eb573cc78cdb66fe90de103819d123efa1d7fae9d4124125"
+        },
+        {
+          "url": "https://aws.amazon.com/autoscaling/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4bb0e7e5f532e97988713b75877fd548961be20e0ceae70b239b2835b87fe3f5"
+        },
+        {
+          "url": "https://aws.amazon.com/backup/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "b647eea4d36155727a349f8da353ec30d54d0c12058e77ff8894070ca6097985"
+        }
+      ]
+    },
+    {
+      "draftId": "d-fa64afce3ca1",
+      "questionId": "CLF-0197",
+      "factIds": [
+        "f-7cd4e2ca2002"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/glue/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "a2712c15eeaa535f17e9db6b964c5102d98569509f4c57dd18a4dc9e7b46bbff"
+        }
+      ]
+    },
+    {
+      "draftId": "d-faf3003edff3",
+      "questionId": "CLF-0198",
+      "factIds": [
+        "f-04b5536da618",
+        "f-26aeb979d514",
+        "f-30e961ed0bcd",
+        "f-dfb0219defd6"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/partners/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "3f7a09d749ed82de3963e14e8e6b4cca561f60aba51a7772f9441a1b4f5526e4"
+        },
+        {
+          "url": "https://aws.amazon.com/premiumsupport/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "d3d51dc00c4362b4bcf4aeae403feed0f65de7a42abdd3f6b6573ecca85934bb"
+        },
+        {
+          "url": "https://aws.amazon.com/premiumsupport/technology/trusted-advisor/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "54662198773a9e54cb8f3b3aa512c52b8f7bc730709bcdba93841c1d49a5ce87"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/welcome.html",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "5dcda2793e6e987b7ca2a2d5fd5a120ab975f005f1a6cad760c966e3b333a262"
+        }
+      ]
+    },
+    {
+      "draftId": "d-fd781750be20",
+      "questionId": "CLF-0199",
+      "factIds": [
+        "f-c4d4a6c5d09c"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/artifact/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "72840e1989a7d860d8777bbf1500cd2fcfeee8bc67d96d712186ecc69c159b82"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ff65f84d610b",
+      "questionId": "CLF-0200",
+      "factIds": [
+        "f-053212ddb652",
+        "f-055c3bb87925",
+        "f-06bb85f33fff",
+        "f-07291649da9f"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/config/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "0054ea68e9f1fb7b07c1f4a862e4a3ae51ef96eac1fc6645866a3dcc7a90c023"
+        },
+        {
+          "url": "https://aws.amazon.com/dms/schema-conversion-tool/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "4491a092e678035f026611802a848b5ba9ea2400136a0c8eae65ef09c0c31aab"
+        },
+        {
+          "url": "https://aws.amazon.com/macie/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "6f0d53b3f4abd20f71268e159a4ab9ecc6e61f4505eb31941b535b41a62a8c13"
+        },
+        {
+          "url": "https://aws.amazon.com/vpn/",
+          "fetchedAt": "2026-10-18",
+          "contentHash": "f3cd9f8ae8f290a975e320983b10d626385ecf8572c62790a2655f1285ac4ed7"
+        }
+      ]
+    }
+  ]
+}

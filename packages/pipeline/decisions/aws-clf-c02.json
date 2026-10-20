@@ -1,0 +1,1205 @@
+{
+  "examCode": "AWS-CLF-C02",
+  "decisions": [
+    {
+      "target": "draft",
+      "id": "d-00098387aae7",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-029847f5d9f5",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-04dd0c674d26",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-04eb25d57d65",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-0556d7025668",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-0699c4c65c32",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-07f7a10cb7d8",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-090de3f02b68",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-0a2c6d2625ba",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-0a4161bc1bc3",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-0a448d1a320d",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-0a758339a932",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-0b5d505b6eba",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-0b9f3d30ae9b",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-0dc74c8af181",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-0dd4ddb635fe",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-0fe70a6cc781",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-11419c8fc928",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-118d07d032ec",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-12214d75e361",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-1394de245952",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-13f526b0461b",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-14d1a8736bc7",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-158c31532792",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-16119dd41b70",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-1b091b37fdef",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-1b0fce333062",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-1b9277adc04e",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-1ce03263e4b0",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-1d2df281e37d",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-1dbd17a9cf62",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-210bd4a92e05",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-21594bca4745",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-22ef26017c39",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-2458b6c11df4",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-249ea7582322",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-254381d0a1a9",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-259c79c84e90",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-2642d2f91831",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-2c176d38bc37",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-2c8458de6308",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-2d46b568ec6a",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-2d50426504f4",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-2e7d1717829c",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-30ce2c80daaa",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-320f231663a8",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-34f00f5312d2",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-35f03cdcfbe1",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-3665d7038ea7",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-3b7ecd34467a",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-3bbdff758fa6",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-3c7d09855d37",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-3c7d7a8ea395",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-3f1e1e4193f3",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-3fe1a99aebd3",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-40c3cdd65aa8",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-40e4de5ad5a0",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-415d56031cfb",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-423d9cede35d",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-42c2a81ffd8d",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-446f40e506df",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-44ad529ad20b",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-45595370e346",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-46656a8e89fc",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-495f425b7b85",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-49b372a4538b",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-4a2a903eaf5f",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-4b5d32e46208",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-4bbf41e3c4ab",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-5098be874fb6",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-50ec72634a1d",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-526e688daba1",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-556c8e7f3b28",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-562cd3e5a4a4",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-57c058b85258",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-596f91c7d724",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-59ffb3930d38",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-5a8ac46bbc03",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-5ab877142824",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-5fa991d05c15",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-62400899b073",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-62ba3ec5b32c",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-62f0f0906371",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-65222e16be76",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-65e9a9450b87",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-66c8c80ee972",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-676621e80fbd",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-6c4dfbfefb6e",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-6e922f49811f",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-70055bc9a50f",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-7033d92cc77e",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-73001612e7c4",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-76e900bead7a",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-7869e9d83b75",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-79c27f1f5476",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-7a204f8bd54b",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-7a2257d6d30e",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-7a64967c7360",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-7b6592482839",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-7cde8d1bc80f",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-7ce9550fe45f",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-7f285dc8b0d8",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-8092804ec5e0",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-818d3758ac64",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-82fca65a50eb",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-87931d817e43",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-8be522919dec",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-8c610a8643fa",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-8cf5b52f9ffc",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-8f7f8bee6252",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-8fa9f63d46b5",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-92bafddb3820",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-977f5b5e41ea",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-97e37b1f8fae",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-99d62f2fcdfa",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-9afa0e062f82",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-9c551c580192",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-9e3b2c50a0bd",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-9e869aff6ac1",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-a0a83087710b",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-a1bf1e3afbe6",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-a2957c449a77",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-a3991d0a9fb4",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-a5aedda2df35",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-a647aae4268f",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-a76f86729f5f",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-a793d25146af",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-a8dda113e718",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-a8fd4945931a",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-aa1c292720ad",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-aaab0c05d1c5",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-aacdf4541ed7",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-ab522670efb6",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-ad199ffabc08",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-ad2d61f1f79d",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-ae0de593f9be",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-ae5c2c2dd05a",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-b228edec55b6",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-b32b06df7a21",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-b3940dfde0fa",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-b51b3b27ea6f",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-b5685d2cce50",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-b6f0224c0a32",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-b9655e77854d",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-ba4998dd4c4f",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-bb81239c55f2",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-bbf3a5b87f39",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-bc107ba359c8",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-bed4f5aa47d7",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-bf06a99f4e4f",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-bf5e7bde496b",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-c00e3dda2d9e",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-c010de9a7346",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-c301c0e474bd",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-c35bd7451544",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-c3e4daba329e",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-c69384449145",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-c810b781814c",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-c9b64fb65e15",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-ca71f10f711d",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-ca810b178010",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-cd79dfc2d9dc",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-ce14279bb56a",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-ceb814e57d2e",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-cecbfbf99c72",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-d1cdc38951be",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-d38d33a50c39",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-d39579cde2d5",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-d3fcb3a1b9dc",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-d6d49337faaf",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-d6f7319723c6",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-d7c34aa83775",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-db4c5d84f090",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-db90b57cc25d",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-dcfa6087c0ca",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-e1aece2419d6",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-e310d9c8fb65",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-e3799da3af59",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-e3cf36792af8",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-e59a04a94d93",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-e633bc689e16",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-e79ca871a1d0",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-e97c242d9306",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-ea1c2bab58f6",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-ecbc7de2cf36",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-edda41664de0",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-f0f233793c10",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-f108d6a77c34",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-f1bfa6a02304",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-f2b85de87848",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-f37f2e4be43b",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-f43d58edb54f",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-f644dbf25c9b",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-f6b42c842c08",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-f7f9a3a361db",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-f9fea5df3609",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-fa64afce3ca1",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-faf3003edff3",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-fd781750be20",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    },
+    {
+      "target": "draft",
+      "id": "d-ff65f84d610b",
+      "decision": "approve",
+      "reason": "owner-bulk-approve"
+    }
+  ]
+}
