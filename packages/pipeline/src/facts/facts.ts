@@ -290,14 +290,14 @@ function importStep(
     const body = cache.has(request.contentHash) ? (cache.read(request.contentHash)?.toString("utf8") ?? null) : null;
     const cards = buildCards(out, { url: source.url, contentHash: request.contentHash, target: source.target });
     const guide = initialLedger.guide?.domains;
-    for (const card of cards) {
+    for (const { card, quote } of cards) {
       const reasons = new Set<string>();
       if (!domains.includes(card.domain)) reasons.add("unknown-domain");
       const size = guide?.find((g) => g.code === card.domain)?.scope.length;
       if (size !== undefined && card.scopeItems.some((n) => n >= size)) reasons.add("scope-item-out-of-range");
       if (body !== null && detectCopy(card.claim, [body]) !== null) reasons.add("long-copy");
       const evidence = card.sources[0] as FactCard["sources"][number];
-      for (const r of checkGrounding(card.claim, evidence, source, body)) reasons.add(r);
+      for (const r of checkGrounding(card.claim, evidence, quote, source, body)) reasons.add(r);
       incoming.push({
         ...card,
         // 本文の写しは、不採用でも台帳に残さない

@@ -5,7 +5,7 @@ import { card, DOC_HASH } from "./test-helpers.ts";
 const OTHER = {
   url: "https://docs.aws.amazon.com/guide/other.html",
   section: "Limits",
-  anchor: { heading: "limits", quote: "100 buckets" },
+  anchor: { heading: "limits" },
   contentHash: DOC_HASH,
 };
 
@@ -54,7 +54,7 @@ describe("矛盾の検出", () => {
     card({
       id: "f-bbb",
       claim: "Widget Store では、アカウントがリージョンごとに持てるバケットは 200 個まで。",
-      sources: [{ ...OTHER, anchor: { heading: "limits", quote: "200 buckets" } }],
+      sources: [OTHER],
       ...over,
     });
 

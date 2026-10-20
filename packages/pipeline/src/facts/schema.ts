@@ -2,7 +2,6 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
 import { ID, Paraphrase, REASON, REGION, SHA256, SourceUrl } from "../collect/ledger.ts";
-import { withinQuoteLimit } from "../collect/text-limits.ts";
 import { EXAM_CODE } from "../contract.ts";
 import { AgentStampSchema } from "../shared/agents.ts";
 import { PathsError } from "../shared/errors.ts";
@@ -10,7 +9,8 @@ import { writeFileAtomic } from "../shared/fs.ts";
 
 /**
  * 事実カード(ADR 0007・0008)。出典から取り出した主張を、1 件ずつ検査できる形で持つ。
- * 資格ごとに 1 つの JSON をコミットする。持つのはリンク、言い換えた主張、見出し、短い引用、本文のハッシュだけで、本文は持たない。
+ * 資格ごとに 1 つの JSON をコミットする。持つのはリンク、言い換えた主張、見出し、本文のハッシュだけで、本文も引用も持たない
+ * (引用は、取り込むときの照合にだけ使い、台帳には残さない。docs/fact-cards.md)。
  */
 
 export const CONFIDENCES = ["high", "medium", "low"] as const;
@@ -22,14 +22,13 @@ export type CardStatus = (typeof CARD_STATUSES)[number];
 
 const DOMAIN_CODE = z.string().regex(/^domain[1-9][0-9]?$/);
 
-/** 根拠 1 件。アンカーは、節の見出し(ID または見出しの文)と、その節にそのまま出てくる短い引用 */
+/** 根拠 1 件。アンカーは、節の見出し(ID または見出しの文)だけ。本文の引用は持たない */
 export const EvidenceSchema = z.strictObject({
   url: SourceUrl,
   /** 人が読む節の名前(分野 > タスクなど) */
   section: z.string().min(1).max(120),
   anchor: z.strictObject({
     heading: z.string().min(1).max(120),
-    quote: z.string().min(1).refine(withinQuoteLimit, "引用が長すぎる"),
   }),
   /** 根拠にした本文のハッシュ。モデルの出力ではなく、取り込むときに CLI が入力の本文から入れる */
   contentHash: SHA256,
