@@ -64,13 +64,13 @@ const average = (values: number[]) => values.reduce((a, b) => a + b, 0) / values
 const QUESTION_ENDING = /(か|ください|なさい|選べ|答えよ|[?？])[。.!！]*$/;
 
 /** 否定の表現。長い語を先に並べ、重なって数えないようにする */
-const NEGATION = /適切でない|不適切|誤っている|含まれない|ではない|できない|以外|でない/g;
+export const NEGATION = /適切でない|不適切|誤っている|含まれない|ではない|できない|以外|でない/g;
 
 const KANJI_NUMBERS: Record<string, number> = { 一: 1, 二: 2, 三: 3, 四: 4, 五: 5, 六: 6, 七: 7, 八: 8, 九: 9, 十: 10 };
 const COUNT_PHRASE = /([0-9０-９]+|[一二三四五六七八九十])\s*(?:つ|個|件|項目)/;
 
 /** 設問文に書かれた「選ぶ数」。書かれていなければ null */
-function statedCount(stem: string): number | null {
+export function statedCount(stem: string): number | null {
   const m = COUNT_PHRASE.exec(stem.normalize("NFKC"));
   if (m === null) return null;
   const raw = m[1] as string;
@@ -80,7 +80,7 @@ function statedCount(stem: string): number | null {
 // ---- 選択肢 ----
 
 /** 「すべて」「いずれでもない」のような、選択肢をまとめる選択肢 */
-const CATCH_ALL =
+export const CATCH_ALL =
   /^(すべて|全て|いずれも|どれも)(が|は)?(正しい|該当|当てはまる|誤り|間違い|適切)|いずれでもない|どれでもない|上記のすべて|上記すべて|上記のいずれも|上記のどれも|^なし$|none of the above|all of the above/i;
 
 /** 断定しすぎる語 */

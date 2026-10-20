@@ -7,7 +7,7 @@ import { DISTRACTOR_TYPES, DraftSchema, FACT_ID } from "./schema.ts";
 import { STYLE_RULES, STYLE_VERSION } from "./style.ts";
 
 /** 依頼の形が変わったら上げる。鍵に入るので、上げると依頼のキャッシュが切れる */
-export const REQUEST_VERSION = 4;
+export const REQUEST_VERSION = 5;
 
 /** エージェントへの依頼(作業用の置き場に書く)。事実カードの主張は、言い換えた短い文 */
 export const DraftRequestSchema = z.strictObject({
@@ -37,6 +37,11 @@ export const DraftRequestSchema = z.strictObject({
   /** 誤答の型の一覧。誤答ごとに型を選ぶ */
   distractorTypes: z.array(z.enum(DISTRACTOR_TYPES)).min(1),
   styleVersion: z.number().int(),
+  /** 資格ごとの出題スタイルの指針の文書(リポジトリ直下からの相対パス)。点数票の帯のある資格だけ */
+  styleGuides: z
+    .array(z.string().regex(/^docs\/exam-style\/[a-z0-9-]+\.md$/))
+    .min(1)
+    .optional(),
   styleRules: z.array(z.strictObject({ name: z.string(), severity: z.enum(["block", "warn"]), summary: z.string() })),
   /** 結果を書く場所。リポジトリ直下からの相対パス */
   outputPath: z.string().min(1),

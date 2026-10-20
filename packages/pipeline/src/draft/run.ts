@@ -21,6 +21,8 @@ import { PlanError, type PlanFile, planPath, readPlan } from "../plan/schema.ts"
 import { planFor, recordedOrComputed } from "../sampling/load.ts";
 import type { SamplingPlan } from "../sampling/plan.ts";
 import { recordOf, writeSampling } from "../sampling/store.ts";
+import { scorecardWarnings } from "../scorecard/draft.ts";
+import { styleGuidePaths } from "../scorecard/profiles.ts";
 import { type AgentStamp, readAgentStampOrReport } from "../shared/agents.ts";
 import { prepareExam } from "../shared/exam.ts";
 import { writeJson } from "../shared/fs.ts";
@@ -339,6 +341,7 @@ function requestStep(
     }
   }
   const settings = config.draft;
+  const styleGuides = styleGuidePaths(examCode);
   let requested = 0;
   let satisfied = 0;
   let cached = 0;
@@ -421,6 +424,7 @@ function requestStep(
         : { answerPositions: assignAnswerPositions(item.kind, count, positionCounts[item.kind]) }),
       distractorTypes: [...DISTRACTOR_TYPES],
       styleVersion: STYLE_VERSION,
+      ...(styleGuides !== null ? { styleGuides } : {}),
       styleRules: styleRuleSummaries(item.kind),
       outputPath: relative(rootDir, join(paths.outDir, `${key}.json`)),
       agent: stamp,
@@ -600,6 +604,7 @@ function importStep(
       const warnings = [
         ...verdict.warnings.map((f) => ({ rule: f.rule, path: f.path })),
         ...distractors.warnings.map((f) => ({ rule: f.code, path: f.path })),
+        ...scorecardWarnings(draft, examCode),
       ];
       for (const w of warnings) report(output, "下書きの警告", `${id} ${w.rule} ${w.path}`);
       // 正答が複数になりうる候補は、モデルによる検査(検証の段階)で確かめるまで、先へ進めない
