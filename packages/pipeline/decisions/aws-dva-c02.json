@@ -1,0 +1,1469 @@
+{
+  "examCode": "AWS-DVA-C02",
+  "decisions": [
+    {
+      "target": "draft",
+      "id": "d-00f46d1fb87d",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-01f0ab653950",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-04176c16229b",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-0460e220de8a",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-0470455bc0b4",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-0471791f2614",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-04d875527290",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-0554171fb3c6",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-05a0a6db8b2b",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-05f1f43300f1",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-072ad9ecf8bb",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-07e52087e0c1",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-085ad8e787e0",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-09ae02e5d692",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-0ac41efe7336",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-0b4c508f8532",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-0bad107d2789",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-0c14eaba0cf7",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-0c65ae76bc56",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-0cde59e5a753",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-0da2a98c705b",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-0e20bd2ddfd3",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-0eaf9feebdbb",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-0ee9cfbf53af",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-0f5b52eed81d",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-119a5652ef6d",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-129a28da5019",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-1326c3ad5c91",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-15521909e166",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-16830a349933",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-16c8fb4c7776",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-17c67d4cf8d7",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-1a41c02b4d6b",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-1d2e4a9f5b1c",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-1d43b83b2a07",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-1e61139f0d3a",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-20ba83701ef4",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-20e406681471",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-220f8f61e87a",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-23396ee12e38",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-24c9488084a1",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-26096d60af5f",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-27c0cea052bc",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-28165d610ece",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-2b20571faac2",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-2b430068499b",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-30c761e4ee9d",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-316d9a88a018",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-3273da646977",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-32878151a781",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-329b0f2269e1",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-32f3dd328e71",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-36864e383d20",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-37b85ba5140a",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-3b3c6f2e44c5",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-3b971d76fcfa",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-3bc3fa80148b",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-3e41a6abd887",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-3e47465c2259",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-3e554acc6115",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-3e9c02a1fc00",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-3ec619fd0de3",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-3ef5f7564cd2",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-4033c7e4f3be",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-43f8cb6c9d72",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-48473cbeb2f8",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-486b668d6c91",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-4b75b0df7273",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-4b81e66464c5",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-4bcc257b547a",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-4bf08291660b",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-4bf2a422ced2",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-4c6e03c71956",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-4cf366677843",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-4d3972ff63b9",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-4e0efd802d0a",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-4fdfc6c05915",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-529097129a22",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-54b0a82316a1",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-54de4138aa6c",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-55e83f755d4e",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-58a927919e06",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-594e5dd2d3eb",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-5a7527d02090",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-5cbbbd9d5e16",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-5cd33e58b346",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-5dd1af4e76a2",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-5ea06d77b117",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-5f37753c67ce",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-60ab9b5c8d57",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-60c4a2364778",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-63ea09c4b233",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-658775c2afea",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-6645756efd03",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-67e50e51ae23",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-68b034b185ab",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-6a4375650ec6",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-6ae8884b5962",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-6aeb6f3eb724",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-6bd21f60c29f",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-6c40bed6025f",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-6dbb015eb260",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-6e15ed85f12a",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-6e3599f07637",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-6e9d0d857827",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-6ef823050ae3",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-6f49106104ef",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-6fc1f45ea6f9",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-703662a4a06f",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-7108dc2496cb",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-71466ea51074",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-719f86046177",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-71c58946b16d",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-756118bfecbd",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-759e9b9791a5",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-75c45da41d01",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-7621f6be77cf",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-769913bbd494",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-76ce56a3af54",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-77a6a32ea00e",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-77acd0b0eb36",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-77b859e762b1",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-77ce5be2c102",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-780e10b6c15b",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-788ef6850a5c",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-7a6842812229",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-7bac6b024242",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-7c554b03bd73",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-7d841f6ddc14",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-7ecf0f382563",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-7f138eea07c0",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-7f1890f14b17",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-80c5749c2ff6",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-856add5278cc",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-881fbabe6080",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-886100ddffcb",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-898e89037eff",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-8a41dabcdb1b",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-8a7a49dd741e",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-8ac57f734520",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-8bf511d934c5",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-8c136126aa5b",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-8cb3cf56e987",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-8d64b8433af6",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-8db01412c7bc",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-9168fbd0eb29",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-91b41f3f4ea4",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-920a83ee0f5e",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-9211c1a5f65a",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-9352997a7528",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-94c7cfdb1b2c",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-94d24ca3b565",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-9772e7344f61",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-998c08b972a6",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-99dd53383085",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-9a0c51f19796",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-9adfbfeb3197",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-9b59202c4b2b",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-9b8a1dd221e5",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-9c699ff8f007",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-9cd07baf4fb8",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-9d27deb3fd7c",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-9de5f48ed8bc",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-9f76f8755fa8",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-a0fff1c72416",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-a1853e680e10",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-a1979366c52f",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-a22b43bb34f9",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-a24a9b80b3a1",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-a37a8627ac63",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-a47f5bcc8ab6",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-a493b317bf99",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-a6b2a50db836",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-a7ac1e8a4309",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-a9fcbb8c5d78",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-ab3a45f76971",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-ab45c3a5fccf",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-ab5fb5b4e106",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-ab7ed7801766",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-aba7fe0c3863",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-ac58f6ce790d",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-acc32776ef86",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-adece798c480",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-aff3aecdfea0",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-b0b62b2eb2f9",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-b17cd1ece89e",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-b2cb76f75d8c",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-b4b9721dd7ee",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-b5b1de3a0d36",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-b6bc4eba4ae1",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-b8ee883a9972",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-bbe43765bdbc",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-bc34e227d589",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-bd04de5d60f1",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-be202f7a5409",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-beaa674ede8e",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-bf4dd8fd6bf6",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-c03d3b8450c8",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-c1a324ad6637",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-c3116d62a704",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-c38d78e3f9f7",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-c437726819cc",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-c5b9f9fe1ac2",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-c68cad492ffe",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-c9f3fc7712f7",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-ca4a951bd743",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-cacacc95ce27",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-cb4bd7d9d29b",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-cc2308eae08f",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-cd1258cb649b",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-ce469272a7f4",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-d370be507fc2",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-d62b62a9e13c",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-d632a86d9049",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-d6f7a6121c70",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-d7215134dfc0",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-d7a6add7803a",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-d7c89708be4b",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-d94e0cba5e81",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-d9cf8507e94a",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-dc47e85a1832",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-dcd57e496ae8",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-dee4df0d3bd9",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-df072b0e4cd0",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-e177f787acab",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-e443d7c9aa68",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-e54678111ad3",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-e546a1e3da43",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-e58dda29827f",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-ec09ca527502",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-ee9b0cd73db8",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-f0c2b7b9aa78",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-f1d822b5bf59",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-f2755db60900",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-f2b46d6f9798",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-f33ecf9f140a",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-f40534431058",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-f6794563db71",
+      "decision": "approve",
+      "reason": "checked-held-ok"
+    },
+    {
+      "target": "draft",
+      "id": "d-f6802ddfa252",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-f6be1a9f7e45",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-f75e67c96669",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-fa7ef79474bd",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-fe9aafd1871d",
+      "decision": "approve",
+      "reason": "checked-passed"
+    },
+    {
+      "target": "draft",
+      "id": "d-ff9d69aa45bf",
+      "decision": "reject",
+      "reason": "defect-or-duplicate"
+    }
+  ]
+}
