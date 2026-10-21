@@ -1,0 +1,4037 @@
+{
+  "cards": [
+    {
+      "claim": "非構造化データでは、キーワード検索やパターン照合でも分析できるが、画像認識や感情分析には機械学習が多く使われる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-0017e176b638",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1,
+        2
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Challenges: structured data vs. unstructured data"
+          },
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "section": "構造化データと非構造化データの課題",
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "AI は大量のデータで学習し、やりとりを重ねるごとにモデルの精度が向上する。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-007bfe0460a1",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        4
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How does AI work?"
+          },
+          "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+          "section": "AI の仕組み",
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "プロンプトで業務用のAIアプリケーションが不適切な内容を生成しないように制限でき、利用者の誤用を防ぐことができる。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-00830094f60c",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        10
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Why is prompt engineering important?"
+          },
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "section": "プロンプトエンジニアリングが重要な理由",
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "小売では、機械学習で誤配置された在庫を特定し、インフラのコストを下げた事例がある（Amazon Fulfillment）。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-03eae9a5d4ab",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        0
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are machine learning use cases?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習の用途",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Amazon Bedrockは、複数の基盤モデルから選べるフルマネージドサービスで、独自データでモデルを調整し、マネージドエージェントを作れる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-0569348864e9",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        12
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How can AWS help Generative AI?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "AWS による生成AIの支援",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "エージェントの型には、単純反射型、モデルベース、目標ベース、効用ベース、学習型、階層型、マルチエージェントシステムなどがある",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-07e3a1f9d25e",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        7
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the types of AI agents?"
+          },
+          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "section": "AIエージェントの種類",
+          "url": "https://aws.amazon.com/what-is/ai-agents/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "AWS Transform は、.NET・メインフレーム・VMware のワークロードの移行を、AI エージェントで自動化するサービスである",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-0833bd50b672",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        4
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How can AWS help with your AI agent requirements?"
+          },
+          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "section": "AWS での AI エージェント",
+          "url": "https://aws.amazon.com/what-is/ai-agents/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "非構造化データの最大の課題は、分析が難しいことである。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-0883649a2ee9",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        2
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Summary of differences: structured data vs. unstructured data"
+          },
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "section": "構造化データと非構造化データの比較表",
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "非構造化データの分析には、一般により複雑なプログラムによる処理と機械学習が必要になる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-09a841139bda",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1,
+        2
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Technologies: structured data vs. unstructured data"
+          },
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "section": "構造化データと非構造化データの技術",
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "プロンプトは、既存の学習データに含まれる人のバイアスの影響を和らげるのに役立つ。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-0baa032b6a09",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        9
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Why is prompt engineering important?"
+          },
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "section": "プロンプトエンジニアリングが重要な理由",
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "生成AIには、偏り、有害な内容、知的財産に関する懸念があり、管理が必要である。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-0cc55de7e1a9",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        10
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Generative AI"
+          },
+          "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+          "section": "生成AI",
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "取り出した関連情報は、プロンプトに文脈として加えてから LLM に渡す。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-0e193ebfb5d8",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        10
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How does Retrieval-Augmented Generation work?"
+          },
+          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "section": "RAG の仕組み",
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "大規模言語モデル(LLM)は、文書の要約、文の補完、質問への回答、翻訳など、多様な作業を行える。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-0e37caafb913",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        0
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What is a prompt?"
+          },
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "section": "プロンプトとは",
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "機械学習のモデルは、性能を望ましい水準に保つために、監視で早期に検知して是正する必要がある。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-0edc6383d72a",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        8
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How can you implement machine learning in your organization?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習の導入",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "学習に使ったデータセットからベースラインを作る。ベースラインは指標を計算し、制約を提案する。制約を外れた予測は違反として報告される。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-10458e104869",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        8
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "model-monitor-how-it-works"
+          },
+          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "section": "仕組み",
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "非構造化データの保存先には、ファイルシステムや DAM、CMS などがあり、大量に集めたものはデータレイクと呼ばれる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-12bdc9623135",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        2
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Key differences: structured data vs. unstructured data"
+          },
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "section": "構造化データと非構造化データの主な違い（保存）",
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "機械学習は、より多くのデータを処理するにつれて性能が向上する性質を持つ。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-1402e20e2dcb",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        12
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the benefits of machine learning?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習の利点",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "方向性刺激のプロンプトは、キーワードなどのヒントを与えて、モデルを望む出力へ導く手法である。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-147e7b89ea3d",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        10
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are prompt engineering techniques?"
+          },
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "section": "プロンプトエンジニアリングの技法",
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "生成AIは入力が少なくても応答するが、どのような入力でも役立つ出力になるとは限らず、体系的に設計されたプロンプトが必要になる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-14dedc44ccda",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        10
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What is a prompt?"
+          },
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "section": "プロンプトとは",
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "製造業では、機械学習を予知保全や品質管理に使える。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-1640403a3745",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        0
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are machine learning use cases?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習の用途",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "GANは、データを生成する器と本物と偽物を見分ける器の2つのニューラルネットワークを競わせて学習させる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-16afc1dcadd4",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How do generative AI models work?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AIモデルの仕組み",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "AI は、人間のような問題解決を機械に行わせる技術で、事業の判断を大規模に支える。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-16ca8d06e629",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        0
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What Is Artificial Intelligence (AI)?"
+          },
+          "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+          "section": "AI とは",
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "機械学習は、入力と出力の関係を事前に知らなくても、十分な例から関係を推定し、新しい入力に対する出力を予測する。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-179342ec64c0",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        4
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How does machine learning work?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習の仕組み",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "ディスク使用率は75%未満に保つことが推奨される。使用率が高いと、データ取得が止まる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-1a5c1937de98",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        8
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "model-monitor-how-it-works"
+          },
+          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "section": "注意事項",
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "トランスフォーマーベースのモデルは自己注意機構を使い、入力の系列を処理するとき、どの部分を重視するかを決める。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-1ac970c17497",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How do generative AI models work?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AIモデルの仕組み",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "独自に生成 AI の解決策を組み立てたい組織には、Amazon SageMaker JumpStart という選択肢がある。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-1b7ee03b0be9",
+      "reasons": [
+        "anchor-not-found"
+      ],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How can AWS support your Retrieval-Augmented Generation requirements?"
+          },
+          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "section": "AWS による RAG の支援",
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
+        }
+      ],
+      "status": "rejected"
+    },
+    {
+      "claim": "リアルタイムエンドポイントの監視では、受け取ったリクエストと予測結果を、データ取得の機能で記録する設定が必要である。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-1bc45cf6e0e5",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        8
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "model-monitor-how-it-works"
+          },
+          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "section": "仕組み",
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "変分オートエンコーダ（VAE）は2013年に開発され、現実に近い画像や音声を生成できた最初の深層生成モデルの一つである。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-1c263c720d2b",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How did generative AI technology evolve?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AI技術の発展",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "構造化データの最大の課題は、すべてのデータが定められたデータモデルに収まる必要があることである。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-1ff31ce18e57",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        2
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Summary of differences: structured data vs. unstructured data"
+          },
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "section": "構造化データと非構造化データの比較表",
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "計画モジュールは、目標を扱いやすい小さな手順に分け、論理的な順序に並べる役割を持つ",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-2067e3d8d96a",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        7
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the key components of AI agent architecture?"
+          },
+          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "section": "AIエージェントの構成要素",
+          "url": "https://aws.amazon.com/what-is/ai-agents/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "AI の土台には、計算能力とメモリを提供する堅牢な IT インフラが必要である。",
+      "confidence": "high",
+      "domain": "domain4",
+      "id": "f-20c02d8a15c4",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        6
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the key components of AI application architecture?"
+          },
+          "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+          "section": "AI アプリケーションの構成要素",
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "生成AIは、大量のデータで事前学習された非常に大きな機械学習モデルによって動く。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-21b493132e3d",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        4
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How does generative AI work?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AIの仕組み",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "推論パイプラインは監視できるが、データの取得と分析はパイプライン全体が対象で、個々のコンテナごとには行われない。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-24882aff8762",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "model-monitor-how-it-works"
+          },
+          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "section": "注意事項",
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "社員の生産性を高めるアシスタントとして、生成AIは時間とコストを減らし、組織全体の効率を上げられる。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-24e9e2827b7b",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        12
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the benefits of generative AI?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AIの利点",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "AIの結果が偏ったり不正確になることがあるため、人によるレビューなどの安全策を組み込み、公平な応答を確保する",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-24ef6227ff90",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        3
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the challenges of using AI agents?"
+          },
+          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "section": "AIエージェントの課題",
+          "url": "https://aws.amazon.com/what-is/ai-agents/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "生成AIは、中身が見えにくいブラックボックスとみなされることが多く、出力に至る理由を理解するのは難しい。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-2daa3ad1af2b",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        0
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the limitations of generative AI?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AIの限界",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "意味検索は、知識ベースの準備作業を担い、関連性の高い文章を関連度の順に返せる。",
+      "confidence": "medium",
+      "domain": "domain1",
+      "id": "f-2f517dfdd2fb",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        12
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What is the difference between Retrieval-Augmented Generation and semantic search?"
+          },
+          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "section": "RAG と意味検索の違い",
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "最小から最大へのプロンプトは、まず問題の部分問題を列挙させ、その順に解かせることで、後の部分問題を前の答えを使って解けるようにする手法である。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-31b23d2dbaf9",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        10
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are prompt engineering techniques?"
+          },
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "section": "プロンプトエンジニアリングの技法",
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "構造化データの課題には、スキーマの変更や、データベース間の関連が増えたときの問い合わせの複雑さなどがある。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-3226a0952cc4",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        2
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Challenges: structured data vs. unstructured data"
+          },
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "section": "構造化データと非構造化データの課題",
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "生成AIの創造性は学習データに縛られるため、真の独創性に欠けることがあり、出力が繰り返しや模倣になりやすい。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-33ba4ee28af0",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the limitations of generative AI?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AIの限界",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "複数のモデルを載せたマルチモデルエンドポイントは、監視の対象にできない。監視できるのは単一のモデルを載せたエンドポイントである。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-3507fef8c65c",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "model-monitor-how-it-works"
+          },
+          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "section": "注意事項",
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "AIエージェントの業務上の効果には、生産性の向上、コストの削減、意思決定の支援、顧客体験の改善がある",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-36023436d65b",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        0
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the benefits of using AI agents?"
+          },
+          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "section": "AIエージェントの利点",
+          "url": "https://aws.amazon.com/what-is/ai-agents/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Amazon CodeWhisperer は、コメントや既存のコードに基づき、断片から関数全体までのコードの提案をリアルタイムで生成する。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-36669add7c2e",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How can AWS support your generative AI requirements?"
+          },
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "section": "AWS による生成AIの支援",
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "生成AIは、金融、医療・ライフサイエンス、自動車・製造、メディア、通信、エネルギーなど、業界をまたいで使われている。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-373bc49cecbd",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        0
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are generative AI examples?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AIの活用例",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "金融分野では、機械学習で高リスクの融資先を特定し、不正の兆候を抑えられる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-37428769a7ae",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        0
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are machine learning use cases?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習の用途",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "従来のソフトウェアが決められた手順に従うのに対し、AIエージェントは過去のデータをもとに次に取る行動を自ら判断して実行する",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-3847a10bf7fb",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        7
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the key principles that define AI agents?"
+          },
+          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "section": "AIエージェントの主な原則",
+          "url": "https://aws.amazon.com/what-is/ai-agents/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Amazon Bedrock Agents は、基盤モデル、API、データを使ってユーザーの依頼を分解し、必要な情報を集めてタスクを完了する",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-390b7bd409d9",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        7
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How can AWS help with your AI agent requirements?"
+          },
+          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "section": "AWS での AI エージェント",
+          "url": "https://aws.amazon.com/what-is/ai-agents/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "AIチャットボットや音声ボット、仮想アシスタントは、初回の問い合わせでの解決を助け、個別化した提案で顧客との関わりを増やす。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-3a764b995da3",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        0
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the benefits of generative AI?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AIの利点",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "組み込みの監視機能はコーディング不要で使える。独自の分析が必要な場合は、コードで監視を組むこともできる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-3a8af33449d1",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        8
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "model-monitor"
+          },
+          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "section": "概要",
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Amazon Bedrock Agents は、監督エージェントの調整のもとで、複数の専門エージェントが協調する構成を作れる",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-3b46667a6c99",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        7
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How can AWS help with your AI agent requirements?"
+          },
+          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "section": "AWS での AI エージェント",
+          "url": "https://aws.amazon.com/what-is/ai-agents/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "生成AIは、簡単なテキストの指示から、画像・文章・音声などの新しいコンテンツを作るAIである。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-3e082936e26f",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Generative AI"
+          },
+          "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+          "section": "生成AI",
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "専門分野の知識が必要な用途では、プロンプトで正しい情報源を参照させ、質問に応じた形で回答を組み立てさせることができる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-3e698a76a092",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        10
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are some prompt engineering use cases?"
+          },
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "section": "プロンプトエンジニアリングの用途",
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "教師なし学習は、ラベルのないデータからパターンや似た項目のまとまりを見つけるのに使われる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-3fb99eb9ccbe",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        4
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the types of machine learning algorithms?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習のアルゴリズムの種類",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "拡散モデルは、データにノイズを段階的に加えたあと、その逆の過程でノイズを取り除き、新しいデータを生成する。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-429837b7c050",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How do generative AI models work?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AIモデルの仕組み",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Amazon Q Developerは、ソフトウェア開発を支援する生成AIのアシスタントで、開発者の生産性向上に役立つ。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-445f76fd1952",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How can AWS help Generative AI?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "AWS による生成AIの支援",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "モデルが複雑になるほど判断の理由が分かりにくくなり、説明可能性の確保が課題になる。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-44ccd30ad75d",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        0
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the challenges in machine learning implementation?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習導入の課題",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "機械学習は主に数学と統計に基づき、他の種類のAIはより複雑だとされる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-452cdd9de8a6",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What is the difference between machine learning vs. artificial intelligence?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "AIと機械学習の違い",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "基盤モデルは、広範な文章や画像のデータで学習した大規模な生成AIモデルで、質問への回答や文章作成など幅広い一般的な作業をこなせる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-455c273b3427",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are foundation models in generative AI?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "基盤モデル",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "生成AIは、複雑なデータを新しい見方で分析して研究の傾向やパターンを見つけ、研究と革新を強める。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-45727c856c48",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        12
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the benefits of generative AI?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AIの利点",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "基盤モデルは、広い範囲の未ラベルデータで学習した深層学習モデルで、組織は既存のモデルを自社データで調整して使う。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-4857f4be4fdf",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        12
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the key components of AI application architecture?"
+          },
+          "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+          "section": "AI アプリケーションの構成要素",
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "構造化データの最大の利点は、整理、クレンジング、検索、分析がしやすいことである。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-4901c51d2ffc",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        2
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Summary of differences: structured data vs. unstructured data"
+          },
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "section": "構造化データと非構造化データの比較表",
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "非構造化データの課題には、データが大きいため保存が大変なことと、分析が単純ではないことがある。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-4a0a5e16c027",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        2
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Challenges: structured data vs. unstructured data"
+          },
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "section": "構造化データと非構造化データの課題",
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "深層学習は、生成AIの発展の土台になったとされる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-4b13cf610845",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What is the difference between machine learning vs. deep learning?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習と深層学習の違い",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "多くの用途では、機械学習モデルが基盤モデルより良い結果を出す場合があり、用途に応じてモデルを選べる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-4c8c6b96c4bb",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        6
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the key components of AI application architecture?"
+          },
+          "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+          "section": "AI アプリケーションの構成要素",
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "非構造化データには決まった属性がないため、検索や整理が構造化データより難しい。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-4cfa69b1b0f6",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        2
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Key differences: structured data vs. unstructured data"
+          },
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "section": "構造化データと非構造化データの主な違い",
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "数値や文字のデータでも、表にモデル化すると非効率な場合は、非構造化データとして扱われることがある。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-4d308a3394d5",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        2
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What’s the Difference Between Structured Data and Unstructured Data?"
+          },
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "section": "構造化データと非構造化データの違い（導入）",
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "生成知識のプロンプトは、回答を作る前に、必要な関連する事実をモデルに先に生成させ、その事実を踏まえて完成させる手法である。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-4dbde6d8bb18",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        10
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are prompt engineering techniques?"
+          },
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "section": "プロンプトエンジニアリングの技法",
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "外部データが古くなる問題には、文書と埋め込みを非同期に更新して対処し、リアルタイムかバッチ処理で行う。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-4e3ac15d128a",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        8
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How does Retrieval-Augmented Generation work?"
+          },
+          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "section": "RAG の仕組み",
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "非構造化データは、分析の前に、分析できる形式へ前処理されることが多い。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-4f43987dbf6f",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        2
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Technologies: structured data vs. unstructured data"
+          },
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "section": "構造化データと非構造化データの技術",
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "機械学習は、統計的な手法で大量の過去データを処理し、データのパターンを見つけ出す。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-4f53271a9058",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1,
+        4
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What is the difference between machine learning, deep learning, and artificial intelligence?"
+          },
+          "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+          "section": "AI・機械学習・深層学習の違い",
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Amazon SageMaker は、独自のモデルを作る場合に、構築・学習・デプロイを支えるマネージドなインフラとツールを提供する。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-50a383e592ee",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How can AWS support your generative AI requirements?"
+          },
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "section": "AWS による生成AIの支援",
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "表形式（テーブル形式）のデータに対してのみ、モデルの指標と統計を計算する。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-51975a93a9f4",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "model-monitor-how-it-works"
+          },
+          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "section": "注意事項",
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "AIエージェントの中核には基盤モデル（LLM）があり、推論を担って、記憶やツールなどの他の構成要素へ指示を出す",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-51ed83ffabc0",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        7
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the key components of AI agent architecture?"
+          },
+          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "section": "AIエージェントの構成要素",
+          "url": "https://aws.amazon.com/what-is/ai-agents/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "プロンプトエンジニアリングは反復の過程であり、異なる案を試して結果を確かめ、改良を続ける必要がある。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-53ea995042df",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        10
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are some prompt engineering best practices?"
+          },
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "section": "プロンプトエンジニアリングの最良の実践",
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "深層学習は機械学習を一歩進めたもので、多数のニューラルネットワークが連携して情報を学習し処理する。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-54792e7d2fe2",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What is the difference between machine learning, deep learning, and artificial intelligence?"
+          },
+          "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+          "section": "AI・機械学習・深層学習の違い",
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "構造化データは、財務、売上、科学モデルなど、離散的な数値データを扱う場合に向いている。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-5cd652f4b7dd",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        2
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "When to use: structured data vs. unstructured data"
+          },
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "section": "構造化データと非構造化データの使い分け",
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "機械学習は、明示的な指示を与えなくても、データ分析の作業をこなすAIの一種である。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-5dae32a37fa7",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What is Machine Learning?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習とは",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "利用者の問い合わせもベクトルに変換し、ベクトルデータベースと照合して関連する情報を探す。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-5ed2a712ff71",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        12
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How does Retrieval-Augmented Generation work?"
+          },
+          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "section": "RAG の仕組み",
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "出力の形式を限定したいときは、プロンプトの中で出力の要件(件数や表の形式など)を明示する。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-62d007246347",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        10
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are some prompt engineering best practices?"
+          },
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "section": "プロンプトエンジニアリングの最良の実践",
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "検知した逸脱をもとに、再学習やデータの連携先の確認などの是正措置を取れる。手作業でモデルを監視し続ける必要はない。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-661b5f944436",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        8
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "model-monitor"
+          },
+          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "section": "概要",
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Model Monitor は、本番稼働中のモデルの品質の逸脱を検知し、通知するための仕組みである。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-69b9e4b1bc0a",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        8
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "model-monitor"
+          },
+          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "section": "概要",
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "自動車・製造では、欠陥や端の事例など、テストデータに含まれにくいデータを生成AIで合成し、アプリケーションを試せる。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-6dabb6d2551f",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        0
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are generative AI examples?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AIの活用例",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "自動テストと手作業のテストの両方を作り、生成AIシステムが起こり得るあらゆる場面を検証する。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-6fe10b00ff34",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        11
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the best practices in generative AI adoption?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AI導入のベストプラクティス",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "入力データの品質の変化（ドリフト）を監視する種類がある。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-708c6c1c0bc4",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        8
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "model-monitor"
+          },
+          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "section": "監視の種類",
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "AI の構成のうち、データ層はAIの土台であり、AI 向けにデータを準備することが中心となる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-71a70ae3401b",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        3
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the key components of AI application architecture?"
+          },
+          "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+          "section": "AI アプリケーションの構成要素",
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "プロンプトとは、生成AIに特定の作業を依頼する、自然言語の文章のことである。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-733b55d71ea3",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        10
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What is a prompt?"
+          },
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "section": "プロンプトとは",
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Amazon Bedrock Guardrails は、組み込みの安全性と信頼性を提供する仕組みである",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-74290a1fd114",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        3
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How can AWS help with your AI agent requirements?"
+          },
+          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "section": "AWS での AI エージェント",
+          "url": "https://aws.amazon.com/what-is/ai-agents/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "プロンプトエンジニアリングは、開発者が利用者と AI の対話や応答の形式を制御する力を高める。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-74c67e2863c1",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        10
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Why is prompt engineering important?"
+          },
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "section": "プロンプトエンジニアリングが重要な理由",
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "生成AIは、実データの代わりに使える合成の患者データや医療データを作り、AIの学習や臨床試験のシミュレーションに役立つ。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-7509c359204d",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        4
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are generative AI examples?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AIの活用例",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "IoT のセンサーデータやシステムログ、チャット記録のように、表に格納すると非効率なデータには非構造化データの形が使われる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-7cbdfb1141a8",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        2
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "When to use: structured data vs. unstructured data"
+          },
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "section": "構造化データと非構造化データの使い分け",
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "本番のモデルの予測に含まれるバイアスを監視する種類がある。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-7d014d3e38ae",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        9
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "model-monitor"
+          },
+          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "section": "監視の種類",
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Model Monitor は新規の顧客には開放されていない。既存の顧客は従来どおり使えるが、新機能の追加は予定されていない。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-7f89238871bd",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "model-monitor"
+          },
+          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "section": "概要の注意書き",
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "半構造化データを使うと、元の非構造化データの分析を速く簡単にできることがある。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-82ae6e9da297",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        2
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "When to use: structured data vs. unstructured data"
+          },
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "section": "構造化データと非構造化データの使い分け",
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "プロンプトエンジニアリングは、生成AIから望む出力を得るために、指示の形式・言い回し・語を適切に選んで利用者との対話を導く作業である。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-82d77909b759",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        10
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What is prompt engineering?"
+          },
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "section": "プロンプトエンジニアリングとは",
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "生成AIの学習と運用には大きな計算資源が必要だが、クラウド上のモデルは一から作るより手に入れやすく、負担が小さい。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-83193c7589c6",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        9
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the limitations of generative AI?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AIの限界",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "RAG は、LLM が応答を作る前に、学習データの外にある権威ある知識源を参照させ、出力を改善する仕組み。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-851530a9b776",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        12
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What is Retrieval-Augmented Generation?"
+          },
+          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "section": "RAG の定義",
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Amazon Bedrock は、インフラを管理せずに、API を通じて言語モデルを使う生成AIアプリケーションの開発を加速するサービスである。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-8567a26aa0bc",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How can AWS support your generative AI requirements?"
+          },
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "section": "AWS による生成AIの支援",
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "ガードレールを実装し、生成AIのアプリケーションが機密データへ不用意にアクセスしないようにする。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-89002e5bf8bf",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        3,
+        6
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the best practices in generative AI adoption?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AI導入のベストプラクティス",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "単純反射型エージェントは、あらかじめ決めたルールと直前のデータだけで動くため、単純な作業に向いている",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-8946cbd5a312",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        7
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the types of AI agents?"
+          },
+          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "section": "AIエージェントの種類",
+          "url": "https://aws.amazon.com/what-is/ai-agents/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "リアルタイムエンドポイント、定期実行のバッチ変換ジョブ、非同期バッチ変換ジョブのスケジュール実行の、いずれも継続的に監視できる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-8ae8c3566ccc",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        8
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "model-monitor"
+          },
+          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "section": "監視の種類",
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "独自データで生成AIを調整すると、プライバシーや不正アクセスのリスクが生じるため、機密データへの不正アクセスを防ぐ対策が必要である。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-8e01f1e2b5b2",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        6
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the limitations of generative AI?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AIの限界",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "モデルの評価では、学習に使っていない検証用のデータで、新しいデータにも一般化できるかを確かめる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-8fd7db0f9c3f",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        4
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How does machine learning work?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習の仕組み",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "AIエージェントは、目標の設定は人が行い、その目標を達成するための行動はエージェントが自ら選ぶソフトウェアである",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-90c399766c58",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        7
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are AI Agents?"
+          },
+          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "section": "AIエージェントの定義",
+          "url": "https://aws.amazon.com/what-is/ai-agents/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Amazon Kendra は、企業向けの検索サービスで、RAG の検索側に使える Retrieve API を提供する。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-910bbd900554",
+      "reasons": [
+        "anchor-not-found"
+      ],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How can AWS support your Retrieval-Augmented Generation requirements?"
+          },
+          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "section": "AWS による RAG の支援",
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
+        }
+      ],
+      "status": "rejected"
+    },
+    {
+      "claim": "半教師あり学習は、少量のラベル付きデータと大量のラベルなしデータを使い、擬似ラベルを付けて学習する。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-913848bfa7f4",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        4
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the types of machine learning algorithms?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習のアルゴリズムの種類",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "機械学習は、人の介在なしにデータの絞り込みや分類などの定型作業を自動化できる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-91d279df4eea",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        6
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the benefits of machine learning?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習の利点",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "収集するデータ、収集の頻度、分析の方法、出力するレポートを定めた監視スケジュールを作る。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-91e922d510e1",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        8
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "model-monitor-how-it-works"
+          },
+          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "section": "仕組み",
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "非構造化データの最大の利点は、構造化しにくいデータも分析できることである。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-93dc0015d8f0",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        2
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Summary of differences: structured data vs. unstructured data"
+          },
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "section": "構造化データと非構造化データの比較表",
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "AIエージェントは、外部のソフトウェアやAPIへ接続してツールを使い、言語を超えた実作業を行える",
+      "confidence": "medium",
+      "domain": "domain1",
+      "id": "f-964bd8f3456c",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        7
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the key components of AI agent architecture?"
+          },
+          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "section": "AIエージェントの構成要素",
+          "url": "https://aws.amazon.com/what-is/ai-agents/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "非構造化データは、音声や動画、大きな文書など、表に収まりにくい性質や大きさのデータである。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-999817c645e1",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        2
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What’s the Difference Between Structured Data and Unstructured Data?"
+          },
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "section": "構造化データと非構造化データの違い（導入）",
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "深層学習は、人間の脳を模した人工ニューラルネットワークを使う機械学習の特殊な形で、画像や音声の認識などの複雑な作業に使われる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-99fceba5dcfd",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What is the difference between machine learning vs. deep learning?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習と深層学習の違い",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "RAG では、最新の研究や統計などを LLM に与えられるため、古くなりがちな学習データの問題を補える。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-9acdaf90b71e",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        11
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the benefits of Retrieval-Augmented Generation?"
+          },
+          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "section": "RAG の利点",
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "生成AIは深層学習の進歩とともに登場し、クラウドの進歩により2022年以降に商用で利用できるようになった。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-9c7e7f84e81d",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "When was generative AI created?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AIが生まれた時期",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "金融機関は、生成AIを使って問い合わせへの応答や商品の提案を行い、請求・カード・融資などの不正を素早く見つけている。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-9f4f45aca842",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        0
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are generative AI examples?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AIの活用例",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "学習データに偏りがあると、モデルが特定の集団を不利に扱うなど、偏ったバイアスが生じ得る。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-a0a924806eca",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        9
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the challenges in machine learning implementation?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習導入の課題",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "LLM は、答えを知らないときに誤った情報を提示することがあり、これが RAG で対処したい課題の一つ。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-a404b4b420f2",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        11
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Why is Retrieval-Augmented Generation important?"
+          },
+          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "section": "RAG が重要な理由",
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "生成AIはAIの部分集合であり、新しいコンテンツを意味のある形で生成する点が特徴である。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-a73972636f88",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What is the difference between AI and Generative AI?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "AIと生成AIの違い",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "構造化データの保存先には、リレーショナルデータベースや OLAP キューブなどがあり、大量に集めたものはデータウェアハウスと呼ばれる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-a7e07c1f21d4",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        2
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Key differences: structured data vs. unstructured data"
+          },
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "section": "構造化データと非構造化データの主な違い（保存）",
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Amazon Bedrock のナレッジベースを使うと、基盤モデルをデータソースに少ない操作で接続し、RAG を構成できる。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-a88fa67ba610",
+      "reasons": [
+        "anchor-not-found"
+      ],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How can AWS support your Retrieval-Augmented Generation requirements?"
+          },
+          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "section": "AWS による RAG の支援",
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
+        }
+      ],
+      "status": "rejected"
+    },
+    {
+      "claim": "RAG を使うと、モデルを再学習させずに、特定の領域や組織の内部知識を LLM に反映できる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-aa84e2e6aead",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        12
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What is Retrieval-Augmented Generation?"
+          },
+          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "section": "RAG の定義",
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "メディアや娯楽では、生成AIで映画やアニメなどの作品を、従来の制作よりも低いコストと短い時間で作れる。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-aab602ac1a43",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        0
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are generative AI examples?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AIの活用例",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "RAG は、LLM を事前に決めた信頼できる知識源から情報を取得させ、組織が出力を統制しやすくする。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-ab955eae8b1d",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        12
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Why is Retrieval-Augmented Generation important?"
+          },
+          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "section": "RAG が重要な理由",
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "AIとやり取りしていることをユーザーに明確に伝え、AIの出力やAIによる検索結果には印を付けて示す。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-abb9951725ae",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        3
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the best practices in generative AI adoption?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AI導入のベストプラクティス",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "2017年にトランスフォーマーが登場し、言語モデルの学習を効率化して、翻訳や要約、質問応答などの生成能力をもたらした。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-ac025be54bbc",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How did generative AI technology evolve?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AI技術の発展",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "連鎖思考(chain-of-thought)のプロンプトは、複雑な問題を論理的な小さな部分に分け、途中の段階を踏んで解かせることで推論の能力を高める。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-afe19b6051b5",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        10
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are prompt engineering techniques?"
+          },
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "section": "プロンプトエンジニアリングの技法",
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "生成AIの学習を始めるには、機械学習の基礎、ニューラルネットワーク、Pythonライブラリの経験、モデル評価、ファインチューニング、プロンプトエンジニアリングが必要である。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-b19957292649",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What is generative AI training for beginners?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "初心者向けの生成AIの学習",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "生成AIは、不正確で誤解を招く情報を出すことがあり、学習データにあるバイアスや不正確さを反映することがある。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-b1c628de1f78",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        11
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the limitations of generative AI?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AIの限界",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "学習データの量が十分でないと、モデルは効果的に学習できない。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-b1fcab73b706",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        3
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the challenges in machine learning implementation?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習導入の課題",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "バッチ変換ジョブの監視では、バッチ変換の入力と出力を、データ取得の機能で記録する設定が必要である。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-b4e20fd8f76b",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        8
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "model-monitor-how-it-works"
+          },
+          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "section": "仕組み",
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "連鎖思考の手法では、複数の推論の経路を試し、最も多く到達した結論を最終的な答えとして選ぶことができる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-b5407af90afd",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        10
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are prompt engineering techniques?"
+          },
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "section": "プロンプトエンジニアリングの技法",
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "良いプロンプトは、指示を文脈、範囲、期待する応答とともに伝える必要がある。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-b560564daffd",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        10
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are some prompt engineering best practices?"
+          },
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "section": "プロンプトエンジニアリングの最良の実践",
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "強化学習は、各段階に報酬を設定し、得られる報酬を多くすることを目標に学習する。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-b5bab7121d0e",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        4
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the types of machine learning algorithms?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習のアルゴリズムの種類",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "構造化データのストアは、多くの場合、データベース内での分析機能を備えるが、非構造化データのストアは一般にそうではない。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-b96fa2205d98",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        2
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Technologies: structured data vs. unstructured data"
+          },
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "section": "構造化データと非構造化データの技術",
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "AIエージェントは、やりとりの結果から学び続けて振る舞いを改善するため、固定のルールだけで動くプログラムとは異なる",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-bbb438aebc23",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        7
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the key principles that define AI agents?"
+          },
+          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "section": "AIエージェントの主な原則",
+          "url": "https://aws.amazon.com/what-is/ai-agents/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "複数のAIエージェントは協調して複雑な業務を自動化でき、統括役のエージェントが専門のエージェントの活動を調整する",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-bc0f21e0ff7e",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        7
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are AI Agents?"
+          },
+          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "section": "AIエージェントの定義",
+          "url": "https://aws.amazon.com/what-is/ai-agents/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "強化学習は、実世界の環境が頻繁に大きく変わるため、実務で効果を出しにくいことがある。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-bc7a920e4d7c",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        8
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the types of machine learning algorithms?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習のアルゴリズムの種類",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "医療・ライフサイエンスでは、生成AIで新しいタンパク質の配列を作り、創薬と研究を加速させている。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-bf462f8f918d",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        0
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are generative AI examples?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AIの活用例",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "ある試算では、生成AIは世界のGDPを7%押し上げ得るとされている。",
+      "confidence": "medium",
+      "domain": "domain2",
+      "id": "f-c67c1617a75f",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        12
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the benefits of generative AI?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AIの利点",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "生成AIは、非常に大規模な機械学習モデルに支えられ、大量のデータで事前に学習したモデルを使って新しいコンテンツを作る。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-c89f9f22cd78",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What is a prompt?"
+          },
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "section": "プロンプトとは",
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "大規模言語モデル（LLM）は基盤モデルの一種で、要約・文章生成・分類・対話・情報抽出など、言語に関する作業に特化している。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-cdfae7b44c5b",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        12
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How does generative AI work?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AIの仕組み",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "半構造化データは、構造化データと非構造化データの中間にあり、動画へのタグ付けのようなメタデータを持つものを指す。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-ce6d1abc4052",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        2
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "When to use: structured data vs. unstructured data"
+          },
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "section": "構造化データと非構造化データの使い分け",
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "RAG は、回答に出典を添えられるため、利用者が情報源を確かめられ、信頼を高めやすい。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-d04babdac1d9",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        12
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the benefits of Retrieval-Augmented Generation?"
+          },
+          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "section": "RAG の利点",
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "過学習は、学習データのノイズまで覚えて新しいデータに弱くなる状態で、学習不足は学習データにも評価データにも性能が出ない状態である。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-d0664df39dd5",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        4
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the challenges in machine learning implementation?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習導入の課題",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "開発者は、利用者の権限のレベルに応じて、機密情報の検索を制限できる。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-d08e1173f919",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        6
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the benefits of Retrieval-Augmented Generation?"
+          },
+          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "section": "RAG の利点",
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "従来のキーワード検索では、知識集約型のタスクで RAG に使える結果が限られる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-d13c2b711751",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        12
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What is the difference between Retrieval-Augmented Generation and semantic search?"
+          },
+          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "section": "RAG と意味検索の違い",
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "構造化データは、SQL によるクエリで分析するのが基本である。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-d2b79bf4497a",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        2
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Technologies: structured data vs. unstructured data"
+          },
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "section": "構造化データと非構造化データの技術",
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Amazon SageMaker JumpStart は、オープンソースの言語モデルを見つけ、確かめ、デプロイするのに使える。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-d5c8f0fd571f",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How can AWS support your generative AI requirements?"
+          },
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "section": "AWS による生成AIの支援",
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "AI は、機械をより人間らしく振る舞わせる手法の総称で、機械学習と深層学習はその一部にあたる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-d6d78703a0df",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What is the difference between machine learning, deep learning, and artificial intelligence?"
+          },
+          "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+          "section": "AI・機械学習・深層学習の違い",
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "正解率などのモデル品質指標の変化（ドリフト）を監視する種類がある。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-d7851b71b714",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        8
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "model-monitor"
+          },
+          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "section": "監視の種類",
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "RAG は、モデルを再学習させるより費用を抑えて、LLM に新しいデータを取り入れられる手法。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-db3a764630d6",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        12
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What is Retrieval-Augmented Generation?"
+          },
+          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "section": "RAG の定義",
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "構造化データは、行と列を持つ表として表せ、各列が属性、各行が一つの記録にあたる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-e0a068744382",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        2
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Key differences: structured data vs. unstructured data"
+          },
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "section": "構造化データと非構造化データの主な違い",
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "生成AIは、会話・物語・画像・動画・音楽などの新しいコンテンツやアイデアを作り出せるAIの一種である。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-e8cfebab7660",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What is Generative AI?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AIとは",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "教師あり学習は、正解のラベルが付いた学習データを使い、入力と出力の対応を学ぶ。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-e98e0c0e83b5",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        4
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the types of machine learning algorithms?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習のアルゴリズムの種類",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Amazon Q Business は、社内の情報を探し、業務を自動化する軽量なエージェント型 AI アプリを、従業員が自ら作れる",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-eb563a3e9351",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        7
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How can AWS help with your AI agent requirements?"
+          },
+          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "section": "AWS での AI エージェント",
+          "url": "https://aws.amazon.com/what-is/ai-agents/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "RAG の外部データは、埋め込みモデルで数値表現に変換し、ベクトルデータベースに格納する。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-eb8da373a50b",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        12
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How does Retrieval-Augmented Generation work?"
+          },
+          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "section": "RAG の仕組み",
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Kendra の Retrieve API は、利用者の権限で閲覧できる文書に絞って応答を返せる。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-ed31b7bfa82f",
+      "reasons": [
+        "anchor-not-found"
+      ],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        6
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How can AWS support your Retrieval-Augmented Generation requirements?"
+          },
+          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "section": "AWS による RAG の支援",
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
+        }
+      ],
+      "status": "rejected"
+    },
+    {
+      "claim": "構造化データは、決まった形式(スキーマ)に従い、表に収まるデータである。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-ef247d64fb59",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        2
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What’s the Difference Between Structured Data and Unstructured Data?"
+          },
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "section": "構造化データと非構造化データの違い（導入）",
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "特徴量の寄与度の変化（ドリフト）を監視する種類がある。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-f13e7f554ddd",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        8
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "model-monitor"
+          },
+          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "section": "監視の種類",
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "生成AIの導入は、まず社内向けの用途から始めると、統制された環境で結果を試し、技術の理解を深められる。",
+      "confidence": "high",
+      "domain": "domain4",
+      "id": "f-f1e5f7891440",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        13
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the best practices in generative AI adoption?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AI導入のベストプラクティス",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "基盤モデルは、学習したパターンと関係を使い、系列の次の要素を確率の分布に基づいて予測する。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-f24c047e59a6",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How does generative AI work?"
+          },
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "section": "生成AIの仕組み",
+          "url": "https://aws.amazon.com/what-is/generative-ai/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "非構造化データは、動画監視、社内文書、SNS 投稿など、構造化の形式に収まらない記録に使われる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-f2e9af26a613",
+      "reasons": [
+        "term-not-found"
+      ],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        2
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "When to use: structured data vs. unstructured data"
+          },
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "section": "構造化データと非構造化データの使い分け",
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+        }
+      ],
+      "status": "rejected"
+    },
+    {
+      "claim": "AIエージェントの導入では、データのプライバシー、倫理上の問題、技術の複雑さ、計算資源の制約が課題になる",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-f3e2d741206a",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        0
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the challenges of using AI agents?"
+          },
+          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "section": "AIエージェントの課題",
+          "url": "https://aws.amazon.com/what-is/ai-agents/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "機械学習はAIの多くの分野のうちの1つで、AIは機械を人間に近づける広い概念である。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-f6695c1ae551",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        1
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What is the difference between machine learning vs. artificial intelligence?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "AIと機械学習の違い",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "大規模なモデルの学習には多くの計算資源が必要で、時間とコストがかかる。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-f894e1339e1d",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        9
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the challenges in machine learning implementation?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習導入の課題",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "機械学習のモデルは、観察と経験から学ぶため確率的な性質を持ち、結果は入力から一意に決まるとは限らない。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-f94b0c16af3b",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        6
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Are machine learning models deterministic?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習モデルは決定的か",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "機械学習の段階は、データの前処理、モデルの学習、評価、最適化の順に進むとされる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-f9586fd4a11f",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        4
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "How does machine learning work?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習の仕組み",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "学習データの品質が低いと、欠損や不整合、ノイズなどによって、モデルの精度が大きく下がり得る。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-fc69a53ab595",
+      "reasons": [],
+      "scope": {
+        "edition": "C01"
+      },
+      "scopeItems": [
+        3
+      ],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "What are the challenges in machine learning implementation?"
+          },
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "section": "機械学習導入の課題",
+          "url": "https://aws.amazon.com/what-is/machine-learning/"
+        }
+      ],
+      "status": "passed"
+    }
+  ],
+  "examCode": "AWS-AIB-C01",
+  "extracted": [
+    {
+      "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+      "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
+    },
+    {
+      "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+      "url": "https://aws.amazon.com/what-is/ai-agents/"
+    },
+    {
+      "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+      "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
+    },
+    {
+      "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+      "url": "https://aws.amazon.com/what-is/generative-ai/"
+    },
+    {
+      "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+      "url": "https://aws.amazon.com/what-is/machine-learning/"
+    },
+    {
+      "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+      "url": "https://aws.amazon.com/what-is/prompt-engineering/"
+    },
+    {
+      "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+      "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
+    },
+    {
+      "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+      "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
+    }
+  ]
+}

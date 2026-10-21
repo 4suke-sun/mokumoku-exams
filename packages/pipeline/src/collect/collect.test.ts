@@ -235,7 +235,7 @@ describe("collect", () => {
     const evidence = {
       url: GUIDE,
       section: "節",
-      anchor: { heading: "h", quote: "q" },
+      anchor: { heading: "h" },
       contentHash: "0".repeat(64),
     };
     const base = {

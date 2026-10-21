@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { checkGrounding, extractNumbers, extractTerms } from "./grounding.ts";
-import { card, DOC_HASH, factsFixture } from "./test-helpers.ts";
+import { card, DOC_HASH, DOC_QUOTE, factsFixture } from "./test-helpers.ts";
 
 const body = factsFixture("service-doc.html");
 const source = { contentHash: DOC_HASH, status: "active" };
@@ -13,11 +13,9 @@ function check(overrides: { claim?: string; heading?: string; quote?: string; ha
     {
       ...evidence,
       contentHash: overrides.hash ?? evidence.contentHash,
-      anchor: {
-        heading: overrides.heading ?? evidence.anchor.heading,
-        quote: overrides.quote ?? evidence.anchor.quote,
-      },
+      anchor: { heading: overrides.heading ?? evidence.anchor.heading },
     },
+    overrides.quote ?? DOC_QUOTE,
     source,
     body,
   );
@@ -63,11 +61,11 @@ describe("根拠と本文の照合", () => {
 
   it("本文のハッシュが台帳の最新と違う・出典が active でない・本文がない_理由コードで返す", () => {
     expect(check({ hash: "f".repeat(64) })).toEqual(["hash-mismatch"]);
-    expect(checkGrounding(base.claim, evidence, { ...source, status: "needs-review" }, body)).toEqual([
+    expect(checkGrounding(base.claim, evidence, DOC_QUOTE, { ...source, status: "needs-review" }, body)).toEqual([
       "source-not-active",
     ]);
-    expect(checkGrounding(base.claim, evidence, undefined, body)).toEqual(["source-not-active"]);
-    expect(checkGrounding(base.claim, evidence, source, null)).toEqual(["body-not-cached"]);
+    expect(checkGrounding(base.claim, evidence, DOC_QUOTE, undefined, body)).toEqual(["source-not-active"]);
+    expect(checkGrounding(base.claim, evidence, DOC_QUOTE, source, null)).toEqual(["body-not-cached"]);
   });
 
   it("結果_理由コードだけで、本文を含まない", () => {

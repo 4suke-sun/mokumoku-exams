@@ -42,8 +42,8 @@ describe("draft の依頼", () => {
       expect(request.count).toBeLessThanOrEqual(baseConfig.draft.maxPerRequest);
       expect(request.facts.every((f) => f.claim.startsWith("架空の主張"))).toBe(true);
       expect(request.styleRules.length).toBeGreaterThan(0);
-      // 点数票の帯のない資格の依頼には、出題スタイルの指針を載せない
-      expect(request.styleGuides).toBeUndefined();
+      // 点数票の帯のある資格の依頼には、出題スタイルの指針(ベンダー共通、資格別)を載せる
+      expect(request.styleGuides).toEqual(["docs/exam-style/aws-common.md", "docs/exam-style/aws-aib.md"]);
     }
     expect(r.out).toContain("下書きの依頼:");
   });
@@ -840,10 +840,12 @@ describe("draft の重複の検出", () => {
     writeOutput(root, second, [draftFor(second, { questionText: bad.questionText })]);
     const r = await runMain(root, ["draft", EXAM, "--import"]);
     expect(r.out).not.toContain("duplicate-similar");
-    // 落ちた下書きの ID は、不採用の行にだけ出る(保留の比較の相手に挙がらない)
+    // 落ちた下書きの ID は、不採用の行にだけ出る(保留の比較の相手に挙がらない。書き方の警告の行は除く)
     const rejectedId = /下書きの不採用: (\S+) data-invalid:/.exec(r.out)?.[1] as string;
     expect(rejectedId).toBeDefined();
-    expect(r.out.split("\n").filter((line) => line.includes(rejectedId))).toHaveLength(1);
+    expect(
+      r.out.split("\n").filter((line) => line.includes(rejectedId) && !line.startsWith("下書きの警告")),
+    ).toHaveLength(1);
     const drafts = readDrafts(workPath(root, "drafts.json"), EXAM).drafts;
     expect(drafts.filter((d) => d.status === "rejected")).toHaveLength(1);
   });

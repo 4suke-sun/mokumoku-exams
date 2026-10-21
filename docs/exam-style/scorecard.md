@@ -61,6 +61,8 @@ npm run pipeline -- score <資格コード>
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | AWS-CLF-C02 | 12 | 8 | 8 | 4 | 4 | 4 | 0 | 40 |
 | AWS-DVA-C02 | 12 | 8 | 6 | 3 | 3 | 3 | 5 | 40 |
+| AWS-AIB-C01 | 12 | 8 | 6 | 3 | 3 | 3 | 5 | 40 |
+| DBX-DEA-2605 | 12 | 8 | 8 | 4 | 4 | 4 | 0 | 40 |
 
 ## 3. 束(100 点)
 
@@ -85,7 +87,7 @@ npm run pipeline -- score <資格コード>
 
 問題 1 問ごとの部分点は、A4 が 5 点(最長÷最短が部分点の帯の内)、A6 が 3 点(否定の語が 1 個)、A3 が 3 点(複数選択で選択肢が 4 つ)、A9 が 3 点(形が 2 種類)、B1 が配点の半分、B4 が配点の 3/5(切り捨て)です。
 
-帯の値は、資格別の文書の「要点」の表にあります([Cloud Practitioner](./aws-clf.md)・[Developer - Associate](./aws-dva.md))。
+帯の値は、資格別の文書の「要点」の表にあります([Cloud Practitioner](./aws-clf.md)・[Developer - Associate](./aws-dva.md)・[AI Business Strategist](./aws-aib.md)・[Data Engineer Associate](./dbx-dea.md))。
 
 ## 4. 帯を足す・変えるとき
 

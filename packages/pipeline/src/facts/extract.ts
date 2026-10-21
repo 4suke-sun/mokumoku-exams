@@ -66,13 +66,19 @@ export function cardId(url: string, heading: string, claim: string, domain: stri
   return `f-${sha256(Buffer.from([url, compact(heading), compact(claim), domain].join("\n"))).slice(0, 12)}`;
 }
 
+/** 取り込む候補 1 件。quote は、本文との照合にだけ使う。台帳のカードには入れない */
+export interface BuiltCard {
+  card: FactCard;
+  quote: string;
+}
+
 /** 候補を事実カードにする。本文のハッシュと ID は CLI が入れる。同じ ID の候補は最初の 1 件だけ残す */
 export function buildCards(
   output: FactsOutput,
   source: { url: string; contentHash: string; target: { edition?: string; region?: string } },
-): FactCard[] {
+): BuiltCard[] {
   const seen = new Set<string>();
-  const cards: FactCard[] = [];
+  const cards: BuiltCard[] = [];
   for (const c of output.cards) {
     const id = cardId(source.url, c.anchor.heading, c.claim, c.domain);
     if (seen.has(id)) continue;
@@ -82,15 +88,25 @@ export function buildCards(
       ...((c.scope?.region ?? source.target.region) ? { region: c.scope?.region ?? source.target.region } : {}),
     };
     cards.push({
-      id,
-      claim: c.claim,
-      sources: [{ url: source.url, section: c.section, anchor: c.anchor, contentHash: source.contentHash }],
-      scope,
-      confidence: c.confidence,
-      domain: c.domain,
-      scopeItems: c.scopeItems,
-      status: "passed",
-      reasons: [],
+      card: {
+        id,
+        claim: c.claim,
+        sources: [
+          {
+            url: source.url,
+            section: c.section,
+            anchor: { heading: c.anchor.heading },
+            contentHash: source.contentHash,
+          },
+        ],
+        scope,
+        confidence: c.confidence,
+        domain: c.domain,
+        scopeItems: c.scopeItems,
+        status: "passed",
+        reasons: [],
+      },
+      quote: c.anchor.quote,
     });
   }
   return cards;

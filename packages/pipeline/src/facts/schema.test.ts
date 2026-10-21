@@ -37,8 +37,8 @@ describe("事実カードのスキーマ", () => {
     ["本文のハッシュの形", (c) => ({ ...c, sources: [{ ...c.sources[0], contentHash: "xyz" }] })],
     ["言い換えが長すぎる", (c) => ({ ...c, claim: "あ".repeat(201) })],
     [
-      "引用が長すぎる",
-      (c) => ({ ...c, sources: [{ ...c.sources[0], anchor: { heading: "quotas", quote: "あ".repeat(31) } }] }),
+      "台帳に引用がある",
+      (c) => ({ ...c, sources: [{ ...c.sources[0], anchor: { heading: "quotas", quote: "up to 100 buckets" } }] }),
     ],
     ["リージョンの形", (c) => ({ ...c, scope: { region: "US East" } })],
   ])("不正_%s で失敗する", (_, mutate) => {

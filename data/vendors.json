@@ -1,3 +1,7 @@
 {
-  "vendors": [{ "name": "AWS", "abbr": "AWS" }, { "name": "Example", "abbr": "EX" }]
+  "vendors": [
+    { "name": "AWS", "abbr": "AWS" },
+    { "name": "Databricks", "abbr": "DBX" },
+    { "name": "Example", "abbr": "EX" }
+  ]
 }

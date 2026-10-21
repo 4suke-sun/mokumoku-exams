@@ -1,0 +1,227 @@
+{
+  "examCode": "AWS-AIB-C01",
+  "entries": [
+    {
+      "draftId": "d-0b974ae0a6e6",
+      "factIds": [
+        "f-0edc6383d72a",
+        "f-179342ec64c0"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-15",
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0d12ed3da7b1",
+      "factIds": [
+        "f-179342ec64c0"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-15",
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e"
+        }
+      ]
+    },
+    {
+      "draftId": "d-1ee7675764ae",
+      "factIds": [
+        "f-0e193ebfb5d8"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-15",
+          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83"
+        }
+      ]
+    },
+    {
+      "draftId": "d-4094a6c055f0",
+      "factIds": [
+        "f-0017e176b638",
+        "f-09a841139bda"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/",
+          "fetchedAt": "2026-10-15",
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791"
+        }
+      ]
+    },
+    {
+      "draftId": "d-449faa2ce811",
+      "factIds": [
+        "f-0883649a2ee9",
+        "f-09a841139bda",
+        "f-12bdc9623135"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/",
+          "fetchedAt": "2026-10-15",
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791"
+        }
+      ]
+    },
+    {
+      "draftId": "d-577ee8d85bec",
+      "factIds": [
+        "f-10458e104869",
+        "f-147e7b89ea3d",
+        "f-16afc1dcadd4",
+        "f-1ac970c17497"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-15",
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-15",
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
+          "fetchedAt": "2026-10-15",
+          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff"
+        }
+      ]
+    },
+    {
+      "draftId": "d-6a9c082c3ff6",
+      "factIds": [
+        "f-147e7b89ea3d",
+        "f-14dedc44ccda"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-15",
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631"
+        }
+      ]
+    },
+    {
+      "draftId": "d-6b9fcfadd6c1",
+      "factIds": [
+        "f-0e193ebfb5d8",
+        "f-0e37caafb913",
+        "f-14dedc44ccda",
+        "f-16afc1dcadd4",
+        "f-179342ec64c0"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-15",
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-15",
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-15",
+          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-15",
+          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83"
+        }
+      ]
+    },
+    {
+      "draftId": "d-767a87515f7e",
+      "factIds": [
+        "f-07e3a1f9d25e",
+        "f-12bdc9623135"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/",
+          "fetchedAt": "2026-10-15",
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-15",
+          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a254bbcedf3c",
+      "factIds": [
+        "f-0017e176b638",
+        "f-0883649a2ee9",
+        "f-12bdc9623135"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/",
+          "fetchedAt": "2026-10-15",
+          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791"
+        }
+      ]
+    },
+    {
+      "draftId": "d-afdc56a3b21b",
+      "factIds": [
+        "f-0edc6383d72a",
+        "f-10458e104869",
+        "f-1bc45cf6e0e5"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-15",
+          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
+          "fetchedAt": "2026-10-15",
+          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ba6e2dfface7",
+      "factIds": [
+        "f-1a5c1937de98",
+        "f-1bc45cf6e0e5"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
+          "fetchedAt": "2026-10-15",
+          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff"
+        }
+      ]
+    },
+    {
+      "draftId": "d-cff8ab70f869",
+      "factIds": [
+        "f-0569348864e9"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-15",
+          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe"
+        }
+      ]
+    }
+  ]
+}

@@ -248,6 +248,9 @@ describe("facts --import", () => {
     const committed = readFileSync(factsPath(join(root, config.factsDir), CODE), "utf8");
     expect(committed).not.toContain("Synthetic");
     expect(committed).not.toContain("Encryption at rest is enabled");
+    // 引用は照合にだけ使い、台帳には残さない(取り込み前の結果にある引用も、台帳には出ない)
+    expect(committed).not.toContain('"quote"');
+    expect(committed).not.toContain("up to 100 buckets per account");
     expect(r.facts().extracted).toEqual([{ url: DOC_URL, contentHash: DOC_HASH, agent: FACT_AGENT }]);
   });
 

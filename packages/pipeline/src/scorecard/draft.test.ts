@@ -47,7 +47,7 @@ describe("下書きの取り込みでの点数票の警告", () => {
   });
 
   it("点数票の帯のない資格_警告を返さない", () => {
-    expect(scorecardWarnings(choiceDraft({ questionText: "バケットの上限はどれか。" }), "AWS-AIB-C01")).toEqual([]);
+    expect(scorecardWarnings(choiceDraft({ questionText: "バケットの上限はどれか。" }), "EX-SMP-XX")).toEqual([]);
   });
 });
 
@@ -63,12 +63,16 @@ describe("出題スタイルの指針の文書", () => {
   it("帯のある資格_ベンダー共通と資格別の文書のパスを返し_どちらも実在する", () => {
     expect(styleGuidePaths("AWS-CLF-C02")).toEqual(["docs/exam-style/aws-common.md", "docs/exam-style/aws-clf.md"]);
     expect(styleGuidePaths("AWS-DVA-C02")).toEqual(["docs/exam-style/aws-common.md", "docs/exam-style/aws-dva.md"]);
-    for (const path of [...(styleGuidePaths("AWS-CLF-C02") ?? []), ...(styleGuidePaths("AWS-DVA-C02") ?? [])]) {
-      expect(existsSync(resolve(repoRoot, path)), path).toBe(true);
+    expect(styleGuidePaths("AWS-AIB-C01")).toEqual(["docs/exam-style/aws-common.md", "docs/exam-style/aws-aib.md"]);
+    expect(styleGuidePaths("DBX-DEA-2605")).toEqual(["docs/exam-style/dbx-common.md", "docs/exam-style/dbx-dea.md"]);
+    for (const code of ["AWS-CLF-C02", "AWS-DVA-C02", "AWS-AIB-C01", "DBX-DEA-2605"]) {
+      for (const path of styleGuidePaths(code) ?? []) {
+        expect(existsSync(resolve(repoRoot, path)), path).toBe(true);
+      }
     }
   });
 
   it("帯のない資格_null を返す", () => {
-    expect(styleGuidePaths("AWS-AIB-C01")).toBeNull();
+    expect(styleGuidePaths("EX-SMP-XX")).toBeNull();
   });
 });

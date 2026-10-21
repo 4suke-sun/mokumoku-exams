@@ -75,7 +75,8 @@ export function choiceForm(text: string): ChoiceForm {
   // 句点で終わるか、述語(ひらがなで終わる)で終わるものを文とする。体言止めの「こと」「もの」などは語句
   if (t.endsWith("。") || (/[ぁ-ん]$/.test(t) && !/(の|こと|もの|ため|など|とき|ほう|ところ)$/.test(t)))
     return "sentence";
-  if (/^[A-Za-z0-9 ./()\-・&–—]+$/.test(t) || (/^(AWS|Amazon)/.test(t) && [...t].length <= 40)) return "name";
+  if (/^[A-Za-z0-9 ./()\-・&–—]+$/.test(t) || (/^(AWS|Amazon|Databricks)/.test(t) && [...t].length <= 40))
+    return "name";
   return "phrase";
 }
 

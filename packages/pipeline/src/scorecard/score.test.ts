@@ -13,7 +13,9 @@ import {
 
 const clf = resolveProfile("AWS-CLF-C02");
 const dva = resolveProfile("AWS-DVA-C02");
-if (clf === null || dva === null) throw new Error("帯がない");
+const aib = resolveProfile("AWS-AIB-C01");
+const dea = resolveProfile("DBX-DEA-2605");
+if (clf === null || dva === null || aib === null || dea === null) throw new Error("帯がない");
 
 /** 架空のサービス名と状況で作る、Cloud Practitioner の形の設問 */
 const SHORT: ScoreInput = {
@@ -47,6 +49,7 @@ const LONG: ScoreInput = {
 describe("選択肢の形", () => {
   it.each([
     ["Amazon Foo Archive", "name"],
+    ["Databricks Foo Bundles (FB) を使う設定", "name"],
     ["書き込みの削減", "phrase"],
     ["書き込みを減らす", "sentence"],
     ["書き込みを減らす。", "sentence"],
@@ -65,8 +68,30 @@ describe("資格ごとの帯", () => {
     expect(clf.points.questionParagraph).toBe(0);
   });
 
+  it("Databricks の帯_状況の問と知識の問の両方を満点の範囲に入れる", () => {
+    expect(dea.stemLength.full).toEqual([30, 320]);
+    expect(dea.contextSentences).toEqual([0, 5]);
+    expect(dea.separateQuestionParagraph).toBe(false);
+    expect(
+      dea.openers.some((o) => new RegExp(`^(?:${o})`).test("あるデータエンジニアは、ジョブを実行する必要があります。")),
+    ).toBe(true);
+    expect(
+      dea.openers.some((o) => new RegExp(`^(?:${o})`).test("データエンジニアが、パイプラインを開発しています。")),
+    ).toBe(true);
+  });
+
+  it("AI Business Strategist の帯_単一選択だけで_書き出しの語を資格別に持つ", () => {
+    expect(aib.stemLength.full).toEqual([120, 300]);
+    expect(aib.batch.multiShare).toEqual([0, 0]);
+    expect(aib.separateQuestionParagraph).toBe(true);
+    expect(aib.openers).not.toEqual(clf.openers);
+    expect(aib.openers.some((o) => new RegExp(`^(?:${o})`).test("ある小売企業が小規模なチームを設立しました。"))).toBe(
+      true,
+    );
+  });
+
   it("帯のない資格_null を返す", () => {
-    expect(resolveProfile("AWS-AIB-C01")).toBeNull();
+    expect(resolveProfile("EX-SMP-XX")).toBeNull();
     expect(resolveProfile("ZZZ-XXX-01")).toBeNull();
   });
 

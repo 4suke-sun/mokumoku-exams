@@ -5,6 +5,7 @@ import { findSection } from "./sections.ts";
 /**
  * 事実カードの根拠を、取得した本文と機械的に照合する(モデルを使わない)。
  * アンカーの見出しで本文の範囲を絞り、その範囲に、引用・数値・固有名詞があるかを確かめる。
+ * 引用は、取り込むときにだけ使う(エージェントの出力にあり、台帳には残さない)。
  * 結果は理由コードだけで、本文や一致した文字列は含めない。
  */
 
@@ -48,12 +49,13 @@ export interface SourceState {
 }
 
 /**
- * 根拠 1 件の照合。source は台帳の出典(なければ undefined)、body はその本文(キャッシュにあれば)。
+ * 根拠 1 件の照合。quote は、エージェントが書いた引用。source は台帳の出典(なければ undefined)、body はその本文(キャッシュにあれば)。
  * 通れば空の配列、通らなければ理由コード(重複なし)を返す。
  */
 export function checkGrounding(
   claim: string,
   evidence: Evidence,
+  quote: string,
   source: SourceState | undefined,
   body: string | null,
 ): GroundingReason[] {
@@ -65,7 +67,7 @@ export function checkGrounding(
 
   const reasons: GroundingReason[] = [];
   const range = section.text;
-  if (!compact(range).includes(compact(evidence.anchor.quote))) reasons.push("quote-not-found");
+  if (!compact(range).includes(compact(quote))) reasons.push("quote-not-found");
   const rangeNumbers = new Set(extractNumbers(range));
   if (extractNumbers(claim).some((n) => !rangeNumbers.has(n))) reasons.push("number-mismatch");
   const lowered = normalize(range);

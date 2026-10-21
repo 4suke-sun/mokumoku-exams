@@ -97,6 +97,41 @@ export const VENDOR_PROFILES: Readonly<Record<string, ScorecardProfile>> = {
       openerPrefixChars: 8,
     },
   },
+  // Databricks: 状況の問と、1 文の知識の問が混ざる。選択肢は製品名・語句・文が混在する
+  DBX: {
+    stemLength: { full: [30, 320], partial: [20, 420] },
+    contextSentences: [0, 5],
+    optionMaxLength: [100, 150],
+    lengthRatio: [3.5, 5],
+    similarityMax: 0.9,
+    openers: [
+      "ある.{0,20}?(企業|会社|組織|団体|チーム|部門|データエンジニア|エンジニア)",
+      "(ジュニア)?データエンジニア",
+      "あなた",
+      ".{1,12}(企業|会社|チーム|部門)は",
+    ],
+    separateQuestionParagraph: false,
+    points: {
+      stemLength: 12,
+      contextSentences: 8,
+      contextRequirement: 8,
+      optionLength: 4,
+      opener: 4,
+      questionEnding: 4,
+      questionParagraph: 0,
+    },
+    batch: {
+      multiShare: [0, 0.15],
+      situationShare: [0.5, 0.8],
+      stemMedian: [100, 190],
+      stemP90Max: 340,
+      nameShare: null,
+      phraseShare: null,
+      sentenceShare: [0, 0.5],
+      openerTopMax: 0.4,
+      openerPrefixChars: 8,
+    },
+  },
 };
 
 /** 資格別の帯。ベンダー共通の帯の上に重ねる項目だけを書く */
@@ -106,6 +141,7 @@ export interface ExamOverride {
   optionMaxLength?: readonly [number, number];
   lengthRatio?: readonly [number, number];
   similarityMax?: number;
+  openers?: readonly string[];
   separateQuestionParagraph?: boolean;
   points?: Partial<BPoints>;
   batch?: Partial<BatchBands>;
@@ -134,6 +170,29 @@ export const EXAM_OVERRIDES: Readonly<Record<string, ExamOverride>> = {
       openerPrefixChars: 8,
     },
   },
+  // AI Business Strategist: 設問は中くらいの長さで、状況の段落と問いの段落を分ける。単一選択だけで、選択肢は短い文が並行する
+  "AWS-AIB-C01": {
+    stemLength: { full: [120, 300], partial: [90, 360] },
+    contextSentences: [2, 6],
+    optionMaxLength: [100, 140],
+    lengthRatio: [2.5, 3.5],
+    openers: ["ある.{0,20}?(企業|会社|銀行|組織|団体|機関|法人|メーカー|社)", "あなた"],
+    separateQuestionParagraph: true,
+    points: { contextRequirement: 6, optionLength: 3, opener: 3, questionEnding: 3, questionParagraph: 5 },
+    batch: {
+      multiShare: [0, 0],
+      situationShare: [0.9, 1],
+      stemMedian: [160, 240],
+      stemP90Max: 300,
+      nameShare: null,
+      phraseShare: null,
+      sentenceShare: [0.8, 1],
+      openerTopMax: 0.45,
+      openerPrefixChars: 8,
+    },
+  },
+  // Data Engineer Associate: 状況の問が約 3 分の 2、知識の問が約 3 分の 1(ベンダー共通の帯のまま)
+  "DBX-DEA-2605": {},
 };
 
 /** 資格の書き方の指針の文書(リポジトリ直下からの相対パス)。ベンダー共通の文書、資格別の文書の順。帯のない資格は null */
