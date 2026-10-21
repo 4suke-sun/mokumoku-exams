@@ -11,6 +11,7 @@ import { PlaySkeleton } from "@/components/page-skeletons.tsx";
 import { QuestionChips } from "@/components/question-chips.tsx";
 import { QuestionGrid } from "@/components/question-grid.tsx";
 import { RecentMarks, useQuestionStats } from "@/components/question-stats.tsx";
+import { ReferenceList } from "@/components/reference-list.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
 import { FreeTextScore } from "@/components/rubric-view.tsx";
 import { type AnswerTimer, createTimer, elapsedTimes, setVisible, showQuestion } from "@/lib/answer-timer.ts";
@@ -472,6 +473,9 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
               <summary className="cursor-pointer font-bold">解説を見る</summary>
               <div className="mt-3">
                 <ExplanationView question={question} choiceOrder={session.choiceOrder} />
+              </div>
+              <div className="mt-3">
+                <ReferenceList references={question.references} />
               </div>
             </details>
           </div>

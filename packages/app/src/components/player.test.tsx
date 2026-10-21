@@ -467,6 +467,37 @@ describe("Player の 1 問ごとの解答の表示", () => {
     expect(await screen.findByText("○ 正解です")).toBeTruthy();
     expect(screen.queryAllByRole("radio")).toHaveLength(0);
   });
+
+  it("出典のある問題を回答する_解説を見るを開くと_出典の一覧が出る", async () => {
+    const withReferences = [
+      {
+        ...question(1, "A"),
+        references: [{ title: "公式の資料", url: "https://docs.aws.amazon.com/guide" }],
+      } as Question,
+      question(2, "B"),
+    ];
+    render(<Player exam={exam} questions={withReferences} />);
+    const user = userEvent.setup();
+    await screen.findByText("問題文 1");
+    await user.keyboard("1{Enter}");
+    await screen.findByText("○ 正解です");
+    await user.click(screen.getByText("解説を見る"));
+    expect(screen.getByRole("heading", { name: "出典" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "公式の資料(外部サイト)" }).getAttribute("href")).toBe(
+      "https://docs.aws.amazon.com/guide",
+    );
+  });
+
+  it("出典のない問題を回答する_解説を見るを開いても_出典の見出しを出さない", async () => {
+    render(<Player exam={exam} questions={questions} />);
+    const user = userEvent.setup();
+    await screen.findByText("問題文 1");
+    await user.keyboard("1{Enter}");
+    await screen.findByText("○ 正解です");
+    await user.click(screen.getByText("解説を見る"));
+    expect(screen.queryByRole("heading", { name: "出典" })).toBeNull();
+    expect(screen.queryByRole("link")).toBeNull();
+  });
 });
 
 describe("Player の印と問題一覧", () => {
