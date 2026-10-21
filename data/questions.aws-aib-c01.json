@@ -34,7 +34,7 @@
       "explanation": "この問題は、社内規程で明文化された条件に従い、同じ入力に対して常に同じ結果を返す業務を、限られた予算と短い期間で自動化するとき、どの手段を選ぶべきかを問うものです。\n\n発注のしきい値や数量といった条件がすでに明文化され、結果が決定論的であるため、まずその条件をルールとして実装するのが適切です。機械学習を適用するかどうかは、このルールベースの結果と比較して優位性が確認できてから判断すべきであり、単純な代替策を評価せずに機械学習へ飛びつくことはアンチパターンとされています。\n\n前提知識\n\nルールベースと機械学習の使い分け\n\n条件が明文化され結果が決定的な業務にはルールベースの解が適しており、不正検知のように手口が絶えず変化する業務では機械学習が有利になります。既存のルールベース解があれば、まずベースラインとして使い、機械学習の優位性を比較検証してから採用するのが原則です。\n\n他の選択肢が誤りである理由：\n\n過去の在庫データから需要を予測する機械学習モデルを構築し、発注数量を算出する\n\n条件が明文化され結果が決定的な業務にはルールベースの解で十分であり、単純な代替策を評価せず機械学習へ飛びつく判断になっています。\n\n先に機械学習モデルを導入し、結果が合わなければ再学習を繰り返して条件に近づける\n\n既存のルールベース解をまずベースラインとして使い、機械学習と比較してから採用するという順序に反しています。\n\n全社の在庫データを統合する環境を先に整備してから、発注の自動化に着手する\n\nデータ環境の整備自体は有用な取り組みですが、限られた予算と短い期間でこの発注自動化を実現するという要件には応えていません。",
       "references": [
         {
-          "title": "MLCOST02-BP01: Evaluate whether ML is the right solution（AWS Well-Architected Machine Learning Lens）",
+          "title": "MLCOST02-BP01 Identify if machine learning is the right solution - Machine Learning Lens",
           "url": "https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/mlcost02-bp01.html"
         },
         {
@@ -84,6 +84,7 @@
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain1.html"
         },
         {
+          "title": "Automate tasks in your application using AI agents - Amazon Bedrock",
           "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/agents.html"
         }
       ]
@@ -129,9 +130,11 @@
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain1.html"
         },
         {
+          "title": "Data and model quality monitoring with Amazon SageMaker Model Monitor - Amazon SageMaker AI",
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
         },
         {
+          "title": "MLOPS06-BP02 Enable model observability and tracking - Machine Learning Lens",
           "url": "https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/mlops06-bp02.html"
         }
       ]
@@ -173,7 +176,7 @@
           "url": "https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/mlcost02-bp02.html"
         },
         {
-          "title": "AWS Marketplace とは - AWS Marketplace 購入者ガイド",
+          "title": "とは AWS Marketplace - AWS Marketplace",
           "url": "https://docs.aws.amazon.com/ja_jp/marketplace/latest/buyerguide/what-is-marketplace.html"
         }
       ]
@@ -211,14 +214,15 @@
       "explanation": "この問題は、複数の AI イニシアチブが並行稼働している状況で、次年度の予算配分（拡大・一時停止・終了）を判断する前に最初に取り組むべきことを問うものです。\n\n各イニシアチブの実績コストと支出予測を、担当チームの報告ではなく全社で同じ基準で把握しなければ、投資に見合う成果が出ているかを比較できません。AWS Cost Explorer は過去最大 13 か月の実績コストと使用状況を分析し、今後 18 か月の支出を予測できるため、この分析結果をビジネス成果と見比べることが拡大・一時停止・終了の判断の前提になります。\n\n前提知識\n\nAWS Cost Explorer\n\n過去最大 13 か月の実績コストと使用状況を表示・分析し、今後 18 か月の支出を予測できるサービスです。\n\n他の選択肢が誤りである理由：\n\nいずれも安定して稼働しているため、現在の予算配分を維持したまま次年度もすべての取り組みを継続する\n\n安定して稼働していることは投資に見合う成果が出ていることを意味せず、コストと成果の比較を行わずに継続を決めているため誤りです。\n\n実績コストが最も低いイニシアチブだけを次年度も残し、それ以外の取り組みは期初にすべて終了する\n\nコストの低さだけを基準にしており、ビジネス成果と見比べていないため決め手を満たしません。\n\n成果が出ていないイニシアチブはモデルを再トレーニングすれば改善すると判断し、投資を継続する\n\n再トレーニングは是正手段の一つであり、コストと成果を比較して拡大・一時停止・終了を判断する前提を置き換えるものではないため誤りです。",
       "references": [
         {
-          "title": "AWS Cost Explorer によるコストと使用状況の分析 - AWS コスト管理",
+          "title": "AWS Cost Explorer を使用してコストと使用状況を分析する - AWS コスト管理",
           "url": "https://docs.aws.amazon.com/ja_jp/cost-management/latest/userguide/ce-what-is.html"
         },
         {
-          "title": "コンテンツ分野 2: AI 戦略とビジネス価値の創造 - AWS Certified AI Business Strategist 試験ガイド",
+          "title": "コンテンツ分野 2: AI 戦略とビジネス価値の創造 - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.html"
         },
         {
+          "title": "Analyzing your costs and usage with AWS Cost Explorer - AWS Cost Management",
           "url": "https://docs.aws.amazon.com/cost-management/latest/userguide/ce-what-is.html"
         }
       ]
@@ -256,7 +260,7 @@
       "explanation": "この問題は、需要予測業務を AI プラットフォームへ移行するにあたり、現行業務を止めないこと、費用を意思決定の前に把握すること、予測精度を現行より下げないことという 3 つの要件を同時に満たすアプローチを問うものです。\n\n移行の判断は、まず既存データの整備状況と品質を評価して実現可能性を確かめ、AWS Pricing Calculator で作成した見積りコストを現行の費用と比較したうえで、段階的に切り替えることで 3 つの要件を満たします。データ品質の評価を先に行うことで予測精度が現行を下回らないかを確認でき、見積りを比較することで費用を意思決定の前に把握でき、段階的な切り替えによって現行の予測業務を止めずに移行できます。\n\n前提知識\n\nAWS Pricing Calculator\n\n新規または変更後のワークロードについて、割引や購入コミットメントを反映した見積りコストを作成し、既存のコストベースラインと比較できるサービスです。意思決定の前に費用を把握する用途で使います。\n\n他の選択肢が誤りである理由：\n\n現行と同じ期間のデータで予測精度だけを先に検証し、目標を上回った時点で全社の業務プロセスを一斉に切り替える\n\n予測精度の検証は行っていますが、費用を意思決定の前に把握しておらず、また一斉切り替えは現行業務を止めずに移行するという要件にも反するため誤りです。\n\n先に全社のプロセスを新しいプラットフォームへ切り替え、データ品質の評価と費用の把握は稼働が安定した後に行う\n\nデータ品質の評価と費用の把握を切り替え後に行っており、費用を意思決定前に把握するという要件の順序が逆であるため誤りです。\n\n現行の業務プロセスを維持したまま新しいプラットフォームを無期限に並行稼働させ、両方の運用と費用負担を続ける\n\n現行業務は止めずに済みますが、移行の意思決定自体を行わず両方の費用を負担し続けるだけで、要件を満たさないため誤りです。",
       "references": [
         {
-          "title": "生成 AI 導入の道のり - 生成 AI のデータに関する考慮事項",
+          "title": "データ戦略 - AWS 規範ガイダンス",
           "url": "https://docs.aws.amazon.com/ja_jp/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/journey.html"
         },
         {
@@ -264,6 +268,7 @@
           "url": "https://aws.amazon.com/aws-cost-management/aws-pricing-calculator/"
         },
         {
+          "title": "Data strategy - AWS Prescriptive Guidance",
           "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/journey.html"
         }
       ]
@@ -306,14 +311,15 @@
       "explanation": "この問題は、生成AIアシスタントが社内資料に根拠のない内容を顧客に提示した事象に対し、モデルを再トレーニングせずに、監査可能かつ顧客に説明できる形で対応する施策を問うものです。\n\nコンテキストグラウンディングチェックは、モデルレスポンスがソースに根拠がない場合や質問と無関係な場合を検出する保護手段であり、根拠のない回答を自動的に検出できます。検出だけでは対応が完結しないため、根拠を確認できない回答が検出された場合に人による確認へ引き継ぐ基準を定めることで、検出から対応までの流れを監査可能な形で運用できます。AとBは役割の異なる対策であり、自動検出（A）とエスカレーション基準（B）を組み合わせることで要件を満たします。\n\n前提知識\n\nコンテキストグラウンディングチェック\n\nBedrockガードレールが提供する保護手段のひとつで、モデルレスポンスがソースに根拠がない場合や、ユーザーの質問と無関係な場合を検出し、ハルシネーション対策に役立つ。\n\n他の選択肢が誤りである理由：\n\n応答が滞らないよう、出力側の保護手段を停止し、事業目標の達成を優先する\n\n出力側の保護手段を停止することは根拠のない回答の検出そのものを放棄する対応であり、監査と顧客への説明という要件に反します。\n\n基盤モデルを再トレーニングし、同じ事象が起きない状態にしてから運用を続ける\n\n再トレーニングは検出後の是正手段の一つですが、問題文は再トレーニングせずに対応することを条件としているため、この選択肢は前提に反します。\n\n機密情報フィルターを設定し、回答に含まれる個人情報をマスクする\n\n機密情報フィルターは個人情報などの機密情報を保護する仕組みであり、根拠のない内容を提示したというハルシネーションの事象には対応しません。",
       "references": [
         {
-          "title": "Amazon Bedrock Guardrails（Amazon Bedrock ユーザーガイド）",
+          "title": "Amazon Bedrock ガードレールを使用して有害なコンテンツを検出してフィルタリングする - Amazon Bedrock",
           "url": "https://docs.aws.amazon.com/ja_jp/bedrock/latest/userguide/guardrails.html"
         },
         {
-          "title": "第 3 分野: AI ガバナンスと責任ある AI リーダーシップ（AWS Certified AI Business Strategist 試験ガイド）",
+          "title": "コンテンツ分野 3: AI ガバナンスと責任ある AI リーダーシップ - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain3.html"
         },
         {
+          "title": "Detect and filter harmful content by using Amazon Bedrock Guardrails - Amazon Bedrock",
           "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html"
         }
       ]
@@ -351,10 +357,11 @@
       "explanation": "この問題は、AIを利用した与信審査において、監督当局と顧客に対し個々の審査結果がなぜその判定になったのかを示せることが求められる場面で、これに直接対応する責任あるAIのディメンションを問うものです。\n\n説明可能性は「システム出力を理解して評価する」ことであり、個々の判定結果がなぜその結論になったかを事後的に示す要件に直接対応します。一方、透明性は「ステークホルダーがAIシステムとの関わりについて十分な情報に基づいた選択を行えるようにする」ことであり、AIシステムと関わる前提として情報を提供する仕組みを指すため、個々の判定結果の根拠を示すという本問の要件の決め手にはなりません。\n\n前提知識\n\n責任あるAIのディメンション\n\n責任あるAIは、公平さ・説明可能性・プライバシーとセキュリティ・安全性・制御性・正確性と堅牢性・ガバナンス・透明性という8つのディメンションで構成され、それぞれ異なる観点をカバーする。\n\n他の選択肢が誤りである理由：\n\n公平さ。さまざまなステークホルダーのグループへの影響を考慮する\n\n公平さはグループ間の影響という別の観点を扱うディメンションであり、個々の判定結果の根拠を示す要件には対応しません。\n\n透明性。ステークホルダーがAIシステムとの関わりについて十分な情報に基づいた選択を行えるようにする\n\n透明性はAIシステムとの関わりについて情報に基づく選択を可能にすることを指し、個々の出力の根拠を事後的に示す要件の決め手にはなりません。\n\nプライバシーとセキュリティ。データとモデルを適切に取得、使用、保護する\n\nプライバシーとセキュリティはデータとモデルの取得・保護という広いスコープを扱うディメンションであり、個々の判定理由という要件には対応しません。",
       "references": [
         {
-          "title": "責任ある AI（AWS）",
+          "title": "責任ある AI – AWS で責任をもって AI を構築する – AWS",
           "url": "https://aws.amazon.com/jp/ai/responsible-ai/"
         },
         {
+          "title": "Responsible AI – Building AI Responsibly – AWS",
           "url": "https://aws.amazon.com/ai/responsible-ai/"
         }
       ]
@@ -392,10 +399,11 @@
       "explanation": "この問題は、生成AI導入を検討する企業が、データサイロを抱えた状態でイニシアチブを本格化する前に、データ準備状況の評価として最初に取り組むべき内容を問うものです。\n\n生成AI導入ジャーニーの構想段階では、既存のデータインフラストラクチャを評価し、内部と外部のデータソースをカタログ化したうえで、生成AIの実現可能性の観点からデータ品質を評価することが基準になります。設問の企業は部門ごとに定義や更新頻度が異なるデータを抱えているため、まず全体のデータソースを把握し品質を評価するBが、この段階で最も適切な取り組みです。\n\n前提知識\n\n生成AI導入ジャーニーの構想段階\n\n生成AI導入ジャーニーは複数の段階で構成され、構想段階では技術投資に着手する前に、既存データの評価とカタログ化、データ品質の把握を行うことが基準とされています。\n\n他の選択肢が誤りである理由：\n\n分散したデータはそのままにし、用途ごとにモデルを選定してパイロットを開始する\n\nデータサイロの影響を評価せずにパイロットを進めても、経営層が求めるデータ準備状況の把握という要件を満たさないため誤りです。\n\n取引件数が最も多い部門のデータだけ品質を評価し、他部門のデータは対象外とする\n\n一部の部門だけを評価しても、データサイロがイニシアチブ全体に与える影響を把握できないため誤りです。\n\nフェデレーティッドなデータアクセスに対応するAIデータプラットフォームに先行投資する\n\nフェデレーティッドなデータアクセス環境への投資は生成AI導入ジャーニーの後段であるスケーリング段階の基準であり、構想段階でまず行うべきデータソースの評価より前倒しになるため誤りです。",
       "references": [
         {
-          "title": "生成 AI 導入ジャーニー - 生成 AI のデータに関する考慮事項",
+          "title": "データ戦略 - AWS 規範ガイダンス",
           "url": "https://docs.aws.amazon.com/ja_jp/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/journey.html"
         },
         {
+          "title": "Data strategy - AWS Prescriptive Guidance",
           "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/journey.html"
         }
       ]
@@ -433,14 +441,15 @@
       "explanation": "この問題は、複数部門が同じ顧客データを別々に保持し、値の食い違いや修正権限の所在が不明確な状態で、生成AIアシスタントを全社展開する前に取るべきデータ所有権と説明責任の明確化の方法を問うものです。\n\nAWS CAFのガバナンスパースペクティブにおけるデータガバナンスは、データに対する権限と管理を行使する機能であり、データの所有者・スチュワード・管理者などの重要な役割を定義して割り当てます。生成AI導入の成功には明確に定義されたデータ戦略が不可欠とされており、住所や契約状況の正しさに責任を持つ役割を先に定めるCが、この段階で取るべき対応です。\n\n前提知識\n\nデータガバナンスとデータキュレーションの違い\n\nどちらもAWS CAFのガバナンスパースペクティブに属する機能ですが、データガバナンスはデータ所有者・スチュワード・管理者の役割定義と権限行使を担い、データキュレーションはメタデータを収集してデータカタログにデータ製品のインベントリを整理する機能であり、役割が異なります。\n\n他の選択肢が誤りである理由：\n\nメタデータを収集し、データカタログにデータ製品のインベントリを整理する\n\nこれはデータキュレーションの機能であり、データ所有者・スチュワード・管理者の役割を定義して説明責任を明確にするデータガバナンスの代わりにはならないため誤りです。\n\nデータ統合ツールを導入して3部門のデータを1か所に集約し、重複は自動で名寄せする\n\n技術的にデータを統合しても、どの値を正とし誰が修正するかという役割と説明責任は定まらないため誤りです。\n\n全部門の顧客データに対する参照権限と修正権限をAI推進チームへ一括で付与する\n\n一部門に権限を集中させることは、データの正しさに責任を持つ所有者やスチュワードの役割を定義したことにはならないため誤りです。",
       "references": [
         {
-          "title": "ガバナンスパースペクティブ: クラウドでの組織の管理 - AWS クラウド導入フレームワークの概要",
+          "title": "ガバナンスのパースペクティブ: 統制と監視 - AWS クラウド導入フレームワークの概要",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/overview-aws-cloud-adoption-framework/governance-perspective.html"
         },
         {
-          "title": "生成 AI 導入ジャーニー - 生成 AI のデータに関する考慮事項",
+          "title": "データ戦略 - AWS 規範ガイダンス",
           "url": "https://docs.aws.amazon.com/ja_jp/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/journey.html"
         },
         {
+          "title": "Governance perspective: control and oversight - An Overview of the AWS Cloud Adoption Framework",
           "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/governance-perspective.html"
         }
       ]
@@ -491,6 +500,7 @@
           "url": "https://aws.amazon.com/jp/what-is/generative-ai/"
         },
         {
+          "title": "What is Machine Learning? - ML Technology Explained - AWS",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
       ]
@@ -532,6 +542,7 @@
           "url": "https://aws.amazon.com/jp/what-is/machine-learning/"
         },
         {
+          "title": "What is Machine Learning? - ML Technology Explained - AWS",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
       ]
@@ -573,6 +584,7 @@
           "url": "https://aws.amazon.com/jp/what-is/structured-data/"
         },
         {
+          "title": "What is Structured Data? - Structured Data Explained - AWS",
           "url": "https://aws.amazon.com/what-is/structured-data/"
         }
       ]
@@ -618,6 +630,7 @@
           "url": "https://aws.amazon.com/jp/what-is/machine-learning/"
         },
         {
+          "title": "Deploy models for inference - Amazon SageMaker AI",
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/deploy-model.html"
         }
       ]
@@ -655,10 +668,11 @@
       "explanation": "この問題は、AI マネジメントシステム (AIMS) に関する国際規格 ISO/IEC 42001 への対応として、組織が取るべき対応の範囲を正しく理解できているかを問うものです。\n\nISO/IEC 42001 は、組織内で AIMS を確立・実装し、維持と継続的な改善まで行うための要件を定めた規格であり、文書整備や個別モデルの精度管理だけでは足りず、確立後も維持・改善を続ける必要があるため、選択肢Aが要件を満たします。\n\n前提知識\n\nAI マネジメントシステム (AIMS)\n\nISO/IEC 42001 は、組織内で AIMS を確立・実装・維持し、継続的に改善するための要件を定めた国際規格であり、対応は文書を整えた時点で終わるものではありません。\n\n他の選択肢が誤りである理由：\n\nISO/IEC 42001 の要件に沿って AI マネジメントシステムを確立し、文書を整えた時点で対応を終える\n\n文書整備の時点で対応を終えており、維持と継続的な改善までを求める規格の要件を満たさないため不正解です。\n\n個々の AI モデルの精度指標を測定する手順だけを整え、組織としての管理体制の整備は対象外とする\n\nAIMS は組織としての管理体制の確立を求める仕組みであり、個々のモデルの精度指標だけでは組織的な管理体制の整備という要件を満たさないため不正解です。\n\n利用するクラウド事業者の ISO/IEC 42001 認証を確認し、その認証をもって自社の体制の説明に代える\n\nクラウド事業者が認証を取得していても、利用する組織が自動的に認証されるわけではないため、事実として誤っており不正解です。",
       "references": [
         {
-          "title": "ISO/IEC 42001:2023 FAQs",
+          "title": "ISO 42001 Artificial Intelligence Management System - Amazon Web Services (AWS)",
           "url": "https://aws.amazon.com/compliance/iso-42001-faqs/"
         },
         {
+          "title": "Content Domain 1: AI Fundamentals and Literacy - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain1.html"
         }
       ]
@@ -704,9 +718,11 @@
           "url": "https://docs.aws.amazon.com/ja_jp/bedrock/latest/userguide/prompt-engineering-guidelines.html"
         },
         {
+          "title": "Prompt engineering concepts - Amazon Bedrock",
           "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/prompt-engineering-guidelines.html"
         },
         {
+          "title": "What is Prompt Engineering? - AI Prompt Engineering Explained - AWS",
           "url": "https://aws.amazon.com/what-is/prompt-engineering/"
         }
       ]
@@ -756,9 +772,11 @@
           "url": "https://docs.aws.amazon.com/ja_jp/bedrock/latest/userguide/inference-parameters.html"
         },
         {
+          "title": "Customize your model to improve its performance for your use case - Amazon Bedrock",
           "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/custom-models.html"
         },
         {
+          "title": "Retrieve data and generate AI responses with Amazon Bedrock Knowledge Bases - Amazon Bedrock",
           "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html"
         }
       ]
@@ -804,9 +822,11 @@
           "url": "https://docs.aws.amazon.com/ja_jp/bedrock/latest/userguide/inference-parameters.html"
         },
         {
+          "title": "Monitor your token usage by counting tokens before running inference - Amazon Bedrock",
           "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/count-tokens.html"
         },
         {
+          "title": "Influence response generation with inference parameters - Amazon Bedrock",
           "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/inference-parameters.html"
         }
       ]
@@ -857,9 +877,11 @@
           "url": "https://aws.amazon.com/jp/what-is/prompt-engineering/"
         },
         {
+          "title": "Retrieve data and generate AI responses with Amazon Bedrock Knowledge Bases - Amazon Bedrock",
           "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/knowledge-base.html"
         },
         {
+          "title": "What is Prompt Engineering? - AI Prompt Engineering Explained - AWS",
           "url": "https://aws.amazon.com/what-is/prompt-engineering/"
         }
       ]
@@ -897,10 +919,11 @@
       "explanation": "この問題は、AI 推進チームが最初に着手するユースケースを1つ選ぶ場面で、対象業務と効果測定の指標をどう定めるべきかを問うものです。\n\n顧客業務の問い合わせ一次対応は、影響力の大きいAIユースケースとして挙げられる業務機能の一つであり、この業務を対象に選び、平均応答時間と解決率の改善幅というビジネス成果に効果を結び付けて測ることで、経営層に報告できる形になるため、選択肢Bが要件を満たします。\n\n前提知識\n\n高影響AIユースケースの選定とビジネス成果への結び付け\n\n影響力の大きいAIユースケースは、顧客業務、セールスおよびマーケティング、研究開発、ソフトウェア開発といった業務機能の中から特定し、AIの能力を個別のビジネス成果に結び付けて測れる形にする必要があります。\n\n他の選択肢が誤りである理由：\n\n社内で最も導入しやすい業務を対象に選び、担当者の利用状況の広がりで効果を測る\n\n導入のしやすさで業務を選び、利用状況の広がりという採用率を効果指標としており、AIの能力を個別のビジネス成果に結び付ける要件を満たさないため不正解です。\n\n顧客業務の問い合わせ一次対応を対象に選び、モデルの回答精度の推移で効果を測る\n\n対象業務は正解と同じですが、効果測定にモデルの回答精度という技術指標を用いており、経営層に報告すべきビジネス成果に結び付いていないため不正解です。\n\n全社のすべての業務を対象に導入計画を作り、専任組織とデータ環境へ先行投資する\n\n最初に取り組むユースケースを1つ選ぶという要件に反し、全社一括で専任組織とデータ環境へ先行投資する対応は過剰であるため不正解です。",
       "references": [
         {
-          "title": "AWS Certified AI Business Strategist (AIB-C01) 試験ガイド: コンテンツ分野 2",
+          "title": "コンテンツ分野 2: AI 戦略とビジネス価値の創造 - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.html"
         },
         {
+          "title": "Content Domain 2: AI Strategy and Business Value Creation - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.html"
         }
       ]
@@ -938,17 +961,19 @@
       "explanation": "この問題は、複数のAI活用候補から限られた予算と期間で最初に着手する1件を選ぶ場面で、優先順位付けの判断軸をどう適用するかを問うものです。\n\nAIイニシアチブの優先順位付けは、ビジネス価値、実現可能性、持続可能性、戦略的連携という4つの軸で行う必要があり、見込まれるビジネス価値だけでなく、必要なデータの整備状況から判断できる実現可能性も同時に満たす候補を選ぶことが、この段階での適切な判断になるため、選択肢Cが要件を満たします。\n\n前提知識\n\nAIイニシアチブの優先順位付けの4つの軸\n\nAIイニシアチブへの優先順位付けは、ビジネス価値、実現可能性、持続可能性、戦略的連携の4つの軸に基づいて行います。着手前の候補を絞る場面では、ビジネス価値の大きさだけでなく実現可能性も同時に確認する必要があり、実現可能性の判断材料の一つが自社の既存のデータ環境とデータ品質の評価です。\n\n他の選択肢が誤りである理由：\n\n見込まれるビジネス価値が最も大きい候補を選び、実現可能性の確認は着手後に行う\n\nビジネス価値の軸だけで候補を選び、実現可能性の確認を着手後に回しており、価値と実現可能性を同時に見るという要件の一部しか満たしていないため不正解です。\n\n基盤モデルの提供側が品質を担保するため、自社データの整備状況は評価せずに着手する\n\n自社データの整備状況の評価は自社が担う責任であり、基盤モデル提供側の品質保証がこれに代わるわけではないため不正解です。\n\n4件すべてを同時に小規模で試行し、実績が出そろってから優先順位を判断する\n\n技術的には試行可能ですが、限られた予算と短い期間で最初の1件を選ぶという制約に反しており最適ではないため不正解です。",
       "references": [
         {
-          "title": "AWS Certified AI Business Strategist (AIB-C01) 試験ガイド: コンテンツ分野 2",
+          "title": "コンテンツ分野 2: AI 戦略とビジネス価値の創造 - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.html"
         },
         {
-          "title": "生成 AI の導入ジャーニー (AWS 規範ガイダンス)",
+          "title": "データ戦略 - AWS 規範ガイダンス",
           "url": "https://docs.aws.amazon.com/ja_jp/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/journey.html"
         },
         {
+          "title": "Content Domain 2: AI Strategy and Business Value Creation - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.html"
         },
         {
+          "title": "Data strategy - AWS Prescriptive Guidance",
           "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/journey.html"
         }
       ]
@@ -986,11 +1011,11 @@
       "explanation": "この問題は、発生件数が少なく判定根拠の説明も必須とされる審査業務にAIを適用すべきかどうかを、事業部門の責任者がどう判断するかを問うものです。\n\nすべての課題に機械学習が必要なわけではなく、単純な代替策の方が効果的で低コストな場合があり、既存のルールベースの解があればまずベースラインとして評価したうえで、データ準備やラベリング、保守を含めた総コストを踏まえて機械学習の要否を判断する必要があるため、選択肢Dが要件を満たします。\n\n前提知識\n\n機械学習の要否判断とベースライン評価\n\nすべての課題に機械学習が必要なわけではなく、単純な代替策の方が効果的で低コストな場合があります。既存の判定手順のような解があれば、まずそれをベースラインとして評価し、機械学習を導入する場合の総コストを踏まえて要否を判断します。\n\n他の選択肢が誤りである理由：\n\n蓄積された数十件の事例を学習させたモデルを構築し、判定結果に担当者の確認を加える\n\n数十件という限られた事例で機械学習モデルを構築しており、担当者の確認を加えても既存手順をベースラインとして評価する手順を欠いているため不正解です。\n\nまず機械学習で自動化し、精度が不足した場合は再学習を繰り返して改善する\n\n単純な代替策を評価せずに機械学習に飛びついており、再学習はデータ準備や保守のコストを過小評価した誤った改善策であるため不正解です。\n\n判定の根拠を提示する仕組みを整えたうえで、機械学習による自動化をそのまま進める\n\n判定根拠を説明できる仕組みは整えていますが、既存の判定手順をベースラインとして評価する手順を欠いたまま自動化を進めているため不正解です。",
       "references": [
         {
-          "title": "AWS Certified AI Business Strategist (AIB-C01) 試験ガイド: コンテンツ分野 2",
+          "title": "コンテンツ分野 2: AI 戦略とビジネス価値の創造 - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.html"
         },
         {
-          "title": "MLCOST02-BP01: Identify if machine learning is the right solution",
+          "title": "MLCOST02-BP01 Identify if machine learning is the right solution - Machine Learning Lens",
           "url": "https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/mlcost02-bp01.html"
         }
       ]
@@ -1028,10 +1053,11 @@
       "explanation": "この問題は、生成 AI 導入の効果を費用と作業時間の両方で説明するために、導入前に最初に取り組むべきことを問うものです。\n\nベースラインメトリクスは AI ソリューションを実装する前に確立しておくことで、導入後の効果を正確に測定できるようになります。現在手作業に要している時間と費用を導入前に測定し記録することが、経営層が求める比較の基準を作る最初の一歩です。\n\n前提知識\n\nベースラインメトリクス\n\nAI ソリューションを導入する前に測定しておく基準値のことで、導入後の実績と比較することで AI の導入効果を正確に把握できるようにするものです。\n\n他の選択肢が誤りである理由：\n\n先に本番導入し、稼働後に集計した実績値をベースラインメトリクスとして設定する\n\nベースラインは導入前に確立する必要があり、導入後の実績値を基準として代用するのは順序が逆であるため誤りです。\n\n現在の手作業に要している費用だけを集計し、作業時間は導入後に測定する\n\n費用と作業時間の両方を導入前に測定する必要があり、作業時間の測定を導入後に持ち越すのは要件を満たさないため誤りです。\n\n同種の業務の一般的な所要時間の目安を外部の指標から引用し、自社の基準値として採用する\n\n外部の一般的な目安は自社の実際の作業実態を反映せず、自社の現状を測定したベースラインの代わりにはならないため誤りです。",
       "references": [
         {
-          "title": "AWS Certified AI Business Strategist 試験ガイド コンテンツ分野 2: AI 戦略とビジネス価値の創造",
+          "title": "コンテンツ分野 2: AI 戦略とビジネス価値の創造 - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.html"
         },
         {
+          "title": "Content Domain 2: AI Strategy and Business Value Creation - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.html"
         }
       ]
@@ -1069,17 +1095,19 @@
       "explanation": "この問題は、AI 施策の効果を測る KPI を、金額換算できる指標だけでなく現場の声も踏まえて再定義する際に、どのようなアプローチが適切かを問うものです。\n\nAI イニシアチブの KPI は、コスト削減や収益増加といった目に見える利益と、顧客満足度や従業員の生産性といった目に見えない利益の両方を含めて定義する必要があります。校正担当者の負担軽減や著者への回答の迅速化は目に見えない利益にあたるため、これらを外注費削減額と並ぶ KPI に加えることが要件を満たします。\n\n前提知識\n\n目に見える利益と目に見えない利益\n\nコスト削減や収益増加のように金額で表せる目に見える利益と、顧客満足度や従業員の生産性のように金額では表しにくい目に見えない利益の両方を、AI イニシアチブの KPI として定義することが求められます。\n\n他の選択肢が誤りである理由：\n\n外注費の削減額のように、金額で表せる目に見える利益だけを KPI として定義する\n\n目に見えない利益である従業員の生産性や著者の満足度を反映しておらず、現場から上がっている声を指標に取り込めないため誤りです。\n\n会社全体の営業利益率を KPI として設定し、編集部門の施策単位の指標は設けない\n\n施策単位の KPI より粗い全社指標に置き換えており、この施策固有の目に見える利益と目に見えない利益を測ることができないため誤りです。\n\n次年度末の全社業績レビューまで待ち、その場で施策の効果をまとめて評価する\n\nKPI の定義自体を見直しておらず、評価のタイミングを先送りするだけで目に見えない利益を指標に含める要件を満たさないため誤りです。",
       "references": [
         {
-          "title": "AWS Certified AI Business Strategist 試験ガイド コンテンツ分野 2: AI 戦略とビジネス価値の創造",
+          "title": "コンテンツ分野 2: AI 戦略とビジネス価値の創造 - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.html"
         },
         {
-          "title": "AWS クラウド導入フレームワークの概要 ビジネスパースペクティブ",
+          "title": "ビジネスのパースペクティブ: 戦略と成果 - AWS クラウド導入フレームワークの概要",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/overview-aws-cloud-adoption-framework/business-perspective.html"
         },
         {
+          "title": "Content Domain 2: AI Strategy and Business Value Creation - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.html"
         },
         {
+          "title": "Business perspective: strategy and outcomes - An Overview of the AWS Cloud Adoption Framework",
           "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/business-perspective.html"
         }
       ]
@@ -1125,9 +1153,11 @@
           "url": "https://docs.aws.amazon.com/ja_jp/bedrock/latest/userguide/prov-throughput.html"
         },
         {
+          "title": "Amazon Bedrock Pricing",
           "url": "https://aws.amazon.com/bedrock/pricing/"
         },
         {
+          "title": "Increase model invocation capacity with Provisioned Throughput in Amazon Bedrock - Amazon Bedrock",
           "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/prov-throughput.html"
         }
       ]
@@ -1165,10 +1195,11 @@
       "explanation": "この問題は、AI プロジェクトの成功を、コスト削減額が確定する前に、試験運用の段階で予測するためのアプローチを問うものです。\n\nAI プロジェクトの成功を予測する先行指標は、プロジェクトの実行中に観測できる予兆であり、年度末に確定するコスト削減額のような結果指標とは区別されます。試験運用中に観測できる提案の採用率や店舗の利用継続率を先行指標として特定することで、全店舗展開前に成功の見込みを判断する材料が得られます。\n\n前提知識\n\n先行指標\n\nAI プロジェクトの成功を予測する、プロジェクトの実行中に観測できる予兆のことで、コスト削減額や ROI のように事後に確定する結果指標とは区別されます。\n\n他の選択肢が誤りである理由：\n\n年度末に確定する食材廃棄コストの削減額を先行指標として定め、確定後に成否を判断する\n\n削減額は事後に確定する結果指標であり、プロジェクト実行中に観測できる予兆という先行指標の定義と逆転しているため誤りです。\n\n試験運用中のシステムの稼働率と応答時間を監視し、技術面の安定性だけで成否を判断する\n\n技術面の安定性だけを見ており、提案の採用率や利用継続率のようなビジネス成果の予兆を含まないため誤りです。\n\n全店舗に展開した後に包括的なフレームワークで ROI を算出し、その結果で継続を判断する\n\nROI の算出自体は有効な手法ですが、全店舗に展開する前に判断材料を求めるという要件に反するため誤りです。",
       "references": [
         {
-          "title": "AWS Certified AI Business Strategist 試験ガイド コンテンツ分野 2: AI 戦略とビジネス価値の創造",
+          "title": "コンテンツ分野 2: AI 戦略とビジネス価値の創造 - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.html"
         },
         {
+          "title": "Content Domain 2: AI Strategy and Business Value Creation - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.html"
         }
       ]
@@ -1210,6 +1241,7 @@
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/overview-aws-cloud-adoption-framework/accelerating-business-outcomes.html"
         },
         {
+          "title": "Accelerating business outcomes with cloud powered digital transformation - An Overview of the AWS Cloud Adoption Framework",
           "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/accelerating-business-outcomes.html"
         }
       ]
@@ -1255,9 +1287,11 @@
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/overview-aws-cloud-adoption-framework/introduction.html"
         },
         {
+          "title": "Business perspective: strategy and outcomes - An Overview of the AWS Cloud Adoption Framework",
           "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/business-perspective.html"
         },
         {
+          "title": "Introduction - An Overview of the AWS Cloud Adoption Framework",
           "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/introduction.html"
         }
       ]
@@ -1295,7 +1329,7 @@
       "explanation": "この問題は、施工管理への AI 活用が業界で広がりつつある一方、自社の取り組みが試験的な段階にとどまる建設会社が、限られた予算の中で次年度の AI 投資水準をどう判断するかを問うものです。\n\n業界での AI 活用の広がりと競合の動きを評価し、それに見合う水準で優先領域へ予算を配分する対応は、適切な AI 投資レベルを業界の成熟度と競争のダイナミクスに基づいて決定するという要件を満たします。\n\n前提知識\n\n業界の成熟度に基づく投資レベルの決定\n\n適切な AI 投資レベルは、業界の成熟度と競争のダイナミクスに基づいて決定する。業界の状況を評価せずに投資規模を一律に決めることは、この判断軸から外れる。\n\n他の選択肢が誤りである理由：\n\n業界の状況にかかわらず最大規模の予算を確保し、全業務領域へ同時に AI を展開する\n\n業界の成熟度を評価せずに一律で最大投資を決めており、業界の成熟度と競争のダイナミクスに基づく判断という要件を満たさないため不正解。\n\n同業他社が公表している導入事例と同じ投資額を、自社の投資水準としてそのまま採用する\n\n自社が試験的な段階にとどまるという状況を評価せず他社の公表額をそのまま流用するだけであり、限られた予算を優先領域へ配分するという要件を満たさないため不正解。\n\n業界で AI の活用方法が定着するまで投資を見送り、標準的なやり方が固まってから着手する\n\n特定の競争優位を維持し続けることが難しくより短い期間での改革が迫られている状況のもとで投資を見送ることは適切でないため不正解。",
       "references": [
         {
-          "title": "コンテンツ分野 2: AI 戦略とビジネス価値の創造 - AWS Certified AI Business Strategist (AIB-C01) 試験ガイド",
+          "title": "コンテンツ分野 2: AI 戦略とビジネス価値の創造 - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.html"
         },
         {
@@ -1303,9 +1337,11 @@
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/overview-aws-cloud-adoption-framework/introduction.html"
         },
         {
+          "title": "Content Domain 2: AI Strategy and Business Value Creation - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.html"
         },
         {
+          "title": "Introduction - An Overview of the AWS Cloud Adoption Framework",
           "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/introduction.html"
         }
       ]
@@ -1351,9 +1387,11 @@
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/overview-aws-cloud-adoption-framework/introduction.html"
         },
         {
+          "title": "Accelerating business outcomes with cloud powered digital transformation - An Overview of the AWS Cloud Adoption Framework",
           "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/accelerating-business-outcomes.html"
         },
         {
+          "title": "Introduction - An Overview of the AWS Cloud Adoption Framework",
           "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/introduction.html"
         }
       ]
@@ -1391,14 +1429,15 @@
       "explanation": "この問題は、生成 AI による応募者の書類選考支援を全社展開する前に、責任ある AI の原則、とりわけ公平さをどう扱うかを問うものです。採用シーズンに間に合わせたい事業部門の要望と、展開前に原則を損なわない判断を求める経営層の要求を、同時に満たす対応が求められています。\n\n正解は、対象を一部の職種に限定して展開し、グループ間の影響評価と人による最終確認は維持するBです。公平さは、さまざまなステークホルダーのグループへの影響を考慮することと定義され、この評価と確認という保護手段は納期というビジネス目標と衝突しても外してはなりません。展開範囲を職種単位に絞ることで、保護手段を維持したままトレードオフのバランスを取れます。\n\n前提知識\n\n公平さとプライバシーとセキュリティ\n\n公平さは、さまざまなステークホルダーのグループへの影響を考慮することと定義されるディメンションです。データとモデルを適切に取得・使用・保護するプライバシーとセキュリティとは異なる観点であり、個人データの取り扱いの整備だけでは公平さの評価を代替できません。\n\n他の選択肢が誤りである理由：\n\n採用シーズンに間に合わせるため、グループ間の影響評価と人による最終確認を外して全社に展開する\n\n納期を優先して評価と確認という保護手段自体を外しており、責任ある AI の原則を損なうため誤りです。\n\n応募者の個人データの取り扱い手順だけを整備し、グループ間の影響評価は行わずに全社に展開する\n\n個人データの取り扱い手順の整備はプライバシーとセキュリティの観点にとどまり、公平さに関するグループ間の影響評価を欠くため要件を満たしません。\n\n予定どおり全職種へ展開し、応募者から申し立てがあった時点でグループ間の影響評価を実施する\n\n展開前に済ませるべき評価を事後の申し立て対応に置き換えており、「全社に展開する前に」という前提を満たしません。",
       "references": [
         {
-          "title": "責任ある AI - AI を責任を持って構築する - AWS",
+          "title": "責任ある AI – AWS で責任をもって AI を構築する – AWS",
           "url": "https://aws.amazon.com/jp/ai/responsible-ai/"
         },
         {
-          "title": "第 3 分野: AI ガバナンスと責任ある AI リーダーシップ - AWS 認定 AI ビジネスストラテジスト",
+          "title": "コンテンツ分野 3: AI ガバナンスと責任ある AI リーダーシップ - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain3.html"
         },
         {
+          "title": "Responsible AI – Building AI Responsibly – AWS",
           "url": "https://aws.amazon.com/ai/responsible-ai/"
         }
       ]
@@ -1445,10 +1484,11 @@
           "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/design-principles.html"
         },
         {
-          "title": "責任ある AI - AI を責任を持って構築する - AWS",
+          "title": "責任ある AI – AWS で責任をもって AI を構築する – AWS",
           "url": "https://aws.amazon.com/jp/ai/responsible-ai/"
         },
         {
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         }
       ]
@@ -1486,10 +1526,11 @@
       "explanation": "この問題は、AI の判定誤りが起きた際に誰が是正を判断し、どこへ報告するかが定まっていない状況で、全社展開前にどのような AI ガバナンス構造を確立すべきかを問うものです。\n\n正解は、経営層と事業、データ、リスク各部門の代表で構成する会議体を設け、報告経路と責任者を定めるBです。AI ガバナンス構造は、最高トランスフォーメーション責任者や CIO、CTO、CFO、CDO、CRO など部門横断のステークホルダーによる代表構成と、問題を適時にシニアリーダーシップへエスカレーションして説明責任と透明性を高める経路の両方で成り立ちます。会議体で報告経路と責任者を明確にすることで、誤りが見つかった際の対応の遅れという課題に対処できます。\n\n前提知識\n\n部門横断の代表構成とエスカレーション経路\n\nAI ガバナンス構造は、単一の部署や役割だけでなく、経営層を含む複数部門の代表で構成され、問題が発生した際にシニアリーダーシップへ適時に報告する経路を備えることで、説明責任と透明性を確保します。\n\n他の選択肢が誤りである理由：\n\nAI のリスク管理を担当する部署を 1 つ指名し、リスク一覧の作成と定期的な更新を任せる\n\nリスク管理という 1 つの機能だけを単一部署に委ねており、部門横断の代表構成や報告経路の明確化が欠けるため誤りです。\n\nすべての AI の判定結果について、経営会議による事前承認を毎回必須とする運用に変更する\n\nすべての判定結果への事前承認を毎回課すのは過剰な運用であり、報告経路と責任者を定める体制の構築そのものにはならないため誤りです。\n\n問題が報告された時点で関係部門を招集し、その都度対応方針と担当者を決める運用にする\n\n問題発生の都度関係部門を招集する場当たり的な対応であり、あらかじめ報告経路と責任者を定めた恒常的な体制にはならないため誤りです。",
       "references": [
         {
-          "title": "ガバナンスのパースペクティブ: リスクの管理と最大化 - AWS クラウド導入フレームワークの概要",
+          "title": "ガバナンスのパースペクティブ: 統制と監視 - AWS クラウド導入フレームワークの概要",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/overview-aws-cloud-adoption-framework/governance-perspective.html"
         },
         {
+          "title": "Governance perspective: control and oversight - An Overview of the AWS Cloud Adoption Framework",
           "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/governance-perspective.html"
         }
       ]
@@ -1535,9 +1576,11 @@
           "url": "https://aws.amazon.com/jp/compliance/shared-responsibility-model/"
         },
         {
+          "title": "Security perspective: compliance and assurance - An Overview of the AWS Cloud Adoption Framework",
           "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/security-perspective.html"
         },
         {
+          "title": "Shared Responsibility Model - Amazon Web Services (AWS)",
           "url": "https://aws.amazon.com/compliance/shared-responsibility-model/"
         }
       ]
@@ -1579,10 +1622,11 @@
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/overview-aws-cloud-adoption-framework/security-perspective.html"
         },
         {
-          "title": "ISO/IEC 42001 FAQs - Amazon Web Services",
+          "title": "ISO 42001 Artificial Intelligence Management System - Amazon Web Services (AWS)",
           "url": "https://aws.amazon.com/compliance/iso-42001-faqs/"
         },
         {
+          "title": "Security perspective: compliance and assurance - An Overview of the AWS Cloud Adoption Framework",
           "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/security-perspective.html"
         }
       ]
@@ -1620,7 +1664,7 @@
       "explanation": "この問題は、複数の AI ユースケースが同時に立ち上がる中、限られた体制と予算でどのユースケースから統制を適用すべきかを問うものです。\n\n正解は、各ユースケースを事業と利用者への潜在的な影響の大きさで分類し、高いものから統制を適用するBです。AI ユースケースは、ベストプラクティスを考慮しなかった場合に事業やプロジェクトが受ける潜在的なリスクの大きさに応じて分類され、リスクの高いものから優先して統制を適用します。\n\n前提知識\n\nAI ユースケースのリスク分類による優先順位付け\n\nリスクの重大性は、影響を受けるステークホルダーへの負の影響の大きさと、その回復可能性で判断します。リスクレベルは発生可能性と重大性を組み合わせて決め、統制はリスクレベルの高いものから優先して適用します。\n\n他の選択肢が誤りである理由：\n\nすべての AI ユースケースに同じ深さの審査を課し、審査を終えたものから順に稼働を認める\n\n深さを分けず一律に審査しており、影響の大きさによる分類に基づく優先順位付けになっていないため誤りです。\n\n担当部門にリスクの自己申告を求め、申告が上がったユースケースだけを審査の対象にする\n\n自己申告に依存するだけで、すべてのユースケースを影響の大きさで分類する仕組みになっていないため誤りです。\n\n稼働を始めやすい小規模なユースケースから審査し、影響の大きいものは運用が安定してから扱う\n\n着手しやすさを優先しており、影響の大きさによる優先順位付けに反するため誤りです。",
       "references": [
         {
-          "title": "Responsible AI Lens - AWS Well-Architected Framework",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
@@ -1670,6 +1714,7 @@
           "url": "https://docs.aws.amazon.com/ja_jp/sagemaker/latest/dg/clarify-detect-data-bias.html"
         },
         {
+          "title": "Pre-training Data Bias - Amazon SageMaker AI",
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/clarify-detect-data-bias.html"
         }
       ]
@@ -1707,10 +1752,11 @@
       "explanation": "この問題は、生成 AI アシスタントが挑発的な質問に侮辱的な表現で応答した事例を受けて、全国展開前にヘイト・侮辱・暴力といった有害な表現を入力・出力の両方で防ぐための対応を問うものです。\n\n正解がCである理由は、この要件を満たす保護手段が、ヘイト・侮辱・性的・暴力・不正行為・プロンプト攻撃という事前定義された有害コンテンツのカテゴリに基づき、ユーザー入力とモデルレスポンスの双方から有害な表現を検出してフィルタリングする仕組みだからです。これにより「入力にも出力にも現れないようにする」という要求を、事前定義されたカテゴリの範囲で包括的に満たせます。\n\n前提知識\n\nコンテンツフィルター\n\n事前定義された有害コンテンツのカテゴリ（ヘイト、侮辱、性的、暴力、不正行為、プロンプト攻撃）の検出に基づき、入力プロンプトとモデルレスポンスの両方から有害なテキスト・画像コンテンツを検出してフィルタリングする保護手段です。\n\n他の選択肢が誤りである理由：\n\n有害な表現を含まない教材データだけでモデルを再トレーニングし、フィルタリングの設定は行わない\n\n再トレーニングだけでは新たな挑発的な入力に対する応答を事前に防ぐフィルタリングの仕組みを欠き、要件を満たしません。\n\nユーザー入力とレスポンスに含まれる個人を特定できる情報をマスクする機密情報フィルターを設定する\n\n機密情報フィルターが保護する対象は個人を特定できる情報などの機密情報であり、ヘイトや侮辱といった有害な表現の抑止には対応しません。\n\nアシスタントの回答をすべて担当者が目視で確認してから受講者に返す運用に切り替える\n\n全国展開の規模では運用が成立しにくく、また入力側で有害な表現を事前に防ぐ仕組みにもならないため、要件を満たしません。",
       "references": [
         {
-          "title": "Amazon Bedrock のガードレール",
+          "title": "Amazon Bedrock ガードレールを使用して有害なコンテンツを検出してフィルタリングする - Amazon Bedrock",
           "url": "https://docs.aws.amazon.com/ja_jp/bedrock/latest/userguide/guardrails.html"
         },
         {
+          "title": "Detect and filter harmful content by using Amazon Bedrock Guardrails - Amazon Bedrock",
           "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/guardrails.html"
         }
       ]
@@ -1753,10 +1799,11 @@
       "explanation": "この問題は、電力会社が需要予測への生成 AI 活用を本番稼働へ移す際、予測のずれがモデル側とデータ側どちらの変化に起因するかを特定できる状態を、本番稼働前にどう整えるかを問うものです。\n\n正解がDとEである理由は、生成 AI 導入のLaunch（起動）段階では、パフォーマンス、モデルの動作、データ品質を追跡する堅牢なモニタリングフレームワークを確立することが求められるためです（D）。同時に、同じ段階の運用領域では、データの系統・出所・品質メトリクスを追跡してギャップを特定するデータオブザーバビリティの実践を確立することも求められます（E）。Dはモデル側とデータ側を横断して検知する仕組み、Eはデータ側の原因をより深く追跡する仕組みであり、両方を本番稼働前に備えることで原因の特定が可能になります。\n\n前提知識\n\nモニタリングフレームワークとデータオブザーバビリティ\n\nモニタリングフレームワークはパフォーマンス・モデルの動作・データ品質を横断的に追跡する仕組みで、データオブザーバビリティはデータの系統・出所・品質メトリクスを追跡してギャップを特定する実践です。いずれも本番稼働の開始前に確立すべき事項とされています。\n\n他の選択肢が誤りである理由：\n\n予測精度の指標だけをダッシュボードで追跡し、データ側の追跡は対象から外す\n\nパフォーマンス・モデルの動作・データ品質を追跡するという要件のうち、データ側の追跡を欠いており要件を満たしません。\n\nモニタリングの仕組みは、本番稼働で一定期間の実績が集まってから設計に着手する\n\n本番稼働の開始前にモニタリングフレームワークを確立するという順序に反しており、この段階の判断としては誤りです。\n\n予測がずれた場合は最新のデータでモデルを再トレーニングすることとし、追跡の仕組みは設けない\n\n再トレーニングは原因を特定した後の是正手段の1つであり、モデル側とデータ側を区別して追跡する仕組みの代わりにはなりません。",
       "references": [
         {
-          "title": "生成 AI 導入ジャーニー（AWS 規範ガイダンス: 生成 AI のデータに関する考慮事項）",
+          "title": "データ戦略 - AWS 規範ガイダンス",
           "url": "https://docs.aws.amazon.com/ja_jp/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/journey.html"
         },
         {
+          "title": "Data strategy - AWS Prescriptive Guidance",
           "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/journey.html"
         }
       ]
@@ -1832,7 +1879,7 @@
       "explanation": "この問題は、生成AIを全社展開する前に技術インフラの点検だけで準備完了と判断してよいかを問うものです。\n\n技術インフラストラクチャの点検結果は、AIを導入するためのビジネス準備状況を評価する際の一部にすぎません。リーダーシップの連携、データ品質、文化的な準備、技術インフラストラクチャ、ガバナンスフレームワークという重要な複数のディメンション全体で準備状況を評価する必要があり、経営層の合意形成や従業員の受け止め方（文化的な準備）が未確認のままでは全社展開の判断はできません。\n\n前提知識\n\nビジネス準備状況の評価\n\nAIを導入するための準備状況は、リーダーシップの連携、データ品質、文化的な準備、技術インフラストラクチャ、ガバナンスフレームワークという重要なディメンション全体で評価する必要がある。単一のディメンションの点検だけでは不十分。\n\n他の選択肢が誤りである理由：\n\n技術インフラストラクチャの点検結果をもって準備完了と判断し残りの確認は展開後に行う\n\n技術インフラの点検だけでは、リーダーシップの連携や文化的な準備など他のディメンションの確認が欠けており、準備状況の評価として不十分なため不正解。\n\n全従業員向けの生成AI研修を先に完了させその受講率を準備状況の指標として扱う\n\n研修受講率は文化的な準備状況などの一部を代替する指標にすぎず、リーダーシップの連携やガバナンスフレームワークの確認を含んでいないため不正解。\n\n全部門に専任のAI組織を設置し全業務を対象とする導入計画を先に承認する\n\n準備状況の評価を経ずに組織体制と全社的な導入計画を先に確定させる対応であり、要件である複数ディメンションでの評価を満たさないため不正解。",
       "references": [
         {
-          "title": "ドメイン 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         },
         {
@@ -1840,6 +1887,7 @@
           "url": "https://docs.aws.amazon.com/ja_jp/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html"
         },
         {
+          "title": "Content Domain 4: Business Readiness, Leadership, and AI Transformation - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -1885,6 +1933,7 @@
           "url": "https://docs.aws.amazon.com/ja_jp/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/introduction.html"
         },
         {
+          "title": "Levels in the generative AI maturity model - AWS Prescriptive Guidance",
           "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html"
         }
       ]
@@ -1922,10 +1971,11 @@
       "explanation": "この問題は、AI予測モデルの精度も稼働環境も問題ないにもかかわらず現場で使われていない状況から、どの能力ギャップに該当するかを問うものです。\n\nAIトランスフォーメーションの成功を妨げる能力ギャップは、人、プロセス、テクノロジー、ガバナンスという観点で分類して特定する。本ケースでは予測の有効性と環境の安定稼働は確認済みであり、問題は既存の発注業務の手順に予測結果を組み込む仕組みがないことにある。これはプロセスの能力ギャップに該当し、発注業務の手順を予測結果を組み込む形に改訂することが要件を満たす対応となる。\n\n前提知識\n\n能力ギャップの4分類\n\nAIトランスフォーメーションの成功を妨げている具体的な能力ギャップは、人、プロセス、テクノロジー、ガバナンスという観点で分類して特定する。既存の業務手順に成果物が組み込まれていない状態はプロセスの能力ギャップにあたる。\n\n他の選択肢が誤りである理由：\n\nテクノロジーの能力ギャップと特定し予測モデルを動かす環境の処理能力を増強する\n\n環境は安定して稼働していると明記されており、処理能力の不足を示す事実がないため不正解。\n\n人の能力ギャップと特定し店舗の担当者向けに操作方法の研修だけを実施する\n\n担当者が操作方法を理解できないという記述はなく、問題の原因は発注手順そのものに予測結果が組み込まれていないことにあるため不正解。\n\nガバナンスの能力ギャップと特定し予測結果の利用状況を毎月監査して報告する\n\n利用状況を監査するだけでは発注手順に予測結果が組み込まれていない状態は変わらず、根本原因への対応にならないため不正解。",
       "references": [
         {
-          "title": "ドメイン 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         },
         {
+          "title": "Content Domain 4: Business Readiness, Leadership, and AI Transformation - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -1971,6 +2021,7 @@
           "url": "https://docs.aws.amazon.com/ja_jp/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html"
         },
         {
+          "title": "Maturity model for adopting generative AI on AWS - AWS Prescriptive Guidance",
           "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/introduction.html"
         }
       ]
@@ -2012,6 +2063,7 @@
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/overview-aws-cloud-adoption-framework/people-perspective.html"
         },
         {
+          "title": "People perspective: culture and change - An Overview of the AWS Cloud Adoption Framework",
           "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/people-perspective.html"
         }
       ]
@@ -2053,6 +2105,7 @@
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/overview-aws-cloud-adoption-framework/people-perspective.html"
         },
         {
+          "title": "People perspective: culture and change - An Overview of the AWS Cloud Adoption Framework",
           "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/people-perspective.html"
         }
       ]
@@ -2090,7 +2143,7 @@
       "explanation": "この問題は、点検記録を判定する AI を全社展開する前に、手作業で確認してきた担当者の職務をどう位置付けるべきかを問うものです。\n\n正解の理由は、AWS 認定 AI ビジネスストラテジスト試験ガイドのスキル 4.3.6 が、人の職務を手動のオペレーションから人による監督や AI システムとの協働へ移行する機会を特定し、人の強み（批判的思考、共感、創造性など）と AI の能力のバランスを取る意思決定を求めている点にあります。選択肢 B はこの移行に対応し、AWS CAF の人員パースペクティブ「ワークフォースのトランスフォーメーション」が挙げる、育成を伴う役割のモダナイズとも一致するため最も適切です。\n\n前提知識\n\nワークフォースのトランスフォーメーション\n\nAWS CAF の人員パースペクティブの能力で、人材を育成し役割をモダナイズして、重要な能力を自律的に高められるワークフォースを育成・維持することを基準とする。\n\n他の選択肢が誤りである理由：\n\nAI の操作手順書を整備し、担当者に新しい画面の操作研修を実施する\n\n操作手順書と画面操作の研修だけでは、担当者の役割の見直しを伴わないため不正解。\n\n点検記録の判定をすべて AI に任せ、担当者は他の部門へ配置転換する\n\n判定を AI に委ね担当者を配置転換することは、人による監督や AI との協働という移行の方向と矛盾するため不正解。\n\n内部および外部の顧客のニーズに応える製品チームを新設し、役割の見直しをそのチームに委ねる\n\nこの部門横断チームはビジネスパースペクティブの「製品管理」に基づく施策であり、担当者の役割の見直しには対応しないため不正解。",
       "references": [
         {
-          "title": "第 4 分野: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション（AWS Certified AI Business Strategist 試験ガイド）",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         },
         {
@@ -2098,13 +2151,15 @@
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/overview-aws-cloud-adoption-framework/people-perspective.html"
         },
         {
-          "title": "ビジネスのパースペクティブ - AWS クラウド導入フレームワークの概要",
+          "title": "ビジネスのパースペクティブ: 戦略と成果 - AWS クラウド導入フレームワークの概要",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/overview-aws-cloud-adoption-framework/business-perspective.html"
         },
         {
+          "title": "Content Domain 4: Business Readiness, Leadership, and AI Transformation - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         },
         {
+          "title": "People perspective: culture and change - An Overview of the AWS Cloud Adoption Framework",
           "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/people-perspective.html"
         }
       ]
@@ -2146,10 +2201,11 @@
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/overview-aws-cloud-adoption-framework/your-cloud-transformation-journey.html"
         },
         {
-          "title": "生成 AI 導入ジャーニー",
+          "title": "データ戦略 - AWS 規範ガイダンス",
           "url": "https://docs.aws.amazon.com/ja_jp/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/journey.html"
         },
         {
+          "title": "Your cloud transformation journey - An Overview of the AWS Cloud Adoption Framework",
           "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/your-cloud-transformation-journey.html"
         }
       ]
@@ -2187,10 +2243,11 @@
       "explanation": "この問題は、規制対象の事業を営む企業が生成 AI アシスタントを実験から本番環境へ移行する前に、運用状況と規制への準拠を監査に説明できるようにするための対応を問うものです。\n\n起動 (Launch) 段階では、実験からフルスケールデプロイへ移行する際に、パフォーマンス・モデル挙動・データ品質を追跡する堅牢なモニタリングフレームワークが確立されます。あわせてガバナンス領域では、規制コンプライアンス・モデルバイアス・責任ある AI のガイドラインに対処し、進化する規制への準拠を検証する継続的な監査を確立することが基準になります。監視とガバナンスの両方を整備する C が、監査への説明責任という要件を満たします。\n\n前提知識\n\n生成 AI 導入ジャーニーの起動 (Launch) 段階\n\n実験からフルスケールデプロイへ移行する段階であり、パフォーマンス・モデル挙動・データ品質を追跡するモニタリングフレームワークの確立と、規制遵守・モデルバイアス・責任ある AI ガイドラインに対応するガバナンスフレームワークの改良、継続的な監査の確立が基準になります。\n\n他の選択肢が誤りである理由：\n\n暗号化とロールベースアクセスコントロールを実装したうえで、実験時の構成のまま本番環境へ移行する\n\nセキュリティ対策の実装だけでは要件の一部しか満たさず、モニタリングフレームワークの確立や規制遵守・モデルバイアスに対応するガバナンスの整備を欠くため不正解です。\n\n実験で使った環境の設定をそのまま複製し、利用部門を段階的に増やしながら課題を集めて対応する\n\nモニタリングとガバナンスの整備を経ずに利用範囲を広げており、監査に運用状況と規制への準拠を説明できる体制にならないため不正解です。\n\n全社での本番利用を先に開始し、蓄積された運用実績をもとに監査とガバナンスの要件を後から定義する\n\n監査とガバナンスの要件定義を本番移行の開始より後回しにしており、起動段階が求める順序と逆であるため不正解です。",
       "references": [
         {
-          "title": "生成 AI 導入ジャーニー",
+          "title": "データ戦略 - AWS 規範ガイダンス",
           "url": "https://docs.aws.amazon.com/ja_jp/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/journey.html"
         },
         {
+          "title": "Data strategy - AWS Prescriptive Guidance",
           "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/journey.html"
         }
       ]
@@ -2228,13 +2285,15 @@
       "explanation": "この問題は、複数の事業部門が独自に AI 活用を進めた結果、取り組みの重複と成果物の品質差が生じている状況で、各部門の取り組みを止めずに全社規模へ展開できる体制をどう整えるかを問うものです。\n\n生成 AI 導入ジャーニーのスケーリング段階では、企業全体の AI リテラシープログラムの開発とあわせて、AI センターオブエクセレンス (COE) を通じて各ビジネス機能に AI 導入を組み込むことが基準になります。部門横断で知見と標準を共有する仕組みを確立する B が、各部門の取り組みを止めずに全社規模の展開体制を整えるという要件を満たします。\n\n前提知識\n\nAI センターオブエクセレンス (COE)\n\n生成 AI 導入ジャーニーのスケーリング段階で確立される、部門横断的に AI 導入を組み込み知見と標準を共有する仕組みです。AWS CAF が定義するクラウドの Cloud Center of Excellence (CCoE) とは別の枠組みです。\n\n他の選択肢が誤りである理由：\n\n各部門の導入事例を一覧にまとめた資料を作成し、四半期ごとに社内へ公開して共有する\n\n事例の共有だけでは知見や標準を統一する仕組みにならず、重複や品質差を解消する体制の確立には至らないため不正解です。\n\n最も成果を出した部門の担当者に、他部門からの相談を受ける窓口を兼任してもらう\n\n個人が窓口を兼任するだけであり、部門横断で知見と標準を共有する恒常的な仕組みとしては不十分なため不正解です。\n\nすべての部門の AI 利用をいったん停止し、全社共通の仕組みが完成してから改めて利用を再開する\n\n各部門の取り組みを止めないという要件に反する過剰な対応であるため不正解です。",
       "references": [
         {
-          "title": "ドメイン 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         },
         {
+          "title": "Data strategy - AWS Prescriptive Guidance",
           "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/journey.html"
         },
         {
+          "title": "Content Domain 4: Business Readiness, Leadership, and AI Transformation - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -2316,7 +2375,7 @@
       "supplement": "定型の処理では、まず既存のサービスで足りるかを見極めるのが定石です。翻訳、文字認識、音声の文字起こしなど、用途を絞ったサービスが多数あります。",
       "references": [
         {
-          "title": "試験に出題される可能性のあるサービス (AIB-C01)",
+          "title": "対象の AWS のサービスと機能 - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-in-scope-services.html"
         },
         {
@@ -2406,7 +2465,7 @@
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-technologies-concepts.html"
         },
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         }
       ]
@@ -2492,7 +2551,7 @@
           "url": "https://aws.amazon.com/jp/bedrock/pricing/"
         },
         {
-          "title": "AWS Cost Explorer の概要",
+          "title": "AWS Cost Explorer を使用してコストと使用状況を分析する - AWS コスト管理",
           "url": "https://docs.aws.amazon.com/ja_jp/cost-management/latest/userguide/ce-what-is.html"
         }
       ]
@@ -2535,7 +2594,7 @@
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-technologies-concepts.html"
         },
         {
-          "title": "試験に出題される可能性のあるサービス (AIB-C01)",
+          "title": "対象の AWS のサービスと機能 - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-in-scope-services.html"
         }
       ]
@@ -2574,7 +2633,7 @@
       "supplement": "ルールは、禁止事項を並べるよりも、してよいことを示す形にすると現場に浸透しやすくなります。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
@@ -2622,11 +2681,11 @@
       "supplement": "移行の判断は、効果、費用、体制の 3 点を並べて行います。いずれかが欠けると、導入後に立ち行かなくなる例が少なくありません。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         }
       ]
@@ -2665,7 +2724,7 @@
       "supplement": "指示文は、業務の目的とあわせて保管すると、後から見たときに何のためのものかが分かります。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -2708,7 +2767,7 @@
       "supplement": "「調べて答える」仕組みと「順に実行する」仕組みは違うものです。要件が手続きの完了まで含む場合は後者を選びます。",
       "references": [
         {
-          "title": "試験に出題される可能性のあるサービス (AIB-C01)",
+          "title": "対象の AWS のサービスと機能 - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-in-scope-services.html"
         },
         {
@@ -2798,7 +2857,7 @@
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-technologies-concepts.html"
         },
         {
-          "title": "試験に出題される可能性のあるサービス (AIB-C01)",
+          "title": "対象の AWS のサービスと機能 - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-in-scope-services.html"
         }
       ]
@@ -2837,7 +2896,7 @@
       "supplement": "外部の内容を取り込む仕組みでは、実行できる操作を最小限にする考え方が基本になります。読み取り専用にとどめるだけでも影響を大きく抑えられます。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
@@ -2927,7 +2986,7 @@
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-technologies-concepts.html"
         },
         {
-          "title": "試験に出題される可能性のあるサービス (AIB-C01)",
+          "title": "対象の AWS のサービスと機能 - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-in-scope-services.html"
         }
       ]
@@ -2966,7 +3025,7 @@
       "supplement": "生成 AI に置き換えるべきでない処理を置き換えると、精度が下がり、検証の負担だけが増えます。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -3009,11 +3068,11 @@
       "supplement": "人の判断を代替する用途では、出力をそのまま結論にせず、判断材料の一つとして扱う設計が基本になります。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
-          "title": "NIST AI Risk Management Framework",
+          "title": "AI Risk Management Framework | NIST",
           "url": "https://www.nist.gov/itl/ai-risk-management-framework"
         }
       ]
@@ -3056,7 +3115,7 @@
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-technologies-concepts.html"
         },
         {
-          "title": "試験に出題される可能性のあるサービス (AIB-C01)",
+          "title": "対象の AWS のサービスと機能 - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-in-scope-services.html"
         }
       ]
@@ -3095,7 +3154,7 @@
       "supplement": "データの準備、分析、可視化、共有という一連の流れを 1 つのサービスで扱えるかが、現場での定着を左右します。",
       "references": [
         {
-          "title": "試験に出題される可能性のあるサービス (AIB-C01)",
+          "title": "対象の AWS のサービスと機能 - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-in-scope-services.html"
         },
         {
@@ -3138,7 +3197,7 @@
       "supplement": "モデルを作る場合でも、基盤モデルを出発点として自社データで調整する方法があります。どの程度作り込むかで選ぶ環境が変わります。",
       "references": [
         {
-          "title": "試験に出題される可能性のあるサービス (AIB-C01)",
+          "title": "対象の AWS のサービスと機能 - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-in-scope-services.html"
         },
         {
@@ -3181,7 +3240,7 @@
       "supplement": "モデルを差し替えられる構成にしておくと、費用や性能の条件が変わったときにも対応しやすくなります。",
       "references": [
         {
-          "title": "試験に出題される可能性のあるサービス (AIB-C01)",
+          "title": "対象の AWS のサービスと機能 - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-in-scope-services.html"
         },
         {
@@ -3228,7 +3287,7 @@
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-technologies-concepts.html"
         },
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         }
       ]
@@ -3362,7 +3421,7 @@
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-risk-and-compliance/shared-responsibility-model.html"
         },
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         }
       ]
@@ -3506,7 +3565,7 @@
           "url": "https://aws.amazon.com/jp/bedrock/pricing/"
         },
         {
-          "title": "AWS Cost Explorer の概要",
+          "title": "AWS Cost Explorer を使用してコストと使用状況を分析する - AWS コスト管理",
           "url": "https://docs.aws.amazon.com/ja_jp/cost-management/latest/userguide/ce-what-is.html"
         }
       ]
@@ -3549,7 +3608,7 @@
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-technologies-concepts.html"
         },
         {
-          "title": "試験に出題される可能性のあるサービス (AIB-C01)",
+          "title": "対象の AWS のサービスと機能 - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-in-scope-services.html"
         }
       ]
@@ -3592,7 +3651,7 @@
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-technologies-concepts.html"
         },
         {
-          "title": "試験に出題される可能性のあるサービス (AIB-C01)",
+          "title": "対象の AWS のサービスと機能 - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-in-scope-services.html"
         }
       ]
@@ -3631,7 +3690,7 @@
       "supplement": "見比べる対象を先に決めておくと、確認の工数を見積もれます。すべてを見比べるのではなく、影響の大きい情報に絞るのが現実的です。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
@@ -3674,7 +3733,7 @@
       "supplement": "制約を満たす方式が見つからない場合は、対象の業務を絞る、扱う情報を限定するといった見直しを先に行います。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
@@ -3722,11 +3781,11 @@
       "supplement": "教育は一度行えば終わりではありません。利用が広がるにつれて、実際に起きた事例を共有する場を設けると定着します。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         }
       ]
@@ -3812,7 +3871,7 @@
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-technologies-concepts.html"
         },
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         }
       ]
@@ -3851,7 +3910,7 @@
       "supplement": "候補の整理では、効果の測り方をあわせて決めておきます。測れない効果は、後の投資判断で根拠にできません。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -3894,11 +3953,11 @@
       "supplement": "効果の前提は、楽観と悲観の両方の条件で示します。1 つの数字だけを示すと、判断の根拠として弱くなります。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
-          "title": "AWS Cost Explorer の概要",
+          "title": "AWS Cost Explorer を使用してコストと使用状況を分析する - AWS コスト管理",
           "url": "https://docs.aws.amazon.com/ja_jp/cost-management/latest/userguide/ce-what-is.html"
         }
       ]
@@ -3937,7 +3996,7 @@
       "supplement": "移行の判断は、実験の開始時点で条件を決めておくと進めやすくなります。終了後に担い手を探すと、往々にして見つかりません。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -3980,11 +4039,11 @@
       "supplement": "既存のサービスを比べる場合も、データの扱いと契約の終了時にどうなるかを確認しておくことが重要です。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
-          "title": "AWS Marketplace 買い手ガイド",
+          "title": "とは AWS Marketplace - AWS Marketplace",
           "url": "https://docs.aws.amazon.com/ja_jp/marketplace/latest/buyerguide/what-is-marketplace.html"
         }
       ]
@@ -4023,7 +4082,7 @@
       "supplement": "共通化する範囲は、広げながら見直します。最初から完全な共通化を目指すと、かえって適用が進みません。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -4066,11 +4125,11 @@
       "supplement": "指標は、導入前の状態を測っておかないと比較できません。着手前に現状の数値を記録しておくことが欠かせません。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
-          "title": "AWS Cost Explorer の概要",
+          "title": "AWS Cost Explorer を使用してコストと使用状況を分析する - AWS コスト管理",
           "url": "https://docs.aws.amazon.com/ja_jp/cost-management/latest/userguide/ce-what-is.html"
         }
       ]
@@ -4114,7 +4173,7 @@
       "supplement": "効果が出るまでの期間は、業務の変更を伴うほど長くなります。現場の習熟にかかる時間も見込んでおきます。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -4157,7 +4216,7 @@
       "supplement": "データの整備は、他の用途にも共通して役立ちます。1 つの取り組みのために整えたデータが、別の分析の元になることが多くあります。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -4200,7 +4259,7 @@
       "supplement": "共通化の検討では、機能だけでなく契約の期間と解約の条件も確認します。途中で集約できない契約は、更新の時期に合わせて見直します。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -4243,11 +4302,11 @@
       "supplement": "選定の観点は、検討の初期に文書化しておきます。後から観点を足すと、比較の前提が揃わなくなります。",
       "references": [
         {
-          "title": "AWS Marketplace 買い手ガイド",
+          "title": "とは AWS Marketplace - AWS Marketplace",
           "url": "https://docs.aws.amazon.com/ja_jp/marketplace/latest/buyerguide/what-is-marketplace.html"
         },
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         }
       ]
@@ -4286,7 +4345,7 @@
       "supplement": "判断を求める事項は、選択肢とあわせて示すと決定が早まります。両論併記のまま持ち込むと、判断が先送りされます。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -4334,11 +4393,11 @@
       "supplement": "展開の初期に集めた課題は、後の部門が同じ問題を避けるための材料になります。共有の場を常設しておくと効果的です。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         }
       ]
@@ -4377,7 +4436,7 @@
       "supplement": "教育は、実際の業務に即した題材で行うと定着します。自部門の業務を使った演習が有効です。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -4420,7 +4479,7 @@
       "supplement": "改善の場では、利用量と課題の両方を見ます。利用が伸びていない場合は、仕組みではなく業務の進め方に原因があることが多くあります。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -4463,7 +4522,7 @@
       "supplement": "効果と実現時期を一枚の表に並べるだけで、優先順位の説明が格段に楽になります。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -4549,7 +4608,7 @@
       "supplement": "「どちらの仕事か」で止まらないことが、外部委託でいちばん有効な予防策です。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         }
       ]
@@ -4588,11 +4647,11 @@
       "supplement": "「どこで人が止めるか」を先に決めると、任せる範囲は自然に定まります。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
-          "title": "試験に出題される可能性のあるサービス (AIB-C01)",
+          "title": "対象の AWS のサービスと機能 - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-in-scope-services.html"
         }
       ]
@@ -4631,11 +4690,11 @@
       "supplement": "「答えをもらう」より「判断の枠組みをもらう」ほうが、次に役立ちます。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         }
       ]
@@ -4679,7 +4738,7 @@
       "supplement": "「途中で動く指標」を一つでも置くと、報告の場で改善の話ができます。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -4722,11 +4781,11 @@
       "supplement": "「使ってみて確かめる場」を用意するのが、いちばん早い解決になります。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         }
       ]
@@ -4765,7 +4824,7 @@
       "supplement": "集計の定義は、後から直すほど手戻りが大きくなります。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -4808,7 +4867,7 @@
       "supplement": "「乗り換えできる余地」を残すことが、結果的に価格交渉力にもなります。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -4851,11 +4910,11 @@
       "supplement": "見送った理由こそ、あとでいちばん参照されます。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         }
       ]
@@ -4894,11 +4953,11 @@
       "supplement": "「減った作業」より「増やすべき判断」に目を向けると、役割が定まります。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         }
       ]
@@ -4937,7 +4996,7 @@
       "supplement": "候補を絞るのは最後の工程です。まず広く拾ってから選びます。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         }
       ]
@@ -5023,7 +5082,7 @@
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/cost-optimization-pillar/welcome.html"
         },
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         }
       ]
@@ -5062,7 +5121,7 @@
       "supplement": "「困りごと」を先に伝えると、提案の質が変わります。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         }
       ]
@@ -5101,7 +5160,7 @@
       "supplement": "「何が出たら次に進むか」を先に決めると、試行が収束します。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         }
       ]
@@ -5140,7 +5199,7 @@
       "supplement": "「主たる根拠」と「補足」を分けるだけで、説明の印象が変わります。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -5187,7 +5246,7 @@
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-technologies-concepts.html"
         },
         {
-          "title": "試験に出題される可能性のあるサービス (AIB-C01)",
+          "title": "対象の AWS のサービスと機能 - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-in-scope-services.html"
         }
       ]
@@ -5226,11 +5285,11 @@
       "supplement": "「根拠はどこにあるか」を尋ねると、提案の質がよく分かります。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
-          "title": "AWS Marketplace 買い手ガイド",
+          "title": "とは AWS Marketplace - AWS Marketplace",
           "url": "https://docs.aws.amazon.com/ja_jp/marketplace/latest/buyerguide/what-is-marketplace.html"
         }
       ]
@@ -5274,7 +5333,7 @@
       "supplement": "「共通機能から直す」は、少ない工数で満足度を上げる定石です。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -5317,7 +5376,7 @@
       "supplement": "課題は「事実・影響・対応方針」の三点セットで伝えます。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         }
       ]
@@ -5356,11 +5415,11 @@
       "supplement": "「他の人が同じ結果を出せるか」が、属人化の判定基準です。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         }
       ]
@@ -5399,7 +5458,7 @@
       "supplement": "見直しの判断も、記録に残すと次に活きます。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -5447,7 +5506,7 @@
       "supplement": "「比べる相手」を決めないと、効果は確かめられません。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -5572,7 +5631,7 @@
       "supplement": "「何を成し遂げたいか」を先に言葉にすると、指標は自然に決まります。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -5620,7 +5679,7 @@
       "supplement": "終了条件は「成果の条件」と「制約の条件」の両方を定めます。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -5663,11 +5722,11 @@
       "supplement": "「してよいこと」を先に書くと、現場が止まりません。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
-          "title": "NIST AI Risk Management Framework",
+          "title": "AI Risk Management Framework | NIST",
           "url": "https://www.nist.gov/itl/ai-risk-management-framework"
         }
       ]
@@ -5706,11 +5765,11 @@
       "supplement": "「業務の流れ」に沿って書くと、リスクの抜けが大きく減ります。",
       "references": [
         {
-          "title": "NIST AI Risk Management Framework",
+          "title": "AI Risk Management Framework | NIST",
           "url": "https://www.nist.gov/itl/ai-risk-management-framework"
         },
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         }
       ]
@@ -5749,7 +5808,7 @@
       "supplement": "確認は「対外に出す直前」に置くのが原則です。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         }
       ]
@@ -5788,11 +5847,11 @@
       "supplement": "「入力してよいか」の決まりがなければ、それを定めるのが最初の仕事です。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
-          "title": "NIST AI Risk Management Framework",
+          "title": "AI Risk Management Framework | NIST",
           "url": "https://www.nist.gov/itl/ai-risk-management-framework"
         },
         {
@@ -5835,11 +5894,11 @@
       "supplement": "説明を求められてから記録を探すと、間に合いません。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
-          "title": "NIST AI Risk Management Framework",
+          "title": "AI Risk Management Framework | NIST",
           "url": "https://www.nist.gov/itl/ai-risk-management-framework"
         }
       ]
@@ -5878,11 +5937,11 @@
       "supplement": "偏りは「データ」と「結果」の両方を見て初めて分かります。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
-          "title": "NIST AI Risk Management Framework",
+          "title": "AI Risk Management Framework | NIST",
           "url": "https://www.nist.gov/itl/ai-risk-management-framework"
         }
       ]
@@ -5921,11 +5980,11 @@
       "supplement": "監査対策は「当日の準備」ではなく「日々の記録」です。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
-          "title": "NIST AI Risk Management Framework",
+          "title": "AI Risk Management Framework | NIST",
           "url": "https://www.nist.gov/itl/ai-risk-management-framework"
         }
       ]
@@ -5964,11 +6023,11 @@
       "supplement": "初動の合言葉は「止める・確かめる・伝える」です。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
-          "title": "NIST AI Risk Management Framework",
+          "title": "AI Risk Management Framework | NIST",
           "url": "https://www.nist.gov/itl/ai-risk-management-framework"
         }
       ]
@@ -6007,11 +6066,11 @@
       "supplement": "「全社の方針」と「現場の判断」の間を埋める役割が要ります。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         }
       ]
@@ -6050,11 +6109,11 @@
       "supplement": "研修は「観点」を渡す場です。事例を一つ入れると効果が跳ね上がります。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         }
       ]
@@ -6093,7 +6152,7 @@
       "supplement": "「学習に使われますか」は、最初の打ち合わせで必ず確認したい一句です。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
@@ -6101,7 +6160,7 @@
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-risk-and-compliance/shared-responsibility-model.html"
         },
         {
-          "title": "AWS Marketplace 買い手ガイド",
+          "title": "とは AWS Marketplace - AWS Marketplace",
           "url": "https://docs.aws.amazon.com/ja_jp/marketplace/latest/buyerguide/what-is-marketplace.html"
         }
       ]
@@ -6140,7 +6199,7 @@
       "supplement": "「数値・条件・固有名詞」から確かめると、短時間で異常に気づけます。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
@@ -6183,11 +6242,11 @@
       "supplement": "違反の背景には「ルールが分かりにくい」が隠れていることが多いです。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
-          "title": "NIST AI Risk Management Framework",
+          "title": "AI Risk Management Framework | NIST",
           "url": "https://www.nist.gov/itl/ai-risk-management-framework"
         }
       ]
@@ -6226,11 +6285,11 @@
       "supplement": "対象地域を先に確定させると、確認すべき法令の範囲が定まります。",
       "references": [
         {
-          "title": "NIST AI Risk Management Framework",
+          "title": "AI Risk Management Framework | NIST",
           "url": "https://www.nist.gov/itl/ai-risk-management-framework"
         },
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         }
       ]
@@ -6269,11 +6328,11 @@
       "supplement": "「条件と参照情報」は、仕組みが判断しても必ず示せます。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
-          "title": "NIST AI Risk Management Framework",
+          "title": "AI Risk Management Framework | NIST",
           "url": "https://www.nist.gov/itl/ai-risk-management-framework"
         }
       ]
@@ -6312,11 +6371,11 @@
       "supplement": "報告を歓迎する空気が、いちばん安上がりな安全対策です。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
-          "title": "NIST AI Risk Management Framework",
+          "title": "AI Risk Management Framework | NIST",
           "url": "https://www.nist.gov/itl/ai-risk-management-framework"
         }
       ]
@@ -6355,11 +6414,11 @@
       "supplement": "「何のために保存するのか」を一行で書くと、期間が決まります。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
-          "title": "NIST AI Risk Management Framework",
+          "title": "AI Risk Management Framework | NIST",
           "url": "https://www.nist.gov/itl/ai-risk-management-framework"
         }
       ]
@@ -6398,7 +6457,7 @@
       "supplement": "「確認の頻度と観点」を運用の決まりごとにしておくと、続きます。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
@@ -6441,11 +6500,11 @@
       "supplement": "「どの工程で使っているか」まで示すと、説明が具体的になります。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
-          "title": "NIST AI Risk Management Framework",
+          "title": "AI Risk Management Framework | NIST",
           "url": "https://www.nist.gov/itl/ai-risk-management-framework"
         }
       ]
@@ -6489,11 +6548,11 @@
       "supplement": "「決め方」まで合意しておくと、意見が分かれても止まりません。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         }
       ]
@@ -6537,11 +6596,11 @@
       "supplement": "「減らす・移す・受け入れる」の三択で考えると、判断が速くなります。",
       "references": [
         {
-          "title": "NIST AI Risk Management Framework",
+          "title": "AI Risk Management Framework | NIST",
           "url": "https://www.nist.gov/itl/ai-risk-management-framework"
         },
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         }
       ]
@@ -6580,15 +6639,15 @@
       "supplement": "体制の見直しの合図は「相談が特定の人に集中したとき」です。",
       "references": [
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         },
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
-          "title": "NIST AI Risk Management Framework",
+          "title": "AI Risk Management Framework | NIST",
           "url": "https://www.nist.gov/itl/ai-risk-management-framework"
         }
       ]
@@ -6627,7 +6686,7 @@
       "supplement": "経営層の仕事は「方向と資源」、現場の仕事は「進め方と技術」です。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         }
       ]
@@ -6666,11 +6725,11 @@
       "supplement": "「何が・いつ・どう変わるか」の三点を早めに配るのが基本です。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
-          "title": "責任ある AI レンズ - AWS Well-Architected",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         }
       ]
@@ -6709,7 +6768,7 @@
       "supplement": "「誰にどの技能を」を職種単位で決めると、育成が回り始めます。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         }
       ]
@@ -6748,7 +6807,7 @@
       "supplement": "「何をやめるか」を決めるのが、いちばん有効な資源配分です。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -6791,7 +6850,7 @@
       "supplement": "部門横断の場は「共有」と「共通化」の二つを目的にします。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         }
       ]
@@ -6830,7 +6889,7 @@
       "supplement": "段階で分けると「次は何を決めるか」まで報告できます。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         }
       ]
@@ -6869,7 +6928,7 @@
       "supplement": "失敗の記録は、次に挑む人のいちばん強い味方になります。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         }
       ]
@@ -6913,7 +6972,7 @@
       "supplement": "「手段を目標にしない」だけで、計画の質が大きく変わります。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -6956,7 +7015,7 @@
       "supplement": "「目的・成果・前提」の三点で、投資の説明は組み立てます。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -6999,7 +7058,7 @@
       "supplement": "「定着」は終わりではなく、改善の入り口です。",
       "references": [
         {
-          "title": "AWS クラウド導入フレームワーク (CAF-AI) - AI の概要",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         },
         {
@@ -7041,7 +7100,7 @@
       "explanation": "この問題は、公開する生成 AI サービスで有害な出力のリスクをどう管理すべきかを問うものです。\n\n正解がAである理由は、有害とされる内容のカテゴリを検出してフィルタリングする設定、業務やサービス上扱うべきでない話題の定義、特定の語句のブロックといった保護を組み合わせることが基本だからです。設定後は、想定される入力や過去の事例を用いて公開前に挙動を確認し、公開後も監視を続けます。\n\n前提知識\n\n有害コンテンツへの保護設定\n\n有害カテゴリの検出とフィルタリング、拒否すべき話題の定義、語句のブロックを組み合わせます。設定は公開前のテストで確認し、公開後も継続的に監視します。利用規約への記載や利用者への判断の委任は、保護の仕組みの代わりにはなりません。\n\n他の選択肢が誤りである理由：\n\n公開後に利用者からの指摘があれば対応する\n\n指摘があってからでは、不適切な出力が既に外部に表示された後になります。\n\n利用規約に禁止事項を記載するだけで十分である\n\n利用規約の記載は注意喚起にとどまり、生成そのものを抑制する仕組みにはなりません。\n\n有害性の判断は利用者に委ねる\n\n判断を利用者に委ねると、有害な出力がそのまま拡散されるおそれがあります。",
       "references": [
         {
-          "title": "Amazon Bedrock ガードレール",
+          "title": "Amazon Bedrock ガードレールを使用して有害なコンテンツを検出してフィルタリングする - Amazon Bedrock",
           "url": "https://docs.aws.amazon.com/ja_jp/bedrock/latest/userguide/guardrails.html"
         },
         {
@@ -7084,7 +7143,7 @@
       "supplement": "権利の帰属や利用条件はサービスごとに異なるため、契約時の確認と定期的な見直しが有効です。",
       "references": [
         {
-          "title": "コンテンツ分野 3: AI ガバナンスと責任ある AI リーダーシップ (AIB-C01)",
+          "title": "コンテンツ分野 3: AI ガバナンスと責任ある AI リーダーシップ - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain3.html"
         }
       ]
@@ -7122,11 +7181,11 @@
       "explanation": "この問題は、AI システムの信頼性に関わるリスクを広く捉えられているかを問うものです。\n\n正解がAである理由は、参照データの品質低下や環境変化に伴うモデルドリフトによって、予測や回答の精度が時間とともに劣化することが、信頼性に関わる代表的なリスクだからです。これらは導入後に徐々に顕在化することが多く、監視と定期的な見直しによって管理します。\n\n前提知識\n\n信頼性に関わるリスク\n\n事実と異なる内容を生成するハルシネーションのほか、参照データの品質低下、モデルドリフト、想定外の入力に対する不安定な挙動などがあります。導入後に徐々に顕在化することが多いため、監視と見直しの仕組みが必要です。\n\n他の選択肢が誤りである理由：\n\n利用者が増えることによる処理待ち時間の発生のみ\n\n処理待ち時間は性能上の課題であり、信頼性に関わるリスクの全体像を示すものではありません。\n\nモデルの名称が変更されること\n\n名称の変更は運用上の連絡事項であり、信頼性のリスクではありません。\n\n契約期間が満了すること\n\n契約期間の満了は調達上の管理事項であり、AI の出力の信頼性に関わるリスクではありません。",
       "references": [
         {
-          "title": "コンテンツ分野 3: AI ガバナンスと責任ある AI リーダーシップ (AIB-C01)",
+          "title": "コンテンツ分野 3: AI ガバナンスと責任ある AI リーダーシップ - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain3.html"
         },
         {
-          "title": "AWS Well-Architected フレームワーク Responsible AI Lens",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         }
       ]
@@ -7164,11 +7223,11 @@
       "explanation": "この問題は、変化の速い規制動向に対して組織がどう備えるべきかを問うものです。\n\n正解がAである理由は、AI に関する規制やガイドラインの整備が進み内容も更新されていくためです。動向を継続的に把握する役割を定め、自社の施策や契約への影響を定期的に評価し、必要な対応を計画する仕組みを持つことが重要です。\n\n前提知識\n\n規制動向への備え\n\n把握する役割の明確化と、施策への影響を定期的に評価する仕組みが必要です。導入時の一度の確認や、法務だけへの委任では変化に対応できません。規制が明確になるまで全てを停止する判断も、事業機会を失う選択になります。\n\n他の選択肢が誤りである理由：\n\n導入時に確認すれば、その後は見直す必要はない\n\n規制は更新されるため、導入時の確認だけでは対応できません。\n\n規制動向の把握は法務部門だけに任せ、事業部門は関与しない\n\n事業への影響を評価するには事業部門の関与が必要です。\n\n規制が明確になるまで、AI の取り組みをすべて停止する\n\nすべてを停止する判断は、事業機会を失ううえ、規制が整っても能力が育っていない状態を招きます。",
       "references": [
         {
-          "title": "AI Risk Management Framework (NIST AI RMF)",
+          "title": "AI Risk Management Framework | NIST",
           "url": "https://www.nist.gov/itl/ai-risk-management-framework"
         },
         {
-          "title": "コンテンツ分野 3: AI ガバナンスと責任ある AI リーダーシップ (AIB-C01)",
+          "title": "コンテンツ分野 3: AI ガバナンスと責任ある AI リーダーシップ - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain3.html"
         }
       ]
@@ -7211,11 +7270,11 @@
       "explanation": "この問題は、人による監視を具体的にどう実装するかを選べるかを問うものです。\n\n正解がAとBである理由は、影響の大きい判断に実行前の承認や最終判断を人が担う工程を設けることと、判断に迷う場合に人へ引き継ぐ条件と手順を定めることが、AI の効率を活かしながら重大な誤りや想定外の事態を抑制できるためです。\n\n前提知識\n\n監視の実装方法\n\n影響の大きい判断への承認工程と、引き継ぎの条件・手順の明確化が中心になります。監視工程を省いた全件自動処理は、影響の大きい業務では適切ではありません。\n\n他の選択肢が誤りである理由：\n\n人の確認をなくし、AI の判断で完結させる\n\n人の確認をなくすと、重大な誤りを止める手段がなくなります。\n\n監視の担当は置かず、全件を自動で処理する\n\n監視の担当を置かない運用は、想定外の事態への対応ができません。\n\n出力を確認せずに、そのまま顧客に提示する\n\n確認せずに顧客へ提示すると、誤りがそのまま顧客に届きます。",
       "references": [
         {
-          "title": "コンテンツ分野 3: AI ガバナンスと責任ある AI リーダーシップ (AIB-C01)",
+          "title": "コンテンツ分野 3: AI ガバナンスと責任ある AI リーダーシップ - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain3.html"
         },
         {
-          "title": "AWS Well-Architected フレームワーク Responsible AI Lens",
+          "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
           "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
         }
       ]
@@ -7253,11 +7312,11 @@
       "explanation": "この問題は、外部データを学習に用いる際の契約上・権利上の確認事項を問うものです。\n\n正解がAである理由は、外部データを学習に利用する場合、そのデータが学習に利用可能か、派生物や生成物の扱いに制約があるか、再利用や再配布に条件があるかを契約上確認する必要があるためです。あわせて、データに第三者の権利が含まれていないかを確認します。\n\n前提知識\n\n外部データ利用の確認事項\n\n学習への利用可否、派生物や生成物の扱い、再利用や再配布の条件、第三者の権利の有無を確認します。条件の確認を省いた利用は、契約違反や権利侵害のリスクにつながります。\n\n他の選択肢が誤りである理由：\n\n提供元が有名であれば、利用条件の確認は不要である\n\n提供元の知名度は利用条件の有無とは関係がなく、確認は必要です。\n\n契約書に記載がなければ、自由に利用してよいと解釈する\n\n記載がないことを自由利用の根拠と解釈すると、権利侵害のリスクを負うことになります。\n\n社内利用に限定すれば、契約上の制約は関係しない\n\n社内利用でも契約上の制約が及ぶ場合があり、利用範囲だけで判断できません。",
       "references": [
         {
-          "title": "コンテンツ分野 3: AI ガバナンスと責任ある AI リーダーシップ (AIB-C01)",
+          "title": "コンテンツ分野 3: AI ガバナンスと責任ある AI リーダーシップ - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain3.html"
         },
         {
-          "title": "AWS Marketplace とは",
+          "title": "とは AWS Marketplace - AWS Marketplace",
           "url": "https://docs.aws.amazon.com/ja_jp/marketplace/latest/buyerguide/what-is-marketplace.html"
         }
       ]
@@ -7295,11 +7354,11 @@
       "explanation": "この問題は、AI 導入の準備状況を評価する際の観点を問うものです。\n\n正解がAである理由は、AI の準備状況が、経営層の関与と方向性の一致、データの品質とアクセス性、変化を受け入れる組織文化、技術的なインフラ、統制の仕組みといった複数の観点から評価されるためです。どれか一つが欠けても取り組みは停滞しやすくなります。\n\n前提知識\n\n準備状況の評価観点\n\nリーダーシップの連携、データの状態、組織文化、技術インフラ、ガバナンス体制を組み合わせて評価します。評価結果は、どの能力に投資すべきかの判断材料として用います。\n\n他の選択肢が誤りである理由：\n\n利用する予定の AI サービスの価格のみを評価する\n\n価格だけでは、組織としての実行力を評価できません。\n\n情報システム部門の人員数だけを評価する\n\n人員数だけでは、データや文化、統制の状態を把握できません。\n\n過去のクラウド導入の実績のみを評価する\n\n過去のクラウド導入の実績は参考情報であり、AI に必要な能力の全体像を示すものではありません。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         },
         {
-          "title": "AI の概要 - AWS クラウド導入フレームワーク (CAF-AI)",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         }
       ]
@@ -7337,7 +7396,7 @@
       "explanation": "この問題は、評価で判明した課題を経営層にどう伝えるべきかを問うものです。\n\n正解がAである理由は、準備状況の評価で判明した課題が投資の優先順位を決めるための材料だからです。特にデータの整備は AI の成果の前提になるため、何が不足しているか、施策にどう影響するか、対応にどの程度の資源が必要かを具体的に示して合意することが重要です。\n\n前提知識\n\n課題の報告と投資判断\n\n不足している内容、施策への影響、必要な資源を具体的に示して経営層と合意します。課題を伝えずに高度な施策から着手すると、成果につながらず投資を回収できません。\n\n他の選択肢が誤りである理由：\n\nデータの課題は技術部門が解決すべきであり、経営層には伝えない\n\n経営層に伝えなければ、必要な投資の判断ができません。\n\n課題があることは伝えるが、投資の必要性には触れない\n\n投資の必要性に触れないと、優先順位の判断につながりません。\n\nデータの整備を待たずに、高度な AI 施策から着手する\n\nデータ整備を待たずに着手すると、成果が出ず投資を回収できないおそれがあります。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -7375,11 +7434,11 @@
       "explanation": "この問題は、AI の成熟度モデルを使う目的を問うものです。\n\n正解がAである理由は、成熟度モデルが、実験段階にあるのか、一部で展開されているのか、全社規模で運用されているのかといった現在地を共通の尺度で捉え、次の段階に進むための課題を整理するために用いられるためです。\n\n前提知識\n\n成熟度モデルの活用\n\n現在地を共通の尺度で把握し、次の段階に進むために必要な取り組みを特定します。評価結果は、人材育成、データ整備、ガバナンス強化といった投資の優先順位を決める材料になります。\n\n他の選択肢が誤りである理由：\n\n成熟度が高いと評価されれば、取り組みを終了できる\n\n成熟度が高い段階でも、技術や環境の変化に応じた継続的な改善が必要です。\n\n他社との優劣を断定するための評価指標である\n\n成熟度モデルは自社の現在地と次の一手を整理するための手段であり、他社との優劣を断定するものではありません。\n\n成熟度は技術力のみで決まる\n\nデータ、人材、組織文化、ガバナンスなども含めて評価します。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         },
         {
-          "title": "AI の概要 - AWS クラウド導入フレームワーク (CAF-AI)",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         }
       ]
@@ -7417,7 +7476,7 @@
       "explanation": "この問題は、実験段階から次の段階へ進むために必要な取り組みを問うものです。\n\n正解がAである理由は、実験段階の組織が次に進むには、個別の試行で得た知見を共有し、他の部門が再利用できる標準的な進め方や共通の環境を整えることが重要だからです。これにより、同じ検討を繰り返す無駄を省き、展開の速度を上げられます。\n\n前提知識\n\n実験段階から次へ進む条件\n\n知見の共有の仕組みと、再利用できる標準的な進め方の整備が鍵になります。実験を増やすだけで共有や標準化を怠ると、取り組みが分散して組織の能力が蓄積されません。\n\n他の選択肢が誤りである理由：\n\n実験の数をさらに増やし、共有や標準化は後回しにする\n\n共有や標準化を後回しにすると、取り組みが分散し、組織としての能力が蓄積されません。\n\n実験をすべて中止し、大規模な刷新を一度に行う\n\nすべてを中止して一斉刷新に移る方法は、準備が整わないまま失敗するリスクが高くなります。\n\n技術的な高度化のみを追求し、組織の仕組みは変更しない\n\n組織の仕組みを変えずに技術だけを高度化しても、展開は進みません。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -7455,7 +7514,7 @@
       "explanation": "この問題は、AI トランスフォーメーションの停滞要因をどう整理すべきかを問うものです。\n\n正解がAである理由は、停滞が人材やスキルの不足、業務プロセスの未整備、技術インフラの制約、ガバナンスの欠如といった複数の要因で生じるためです。人、プロセス、テクノロジー、ガバナンスの各領域に分けて能力ギャップを整理すると、どの領域にどの対策を打つべきかが明確になります。\n\n前提知識\n\n能力ギャップの整理\n\n人、プロセス、テクノロジー、ガバナンスの 4 領域に分けて不足を特定します。整理されたギャップは、投資の優先順位を決める材料になります。\n\n他の選択肢が誤りである理由：\n\n技術的なスキルの不足のみに着目する\n\nスキル以外にプロセスやガバナンスの不足も停滞の原因になるため、技術だけに着目すると対策が偏ります。\n\n予算の不足のみを原因とみなす\n\n予算は要因の一つにすぎず、他の領域の不足を見落とします。\n\n原因を特定せず、まず全社員の研修を実施する\n\n原因を特定せずに一律の研修を行うと、本当のボトルネックが解消されません。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -7493,7 +7552,7 @@
       "explanation": "この問題は、AI リテラシー向上のための育成計画の立て方を問うものです。\n\n正解がAである理由は、AI リテラシーの育成では、経営層、管理職、業務担当者、技術者といった役割によって必要な知識と活用の仕方が異なるためです。経営層には投資判断に必要な理解、業務担当者には日常業務での活用と出力の確認方法、技術者には実装と運用の知識といったように、対象を分けた計画が効果的です。\n\n前提知識\n\n役割別の育成\n\n役割ごとに必要な知識と活用場面が異なることを踏まえて対象を分けます。一律の研修では、それぞれの業務に即した理解が得られにくくなります。\n\n他の選択肢が誤りである理由：\n\n全社員に同じ内容の研修を一律に実施すれば十分である\n\n一律の研修では、役割ごとに必要な知識の違いに対応できません。\n\n経営層向けの研修のみを実施する\n\n経営層だけでは、現場での活用が進みません。\n\n外部の専門家にすべてを任せ、社内に知見を残さない\n\n知見を社内に残さないと、継続的な育成と改善ができません。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -7531,11 +7590,11 @@
       "explanation": "この問題は、データの分散と識別の不統一という課題への対応方針を問うものです。\n\n正解がAである理由は、データが複数のシステムに分散し同一の対象が異なる識別子で管理されている状態が、AI の精度と業務の効率の両方に悪影響を及ぼすためです。部門をまたいでデータの定義、識別のルール、管理責任をそろえる取り組みを計画し、優先的に対応する必要があります。\n\n前提知識\n\nデータ統合の課題\n\n分散と識別の不統一は、分析の重複や誤った突合を招きます。データは業務プロセスから生まれるため、業務部門の関与が不可欠です。\n\n他の選択肢が誤りである理由：\n\n分散したまま扱いやすい一部のデータだけを使い、全体の整備は行わない\n\n一部だけを使う方法は、対象範囲が限定され、全体の精度も改善しません。\n\n各部門のデータをそのまま統合し、重複は残したまま分析する\n\n重複を残したまま統合すると、分析結果が歪みます。\n\nデータ整備は技術部門の作業であるため、業務部門は関与しない\n\nデータは業務プロセスから生まれるため、業務部門の関与が欠かせません。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         },
         {
-          "title": "AI の概要 - AWS クラウド導入フレームワーク (CAF-AI)",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         }
       ]
@@ -7573,7 +7632,7 @@
       "explanation": "この問題は、データ共有の枠組みを整備する目的を問うものです。\n\n正解がAである理由は、データ共有の枠組みが、どのデータを誰がどの条件で利用できるのか、誰が管理責任を負うのかを明確にするものだからです。これにより、部門をまたいだ活用を進めながら、機密情報の保護や規制対応も同時に実現できます。\n\n前提知識\n\nデータ共有の枠組み\n\n利用できる範囲と条件、管理責任を明確にします。無条件の開放や全面禁止は、いずれも活用と保護のバランスを欠きます。\n\n他の選択肢が誤りである理由：\n\nすべてのデータを無条件に全社に開放すること\n\n無条件の開放は、機密情報の保護や規制対応を損ないます。\n\nデータの利用を全面的に禁止すること\n\n全面禁止は、AI 活用の前提となるデータ利用そのものを不可能にします。\n\nデータの所有権を曖昧なままにしておくこと\n\n所有権を曖昧にすると、品質の維持や利用可否の判断が滞ります。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -7611,7 +7670,7 @@
       "explanation": "この問題は、データの所有権と管理責任を定める理由を問うものです。\n\n正解がCである理由は、所有権と管理責任が曖昧なままだと、品質の維持や更新の主体が定まらず、利用の可否を判断する窓口も不明確になるためです。結果として活用の検討がその都度止まり、データの信頼性も保てません。\n\n前提知識\n\n所有権と管理責任\n\n誰がどのデータに責任を持ち、どの条件で利用を認めるかを定めることが、活用を前に進める前提になります。定めれば品質が自動的に向上するわけではなく、運用の中で維持する必要があります。\n\n他の選択肢が誤りである理由：\n\n所有権を決めれば、データの品質は自動的に向上するため\n\n所有権の明確化は責任の所在を定めるものであり、品質が自動的に向上するわけではありません。\n\n法的に所有権の登記が義務づけられているため\n\nデータの所有権について一般的な登記制度が義務づけられているわけではありません。\n\n所有権を定めると、データの利用が禁止されるため\n\n所有権と利用条件を定めることは、利用を止めるためではなく、安全に使うために行います。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -7649,11 +7708,11 @@
       "explanation": "この問題は、AI を支える技術インフラの要件をビジネス側がどう確認すべきかを問うものです。\n\n正解がCである理由は、インフラの要件が業務の性質と将来の展開計画に照らして評価されるべきものだからです。必要な処理能力、利用可能な時間帯と可用性、利用拡大への対応、費用の見通し、社内の運用体制との整合を確認します。\n\n前提知識\n\nインフラ要件の確認観点\n\n性能、可用性、拡張性、費用の見通し、運用体制との整合を業務要件と照らして確認します。設定の詳細を自ら習得する必要はありませんが、業務要件が満たされるかを判断し技術部門に伝えるのはビジネス側の役割です。\n\n他の選択肢が誤りである理由：\n\n利用する技術の詳細な設定手順を自ら習得する\n\n設定の詳細は技術部門の役割であり、ビジネス側が習得すべき事項ではありません。\n\nクラウド事業者の選択を技術的な人気だけで決める\n\n人気だけで選ぶと、業務要件や運用体制との整合を確認できません。\n\nインフラの要件は業務とは無関係であると考える\n\nインフラの要件は業務の性質に依存するため、無関係ではありません。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         },
         {
-          "title": "対象の AWS のサービスと機能 (AIB-C01)",
+          "title": "対象の AWS のサービスと機能 - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/aib-01-in-scope-services.html"
         }
       ]
@@ -7691,7 +7750,7 @@
       "explanation": "この問題は、AI の全社展開における経営幹部の支援の意義を問うものです。\n\n正解がCである理由は、経営幹部の支援が、部門をまたぐ調整、予算や人材の配分、優先順位の決定において大きな影響を持つためです。トップが取り組みを明確に支持し期待を示すことは、組織全体への優先度のメッセージになり、現場の後押しにもつながります。\n\n前提知識\n\n経営幹部の支援の役割\n\n部門横断の調整と資源配分を後押しし、組織としての優先度を示します。ただし、現場の理解と協力を得る活動や実装は別途必要であり、支援があれば不要になるものではありません。\n\n他の選択肢が誤りである理由：\n\n経営層が技術の実装を直接担うことで、施策が加速する\n\n経営層の役割は方向性の提示と資源の配分であり、実装の担当ではありません。\n\n支援があれば、現場の理解を得る活動は不要になる\n\n現場の理解を得る活動は、支援の有無にかかわらず必要です。\n\n経営層の関与は、現場の裁量を奪うため望ましくない\n\n関与の目的は優先度の明確化と支援であり、裁量の設計は別途行います。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -7729,7 +7788,7 @@
       "explanation": "この問題は、各部門に推進役を配置する目的を問うものです。\n\n正解がCである理由は、部門の業務を理解した人材が、現場の課題と全社の方針や支援策をつなぎ、具体的な活用を前に進め、定着させることにあるためです。この役割が機能すると、現場の声が施策に反映され、部門ごとの取り組みがばらばらになるのを防げます。\n\n前提知識\n\n部門推進役の役割\n\n現場の課題と全社方針をつなぎ、活用の具体化と定着を担います。役割と権限、活動時間の確保をあわせて整えることが、機能させる前提になります。\n\n他の選択肢が誤りである理由：\n\n外部の専門家を置き換えて、費用を削減する\n\n推進役は外部の専門家の代替ではなく、社内の連携を担う役割です。\n\n各部門の裁量をなくし、全社で統制を強める\n\n統制の強化ではなく、現場の裁量を活かしながら活用を進めることが目的です。\n\n技術的な実装作業をすべてこの人材に集約する\n\n実装作業の集約ではなく、業務と施策の連携が主な役割です。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -7768,7 +7827,7 @@
       "supplement": "影響を受ける従業員が新しい役割に移るための支援や再教育の計画も、あわせて伝えると効果的です。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -7806,7 +7865,7 @@
       "explanation": "この問題は、AI 導入を妨げる組織文化上の障壁を問うものです。\n\n正解がCである理由は、AI 導入を妨げる文化的障壁として典型的なのが、リスク回避の姿勢、変化への抵抗、失敗への恐れだからです。これらが強い組織では、小さな試行すら行われず、学びが蓄積されません。\n\n前提知識\n\n文化的障壁\n\n失敗への恐れや変化への抵抗が強い組織では、試行が行われず学びが蓄積されません。経営層が試行を奨励し、失敗から学ぶ姿勢を明確に示し、改善の裁量を現場に認めることが有効な介入になります。\n\n他の選択肢が誤りである理由：\n\n経営層が取り組みを明確に支持していること\n\n経営層の支持は障壁ではなく、むしろ推進要因になります。\n\n現場に改善の裁量が認められていること\n\n改善の裁量は試行を促す要因であり、障壁ではありません。\n\n学習の機会が継続的に提供されていること\n\n学習機会の提供は能力形成を支える要因であり、障壁ではありません。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -7849,7 +7908,7 @@
       "explanation": "この問題は、文化的な障壁に対して経営層や管理職がどう働きかけるべきかを問うものです。\n\n正解がCとDである理由は、小さな試行とその結果からの学習を奨励する姿勢を明確に示すことと、業務を熟知した現場の人材が改善を提案し実行できる裁量を認めることが、リスク回避の姿勢と失敗への恐れを和らげ、現場発の改善を生むためです。\n\n前提知識\n\n文化的障壁への介入\n\n試行の奨励と、失敗から学ぶ姿勢の明示、現場の裁量の付与が有効です。失敗を評価に直結させたり、意見を排除したり、目的を伏せたりする対応は、抵抗と不信を強めます。\n\n他の選択肢が誤りである理由：\n\n導入の失敗を担当者の評価に直接反映させる\n\n失敗を評価に直結させると、挑戦が行われなくなり、学びも蓄積されません。\n\n現場の意見を反映せず、方針を一方的に決定する\n\n現場の意見を排除すると、実態に合わない方針になり、抵抗が強まります。\n\n導入目的を伏せて進め、結果が出てから説明する\n\n目的を伏せると、不信感が強まり協力が得られません。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -7887,7 +7946,7 @@
       "explanation": "この問題は、管理職層の育成を優先すべき理由を問うものです。\n\n正解がCである理由は、管理職が業務の進め方や役割分担を決め、部下の取り組みを支援する立場にあるためです。その理解が乏しいと、現場が活用を進めようとしても承認や支援が得られず、取り組みが停滞します。\n\n前提知識\n\n管理職層の役割\n\n業務の進め方と役割分担を決め、部下の取り組みを支援する立場にあります。AI の基本的な仕組み、業務への適用の考え方、出力の確認方法、統制の要点を理解してもらうことが、組織全体の浸透の鍵になります。\n\n他の選択肢が誤りである理由：\n\n管理職だけが AI を利用するため\n\nAI を利用するのは管理職に限らず、現場の担当者も利用します。\n\n管理職は技術的な実装を担うため\n\n技術的な実装は技術部門の役割であり、管理職の主な役割ではありません。\n\n管理職への教育は、他の層より費用が安いため\n\n費用の安さは育成の優先度を決める理由にはなりません。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -7925,7 +7984,7 @@
       "explanation": "この問題は、自動化によって生じた業務の変化にどう対応すべきかを問うものです。\n\n正解がCである理由は、定型作業の自動化が進むと、人の役割が例外への対応、文脈を踏まえた判断、顧客との関係構築、AI の出力の確認と改善といった業務に移っていくためです。人の強みである批判的思考、共感、創造性を活かせる領域へ業務を組み替えることが、導入効果の最大化と従業員の納得感につながります。\n\n前提知識\n\n人の役割の再設計\n\n定型作業から、例外対応や判断を伴う業務、AI の出力を確認し改善する役割へと業務を組み替えます。役割の設計と必要な再教育をあわせて行うことが重要です。\n\n他の選択肢が誤りである理由：\n\n担当者の人数を変えずに、同じ作業を継続させる\n\n自動化後も同じ作業を続けると、効率化の効果が得られません。\n\n削減された作業量をそのまま人員削減の根拠とする\n\n削減された作業量を直ちに人員削減の根拠とすると、新たに必要になる役割の人材を失い、信頼も損ないます。\n\n新しい役割は設けず、担当者の判断で対応させる\n\n役割を設計せずに任せると、業務の空白や負担の偏りが生じます。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -7963,11 +8022,11 @@
       "explanation": "この問題は、AI トランスフォーメーションで反復的な進め方が推奨される理由を問うものです。\n\n正解がCである理由は、AI トランスフォーメーションが、技術、業務、組織の前提が変化し続ける取り組みだからです。構想を立てて実験し、成果と課題を確認して計画を見直し、起動と拡大の段階へ進むという反復的な進め方をとることで、環境変化や学びを反映しながら前進できます。\n\n前提知識\n\n反復的なアプローチ\n\n構想、実験、起動、スケーリングの段階を繰り返しながら進めます。各段階で学びを得て次の計画に反映できるため、不確実性の高い取り組みでも軌道修正が可能になります。\n\n他の選択肢が誤りである理由：\n\n計画を最初に固定できるため、変更が不要になる\n\n前提が変化し続けるため、当初の計画を固定することは現実的ではありません。\n\n短期的な成果を出さずに、長期の構想だけを追えるため\n\n反復的な進め方は、短期的な成果を確認しながら長期の構想につなげる手法です。\n\n関係者の合意が不要になるため\n\n反復的な進め方でも、各段階での合意と確認は必要です。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         },
         {
-          "title": "AI の概要 - AWS クラウド導入フレームワーク (CAF-AI)",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         }
       ]
@@ -8005,7 +8064,7 @@
       "explanation": "この問題は、反復的な進め方を機能させるために必要な評価の設計を問うものです。\n\n正解がDである理由は、各段階で何を達成すべきか、どの指標で確認するか、次の段階に進むか見直すかをどう判断するかをあらかじめ定めておく必要があるためです。これにより、進捗の確認と資源配分の見直しが継続的に行えます。\n\n前提知識\n\n段階ごとの評価基準\n\n達成基準と、次の段階へ進むか見直すかの判断基準を定めます。評価を最後に一度だけ行う運用では、問題の発見が遅れ、成果につながらなくなります。\n\n他の選択肢が誤りである理由：\n\n段階を評価せず、期間が来たら次に進む運用\n\n評価を行わずに進めると、課題を抱えたまま次の段階に進むことになります。\n\n最初に決めた計画を変更しないという原則\n\n計画の変更を禁じると、学びを反映できません。\n\n評価は最後に一度だけ行う方針\n\n最後の一度だけでは、途中の問題に気づけず、軌道修正ができません。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -8043,11 +8102,11 @@
       "explanation": "この問題は、AI センターオブエクセレンスに期待される役割を問うものです。\n\n正解がDである理由は、センターオブエクセレンスが、全社の取り組みを支える中核組織として、標準的な進め方や共通環境の整備、各部門への支援、知見の共有と横展開、人材育成などを担うためです。\n\n前提知識\n\nAI センターオブエクセレンス (COE)\n\n標準的な進め方と共通環境の整備、各部門への支援、知見の横展開、人材育成を担う中核組織です。施策をすべて自ら実施したり、審査だけに限定したりすると、展開の速度と現場の主体性を損ないます。支援と統制のバランスが重要です。\n\n他の選択肢が誤りである理由：\n\nすべての AI 施策を自ら実施し、各部門は関与しない\n\nすべてを自ら実施すると、現場の主体性と業務理解が活かせず、展開の速度も落ちます。\n\n各部門の施策を審査して承認または却下するだけの役割とする\n\n審査に限定すると、支援の機能が失われ、現場から遊離します。\n\n外部ベンダーとの契約実務のみを担当する\n\n契約実務は役割の一部にすぎず、全社の取り組みを支える機能が欠けます。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         },
         {
-          "title": "AI の概要 - AWS クラウド導入フレームワーク (CAF-AI)",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         }
       ]
@@ -8085,7 +8144,7 @@
       "explanation": "この問題は、センターオブエクセレンスを機能させ続ける運営のあり方を問うものです。\n\n正解がDである理由は、各部門の施策に実際に関与して成果を支援し、そこで得た知見や標準化の必要性を吸い上げて共通の進め方に反映する循環を持つことが重要だからです。\n\n前提知識\n\n形骸化を防ぐ運営\n\n施策への実質的な関与と、知見の吸い上げと標準への反映の循環を持ちます。方針の策定だけを行う、標準を固定する、会議の回数を成果とする運用は、現場から遊離し形骸化につながります。\n\n他の選択肢が誤りである理由：\n\n方針の策定のみを行い、現場の施策には関与しない\n\n方針の策定だけでは、現場の実態を踏まえた支援ができません。\n\n標準を一度策定したら、その後は改訂しない\n\n標準を固定すると、業務や技術の変化に追随できなくなります。\n\n会議の開催回数を活動実績として報告する\n\n会議の回数は活動量であり、成果を示すものではありません。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -8128,7 +8187,7 @@
       "explanation": "この問題は、AI 施策の価値を継続的に追跡する仕組みを選べるかを問うものです。\n\n正解がAとEである理由は、業務指標の変化を定期的に確認して導入前の基準と比較することと、利用者からのフィードバックを集めて改善に反映する経路を設けることが、成果の検証と継続的な改善を両立させるためです。\n\n前提知識\n\n価値の追跡\n\n業務指標の定期確認とベースラインとの比較、利用者からのフィードバックの収集と反映が中心になります。開始時の一度きりの確認や年度末の総括のみでは、問題の発見と軌道修正が遅れます。\n\n他の選択肢が誤りである理由：\n\n施策の開始時に一度だけ成果を確認する\n\n開始時の一度だけでは、その後の変化を捉えられません。\n\n進捗の確認は行わず、年度末の総括のみで評価する\n\n年度末の総括のみでは、問題の発見と軌道修正が遅れます。\n\n利用者からの意見は集めるが、内容は検討しない\n\n集めるだけで検討しないと、改善につながらず仕組みとして機能しません。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -8166,7 +8225,7 @@
       "explanation": "この問題は、現場のフィードバックを改善につなげる仕組みを問うものです。\n\n正解がDである理由は、AI の出力の誤りや使いにくさは、実際に業務で使う現場が最も早く気づくためです。報告しやすい経路を用意し、集まった内容を定期的に確認して、モデルや参照データ、業務手順、画面の改善につなげる循環を作ることが重要です。\n\n前提知識\n\nフィードバックの循環\n\n報告の経路、定期確認、改善への反映の 3 つがそろって初めて機能します。収集しても対応しない、情報を共有しない運用は、仕組みとして成立しません。\n\n他の選択肢が誤りである理由：\n\nフィードバックは収集するが、対応は行わない\n\n収集しても対応しないと、現場は報告しなくなります。\n\n問題の報告は禁止し、利用者には我慢を求める\n\n報告を禁じると、誤りが長期間放置されます。\n\nフィードバックは管理職だけが把握し、現場には共有しない\n\n情報を共有しないと、改善の実感が得られず協力が続きません。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -8204,7 +8263,7 @@
       "explanation": "この問題は、実証実験から本番環境へ移行する判断の基準を問うものです。\n\n正解がDである理由は、本番環境への移行が、技術的な動作の確認だけでなく、業務要件を満たす性能と品質、出力の確認や障害対応を含む運用体制、統制の仕組み、費用の妥当性を総合的に判断して決めるものだからです。\n\n前提知識\n\n本番移行の判断基準\n\n性能と品質、運用体制、統制の仕組み、費用の妥当性を確認します。期間の経過や好意的な意見のみを根拠にすると、運用開始後に想定外の負担や問題が生じやすくなります。\n\n他の選択肢が誤りである理由：\n\n実験で好意的な意見が得られたかどうかだけを確認する\n\n好意的な意見は、運用体制や費用の妥当性を保証するものではありません。\n\n予定していた期間が経過したかどうかだけを基準にする\n\n期間の経過は移行の可否を判断する基準になりません。\n\n技術的に動作すれば、運用体制は後から整えればよい\n\n運用体制を後回しにすると、運用開始直後に混乱が生じます。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -8242,7 +8301,7 @@
       "explanation": "この問題は、AI を業務に組み込む際の事業継続の検討事項を問うものです。\n\n正解がDである理由は、AI を業務の一部に組み込むと、サービスの停止や性能の低下が業務全体に影響するためです。停止時の代替手順、復旧の優先順位、連絡体制、データの保全方法をあらかじめ定めておくことが、事業継続の観点で重要になります。\n\n前提知識\n\n事業継続の検討事項\n\n停止時の代替手順（手作業への切り戻し）、復旧の優先順位、連絡体制、データの保全方法を定めます。障害が起きない前提や、その場での対応は、影響を拡大させます。\n\n他の選択肢が誤りである理由：\n\n障害は発生しない前提で計画を立てる\n\n障害が起きない前提で計画を立てると、発生時に対応できません。\n\n業務への影響は検討せず、技術的な冗長化のみを行う\n\n技術的な冗長化だけでは、業務の継続手順が定まらず、現場が判断に迷います。\n\n復旧の手順は、障害発生時に決める\n\n復旧手順をその場で決めると、初動が遅れ、影響が拡大します。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         },
         {
@@ -8284,7 +8343,7 @@
       "explanation": "この問題は、実践を通じた学びを促す育成の取り組みを問うものです。\n\n正解がDである理由は、全社のリテラシーを高めるには座学だけでなく実践の場を組み合わせることが効果的だからです。小さな業務課題に取り組む社内コンテストや、成果を持ち寄る勉強会は、参加者が手を動かして学べる機会になり、部門を越えた知見の共有も促します。\n\n前提知識\n\n実践を通じた学び\n\n座学に加えて、実際の業務課題に取り組む機会を設けます。コンテストや部門をまたぐ勉強会は、学びの定着と知見の共有の両方に効果があります。\n\n他の選択肢が誤りである理由：\n\n座学の研修のみを実施し、実践の場は設けない\n\n座学だけでは、実際の業務での活用につながりにくくなります。\n\n研修は一度実施したら、その後は行わない\n\n一度きりの研修では、技術や業務の変化に追随できません。\n\n一部の専門人材だけに学習を限定する\n\n一部に限定すると、組織全体の底上げにつながりません。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -8322,7 +8381,7 @@
       "explanation": "この問題は、AI の出力確認という新しい役割に生じる負担への対応を問うものです。\n\n正解がDである理由は、人の役割が AI の出力の確認に移ると、判断を伴わない単純な確認作業が増え、負担と疲弊につながることがあるためです。確認の手順、判断基準、例外の扱いを見直し、人の判断が必要な部分に集中できるようにすることが重要です。あわせて、AI の出力品質そのものを改善して確認の負荷を下げる取り組みも有効です。\n\n前提知識\n\n確認作業の負担軽減\n\n確認の手順と判断基準の見直し、例外の扱いの整理、AI 側の出力品質の改善を組み合わせます。単純な確認を人の役割として固定すると、やりがいと生産性の両面で問題が生じます。\n\n他の選択肢が誤りである理由：\n\n確認作業は重要な役割であると伝え、対応は変えない\n\n重要性を伝えるだけでは、負担そのものが軽くなりません。\n\n確認作業を廃止し、AI の出力をそのまま使う\n\n確認を廃止すると、誤りが業務に流れ込むおそれがあります。\n\n担当者を交代させ、同じ作業を続けさせる\n\n担当者を交代しても、作業の負担は解消されません。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -8360,7 +8419,7 @@
       "explanation": "この問題は、人の強みと AI の能力をどう役割分担させるべきかを問うものです。\n\n正解がDである理由は、AI が大量の情報処理や定型的な作業、候補の提示を得意とする一方、人は文脈を踏まえた判断、例外への対応、合意形成、共感を伴う対応、創造的な発想を得意とするためです。業務を分解し、それぞれの特性に合った役割を割り当てることが成果の最大化につながります。\n\n前提知識\n\n役割分担の設計\n\nAI には定型処理や情報整理を、人には判断、関係構築、創造性が求められる部分を割り当てます。全面的な置き換えや限定的な利用は、いずれも特性を活かしきれません。\n\n他の選択肢が誤りである理由：\n\nすべての判断を AI に任せ、人は監視も行わない\n\n人の監視を省くと、重大な誤りを止める手段がなくなります。\n\nAI は補助的な検索にのみ使い、業務の進め方は変えない\n\n限定的な利用にとどめると、AI の能力を活かせません。\n\n人の業務をすべて AI に置き換え、関与をなくす\n\n人にしか担えない判断や関係構築の部分まで置き換えると、業務の質が下がります。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -8398,7 +8457,7 @@
       "explanation": "この問題は、全社の統制と部門の実行の役割分担をどう設計すべきかを問うものです。\n\n正解がDである理由は、全社の会議体が方針、基準、優先順位、支援策を示し、日常の実行は業務を理解する部門に委ねる設計が、統制の一貫性と実行の機動性を両立させるためです。あわせて、部門が相談できる窓口と知見を共有する経路を設けることが重要です。\n\n前提知識\n\n統制と実行の役割分担\n\n全社は方針と基準、部門は日常の実行を担います。細かな判断まで全社が決めると機動性が失われ、完全に部門任せにすると統制の一貫性が保てません。\n\n他の選択肢が誤りである理由：\n\n日常の細かな判断まで全社の会議体が決定する\n\n細かな判断まで全社が決めると、意思決定が遅くなり、現場の機動性が失われます。\n\n全社の方針は示さず、各部門の判断に完全に委ねる\n\n方針を示さないと、部門ごとに判断がばらつき、統制の一貫性が保てません。\n\n部門の実行チームは設けず、全社組織がすべてを実行する\n\n部門の実行チームを設けないと、業務を理解した現場の実行力が活かせません。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -8441,7 +8500,7 @@
       "explanation": "この問題は、部門横断の連携を機能させる条件を選べるかを問うものです。\n\n正解がBとCである理由は、各部門の役割と意思決定の範囲が明確になっていることと、部門をまたぐ課題を調整する場と知見を共有する経路があることが、連携を機能させる前提になるためです。\n\n前提知識\n\n部門横断の連携の条件\n\n役割と意思決定の範囲の明確化、調整の場と共有の経路の確保が中心です。役割が曖昧なままでは責任の空白と重複が生じ、共有の経路がなければ同じ検討が繰り返されます。\n\n他の選択肢が誤りである理由：\n\n各部門が独自の基準で判断し、情報は共有しない\n\n基準がばらばらで情報も共有されないと、統制が効かず重複投資が生じます。\n\nすべての決定を特定の部門に集約する\n\n決定を一箇所に集約すると、業務を理解した部門の判断が活かせず、意思決定が遅れます。\n\n課題は各部門が個別に解決し、全社での調整は行わない\n\n個別解決に委ねると、部門をまたぐ課題が放置されます。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -8479,7 +8538,7 @@
       "explanation": "この問題は、現場の当事者を計画段階から参画させる利点を問うものです。\n\n正解がDである理由は、現場の当事者を計画段階から参画させると、実際の業務の流れや例外、使いにくさが設計に反映され、導入後の定着が進みやすいためです。また、当事者自身が改善の担い手になることで、運用開始後の継続的な改善も期待できます。\n\n前提知識\n\n当事者参画の効果\n\n業務の実態が設計に反映され、定着と継続的な改善につながります。参画は手続きの省略や意見の抑圧、技術設計の委任を目的とするものではありません。\n\n他の選択肢が誤りである理由：\n\n意思決定の手続きを省略できる\n\n参画は検討を充実させる取り組みであり、手続きの省略を目的としたものではありません。\n\n現場の反対意見を抑え込める\n\n参画の目的は意見を抑え込むことではなく、実態を反映させることです。\n\n技術的な設計を現場に任せられる\n\n技術的な設計は技術部門の役割であり、現場に任せるものではありません。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -8517,7 +8576,7 @@
       "explanation": "この問題は、AI の展開を拡大する段階での投資判断を問うものです。\n\n正解がDである理由は、拡大の段階では、対象業務ごとに得られる効果と運用に必要な負担を比較し、拡大する範囲、順序、投資の水準を見直すことが重要だからです。効果の小さい領域に同じ水準の資源を投入し続けると、全体の投資効率が損なわれます。\n\n前提知識\n\n拡大段階の投資判断\n\n対象業務ごとの効果と運用負担を比較し、範囲と優先順位を見直します。計画は状況に応じて更新する前提で運用します。\n\n他の選択肢が誤りである理由：\n\n一度決めた展開計画は、効果にかかわらず最後まで実行する\n\n効果にかかわらず計画を維持すると、投資効率が損なわれます。\n\nすべての業務に同時に展開し、効果は後から確認する\n\n同時展開で効果を後から確認する方法は、無駄な投資を拡大するおそれがあります。\n\n効果が小さい業務でも、同じ水準で展開を続ける\n\n効果が小さい領域に同じ水準の資源を投じ続けると、全体の効率が下がります。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -8555,7 +8614,7 @@
       "explanation": "この問題は、AI トランスフォーメーションの進捗報告で注意すべき点を問うものです。\n\n正解がDである理由は、進捗が業務指標の変化といった成果と、組織が獲得した能力（人材、データ、仕組み）の両面から報告されるべきものだからです。あわせて、顕在化している課題と今後の見通しを共有することで、経営層が必要な支援や資源配分を判断できます。\n\n前提知識\n\n進捗報告の内容\n\n業務指標の変化と組織の能力向上の両面を示し、課題と先行きも伝えます。導入件数や感想だけの報告では、投資の妥当性を判断できません。\n\n他の選択肢が誤りである理由：\n\n導入したシステムの数だけを成果として報告する\n\n導入件数は活動量であり、成果や能力の向上を示すものではありません。\n\n課題は報告せず、良好な点のみを伝える\n\n課題を隠すと、必要な支援や軌道修正の判断ができません。\n\n現場の実感のみを報告し、数値は示さない\n\n実感だけでは、成果の程度を客観的に示せません。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         }
       ]
@@ -8593,11 +8652,11 @@
       "explanation": "この問題は、効率化を達成した次の段階で取り組むべき方向性を問うものです。\n\n正解がDである理由は、業務効率化が AI 活用の初期段階にあたるためです。全社展開で培ったデータ、人材、改善の仕組み、ガバナンスを元に、顧客価値の創出、新たなサービスの提供、事業モデルの変革といった次の段階へ取り組みを広げることが、持続的な成果につながります。\n\n前提知識\n\n次の段階への展開\n\n効率化で培ったデータ、人材、改善の仕組み、ガバナンスを元に、顧客価値の創出や事業の変革へ取り組みを広げます。効率化の達成を終着点とせず、組織としての進化を続けることが重要です。\n\n他の選択肢が誤りである理由：\n\n効率化を達成したため、AI の取り組みを終了する\n\n効率化の達成は終着点ではなく、次の段階への出発点になります。\n\n効率化の水準を維持するだけで、新たな取り組みは行わない\n\n維持のみでは、環境の変化や競合の動きに対して相対的に立ち遅れます。\n\n導入した仕組みを見直さず、そのままの構成を維持する\n\n見直しを行わないと、業務や技術の変化に追随できなくなります。",
       "references": [
         {
-          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション (AIB-C01)",
+          "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
           "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
         },
         {
-          "title": "AI の概要 - AWS クラウド導入フレームワーク (CAF-AI)",
+          "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
           "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
         }
       ]
