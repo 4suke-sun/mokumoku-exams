@@ -1,0 +1,5150 @@
+{
+  "examCode": "AWS-DVA-C02",
+  "entries": [
+    {
+      "draftId": "d-00f46d1fb87d",
+      "factIds": [
+        "f-10334aa1e163"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "d5d31626168cf2483eb831d6b4eef812ebe06296b6eb12657a3b11e3739cb898"
+        }
+      ]
+    },
+    {
+      "draftId": "d-01f0ab653950",
+      "factIds": [
+        "f-2c707c4b7861",
+        "f-80d3b9ba7b5d",
+        "f-8283369216ca",
+        "f-92386d627b08"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "8682dd049e4315193ae5d2e34ca5ba406fec62db47646c28fce4c5acc285305a"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codeguru/latest/profiler-ug/what-is-codeguru-profiler.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "64266d39e6b4742565886ba4f7cade9548d227f1cea46f56843582dad92ac863"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/compute-optimizer/latest/ug/what-is-compute-optimizer.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5412f5b3af3db135609a0df86e9e4ca0bd4bce214e5a892dc11d7ab30c9e1299"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f54ccfe342cdc5df08cd5d4024c2c57f3092909ee631d127ef99c313f2c0cd1a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-04176c16229b",
+      "questionId": "DVA-0001",
+      "factIds": [
+        "f-00d75575be8c",
+        "f-0c6754aaf8be",
+        "f-2953f02f88ba",
+        "f-b5c9d5ffa1e3"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "1bad70a471afec919ac98e29a9ddc5d52934d77e336966fbace91e7c06e57b6a"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "8682dd049e4315193ae5d2e34ca5ba406fec62db47646c28fce4c5acc285305a"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-caching.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "738be4c483fe712e9b17845bed25841133b2d2f764e1cd6ac2ca94ed23eb5513"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/compute-optimizer/latest/ug/what-is-compute-optimizer.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5412f5b3af3db135609a0df86e9e4ca0bd4bce214e5a892dc11d7ab30c9e1299"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0460e220de8a",
+      "factIds": [
+        "f-22b0c4b5a524",
+        "f-332b200cbc78",
+        "f-77a94164424c"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "38e32eeb520586da45d9f0f2b36c1cedc46ddd0a1a8e144c17582eaff35a03ab"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5177c72660f33883bd88acae91d663fa632fb1cb42871831f16f12fc524154ea"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a9a1f03ed5452570fa1e1788cbae1234009650c8df9f8e819c29485683ac447b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0470455bc0b4",
+      "questionId": "DVA-0002",
+      "factIds": [
+        "f-2ba60843c1f3"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "c080bcfc94592c2b9e208a2194d90ce0e5968402f5bb92d8f83c8258a0f856ee"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0471791f2614",
+      "questionId": "DVA-0003",
+      "factIds": [
+        "f-008591d4589b"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "be755f9170941fdd3358e34a2bae229e529d194de7069f6715fa0102964618be"
+        }
+      ]
+    },
+    {
+      "draftId": "d-04d875527290",
+      "questionId": "DVA-0004",
+      "factIds": [
+        "f-05802bd983ad",
+        "f-352b06f7fecf",
+        "f-96cfadf52262"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonECR/latest/userguide/what-is-ecr.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f560a39794da4d6568c9e8f8646e5d21dbde63cb40880a4c79330788f2410d2f"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codebuild/latest/userguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "8609e9a7abe32bea3684cc05fce308de1339076533b6f34851e2dead79296e00"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "bc68d108e14140a1a9f5d158e82fa0c2ced609cb0131ff319562a64da2d038e9"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0554171fb3c6",
+      "questionId": "DVA-0005",
+      "factIds": [
+        "f-1943b8cad6f8"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "19a6459dd5046ded2f0050126c8c00966dbe6d2440cc2884a1f9d4511b417b0c"
+        }
+      ]
+    },
+    {
+      "draftId": "d-05a0a6db8b2b",
+      "factIds": [
+        "f-0acb6db63af6"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/sdkref/latest/guide/feature-retry-behavior.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "9f5a207310f50d7335e1a528ab197126a908df26f01a7a9b18ef3b6f4ac89beb"
+        }
+      ]
+    },
+    {
+      "draftId": "d-05f1f43300f1",
+      "questionId": "DVA-0006",
+      "factIds": [
+        "f-248c940dced2"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "4e6f7c5f3d9c826b209fd4e7048c9982125cb75c18ff4d4ab7e470cd4235eecc"
+        }
+      ]
+    },
+    {
+      "draftId": "d-072ad9ecf8bb",
+      "factIds": [
+        "f-1a75a3aaba19",
+        "f-79b40c11522e"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0c286bb363d804d7cee8cf712cc24edf260b9a7744f5a6905797ec9bbe7b92a0"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "c89f839064a26a0832b99613f691ef312edd02778f951ff24e577766cb822b2f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-07e52087e0c1",
+      "questionId": "DVA-0007",
+      "factIds": [
+        "f-2fd401c5c497"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ec15592847642cfd002961f0ff09b4451b787bef1244d1cfd6e0a21e88902458"
+        }
+      ]
+    },
+    {
+      "draftId": "d-085ad8e787e0",
+      "questionId": "DVA-0008",
+      "factIds": [
+        "f-1577ff3cab96"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0586c990cabdaf3ba606677d3bda0392431d861ae3baa7541e8505ed4ccc5e5b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-09ae02e5d692",
+      "factIds": [
+        "f-2e1c73cec800",
+        "f-322e8077427c"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "342336f0f8be024c92b3d7022d5a7d51871c94c64ee6980ea7b5f8be97e07213"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5d02acaf53377d2d893e86d50dd2608465a518e98dab9635c023c7914a9a5b3f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0ac41efe7336",
+      "questionId": "DVA-0009",
+      "factIds": [
+        "f-0b54321024af",
+        "f-100120b57304"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/serv-side-encryption.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "804c6016538b1111a9b028c032dce2810baa0dd2785043ce6cf273cb5b6735e8"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "22aa03967381c45728308b96eb04c584c50738fd80a910f9a72865a494e1199c"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0b4c508f8532",
+      "questionId": "DVA-0010",
+      "factIds": [
+        "f-4eeb40ae548e"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "1583a9671685d2e647c0c4a126eec938213cebc3af142781b8b64664adee6e61"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0bad107d2789",
+      "questionId": "DVA-0011",
+      "factIds": [
+        "f-315da41b4b5e"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "38e32eeb520586da45d9f0f2b36c1cedc46ddd0a1a8e144c17582eaff35a03ab"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0c14eaba0cf7",
+      "questionId": "DVA-0012",
+      "factIds": [
+        "f-1165e29af911",
+        "f-11fbd2fada8b",
+        "f-14ecdbd9177d",
+        "f-1c92a7c84ddd",
+        "f-22022013918d"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e13db9d9c821e8195c1c5e20b59ab732a32c780a17c0489caac3571cbb542da0"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ed860942f0967748ef7e2094b8f310131482070084b9cf00199e25a14cf30ae5"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5ca53f3a9729de3097aff3d7ef469aeea0eabec4d5e83260334189c835ac6594"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "92ca8fba6b9e4f419348db66902346b18bcc188ac401a6c6974de66f950f22d2"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs-view.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "25d416c4578c97dbc3abdc990de4ff78cfb916e038e4a3867aa23828f1fd5327"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0c65ae76bc56",
+      "questionId": "DVA-0013",
+      "factIds": [
+        "f-1452811588bd"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "bac1ddd7349065223d1a93a3b864c27b9153abfd27a4531ed358972f10ed8510"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0cde59e5a753",
+      "questionId": "DVA-0014",
+      "factIds": [
+        "f-041b43d95def",
+        "f-055dfa6970ac",
+        "f-06f2c76dc146",
+        "f-073e69288392"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAX.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a77c092567e8368a971d2ef81b9b31df93d1db0ff473b4e4299dec91840edafa"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Scan.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "b179c5334be11de25f526737cff134eca863bf95364f456127939a3e5f62cc95"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "dbcd0bc10101e348434813e0b07d1c62c21f0c01af80dd090c4373e8e6d758ba"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/capacity-mode.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5ecf1cb7f7ef59aa52a65fddd3f86076fddb9cb15b3d248a1173b59cc1411851"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0da2a98c705b",
+      "questionId": "DVA-0015",
+      "factIds": [
+        "f-055dfa6970ac",
+        "f-06f2c76dc146",
+        "f-09a30b9f27cb"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAX.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a77c092567e8368a971d2ef81b9b31df93d1db0ff473b4e4299dec91840edafa"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "dbcd0bc10101e348434813e0b07d1c62c21f0c01af80dd090c4373e8e6d758ba"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/efs/latest/ug/whatisefs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5af30941ebf771ea17e668065f33c18b16c3de4dfd7926ea0e9dd27b98f7c045"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0e20bd2ddfd3",
+      "questionId": "DVA-0016",
+      "factIds": [
+        "f-a250847477aa",
+        "f-d85b4d87e4ce"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "37eda5874f5577bc02552d465e45ecf935b2048b880212de47f65242cb1e16f1"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/cors.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "da4acc32befb7018e9326207136e53ae4409b070141ead1be55a67fa7c445cb1"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0eaf9feebdbb",
+      "questionId": "DVA-0017",
+      "factIds": [
+        "f-0e339472c966",
+        "f-0eeb514a79f9"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/cors.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "da4acc32befb7018e9326207136e53ae4409b070141ead1be55a67fa7c445cb1"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "69c3cbba7a976efc7d37f933d113a2f48eff409ff27800614db1c4b08aee95b4"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0ee9cfbf53af",
+      "questionId": "DVA-0018",
+      "factIds": [
+        "f-34c0c19bab07"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5177c72660f33883bd88acae91d663fa632fb1cb42871831f16f12fc524154ea"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0f5b52eed81d",
+      "questionId": "DVA-0019",
+      "factIds": [
+        "f-a56de95c7692"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5eba9eb5826e2887b5c5b2a223d330534572ef31b80d44181d18e76338d52a44"
+        }
+      ]
+    },
+    {
+      "draftId": "d-119a5652ef6d",
+      "questionId": "DVA-0020",
+      "factIds": [
+        "f-5e608268148b"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "45456ae7648acb2e9c2fb6c140452cf8f0b2d3014fd2a0c84b549d3441af92b7"
+        }
+      ]
+    },
+    {
+      "draftId": "d-129a28da5019",
+      "questionId": "DVA-0021",
+      "factIds": [
+        "f-406cf84b95fd"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "60d704c3357e63e88845c30a3f18da9dd0a40c3673b6a286f23479772469187b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-1326c3ad5c91",
+      "factIds": [
+        "f-00d75575be8c",
+        "f-0c6754aaf8be",
+        "f-707291d911e8",
+        "f-8283369216ca"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "1583a9671685d2e647c0c4a126eec938213cebc3af142781b8b64664adee6e61"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "8682dd049e4315193ae5d2e34ca5ba406fec62db47646c28fce4c5acc285305a"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codeguru/latest/profiler-ug/what-is-codeguru-profiler.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "64266d39e6b4742565886ba4f7cade9548d227f1cea46f56843582dad92ac863"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/compute-optimizer/latest/ug/what-is-compute-optimizer.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5412f5b3af3db135609a0df86e9e4ca0bd4bce214e5a892dc11d7ab30c9e1299"
+        }
+      ]
+    },
+    {
+      "draftId": "d-15521909e166",
+      "questionId": "DVA-0022",
+      "factIds": [
+        "f-731561f8f8d0",
+        "f-84bc3b38d27f",
+        "f-8805c3d47446",
+        "f-a831e4a3b93d"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-post-authentication.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "efadaf9b1ca4f5819b27350113774419b7ca4455d7d7381c6e565b4356664195"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5656bedab8e4de2e9ea876f9ad70608f3f9b0bf3b38494a0d8fb359d3a13b57f"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-local-generate-event.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e2cbd5f552a7cf018cf915a699bc06d331deb6f342786a854c49c262ae5177e0"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/using-sam-cli-local-invoke.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "675a9f9baa90545ecedcb1fac1427ded5f5752d5f004158998bdbcb2275b4e8d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-16830a349933",
+      "questionId": "DVA-0023",
+      "factIds": [
+        "f-42db4b9ccc2b",
+        "f-64f1dce55889",
+        "f-80c7ee70cdd9"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amplify/latest/userguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "d6c9e4f8aee8e18d79fb130ea6883b21791de99f70b495d9ea0a4cfeb838be8f"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-stages.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ed3dcd8756b7247351a034f4cd4b254f33cc7904d4bd2e31a95ed034cbebfede"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a8a34ed3346f5828b6d4101321960e9a5fd6a4c3a6a8a914c62c6c34f083f1dd"
+        }
+      ]
+    },
+    {
+      "draftId": "d-16c8fb4c7776",
+      "questionId": "DVA-0024",
+      "factIds": [
+        "f-356545249699",
+        "f-7798846fbee5"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-working-with-lambda-triggers.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "fef1ceaed1f8ebf605a7ee52c90ad56737c8b9e694a918be8f2599de6020e37b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-post-authentication.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "efadaf9b1ca4f5819b27350113774419b7ca4455d7d7381c6e565b4356664195"
+        }
+      ]
+    },
+    {
+      "draftId": "d-17c67d4cf8d7",
+      "questionId": "DVA-0025",
+      "factIds": [
+        "f-e85723a58787"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/Strategies.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "1878a8bee2ffd1f4f0ca5b3902987fa37496588df7f102f9c6bb0187be2713b7"
+        }
+      ]
+    },
+    {
+      "draftId": "d-1a41c02b4d6b",
+      "factIds": [
+        "f-9e2ad087b41c"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "3c8eebd192f26659f4191ccc094e9144fb7e3482c59bf17c5345a17d5e735f2e"
+        }
+      ]
+    },
+    {
+      "draftId": "d-1d2e4a9f5b1c",
+      "factIds": [
+        "f-731561f8f8d0",
+        "f-84bc3b38d27f",
+        "f-8805c3d47446",
+        "f-a831e4a3b93d",
+        "f-c146b15a18ac"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a8a34ed3346f5828b6d4101321960e9a5fd6a4c3a6a8a914c62c6c34f083f1dd"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-post-authentication.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "efadaf9b1ca4f5819b27350113774419b7ca4455d7d7381c6e565b4356664195"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5656bedab8e4de2e9ea876f9ad70608f3f9b0bf3b38494a0d8fb359d3a13b57f"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-local-generate-event.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e2cbd5f552a7cf018cf915a699bc06d331deb6f342786a854c49c262ae5177e0"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/using-sam-cli-local-invoke.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "675a9f9baa90545ecedcb1fac1427ded5f5752d5f004158998bdbcb2275b4e8d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-1d43b83b2a07",
+      "questionId": "DVA-0026",
+      "factIds": [
+        "f-211e6d956581",
+        "f-244688ef7f97",
+        "f-277f9ed17a0e"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "74f7522af12208d0198cdd2025e4ea7d7abd6de686844dfc68d16c04707f51c1"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/testing-guide.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0fbc8cd18dea7e3ca81a44ae7d0a72481499ac6a85bb9880107f815a65367e8a"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/streams/latest/dev/key-concepts.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "426abc2f424e859000ed0b07abfe1e8159c9c3494b2f7cd762f09d3643b08aa8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-1e61139f0d3a",
+      "questionId": "DVA-0027",
+      "factIds": [
+        "f-3a6d2bf2d883"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "be4547f657d2f3eabe3bf794cfbe3cd0d20ff9dd6a374554c67ab85c8e47e4b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-20ba83701ef4",
+      "questionId": "DVA-0028",
+      "factIds": [
+        "f-1ceadc98f591"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "bf2013e8c65e80bca7d3982fdfbdd7b74e89cc58b00ceec7f8f6bc6bd6583554"
+        }
+      ]
+    },
+    {
+      "draftId": "d-20e406681471",
+      "questionId": "DVA-0029",
+      "factIds": [
+        "f-2735bf7f9fb6",
+        "f-40fc6728139c"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/canary-release.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "73a9ddcd27518b7a630d8e55fea2432b93ecc15c02c755d11e67210b8b58f020"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-stages.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ed3dcd8756b7247351a034f4cd4b254f33cc7904d4bd2e31a95ed034cbebfede"
+        }
+      ]
+    },
+    {
+      "draftId": "d-220f8f61e87a",
+      "questionId": "DVA-0030",
+      "factIds": [
+        "f-164ecefcd9e6"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/using-sam-cli-local-invoke.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "675a9f9baa90545ecedcb1fac1427ded5f5752d5f004158998bdbcb2275b4e8d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-23396ee12e38",
+      "questionId": "DVA-0031",
+      "factIds": [
+        "f-055dfa6970ac",
+        "f-0da2cae9ad6a"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "dbcd0bc10101e348434813e0b07d1c62c21f0c01af80dd090c4373e8e6d758ba"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/streams/latest/dev/introduction.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "fc409fa73adbd1550a3613b79ee2f6ee5019d225ee3760160eaea118d4e69f44"
+        }
+      ]
+    },
+    {
+      "draftId": "d-24c9488084a1",
+      "questionId": "DVA-0032",
+      "factIds": [
+        "f-1a24d2357b28"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "c6e92d3dea128875aaae81cc0057ca2c420f0dddc52aa16dad1b828b6c6b4ca3"
+        }
+      ]
+    },
+    {
+      "draftId": "d-26096d60af5f",
+      "questionId": "DVA-0033",
+      "factIds": [
+        "f-63cc7d592b14",
+        "f-731561f8f8d0",
+        "f-84bc3b38d27f",
+        "f-8805c3d47446"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-changesets.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e3e688dc1a314383dc0e828a8b976586d5c0556582968afc2401a326167d437a"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5656bedab8e4de2e9ea876f9ad70608f3f9b0bf3b38494a0d8fb359d3a13b57f"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-local-generate-event.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e2cbd5f552a7cf018cf915a699bc06d331deb6f342786a854c49c262ae5177e0"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/using-sam-cli-local-invoke.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "675a9f9baa90545ecedcb1fac1427ded5f5752d5f004158998bdbcb2275b4e8d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-27c0cea052bc",
+      "questionId": "DVA-0034",
+      "factIds": [
+        "f-1767d8333461"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-local-generate-event.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e2cbd5f552a7cf018cf915a699bc06d331deb6f342786a854c49c262ae5177e0"
+        }
+      ]
+    },
+    {
+      "draftId": "d-28165d610ece",
+      "questionId": "DVA-0035",
+      "factIds": [
+        "f-097843542049",
+        "f-322e8077427c",
+        "f-467a7c299228"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "347af0f16b7b1ed25e467dc6e6264ebba07f0f3edfc7abebfa635a4db307871b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "342336f0f8be024c92b3d7022d5a7d51871c94c64ee6980ea7b5f8be97e07213"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/privateca/latest/userguide/PcaWelcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0050d9b3ba441c3274814773e0e0093fa299eea62ddcf440403362c34a9c569f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-2b20571faac2",
+      "questionId": "DVA-0036",
+      "factIds": [
+        "f-42651439afd7"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Embedded_Metric_Format.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "2ad43cffa05da721f51628b6d317d59394f746e77165ffef697599bbfb29ddfb"
+        }
+      ]
+    },
+    {
+      "draftId": "d-2b430068499b",
+      "questionId": "DVA-0037",
+      "factIds": [
+        "f-04a51be0c164",
+        "f-05de09ee51c3",
+        "f-0b54321024af",
+        "f-0e4596b73cf9",
+        "f-100120b57304"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/WhatIs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "459395f39644de8fafb049637bec507e1207c2d649c1f37fa50afba3d70e6f8c"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/serv-side-encryption.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "804c6016538b1111a9b028c032dce2810baa0dd2785043ce6cf273cb5b6735e8"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "07358f157e84adc2521026c9848010a6ca71680063f1bcb79d079d2dbb459d44"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ae38d1ec34079b789cabf235a83972bff8c992beb388f02eb8a4a7d124b58864"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "22aa03967381c45728308b96eb04c584c50738fd80a910f9a72865a494e1199c"
+        }
+      ]
+    },
+    {
+      "draftId": "d-30c761e4ee9d",
+      "factIds": [
+        "f-10334aa1e163"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "d5d31626168cf2483eb831d6b4eef812ebe06296b6eb12657a3b11e3739cb898"
+        }
+      ]
+    },
+    {
+      "draftId": "d-316d9a88a018",
+      "factIds": [
+        "f-2b0c86076529"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0eef1182fc35c64aba32ccc071588cd726d37f5d2ccc639003116f4a6a89908b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-3273da646977",
+      "questionId": "DVA-0038",
+      "factIds": [
+        "f-05802bd983ad",
+        "f-1a0d68259149",
+        "f-8e6f9d8611a4"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonECR/latest/userguide/what-is-ecr.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f560a39794da4d6568c9e8f8646e5d21dbde63cb40880a4c79330788f2410d2f"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/q-in-IDE-chat.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "20811c19a9717c30fbfbaa39885818dff8f0eb1b59585496dfeb06ef1fb5a3c1"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/chapter-layers.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "d42aec23cf5aaa3546ec9012e33fc777b35b53693d822e8786d62bd2c123bdfe"
+        }
+      ]
+    },
+    {
+      "draftId": "d-32878151a781",
+      "questionId": "DVA-0039",
+      "factIds": [
+        "f-48721cb865f4"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAX.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a77c092567e8368a971d2ef81b9b31df93d1db0ff473b4e4299dec91840edafa"
+        }
+      ]
+    },
+    {
+      "draftId": "d-329b0f2269e1",
+      "questionId": "DVA-0040",
+      "factIds": [
+        "f-0b59d4a875e0",
+        "f-0f26d9849868",
+        "f-1be49e14cad8"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "72c5883584a60d162dfde1327c0a57428f6ea31de4169cf3a85532bc5a65a409"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0586c990cabdaf3ba606677d3bda0392431d861ae3baa7541e8505ed4ccc5e5b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "cc5f063d80825d59ebd305ac9a0e00137f9877a814f9aca75b9ba10db9e5f9f5"
+        }
+      ]
+    },
+    {
+      "draftId": "d-32f3dd328e71",
+      "questionId": "DVA-0041",
+      "factIds": [
+        "f-58d55682a202"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "3c8eebd192f26659f4191ccc094e9144fb7e3482c59bf17c5345a17d5e735f2e"
+        }
+      ]
+    },
+    {
+      "draftId": "d-36864e383d20",
+      "questionId": "DVA-0042",
+      "factIds": [
+        "f-1a24d2357b28",
+        "f-3ef79e4bb8af",
+        "f-5e608268148b"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "45456ae7648acb2e9c2fb6c140452cf8f0b2d3014fd2a0c84b549d3441af92b7"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/canary-release.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "73a9ddcd27518b7a630d8e55fea2432b93ecc15c02c755d11e67210b8b58f020"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "c6e92d3dea128875aaae81cc0057ca2c420f0dddc52aa16dad1b828b6c6b4ca3"
+        }
+      ]
+    },
+    {
+      "draftId": "d-37b85ba5140a",
+      "factIds": [
+        "f-204357258edd"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "9debb8e75029317d779ed58ca2b3bbc45598e28fca90ab3de455ddd78f7b148e"
+        }
+      ]
+    },
+    {
+      "draftId": "d-3b3c6f2e44c5",
+      "questionId": "DVA-0043",
+      "factIds": [
+        "f-332b200cbc78"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5177c72660f33883bd88acae91d663fa632fb1cb42871831f16f12fc524154ea"
+        }
+      ]
+    },
+    {
+      "draftId": "d-3b971d76fcfa",
+      "questionId": "DVA-0044",
+      "factIds": [
+        "f-2735bf7f9fb6",
+        "f-40fc6728139c",
+        "f-567f82dbafce"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/canary-release.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "73a9ddcd27518b7a630d8e55fea2432b93ecc15c02c755d11e67210b8b58f020"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-stages.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ed3dcd8756b7247351a034f4cd4b254f33cc7904d4bd2e31a95ed034cbebfede"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/stage-variables.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e0788fa9cc557c5e5f8417eb74fa1d0a2d6b89888ccc33e20f2d7cf05b06f2aa"
+        }
+      ]
+    },
+    {
+      "draftId": "d-3bc3fa80148b",
+      "questionId": "DVA-0045",
+      "factIds": [
+        "f-15f44aa6af74"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5656bedab8e4de2e9ea876f9ad70608f3f9b0bf3b38494a0d8fb359d3a13b57f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-3e41a6abd887",
+      "questionId": "DVA-0046",
+      "factIds": [
+        "f-1a3feeb5d664"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ab7269d75973acddf654dbf4c55540495c98448539d650c66f182aa4512e5890"
+        }
+      ]
+    },
+    {
+      "draftId": "d-3e47465c2259",
+      "questionId": "DVA-0047",
+      "factIds": [
+        "f-3e169ab4b008",
+        "f-50ba783a4733",
+        "f-70f59fb062f9",
+        "f-84bc3b38d27f",
+        "f-8805c3d47446"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "38e32eeb520586da45d9f0f2b36c1cedc46ddd0a1a8e144c17582eaff35a03ab"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/Welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "cc98e0d7bb33843c156c59efc5a5d23b83a1b304199b908215cb2648dffe4c11"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ab7269d75973acddf654dbf4c55540495c98448539d650c66f182aa4512e5890"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-local-generate-event.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e2cbd5f552a7cf018cf915a699bc06d331deb6f342786a854c49c262ae5177e0"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/using-sam-cli-local-invoke.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "675a9f9baa90545ecedcb1fac1427ded5f5752d5f004158998bdbcb2275b4e8d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-3e554acc6115",
+      "questionId": "DVA-0048",
+      "factIds": [
+        "f-08c1c1a07fa9",
+        "f-341f330f6cc3",
+        "f-3ac918c35789"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amplify/latest/userguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "d6c9e4f8aee8e18d79fb130ea6883b21791de99f70b495d9ea0a4cfeb838be8f"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codeartifact/latest/ug/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "873629f161f5ccad6363b6c09aeccd36e090fabb48dea1521428219f866bde3d"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a2b09052cc91e9c40aa804b75c2cb3bc517699521c95a188365768125286bf65"
+        }
+      ]
+    },
+    {
+      "draftId": "d-3e9c02a1fc00",
+      "questionId": "DVA-0049",
+      "factIds": [
+        "f-0a4b0fa20fde",
+        "f-315da41b4b5e",
+        "f-3ff9fe4cc7bc",
+        "f-92386d627b08",
+        "f-ee355aeec81d"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5ca53f3a9729de3097aff3d7ef469aeea0eabec4d5e83260334189c835ac6594"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-caching.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "738be4c483fe712e9b17845bed25841133b2d2f764e1cd6ac2ca94ed23eb5513"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "38e32eeb520586da45d9f0f2b36c1cedc46ddd0a1a8e144c17582eaff35a03ab"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f54ccfe342cdc5df08cd5d4024c2c57f3092909ee631d127ef99c313f2c0cd1a"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "bf2013e8c65e80bca7d3982fdfbdd7b74e89cc58b00ceec7f8f6bc6bd6583554"
+        }
+      ]
+    },
+    {
+      "draftId": "d-3ec619fd0de3",
+      "questionId": "DVA-0050",
+      "factIds": [
+        "f-0025b5c29a5e"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "347af0f16b7b1ed25e467dc6e6264ebba07f0f3edfc7abebfa635a4db307871b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-3ef5f7564cd2",
+      "factIds": [
+        "f-70f59fb062f9",
+        "f-731561f8f8d0"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5656bedab8e4de2e9ea876f9ad70608f3f9b0bf3b38494a0d8fb359d3a13b57f"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ab7269d75973acddf654dbf4c55540495c98448539d650c66f182aa4512e5890"
+        }
+      ]
+    },
+    {
+      "draftId": "d-4033c7e4f3be",
+      "questionId": "DVA-0051",
+      "factIds": [
+        "f-073e69288392",
+        "f-0fd529f907db",
+        "f-137b7f8f8198"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "7170a35163c0d845ae27e549f085247c92f34c893cb46c48c12d6cb5bb76e655"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "6f8e7f11b88d918b911c78978ddecc9e464f9a601e5935cd6f1eba1bd4229c72"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/capacity-mode.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5ecf1cb7f7ef59aa52a65fddd3f86076fddb9cb15b3d248a1173b59cc1411851"
+        }
+      ]
+    },
+    {
+      "draftId": "d-43f8cb6c9d72",
+      "questionId": "DVA-0052",
+      "factIds": [
+        "f-0804f5f71325",
+        "f-083f16900290",
+        "f-0b54321024af",
+        "f-0b59d4a875e0",
+        "f-1356803201cf"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/serv-side-encryption.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "804c6016538b1111a9b028c032dce2810baa0dd2785043ce6cf273cb5b6735e8"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "c89f839064a26a0832b99613f691ef312edd02778f951ff24e577766cb822b2f"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-caching.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "738be4c483fe712e9b17845bed25841133b2d2f764e1cd6ac2ca94ed23eb5513"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-integrate-with-cognito.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "c510eff4b4d24c7fa985526fa2b4abef793be6dc2a0eee7bc9b44f85a4c57886"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0586c990cabdaf3ba606677d3bda0392431d861ae3baa7541e8505ed4ccc5e5b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-48473cbeb2f8",
+      "questionId": "DVA-0053",
+      "factIds": [
+        "f-4470aa5cbfa4"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-stages.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ed3dcd8756b7247351a034f4cd4b254f33cc7904d4bd2e31a95ed034cbebfede"
+        }
+      ]
+    },
+    {
+      "draftId": "d-486b668d6c91",
+      "questionId": "DVA-0054",
+      "factIds": [
+        "f-04a51be0c164"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ae38d1ec34079b789cabf235a83972bff8c992beb388f02eb8a4a7d124b58864"
+        }
+      ]
+    },
+    {
+      "draftId": "d-4b75b0df7273",
+      "questionId": "DVA-0055",
+      "factIds": [
+        "f-297129949c73",
+        "f-326a5d4efa84",
+        "f-349bc0c6d865",
+        "f-38e9ff3d7cae",
+        "f-4eeb40ae548e",
+        "f-87d92890477c"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AnalyzingLogData.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a8f9688d11ea02b2877a7d5cbf0bdc4f45f0a5a029925d241094f536d18fcb7b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/mask-sensitive-log-data.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f6e26380aa44d3298a070fcf95554302c70a56ed59656608e1763c8930b1d4ec"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "1583a9671685d2e647c0c4a126eec938213cebc3af142781b8b64664adee6e61"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "2cbb26a8515390f7b7cab12f4730a76f2debc92843120f0b21531cbf07b41ff8"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/ebs/latest/userguide/what-is-ebs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f59da8e55c0ed26712eb65f60e5ee37eb9a704e2909e65e51712e915bda0126c"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/privateca/latest/userguide/PcaWelcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0050d9b3ba441c3274814773e0e0093fa299eea62ddcf440403362c34a9c569f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-4b81e66464c5",
+      "questionId": "DVA-0056",
+      "factIds": [
+        "f-707291d911e8"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "1583a9671685d2e647c0c4a126eec938213cebc3af142781b8b64664adee6e61"
+        }
+      ]
+    },
+    {
+      "draftId": "d-4bcc257b547a",
+      "factIds": [
+        "f-63cc7d592b14",
+        "f-ec264002bfe7"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-changesets.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e3e688dc1a314383dc0e828a8b976586d5c0556582968afc2401a326167d437a"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/introduction-devops-aws/aws-serverless-application-model.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "69810728ee5c35a39018cfcd4e6a0b640e5d3a79d3dfac9eb67a6671bfc7c6ac"
+        }
+      ]
+    },
+    {
+      "draftId": "d-4bf08291660b",
+      "questionId": "DVA-0057",
+      "factIds": [
+        "f-0df880a5fe42"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5110d25ae54f5612fc56fde603acabf1979c3fe1a34f1bfe934c2a66229a884e"
+        }
+      ]
+    },
+    {
+      "draftId": "d-4bf2a422ced2",
+      "questionId": "DVA-0058",
+      "factIds": [
+        "f-2be85e08818d",
+        "f-62658e6b8485",
+        "f-80d3b9ba7b5d",
+        "f-8283369216ca"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/mask-sensitive-log-data.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f6e26380aa44d3298a070fcf95554302c70a56ed59656608e1763c8930b1d4ec"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ed860942f0967748ef7e2094b8f310131482070084b9cf00199e25a14cf30ae5"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "8682dd049e4315193ae5d2e34ca5ba406fec62db47646c28fce4c5acc285305a"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codeguru/latest/profiler-ug/what-is-codeguru-profiler.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "64266d39e6b4742565886ba4f7cade9548d227f1cea46f56843582dad92ac863"
+        }
+      ]
+    },
+    {
+      "draftId": "d-4c6e03c71956",
+      "questionId": "DVA-0059",
+      "factIds": [
+        "f-692a5ca23d7e",
+        "f-7af190e1da9d"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5656bedab8e4de2e9ea876f9ad70608f3f9b0bf3b38494a0d8fb359d3a13b57f"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ab7269d75973acddf654dbf4c55540495c98448539d650c66f182aa4512e5890"
+        }
+      ]
+    },
+    {
+      "draftId": "d-4cf366677843",
+      "questionId": "DVA-0060",
+      "factIds": [
+        "f-232e8092fddd"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/Strategies.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "1878a8bee2ffd1f4f0ca5b3902987fa37496588df7f102f9c6bb0187be2713b7"
+        }
+      ]
+    },
+    {
+      "draftId": "d-4d3972ff63b9",
+      "questionId": "DVA-0061",
+      "factIds": [
+        "f-1c92a7c84ddd",
+        "f-22022013918d",
+        "f-2cbe17b213f0"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "92ca8fba6b9e4f419348db66902346b18bcc188ac401a6c6974de66f950f22d2"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs-view.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "25d416c4578c97dbc3abdc990de4ff78cfb916e038e4a3867aa23828f1fd5327"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/xray/latest/devguide/aws-xray.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "2741daeb86551680d94ff1a23b24115fa14a3da347d74ab10c4b21649ed8cad0"
+        }
+      ]
+    },
+    {
+      "draftId": "d-4e0efd802d0a",
+      "factIds": [
+        "f-09a30b9f27cb",
+        "f-0e339472c966",
+        "f-0f6cbe0eb91c",
+        "f-0fa2ab1b8aca",
+        "f-1261cb140a85"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "69c3cbba7a976efc7d37f933d113a2f48eff409ff27800614db1c4b08aee95b4"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/appsync/latest/devguide/what-is-appsync.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f623c887f7c51ba6b4f1b128a4333e08ca02f234d7c16a62369a5e0b2b77c225"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/efs/latest/ug/whatisefs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5af30941ebf771ea17e668065f33c18b16c3de4dfd7926ea0e9dd27b98f7c045"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e1ca5cd7a8ffe54a7c752b94146f2589d6df376cd3699d0bedb6aaca1bed5542"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/using-sam-cli-local-invoke.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "675a9f9baa90545ecedcb1fac1427ded5f5752d5f004158998bdbcb2275b4e8d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-4fdfc6c05915",
+      "questionId": "DVA-0062",
+      "factIds": [
+        "f-0acb6db63af6"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/sdkref/latest/guide/feature-retry-behavior.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "9f5a207310f50d7335e1a528ab197126a908df26f01a7a9b18ef3b6f4ac89beb"
+        }
+      ]
+    },
+    {
+      "draftId": "d-529097129a22",
+      "questionId": "DVA-0063",
+      "factIds": [
+        "f-3a9f86258f6c"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "2cbb26a8515390f7b7cab12f4730a76f2debc92843120f0b21531cbf07b41ff8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-54b0a82316a1",
+      "questionId": "DVA-0064",
+      "factIds": [
+        "f-055dfa6970ac",
+        "f-072944b087d6"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "dbcd0bc10101e348434813e0b07d1c62c21f0c01af80dd090c4373e8e6d758ba"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/appconfig/latest/userguide/what-is-appconfig.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "27394e41d2d11a4101f43e073d814f342241d310da95f6d09e02b0d50ecad42c"
+        }
+      ]
+    },
+    {
+      "draftId": "d-54de4138aa6c",
+      "questionId": "DVA-0065",
+      "factIds": [
+        "f-421f9f1044fb",
+        "f-469e532cfbdf",
+        "f-6b5e7a165a4f"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "22a192068b709f9529a736c2317d302920abd2ef0a196f3882569d24c811fc2b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "38e32eeb520586da45d9f0f2b36c1cedc46ddd0a1a8e144c17582eaff35a03ab"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5177c72660f33883bd88acae91d663fa632fb1cb42871831f16f12fc524154ea"
+        }
+      ]
+    },
+    {
+      "draftId": "d-55e83f755d4e",
+      "factIds": [
+        "f-03b57d99f279"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "8b97534d790da8647c2b58e497060630ce5f2b01ce46e2d2deac2070ada0f338"
+        }
+      ]
+    },
+    {
+      "draftId": "d-58a927919e06",
+      "factIds": [
+        "f-03451341b84b",
+        "f-41be59f0b715",
+        "f-4ad8bbec71b4",
+        "f-74773b3f7c1f",
+        "f-ef2c4d6cdcc5"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AnalyzingLogData.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a8f9688d11ea02b2877a7d5cbf0bdc4f45f0a5a029925d241094f536d18fcb7b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e13db9d9c821e8195c1c5e20b59ab732a32c780a17c0489caac3571cbb542da0"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a8a34ed3346f5828b6d4101321960e9a5fd6a4c3a6a8a914c62c6c34f083f1dd"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs-view.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "25d416c4578c97dbc3abdc990de4ff78cfb916e038e4a3867aa23828f1fd5327"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/using-sam-cli-local-invoke.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "675a9f9baa90545ecedcb1fac1427ded5f5752d5f004158998bdbcb2275b4e8d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-594e5dd2d3eb",
+      "questionId": "DVA-0066",
+      "factIds": [
+        "f-4f56500840b1"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-short-and-long-polling.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a1dc39924f32c06dc395d0ac89b1afc2b6c71187bb5e06d26e4c8eaecdd9c0b4"
+        }
+      ]
+    },
+    {
+      "draftId": "d-5a7527d02090",
+      "factIds": [
+        "f-9e2ad087b41c"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "3c8eebd192f26659f4191ccc094e9144fb7e3482c59bf17c5345a17d5e735f2e"
+        }
+      ]
+    },
+    {
+      "draftId": "d-5cbbbd9d5e16",
+      "factIds": [
+        "f-2a831f1b705a",
+        "f-40fc6728139c",
+        "f-567f82dbafce",
+        "f-70f59fb062f9"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/canary-release.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "73a9ddcd27518b7a630d8e55fea2432b93ecc15c02c755d11e67210b8b58f020"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/stage-variables.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e0788fa9cc557c5e5f8417eb74fa1d0a2d6b89888ccc33e20f2d7cf05b06f2aa"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "c6e92d3dea128875aaae81cc0057ca2c420f0dddc52aa16dad1b828b6c6b4ca3"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ab7269d75973acddf654dbf4c55540495c98448539d650c66f182aa4512e5890"
+        }
+      ]
+    },
+    {
+      "draftId": "d-5cd33e58b346",
+      "factIds": [
+        "f-58d55682a202"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "3c8eebd192f26659f4191ccc094e9144fb7e3482c59bf17c5345a17d5e735f2e"
+        }
+      ]
+    },
+    {
+      "draftId": "d-5dd1af4e76a2",
+      "questionId": "DVA-0067",
+      "factIds": [
+        "f-77a94164424c"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a9a1f03ed5452570fa1e1788cbae1234009650c8df9f8e819c29485683ac447b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-5ea06d77b117",
+      "questionId": "DVA-0068",
+      "factIds": [
+        "f-0e339472c966"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "69c3cbba7a976efc7d37f933d113a2f48eff409ff27800614db1c4b08aee95b4"
+        }
+      ]
+    },
+    {
+      "draftId": "d-5f37753c67ce",
+      "questionId": "DVA-0069",
+      "factIds": [
+        "f-3e836219c7a4",
+        "f-3ec03aabeb5a"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "4804254e74cb22518973a37c7eedc006f04a5d689180463de9b3b8f11aceb493"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cdk/v2/guide/home.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "4cc9a8f2cb19befa6091f2eb4310cc4564d6d2e29288207327a411e247efc034"
+        }
+      ]
+    },
+    {
+      "draftId": "d-60ab9b5c8d57",
+      "questionId": "DVA-0070",
+      "factIds": [
+        "f-1356803201cf",
+        "f-1b7e0b148ce7"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "4e6f7c5f3d9c826b209fd4e7048c9982125cb75c18ff4d4ab7e470cd4235eecc"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-integrate-with-cognito.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "c510eff4b4d24c7fa985526fa2b4abef793be6dc2a0eee7bc9b44f85a4c57886"
+        }
+      ]
+    },
+    {
+      "draftId": "d-60c4a2364778",
+      "questionId": "DVA-0071",
+      "factIds": [
+        "f-1f3fe3078937"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-fifo-queues.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "3c99ffc4c0d6e8d64070bb39ae0ef9647e3b290636178981e68b853597a0c7e2"
+        }
+      ]
+    },
+    {
+      "draftId": "d-63ea09c4b233",
+      "questionId": "DVA-0072",
+      "factIds": [
+        "f-40fc6728139c",
+        "f-567f82dbafce"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/canary-release.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "73a9ddcd27518b7a630d8e55fea2432b93ecc15c02c755d11e67210b8b58f020"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/stage-variables.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e0788fa9cc557c5e5f8417eb74fa1d0a2d6b89888ccc33e20f2d7cf05b06f2aa"
+        }
+      ]
+    },
+    {
+      "draftId": "d-658775c2afea",
+      "questionId": "DVA-0073",
+      "factIds": [
+        "f-041b43d95def"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Scan.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "b179c5334be11de25f526737cff134eca863bf95364f456127939a3e5f62cc95"
+        }
+      ]
+    },
+    {
+      "draftId": "d-6645756efd03",
+      "questionId": "DVA-0074",
+      "factIds": [
+        "f-63262f4e5a3f"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/athena/latest/ug/what-is.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "2c2c45127212218dcf6ad7caf871f49c1828e83f453a56673b999854789bae2f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-67e50e51ae23",
+      "questionId": "DVA-0075",
+      "factIds": [
+        "f-097843542049",
+        "f-45202b113789",
+        "f-573c90b212ad",
+        "f-9428c4a209ae"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/mask-sensitive-log-data.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f6e26380aa44d3298a070fcf95554302c70a56ed59656608e1763c8930b1d4ec"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "347af0f16b7b1ed25e467dc6e6264ebba07f0f3edfc7abebfa635a4db307871b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5d02acaf53377d2d893e86d50dd2608465a518e98dab9635c023c7914a9a5b3f"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/waf/latest/developerguide/what-is-aws-waf.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "095d63c8316fab1e36d7d4d8a6e877b4c40b0b96914f2131aec076af4153d77f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-68b034b185ab",
+      "questionId": "DVA-0076",
+      "factIds": [
+        "f-1943b8cad6f8",
+        "f-19c49805dab5",
+        "f-1b7e0b148ce7",
+        "f-2130f390afc8",
+        "f-277f9ed17a0e"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "74f7522af12208d0198cdd2025e4ea7d7abd6de686844dfc68d16c04707f51c1"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "4e6f7c5f3d9c826b209fd4e7048c9982125cb75c18ff4d4ab7e470cd4235eecc"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "19a6459dd5046ded2f0050126c8c00966dbe6d2440cc2884a1f9d4511b417b0c"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0b05ce16085793e6747bd721df75ec0dd278b22df6ff7450dc92fb22e9edf605"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cloudshell/latest/userguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "fbdcf93260bd30b6894d8bc7f042b32346726aecd2e38612183432a5ec06a227"
+        }
+      ]
+    },
+    {
+      "draftId": "d-6a4375650ec6",
+      "questionId": "DVA-0077",
+      "factIds": [
+        "f-18dbe17a7f88"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/deployment-configurations.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a66604e562ac23a854af6b916f6af83514e773a16eead0038be216c667f58f9b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-6ae8884b5962",
+      "questionId": "DVA-0078",
+      "factIds": [
+        "f-9428c4a209ae"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/waf/latest/developerguide/what-is-aws-waf.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "095d63c8316fab1e36d7d4d8a6e877b4c40b0b96914f2131aec076af4153d77f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-6aeb6f3eb724",
+      "questionId": "DVA-0079",
+      "factIds": [
+        "f-1c92a7c84ddd",
+        "f-2cbe17b213f0",
+        "f-43ac622b59c2",
+        "f-597ae53f3777"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "025c9d70240859616439733484013f2ecb953592b6f8baae66e6573f1f2cc4be"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "92ca8fba6b9e4f419348db66902346b18bcc188ac401a6c6974de66f950f22d2"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/sns/latest/dg/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "9c66ba9d878b38bc393ca7d3ba5d716f701a324d1b9b339af3f8354f52d08bd8"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/xray/latest/devguide/aws-xray.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "2741daeb86551680d94ff1a23b24115fa14a3da347d74ab10c4b21649ed8cad0"
+        }
+      ]
+    },
+    {
+      "draftId": "d-6bd21f60c29f",
+      "factIds": [
+        "f-2fd401c5c497"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ec15592847642cfd002961f0ff09b4451b787bef1244d1cfd6e0a21e88902458"
+        }
+      ]
+    },
+    {
+      "draftId": "d-6c40bed6025f",
+      "questionId": "DVA-0080",
+      "factIds": [
+        "f-34c0c19bab07"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5177c72660f33883bd88acae91d663fa632fb1cb42871831f16f12fc524154ea"
+        }
+      ]
+    },
+    {
+      "draftId": "d-6dbb015eb260",
+      "questionId": "DVA-0081",
+      "factIds": [
+        "f-02195309666d"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0c286bb363d804d7cee8cf712cc24edf260b9a7744f5a6905797ec9bbe7b92a0"
+        }
+      ]
+    },
+    {
+      "draftId": "d-6e15ed85f12a",
+      "questionId": "DVA-0082",
+      "factIds": [
+        "f-22b0c4b5a524"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "38e32eeb520586da45d9f0f2b36c1cedc46ddd0a1a8e144c17582eaff35a03ab"
+        }
+      ]
+    },
+    {
+      "draftId": "d-6e3599f07637",
+      "questionId": "DVA-0083",
+      "factIds": [
+        "f-2472a1936ccb"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AnalyzingLogData.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a8f9688d11ea02b2877a7d5cbf0bdc4f45f0a5a029925d241094f536d18fcb7b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-6e9d0d857827",
+      "factIds": [
+        "f-221723c17f93",
+        "f-239daa954962",
+        "f-9e2ad087b41c",
+        "f-e3d808f2e9c2"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-fifo-queues.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "3c99ffc4c0d6e8d64070bb39ae0ef9647e3b290636178981e68b853597a0c7e2"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "3c8eebd192f26659f4191ccc094e9144fb7e3482c59bf17c5345a17d5e735f2e"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/appsync/latest/devguide/what-is-appsync.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f623c887f7c51ba6b4f1b128a4333e08ca02f234d7c16a62369a5e0b2b77c225"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "d53c773403cfc6b1b65fc54e684c92d1331a12e1ca088b454e7d6ca7fb3306e1"
+        }
+      ]
+    },
+    {
+      "draftId": "d-6ef823050ae3",
+      "questionId": "DVA-0084",
+      "factIds": [
+        "f-2130f390afc8",
+        "f-326a5d4efa84"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0b05ce16085793e6747bd721df75ec0dd278b22df6ff7450dc92fb22e9edf605"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/privateca/latest/userguide/PcaWelcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0050d9b3ba441c3274814773e0e0093fa299eea62ddcf440403362c34a9c569f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-6f49106104ef",
+      "questionId": "DVA-0085",
+      "factIds": [
+        "f-1a75a3aaba19",
+        "f-c02e11fe7029",
+        "f-f0feaefc536b"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e13db9d9c821e8195c1c5e20b59ab732a32c780a17c0489caac3571cbb542da0"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0c286bb363d804d7cee8cf712cc24edf260b9a7744f5a6905797ec9bbe7b92a0"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/stage-variables.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e0788fa9cc557c5e5f8417eb74fa1d0a2d6b89888ccc33e20f2d7cf05b06f2aa"
+        }
+      ]
+    },
+    {
+      "draftId": "d-6fc1f45ea6f9",
+      "questionId": "DVA-0086",
+      "factIds": [
+        "f-0a4b0fa20fde",
+        "f-42651439afd7"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Embedded_Metric_Format.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "2ad43cffa05da721f51628b6d317d59394f746e77165ffef697599bbfb29ddfb"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5ca53f3a9729de3097aff3d7ef469aeea0eabec4d5e83260334189c835ac6594"
+        }
+      ]
+    },
+    {
+      "draftId": "d-703662a4a06f",
+      "questionId": "DVA-0087",
+      "factIds": [
+        "f-0b6a3078e3df",
+        "f-4dc983d78e38"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "8b97534d790da8647c2b58e497060630ce5f2b01ce46e2d2deac2070ada0f338"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cloudshell/latest/userguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "fbdcf93260bd30b6894d8bc7f042b32346726aecd2e38612183432a5ec06a227"
+        }
+      ]
+    },
+    {
+      "draftId": "d-7108dc2496cb",
+      "factIds": [
+        "f-298d5d960e1a"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "9debb8e75029317d779ed58ca2b3bbc45598e28fca90ab3de455ddd78f7b148e"
+        }
+      ]
+    },
+    {
+      "draftId": "d-71466ea51074",
+      "questionId": "DVA-0088",
+      "factIds": [
+        "f-63cc7d592b14",
+        "f-70f59fb062f9",
+        "f-84bc3b38d27f",
+        "f-8805c3d47446",
+        "f-ec264002bfe7"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-changesets.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e3e688dc1a314383dc0e828a8b976586d5c0556582968afc2401a326167d437a"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ab7269d75973acddf654dbf4c55540495c98448539d650c66f182aa4512e5890"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-local-generate-event.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e2cbd5f552a7cf018cf915a699bc06d331deb6f342786a854c49c262ae5177e0"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/using-sam-cli-local-invoke.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "675a9f9baa90545ecedcb1fac1427ded5f5752d5f004158998bdbcb2275b4e8d"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/introduction-devops-aws/aws-serverless-application-model.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "69810728ee5c35a39018cfcd4e6a0b640e5d3a79d3dfac9eb67a6671bfc7c6ac"
+        }
+      ]
+    },
+    {
+      "draftId": "d-719f86046177",
+      "factIds": [
+        "f-2256b027008e"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/chapter-layers.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "d42aec23cf5aaa3546ec9012e33fc777b35b53693d822e8786d62bd2c123bdfe"
+        }
+      ]
+    },
+    {
+      "draftId": "d-71c58946b16d",
+      "questionId": "DVA-0089",
+      "factIds": [
+        "f-0fa2ab1b8aca",
+        "f-137b7f8f8198"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "7170a35163c0d845ae27e549f085247c92f34c893cb46c48c12d6cb5bb76e655"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/appsync/latest/devguide/what-is-appsync.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f623c887f7c51ba6b4f1b128a4333e08ca02f234d7c16a62369a5e0b2b77c225"
+        }
+      ]
+    },
+    {
+      "draftId": "d-756118bfecbd",
+      "questionId": "DVA-0090",
+      "factIds": [
+        "f-29c44706ed29",
+        "f-2c707c4b7861",
+        "f-41be59f0b715",
+        "f-c455e903e375"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AnalyzingLogData.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a8f9688d11ea02b2877a7d5cbf0bdc4f45f0a5a029925d241094f536d18fcb7b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "22a192068b709f9529a736c2317d302920abd2ef0a196f3882569d24c811fc2b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codeguru/latest/profiler-ug/what-is-codeguru-profiler.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "64266d39e6b4742565886ba4f7cade9548d227f1cea46f56843582dad92ac863"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/compute-optimizer/latest/ug/what-is-compute-optimizer.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5412f5b3af3db135609a0df86e9e4ca0bd4bce214e5a892dc11d7ab30c9e1299"
+        }
+      ]
+    },
+    {
+      "draftId": "d-759e9b9791a5",
+      "factIds": [
+        "f-692a5ca23d7e",
+        "f-7af190e1da9d"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5656bedab8e4de2e9ea876f9ad70608f3f9b0bf3b38494a0d8fb359d3a13b57f"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ab7269d75973acddf654dbf4c55540495c98448539d650c66f182aa4512e5890"
+        }
+      ]
+    },
+    {
+      "draftId": "d-75c45da41d01",
+      "questionId": "DVA-0091",
+      "factIds": [
+        "f-29b22107efc6",
+        "f-51865d493099",
+        "f-69234eb1c5c1",
+        "f-6f234e9df34b",
+        "f-7812cfaa3f32"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonECR/latest/userguide/what-is-ecr.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f560a39794da4d6568c9e8f8646e5d21dbde63cb40880a4c79330788f2410d2f"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "025c9d70240859616439733484013f2ecb953592b6f8baae66e6573f1f2cc4be"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codeartifact/latest/ug/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "873629f161f5ccad6363b6c09aeccd36e090fabb48dea1521428219f866bde3d"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f54ccfe342cdc5df08cd5d4024c2c57f3092909ee631d127ef99c313f2c0cd1a"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/waf/latest/developerguide/what-is-aws-waf.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "095d63c8316fab1e36d7d4d8a6e877b4c40b0b96914f2131aec076af4153d77f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-7621f6be77cf",
+      "questionId": "DVA-0092",
+      "factIds": [
+        "f-0123ebc790f3"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/deployment-configurations.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a66604e562ac23a854af6b916f6af83514e773a16eead0038be216c667f58f9b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-769913bbd494",
+      "questionId": "DVA-0093",
+      "factIds": [
+        "f-2b0c86076529",
+        "f-2fd401c5c497",
+        "f-33e1b660d362",
+        "f-4869d3c706f1",
+        "f-4f56500840b1"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-short-and-long-polling.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a1dc39924f32c06dc395d0ac89b1afc2b6c71187bb5e06d26e4c8eaecdd9c0b4"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0eef1182fc35c64aba32ccc071588cd726d37f5d2ccc639003116f4a6a89908b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LSI.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "7ff7437073dc662a0b334680c1120deb44f4bdc21bfba213a1ee72a628824c24"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "8f3613531e4ae2d6259494baee9c7de89b58103bd1fd76de431c00edb06ac1d5"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ec15592847642cfd002961f0ff09b4451b787bef1244d1cfd6e0a21e88902458"
+        }
+      ]
+    },
+    {
+      "draftId": "d-76ce56a3af54",
+      "questionId": "DVA-0094",
+      "factIds": [
+        "f-1165e29af911",
+        "f-14e514290c99",
+        "f-1c336c3a1435",
+        "f-232e8092fddd",
+        "f-685a6a9de27a"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "1bad70a471afec919ac98e29a9ddc5d52934d77e336966fbace91e7c06e57b6a"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ed860942f0967748ef7e2094b8f310131482070084b9cf00199e25a14cf30ae5"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/Strategies.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "1878a8bee2ffd1f4f0ca5b3902987fa37496588df7f102f9c6bb0187be2713b7"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codeguru/latest/profiler-ug/what-is-codeguru-profiler.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "64266d39e6b4742565886ba4f7cade9548d227f1cea46f56843582dad92ac863"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "8f3613531e4ae2d6259494baee9c7de89b58103bd1fd76de431c00edb06ac1d5"
+        }
+      ]
+    },
+    {
+      "draftId": "d-77a6a32ea00e",
+      "questionId": "DVA-0095",
+      "factIds": [
+        "f-204357258edd"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "9debb8e75029317d779ed58ca2b3bbc45598e28fca90ab3de455ddd78f7b148e"
+        }
+      ]
+    },
+    {
+      "draftId": "d-77acd0b0eb36",
+      "questionId": "DVA-0096",
+      "factIds": [
+        "f-09a30b9f27cb",
+        "f-0da2cae9ad6a",
+        "f-0f6cbe0eb91c",
+        "f-0fa2ab1b8aca",
+        "f-1261cb140a85"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/appsync/latest/devguide/what-is-appsync.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f623c887f7c51ba6b4f1b128a4333e08ca02f234d7c16a62369a5e0b2b77c225"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/efs/latest/ug/whatisefs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5af30941ebf771ea17e668065f33c18b16c3de4dfd7926ea0e9dd27b98f7c045"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e1ca5cd7a8ffe54a7c752b94146f2589d6df376cd3699d0bedb6aaca1bed5542"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/using-sam-cli-local-invoke.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "675a9f9baa90545ecedcb1fac1427ded5f5752d5f004158998bdbcb2275b4e8d"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/streams/latest/dev/introduction.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "fc409fa73adbd1550a3613b79ee2f6ee5019d225ee3760160eaea118d4e69f44"
+        }
+      ]
+    },
+    {
+      "draftId": "d-77b859e762b1",
+      "factIds": [
+        "f-045b23cfcbae"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "be755f9170941fdd3358e34a2bae229e529d194de7069f6715fa0102964618be"
+        }
+      ]
+    },
+    {
+      "draftId": "d-77ce5be2c102",
+      "questionId": "DVA-0097",
+      "factIds": [
+        "f-08a38ffb28d1",
+        "f-115332ef47cc",
+        "f-1a0d68259149"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/deployment-configurations.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a66604e562ac23a854af6b916f6af83514e773a16eead0038be216c667f58f9b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/chapter-layers.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "d42aec23cf5aaa3546ec9012e33fc777b35b53693d822e8786d62bd2c123bdfe"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "77ae6b24a3245c5198c9f7e28994108f3d8c089c14651cefc7c683dc2c292b41"
+        }
+      ]
+    },
+    {
+      "draftId": "d-780e10b6c15b",
+      "questionId": "DVA-0098",
+      "factIds": [
+        "f-0d456903e3c3",
+        "f-17d2f729912f",
+        "f-7288cf364c62"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "fae5de9fbd01fad29f71b839d4414733ee3e779969bc9af031c0f29e1bc65106"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codeartifact/latest/ug/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "873629f161f5ccad6363b6c09aeccd36e090fabb48dea1521428219f866bde3d"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e343f91497ce5e0dac65f5cf6fe02b700347faee90c1ea45c600163b4283708a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-788ef6850a5c",
+      "questionId": "DVA-0099",
+      "factIds": [
+        "f-0fd09eaf08b0",
+        "f-28add6a12961",
+        "f-28e140d0c64c"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "2cbb26a8515390f7b7cab12f4730a76f2debc92843120f0b21531cbf07b41ff8"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codebuild/latest/userguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "8609e9a7abe32bea3684cc05fce308de1339076533b6f34851e2dead79296e00"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "cf4f7e555f3ce1894813b622bc5f18b6162587a7465099227eca6caa21f9fec1"
+        }
+      ]
+    },
+    {
+      "draftId": "d-7a6842812229",
+      "factIds": [
+        "f-0b22172ebb22",
+        "f-3ef79e4bb8af"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/canary-release.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "73a9ddcd27518b7a630d8e55fea2432b93ecc15c02c755d11e67210b8b58f020"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "c6e92d3dea128875aaae81cc0057ca2c420f0dddc52aa16dad1b828b6c6b4ca3"
+        }
+      ]
+    },
+    {
+      "draftId": "d-7bac6b024242",
+      "questionId": "DVA-0100",
+      "factIds": [
+        "f-2b0c86076529"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0eef1182fc35c64aba32ccc071588cd726d37f5d2ccc639003116f4a6a89908b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-7c554b03bd73",
+      "questionId": "DVA-0101",
+      "factIds": [
+        "f-14e514290c99",
+        "f-14ecdbd9177d",
+        "f-22022013918d",
+        "f-34b9821d0c34",
+        "f-43ac622b59c2"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Embedded_Metric_Format.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "2ad43cffa05da721f51628b6d317d59394f746e77165ffef697599bbfb29ddfb"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5ca53f3a9729de3097aff3d7ef469aeea0eabec4d5e83260334189c835ac6594"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "8f3613531e4ae2d6259494baee9c7de89b58103bd1fd76de431c00edb06ac1d5"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs-view.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "25d416c4578c97dbc3abdc990de4ff78cfb916e038e4a3867aa23828f1fd5327"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/sns/latest/dg/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "9c66ba9d878b38bc393ca7d3ba5d716f701a324d1b9b339af3f8354f52d08bd8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-7d841f6ddc14",
+      "questionId": "DVA-0102",
+      "factIds": [
+        "f-14e514290c99",
+        "f-1c92a7c84ddd",
+        "f-1e04d52281b8",
+        "f-685a6a9de27a"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ed860942f0967748ef7e2094b8f310131482070084b9cf00199e25a14cf30ae5"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "92ca8fba6b9e4f419348db66902346b18bcc188ac401a6c6974de66f950f22d2"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codeguru/latest/profiler-ug/what-is-codeguru-profiler.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "64266d39e6b4742565886ba4f7cade9548d227f1cea46f56843582dad92ac863"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "8f3613531e4ae2d6259494baee9c7de89b58103bd1fd76de431c00edb06ac1d5"
+        }
+      ]
+    },
+    {
+      "draftId": "d-7ecf0f382563",
+      "questionId": "DVA-0103",
+      "factIds": [
+        "f-59d22789b436"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonECR/latest/userguide/what-is-ecr.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f560a39794da4d6568c9e8f8646e5d21dbde63cb40880a4c79330788f2410d2f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-7f138eea07c0",
+      "questionId": "DVA-0104",
+      "factIds": [
+        "f-050b99891bed"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs-view.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "25d416c4578c97dbc3abdc990de4ff78cfb916e038e4a3867aa23828f1fd5327"
+        }
+      ]
+    },
+    {
+      "draftId": "d-7f1890f14b17",
+      "questionId": "DVA-0105",
+      "factIds": [
+        "f-0a4b0fa20fde",
+        "f-ded612c88c91"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5ca53f3a9729de3097aff3d7ef469aeea0eabec4d5e83260334189c835ac6594"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "025c9d70240859616439733484013f2ecb953592b6f8baae66e6573f1f2cc4be"
+        }
+      ]
+    },
+    {
+      "draftId": "d-80c5749c2ff6",
+      "questionId": "DVA-0106",
+      "factIds": [
+        "f-01365d179180"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f178312a606490d4be5993b99699c42bfb14b6618ee359523ab974d19a500e32"
+        }
+      ]
+    },
+    {
+      "draftId": "d-856add5278cc",
+      "questionId": "DVA-0107",
+      "factIds": [
+        "f-1428e4273731",
+        "f-143f04e24586",
+        "f-1452811588bd",
+        "f-151ed836503f",
+        "f-15e62bb15113"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "bac1ddd7349065223d1a93a3b864c27b9153abfd27a4531ed358972f10ed8510"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventNotifications.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e0002e3d1e3ba1cd05736d6d593751f2bbd9f71fff75ab5c8bed3602e8fd0a88"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/specifying-conditions.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "cfd15d1ed6c8c6f519c7cb053e156f1dba9e5bde187d83cbbd08ee30c831d4e9"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f54ccfe342cdc5df08cd5d4024c2c57f3092909ee631d127ef99c313f2c0cd1a"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "c080bcfc94592c2b9e208a2194d90ce0e5968402f5bb92d8f83c8258a0f856ee"
+        }
+      ]
+    },
+    {
+      "draftId": "d-881fbabe6080",
+      "questionId": "DVA-0108",
+      "factIds": [
+        "f-072944b087d6",
+        "f-07fea47416fc",
+        "f-0da2cae9ad6a"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/appconfig/latest/userguide/what-is-appconfig.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "27394e41d2d11a4101f43e073d814f342241d310da95f6d09e02b0d50ecad42c"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "00b2b6ca937d32e829f05ce735218ae5d739771f2070ecb24f8bdd0cb277d8ed"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/streams/latest/dev/introduction.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "fc409fa73adbd1550a3613b79ee2f6ee5019d225ee3760160eaea118d4e69f44"
+        }
+      ]
+    },
+    {
+      "draftId": "d-886100ddffcb",
+      "factIds": [
+        "f-0185b64b4e18",
+        "f-0b22172ebb22",
+        "f-336aa7083c6e",
+        "f-6126bdf93a9f"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/deployment-configurations.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a66604e562ac23a854af6b916f6af83514e773a16eead0038be216c667f58f9b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0b201a8106e8d51e114dc0ca25ce268167465338eaee424118ddbda41fc0c432"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "cf4f7e555f3ce1894813b622bc5f18b6162587a7465099227eca6caa21f9fec1"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "c6e92d3dea128875aaae81cc0057ca2c420f0dddc52aa16dad1b828b6c6b4ca3"
+        }
+      ]
+    },
+    {
+      "draftId": "d-898e89037eff",
+      "questionId": "DVA-0109",
+      "factIds": [
+        "f-1452811588bd",
+        "f-151ed836503f",
+        "f-154fe3acaf1a"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "bac1ddd7349065223d1a93a3b864c27b9153abfd27a4531ed358972f10ed8510"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventNotifications.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e0002e3d1e3ba1cd05736d6d593751f2bbd9f71fff75ab5c8bed3602e8fd0a88"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/sns/latest/dg/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "9c66ba9d878b38bc393ca7d3ba5d716f701a324d1b9b339af3f8354f52d08bd8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-8a41dabcdb1b",
+      "questionId": "DVA-0110",
+      "factIds": [
+        "f-045b23cfcbae"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "be755f9170941fdd3358e34a2bae229e529d194de7069f6715fa0102964618be"
+        }
+      ]
+    },
+    {
+      "draftId": "d-8a7a49dd741e",
+      "factIds": [
+        "f-1943b8cad6f8",
+        "f-19c49805dab5",
+        "f-1b7e0b148ce7",
+        "f-2130f390afc8",
+        "f-277f9ed17a0e"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "74f7522af12208d0198cdd2025e4ea7d7abd6de686844dfc68d16c04707f51c1"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "4e6f7c5f3d9c826b209fd4e7048c9982125cb75c18ff4d4ab7e470cd4235eecc"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "19a6459dd5046ded2f0050126c8c00966dbe6d2440cc2884a1f9d4511b417b0c"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0b05ce16085793e6747bd721df75ec0dd278b22df6ff7450dc92fb22e9edf605"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cloudshell/latest/userguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "fbdcf93260bd30b6894d8bc7f042b32346726aecd2e38612183432a5ec06a227"
+        }
+      ]
+    },
+    {
+      "draftId": "d-8ac57f734520",
+      "questionId": "DVA-0111",
+      "factIds": [
+        "f-274885aba551"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/CHAP_AuroraOverview.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "cbdfd91c7d48d12256f358091462f2c8f0d4c963c4db34c9862ac57cbcb5cca9"
+        }
+      ]
+    },
+    {
+      "draftId": "d-8bf511d934c5",
+      "questionId": "DVA-0112",
+      "factIds": [
+        "f-08524771fe71"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/cors.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "da4acc32befb7018e9326207136e53ae4409b070141ead1be55a67fa7c445cb1"
+        }
+      ]
+    },
+    {
+      "draftId": "d-8c136126aa5b",
+      "questionId": "DVA-0113",
+      "factIds": [
+        "f-34c0c19bab07",
+        "f-7d70e56642dc"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/Strategies.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "1878a8bee2ffd1f4f0ca5b3902987fa37496588df7f102f9c6bb0187be2713b7"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5177c72660f33883bd88acae91d663fa632fb1cb42871831f16f12fc524154ea"
+        }
+      ]
+    },
+    {
+      "draftId": "d-8cb3cf56e987",
+      "questionId": "DVA-0114",
+      "factIds": [
+        "f-0fd09eaf08b0",
+        "f-15f44aa6af74",
+        "f-269def4df822",
+        "f-37204fc74184"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-changesets.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e3e688dc1a314383dc0e828a8b976586d5c0556582968afc2401a326167d437a"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a8a34ed3346f5828b6d4101321960e9a5fd6a4c3a6a8a914c62c6c34f083f1dd"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "cf4f7e555f3ce1894813b622bc5f18b6162587a7465099227eca6caa21f9fec1"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5656bedab8e4de2e9ea876f9ad70608f3f9b0bf3b38494a0d8fb359d3a13b57f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-8d64b8433af6",
+      "questionId": "DVA-0115",
+      "factIds": [
+        "f-1a75a3aaba19",
+        "f-406cf84b95fd",
+        "f-5d4db6700585"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f178312a606490d4be5993b99699c42bfb14b6618ee359523ab974d19a500e32"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0c286bb363d804d7cee8cf712cc24edf260b9a7744f5a6905797ec9bbe7b92a0"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "60d704c3357e63e88845c30a3f18da9dd0a40c3673b6a286f23479772469187b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-8db01412c7bc",
+      "questionId": "DVA-0116",
+      "factIds": [
+        "f-03b57d99f279"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "8b97534d790da8647c2b58e497060630ce5f2b01ce46e2d2deac2070ada0f338"
+        }
+      ]
+    },
+    {
+      "draftId": "d-9168fbd0eb29",
+      "questionId": "DVA-0117",
+      "factIds": [
+        "f-00429333c0b3",
+        "f-3ac918c35789",
+        "f-c02e11fe7029",
+        "f-f0feaefc536b"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e13db9d9c821e8195c1c5e20b59ab732a32c780a17c0489caac3571cbb542da0"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/amplify/latest/userguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "d6c9e4f8aee8e18d79fb130ea6883b21791de99f70b495d9ea0a4cfeb838be8f"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/stage-variables.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e0788fa9cc557c5e5f8417eb74fa1d0a2d6b89888ccc33e20f2d7cf05b06f2aa"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "347af0f16b7b1ed25e467dc6e6264ebba07f0f3edfc7abebfa635a4db307871b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-91b41f3f4ea4",
+      "questionId": "DVA-0118",
+      "factIds": [
+        "f-115332ef47cc"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "77ae6b24a3245c5198c9f7e28994108f3d8c089c14651cefc7c683dc2c292b41"
+        }
+      ]
+    },
+    {
+      "draftId": "d-920a83ee0f5e",
+      "questionId": "DVA-0119",
+      "factIds": [
+        "f-1decd6ceb0b7"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a3ab7175d14c3c3d72d73810f41e0fdc92687c6769a584d5dba3c143204bdbcc"
+        }
+      ]
+    },
+    {
+      "draftId": "d-9211c1a5f65a",
+      "questionId": "DVA-0120",
+      "factIds": [
+        "f-1a75a3aaba19",
+        "f-79b40c11522e"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0c286bb363d804d7cee8cf712cc24edf260b9a7744f5a6905797ec9bbe7b92a0"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "c89f839064a26a0832b99613f691ef312edd02778f951ff24e577766cb822b2f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-9352997a7528",
+      "questionId": "DVA-0121",
+      "factIds": [
+        "f-03451341b84b",
+        "f-0e980a145fbd",
+        "f-2ff13d54b975",
+        "f-6725f15543d2"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/MonitoringLogData.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "8b8c053cc85b2bd835727262770ba1a79d99e934330eabf0c00e006fefcd3191"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ed860942f0967748ef7e2094b8f310131482070084b9cf00199e25a14cf30ae5"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a8a34ed3346f5828b6d4101321960e9a5fd6a4c3a6a8a914c62c6c34f083f1dd"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/compute-optimizer/latest/ug/what-is-compute-optimizer.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5412f5b3af3db135609a0df86e9e4ca0bd4bce214e5a892dc11d7ab30c9e1299"
+        }
+      ]
+    },
+    {
+      "draftId": "d-94c7cfdb1b2c",
+      "questionId": "DVA-0122",
+      "factIds": [
+        "f-159fb1dc9ff3",
+        "f-15e0034ed10b",
+        "f-17077dc88b55",
+        "f-173ac42bc620",
+        "f-18a360d26673"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-caching.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "738be4c483fe712e9b17845bed25841133b2d2f764e1cd6ac2ca94ed23eb5513"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a8a34ed3346f5828b6d4101321960e9a5fd6a4c3a6a8a914c62c6c34f083f1dd"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/compute-optimizer/latest/ug/what-is-compute-optimizer.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5412f5b3af3db135609a0df86e9e4ca0bd4bce214e5a892dc11d7ab30c9e1299"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/ebs/latest/userguide/what-is-ebs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f59da8e55c0ed26712eb65f60e5ee37eb9a704e2909e65e51712e915bda0126c"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/testing-guide.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0fbc8cd18dea7e3ca81a44ae7d0a72481499ac6a85bb9880107f815a65367e8a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-94d24ca3b565",
+      "questionId": "DVA-0123",
+      "factIds": [
+        "f-4a7d6ce460c5"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "cf4f7e555f3ce1894813b622bc5f18b6162587a7465099227eca6caa21f9fec1"
+        }
+      ]
+    },
+    {
+      "draftId": "d-9772e7344f61",
+      "questionId": "DVA-0124",
+      "factIds": [
+        "f-100120b57304",
+        "f-1be49e14cad8",
+        "f-211e6d956581",
+        "f-244688ef7f97",
+        "f-297129949c73"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/ebs/latest/userguide/what-is-ebs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f59da8e55c0ed26712eb65f60e5ee37eb9a704e2909e65e51712e915bda0126c"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/testing-guide.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0fbc8cd18dea7e3ca81a44ae7d0a72481499ac6a85bb9880107f815a65367e8a"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "cc5f063d80825d59ebd305ac9a0e00137f9877a814f9aca75b9ba10db9e5f9f5"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/streams/latest/dev/key-concepts.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "426abc2f424e859000ed0b07abfe1e8159c9c3494b2f7cd762f09d3643b08aa8"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "22aa03967381c45728308b96eb04c584c50738fd80a910f9a72865a494e1199c"
+        }
+      ]
+    },
+    {
+      "draftId": "d-998c08b972a6",
+      "questionId": "DVA-0125",
+      "factIds": [
+        "f-0fd09eaf08b0"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "cf4f7e555f3ce1894813b622bc5f18b6162587a7465099227eca6caa21f9fec1"
+        }
+      ]
+    },
+    {
+      "draftId": "d-99dd53383085",
+      "questionId": "DVA-0126",
+      "factIds": [
+        "f-0b54321024af"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/serv-side-encryption.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "804c6016538b1111a9b028c032dce2810baa0dd2785043ce6cf273cb5b6735e8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-9a0c51f19796",
+      "questionId": "DVA-0127",
+      "factIds": [
+        "f-269def4df822"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-changesets.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e3e688dc1a314383dc0e828a8b976586d5c0556582968afc2401a326167d437a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-9adfbfeb3197",
+      "questionId": "DVA-0128",
+      "factIds": [
+        "f-349bc0c6d865",
+        "f-87d92890477c"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AnalyzingLogData.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a8f9688d11ea02b2877a7d5cbf0bdc4f45f0a5a029925d241094f536d18fcb7b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/mask-sensitive-log-data.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f6e26380aa44d3298a070fcf95554302c70a56ed59656608e1763c8930b1d4ec"
+        }
+      ]
+    },
+    {
+      "draftId": "d-9b59202c4b2b",
+      "questionId": "DVA-0129",
+      "factIds": [
+        "f-0396e562b3f5",
+        "f-29c44706ed29",
+        "f-41be59f0b715",
+        "f-cb8e6d3dc263"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AnalyzingLogData.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a8f9688d11ea02b2877a7d5cbf0bdc4f45f0a5a029925d241094f536d18fcb7b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/MonitoringLogData.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "8b8c053cc85b2bd835727262770ba1a79d99e934330eabf0c00e006fefcd3191"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e13db9d9c821e8195c1c5e20b59ab732a32c780a17c0489caac3571cbb542da0"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "22a192068b709f9529a736c2317d302920abd2ef0a196f3882569d24c811fc2b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-9b8a1dd221e5",
+      "questionId": "DVA-0130",
+      "factIds": [
+        "f-141073995cb6"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "be755f9170941fdd3358e34a2bae229e529d194de7069f6715fa0102964618be"
+        }
+      ]
+    },
+    {
+      "draftId": "d-9c699ff8f007",
+      "factIds": [
+        "f-22b0c4b5a524"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "38e32eeb520586da45d9f0f2b36c1cedc46ddd0a1a8e144c17582eaff35a03ab"
+        }
+      ]
+    },
+    {
+      "draftId": "d-9cd07baf4fb8",
+      "questionId": "DVA-0131",
+      "factIds": [
+        "f-144ac86eb435",
+        "f-e2c12ba21a0b"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/deployment-configurations.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a66604e562ac23a854af6b916f6af83514e773a16eead0038be216c667f58f9b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f54ccfe342cdc5df08cd5d4024c2c57f3092909ee631d127ef99c313f2c0cd1a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-9d27deb3fd7c",
+      "questionId": "DVA-0132",
+      "factIds": [
+        "f-3cbbc592f87d"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-changesets.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e3e688dc1a314383dc0e828a8b976586d5c0556582968afc2401a326167d437a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-9de5f48ed8bc",
+      "questionId": "DVA-0133",
+      "factIds": [
+        "f-22cdfbbaf70b",
+        "f-669d23ed7e7b",
+        "f-9883eed46880"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "45456ae7648acb2e9c2fb6c140452cf8f0b2d3014fd2a0c84b549d3441af92b7"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "55e44e6092826f51f92c091afa5dc87bd9f32477217b6f8eaebe1f36e1de1e6d"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0b201a8106e8d51e114dc0ca25ce268167465338eaee424118ddbda41fc0c432"
+        }
+      ]
+    },
+    {
+      "draftId": "d-9f76f8755fa8",
+      "questionId": "DVA-0134",
+      "factIds": [
+        "f-0f26d9849868",
+        "f-1be49e14cad8"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "72c5883584a60d162dfde1327c0a57428f6ea31de4169cf3a85532bc5a65a409"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "cc5f063d80825d59ebd305ac9a0e00137f9877a814f9aca75b9ba10db9e5f9f5"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a0fff1c72416",
+      "factIds": [
+        "f-05b9ef282221"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/sns/latest/dg/sns-message-filtering.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f7af88ef3c7dd62e0008dc0b915010e2d128dc3b048bc6828a18ab48ea981daa"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a1853e680e10",
+      "questionId": "DVA-0135",
+      "factIds": [
+        "f-1452811588bd"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "bac1ddd7349065223d1a93a3b864c27b9153abfd27a4531ed358972f10ed8510"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a1979366c52f",
+      "questionId": "DVA-0136",
+      "factIds": [
+        "f-2c848a4aba89"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "00b2b6ca937d32e829f05ce735218ae5d739771f2070ecb24f8bdd0cb277d8ed"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a22b43bb34f9",
+      "questionId": "DVA-0137",
+      "factIds": [
+        "f-3e836219c7a4"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/cdk/v2/guide/home.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "4cc9a8f2cb19befa6091f2eb4310cc4564d6d2e29288207327a411e247efc034"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a24a9b80b3a1",
+      "questionId": "DVA-0138",
+      "factIds": [
+        "f-08a38ffb28d1",
+        "f-22cdfbbaf70b",
+        "f-40fc6728139c"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/canary-release.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "73a9ddcd27518b7a630d8e55fea2432b93ecc15c02c755d11e67210b8b58f020"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/deployment-configurations.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a66604e562ac23a854af6b916f6af83514e773a16eead0038be216c667f58f9b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0b201a8106e8d51e114dc0ca25ce268167465338eaee424118ddbda41fc0c432"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a37a8627ac63",
+      "questionId": "DVA-0139",
+      "factIds": [
+        "f-19396bbc38f2"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/WhatIs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "459395f39644de8fafb049637bec507e1207c2d649c1f37fa50afba3d70e6f8c"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a47f5bcc8ab6",
+      "questionId": "DVA-0140",
+      "factIds": [
+        "f-27776e3deb59"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/efs/latest/ug/whatisefs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5af30941ebf771ea17e668065f33c18b16c3de4dfd7926ea0e9dd27b98f7c045"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a493b317bf99",
+      "questionId": "DVA-0141",
+      "factIds": [
+        "f-7d43dec02dc4"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5eba9eb5826e2887b5c5b2a223d330534572ef31b80d44181d18e76338d52a44"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a6b2a50db836",
+      "questionId": "DVA-0142",
+      "factIds": [
+        "f-2256b027008e"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/chapter-layers.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "d42aec23cf5aaa3546ec9012e33fc777b35b53693d822e8786d62bd2c123bdfe"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a7ac1e8a4309",
+      "questionId": "DVA-0143",
+      "factIds": [
+        "f-5319325f073f",
+        "f-6a97cb51745b"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/how-it-works.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "7fbce1a003f41e95fc330052a565f66395cd6eebad8424890cae96117cb03e6b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/kms/latest/developerguide/data-keys.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ae6079a3132b58dc6541a559dd757f93210ed79f0a868571d5bbb271f754cf26"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a9fcbb8c5d78",
+      "questionId": "DVA-0144",
+      "factIds": [
+        "f-0f6cbe0eb91c",
+        "f-0fd529f907db"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "6f8e7f11b88d918b911c78978ddecc9e464f9a601e5935cd6f1eba1bd4229c72"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e1ca5cd7a8ffe54a7c752b94146f2589d6df376cd3699d0bedb6aaca1bed5542"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ab3a45f76971",
+      "questionId": "DVA-0145",
+      "factIds": [
+        "f-05b9ef282221",
+        "f-06de90d86c68"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-fifo-queues.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "3c99ffc4c0d6e8d64070bb39ae0ef9647e3b290636178981e68b853597a0c7e2"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/sns/latest/dg/sns-message-filtering.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f7af88ef3c7dd62e0008dc0b915010e2d128dc3b048bc6828a18ab48ea981daa"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ab45c3a5fccf",
+      "questionId": "DVA-0146",
+      "factIds": [
+        "f-2a72b159dc62"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "37eda5874f5577bc02552d465e45ecf935b2048b880212de47f65242cb1e16f1"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ab5fb5b4e106",
+      "questionId": "DVA-0147",
+      "factIds": [
+        "f-7caad36fed1d"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/cdk/v2/guide/home.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "4cc9a8f2cb19befa6091f2eb4310cc4564d6d2e29288207327a411e247efc034"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ab7ed7801766",
+      "questionId": "DVA-0148",
+      "factIds": [
+        "f-1ceadc98f591"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "bf2013e8c65e80bca7d3982fdfbdd7b74e89cc58b00ceec7f8f6bc6bd6583554"
+        }
+      ]
+    },
+    {
+      "draftId": "d-aba7fe0c3863",
+      "questionId": "DVA-0149",
+      "factIds": [
+        "f-43abba83b508"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "8f3613531e4ae2d6259494baee9c7de89b58103bd1fd76de431c00edb06ac1d5"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ac58f6ce790d",
+      "questionId": "DVA-0150",
+      "factIds": [
+        "f-033490fd99af",
+        "f-03a4b31b697d",
+        "f-0b59d4a875e0"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "8b97534d790da8647c2b58e497060630ce5f2b01ce46e2d2deac2070ada0f338"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0586c990cabdaf3ba606677d3bda0392431d861ae3baa7541e8505ed4ccc5e5b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a2b09052cc91e9c40aa804b75c2cb3bc517699521c95a188365768125286bf65"
+        }
+      ]
+    },
+    {
+      "draftId": "d-acc32776ef86",
+      "questionId": "DVA-0151",
+      "factIds": [
+        "f-223c21c64b89",
+        "f-669d23ed7e7b",
+        "f-7caad36fed1d",
+        "f-9883eed46880",
+        "f-cfefa56a0c65"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "45456ae7648acb2e9c2fb6c140452cf8f0b2d3014fd2a0c84b549d3441af92b7"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "55e44e6092826f51f92c091afa5dc87bd9f32477217b6f8eaebe1f36e1de1e6d"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cdk/v2/guide/home.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "4cc9a8f2cb19befa6091f2eb4310cc4564d6d2e29288207327a411e247efc034"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "c080bcfc94592c2b9e208a2194d90ce0e5968402f5bb92d8f83c8258a0f856ee"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/introduction-devops-aws/aws-serverless-application-model.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "69810728ee5c35a39018cfcd4e6a0b640e5d3a79d3dfac9eb67a6671bfc7c6ac"
+        }
+      ]
+    },
+    {
+      "draftId": "d-adece798c480",
+      "questionId": "DVA-0152",
+      "factIds": [
+        "f-0b1b9ae76fca"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5110d25ae54f5612fc56fde603acabf1979c3fe1a34f1bfe934c2a66229a884e"
+        }
+      ]
+    },
+    {
+      "draftId": "d-aff3aecdfea0",
+      "questionId": "DVA-0153",
+      "factIds": [
+        "f-14ecdbd9177d"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5ca53f3a9729de3097aff3d7ef469aeea0eabec4d5e83260334189c835ac6594"
+        }
+      ]
+    },
+    {
+      "draftId": "d-b0b62b2eb2f9",
+      "factIds": [
+        "f-2ff13d54b975",
+        "f-6725f15543d2",
+        "f-6c3c13bdef33",
+        "f-cb8e6d3dc263"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e13db9d9c821e8195c1c5e20b59ab732a32c780a17c0489caac3571cbb542da0"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ed860942f0967748ef7e2094b8f310131482070084b9cf00199e25a14cf30ae5"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/compute-optimizer/latest/ug/what-is-compute-optimizer.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5412f5b3af3db135609a0df86e9e4ca0bd4bce214e5a892dc11d7ab30c9e1299"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "77ae6b24a3245c5198c9f7e28994108f3d8c089c14651cefc7c683dc2c292b41"
+        }
+      ]
+    },
+    {
+      "draftId": "d-b17cd1ece89e",
+      "questionId": "DVA-0154",
+      "factIds": [
+        "f-1356803201cf",
+        "f-1be49e14cad8",
+        "f-1decd6ceb0b7",
+        "f-211e6d956581"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-integrate-with-cognito.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "c510eff4b4d24c7fa985526fa2b4abef793be6dc2a0eee7bc9b44f85a4c57886"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a3ab7175d14c3c3d72d73810f41e0fdc92687c6769a584d5dba3c143204bdbcc"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/testing-guide.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0fbc8cd18dea7e3ca81a44ae7d0a72481499ac6a85bb9880107f815a65367e8a"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "cc5f063d80825d59ebd305ac9a0e00137f9877a814f9aca75b9ba10db9e5f9f5"
+        }
+      ]
+    },
+    {
+      "draftId": "d-b2cb76f75d8c",
+      "questionId": "DVA-0155",
+      "factIds": [
+        "f-0b6a3078e3df",
+        "f-186740f9a90c"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "8b97534d790da8647c2b58e497060630ce5f2b01ce46e2d2deac2070ada0f338"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-post-authentication.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "efadaf9b1ca4f5819b27350113774419b7ca4455d7d7381c6e565b4356664195"
+        }
+      ]
+    },
+    {
+      "draftId": "d-b4b9721dd7ee",
+      "questionId": "DVA-0156",
+      "factIds": [
+        "f-057dfd38b9e3",
+        "f-24452b6e4153",
+        "f-d30d40f73a35"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-caching.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "738be4c483fe712e9b17845bed25841133b2d2f764e1cd6ac2ca94ed23eb5513"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-stages.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ed3dcd8756b7247351a034f4cd4b254f33cc7904d4bd2e31a95ed034cbebfede"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/appconfig/latest/userguide/what-is-appconfig.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "27394e41d2d11a4101f43e073d814f342241d310da95f6d09e02b0d50ecad42c"
+        }
+      ]
+    },
+    {
+      "draftId": "d-b5b1de3a0d36",
+      "questionId": "DVA-0157",
+      "factIds": [
+        "f-0d456903e3c3"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e343f91497ce5e0dac65f5cf6fe02b700347faee90c1ea45c600163b4283708a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-b6bc4eba4ae1",
+      "factIds": [
+        "f-100120b57304",
+        "f-1943b8cad6f8",
+        "f-244688ef7f97",
+        "f-277f9ed17a0e",
+        "f-297129949c73"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "74f7522af12208d0198cdd2025e4ea7d7abd6de686844dfc68d16c04707f51c1"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "19a6459dd5046ded2f0050126c8c00966dbe6d2440cc2884a1f9d4511b417b0c"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/ebs/latest/userguide/what-is-ebs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f59da8e55c0ed26712eb65f60e5ee37eb9a704e2909e65e51712e915bda0126c"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/streams/latest/dev/key-concepts.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "426abc2f424e859000ed0b07abfe1e8159c9c3494b2f7cd762f09d3643b08aa8"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "22aa03967381c45728308b96eb04c584c50738fd80a910f9a72865a494e1199c"
+        }
+      ]
+    },
+    {
+      "draftId": "d-b8ee883a9972",
+      "questionId": "DVA-0158",
+      "factIds": [
+        "f-707291d911e8",
+        "f-92386d627b08"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "1583a9671685d2e647c0c4a126eec938213cebc3af142781b8b64664adee6e61"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f54ccfe342cdc5df08cd5d4024c2c57f3092909ee631d127ef99c313f2c0cd1a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-bbe43765bdbc",
+      "questionId": "DVA-0159",
+      "factIds": [
+        "f-22022013918d"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs-view.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "25d416c4578c97dbc3abdc990de4ff78cfb916e038e4a3867aa23828f1fd5327"
+        }
+      ]
+    },
+    {
+      "draftId": "d-bc34e227d589",
+      "questionId": "DVA-0160",
+      "factIds": [
+        "f-115332ef47cc",
+        "f-1a0d68259149",
+        "f-22cdfbbaf70b",
+        "f-43abba83b508"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0b201a8106e8d51e114dc0ca25ce268167465338eaee424118ddbda41fc0c432"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/chapter-layers.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "d42aec23cf5aaa3546ec9012e33fc777b35b53693d822e8786d62bd2c123bdfe"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "8f3613531e4ae2d6259494baee9c7de89b58103bd1fd76de431c00edb06ac1d5"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "77ae6b24a3245c5198c9f7e28994108f3d8c089c14651cefc7c683dc2c292b41"
+        }
+      ]
+    },
+    {
+      "draftId": "d-bd04de5d60f1",
+      "factIds": [
+        "f-692a5ca23d7e",
+        "f-7af190e1da9d"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5656bedab8e4de2e9ea876f9ad70608f3f9b0bf3b38494a0d8fb359d3a13b57f"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ab7269d75973acddf654dbf4c55540495c98448539d650c66f182aa4512e5890"
+        }
+      ]
+    },
+    {
+      "draftId": "d-be202f7a5409",
+      "questionId": "DVA-0161",
+      "factIds": [
+        "f-094277938fa5",
+        "f-0b1b7cbecb2a"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/MonitoringLogData.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "8b8c053cc85b2bd835727262770ba1a79d99e934330eabf0c00e006fefcd3191"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Embedded_Metric_Format.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "2ad43cffa05da721f51628b6d317d59394f746e77165ffef697599bbfb29ddfb"
+        }
+      ]
+    },
+    {
+      "draftId": "d-beaa674ede8e",
+      "factIds": [
+        "f-0b1b7cbecb2a",
+        "f-6c3c13bdef33",
+        "f-81f89403f658",
+        "f-8e9c6d2fb79c"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Embedded_Metric_Format.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "2ad43cffa05da721f51628b6d317d59394f746e77165ffef697599bbfb29ddfb"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/cors.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "da4acc32befb7018e9326207136e53ae4409b070141ead1be55a67fa7c445cb1"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "4e6f7c5f3d9c826b209fd4e7048c9982125cb75c18ff4d4ab7e470cd4235eecc"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "77ae6b24a3245c5198c9f7e28994108f3d8c089c14651cefc7c683dc2c292b41"
+        }
+      ]
+    },
+    {
+      "draftId": "d-bf4dd8fd6bf6",
+      "questionId": "DVA-0162",
+      "factIds": [
+        "f-4e4df85196c5",
+        "f-56b471ea4f8d",
+        "f-80c7ee70cdd9",
+        "f-a702a6fdac38"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amplify/latest/userguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "d6c9e4f8aee8e18d79fb130ea6883b21791de99f70b495d9ea0a4cfeb838be8f"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "bc68d108e14140a1a9f5d158e82fa0c2ced609cb0131ff319562a64da2d038e9"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-local-generate-event.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e2cbd5f552a7cf018cf915a699bc06d331deb6f342786a854c49c262ae5177e0"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "c080bcfc94592c2b9e208a2194d90ce0e5968402f5bb92d8f83c8258a0f856ee"
+        }
+      ]
+    },
+    {
+      "draftId": "d-c03d3b8450c8",
+      "questionId": "DVA-0163",
+      "factIds": [
+        "f-5d4db6700585"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f178312a606490d4be5993b99699c42bfb14b6618ee359523ab974d19a500e32"
+        }
+      ]
+    },
+    {
+      "draftId": "d-c1a324ad6637",
+      "questionId": "DVA-0164",
+      "factIds": [
+        "f-33e1b660d362"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LSI.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "7ff7437073dc662a0b334680c1120deb44f4bdc21bfba213a1ee72a628824c24"
+        }
+      ]
+    },
+    {
+      "draftId": "d-c3116d62a704",
+      "questionId": "DVA-0165",
+      "factIds": [
+        "f-373776152760",
+        "f-619be74631bc",
+        "f-8ecfb963a7c3",
+        "f-c146b15a18ac"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a8a34ed3346f5828b6d4101321960e9a5fd6a4c3a6a8a914c62c6c34f083f1dd"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codeartifact/latest/ug/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "873629f161f5ccad6363b6c09aeccd36e090fabb48dea1521428219f866bde3d"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/chapter-layers.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "d42aec23cf5aaa3546ec9012e33fc777b35b53693d822e8786d62bd2c123bdfe"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ab7269d75973acddf654dbf4c55540495c98448539d650c66f182aa4512e5890"
+        }
+      ]
+    },
+    {
+      "draftId": "d-c38d78e3f9f7",
+      "factIds": [
+        "f-22b0c4b5a524",
+        "f-77a94164424c",
+        "f-bf5135b1350c"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "38e32eeb520586da45d9f0f2b36c1cedc46ddd0a1a8e144c17582eaff35a03ab"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ab7269d75973acddf654dbf4c55540495c98448539d650c66f182aa4512e5890"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a9a1f03ed5452570fa1e1788cbae1234009650c8df9f8e819c29485683ac447b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-c437726819cc",
+      "questionId": "DVA-0166",
+      "factIds": [
+        "f-0abfb2a854dd",
+        "f-1943b8cad6f8",
+        "f-19c49805dab5",
+        "f-1decd6ceb0b7"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "19a6459dd5046ded2f0050126c8c00966dbe6d2440cc2884a1f9d4511b417b0c"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cloudshell/latest/userguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "fbdcf93260bd30b6894d8bc7f042b32346726aecd2e38612183432a5ec06a227"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e343f91497ce5e0dac65f5cf6fe02b700347faee90c1ea45c600163b4283708a"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a3ab7175d14c3c3d72d73810f41e0fdc92687c6769a584d5dba3c143204bdbcc"
+        }
+      ]
+    },
+    {
+      "draftId": "d-c5b9f9fe1ac2",
+      "questionId": "DVA-0167",
+      "factIds": [
+        "f-07cde283ad54"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "92ca8fba6b9e4f419348db66902346b18bcc188ac401a6c6974de66f950f22d2"
+        }
+      ]
+    },
+    {
+      "draftId": "d-c68cad492ffe",
+      "questionId": "DVA-0168",
+      "factIds": [
+        "f-1be49e14cad8",
+        "f-38e9ff3d7cae"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "2cbb26a8515390f7b7cab12f4730a76f2debc92843120f0b21531cbf07b41ff8"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "cc5f063d80825d59ebd305ac9a0e00137f9877a814f9aca75b9ba10db9e5f9f5"
+        }
+      ]
+    },
+    {
+      "draftId": "d-c9f3fc7712f7",
+      "questionId": "DVA-0169",
+      "factIds": [
+        "f-3e836219c7a4",
+        "f-3ec03aabeb5a",
+        "f-96cfadf52262"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "4804254e74cb22518973a37c7eedc006f04a5d689180463de9b3b8f11aceb493"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cdk/v2/guide/home.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "4cc9a8f2cb19befa6091f2eb4310cc4564d6d2e29288207327a411e247efc034"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "bc68d108e14140a1a9f5d158e82fa0c2ced609cb0131ff319562a64da2d038e9"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ca4a951bd743",
+      "questionId": "DVA-0170",
+      "factIds": [
+        "f-520a36b36689",
+        "f-6a97cb51745b"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/how-it-works.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "7fbce1a003f41e95fc330052a565f66395cd6eebad8424890cae96117cb03e6b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/kms/latest/developerguide/data-keys.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ae6079a3132b58dc6541a559dd757f93210ed79f0a868571d5bbb271f754cf26"
+        }
+      ]
+    },
+    {
+      "draftId": "d-cacacc95ce27",
+      "factIds": [
+        "f-0185b64b4e18",
+        "f-6126bdf93a9f",
+        "f-781697cab244",
+        "f-8ecfb963a7c3"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0b201a8106e8d51e114dc0ca25ce268167465338eaee424118ddbda41fc0c432"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "cf4f7e555f3ce1894813b622bc5f18b6162587a7465099227eca6caa21f9fec1"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ab7269d75973acddf654dbf4c55540495c98448539d650c66f182aa4512e5890"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "22aa03967381c45728308b96eb04c584c50738fd80a910f9a72865a494e1199c"
+        }
+      ]
+    },
+    {
+      "draftId": "d-cb4bd7d9d29b",
+      "questionId": "DVA-0171",
+      "factIds": [
+        "f-298d5d960e1a"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "9debb8e75029317d779ed58ca2b3bbc45598e28fca90ab3de455ddd78f7b148e"
+        }
+      ]
+    },
+    {
+      "draftId": "d-cc2308eae08f",
+      "factIds": [
+        "f-22b0c4b5a524"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "38e32eeb520586da45d9f0f2b36c1cedc46ddd0a1a8e144c17582eaff35a03ab"
+        }
+      ]
+    },
+    {
+      "draftId": "d-cd1258cb649b",
+      "questionId": "DVA-0172",
+      "factIds": [
+        "f-707291d911e8",
+        "f-92386d627b08",
+        "f-ee355aeec81d"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "1583a9671685d2e647c0c4a126eec938213cebc3af142781b8b64664adee6e61"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f54ccfe342cdc5df08cd5d4024c2c57f3092909ee631d127ef99c313f2c0cd1a"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "bf2013e8c65e80bca7d3982fdfbdd7b74e89cc58b00ceec7f8f6bc6bd6583554"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ce469272a7f4",
+      "questionId": "DVA-0173",
+      "factIds": [
+        "f-22cdfbbaf70b",
+        "f-34f74f481f7e",
+        "f-352b06f7fecf",
+        "f-567f82dbafce"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amplify/latest/userguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "d6c9e4f8aee8e18d79fb130ea6883b21791de99f70b495d9ea0a4cfeb838be8f"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/stage-variables.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e0788fa9cc557c5e5f8417eb74fa1d0a2d6b89888ccc33e20f2d7cf05b06f2aa"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codebuild/latest/userguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "8609e9a7abe32bea3684cc05fce308de1339076533b6f34851e2dead79296e00"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0b201a8106e8d51e114dc0ca25ce268167465338eaee424118ddbda41fc0c432"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d370be507fc2",
+      "questionId": "DVA-0174",
+      "factIds": [
+        "f-002802fdc04c"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "d5d31626168cf2483eb831d6b4eef812ebe06296b6eb12657a3b11e3739cb898"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d62b62a9e13c",
+      "questionId": "DVA-0175",
+      "factIds": [
+        "f-4594685a8e41",
+        "f-520a36b36689"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/how-it-works.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "7fbce1a003f41e95fc330052a565f66395cd6eebad8424890cae96117cb03e6b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/kms/latest/developerguide/data-keys.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ae6079a3132b58dc6541a559dd757f93210ed79f0a868571d5bbb271f754cf26"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d632a86d9049",
+      "factIds": [
+        "f-9428c4a209ae"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/waf/latest/developerguide/what-is-aws-waf.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "095d63c8316fab1e36d7d4d8a6e877b4c40b0b96914f2131aec076af4153d77f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d6f7a6121c70",
+      "factIds": [
+        "f-10334aa1e163"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "d5d31626168cf2483eb831d6b4eef812ebe06296b6eb12657a3b11e3739cb898"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d7215134dfc0",
+      "questionId": "DVA-0176",
+      "factIds": [
+        "f-05de09ee51c3",
+        "f-0abfb2a854dd",
+        "f-0f26d9849868",
+        "f-100120b57304",
+        "f-1943b8cad6f8"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "19a6459dd5046ded2f0050126c8c00966dbe6d2440cc2884a1f9d4511b417b0c"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "72c5883584a60d162dfde1327c0a57428f6ea31de4169cf3a85532bc5a65a409"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e343f91497ce5e0dac65f5cf6fe02b700347faee90c1ea45c600163b4283708a"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "07358f157e84adc2521026c9848010a6ca71680063f1bcb79d079d2dbb459d44"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "22aa03967381c45728308b96eb04c584c50738fd80a910f9a72865a494e1199c"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d7a6add7803a",
+      "factIds": [
+        "f-055dfa6970ac",
+        "f-06de90d86c68",
+        "f-073e69288392",
+        "f-0e339472c966"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-fifo-queues.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "3c99ffc4c0d6e8d64070bb39ae0ef9647e3b290636178981e68b853597a0c7e2"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "69c3cbba7a976efc7d37f933d113a2f48eff409ff27800614db1c4b08aee95b4"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "dbcd0bc10101e348434813e0b07d1c62c21f0c01af80dd090c4373e8e6d758ba"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/capacity-mode.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5ecf1cb7f7ef59aa52a65fddd3f86076fddb9cb15b3d248a1173b59cc1411851"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d7c89708be4b",
+      "questionId": "DVA-0177",
+      "factIds": [
+        "f-085e06a108b0",
+        "f-08c1c1a07fa9"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "fae5de9fbd01fad29f71b839d4414733ee3e779969bc9af031c0f29e1bc65106"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a2b09052cc91e9c40aa804b75c2cb3bc517699521c95a188365768125286bf65"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d94e0cba5e81",
+      "questionId": "DVA-0178",
+      "factIds": [
+        "f-3b5a64f942dd"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/CHAP_AuroraOverview.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "cbdfd91c7d48d12256f358091462f2c8f0d4c963c4db34c9862ac57cbcb5cca9"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d9cf8507e94a",
+      "factIds": [
+        "f-2c707c4b7861",
+        "f-6c3c13bdef33",
+        "f-81f89403f658",
+        "f-8e9c6d2fb79c"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/cors.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "da4acc32befb7018e9326207136e53ae4409b070141ead1be55a67fa7c445cb1"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "4e6f7c5f3d9c826b209fd4e7048c9982125cb75c18ff4d4ab7e470cd4235eecc"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/compute-optimizer/latest/ug/what-is-compute-optimizer.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5412f5b3af3db135609a0df86e9e4ca0bd4bce214e5a892dc11d7ab30c9e1299"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "77ae6b24a3245c5198c9f7e28994108f3d8c089c14651cefc7c683dc2c292b41"
+        }
+      ]
+    },
+    {
+      "draftId": "d-dc47e85a1832",
+      "questionId": "DVA-0179",
+      "factIds": [
+        "f-0313cb73f1e6"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "d5d31626168cf2483eb831d6b4eef812ebe06296b6eb12657a3b11e3739cb898"
+        }
+      ]
+    },
+    {
+      "draftId": "d-dcd57e496ae8",
+      "questionId": "DVA-0180",
+      "factIds": [
+        "f-02990d4eb2f9",
+        "f-02f118f02b31",
+        "f-0660c7e11332"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "342336f0f8be024c92b3d7022d5a7d51871c94c64ee6980ea7b5f8be97e07213"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "60d704c3357e63e88845c30a3f18da9dd0a40c3673b6a286f23479772469187b"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5110d25ae54f5612fc56fde603acabf1979c3fe1a34f1bfe934c2a66229a884e"
+        }
+      ]
+    },
+    {
+      "draftId": "d-dee4df0d3bd9",
+      "questionId": "DVA-0181",
+      "factIds": [
+        "f-005b537102c7"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "be4547f657d2f3eabe3bf794cfbe3cd0d20ff9dd6a374554c67ab85c8e47e4b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-df072b0e4cd0",
+      "factIds": [
+        "f-419ea080fb78"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-post-authentication.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "efadaf9b1ca4f5819b27350113774419b7ca4455d7d7381c6e565b4356664195"
+        }
+      ]
+    },
+    {
+      "draftId": "d-e177f787acab",
+      "questionId": "DVA-0182",
+      "factIds": [
+        "f-2210a9194fb9"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "69c3cbba7a976efc7d37f933d113a2f48eff409ff27800614db1c4b08aee95b4"
+        }
+      ]
+    },
+    {
+      "draftId": "d-e443d7c9aa68",
+      "questionId": "DVA-0183",
+      "factIds": [
+        "f-057dfd38b9e3"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/appconfig/latest/userguide/what-is-appconfig.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "27394e41d2d11a4101f43e073d814f342241d310da95f6d09e02b0d50ecad42c"
+        }
+      ]
+    },
+    {
+      "draftId": "d-e54678111ad3",
+      "questionId": "DVA-0184",
+      "factIds": [
+        "f-192895e7d6a7"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "22a192068b709f9529a736c2317d302920abd2ef0a196f3882569d24c811fc2b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-e546a1e3da43",
+      "questionId": "DVA-0185",
+      "factIds": [
+        "f-0e47ee75cfd5"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-working-with-lambda-triggers.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "fef1ceaed1f8ebf605a7ee52c90ad56737c8b9e694a918be8f2599de6020e37b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-e58dda29827f",
+      "questionId": "DVA-0186",
+      "factIds": [
+        "f-1c807f6b8e65"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/kms/latest/developerguide/data-keys.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ae6079a3132b58dc6541a559dd757f93210ed79f0a868571d5bbb271f754cf26"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ec09ca527502",
+      "questionId": "DVA-0187",
+      "factIds": [
+        "f-0660c7e11332"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "342336f0f8be024c92b3d7022d5a7d51871c94c64ee6980ea7b5f8be97e07213"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ee9b0cd73db8",
+      "questionId": "DVA-0188",
+      "factIds": [
+        "f-02ee312e9da2",
+        "f-0477e2c188ed",
+        "f-072944b087d6"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/appconfig/latest/userguide/what-is-appconfig.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "27394e41d2d11a4101f43e073d814f342241d310da95f6d09e02b0d50ecad42c"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "5d02acaf53377d2d893e86d50dd2608465a518e98dab9635c023c7914a9a5b3f"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/sdkref/latest/guide/feature-retry-behavior.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "9f5a207310f50d7335e1a528ab197126a908df26f01a7a9b18ef3b6f4ac89beb"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f0c2b7b9aa78",
+      "questionId": "DVA-0189",
+      "factIds": [
+        "f-0529b4d882d3"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/introduction-devops-aws/aws-serverless-application-model.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "69810728ee5c35a39018cfcd4e6a0b640e5d3a79d3dfac9eb67a6671bfc7c6ac"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f1d822b5bf59",
+      "factIds": [
+        "f-53d8172dc9a9",
+        "f-6c3c13bdef33",
+        "f-81f89403f658",
+        "f-8e9c6d2fb79c"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/cors.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "da4acc32befb7018e9326207136e53ae4409b070141ead1be55a67fa7c445cb1"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "4e6f7c5f3d9c826b209fd4e7048c9982125cb75c18ff4d4ab7e470cd4235eecc"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "e343f91497ce5e0dac65f5cf6fe02b700347faee90c1ea45c600163b4283708a"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "77ae6b24a3245c5198c9f7e28994108f3d8c089c14651cefc7c683dc2c292b41"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f2755db60900",
+      "questionId": "DVA-0190",
+      "factIds": [
+        "f-38e9ff3d7cae"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "2cbb26a8515390f7b7cab12f4730a76f2debc92843120f0b21531cbf07b41ff8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f2b46d6f9798",
+      "questionId": "DVA-0191",
+      "factIds": [
+        "f-05b9ef282221"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/sns/latest/dg/sns-message-filtering.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f7af88ef3c7dd62e0008dc0b915010e2d128dc3b048bc6828a18ab48ea981daa"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f33ecf9f140a",
+      "factIds": [
+        "f-8bb2c664b3f2"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "07358f157e84adc2521026c9848010a6ca71680063f1bcb79d079d2dbb459d44"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f40534431058",
+      "questionId": "DVA-0192",
+      "factIds": [
+        "f-17d47394d35f",
+        "f-32ee5bd53fdc",
+        "f-330697d1e165",
+        "f-5b4f3513cfff"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "8682dd049e4315193ae5d2e34ca5ba406fec62db47646c28fce4c5acc285305a"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/athena/latest/ug/what-is.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "2c2c45127212218dcf6ad7caf871f49c1828e83f453a56673b999854789bae2f"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "d53c773403cfc6b1b65fc54e684c92d1331a12e1ca088b454e7d6ca7fb3306e1"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "229e4d45835eab1cd2f035ee6c549dd2dec86e7f6b9aa0123e02bd8aa20bd320"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f6794563db71",
+      "questionId": "DVA-0193",
+      "factIds": [
+        "f-3b11c80704bd"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/codeartifact/latest/ug/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "873629f161f5ccad6363b6c09aeccd36e090fabb48dea1521428219f866bde3d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f6802ddfa252",
+      "factIds": [
+        "f-1a24d2357b28",
+        "f-3e0af2949813",
+        "f-96cfadf52262"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "bc68d108e14140a1a9f5d158e82fa0c2ced609cb0131ff319562a64da2d038e9"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/Welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "cc98e0d7bb33843c156c59efc5a5d23b83a1b304199b908215cb2648dffe4c11"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "c6e92d3dea128875aaae81cc0057ca2c420f0dddc52aa16dad1b828b6c6b4ca3"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f6be1a9f7e45",
+      "questionId": "DVA-0194",
+      "factIds": [
+        "f-0fd529f907db",
+        "f-1261cb140a85",
+        "f-143f04e24586",
+        "f-159fb1dc9ff3",
+        "f-15e0034ed10b"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "6f8e7f11b88d918b911c78978ddecc9e464f9a601e5935cd6f1eba1bd4229c72"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/ebs/latest/userguide/what-is-ebs.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "f59da8e55c0ed26712eb65f60e5ee37eb9a704e2909e65e51712e915bda0126c"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/testing-guide.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "0fbc8cd18dea7e3ca81a44ae7d0a72481499ac6a85bb9880107f815a65367e8a"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/using-sam-cli-local-invoke.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "675a9f9baa90545ecedcb1fac1427ded5f5752d5f004158998bdbcb2275b4e8d"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "c080bcfc94592c2b9e208a2194d90ce0e5968402f5bb92d8f83c8258a0f856ee"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f75e67c96669",
+      "questionId": "DVA-0195",
+      "factIds": [
+        "f-0ed95d0ce10b"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Scan.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "b179c5334be11de25f526737cff134eca863bf95364f456127939a3e5f62cc95"
+        }
+      ]
+    },
+    {
+      "draftId": "d-fa7ef79474bd",
+      "questionId": "DVA-0196",
+      "factIds": [
+        "f-4dc983d78e38"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/cloudshell/latest/userguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "fbdcf93260bd30b6894d8bc7f042b32346726aecd2e38612183432a5ec06a227"
+        }
+      ]
+    },
+    {
+      "draftId": "d-fe9aafd1871d",
+      "questionId": "DVA-0197",
+      "factIds": [
+        "f-0fd529f907db",
+        "f-137b7f8f8198",
+        "f-1428e4273731"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "7170a35163c0d845ae27e549f085247c92f34c893cb46c48c12d6cb5bb76e655"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "6f8e7f11b88d918b911c78978ddecc9e464f9a601e5935cd6f1eba1bd4229c72"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/specifying-conditions.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "cfd15d1ed6c8c6f519c7cb053e156f1dba9e5bde187d83cbbd08ee30c831d4e9"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ff9d69aa45bf",
+      "factIds": [
+        "f-03451341b84b",
+        "f-22b0c4b5a524",
+        "f-339d57877e56",
+        "f-74773b3f7c1f",
+        "f-bf5135b1350c"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "38e32eeb520586da45d9f0f2b36c1cedc46ddd0a1a8e144c17582eaff35a03ab"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "a8a34ed3346f5828b6d4101321960e9a5fd6a4c3a6a8a914c62c6c34f083f1dd"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "ab7269d75973acddf654dbf4c55540495c98448539d650c66f182aa4512e5890"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/using-sam-cli-local-invoke.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "675a9f9baa90545ecedcb1fac1427ded5f5752d5f004158998bdbcb2275b4e8d"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/xray/latest/devguide/aws-xray.html",
+          "fetchedAt": "2026-10-19",
+          "contentHash": "2741daeb86551680d94ff1a23b24115fa14a3da347d74ab10c4b21649ed8cad0"
+        }
+      ]
+    }
+  ]
+}
