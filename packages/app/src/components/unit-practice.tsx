@@ -6,6 +6,7 @@ import { ChoiceChip, ChoiceReview } from "@/components/choice-review.tsx";
 import { ExplanationView } from "@/components/explanation-view.tsx";
 import { Notice } from "@/components/notice.tsx";
 import { QuestionChips } from "@/components/question-chips.tsx";
+import { ReferenceList } from "@/components/reference-list.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
 import { ScoreRing } from "@/components/score-ring.tsx";
 import { type AnswerTimer, createTimer, elapsedTimes, setVisible, showQuestion } from "@/lib/answer-timer.ts";
@@ -316,6 +317,9 @@ export function UnitPractice({ exam, questions, next }: Props) {
             <summary className="cursor-pointer font-bold">解説</summary>
             <div className="mt-3">
               <ExplanationView question={question} />
+            </div>
+            <div className="mt-3">
+              <ReferenceList references={question.references} />
             </div>
           </details>
         </div>

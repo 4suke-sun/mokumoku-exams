@@ -13,6 +13,16 @@ describe("ReferenceList", () => {
     expect(link.getAttribute("rel")).toBe("noopener noreferrer");
   });
 
+  it("題のある出典_ホスト名ではなく題を表示する", () => {
+    render(
+      <ReferenceList
+        references={[{ title: "Amazon SQS のデッドレターキュー", url: "https://docs.aws.amazon.com/queue.html" }]}
+      />,
+    );
+    expect(screen.getByRole("link", { name: "Amazon SQS のデッドレターキュー(外部サイト)" })).toBeTruthy();
+    expect(screen.queryByText(/docs\.aws\.amazon\.com/)).toBeNull();
+  });
+
   it("題のない出典_ホスト名を表示する", () => {
     render(<ReferenceList references={[{ url: "https://www.nist.gov/itl/ai" }]} />);
     expect(screen.getByRole("link", { name: "www.nist.gov(外部サイト)" })).toBeTruthy();
