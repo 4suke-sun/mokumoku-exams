@@ -100,6 +100,29 @@ describe("UnitPractice", () => {
     await waitFor(() => expect(document.activeElement).toBe(verdict));
   });
 
+  it("出典のある問題を回答する_解説の下に出典の一覧を出す", async () => {
+    const withReferences = {
+      ...single(1),
+      references: [{ title: "公式の資料", url: "https://docs.aws.amazon.com/guide" }],
+    } as ChoiceQuestion;
+    const user = await start([withReferences]);
+    await user.click(screen.getByLabelText(/選択肢 1-1/));
+    await user.click(screen.getByRole("button", { name: "回答する" }));
+    expect(screen.getByRole("heading", { name: "出典" })).toBeTruthy();
+    expect(screen.getByRole("link", { name: "公式の資料(外部サイト)" }).getAttribute("href")).toBe(
+      "https://docs.aws.amazon.com/guide",
+    );
+  });
+
+  it("出典のない問題を回答する_出典の見出しを出さない", async () => {
+    const user = await start([single(1)]);
+    await user.click(screen.getByLabelText(/選択肢 1-1/));
+    await user.click(screen.getByRole("button", { name: "回答する" }));
+    expect(screen.getByText("解説 1")).toBeTruthy();
+    expect(screen.queryByRole("heading", { name: "出典" })).toBeNull();
+    expect(screen.queryByRole("link")).toBeNull();
+  });
+
   it("不正解を回答する_正解を示し_揺れる動きの印を付ける", async () => {
     const user = await start([single(1)]);
     await user.click(screen.getByLabelText(/選択肢 1-2/));

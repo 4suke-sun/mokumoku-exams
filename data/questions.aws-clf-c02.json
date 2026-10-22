@@ -11,12 +11,15 @@
       "explanation": "## 問われている要件\nセキュリティとコンプライアンスに関する説明のうち、正しいものを 2 つ選ぶ問題です。\n\n## 正解の決め手\nAWS Artifact には、監査人が発行した報告書、認証、認定、第三者による証明を一か所で探せる資料があります。また AWS Backup は、データ保護のポリシーと運用のコンプライアンスの洞察と分析を提供します。よって A と C が正解です。\n\n## 他の選択肢が誤りである理由\n\n出品元の事業者の報告書は、購入の手続きを終えたあとにしか確認できない\n\n出品元の事業者は、セキュリティやコンプライアンスの報告書を使って事前に確認できるため、購入後にしか見られないという説明は逆です。\n\n秘密鍵は、保管の際に暗号化を省略して平文で置くのが基本である\n\n秘密鍵は、強力な暗号化と鍵管理の方針で保護して保管されます。平文で置くのが基本という説明は誤解です。\n\nAWS の証明書管理で発行した証明書は、更新を利用者が手作業で行う\n\nAWS 側が発行した証明書は更新がマネージドで提供されるため、利用者が手作業で更新するという説明は誤りです。",
       "references": [
         {
+          "title": "Security Compliance Management - AWS Artifact - AWS",
           "url": "https://aws.amazon.com/artifact/"
         },
         {
+          "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
           "url": "https://aws.amazon.com/backup/"
         },
         {
+          "title": "Certificate Manager - AWS Certificate Manager - AWS",
           "url": "https://aws.amazon.com/certificate-manager/"
         }
       ],
@@ -57,15 +60,19 @@
       "explanation": "## 問われている要件\nAWS のセキュリティ関連の機能のうち、正しい説明を 2 つ選ぶ問題です。\n\n## 正解の決め手\n拠点間の通信を暗号化して安全につなぐのは Site-to-Site VPN の役割です。また、社内ディレクトリの認証情報を使って複数の AWS アカウントへシングルサインオンできる仕組みがあります。この 2 つが正しい説明です。\n\n## 他の選択肢が誤りである理由\n\n私設認証局のリソースは、アカウントごとに別々に作る必要があり、中央管理はできない。\n\n私設認証局のようなリソースは中央で管理でき、複数のアカウントで証明書を発行できます。アカウントごとに作る必要はありません。\n\n社内ディレクトリの認証情報は利用できず、アカウントごとに別のユーザーを作る必要がある。\n\n社内ディレクトリの認証情報を使って、複数のアカウントへシングルサインオンできます。利用できないという説明は逆です。\n\n保存時のデータは暗号化の対象外で、転送中の暗号化だけに対応している。\n\n保存時のデータも暗号化の対象で、自動的に暗号化されます。転送中の暗号化だけが対象という説明は、適用範囲を狭く誤っています。",
       "references": [
         {
+          "title": "Amazon FSx | Feature-Rich & Highly-Performant File Systems | Amazon Web Services",
           "url": "https://aws.amazon.com/fsx/"
         },
         {
+          "title": "Single-Sign On SAML - SSO Provider - AWS IAM Identity Center - AWS",
           "url": "https://aws.amazon.com/iam/identity-center/"
         },
         {
+          "title": "Resource Sharing – AWS Resource Access Manager – Amazon Web Services",
           "url": "https://aws.amazon.com/ram/"
         },
         {
+          "title": "Virtual Private Network (VPN) – AWS VPN – Amazon Web Services",
           "url": "https://aws.amazon.com/vpn/"
         }
       ],
@@ -106,9 +113,11 @@
       "explanation": "## 問われている要件\nAWS 側が受けた第三者の監査結果を確かめる手段と、自社アカウントの操作を監査に役立てる手段の、2 つの役割を区別して説明することが求められています。\n\n## 正解の決め手\nAWS Artifact は、監査人が発行した報告書や認証、認定、第三者による証明を一か所で探せるサービスです。また、AWS との合意の確認や承諾なども行えます。一方、AWS CloudTrail は、アカウントのガバナンス、コンプライアンス、運用監査を支えるサービスで、VPC エンドポイントを通るネットワークの操作も記録できます。\n\n## まとめ\n解答の例: Artifact で AWS が取得した第三者の報告書や認証を確認し、CloudTrail で自社アカウントの操作の記録を残して監査に使います。",
       "references": [
         {
+          "title": "Security Compliance Management - AWS Artifact - AWS",
           "url": "https://aws.amazon.com/artifact/"
         },
         {
+          "title": "API Logs - Secure Standardized Logging Service - AWS CloudTrail - AWS",
           "url": "https://aws.amazon.com/cloudtrail/"
         }
       ],
@@ -138,18 +147,23 @@
       "explanation": "## 正解の決め手\nルートユーザーは、ルートの権限が必要な作業だけに使い、日常の作業には使わないことが推奨されます。また、AWS KMS の鍵を使ってサービスのサーバー側の暗号化を有効にすると、保管中のデータを守れます。鍵は利用者が管理します。\n\n## 他の選択肢が誤りである理由\n\nセキュリティグループのルールは、監査しても危険度の高いものを見つけられない。\n\nセキュリティグループのルールは監査でき、危険度の高いルールを見つけられます。見つけられないという記述は誤りです。\n\n政府向けリージョンのハードウェア認証トークンは、別アカウントのユーザーも共有して使える。\n\n政府向けリージョンのハードウェア認証トークンを使えるのは、そのアカウントのユーザーだけです。別アカウントとは共有できません。\n\nビルド環境は用意済みのものだけが使え、自前の環境は選べない。\n\nビルド環境は、用意済みのものか自前のものかを選べます。自前の環境が選べないという記述は逆です。\n## まとめ\nルートユーザーは限定して使い、保管中のデータは KMS の鍵による暗号化で守る、と覚えておきましょう。",
       "references": [
         {
+          "title": "Managed Build Server - AWS CodeBuild - AWS",
           "url": "https://aws.amazon.com/codebuild/"
         },
         {
+          "title": "Centrally Manage Cloud Firewall Rules - AWS Firewall Manager - AWS",
           "url": "https://aws.amazon.com/firewall-manager/"
         },
         {
+          "title": "IAM - Multi-Factor Authentication",
           "url": "https://aws.amazon.com/iam/features/mfa/"
         },
         {
+          "title": "Encryption Cryptography Signing - AWS Key Management Service - AWS",
           "url": "https://aws.amazon.com/kms/"
         },
         {
+          "title": "AWS account root user - AWS Identity and Access Management",
           "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html"
         }
       ],
@@ -190,12 +204,15 @@
       "explanation": "## 問われている要件\nメンバーアカウントごとに、支払いの設定を変えることが求められています。\n\n## 正解の決め手\n支払いプロファイルを使うと、サービスプロバイダーが異なるメンバーアカウントごとに支払いの設定を変えられます。\n\n## 他の選択肢が誤りである理由\n\n請求レポートを作成して公開し、費用を内訳に分けて示す\n\n請求レポートは費用を内訳に分けて示すためのもので、支払いの設定をアカウントごとに変える機能ではありません。\n\n予算を月次で設定し、費用の上限を決めておく\n\n予算は期間と上限を決めて費用を管理する機能で、支払いの設定を変える機能ではありません。\n\n節約プランの利用を追跡し、内部のコスト配分を計算する\n\n節約プランの追跡は、利用状況の把握とコスト配分の計算のための機能で、支払いの設定を変えるものではありません。",
       "references": [
         {
+          "title": "AWS Billing - Amazon Web Services",
           "url": "https://aws.amazon.com/aws-cost-management/aws-billing/"
         },
         {
+          "title": "Set Custom Cost and Usage Budgets – AWS Budgets – Amazon Web Services",
           "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/"
         },
         {
+          "title": "Cloud Usage Report - AWS Cost and Usage Reports - AWS",
           "url": "https://aws.amazon.com/aws-cost-management/aws-cost-and-usage-reporting/"
         }
       ],
@@ -232,6 +249,7 @@
       "explanation": "## 問われている要件\n監査人が発行した報告書や認証などを、一か所で探して取り出したいという要件です。\n\n## 正解の決め手\nAWS Artifact は、監査人の報告書、認証、認定、第三者による証明を一か所で探せる資料を持ち、セルフサービスの画面から取り出せます。\n\n## 他の選択肢が誤りである理由\n\nAWS Backup\n\nバックアップとデータ保護の運用を扱うサービスで、第三者の監査報告書や認証を探して取得する用途ではありません。\n\nAmazon CloudWatch\n\nメトリクスの監視とアラームのサービスです。監査人が発行した報告書や認証を探す場所ではありません。\n\nAWS CloudTrail\n\n利用者の活動や API 呼び出しの記録を扱います。コンプライアンスの材料にはなっても、監査人の報告書を取り出す入口ではありません。",
       "references": [
         {
+          "title": "Security Compliance Management - AWS Artifact - AWS",
           "url": "https://aws.amazon.com/artifact/"
         }
       ],
@@ -268,9 +286,11 @@
       "explanation": "## 問われている要件\nリージョンが持つ AZ の数と、リージョンそのものの性質を正しく理解しているかが問われています。\n\n## 前提知識\nリージョンは、世界各地でデータセンターをまとめて置く物理的な場所です。\n\n## 正解の決め手\n各リージョンは、物理的に分かれた AZ を少なくとも三つ持ちます。\n\n## 他の選択肢が誤りである理由\n\n各リージョンは、物理的に分かれた AZ を1つだけ持つ。\n\nAZ は少なくとも三つあります。1つだけという数は、事実と異なります。\n\n各リージョンは、物理的に分かれた AZ をちょうど2つ持つ。\n\nAZ の数は少なくとも三つで、2つでは下限に届きません。\n\nリージョンは、AZ を持たず、データセンター1棟だけでできた場所である。\n\nリージョンは、データセンターをまとめて置く物理的な場所で、複数の AZ を持ちます。データセンター1棟だけではありません。",
       "references": [
         {
+          "title": "Global Infrastructure - AWS",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/"
         },
         {
+          "title": "Global Infrastructure Regions & AZs",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/"
         }
       ],
@@ -307,6 +327,7 @@
       "explanation": "## 問われている要件\nルートユーザーをどう扱うのが推奨かが問われています。\n\n## 正解の決め手\nルートユーザーは、ルートの権限が必要な作業だけに使い、日常の作業には使わないことが推奨されます。\n\n## 他の選択肢が誤りである理由\n\n日常の管理作業は、すべてルートユーザーで行う。\n\n日常の作業にルートユーザーを使うのは、推奨に反します。ルートの権限が必要な作業だけに限ります。\n\nルートユーザーの資格情報を、運用チームの全員で共有して使う。\n\nルートユーザーは、ルートの権限が必要な作業だけに使うものです。全員で共有して日常的に使う運用は推奨されません。\n\nルートの権限が不要な作業にこそ、ルートユーザーを優先して使う。\n\n条件が逆です。ルートの権限が必要な作業だけに使うのが推奨で、不要な作業に優先して使うことは勧められません。",
       "references": [
         {
+          "title": "AWS account root user - AWS Identity and Access Management",
           "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html"
         }
       ],
@@ -343,6 +364,7 @@
       "explanation": "## 問われている要件\nSQL と Spark の分析処理の起動面の特徴が問われています。\n\n## 正解の決め手\nこれらの分析処理は、サーバーレスで素早く起動できます。\n\n## 他の選択肢が誤りである理由\n\n事前にクラスターを手動で構築してからでないと使えない\n\nサーバーレスで素早く起動できるため、クラスターの事前構築は前提になりません。\n\nオンプレミス専用の機器を設置しないと使えない\n\nサーバーレスで起動できる処理であり、専用機器の設置は必要ありません。\n\n起動に長い準備時間がかかる前提で設計されている\n\n素早く起動できるのが特徴で、長い準備時間を前提とする説明は逆です。",
       "references": [
         {
+          "title": "Interactive SQL - Serverless Query Service - Amazon Athena - AWS",
           "url": "https://aws.amazon.com/athena/"
         }
       ],
@@ -379,15 +401,19 @@
       "explanation": "## 問われている要件\n公開インターネットを経由せずに、AWS と通信する手段が問われています。\n\n## 正解の決め手\nDの専用の接続を使うと、AWS への通信が公開インターネットを通らずに行えます。\n\n## 他の選択肢が誤りである理由\n\nSES で送信元のドメインを検証する\n\n送信元の検証は、認証されたメールとして送れるようにするためのものです。通信経路の変更とは関係がありません。\n\nゼロ ETL 連携を設定して接続する\n\nゼロ ETL 連携は、更新データを Redshift へ送る仕組みです。通信を公開インターネットから切り離すものではありません。\n\nS3 Intelligent-Tiering を使う\n\n保存階層の自動移動は、データの置き場所とコストの話です。通信経路には影響しません。",
       "references": [
         {
+          "title": "Dedicated Network Connections - AWS Direct Connect - AWS",
           "url": "https://aws.amazon.com/directconnect/"
         },
         {
+          "title": "Cloud Data Warehouse – Amazon Redshift – AWS",
           "url": "https://aws.amazon.com/redshift/"
         },
         {
+          "title": "Object Storage Classes – Amazon S3",
           "url": "https://aws.amazon.com/s3/storage-classes/"
         },
         {
+          "title": "Email Service Provider — Amazon Simple Email Service (Amazon SES) — AWS",
           "url": "https://aws.amazon.com/ses/"
         }
       ],
@@ -424,6 +450,7 @@
       "explanation": "## 問われている要件\nランサムウェアからの復旧を助ける機能を持つサービスを選ぶ問題です。\n\n## 正解の決め手\nAWS Backup には、ランサムウェアからの復旧を助ける機能があります。データ保護のポリシーと運用について、コンプライアンスの洞察と分析も得られます。\n\n## 他の選択肢が誤りである理由\n\nAWS Artifact\n\nコンプライアンス報告書を取得するサービスです。コンプライアンスという語は共通でも、データの復旧を助けるものではありません。\n\nAmazon CloudWatch\n\n異常をアラームで知らせ対応を自動化するための監視サービスです。バックアップからの復旧を担うものではありません。\n\nAWS CloudTrail\n\n活動の記録は調査や準拠の材料になりますが、記録は復旧の手段ではありません。",
       "references": [
         {
+          "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
           "url": "https://aws.amazon.com/backup/"
         }
       ],
@@ -460,15 +487,19 @@
       "explanation": "## 問われている要件\n先月と今月という、異なる期間のコストと利用量を比べて差異を見つけることです。\n\n## 正解の決め手\n前日比・前月比・前年比で、コストと利用量を比べ、パターンや差異を見つけられます。\n\n## 他の選択肢が誤りである理由\n\n請求ページで税金や返金を含む請求の内容を確認する\n\n請求ページでは割引や税金などを含む請求の内容を確認しますが、期間どうしの比較で差異を見つける機能ではありません。\n\n支出や使用量の予測を把握し、想定外の使われ方に早く気づく\n\n予測は将来の支出や使用量を把握するもので、過去の期間どうしを比べる機能ではありません。\n\n節約プランの利用を追跡し、関連する料金を償却する\n\n節約プランの追跡は、利用と料金の償却、コスト配分の計算のためのもので、期間比較の機能ではありません。",
       "references": [
         {
+          "title": "AWS Billing - Amazon Web Services",
           "url": "https://aws.amazon.com/aws-cost-management/aws-billing/"
         },
         {
+          "title": "Set Custom Cost and Usage Budgets – AWS Budgets – Amazon Web Services",
           "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/"
         },
         {
+          "title": "Cloud Usage Report - AWS Cost and Usage Reports - AWS",
           "url": "https://aws.amazon.com/aws-cost-management/aws-cost-and-usage-reporting/"
         },
         {
+          "title": "Cloud Cost Report - AWS Cost Explorer - AWS",
           "url": "https://aws.amazon.com/aws-cost-management/aws-cost-explorer/"
         }
       ],
@@ -505,15 +536,19 @@
       "explanation": "## 問われている要件\n拠点に AWS のコンピュートなどを広げる構成が、どの要件に向くかを問う問題です。\n\n## 正解の決め手\n拠点で動かす構成は、近くのパブリッククラウドのサーバーでも間に合わないほどの低遅延や、拠点内でのデータ処理、データの所在の要件に応えられます。そのため、低遅延の要件と、拠点内でのデータ処理の要件が正答です。\n\n## 解くための考え方\n拠点に処理を置く利点は、処理を利用者やデータの近くに置けることです。選択肢が、場所の近さに関わる要件かどうかで切り分けます。\n\n## 他の選択肢が誤りである理由\n\n大量の画像や動画を短時間で分析し、人によるレビューを補いたい\n\n画像や動画の分析と人のレビューの補助は、AI による分析サービスの特徴です。拠点にコンピュートを広げる理由ではありません。\n\nライブ配信とオンデマンドの動画を、メディア系サービスと連携して配信したい\n\n動画の配信は、メディア系サービスの連携で実現する用途です。拠点で処理を動かす要件とは別です。\n\nネットワークとファイアウォールの管理ルールを簡素にし、転送費用を抑えたい\n\n管理ルールの簡素化と転送費用の抑制は、ネットワーク構成の利点です。拠点にコンピュートを広げる目的ではありません。",
       "references": [
         {
+          "title": "Low-Latency Content Delivery Network (CDN) - Amazon CloudFront - Amazon Web Services",
           "url": "https://aws.amazon.com/cloudfront/"
         },
         {
+          "title": "On Premises Private Cloud - AWS Outposts - AWS",
           "url": "https://aws.amazon.com/outposts/"
         },
         {
+          "title": "VPC Networking – AWS PrivateLink – Amazon Web Services",
           "url": "https://aws.amazon.com/privatelink/"
         },
         {
+          "title": "Image recognition software, ML image analysis, and video analysis – Amazon Rekognition – AWS",
           "url": "https://aws.amazon.com/rekognition/"
         }
       ],
@@ -554,6 +589,7 @@
       "explanation": "## 問われている要件\nメトリクスの変化に応じたアラームと、対応の自動化ができるサービスを選ぶ問いです。\n\n## 正解の決め手\nAmazon CloudWatch では、メトリクスの変化にアラームを設定でき、問題が利用者に届く前に対応を自動化できます。\n\n## 他の選択肢が誤りである理由\n\nAWS Artifact\n\n報告書へアクセスするためのサービスで、メトリクスのアラームや自動対応の機能はありません。\n\nAWS Backup\n\nバックアップを作り復旧に備えるサービスで、メトリクスの変化を見て対応する用途ではありません。\n\nCloudTrail Lake\n\nイベントデータを SQL で調べるサービスで、メトリクスのアラームを設定する用途ではありません。",
       "references": [
         {
+          "title": "Amazon Monitoring and Observability-Amazon CloudWatch - AWS",
           "url": "https://aws.amazon.com/cloudwatch/"
         }
       ],
@@ -590,6 +626,7 @@
       "explanation": "## 問われている要件\n二つの柱の重点を、取り違えずに組み合わせられるかが問われています。\n\n## 正解の決め手\nパフォーマンス効率は、用途に合った資源の種類と規模を選び、効率を保つことが重点です。持続可能性は、ワークロードが環境に与える影響を抑えることが重点です。\n\n## 他の選択肢が誤りである理由\n\nパフォーマンス効率は環境への影響を抑えることに、持続可能性は資源の種類と規模を選び効率を保つことに重点を置く\n\n環境への影響を抑えるのが持続可能性、資源の種類と規模を選ぶのがパフォーマンス効率です。二つの重点が入れ替わっています。\n\nパフォーマンス効率は支出を減らすことに、持続可能性は障害からの復旧を早めることに重点を置く\n\nパフォーマンス効率の重点は支出の削減ではなく、用途に合った資源の選択と効率の維持です。持続可能性も復旧の速さではありません。\n\nパフォーマンス効率は用途に合った資源の種類と規模を選ぶことに、持続可能性は利用者の認証と権限の管理に重点を置く\n\n持続可能性の柱が扱うのは環境への影響の抑制です。認証や権限の管理は、この柱の重点の範囲ではありません。",
       "references": [
         {
+          "title": "AWS Well-Architected - Build secure, efficient cloud applications",
           "url": "https://aws.amazon.com/architecture/well-architected/"
         }
       ],
@@ -626,6 +663,7 @@
       "explanation": "## 問われている要件\nAuto Scaling 自体の料金の考え方を問う問題です。\n\n## 正解の決め手\n機能そのものに追加料金はなく、実際に使った資源の料金と、監視の料金が課金の中心になります。\n\n## 他の選択肢が誤りである理由\n\n起動する資源の料金は無料で、監視の料金だけがかかる\n\n課金の中心は、利用した資源の料金と監視の料金です。資源の料金が無料になるわけではありません。\n\n増減させた台数ごとの月額固定の利用料が、機能に対してかかる\n\n機能そのものに追加料金はなく、台数ごとの月額固定の利用料もありません。\n\n無料の期間が終わると、機能そのものの利用料が発生し始める\n\n機能自体は追加料金なしで使えます。期間の終了で利用料が発生し始めることはありません。",
       "references": [
         {
+          "title": "App Scaling - AWS Application Auto Scaling - AWS",
           "url": "https://aws.amazon.com/autoscaling/"
         }
       ],
@@ -662,15 +700,19 @@
       "explanation": "## 問われている要件\n料金の仕組みについて、事実と合致する記述を 2 つ見分ける問題です。\n\n## 正解の決め手\nAは、Control Tower の利用そのものには料金がかからず、組み合わせて使った他のサービスの分だけが請求される、という内容で正しいです。Cは、S3 から Amazon CloudFront へのデータ転送が料金の対象外になる、という内容で正しいです。\n\n## 他の選択肢が誤りである理由\n\n未使用の計算容量を使う購入オプションは、オンデマンド価格より最大 50% 安く利用できる\n\n未使用の容量を使う購入オプションの割引は、オンデマンド価格より最大 90% 安いため、50% という数値は誤りです。\n\nConvertible RI は、ファミリーや OS を変更すると RI 価格の割引を受けられなくなる\n\nConvertible RI は、ファミリー、OS、テナンシーを変えても RI 価格の恩恵を受け続けられるため、条件が逆です。\n\nRI の支払い方法は、全額前払いと前払いなしの 2 種類から選ぶ\n\n支払い方法は全額前払い、一部前払い、前払いなしの 3 種類から選べるため、2 種類とする点が誤りです。\n## まとめ\n数値と条件の細部(割引率、支払い方法の種類、変更できる範囲)を取り違えないようにします。",
       "references": [
         {
+          "title": "Cloud Security Governance - AWS Control Tower - AWS",
           "url": "https://aws.amazon.com/controltower/"
         },
         {
+          "title": "Amazon EC2 - Secure and resizable compute capacity – Amazon Web Services",
           "url": "https://aws.amazon.com/ec2/pricing/reserved-instances/"
         },
         {
+          "title": "Save up-to 90% on On-Demand Prices – Amazon EC2 Spot Instances – Amazon Web Services",
           "url": "https://aws.amazon.com/ec2/spot/"
         },
         {
+          "title": "S3 Pricing",
           "url": "https://aws.amazon.com/s3/pricing/"
         }
       ],
@@ -711,6 +753,7 @@
       "explanation": "## 問われている要件\nバックアップと復旧を、ポリシーに基づいて一元的に行えるフルマネージドのサービスが問われています。\n\n## 正解の決め手\nAWS Backup は、ポリシーに基づくフルマネージドのサービスで、AWS のリソースやハイブリッドなサービスのバックアップと復旧を一元的に扱えます。\n\n## 他の選択肢が誤りである理由\n\nAmazon CloudWatch\n\nAmazon CloudWatch は監視のサービスです。バックアップと復旧をポリシーで一元的に行う役割は、バックアップ用のサービスが担います。\n\nCost Explorer\n\nCost Explorer は、コストと利用量のデータを確認するための機能です。データ保護の作業を簡素化するものではありません。\n\nAmazon SageMaker\n\nAmazon SageMaker は SQL や Spark の処理などを扱う基盤です。リソースのバックアップを一元化するサービスではありません。",
       "references": [
         {
+          "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
           "url": "https://aws.amazon.com/backup/"
         }
       ],
@@ -747,15 +790,19 @@
       "explanation": "## 問われている要件\nワークロードを、セキュリティ、信頼性、性能のベストプラクティスで評価する取り組みを選ぶ問題です。\n\n## 正解の決め手\nWell-Architected Review では、ワークロードのセキュリティ、信頼性、性能のベストプラクティスを評価します。したがって D が正解です。\n\n## 他の選択肢が誤りである理由\n\n事業の観点でクラウドの価値を捉える枠組みを使って整理する\n\n事業の観点でクラウドの価値を捉える枠組みで、ワークロードを評価する取り組みではありません。\n\nベストプラクティスの実装経験を積むため、コードと資料のリポジトリで演習する\n\n実装の経験を積むための教材であり、ワークロードを評価する取り組みではありません。\n\n需要に合わせて資源を増減させる設定を行い、容量を調整する\n\n需要に応じた増減は、資源を調整する特徴です。ベストプラクティスで評価する取り組みとは別です。\n## まとめ\n評価はレビュー、経験を積むのは演習用のリポジトリ、と役割を区別しましょう。",
       "references": [
         {
+          "title": "Shared Responsibility Model - Amazon Web Services (AWS)",
           "url": "https://aws.amazon.com/compliance/shared-responsibility-model/"
         },
         {
+          "title": "Learn Cloud Economics - Value of Cloud - Cloud ROI Framework - AWS",
           "url": "https://aws.amazon.com/economics/"
         },
         {
+          "title": "What is Cloud Computing? - Cloud Computing Services, Benefits, and Types - AWS",
           "url": "https://aws.amazon.com/what-is-cloud-computing/"
         },
         {
+          "title": "AWS Well-Architected Framework - AWS Well-Architected Framework",
           "url": "https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html"
         }
       ],
@@ -792,6 +839,7 @@
       "explanation": "## 正解の決め手\nフルマネージドで、ポリシーに基づいて、AWS のリソースとハイブリッドなサービスのバックアップと復旧を一元的に行えます。\n\n## 他の選択肢が誤りである理由\n\nサービスごとの画面で、個別に手作業で管理する。\n\nポリシーに基づいて一元的に行えるため、サービスごとに個別に手作業で管理する必要はありません。\n\nAWS のリソースだけが対象で、ハイブリッドな環境は扱えない。\n\nVMware のワークロードや Storage Gateway のボリュームなど、ハイブリッド環境も対象に含まれます。\n\n利用者が管理用のサーバーを構築し、自分で運用する。\n\nフルマネージドサービスなので、利用者が管理用のサーバーを構築して運用する必要はありません。",
       "references": [
         {
+          "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
           "url": "https://aws.amazon.com/backup/"
         }
       ],
@@ -828,12 +876,15 @@
       "explanation": "## 問われている要件\n監視の対象範囲と、スケーリングの対象範囲について、正しい説明を 2 つ選ぶ問題です。\n\n## 正解の決め手\nAWS の外にあるオンプレミスや他のクラウドのワークロードも、エージェントでテレメトリを取り込んで監視できます。スケーリングの対象には、インスタンスやタスクに加え、DynamoDB のテーブルとインデックス、Aurora のレプリカなど複数の種類のリソースを含められます。\n\n## 他の選択肢が誤りである理由\n\n外部のワークロードは監視の対象外で、AWS 内のものだけを取り込める。\n\nオンプレミスや他のクラウドのワークロードも、エージェントでテレメトリを取り込んで監視できます。AWS 内に限られません。\n\nスケーリングの対象は、仮想サーバーのインスタンスの 1 種類に限られる。\n\nスケーリングの対象には、インスタンスのほか、タスクやテーブル、レプリカなど複数の種類のリソースを含められます。\n\nバックアップのサービスは、ポリシーを使わず、作業ごとに手作業で設定する。\n\nバックアップのサービスは、ポリシーに基づいてデータ保護の作業を簡素化します。手作業の設定が前提ではありません。",
       "references": [
         {
+          "title": "App Scaling - AWS Application Auto Scaling - AWS",
           "url": "https://aws.amazon.com/autoscaling/"
         },
         {
+          "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
           "url": "https://aws.amazon.com/backup/"
         },
         {
+          "title": "Amazon Monitoring and Observability-Amazon CloudWatch - AWS",
           "url": "https://aws.amazon.com/cloudwatch/"
         }
       ],
@@ -874,12 +925,15 @@
       "explanation": "## 問われている要件\n監査に備え、規制への準拠を示す材料を用意するという目的に合う、CloudTrail のログの利点が問われています。\n\n## 正解の決め手\nCloudTrail のログは、SOC・PCI・HIPAA などの規制に準拠していることを示す材料になります。目的に直接合うのは C です。\n\n## 他の選択肢が誤りである理由\n\n実ユーザーや合成テストの監視を、一つの場所にまとめて行える。\n\nこれは監視を一か所にまとめる可観測性の機能の説明で、規制への準拠を示す材料という目的には当たりません。\n\n運用上の問題の根本原因を、AI が分析して解決を支援する。\n\nAI による根本原因分析は、運用上の問題の調査と解決を支える機能です。CloudTrail のログの利点として挙がるものではありません。\n\n販売元の報告書を使って、ベンダーを事前に確認できる。\n\n販売元の報告書でベンダーを事前に確認できるのは、Marketplace での購入前の確認です。CloudTrail のログの利点ではありません。",
       "references": [
         {
+          "title": "Security Compliance Management - AWS Artifact - AWS",
           "url": "https://aws.amazon.com/artifact/"
         },
         {
+          "title": "API Logs - Secure Standardized Logging Service - AWS CloudTrail - AWS",
           "url": "https://aws.amazon.com/cloudtrail/"
         },
         {
+          "title": "Amazon Monitoring and Observability-Amazon CloudWatch - AWS",
           "url": "https://aws.amazon.com/cloudwatch/"
         }
       ],
@@ -916,15 +970,19 @@
       "explanation": "## 問われている要件\nAWS Backup が何をするサービスかを選ぶ問題です。\n\n## 正解の決め手\nAWS Backup は、AWS のサービスとハイブリッド環境のワークロードを対象に、データ保護を一元化して自動化するフルマネージドサービスです。\n\n## 他の選択肢が誤りである理由\n\n1 つの SQL クエリで、複数種類のデータをまとめて分析する。\n\n複数種類のデータを 1 つの SQL クエリで分析するのは、データ分析のサービスの機能で、バックアップではありません。\n\n仮想デスクトップを、利用のたびに新しい状態で提供する。\n\n仮想デスクトップを利用のたびに新しい状態で提供するのは、アプリケーションの画面配信のサービスの機能です。\n\nAI ワークロードの推論性能を、一つの場所で監視する。\n\n推論性能や多段の処理の流れを一つの場所で監視するのは、AI ワークロードの監視の機能で、データ保護とは別です。",
       "references": [
         {
+          "title": "Desktops and application streaming - Amazon WorkSpaces applications - AWS",
           "url": "https://aws.amazon.com/appstream2/"
         },
         {
+          "title": "Interactive SQL - Serverless Query Service - Amazon Athena - AWS",
           "url": "https://aws.amazon.com/athena/"
         },
         {
+          "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
           "url": "https://aws.amazon.com/backup/"
         },
         {
+          "title": "Amazon Monitoring and Observability-Amazon CloudWatch - AWS",
           "url": "https://aws.amazon.com/cloudwatch/"
         }
       ],
@@ -961,15 +1019,19 @@
       "explanation": "## 問われている要件\nAWS Backup が何をするサービスかを、似た別のサービスの役割と区別して選ぶ問題です。\n\n## 正解の決め手\nAWS Backup は、AWS のサービスとハイブリッド環境のワークロードを対象に、データ保護を一元化して自動化するフルマネージドサービスです。ポリシーに基づいて、バックアップと復旧を一元的に行えます。Aと D がこれに当たります。\n\n## 他の選択肢が誤りである理由\n\n利用のたびに新しい状態の仮想デスクトップを、利用者へ画面配信で提供する。\n\n利用のたびに新しい仮想デスクトップを画面配信で提供するのは、アプリケーション配信のサービスの役割で、バックアップではありません。\n\nコストと利用量のデータを、プログラムから問い合わせられるようにする。\n\nコストと利用量のデータをプログラムから問い合わせるのは、コスト分析の API の役割で、データ保護とは別です。\n\n機械学習の推論性能や多段の処理の流れを、一つの場所で監視する。\n\n推論性能や処理の流れを一つの場所で監視するのは、監視の機能の役割です。バックアップの機能と取り違えないようにします。\n## まとめ\nバックアップと復旧の一元化と自動化、ポリシーに基づく管理が、AWS Backup の要点です。",
       "references": [
         {
+          "title": "Desktops and application streaming - Amazon WorkSpaces applications - AWS",
           "url": "https://aws.amazon.com/appstream2/"
         },
         {
+          "title": "Cloud Cost Report - AWS Cost Explorer - AWS",
           "url": "https://aws.amazon.com/aws-cost-management/aws-cost-explorer/"
         },
         {
+          "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
           "url": "https://aws.amazon.com/backup/"
         },
         {
+          "title": "Amazon Monitoring and Observability-Amazon CloudWatch - AWS",
           "url": "https://aws.amazon.com/cloudwatch/"
         }
       ],
@@ -1010,15 +1072,19 @@
       "explanation": "## 問われている要件\nネットワークとストレージの基本機能について、正しい説明を 2 つ見分ける問題です。\n\n## 正解の決め手\nVPC ピアリング接続は、2 つの VPC のあいだでリソースどうしの通信を経路づけする仕組みです。S3 File Gateway は、S3 に置いたデータへ SMB や NFS といったファイルの形でアクセスできるようにします。\n\n## 他の選択肢が誤りである理由\n\nVPC ピアリング接続は、オンプレミスと VPC を結ぶ専用線を提供する。\n\nVPC ピアリング接続が結ぶのは 2 つの VPC のリソース間であり、オンプレミスとの専用線を提供するものではありません。\n\nAmazon Translate は、録画済みの動画に字幕を付け、会議の内容を記録する。\n\n録画済みの動画への字幕付けや会議の記録は文字起こしのサービスの用途で、翻訳サービスの用途ではありません。\n\n画像・映像分析の API を使うには、ML モデルを一から作って学習させておく。\n\n学習済みの、または作り替え可能な分析 API を組み込めるので、ML モデルを一から作る必要はありません。",
       "references": [
         {
+          "title": "Image recognition software, ML image analysis, and video analysis – Amazon Rekognition – AWS",
           "url": "https://aws.amazon.com/rekognition/"
         },
         {
+          "title": "AWS Storage Gateway | Amazon Web Services",
           "url": "https://aws.amazon.com/storagegateway/"
         },
         {
+          "title": "Amazon Transcribe – Speech to Text - AWS",
           "url": "https://aws.amazon.com/transcribe/"
         },
         {
+          "title": "What is Amazon VPC? - Amazon Virtual Private Cloud",
           "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
         }
       ],
@@ -1059,9 +1125,11 @@
       "explanation": "## 問われている要件\n\nデータ保護の基本として、データの暗号化と、認証情報などの機密情報の管理の 2 点を説明することが求められています。\n\n## 正解の決め手\n\n1 点目は、保存時のデータが暗号化サービスによって自動的に暗号化され、転送中の暗号化にも対応していることです。2 点目は、AWS Secrets Manager と連携して、認証情報などの機密情報を一か所で保管・管理できることです。\n\n## まとめ\n\n解答の例: 保存しているデータは暗号化サービスで自動的に暗号化され、通信中のデータの暗号化にも対応している。認証情報などの機密情報は、AWS Secrets Manager を使って一か所にまとめて保管・管理できる。",
       "references": [
         {
+          "title": "Cloud Database Migration – AWS Database Migration Service (AWS DMS) Features – AWS",
           "url": "https://aws.amazon.com/dms/schema-conversion-tool/"
         },
         {
+          "title": "Amazon FSx | Feature-Rich & Highly-Performant File Systems | Amazon Web Services",
           "url": "https://aws.amazon.com/fsx/"
         }
       ],
@@ -1091,9 +1159,11 @@
       "explanation": "## 問われている要件\n近くのパブリッククラウドのサーバーでも間に合わないほど、応答時間に厳しい業務を扱う場面です。そのため、処理を行う場所を利用者や機器の近くへ寄せる必要があります。\n\n## 正解の決め手\nAWS のコンピュートなどを拠点に広げると、低遅延、拠点内でのデータ処理、データの所在に関する要件に応えられます。ハイブリッドの構成は、クラウド・オンプレミス・エッジにまたがって、AWS の幅広いサービスを組み合わせて作れます。\n\n## まとめ\n解答の例: 近くのクラウドでも遅延が大きすぎる業務では、AWS のコンピュートを拠点に置くハイブリッド構成が合います。拠点内でデータを処理でき、低遅延になり、データを置く場所の要件も満たせます。クラウドとオンプレミスとエッジを組み合わせて作れる点も利点です。",
       "references": [
         {
+          "title": "AWS Hybrid Cloud | On Premises & Edge | Amazon Web Services",
           "url": "https://aws.amazon.com/hybrid/"
         },
         {
+          "title": "On Premises Private Cloud - AWS Outposts - AWS",
           "url": "https://aws.amazon.com/outposts/"
         }
       ],
@@ -1133,12 +1203,15 @@
       "explanation": "## 問われている要件\nリージョンと AZ の基本的な構成を、正しく覚えているかを問う問題です。\n\n## 正解の決め手\nリージョンは、世界各地でデータセンターをまとめて置く物理的な場所です。各リージョンは、物理的に分かれた AZ を少なくとも 3 つ持ちます。BとEがこれに当たります。\n\n## 他の選択肢が誤りである理由\n\n各リージョンは、物理的に分かれた AZ をちょうど 1 つだけ持つ。\n\nAZ の数が違います。各リージョンは、物理的に分かれた AZ を少なくとも 3 つ持ち、1 つだけではありません。\n\nリージョンは、データセンターを持たない、論理的な区分にすぎない。\n\nリージョンは、世界各地でデータセンターをまとめて置く物理的な場所です。論理的な区分にすぎないというのは誤解です。\n\nリージョンは、マルチクラウドの分析基盤への問い合わせを表示する仕組みである。\n\nマルチクラウドの分析基盤への問い合わせを可視化するのは、分析の機能の話です。リージョンの定義とは範囲が違います。\n## まとめ\nリージョンは物理的な場所で、複数の AZ(少なくとも 3 つ)を持つ、と覚えます。",
       "references": [
         {
+          "title": "Global Infrastructure - AWS",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/"
         },
         {
+          "title": "Global Infrastructure Regions & AZs",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/"
         },
         {
+          "title": "Interactive SQL - Serverless Query Service - Amazon Athena - AWS",
           "url": "https://aws.amazon.com/athena/"
         }
       ],
@@ -1179,6 +1252,7 @@
       "explanation": "## 正解の決め手\n統合サービスの中で使う証明書は、追加費用を払わずに利用できます。\n\n## 他の選択肢が誤りである理由\n\n証明書を発行するたびに、手数料が別途かかる\n\n統合サービスで使う証明書は追加の費用なしで利用でき、発行ごとの手数料は発生しません。\n\n統合サービスを利用する場合は、証明書の利用料を別に支払う必要がある\n\n条件が逆です。統合サービスで使う場合こそ、追加の費用なしで利用できます。\n\n統合サービスの外で使う場合にだけ、追加の費用なしで利用できる\n\n統合サービスの外で使う証明書は低コストで入手できるとされるだけで、追加費用なしとは限りません。無償なのは統合サービス側です。",
       "references": [
         {
+          "title": "Certificate Manager - AWS Certificate Manager - AWS",
           "url": "https://aws.amazon.com/certificate-manager/"
         }
       ],
@@ -1215,6 +1289,7 @@
       "explanation": "## 問われている要件\nスケーリングの対象になるリソースの範囲が問われています。\n\n## 正解の決め手\nスケーリングの対象には、EC2 インスタンスや Spot Fleet、ECS のタスク、DynamoDB のテーブルとインデックス、Aurora のレプリカなど、複数の種類を含められます。\n\n## 他の選択肢が誤りである理由\n\n対象にできるのは仮想サーバーだけで、データベース関連は含められない\n\n対象は仮想サーバーに限られません。コンテナのタスクやデータベースのテーブルなども含められます。\n\nコンテナのタスクは対象にできるが、データベースのレプリカは対象外である\n\nAurora のレプリカも対象に含められます。データベースのレプリカを対象外とするのは誤解です。\n\n対象にできるのは一度に1種類のリソースだけで、混在させられない\n\n複数の種類のリソースを対象に含められます。1種類に限るという条件は逆です。",
       "references": [
         {
+          "title": "App Scaling - AWS Application Auto Scaling - AWS",
           "url": "https://aws.amazon.com/autoscaling/"
         }
       ],
@@ -1251,18 +1326,23 @@
       "explanation": "## 正解の決め手\nS3 File Gateway は、S3 に置かれたデータに対して、SMB や NFS といったファイル共有の形でアクセスできるようにするものです。\n\n## 他の選択肢が誤りである理由\n\n録画済みの動画に字幕を付け、会議の内容を記録する用途に使う。\n\nこれは録画済みの動画に字幕を付ける機能の説明で、S3 のデータへのファイルアクセスとは別の用途です。\n\n二つの仮想ネットワークのリソース間で、通信を経路づけする。\n\nこれは二つのネットワークの間で通信を経路づけする、ピアリング接続の説明です。ファイルの形のアクセスではありません。\n\nサーバーレス構成のバックエンド向けに、ウェブの API を作る。\n\nこれはサーバーレスや HTTP のバックエンド向けの API を作る話で、S3 データへのファイル共有アクセスではありません。\n\nイベントのストリーミングデータを分析し、継続的な処理経路を作る。\n\nこれはストリーミングデータの分析とパイプラインの話です。S3 のデータを SMB や NFS で見せる機能ではありません。\n## まとめ\nサービス名と、その特徴の組み合わせを区別して覚えましょう。",
       "references": [
         {
+          "title": "Amazon API Gateway | API Management | Amazon Web Services",
           "url": "https://aws.amazon.com/api-gateway/"
         },
         {
+          "title": "Big Data Platform – Amazon EMR – Amazon Web Services",
           "url": "https://aws.amazon.com/emr/"
         },
         {
+          "title": "AWS Storage Gateway | Amazon Web Services",
           "url": "https://aws.amazon.com/storagegateway/"
         },
         {
+          "title": "Amazon Transcribe – Speech to Text - AWS",
           "url": "https://aws.amazon.com/transcribe/"
         },
         {
+          "title": "What is Amazon VPC? - Amazon Virtual Private Cloud",
           "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
         }
       ],
@@ -1304,6 +1384,7 @@
       "explanation": "## 正解の決め手\n予算の目標を超えたとき、事前に定めた操作を実行できます。実行の方法は、自動と承認を経る方式から選べます。\n\n## 他の選択肢が誤りである理由\n\n通知が届くだけで、操作を実行することはできない\n\n予算の目標を超えたとき、事前に定めた操作を実行できます。通知だけに限られません。\n\n操作はすべて自動で実行され、承認の手続きは挟めない\n\n自動実行だけではなく、承認の手続きを経て実行する方式も選べます。\n\n操作は、承認の手続きを経た場合にだけ実行できる\n\n承認を必須とする説明は誤りです。承認を挟まず自動で実行する方式も選べます。",
       "references": [
         {
+          "title": "Set Custom Cost and Usage Budgets – AWS Budgets – Amazon Web Services",
           "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/"
         }
       ],
@@ -1340,9 +1421,11 @@
       "explanation": "## 正解の決め手\n世界規模の拠点網があると、利用者に近い場所でデータをやり取りできるため、データ転送が速まり遅延が下がります。\n\n## 他の選択肢が誤りである理由\n\n拠点が増えるほど、利用料金が自動的に無料になる\n\n拠点網の利点は転送の高速化と遅延の低下であり、料金が無料になるわけではありません。\n\n経路が増えることで、データ転送が遅くなり遅延が増える\n\n拠点網により、転送は速まり遅延は下がります。効果が逆になっています。\n\n新しいリージョンの開設は遅く、拠点は限られた地域にとどまる\n\n新しいリージョンは速やかに開設され、拠点は世界の広い地域に及んでいます。",
       "references": [
         {
+          "title": "Global Infrastructure - AWS",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/"
         },
         {
+          "title": "Global Infrastructure Regions & AZs",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/"
         }
       ],
@@ -1379,6 +1462,7 @@
       "explanation": "## 問われている要件\nルートユーザーをどの場面で使うのが推奨されるか、が問われています。\n\n## 正解の決め手\nルートユーザーは、ルートの権限が必要な作業だけに使い、日常の作業には使わないことが推奨されています。\n\n## 他の選択肢が誤りである理由\n\n日常の運用作業もルートユーザーで行う\n\n日常の作業にはルートユーザーを使わないことが推奨されており、この選択肢は推奨と逆です。\n\n開発チームで共有し、作業を分担させる\n\n共有して日常の作業を分担させるのは、日常の作業に使わないという推奨に反する使い方です。\n\nどんな作業でも、使うこと自体を禁じる\n\nルートの権限が必要な作業では使うので、使うこと自体を禁じるという説明は適切ではありません。\n## まとめ\nルートユーザーは、必要な作業だけに限って使います。",
       "references": [
         {
+          "title": "AWS account root user - AWS Identity and Access Management",
           "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html"
         }
       ],
@@ -1415,15 +1499,19 @@
       "explanation": "## 正解の決め手\nワークロードを置く場所には、Region のほかに Local Zones や Wavelength などの選択肢があります。\n\n## 他の選択肢が誤りである理由\n\nAmazon SageMaker の次世代版\n\nSageMaker の次世代版は、SQL や Spark の処理を使うための環境で、ワークロードを置く場所の選択肢ではありません。\n\nGit のブランチ連携によるプレビュー環境\n\nブランチ連携のプレビューは、変更を事前に確かめる開発の仕組みで、配置先の選択肢ではありません。\n\n費用と利用量を問い合わせて分析する機能\n\n費用と利用量の分析は、コストを把握する機能で、ワークロードの配置先を選ぶものではありません。",
       "references": [
         {
+          "title": "Global Infrastructure - AWS",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/"
         },
         {
+          "title": "Full Stack Development - Web and Mobile Apps - AWS Amplify",
           "url": "https://aws.amazon.com/amplify/"
         },
         {
+          "title": "Interactive SQL - Serverless Query Service - Amazon Athena - AWS",
           "url": "https://aws.amazon.com/athena/"
         },
         {
+          "title": "Cloud Usage Report - AWS Cost and Usage Reports - AWS",
           "url": "https://aws.amazon.com/aws-cost-management/aws-cost-and-usage-reporting/"
         }
       ],
@@ -1460,15 +1548,19 @@
       "explanation": "## 問われている要件\n成果重視の手法で、移行とモダナイゼーションを加速する支援プログラムを選ぶ問題です。\n\n## 正解の決め手\nMigration Acceleration Program が、この支援プログラムにあたります。\n\n## 他の選択肢が誤りである理由\n\nシステムの稼働と監視を重視する設計の柱\n\n稼働と監視に重点を置くのは運用上の優秀性の柱で、移行を加速する支援プログラムではありません。\n\n事業変革の成果を加速するための指針を示す枠組み\n\n事業変革の成果を加速する指針を与えるのは CAF で、移行を加速する支援プログラムとは別のものです。\n\n世界規模へ広げて提供するための配信の仕組み\n\n世界規模で提供できるのは配信の仕組みの特長で、移行の支援プログラムとは適用範囲が違います。",
       "references": [
         {
+          "title": "Desktops and application streaming - Amazon WorkSpaces applications - AWS",
           "url": "https://aws.amazon.com/appstream2/"
         },
         {
+          "title": "AWS Well-Architected - Build secure, efficient cloud applications",
           "url": "https://aws.amazon.com/architecture/well-architected/"
         },
         {
+          "title": "AWS Cloud Adoption Framework",
           "url": "https://aws.amazon.com/cloud-adoption-framework/"
         },
         {
+          "title": "AWS Migration & Modernization | Cloud Transformation",
           "url": "https://aws.amazon.com/cloud-migration/"
         }
       ],
@@ -1505,15 +1597,19 @@
       "explanation": "## 問われている要件\n料金と割引の仕組みについて、事実と合う説明を 2 つ見つける問題です。\n\n## 正解の決め手\n予約の支払い方法は、全額前払い、一部前払い、前払いなしの 3 種類から選べます。また、S3 から Amazon CloudFront へ転送するデータは、料金の対象外になります。\n\n## 他の選択肢が誤りである理由\n\n柔軟に変更できるタイプの予約では、ファミリーや稼働環境を変えた時点で割引が失われる。\n\n柔軟に変更できるタイプの予約は、ファミリー・稼働環境・テナンシーを変えても割引の恩恵を受け続けられます。失われるという説明は逆です。\n\n一定量の利用をコミットしても、料金はオンデマンドと変わらず、割引は得られない。\n\n一定量の利用をコミットする代わりに、オンデマンドより安い料金が得られます。割引がないという理解は誤りです。\n\n未使用の容量を使う購入方法では、オンデマンド価格より最大 50% 安くなる。\n\n未使用の容量を使う購入方法は、オンデマンド価格より最大 90% 安く利用できます。50% は数値が違います。\n## まとめ\n割引の仕組みは、コミットの有無、柔軟性、数値の上限を区別して覚えましょう。",
       "references": [
         {
+          "title": "Amazon EC2 - Secure and resizable compute capacity – Amazon Web Services",
           "url": "https://aws.amazon.com/ec2/pricing/reserved-instances/"
         },
         {
+          "title": "Save up-to 90% on On-Demand Prices – Amazon EC2 Spot Instances – Amazon Web Services",
           "url": "https://aws.amazon.com/ec2/spot/"
         },
         {
+          "title": "AWS Product and Service Pricing | Amazon Web Services",
           "url": "https://aws.amazon.com/pricing/"
         },
         {
+          "title": "S3 Pricing",
           "url": "https://aws.amazon.com/s3/pricing/"
         }
       ],
@@ -1554,6 +1650,7 @@
       "explanation": "## 問われている要件\n責任共有モデルで、AWS と利用者の分担について正しく述べているものを 2 つ選ぶ問題です。\n\n## 正解の決め手\nB は、AWS が担うのがクラウドを動かす基盤(ハードウェア、ソフトウェア、ネットワーク、施設)の保護であることを述べています。D は、利用者の責任が、使うサービスやリージョン、IT 環境への組み込み方、適用される法規制などで変わることを述べています。\n\n## 他の選択肢が誤りである理由\n\n利用者の責任の範囲は、どのサービスを使う場合でも同じで、法規制の違いによっても変わらない。\n\n利用者の責任は、使うサービスやリージョン、適用される法規制などの要因で変わります。どの場合も同じという説明は、条件を逆にしています。\n\nクラウドを動かす施設やネットワークの保護は、利用者が自社の責任として担う。\n\n施設やネットワークを含む、クラウドを動かす基盤の保護を担うのは AWS です。利用者が担うという説明は、責任の所在を取り違えています。\n\n利用するアプリケーションに基づくゾーンの分離などの統制は、AWS が利用者に代わって担う。\n\n利用するアプリケーションに基づく、ゾーンの分離のような統制は、利用者だけが責任を負う範囲です。AWS の担当範囲とは異なります。\n## まとめ\nAWS は基盤を守り、利用者はサービスの使い方や法規制に応じて自分の責任範囲を見極めます。",
       "references": [
         {
+          "title": "Shared Responsibility Model - Amazon Web Services (AWS)",
           "url": "https://aws.amazon.com/compliance/shared-responsibility-model/"
         }
       ],
@@ -1594,15 +1691,19 @@
       "explanation": "## 問われている要件\nアクセス頻度が読めないデータを、利用状況に応じて自動で安い階層へ移す方法が問われています。\n\n## 正解の決め手\nAの S3 Intelligent-Tiering は、頻度が不明または変動するデータを、アクセスの状況を見て自動で安い階層へ移す仕組みです。\n\n## 他の選択肢が誤りである理由\n\nDeep Archive にデータを置く\n\nDeep Archive は、テープ保管の代わりに使える管理しやすい保存先という位置づけです。アクセス状況に応じて自動で階層を移す機能ではありません。\n\n専用の接続を使って通信する\n\n専用の接続は、公開インターネットを通さずに通信するためのものです。データの保存階層を自動で変える機能ではありません。\n\nSES で送信元を検証する\n\n送信元の検証は、認証されたメールを送るための手順です。保存コストの最適化とは適用範囲が異なります。",
       "references": [
         {
+          "title": "Dedicated Network Connections - AWS Direct Connect - AWS",
           "url": "https://aws.amazon.com/directconnect/"
         },
         {
+          "title": "Object Storage Classes – Amazon S3",
           "url": "https://aws.amazon.com/s3/storage-classes/"
         },
         {
+          "title": "Secure archive storage – Amazon S3 Glacier storage classes – AWS",
           "url": "https://aws.amazon.com/s3/storage-classes/glacier/"
         },
         {
+          "title": "Email Service Provider — Amazon Simple Email Service (Amazon SES) — AWS",
           "url": "https://aws.amazon.com/ses/"
         }
       ],
@@ -1639,6 +1740,7 @@
       "explanation": "## 問われている要件\n請求ページの利用条件と、探せる請求データの範囲が問われています。\n\n## 正解の決め手\n請求ページは追加の設定をしなくても全アカウントで使え、アカウントを作った時点以降の過去の請求データを探せます。\n\n## 他の選択肢が誤りである理由\n\n利用を始める前に、請求ページを有効にする手続きが必要である\n\n請求ページは追加の設定なしで使えるため、事前の有効化手続きは必要ありません。\n\n過去の請求データは、直近の数か月分だけを探すことができる\n\n過去の請求データは、アカウントを作った時点まで遡って探せます。期間は数か月分に限られません。\n\n管理アカウントだけが使え、それ以外のアカウントは使えない\n\n請求ページは全アカウントから使えます。管理アカウントに限った機能ではありません。",
       "references": [
         {
+          "title": "AWS Billing - Amazon Web Services",
           "url": "https://aws.amazon.com/aws-cost-management/aws-billing/"
         }
       ],
@@ -1675,18 +1777,23 @@
       "explanation": "## 問われている要件\n社内ディレクトリの認証情報を使い、複数のアカウントへシングルサインオンすることです。\n\n## 正解の決め手\n社内ディレクトリの認証情報で複数アカウントへ入れる仕組みが、要件に合います。\n\n## 他の選択肢が誤りである理由\n\nリスクに応じた適応型認証と、漏えい認証情報の監視\n\n適応型認証と漏えい認証情報の監視は、認証を守る防御機能です。社内の認証情報で複数アカウントへ入る仕組みではありません。\n\n私設認証局のようなリソースの中央管理\n\n認証局のリソースの中央管理は、複数アカウントでの証明書の発行に使います。サインオンの仕組みではありません。\n\n自動分析による、複数アカウントでの脅威検出の拡張\n\n自動分析は、複数アカウント全体で脅威検出を拡張する機能です。利用者のサインオンを扱うものではありません。\n\n保存時のデータの自動的な暗号化\n\n保存時の暗号化はデータを保護する機能です。人がアカウントへ入る認証の仕組みではありません。",
       "references": [
         {
+          "title": "Amazon Cognito - Customer Identity and Access Management - Machine Identity and Access Management",
           "url": "https://aws.amazon.com/cognito/"
         },
         {
+          "title": "Amazon FSx | Feature-Rich & Highly-Performant File Systems | Amazon Web Services",
           "url": "https://aws.amazon.com/fsx/"
         },
         {
+          "title": "Intelligent Threat Detection – Amazon GuardDuty – AWS",
           "url": "https://aws.amazon.com/guardduty/"
         },
         {
+          "title": "Single-Sign On SAML - SSO Provider - AWS IAM Identity Center - AWS",
           "url": "https://aws.amazon.com/iam/identity-center/"
         },
         {
+          "title": "Resource Sharing – AWS Resource Access Manager – Amazon Web Services",
           "url": "https://aws.amazon.com/ram/"
         }
       ],
@@ -1728,15 +1835,19 @@
       "explanation": "## 正解の決め手\nAWS Glue は、サーバーの管理が要らないデータ統合サービスで、分析に使うデータを準備する役割を持ちます。\n\n## 他の選択肢が誤りである理由\n\n画面上で複雑な業務の流れを図のように組み立てる\n\n業務の流れを視覚的に組み立てるのは、ワークフローを図で作るための機能であり、データ統合の役割ではありません。\n\n移行したワークロードへ高性能なブロックストレージを接続する\n\n高性能で高可用なブロックストレージを接続するのは、ストレージ側の役割です。分析用のデータ準備を担う Glue の説明ではありません。\n\n利用者を固定のアドレス経由でエンドポイントへ接続させる\n\n固定のアドレスで利用者を接続させるのは、ネットワークの入口に関する機能です。データ統合の範囲には含まれません。",
       "references": [
         {
+          "title": "High-Performance Block Storage – Amazon EBS – Amazon Web Services",
           "url": "https://aws.amazon.com/ebs/"
         },
         {
+          "title": "Network Acceleration Service - AWS Global Accelerator - AWS",
           "url": "https://aws.amazon.com/global-accelerator/"
         },
         {
+          "title": "Serverless Data Integration – AWS Glue – Amazon Web Services",
           "url": "https://aws.amazon.com/glue/"
         },
         {
+          "title": "Serverless Workflow Orchestration – AWS Step Functions – Amazon Web Services",
           "url": "https://aws.amazon.com/step-functions/"
         }
       ],
@@ -1773,6 +1884,7 @@
       "explanation": "## 問われている要件\nテレメトリの取り込み料金が、データの発生元によって変わるかどうかを判断することです。\n\n## 正解の決め手\n取り込みの料金は、データの発生元が AWS か外部かにかかわらず同じです。\n\n## 他の選択肢が誤りである理由\n\nクラウド内で発生したデータは割引され、外部のデータは通常の料金になる\n\n発生元による割引はなく、クラウド内か外部かにかかわらず取り込みの料金は同じです。\n\n外部で発生したデータのほうが、取り込みの料金は安くなる\n\n外部のデータが安くなることはなく、発生元によらず取り込みの料金は同じです。\n\n外部で発生したデータにだけ、追加の取り込み料金が上乗せされる\n\n外部のデータにだけ上乗せされる料金はなく、発生元によらず取り込みの料金は同じです。",
       "references": [
         {
+          "title": "Amazon Monitoring and Observability-Amazon CloudWatch - AWS",
           "url": "https://aws.amazon.com/cloudwatch/"
         }
       ],
@@ -1809,18 +1921,23 @@
       "explanation": "## 正解の決め手\nVPC ピアリング接続は、二つの VPC に置かれたリソースの間で通信を経路づけるためのものです。\n\n## 他の選択肢が誤りである理由\n\n録画済みの動画に字幕を付け、会議の内容を記録できる。\n\nこれは録画済みの動画に字幕を付ける機能の説明で、VPC 間の通信とは関係がありません。\n\n投稿などの利用者の作る内容を、大量かつ即時に自動翻訳できる。\n\nこれはユーザー生成コンテンツを自動翻訳する機能の説明で、ネットワークの接続ではありません。\n\nサーバーレス構成のバックエンド向けに、ウェブの API を作れる。\n\nこれはサーバーレスや HTTP のバックエンド向けの API を作る用途で、VPC どうしの通信を経路づけるものではありません。\n\nオブジェクトストレージのデータに、ファイル共有の形でアクセスできる。\n\nこれはストレージのデータをファイルの形で見せる機能の説明で、VPC 間の通信の経路づけではありません。",
       "references": [
         {
+          "title": "Amazon API Gateway | API Management | Amazon Web Services",
           "url": "https://aws.amazon.com/api-gateway/"
         },
         {
+          "title": "AWS Storage Gateway | Amazon Web Services",
           "url": "https://aws.amazon.com/storagegateway/"
         },
         {
+          "title": "Amazon Transcribe – Speech to Text - AWS",
           "url": "https://aws.amazon.com/transcribe/"
         },
         {
+          "title": "Machine Translation Service — Amazon Translate — Amazon Web Services",
           "url": "https://aws.amazon.com/translate/"
         },
         {
+          "title": "What is Amazon VPC? - Amazon Virtual Private Cloud",
           "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
         }
       ],
@@ -1862,6 +1979,7 @@
       "explanation": "## 問われている要件\nピークに備えた過剰な確保が不要になる、クラウドの特徴を選ぶ問題です。\n\n## 正解の決め手\nクラウドでは、需要に合わせて資源を増減でき、ピークに備えて事前に過剰に確保する必要がありません。したがって A が正解です。\n\n## 他の選択肢が誤りである理由\n\n資源の容量が固定され、ピークに合わせた契約が前提になる\n\n容量を固定するのは逆です。クラウドは需要に合わせて増減でき、ピーク分の確保は前提になりません。\n\n利用者が増えると料金が自動的に定額になる\n\n利用者が増えても、料金が自動で定額になるわけではありません。理由は資源の増減にあります。\n\n長期契約を結ぶほど、必要な資源の量が減る\n\n必要な資源の量は契約の長さではなく、需要に合わせた増減で決まります。\n## まとめ\n増減できる弾力性が、過剰な確保を不要にします。",
       "references": [
         {
+          "title": "What is Cloud Computing? - Cloud Computing Services, Benefits, and Types - AWS",
           "url": "https://aws.amazon.com/what-is-cloud-computing/"
         }
       ],
@@ -1898,12 +2016,15 @@
       "explanation": "## 問われている要件\n権限を委任するときに、与えられる権限の範囲に歯止めをかける仕組みの働きを答える問題です。\n\n## 正解の決め手\nアクセス許可の境界は、委任された権限の上限を決めるものです。境界そのものは権限を与えないため、実際に使える権限は、別に付けた許可と境界の両方が認める範囲になります。\n\n## 他の選択肢が誤りである理由\n\n境界を設定すると、その範囲の権限が対象のユーザーへ自動的に付与される。\n\n境界は権限の上限を決めるだけで、それ自体では権限を与えません。権限の付与と上限の設定を取り違えた誤りです。\n\n対象ユーザーに、自分のパスワードを変更する許可を与える設定として働く。\n\n自分のパスワードの変更を許可するのは、パスワードポリシーの別の設定項目です。権限の上限を決める境界とは役割が異なります。\n\n通常の通信を学習して基準を作り、異常を検知して防御を適応させる。\n\n通常の通信を基準に学習して異常を検知し、防御を適応させるのは DDoS 対策サービスの働きで、権限管理の機能ではありません。",
       "references": [
         {
+          "title": "Network Posture Analysis and Managed DDoS Protection - AWS Shield - AWS",
           "url": "https://aws.amazon.com/shield/"
         },
         {
+          "title": "Security best practices in IAM - AWS Identity and Access Management",
           "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
         },
         {
+          "title": "Set an account password policy for IAM users - AWS Identity and Access Management",
           "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_passwords_account-policy.html"
         }
       ],
@@ -1940,6 +2061,7 @@
       "explanation": "## 問われている要件\nメトリクスの変化を捉えてアラームを出し、対応を自動化するサービスを選びます。\n\n## 正解の決め手\nAmazon CloudWatch は、メトリクスの変化にアラームを設定でき、問題が利用者に届く前に対応を自動化できます。\n\n## 他の選択肢が誤りである理由\n\nAWS CloudTrail\n\n活動や API 呼び出しを記録して調査に使うサービスです。メトリクスにアラームを設定するものではありません。\n\nAWS Artifact\n\n報告書へアクセスするためのサービスで、メトリクスの監視や対応の自動化は役割に含まれません。\n\nAWS Backup\n\nデータ保護と復旧の範囲のサービスで、メトリクスの変化に応じたアラームと対応の自動化は範囲外です。",
       "references": [
         {
+          "title": "Amazon Monitoring and Observability-Amazon CloudWatch - AWS",
           "url": "https://aws.amazon.com/cloudwatch/"
         }
       ],
@@ -1976,12 +2098,15 @@
       "explanation": "## 問われている要件\n容量の扱い、コスト、セキュリティと信頼性という 3 つの観点で、クラウドの利点を述べることが求められています。\n\n## 解くための考え方\n観点ごとに、利点を 1 文ずつ書くと整理しやすくなります。\n\n## 正解の決め手\n容量については、需要に合わせて資源を増やしたり減らしたりでき、ピークに備えて事前に多めに確保する必要がない点を挙げます。コストについては、使った分だけ支払う従量課金と、運用作業を AWS が肩代わりすることで、総所有コストを抑えられる点を挙げます。セキュリティと信頼性については、AWS の基盤が持つ仕組みを利用できる点を挙げます。\n\n## まとめ\n解答の例: クラウドでは需要に応じて容量を増減でき、事前の過剰な確保が不要です。従量課金と運用の肩代わりにより総所有コストを抑えられ、AWS の基盤が持つセキュリティと信頼性も利用できます。",
       "references": [
         {
+          "title": "Fully Managed Container Solution – Amazon Elastic Container Service (Amazon ECS) - Amazon Web Services",
           "url": "https://aws.amazon.com/ecs/"
         },
         {
+          "title": "Virtual Private Server and Web Hosting–Amazon Lightsail—Amazon Web Services",
           "url": "https://aws.amazon.com/lightsail/"
         },
         {
+          "title": "What is Cloud Computing? - Cloud Computing Services, Benefits, and Types - AWS",
           "url": "https://aws.amazon.com/what-is-cloud-computing/"
         }
       ],
@@ -2016,12 +2141,15 @@
       "explanation": "## 問われている要件\n求められているのは、サービスプロバイダーが異なるメンバーアカウントに対し、アカウントごとに支払いの設定を変えることです。\n\n## 正解の決め手\n支払いプロファイルを使うと、サービスプロバイダーが異なるメンバーアカウントごとに支払いの設定を変えられます。\n\n## 他の選択肢が誤りである理由\n\n請求レポートを作成して公開し、費用を内訳に分けて示す機能\n\n請求レポートは費用を内訳に分けて示すためのもので、支払いの設定をアカウントごとに変える機能ではありません。\n\nコスト配分タグで費用と利用量のデータを整理する機能\n\nコスト配分タグは費用と利用量のデータを整理する手段です。支払いの設定を変える機能ではありません。\n\n上限超過や無駄なリソース利用を防ぐ操作を設定する機能\n\n上限超過などを防ぐ操作は費用の管理が目的です。サービスプロバイダー別の支払い設定は扱いません。",
       "references": [
         {
+          "title": "AWS Billing - Amazon Web Services",
           "url": "https://aws.amazon.com/aws-cost-management/aws-billing/"
         },
         {
+          "title": "Set Custom Cost and Usage Budgets – AWS Budgets – Amazon Web Services",
           "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/"
         },
         {
+          "title": "Cloud Usage Report - AWS Cost and Usage Reports - AWS",
           "url": "https://aws.amazon.com/aws-cost-management/aws-cost-and-usage-reporting/"
         }
       ],
@@ -2058,15 +2186,19 @@
       "explanation": "## 正解の決め手\n\nVPC ピアリング接続は、2 つの VPC にあるリソースどうしが通信できるように、経路を用意する機能です。設問の「2 つの VPC の間の通信」という条件に合うのは、この機能だけです。\n\n## 他の選択肢が誤りである理由\n\nS3 File Gateway\n\nS3 File Gateway は、S3 のデータへのファイル形式のアクセスを提供するもので、VPC 間の通信を経路づける機能ではありません。\n\nTraffic Flow のポリシービルダー\n\nルーティングポリシーの実装を簡単にするビルダーですが、2 つの VPC のリソース間の通信をつなぐ機能ではありません。名前に経路の語が近いだけの誤解です。\n\n学習済みの画像・映像分析 API\n\n画像や映像を分析する API であり、適用範囲がネットワーク接続とは異なります。VPC 間の通信には使いません。",
       "references": [
         {
+          "title": "Image recognition software, ML image analysis, and video analysis – Amazon Rekognition – AWS",
           "url": "https://aws.amazon.com/rekognition/"
         },
         {
+          "title": "Amazon Route 53 - DNS Service - AWS",
           "url": "https://aws.amazon.com/route53/"
         },
         {
+          "title": "AWS Storage Gateway | Amazon Web Services",
           "url": "https://aws.amazon.com/storagegateway/"
         },
         {
+          "title": "What is Amazon VPC? - Amazon Virtual Private Cloud",
           "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
         }
       ],
@@ -2103,15 +2235,19 @@
       "explanation": "## 問われている要件\n長期利用のコミットメントと引き換えに割引を得ること、そして期間中にファミリー・OS・テナンシーを変えても割引が続くことの 2 点です。\n\n## 正解の決め手\nConvertible RI は、ファミリー、OS、テナンシーを変えても RI 価格の恩恵を受け続けられます。コミットメント型の割引で、変更への柔軟性も満たすのは、この選択肢だけです。\n\n## 他の選択肢が誤りである理由\n\nAWS Control Tower を有効にする\n\nControl Tower 自体には追加料金がかからず、使った他のサービスの料金だけを支払う仕組みです。EC2 の割引を得る手段ではないため、要件を満たしません。\n\nスポットインスタンスだけで運用する\n\n未使用の EC2 容量をオンデマンド価格より最大 90% 安く使うものです。コミットメントと引き換えの割引ではなく、ファミリーなどを変えても RI 価格が続く仕組みでもありません。\n\nAWS Batch でジョブを実行する\n\nAWS Batch は、複数の計算基盤の上でジョブを実行するサービスです。料金を割り引く契約の種類ではないため、問われている要件とは適用範囲が異なります。\n## まとめ\n割引の種類は、コミットメントの有無と、期間中の変更への対応で区別します。ファミリーなどを変える前提なら Convertible RI です。",
       "references": [
         {
+          "title": "Efficient Batch Processing - AWS Batch - AWS",
           "url": "https://aws.amazon.com/batch/"
         },
         {
+          "title": "Cloud Security Governance - AWS Control Tower - AWS",
           "url": "https://aws.amazon.com/controltower/"
         },
         {
+          "title": "Amazon EC2 - Secure and resizable compute capacity – Amazon Web Services",
           "url": "https://aws.amazon.com/ec2/pricing/reserved-instances/"
         },
         {
+          "title": "Save up-to 90% on On-Demand Prices – Amazon EC2 Spot Instances – Amazon Web Services",
           "url": "https://aws.amazon.com/ec2/spot/"
         }
       ],
@@ -2148,9 +2284,11 @@
       "explanation": "## 問われている要件\nCost Explorer を有効にする操作の経路が問われています。\n\n## 正解の決め手\n有効化は、請求とコスト管理のコンソールの手順で行います。API からは有効にできません。有効にすると、コストのデータの準備と、先の期間の予測の計算が行われます。\n\n## 他の選択肢が誤りである理由\n\nAPI を呼び出して有効にする\n\nCost Explorer は API からは有効にできず、コンソールの手順で有効にします。\n\nアカウント作成時に自動で有効になるので、操作は要らない\n\n有効化はコンソールで操作して行うもので、自動では有効になりません。有効にして初めてコストのデータが準備されます。\n\n支払いプロファイルの設定画面から有効にする\n\n支払いプロファイルは、メンバーアカウントごとの支払い設定に使うもので、Cost Explorer の有効化とは関係がありません。",
       "references": [
         {
+          "title": "AWS Billing - Amazon Web Services",
           "url": "https://aws.amazon.com/aws-cost-management/aws-billing/"
         },
         {
+          "title": "Cloud Cost Report - AWS Cost Explorer - AWS",
           "url": "https://aws.amazon.com/aws-cost-management/aws-cost-explorer/"
         }
       ],
@@ -2187,15 +2325,19 @@
       "explanation": "## 問われている要件\nソフトウェアライセンスを、クラウドとオンプレミスをまたいで管理することが要件です。\n\n## 正解の決め手\nライセンスをクラウドとオンプレミスの両方にまたがって管理するためのサービスは、License Manager です。\n\n## 他の選択肢が誤りである理由\n\nクラウドへの備えを評価し、変革のロードマップを更新するための指針\n\nクラウドへの備えの評価やロードマップの更新に使う指針であり、ライセンスの管理を目的にしたものではありません。\n\n全メンバーアカウントの請求を一本化し、大量利用の割引などを得る仕組み\n\n請求の一本化は大量利用の割引などの料金面の効果を狙うもので、ライセンスの管理には使いません。\n\nサーバーの管理を任せ、アプリの開発に集中できる実行の仕組み\n\nサーバーの管理を任せてアプリ開発に集中するための仕組みで、ライセンスを管理するものではありません。",
       "references": [
         {
+          "title": "Serverless Compute Engine – AWS Fargate – AWS",
           "url": "https://aws.amazon.com/fargate/"
         },
         {
+          "title": "License Manager Software - Amazon License Manager - AWS",
           "url": "https://aws.amazon.com/license-manager/"
         },
         {
+          "title": "Cloud Administration – AWS Organizations – Amazon Web Services",
           "url": "https://aws.amazon.com/organizations/"
         },
         {
+          "title": "An Overview of the AWS Cloud Adoption Framework - An Overview of the AWS Cloud Adoption Framework",
           "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/welcome.html"
         }
       ],
@@ -2232,15 +2374,19 @@
       "explanation": "## 問われている要件\nライセンスの管理を、AWS とオンプレミスの両方にまたがって行いたいという要件です。\n\n## 正解の決め手\nAWS License Manager は、ソフトウェアライセンスを AWS とオンプレミスをまたいで管理するためのサービスです。\n\n## 他の選択肢が誤りである理由\n\nAmazon EKS\n\n**Amazon EKS** は、本番のワークロードを動かすためのサービスです。ライセンスをオンプレミスと合わせて管理する機能ではありません。\n\nAWS CAF\n\n**AWS CAF** は、変革の機会の見極めや備えの評価に使う枠組みです。ライセンスの管理を行うサービスではありません。\n\nAWS Fargate\n\n**AWS Fargate** は、サーバーの管理を AWS に任せるための仕組みです。ライセンスの管理が目的ではありません。",
       "references": [
         {
+          "title": "Managed Kubernetes Service - Amazon EKS - AWS",
           "url": "https://aws.amazon.com/eks/"
         },
         {
+          "title": "Serverless Compute Engine – AWS Fargate – AWS",
           "url": "https://aws.amazon.com/fargate/"
         },
         {
+          "title": "License Manager Software - Amazon License Manager - AWS",
           "url": "https://aws.amazon.com/license-manager/"
         },
         {
+          "title": "An Overview of the AWS Cloud Adoption Framework - An Overview of the AWS Cloud Adoption Framework",
           "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/welcome.html"
         }
       ],
@@ -2277,9 +2423,11 @@
       "explanation": "## 問われている要件\nコストと利用量のデータを、プログラムから取得する手段が問われています。\n\n## 正解の決め手\nCost Explorer の API を使うと、コストと利用量のデータをプログラムから問い合わせられます。\n\n## 他の選択肢が誤りである理由\n\n画面で表示した内容を、人が手作業で書き写す方法だけが使える\n\nプログラムから問い合わせる手段があるため、手作業で書き写す方法に限られるわけではありません。\n\nAmazon SageMaker のノートブックから、自動で取得する\n\nAmazon SageMaker は、機械学習やデータ処理の基盤です。コストと利用量のデータを問い合わせる手段ではありません。\n\nバックアップのポリシーを設定して、コストのデータを保存させる\n\nバックアップのポリシーは、データ保護の作業のためのものです。コストのデータを取得する手段ではありません。",
       "references": [
         {
+          "title": "Cloud Cost Report - AWS Cost Explorer - AWS",
           "url": "https://aws.amazon.com/aws-cost-management/aws-cost-explorer/"
         },
         {
+          "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
           "url": "https://aws.amazon.com/backup/"
         }
       ],
@@ -2316,6 +2464,7 @@
       "explanation": "## 問われている要件\n利用者の活動と API 呼び出しを記録し、VPC エンドポイントを通る通信のイベントも扱えるサービスを選びます。\n\n## 正解の決め手\nAWS CloudTrail は、アカウント内の活動と API 呼び出しを記録し、セキュリティの体制を高めます。VPC エンドポイントを通るネットワークアクティビティのイベントも記録できます。\n\n## 他の選択肢が誤りである理由\n\nAmazon CloudWatch\n\nメトリクスとアラームによる監視のサービスです。利用者の活動や API 呼び出しの記録を担うサービスではありません。\n\nAWS Backup\n\nバックアップによるデータ保護のサービスで、API 呼び出しや利用者の活動を記録するものではありません。\n\nAWS Artifact\n\n報告書や認証を取得するためのサービスで、アカウント内の操作を記録する範囲は持ちません。",
       "references": [
         {
+          "title": "API Logs - Secure Standardized Logging Service - AWS CloudTrail - AWS",
           "url": "https://aws.amazon.com/cloudtrail/"
         }
       ],
@@ -2352,6 +2501,7 @@
       "explanation": "## 問われている要件\n\n災害復旧と事業継続の備えとして、バックアップをどこに置くか、そして取ったバックアップが実際に使えるかをどう確かめるか、の 2 点を説明することが求められています。\n\n## 解くための考え方\n\n1 点目は保管先の分散です。異なるリージョンと異なるアカウントにまたがってバックアップを取ることで、1 つの場所や 1 つのアカウントに障害が起きても復旧の土台が残ります。2 点目は確認の仕組みです。バックアップの復旧テストと検証は自動で実行でき、取っただけで終わらせず、復元できることを継続して確かめられます。\n\n## まとめ\n\n解答の例は次のとおりです。「バックアップを別のリージョンや別のアカウントにも保管して、災害時の復旧と事業継続の基盤にする。あわせて、復旧テストと検証を自動で実行し、必要なときに復元できることを確かめておく。」",
       "references": [
         {
+          "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
           "url": "https://aws.amazon.com/backup/"
         }
       ],
@@ -2389,12 +2539,15 @@
       "explanation": "## 問われている要件\n自社の施設など、AWS のデータセンター以外の場所に AWS の機能を持ち込める仕組みを選びます。\n\n## 正解の決め手\nOutposts は、AWS のサービスとインフラを、オンプレミスなどの施設に持ち込める仕組みです。要件の「施設に持ち込む」に直接対応します。\n\n## 他の選択肢が誤りである理由\n\nLocal Zones を使い、リージョンの延長として利用者の近くにコンピューティングを置く\n\nLocal Zones は、リージョンの延長として利用者の近くに置く仕組みです。オンプレミスなどの施設に持ち込む用途には当たりません。\n\nCloudFormation を使い、インフラをコードで定義して素早く用意する\n\nCloudFormation は、インフラをコードで定義して用意・管理するサービスで、設備を施設へ持ち込む仕組みではありません。\n\nAthena を使い、サーバーレスでデータを分析する\n\nAthena はサーバーレスの分析サービスで、利用者がインフラを用意しない点が特徴です。インフラを施設に持ち込む仕組みではありません。",
       "references": [
         {
+          "title": "Global Infrastructure Regions & AZs",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/"
         },
         {
+          "title": "Interactive SQL - Serverless Query Service - Amazon Athena - AWS",
           "url": "https://aws.amazon.com/athena/"
         },
         {
+          "title": "Provision Infrastructure as Code - AWS CloudFormation - AWS",
           "url": "https://aws.amazon.com/cloudformation/"
         }
       ],
@@ -2431,6 +2584,7 @@
       "explanation": "## 問われている要件\nモダナイゼーションの効果として正しいものを選ぶ問題です。\n\n## 正解の決め手\nモダナイゼーションにより、技術的負債が減り、浮いた資源を革新に回せます。\n\n## 他の選択肢が誤りである理由\n\n技術的負債はそのままに、運用の担当者だけを増やせる\n\nモダナイゼーションは技術的負債を減らすもので、負債を残したまま担当者を増やすものではありません。\n\n移行の支援プログラムを使うことが、効果を得る前提になる\n\n支援プログラムは加速のための手段の一つで、効果を得るための前提条件ではありません。\n\n技術的負債が増える代わりに、新機能の開発が速くなる\n\nモダナイゼーションは技術的負債を減らします。増える代わりに何かが得られるわけではありません。",
       "references": [
         {
+          "title": "AWS Migration & Modernization | Cloud Transformation",
           "url": "https://aws.amazon.com/cloud-migration/"
         }
       ],
@@ -2467,6 +2621,7 @@
       "explanation": "## 正解の決め手\nコスト最適化の柱は、不要な費用を避け、支出を管理することに重点を置きます。\n\n## 他の選択肢が誤りである理由\n\n性能を高めるため、最上位の構成のリソースを選ぶこと\n\n高性能な構成を選ぶと費用が増えやすく、不要な費用を避ける方針とは合いません。\n\n復旧時間を短くするため、冗長な構成を増やすこと\n\n復旧時間の短縮は別の柱の関心事で、コスト最適化の柱は支出の管理に重点があります。\n\n利用者のアクセス権限を最小限に絞り込むこと\n\n権限の絞り込みは別の柱の内容で、コスト最適化の柱の重点ではありません。",
       "references": [
         {
+          "title": "AWS Well-Architected - Build secure, efficient cloud applications",
           "url": "https://aws.amazon.com/architecture/well-architected/"
         }
       ],
@@ -2503,6 +2658,7 @@
       "explanation": "## 問われている要件\n従量課金という料金の仕組みが、利用者にどのような利点をもたらすかを問う設問です。\n\n## 正解の決め手\n従量課金は、実際に使った分だけを支払う仕組みです。使わない分の支出が発生しにくいため、コストを抑えられます。\n\n## 他の選択肢が誤りである理由\n\n利用の有無にかかわらず、毎月一定の固定料金を支払う。\n\n従量課金は使った分だけ支払う仕組みです。利用に関係なく固定額を払うという説明は、条件が逆になっています。\n\n契約時に、数年分の利用料をまとめて前払いする必要がある。\n\n使った分だけ支払う仕組みなので、数年分をまとめて前払いする必要はありません。固定費のような誤解です。\n\n利用するリージョンの数だけで、料金の総額が決まる。\n\n料金は利用した量に応じて決まります。リージョンの数という別の単位だけで総額が決まるわけではありません。",
       "references": [
         {
+          "title": "Desktops and application streaming - Amazon WorkSpaces applications - AWS",
           "url": "https://aws.amazon.com/appstream2/"
         }
       ],
@@ -2539,6 +2695,7 @@
       "explanation": "## 問われている要件\nデータ移動の仕組みを自分で組まずに、更新データを Redshift へ送ることが条件です。\n\n## 正解の決め手\nゼロ ETL 連携は、業務データベースの更新データを、移動の仕組みを組まずに Redshift へ送れます。\n\n## 他の選択肢が誤りである理由\n\n転送処理を自前で組み、定期的に実行する方式\n\n移動の仕組みを自前で組む方式は、組まずに送るという条件と逆です。\n\nSMS で更新内容を通知して反映する方式\n\nメッセージを送る手段であり、更新データを移動させる連携ではありません。ゼロ ETL 連携の役割とは異なります。\n\n移動用のサーバーを自分で立てて運用する方式\n\n移動用のサーバーを自分で用意して運用するのは、移動の仕組みを組まないという条件に合いません。",
       "references": [
         {
+          "title": "Cloud Data Warehouse – Amazon Redshift – AWS",
           "url": "https://aws.amazon.com/redshift/"
         }
       ],
@@ -2575,12 +2732,15 @@
       "explanation": "## 問われている要件\n報告書をセルフサービスで取り出して、法令遵守や安全性の確認の手間を減らすことが求められています。\n\n## 正解の決め手\nセルフサービスの画面から報告書を取り出せるのは、AWS Artifact です。状況を把握できると、利用者はワークロードを自信を持って展開しやすくなります。\n\n## 他の選択肢が誤りである理由\n\nAmazon CloudWatch\n\n監視のサービスで、インフラやアプリケーションの状態を一つの場所にまとめて見る用途です。報告書をセルフサービスで取り出す用途ではありません。\n\nAWS CloudTrail Lake\n\nダッシュボードで傾向を可視化するための機能です。報告書を取り出して確認の手間を減らす用途は、報告書を扱う別のサービスの役割です。\n\nAWS Backup\n\nバックアップを作り、保管庫で守るための機能です。報告書をセルフサービスで取り出す用途には使いません。",
       "references": [
         {
+          "title": "Security Compliance Management - AWS Artifact - AWS",
           "url": "https://aws.amazon.com/artifact/"
         },
         {
+          "title": "API Logs - Secure Standardized Logging Service - AWS CloudTrail - AWS",
           "url": "https://aws.amazon.com/cloudtrail/"
         },
         {
+          "title": "Amazon Monitoring and Observability-Amazon CloudWatch - AWS",
           "url": "https://aws.amazon.com/cloudwatch/"
         }
       ],
@@ -2617,9 +2777,11 @@
       "explanation": "## 問われている要件\nAWS CLI が持つ機能のうち、正しいものを 2 つ選ぶ問題です。\n\n## 正解の決め手\n過去に実行したコマンドは、履歴の一覧と詳細の表示で確認できます。また CLI v2 は、コマンドの実行時に、コマンドやパラメータ、リソースなどを案内します。\n\n## 他の選択肢が誤りである理由\n\n履歴の機能は、今後実行を予定するコマンドの一覧を表示する。\n\n履歴で確認できるのは、過去に実行したコマンドです。今後の予定を表示する機能ではありません。\n\n過去のコマンドの履歴は、コストと利用量を問い合わせる機能で確認する。\n\nコストと利用量の問い合わせは、別の機能の役割です。実行したコマンドの履歴を調べる手段ではありません。\n\n実行時の案内は提供されず、手順書を別に参照して入力する必要がある。\n\n実行時には、コマンドやパラメータ、リソース、ドキュメントなどの案内が得られます。手順書だけに頼る必要はありません。",
       "references": [
         {
+          "title": "Cloud Cost Report - AWS Cost Explorer - AWS",
           "url": "https://aws.amazon.com/aws-cost-management/aws-cost-explorer/"
         },
         {
+          "title": "AWS CLI",
           "url": "https://aws.amazon.com/cli/"
         }
       ],
@@ -2660,12 +2822,15 @@
       "explanation": "## 問われている要件\n期間を四半期とし、その期間の上限額を事前に決めて費用を管理することです。\n\n## 正解の決め手\n予算では、期間を日次・月次・四半期・年次から選び、具体的な上限を設定できます。\n\n## 他の選択肢が誤りである理由\n\n請求書を表示し、ダウンロードして保管する\n\n請求書の表示とダウンロードは、請求済みの内容を確認するためのもので、事前に上限を決める機能ではありません。\n\n前年比でコストと利用量を比べ、差異を見つける\n\n前年比の比較は、過去との差異を見つけるもので、将来の期間に上限額を設定する機能ではありません。\n\n支払いプロファイルで、支払いの設定を変える\n\n支払いプロファイルは支払いの設定を変える機能で、費用の上限を決める機能ではありません。",
       "references": [
         {
+          "title": "AWS Billing - Amazon Web Services",
           "url": "https://aws.amazon.com/aws-cost-management/aws-billing/"
         },
         {
+          "title": "Set Custom Cost and Usage Budgets – AWS Budgets – Amazon Web Services",
           "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/"
         },
         {
+          "title": "Cloud Cost Report - AWS Cost Explorer - AWS",
           "url": "https://aws.amazon.com/aws-cost-management/aws-cost-explorer/"
         }
       ],
@@ -2702,18 +2867,23 @@
       "explanation": "## 問われている要件\n負荷が一時的に急増する業務で、ピークに合わせた事前の過剰な確保を避けたい、という課題です。必要なのは、需要の増減に資源の量を合わせられる性質です。\n\n## 正解の決め手\nクラウドでは、需要に合わせて資源を増減でき、ピークに備えて事前に過剰に確保する必要がありません。セール期間だけ増やし、終われば戻せるため、この課題に直接対応します。\n\n## 他の選択肢が誤りである理由\n\nアプリケーションを複数の地域へ簡単に展開し、利用者に近い場所で遅延を低く抑えられる\n\n複数の地域への展開と低遅延は、利用者に近い場所で提供する話です。ピーク負荷に備えた容量の過剰確保という課題とは対象が異なります。\n\nコードの変更ごとにテストを行い、機能の更新を早く回して不具合を早く見つけられる\n\n変更ごとのテストは、更新を早く回し不具合を早く見つける開発手法の利点です。資源量を需要に合わせる話ではありません。\n\nクラウドの価値を事業の観点から捉える枠組みを使い、利用者の理解を助けられる\n\n価値を事業の観点から捉える枠組みは、理解を助ける考え方です。負荷に応じて資源を増減する機能ではないため、容量の課題は解決しません。\n\n文書からのデータ抽出に要する作業時間を、手作業と比べて大幅に短縮できる\n\n文書からのデータ抽出の時間短縮は、特定の処理を自動化する利点です。ピーク時の資源の確保という課題には対応しません。\n## まとめ\n需要の変動に合わせて資源を増減できることが、事前の過剰確保を不要にするクラウドの利点です。",
       "references": [
         {
+          "title": "CI/CD Pipeline – AWS CodePipeline – AWS",
           "url": "https://aws.amazon.com/codepipeline/"
         },
         {
+          "title": "Learn Cloud Economics - Value of Cloud - Cloud ROI Framework - AWS",
           "url": "https://aws.amazon.com/economics/"
         },
         {
+          "title": "Intelligently Extract Text & Data with OCR - Amazon Textract - Amazon Web Services",
           "url": "https://aws.amazon.com/textract/"
         },
         {
+          "title": "What is Cloud Computing? - Cloud Computing Services, Benefits, and Types - AWS",
           "url": "https://aws.amazon.com/what-is-cloud-computing/"
         },
         {
+          "title": "Six advantages of cloud computing - Overview of Amazon Web Services",
           "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html"
         }
       ],
@@ -2755,15 +2925,19 @@
       "explanation": "## 問われている要件\nサーバーの管理を AWS 側に任せ、利用者はアプリケーション開発に専念できる仕組みを選ぶ問題です。\n\n## 正解の決め手\nFargate を使うと、サーバーの管理は AWS が引き受けます。そのため、利用者はアプリケーションの開発に集中できます。\n\n## 他の選択肢が誤りである理由\n\nAWS License Manager\n\n**AWS License Manager** は、ソフトウェアライセンスを AWS とオンプレミスにまたがって管理するサービスです。サーバー管理を任せる仕組みではありません。\n\nAWS CAF\n\n**AWS CAF** は、変革の機会の見極めや備えの評価、ロードマップの更新に使う枠組みです。サーバーの運用を任せるものではありません。\n\nAurora への標準ツールによる移行\n\n標準ツールで MySQL や PostgreSQL のデータベースを Aurora へ移す話であり、対象はデータベースの移行です。サーバー管理を任せる説明にはなりません。",
       "references": [
         {
+          "title": "Serverless Compute Engine – AWS Fargate – AWS",
           "url": "https://aws.amazon.com/fargate/"
         },
         {
+          "title": "License Manager Software - Amazon License Manager - AWS",
           "url": "https://aws.amazon.com/license-manager/"
         },
         {
+          "title": "Relational Database – Amazon Aurora MySQL PostgreSQL – AWS",
           "url": "https://aws.amazon.com/rds/aurora/"
         },
         {
+          "title": "An Overview of the AWS Cloud Adoption Framework - An Overview of the AWS Cloud Adoption Framework",
           "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/welcome.html"
         }
       ],
@@ -2800,15 +2974,19 @@
       "explanation": "## 問われている要件\nクラウドを採用する利点として適切なものを、2 つ選ぶ問題です。\n\n## 正解の決め手\nB は、需要に応じて設定を変えずに容量とスループットを拡張できるという、クラウドの拡張性を表しています。D は、運用コストの低下と、生産性・利用者の体験の向上というクラウド採用の利点そのものです。\n\n## 他の選択肢が誤りである理由\n\n利用量が増えるほど単価が上がる料金体系になり、データの受信にも料金がかかる。\n\n段階制の料金は、利用量が増えるほど単価が**下がる**仕組みです。データの受信も無料とされているため、料金がかかるという説明は誤りです。\n\nリファクタリングは、アプリの構成を変えずにそのまま移す戦略で、俊敏性は変わらない。\n\nリファクタリングは、構成を変えずに移す戦略ではありません。クラウドネイティブな機能を生かして構成を作り直し、俊敏性や拡張性を高める戦略です。\n\n需要が増えるたびに、容量の設定を手作業で見直さないと拡張できない。\n\nクラウドでは、需要に応じて設定を変えずに容量とスループットを拡張できます。手作業の見直しが必要という条件は、実際とは逆です。",
       "references": [
         {
+          "title": "AWS Cloud Adoption Framework",
           "url": "https://aws.amazon.com/cloud-adoption-framework/"
         },
         {
+          "title": "Shared File Storage - Amazon Elastic File System (EFS) - AWS",
           "url": "https://aws.amazon.com/efs/"
         },
         {
+          "title": "AWS Product and Service Pricing | Amazon Web Services",
           "url": "https://aws.amazon.com/pricing/"
         },
         {
+          "title": "About the migration strategies - AWS Prescriptive Guidance",
           "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html"
         }
       ],
@@ -2849,15 +3027,19 @@
       "explanation": "## 問われている要件\n運用上の優秀性の柱が、何に重点を置くかを問う問題です。\n\n## 正解の決め手\nこの柱は、システムの稼働と監視、そして手順を継続して改善することに重点を置きます。\n\n## 他の選択肢が誤りである理由\n\n新しい製品や販路を開いて、収益を伸ばすこと\n\n収益を伸ばすことはクラウド採用の利点で、運用上の優秀性の柱の重点ではありません。\n\n需要に応じて、容量を自動で増減させること\n\n容量の自動増減はクラウドの特長で、運用上の柱が重点を置く稼働と手順の改善とは範囲が違います。\n\n技術的負債を減らし、資源を革新へ振り向けること\n\n技術的負債の削減はモダナイゼーションの効果で、運用上の優秀性の柱の重点ではありません。",
       "references": [
         {
+          "title": "Desktops and application streaming - Amazon WorkSpaces applications - AWS",
           "url": "https://aws.amazon.com/appstream2/"
         },
         {
+          "title": "AWS Well-Architected - Build secure, efficient cloud applications",
           "url": "https://aws.amazon.com/architecture/well-architected/"
         },
         {
+          "title": "AWS Cloud Adoption Framework",
           "url": "https://aws.amazon.com/cloud-adoption-framework/"
         },
         {
+          "title": "AWS Migration & Modernization | Cloud Transformation",
           "url": "https://aws.amazon.com/cloud-migration/"
         }
       ],
@@ -2894,6 +3076,7 @@
       "explanation": "## 問われている要件\nAZ 同士の距離感を正しく捉えているかが問われています。\n\n## 正解の決め手\nAZ 同士は、物理的に十分に離れていながら、互いの距離は 100 km 以内に収まっています。離れていることと近いことの両方を満たす選択肢が C です。\n\n## 他の選択肢が誤りである理由\n\n同じ建物内の別フロアに置かれ、物理的な距離はほとんどない\n\nAZ は同じ建物内のフロアではなく、物理的に十分に離れた場所に置かれます。\n\n数百 km から 1,000 km 以上離れており、距離の上限はない\n\nAZ 同士の距離には上限があり、互いに 100 km 以内に収まります。数百 km 以上離れるわけではありません。\n\n障害の影響を避けるため、リージョンをまたいで数千 km 離して配置される\n\nAZ は 1 つのリージョンの内部にある単位です。リージョンをまたぐ距離の話とは範囲が異なります。",
       "references": [
         {
+          "title": "Global Infrastructure Regions & AZs",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/"
         }
       ],
@@ -2930,6 +3113,7 @@
       "explanation": "## 問われている要件\nモダナイゼーションの効果と、支援の範囲の両方が正しい選択肢を選ぶ問題です。\n\n## 正解の決め手\nモダナイゼーションは技術的負債を減らし、資源を革新へ振り向けやすくします。AWS は移行とモダナイゼーションを支える組織・運用・技術の能力を蓄積し、その支援を提供しています。\n\n## 他の選択肢が誤りである理由\n\n技術的負債は残るが、移行後は資源を既存システムの保守へ集中できる。支援は、技術面の能力に限られる\n\nモダナイゼーションは技術的負債を減らし、資源を革新へ振り向けるものです。保守へ集中するという説明は逆です。\n\n技術的負債が減って資源を革新へ振り向けられるが、受けられる支援は、技術面の能力に限られる\n\n支援は技術面だけでなく、組織・運用・技術にわたる能力に基づいて提供されます。支援の範囲を狭く捉えた誤りです。\n\n技術的負債が増える代わりに運用の手間が減る。支援は、運用の代行だけが提供される\n\nモダナイゼーションは技術的負債を減らすものです。負債が増えるという理解は誤りで、支援も運用の代行に限られません。",
       "references": [
         {
+          "title": "AWS Migration & Modernization | Cloud Transformation",
           "url": "https://aws.amazon.com/cloud-migration/"
         }
       ],
@@ -2966,15 +3150,19 @@
       "explanation": "## 問われている要件\n利用者の操作を記録して監査や調査に使うサービス、CloudTrail の説明を 2 つ選ぶ問題です。\n\n## 正解の決め手\nCloudTrail は、利用者の活動と API の呼び出しをアカウント内で記録し、セキュリティの体制を高めます。記録したログは、SOC・PCI・HIPAA などの規制への準拠を示す材料にもなります。これが選択肢 C と E です。\n\n## 他の選択肢が誤りである理由\n\nランサムウェアからの復旧を助ける機能を備えたサービスである\n\nランサムウェアからの復旧を助けるのは **AWS Backup** の機能です。CloudTrail は操作の記録が役割で、復旧は担当しません。\n\nセキュリティ・コンプライアンス報告書へ、オンデマンドでアクセスできる\n\n報告書へオンデマンドでアクセスできるのは **AWS Artifact** です。CloudTrail が提供するのは操作の記録です。\n\n指標の変化に応じてアラームを設定し、対応を自動化できる\n\n指標に対するアラームで対応を自動化するのは **CloudWatch** の機能です。ログの記録と監視を混同した誤りです。\n## まとめ\n「誰が・いつ・何をしたか」の記録は CloudTrail、と覚えましょう。",
       "references": [
         {
+          "title": "Security Compliance Management - AWS Artifact - AWS",
           "url": "https://aws.amazon.com/artifact/"
         },
         {
+          "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
           "url": "https://aws.amazon.com/backup/"
         },
         {
+          "title": "API Logs - Secure Standardized Logging Service - AWS CloudTrail - AWS",
           "url": "https://aws.amazon.com/cloudtrail/"
         },
         {
+          "title": "Amazon Monitoring and Observability-Amazon CloudWatch - AWS",
           "url": "https://aws.amazon.com/cloudwatch/"
         }
       ],
@@ -3015,15 +3203,19 @@
       "explanation": "## 問われている要件\n資格情報や API キーなどの秘密情報を、一元的に保存して管理することが求められています。\n\n## 正解の決め手\n秘密情報の保存と管理を一元化するのは、AWS Secrets Manager の役割です。\n\n## 他の選択肢が誤りである理由\n\nAWS License Manager\n\nAWS License Manager が扱うのはソフトウェアライセンスの使用状況の可視化と制御であり、秘密情報の保存・管理ではありません。\n\nAmazon Detective\n\nAmazon Detective は、資産とその関係をグラフで表して問題を調べる用途です。秘密情報を保管する場所ではありません。\n\nAWS Security Hub\n\nAWS Security Hub は検出結果を関連づけて分析し、対応が急ぐ問題を見分けるものです。秘密情報の保管は対象外です。",
       "references": [
         {
+          "title": "License Manager Software - Amazon License Manager - AWS",
           "url": "https://aws.amazon.com/license-manager/"
         },
         {
+          "title": "Managed Graph Database – Amazon Neptune – AWS",
           "url": "https://aws.amazon.com/neptune/"
         },
         {
+          "title": "Cloud Secrets Management - AWS Secrets Manager - AWS",
           "url": "https://aws.amazon.com/secrets-manager/"
         },
         {
+          "title": "AWS Security Hub - AWS",
           "url": "https://aws.amazon.com/security-hub/"
         }
       ],
@@ -3060,15 +3252,19 @@
       "explanation": "## 問われている要件\n耐障害性とアプリ固有の専門知識を強化できる、推奨のサポートを選ぶ問題です。\n\n## 正解の決め手\nUnified Operations は、ミッションクリティカルなワークロード向けで、耐障害性とアプリ固有の専門知識を強化した推奨プランです。\n\n## 他の選択肢が誤りである理由\n\n重要度の高い推奨を優先順位付きで届ける機能だけを利用する\n\nこの機能は、上位のプランの利用者に推奨を届ける機能です。機能の利用がプランの選択の代わりになる、という関係は逆です。\n\n費用の最適化について専門家の支援を受けられる推奨を使う\n\nこの支援の対象は費用の最適化です。耐障害性とアプリ固有の専門知識の強化には、適用範囲が合いません。\n\n新しい世代のインスタンスへの移行でワークロードを見直す\n\n新しい世代への移行は、ワークロードのコストを最適化する手段です。サポートの選択ではなく、耐障害性の強化とは別の話です。",
       "references": [
         {
+          "title": "AI-powered cloud support – AWS Support plans – AWS",
           "url": "https://aws.amazon.com/premiumsupport/"
         },
         {
+          "title": "AWS Support plan comparison – AWS Support features – AWS",
           "url": "https://aws.amazon.com/premiumsupport/plans/"
         },
         {
+          "title": "Best Practice Guidance for AWS Optimization - AWS Trusted Advisor",
           "url": "https://aws.amazon.com/premiumsupport/technology/trusted-advisor/"
         },
         {
+          "title": "Cloud Cost Savings – Savings Plans – Amazon Web Services",
           "url": "https://aws.amazon.com/savingsplans/"
         }
       ],
@@ -3105,18 +3301,23 @@
       "explanation": "## 問われている要件\nサーバーの管理を AWS に任せ、利用者は処理やアプリの開発に集中できる選択肢を、2 つ選ぶ問題です。\n\n## 正解の決め手\nFargate を使うと、サーバーの管理は AWS に任せられ、利用者はアプリの開発に集中できます。Lambda は、どの形態でもサーバーを管理せず、使った分だけ支払う考え方です。この 2 つが正答です。\n\n## 解くための考え方\n各選択肢が「処理を動かす基盤」の話か、それ以外(ライセンス、導入の指針、請求)の話かを分けると、絞り込めます。\n\n## 他の選択肢が誤りである理由\n\nソフトウェアライセンスをクラウドとオンプレミスにまたがって管理するサービスを使う\n\nライセンスを AWS とオンプレミスをまたいで管理するためのもので、処理を動かすサーバーの管理を任せる手段ではありません。\n\nクラウド導入の優先順位づけや準備状況の評価に使う指針を使う\n\n変革の機会の見極めや、クラウドへの備えの評価と改善に使う指針です。処理を実行する基盤ではなく、適用範囲が異なります。\n\n全メンバーアカウントの請求を一本化する仕組みを使う\n\n請求を一本化して大量利用による割引などの効果を得る仕組みです。サーバー管理の負担とは関係がありません。",
       "references": [
         {
+          "title": "Serverless Compute Engine – AWS Fargate – AWS",
           "url": "https://aws.amazon.com/fargate/"
         },
         {
+          "title": "Serverless Computing - AWS Lambda - Amazon Web Services",
           "url": "https://aws.amazon.com/lambda/"
         },
         {
+          "title": "License Manager Software - Amazon License Manager - AWS",
           "url": "https://aws.amazon.com/license-manager/"
         },
         {
+          "title": "Cloud Administration – AWS Organizations – Amazon Web Services",
           "url": "https://aws.amazon.com/organizations/"
         },
         {
+          "title": "An Overview of the AWS Cloud Adoption Framework - An Overview of the AWS Cloud Adoption Framework",
           "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/welcome.html"
         }
       ],
@@ -3157,9 +3358,11 @@
       "explanation": "## 問われている要件\n北米の AZ・Edge・Region の数を、取り違えずに選びます。\n\n## 正解の決め手\n北米では、AZ と Edge の拠点がそれぞれ 31 か所、Region が 9 か所あります。AZ のほうが Region より多いという関係も、見分ける手がかりになります。\n\n## 他の選択肢が誤りである理由\n\nAZ と Edge の拠点がそれぞれ 13 か所、Region が 7 か所\n\n拠点の数は 31 か所、Region は 9 か所です。ここに挙げた数値は合いません。\n\nAZ が 9 か所、Edge の拠点と Region がそれぞれ 31 か所\n\nAZ の数と Region の数を取り違えています。AZ は 31 か所、Region は 9 か所です。\n\nAZ と Edge の拠点がそれぞれ 21 か所、Region が 13 か所\n\nRegion の数が多すぎ、拠点の数も合いません。1 つの Region は三つ以上の AZ で構成されるため、Region が AZ に近い数になることもありません。",
       "references": [
         {
+          "title": "Global Infrastructure - AWS",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/"
         },
         {
+          "title": "Global Infrastructure Regions & AZs",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/"
         }
       ],
@@ -3196,15 +3399,19 @@
       "explanation": "## 問われている要件\n保管中のデータの暗号化に使う鍵を、利用者が管理できる手段を選ぶ問題です。\n\n## 正解の決め手\nAWS KMS の鍵を使ってサービスのサーバー側の暗号化を有効にすると、保管中のデータを守れます。鍵は利用者が管理します。\n\n## 他の選択肢が誤りである理由\n\nパートナーのセキュリティ製品を探せる場\n\nパートナーの製品を選べる場であり、サーバー側の暗号化の鍵を利用者が管理する手段ではありません。\n\nネットワークの通信を検査し制限する仕組み\n\n接続の監視や通信の検査、アクセスの制限が役割で、保管中のデータの暗号化の鍵とは別の話です。\n\n秘密情報を一元的に保存して管理する仕組み\n\n資格情報などの秘密情報を保存して管理する仕組みで、サーバー側の暗号化の鍵を提供するものではありません。\n## まとめ\n保管中のデータの暗号化には、利用者が管理する KMS の鍵を使います。",
       "references": [
         {
+          "title": "Encryption Cryptography Signing - AWS Key Management Service - AWS",
           "url": "https://aws.amazon.com/kms/"
         },
         {
+          "title": "Cloud Secrets Management - AWS Secrets Manager - AWS",
           "url": "https://aws.amazon.com/secrets-manager/"
         },
         {
+          "title": "Cloud Security – Amazon Web Services (AWS)",
           "url": "https://aws.amazon.com/security/"
         },
         {
+          "title": "Logically Isolated Virtual Private Cloud—Amazon VPC – Amazon Web Services",
           "url": "https://aws.amazon.com/vpc/"
         }
       ],
@@ -3241,12 +3448,15 @@
       "explanation": "## 問われている要件\n費用を下げる手段として、料金モデルの Savings Plans と、推奨を届ける Trusted Advisor Priority の 2 つを、それぞれ説明できるかを問う問題です。\n\n## 正解の決め手\nSavings Plans は、一定の使用量を約束する代わりに、オンデマンド価格より料金を下げられる料金モデルで、下げ幅は最大 72% です。Trusted Advisor Priority は、重要度の高い推奨を優先順位付きで届ける機能で、Enterprise Support または Unified Operations のプランの利用者が使えます。\n\n## まとめ\n解答の例は次のとおりです。Savings Plans は、使用量を約束する代わりにオンデマンド価格から最大 72% 安くなる柔軟な料金モデルです。Trusted Advisor Priority は、重要度の高い推奨を優先順位付きで届け、Enterprise Support か Unified Operations の利用者が使えます。",
       "references": [
         {
+          "title": "Amazon EC2 – Secure and resizable compute capacity – AWS",
           "url": "https://aws.amazon.com/ec2/pricing/"
         },
         {
+          "title": "Best Practice Guidance for AWS Optimization - AWS Trusted Advisor",
           "url": "https://aws.amazon.com/premiumsupport/technology/trusted-advisor/"
         },
         {
+          "title": "Cloud Cost Savings – Savings Plans – Amazon Web Services",
           "url": "https://aws.amazon.com/savingsplans/"
         }
       ],
@@ -3286,15 +3496,19 @@
       "explanation": "## 問われている要件\n受け取ったイベントを、条件に応じて宛先へ届けるサーバーレスのイベントブローカーを選ぶ問題です。\n\n## 正解の決め手\nEventBridge は、自前のアプリ、SaaS、AWS サービスからイベントを受け取り、条件に合う宛先へ届けるサーバーレスのイベントブローカーです。\n\n## 他の選択肢が誤りである理由\n\nAWS Storage Gateway\n\nStorage Gateway は、VMware などの仮想環境や VPC 内の EC2 に展開するストレージ接続の仕組みです。イベントを条件で振り分けて届ける役割はありません。\n\nAWS IAM\n\nIAM は多くの AWS サービスと統合される権限管理の仕組みです。統合されていることと、イベントを宛先へ届けることは別で、イベントブローカーではありません。\n\nリソース用の VPC エンドポイント\n\nリソース用の VPC エンドポイントは、RDS のデータベースや、ほかの VPC・アカウントにある名前と IP アドレスへ接続するためのものです。イベントの配信ではありません。",
       "references": [
         {
+          "title": "Serverless Event Router – Amazon EventBridge – AWS",
           "url": "https://aws.amazon.com/eventbridge/"
         },
         {
+          "title": "VPC Networking – AWS PrivateLink – Amazon Web Services",
           "url": "https://aws.amazon.com/privatelink/"
         },
         {
+          "title": "AWS Storage Gateway | Amazon Web Services",
           "url": "https://aws.amazon.com/storagegateway/"
         },
         {
+          "title": "What is IAM? - AWS Identity and Access Management",
           "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html"
         }
       ],
@@ -3331,9 +3545,11 @@
       "explanation": "## 問われている要件\nオンプレミスなどの自社施設に、サービスとインフラを置きたいという要件です。\n\n## 正解の決め手\nAWS Outposts は、サービスとインフラをオンプレミスなどの施設に持ち込めます。\n\n## 他の選択肢が誤りである理由\n\nLocal Zones\n\nLocal Zones はリージョン以外にワークロードを置く場所の選択肢で、自社施設に持ち込むものではありません。\n\nWavelength\n\nWavelength もリージョン以外の置き場所の選択肢で、オンプレミスへ持ち込む仕組みではありません。\n\nアベイラビリティーゾーン\n\nアベイラビリティーゾーンはリージョンを構成する単位で、自社施設に置くものではありません。",
       "references": [
         {
+          "title": "Global Infrastructure - AWS",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/"
         },
         {
+          "title": "Global Infrastructure Regions & AZs",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/"
         }
       ],
@@ -3370,15 +3586,19 @@
       "explanation": "## 問われている要件\n未使用の EC2 容量を、オンデマンドより安く使う購入オプションを選ぶ問題です。\n\n## 正解の決め手\n未使用の EC2 容量を、オンデマンド価格より最大 90% 安く使えるのは Spot インスタンスです。\n\n## 他の選択肢が誤りである理由\n\nConvertible RI\n\nConvertible RI は、ファミリー、OS、テナンシーを変えても RI 価格の恩恵を保てる予約の仕組みです。未使用の EC2 容量を安く使うものではありません。\n\nSavings Plans\n\nSavings Plans は、未使用の容量を使うのではなく、一定量の利用をコミットする代わりにオンデマンドより安くなる仕組みです。\n\nAWS Batch\n\nAWS Batch は、Spot や On-Demand のインスタンスを含む計算基盤でジョブを動かすサービスです。購入オプションではありません。",
       "references": [
         {
+          "title": "Efficient Batch Processing - AWS Batch - AWS",
           "url": "https://aws.amazon.com/batch/"
         },
         {
+          "title": "Amazon EC2 - Secure and resizable compute capacity – Amazon Web Services",
           "url": "https://aws.amazon.com/ec2/pricing/reserved-instances/"
         },
         {
+          "title": "Save up-to 90% on On-Demand Prices – Amazon EC2 Spot Instances – Amazon Web Services",
           "url": "https://aws.amazon.com/ec2/spot/"
         },
         {
+          "title": "AWS Product and Service Pricing | Amazon Web Services",
           "url": "https://aws.amazon.com/pricing/"
         }
       ],
@@ -3415,6 +3635,7 @@
       "explanation": "## 問われている要件\nAWS との合意を扱い、複数のアカウントに適用できるサービスを選ぶ問題です。\n\n## 正解の決め手\nAWS Artifact では、AWS との合意を確認、承諾、終了、取得でき、複数のアカウントへ適用できます。\n\n## 他の選択肢が誤りである理由\n\nAWS Backup\n\nデータ保護のポリシーと運用の洞察を得るサービスです。合意の承諾や終了は扱いません。\n\nAWS Certificate Manager\n\n証明書を用意して管理し、通信を安全にするためのものです。合意の確認や承諾の機能はありません。\n\nAWS CloudTrail\n\nアカウントの運用監査を支える記録のサービスです。合意を承諾する用途ではありません。",
       "references": [
         {
+          "title": "Security Compliance Management - AWS Artifact - AWS",
           "url": "https://aws.amazon.com/artifact/"
         }
       ],
@@ -3451,18 +3672,23 @@
       "explanation": "## 正解の決め手\nサーバーレスや HTTP のバックエンド向けの RESTful API を作る用途には、HTTP API が適しているとされています。\n\n## 他の選択肢が誤りである理由\n\n二つの仮想ネットワークのリソース間で、通信を経路づけする。\n\nこれは二つのネットワークの間で通信を経路づけする機能で、API を作る用途ではありません。\n\nオブジェクトストレージのデータを、ファイル共有の形で見せる。\n\nこれはストレージのデータをファイルの形で扱う機能の説明で、API の作成とは別の用途です。\n\n投稿などの利用者の作る内容を、大量かつ即時に自動翻訳する。\n\nこれは投稿などを自動翻訳する機能の説明で、バックエンド向けの API を作る用途ではありません。\n\nエージェントの記憶に使うベクトル検索を、業務データと同じ場所で行う。\n\nこれはベクトル検索を業務データと同じ場所で行う話で、サーバーレスのバックエンド向けの API を作る用途ではありません。",
       "references": [
         {
+          "title": "Amazon API Gateway | API Management | Amazon Web Services",
           "url": "https://aws.amazon.com/api-gateway/"
         },
         {
+          "title": "Fast NoSQL Key-Value Database – Amazon DynamoDB – AWS",
           "url": "https://aws.amazon.com/dynamodb/"
         },
         {
+          "title": "AWS Storage Gateway | Amazon Web Services",
           "url": "https://aws.amazon.com/storagegateway/"
         },
         {
+          "title": "Machine Translation Service — Amazon Translate — Amazon Web Services",
           "url": "https://aws.amazon.com/translate/"
         },
         {
+          "title": "What is Amazon VPC? - Amazon Virtual Private Cloud",
           "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
         }
       ],
@@ -3504,6 +3730,7 @@
       "explanation": "## 問われている要件\nCloudTrail Lake が持つ機能を、他のサービスの機能と区別して選ぶ問いです。\n\n## 正解の決め手\nCloudTrail Lake では、ダッシュボードで傾向を可視化できます。イベントデータは SQL のクエリで調べることもできます。\n\n## 他の選択肢が誤りである理由\n\nAWS と ISV の報告書を、セルフサービスの画面から取り出せる\n\n報告書をセルフサービスで取り出せるのは、別のサービスである AWS Artifact の特徴です。\n\n論理的なエアギャップの保管庫で、バックアップを守れる\n\n論理的なエアギャップの保管庫でバックアップを守るのは、AWS Backup 側の仕組みです。\n\nメトリクスの変化にアラームを設定し、対応を自動化できる\n\nメトリクスへのアラームと対応の自動化は、Amazon CloudWatch の機能の説明です。",
       "references": [
         {
+          "title": "API Logs - Secure Standardized Logging Service - AWS CloudTrail - AWS",
           "url": "https://aws.amazon.com/cloudtrail/"
         }
       ],
@@ -3540,9 +3767,11 @@
       "explanation": "## 問われている要件\n専用ホストの特徴として正しいものを 2 つ選ぶ問題です。\n\n## 正解の決め手\n専用ホストは、利用者だけが使う物理サーバーです。そのため、既存のサーバー紐づき型ライセンスを持ち込めます。\n\n## 他の選択肢が誤りである理由\n\n購入方法は、長期の前払い契約だけに限られる\n\n専用ホストは、オンデマンドか節約プランで購入できます。長期の前払い契約だけに限られるわけではありません。\n\n複数の利用者が同じ物理サーバーを共有して使う\n\n専用ホストは、利用者だけが使う物理サーバーです。他の利用者と共有する形ではありません。\n\n使わないときは容量が最小まで縮み、待機中の費用が出ない\n\n容量が最小まで縮み待機中の費用が出ないのは、サーバーレス版の特性です。専用ホストの特徴ではありません。",
       "references": [
         {
+          "title": "Amazon EC2 – Secure and resizable compute capacity – AWS",
           "url": "https://aws.amazon.com/ec2/pricing/"
         },
         {
+          "title": "Real-Time Retrieval Engine for AI, Search & Analytics - Amazon OpenSearch Service - AWS",
           "url": "https://aws.amazon.com/opensearch-service/"
         }
       ],
@@ -3583,15 +3812,19 @@
       "explanation": "## 問われている要件\nAWS の機能や考え方と、その説明が合っている組み合わせを 2 つ選ぶ問題です。\n\n## 正解の決め手\nWell-Architected Review は、ワークロードのセキュリティ・信頼性・性能のベストプラクティスを評価するために行います。AWS License Manager は、Dedicated Host 上のソフトウェアライセンスの追跡と管理に使えます。\n\n## 他の選択肢が誤りである理由\n\nWell-Architected Review は、請求額を自動で割引プランに切り替える機能である。\n\nWell-Architected Review は、ワークロードの設計上のベストプラクティスを評価するもので、請求の切り替えは行いません。\n\nAWS Graviton への移行は、どのワークロードでも手間に見合う効果が同じように得られる。\n\nGraviton への移行では、手間に対して効果の大きい EC2・Auto Scaling・RDS のワークロードを見つけて選びます。すべてで同じ効果とは限りません。\n\nTextract は、文書からの抽出を手作業より長い時間をかけて行う代わりに精度を高める。\n\nTextract は、手作業と比べて抽出の作業時間を大幅に短縮できます。時間をかける向きは逆です。",
       "references": [
         {
+          "title": "Shared Responsibility Model - Amazon Web Services (AWS)",
           "url": "https://aws.amazon.com/compliance/shared-responsibility-model/"
         },
         {
+          "title": "Web Optimizer - Workload Rightsizing - AWS Compute Optimizer - AWS",
           "url": "https://aws.amazon.com/compute-optimizer/"
         },
         {
+          "title": "Dedicated Server Hosting - Amazon EC2 Dedicated Hosts - AWS",
           "url": "https://aws.amazon.com/ec2/dedicated-hosts/"
         },
         {
+          "title": "Intelligently Extract Text & Data with OCR - Amazon Textract - Amazon Web Services",
           "url": "https://aws.amazon.com/textract/"
         }
       ],
@@ -3632,15 +3865,19 @@
       "explanation": "## 問われている要件\n機密性の高いデータを扱うときの 4 つの場面(秘密情報、長期保存の記録、個人を特定できる情報、タグ)について、それぞれの方針や仕組みを答える問題です。\n\n## 解くための考え方\n場面ごとに、何を守るか、どう管理するかを 1 文ずつ対応させて書くと、抜けがなくなります。\n\n## まとめ\n(1) 資格情報や API キーなどの秘密情報は、一元的に保存して管理します。(2) 規制やコンプライアンスで長期保存が必要な記録は、S3 Object Lock で保持の管理を設定します。(3) 文書から PII(個人を特定できる情報)を見つけて墨消しし、機密データへのアクセスを保護・管理します。(4) タグには機密情報を含めないことが推奨されます。\n\n解答の例: 秘密情報は一元的な保存先で管理し、長期保存が必要な記録は S3 Object Lock で保持を設定する。文書内の PII は検出して墨消しし、タグには機密情報を入れない。",
       "references": [
         {
+          "title": "Natural Language Processing – Amazon Comprehend – AWS",
           "url": "https://aws.amazon.com/comprehend/"
         },
         {
+          "title": "Secure archive storage – Amazon S3 Glacier storage classes – AWS",
           "url": "https://aws.amazon.com/s3/storage-classes/glacier/"
         },
         {
+          "title": "Cloud Secrets Management - AWS Secrets Manager - AWS",
           "url": "https://aws.amazon.com/secrets-manager/"
         },
         {
+          "title": "Organizing and tracking costs using AWS cost allocation tags - AWS Billing",
           "url": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html"
         }
       ],
@@ -3680,6 +3917,7 @@
       "explanation": "## 問われている要件\n政府向けリージョンのハードウェア TOTP トークンを、どの範囲の利用者が使えるかが問われています。\n\n## 正解の決め手\nこのトークンは、そのアカウントの IAM ユーザーだけが使います。\n\n## 他の選択肢が誤りである理由\n\n複数のアカウントのユーザーが、共有して使える\n\n使えるのはそのアカウントの IAM ユーザーだけで、複数のアカウントで共有することはできません。\n\nルートユーザーだけが使え、ほかは使えない\n\n使うのはルートユーザーではなく、そのアカウントの IAM ユーザーです。\n\n同じ組織に属せば、別のアカウントのユーザーも使える\n\n同じ組織に属していても、ほかのアカウントのユーザーは使えず、そのアカウントの IAM ユーザーに限られます。\n## まとめ\n利用者の範囲は、そのアカウントの IAM ユーザーに限られます。",
       "references": [
         {
+          "title": "IAM - Multi-Factor Authentication",
           "url": "https://aws.amazon.com/iam/features/mfa/"
         }
       ],
@@ -3716,15 +3954,19 @@
       "explanation": "## 問われている要件\nベストプラクティスを、実際に手を動かして実装する経験を積めるものを選ぶ問題です。\n\n## 正解の決め手\nベストプラクティスを実装する経験のために、コードと資料をまとめたリポジトリが提供されています。それが A です。\n\n## 他の選択肢が誤りである理由\n\n自社独自の指針を一か所にまとめる、カスタムレンズ\n\nカスタムレンズは、自社と AWS のベストプラクティスを一か所にまとめるためのものです。実装の経験を積むための教材ではありません。\n\nワークロードを評価して、改善点を洗い出すレビュー\n\nレビューは、ワークロードのセキュリティ、信頼性、性能を評価するものです。実装の経験を積む教材とは役割が違います。\n\n推奨を定期的なスケジュールで、自動的に適用する機能\n\n推奨を条件に合えば自動で適用する機能の説明です。ベストプラクティスの実装を学ぶ話とは、適用範囲が異なります。",
       "references": [
         {
+          "title": "Shared Responsibility Model - Amazon Web Services (AWS)",
           "url": "https://aws.amazon.com/compliance/shared-responsibility-model/"
         },
         {
+          "title": "Web Optimizer - Workload Rightsizing - AWS Compute Optimizer - AWS",
           "url": "https://aws.amazon.com/compute-optimizer/"
         },
         {
+          "title": "Optimized IT Architecture Tools – AWS Well-Architected Tool – Amazon Web Services",
           "url": "https://aws.amazon.com/well-architected-tool/"
         },
         {
+          "title": "AWS Well-Architected Framework - AWS Well-Architected Framework",
           "url": "https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html"
         }
       ],
@@ -3761,15 +4003,19 @@
       "explanation": "## 問われている要件\n想定外の費用に早く気づくことと、その原因を分析して対処することの 2 点に合う機能が問われています。\n\n## 正解の決め手\nBは、支出や使用量の予測を把握して、想定外の使われ方に早めに気づく機能です。Eは、レポートへの問い合わせで想定外の費用の傾向の根本原因を分析し、すぐに対処できる機能です。\n\n## 他の選択肢が誤りである理由\n\n支払いプロファイルを使い、想定外の費用の根本原因を特定する\n\n支払いプロファイルは、メンバーアカウントごとに支払いの設定を変えるための仕組みで、費用の原因分析のための機能ではありません。\n\nBilling Conductor で、メンバーアカウントに実際の請求データを示す\n\nBilling Conductor の利用時、メンバーアカウントに示されるのは模擬(pro forma)のデータです。実際の請求対象との切り替えは管理アカウントが行います。\n\nテレメトリの取り込み料金を、発生元が外部かどうかで分けて見積もる\n\nテレメトリの取り込み料金は、データの発生元が AWS か外部かにかかわらず同じなので、発生元で分けて見積もるものではありません。\n\n請求書 PDF を使い、月ごとの合計料金ではなく内訳だけを確認する\n\n請求書 PDF の取得では、月ごとの合計料金の一覧も内訳も確認できます。合計が見られず内訳だけという説明は逆です。",
       "references": [
         {
+          "title": "AWS Billing - Amazon Web Services",
           "url": "https://aws.amazon.com/aws-cost-management/aws-billing/"
         },
         {
+          "title": "Set Custom Cost and Usage Budgets – AWS Budgets – Amazon Web Services",
           "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/"
         },
         {
+          "title": "Cloud Usage Report - AWS Cost and Usage Reports - AWS",
           "url": "https://aws.amazon.com/aws-cost-management/aws-cost-and-usage-reporting/"
         },
         {
+          "title": "Amazon Monitoring and Observability-Amazon CloudWatch - AWS",
           "url": "https://aws.amazon.com/cloudwatch/"
         }
       ],
@@ -3815,9 +4061,11 @@
       "explanation": "## 問われている要件\nリージョンとローカルゾーンの性質について、正しい説明を 2 つ選ぶ問題です。\n\n## 正解の決め手\nリージョンは、世界各地でデータセンターをまとめて置く物理的な場所です。ローカルゾーンは、単一桁のミリ秒という低い遅延が求められるアプリの実行に使えます。\n\n## 他の選択肢が誤りである理由\n\nリージョンは論理的な区画であり、物理的な場所を指さない。\n\nリージョンは、データセンターをまとめて置く物理的な場所です。論理的な区画だけを指すものではありません。\n\nローカルゾーンは、数百ミリ秒の遅延を許す、バッチ処理向けである。\n\nローカルゾーンが想定するのは、単一桁のミリ秒の遅延が求められるアプリです。数百ミリ秒を許す処理向けではありません。\n\nバックアップのサービスは、リージョン間の通信の遅延を縮めるために使う。\n\nバックアップのサービスは、データ保護の作業を簡素化するものです。通信の遅延を縮める目的のものではありません。",
       "references": [
         {
+          "title": "Global Infrastructure Regions & AZs",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/"
         },
         {
+          "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
           "url": "https://aws.amazon.com/backup/"
         }
       ],
@@ -3858,18 +4106,23 @@
       "explanation": "## 問われている要件\nサーバー単位で課金されるライセンスを管理するために、物理ソケット数と物理コア数を把握できることが条件です。\n\n## 正解の決め手\nDedicated Host は、インスタンスを支える物理ソケット数と物理コア数を把握でき、サーバー単位で課金されるソフトウェアのライセンス管理に使えます。したがって B が正解です。\n\n## 他の選択肢が誤りである理由\n\n長期契約なしで時間単位に支払えるオンデマンドのインスタンスを使う\n\nオンデマンドは長期契約なしで時間単位に支払える料金の仕組みです。物理ソケット数やコア数を把握してライセンスを管理する要件は満たしません。\n\nオブジェクトストレージの高い耐久性の既定値に任せる\n\nストレージの耐久性と可用性に関する設計であり、サーバー単位のライセンス管理という適用範囲とは別の話です。\n\nクラウドネイティブな機能を生かしてアプリの構成を作り直す\n\nアプリの構成を作り直して俊敏性や拡張性を高める移行戦略です。物理ソケットやコアの把握とは関係がありません。\n\n承認済みのリソースを利用者が自分で探して配備できるようにする\n\n承認済みリソースの配備を利用者に任せる仕組みであり、物理的な構成を把握してライセンスを管理する条件とは逆の方向です。",
       "references": [
         {
+          "title": "Cloud Database Migration – AWS Database Migration Service (AWS DMS) Features – AWS",
           "url": "https://aws.amazon.com/dms/schema-conversion-tool/"
         },
         {
+          "title": "Dedicated Server Hosting - Amazon EC2 Dedicated Hosts - AWS",
           "url": "https://aws.amazon.com/ec2/dedicated-hosts/"
         },
         {
+          "title": "Cloud Object Storage – Amazon S3 – Amazon Web Services",
           "url": "https://aws.amazon.com/s3/"
         },
         {
+          "title": "Cloud Management and Governance – AWS Service Catalog – Amazon Web Services",
           "url": "https://aws.amazon.com/servicecatalog/"
         },
         {
+          "title": "About the migration strategies - AWS Prescriptive Guidance",
           "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html"
         }
       ],
@@ -3911,6 +4164,7 @@
       "explanation": "## 問われている要件\nリージョンとゾーンの構成を、数と中身の両面から正しく説明した選択肢を選ぶ問題です。\n\n## 正解の決め手\n一つのリージョンは、三つ以上の隔離された、物理的に離れたゾーンで構成されます。各ゾーンは、一つ以上の離散したデータセンターから成り、電力・ネットワーク・接続が冗長化されています。この二点を同時に満たすのは、三つ以上のゾーンと一つ以上のデータセンターを述べた選択肢だけです。\n\n## 他の選択肢が誤りである理由\n\n一つのリージョンは二つの隔離されたゾーンだけで構成され、それ以上には増えない\n\nゾーンの数は三つ以上であり、二つだけに限られるわけではありません。\n\n各ゾーンは単一のデータセンターに限られ、電力やネットワークは冗長化されていない\n\nゾーンは一つ以上のデータセンターから成り、電力・ネットワーク・接続が冗長化されています。冗長化されないというのは逆です。\n\nリージョンは一つのゾーンを利用者の近くに延ばしたもので、複数のゾーンを持たない\n\n利用者の近くに置く仕組みはリージョンの延長として提供されるもので、リージョン自体は三つ以上のゾーンで構成されます。",
       "references": [
         {
+          "title": "Global Infrastructure Regions & AZs",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/"
         }
       ],
@@ -3947,15 +4201,19 @@
       "explanation": "## 問われている要件\nコスト管理の機能についての正しい説明を 2 つ選ぶ問題です。\n\n## 正解の決め手\nCost Explorer は有効にするとコストのデータが準備され、先の期間の予測も計算されます。予算は、日次・月次・四半期・年次から期間を選び、具体的な上限を決められます。\n\n## 他の選択肢が誤りである理由\n\n請求ページでは請求書を表示できるが、割引や税金の内容までは確認できない\n\n請求ページでは、割引、クレジット、返金、税金を含む請求の内容まで確認できます。\n\n管理アカウントから見られるのは全体の合計だけで、アカウントごとの内訳は分からない\n\n管理アカウントでは、メンバーアカウント全体の集計に加え、アカウントごとの内訳も確認できます。\n\nテレメトリの取り込み料金は、データの発生元が外部のときのほうが高くなる\n\nテレメトリの取り込み料金は、発生元が AWS か外部かにかかわらず同じで、差はありません。\n## まとめ\n請求の確認、コストの分析と予測、予算の設定は、それぞれ役割が異なります。",
       "references": [
         {
+          "title": "AWS Billing - Amazon Web Services",
           "url": "https://aws.amazon.com/aws-cost-management/aws-billing/"
         },
         {
+          "title": "Set Custom Cost and Usage Budgets – AWS Budgets – Amazon Web Services",
           "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/"
         },
         {
+          "title": "Cloud Cost Report - AWS Cost Explorer - AWS",
           "url": "https://aws.amazon.com/aws-cost-management/aws-cost-explorer/"
         },
         {
+          "title": "Amazon Monitoring and Observability-Amazon CloudWatch - AWS",
           "url": "https://aws.amazon.com/cloudwatch/"
         }
       ],
@@ -3996,6 +4254,7 @@
       "explanation": "## 問われている要件\nパスワードポリシーに対する CLI コマンドが、作成・変更・参照・削除のどれに当たるかを区別できるかが問われています。\n\n## 正解の決め手\nget で始まるコマンドは、現在のポリシーを参照するための操作です。\n\n## 他の選択肢が誤りである理由\n\nパスワードポリシーを新しく作成する\n\n作成には専用の create 系ではなく、変更と同じ update 系のコマンドを使います。参照のコマンドでは作成できません。\n\n設定済みの内容を書き換えて変更する\n\n内容の変更は update 系のコマンドの役割です。参照のコマンドは現在の設定を読むだけです。\n\n設定したパスワードポリシーを削除する\n\n削除は delete 系のコマンドの役割です。参照のコマンドとは、操作の向きが逆になります。\n## まとめ\n作成・変更は update、参照は get、削除は delete と、動詞で役割を覚えておきましょう。",
       "references": [
         {
+          "title": "Set an account password policy for IAM users - AWS Identity and Access Management",
           "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_passwords_account-policy.html"
         }
       ],
@@ -4032,15 +4291,19 @@
       "explanation": "## 問われている要件\nセキュリティグループのルールを監査し、危険度の高いものを見つけることが求められています。\n\n## 正解の決め手\nルールの監査と危険度の高いルールの検出は、セキュリティグループを対象にした機能の説明そのものです。\n\n## 他の選択肢が誤りである理由\n\n多数の脆弱性情報源を使い、脆弱性の発見と対応の振り分けを自動化する機能\n\n脆弱性の発見と対応への振り分けを自動化する機能で、セキュリティグループのルールを監査する目的とは対象が異なります。\n\n生成 AI の洞察を使い、セキュリティの調査を加速する機能\n\n生成 AI の洞察は、調査を速めて脅威の内容を理解するための機能です。ルールの監査や危険度の判定を行うものではありません。\n\n利用者が管理する鍵で、サーバー側の暗号化を有効にする機能\n\nサーバー側の暗号化は保管中のデータを守るためのもので、通信の許可ルールを監査する機能ではありません。",
       "references": [
         {
+          "title": "Security Investigation Visualization - Amazon Detective - AWS",
           "url": "https://aws.amazon.com/detective/"
         },
         {
+          "title": "Centrally Manage Cloud Firewall Rules - AWS Firewall Manager - AWS",
           "url": "https://aws.amazon.com/firewall-manager/"
         },
         {
+          "title": "Automated Software Vulnerability Management - Amazon Inspector - AWS",
           "url": "https://aws.amazon.com/inspector/"
         },
         {
+          "title": "Encryption Cryptography Signing - AWS Key Management Service - AWS",
           "url": "https://aws.amazon.com/kms/"
         }
       ],
@@ -4077,6 +4340,7 @@
       "explanation": "## 正解の決め手\n1 つの SQL クエリで、S3、オンプレミス、マルチクラウドにある複数種類のデータを分析できます。\n\n## 他の選択肢が誤りである理由\n\nS3 にあるデータだけ\n\n対象は S3 に限らず、オンプレミスやマルチクラウドにあるデータも含まれます。\n\nオンプレミスにあるデータだけ\n\nオンプレミスだけではなく、S3 やマルチクラウドのデータも 1 つのクエリで扱えます。\n\nAWS のデータベースにあるデータだけ\n\nAWS のデータベースに限られず、S3 やオンプレミス、マルチクラウドのデータも分析できます。",
       "references": [
         {
+          "title": "Interactive SQL - Serverless Query Service - Amazon Athena - AWS",
           "url": "https://aws.amazon.com/athena/"
         }
       ],
@@ -4113,15 +4377,19 @@
       "explanation": "## 問われている要件\n\nインフラの「置き場所」を、オンプレミスの施設や利用者の近くへ広げることが条件です。容量の調整や、構築の自動化、データの保護といった別の目的ではありません。\n\n## 正解の決め手\n\nBの Outposts は、AWS のサービスとインフラをオンプレミスなどの施設に持ち込めます。Dの Local Zones は、リージョンの延長として利用者の近くにコンピューティングなどを置く仕組みです。どちらも「場所を広げる」サービスです。\n\n## 他の選択肢が誤りである理由\n\nAWS Auto Scaling:需要の変化に合わせて容量を自動で増減する\n\nAuto Scaling は、需要の変化に合わせて容量を増減させるサービスです。インフラの置き場所を広げる目的には当てはまりません。\n\nAWS CloudFormation:インフラをコードで定義して、素早く用意・管理する\n\nCloudFormation は、インフラをコードで定義して用意・管理する仕組みです。設置場所をオンプレミスや利用者の近くへ広げるものではありません。\n\nAWS Backup:複数のアカウントやリージョンのバックアップを一元的に管理する\n\nAWS Backup は、複数のアカウントやリージョンにまたがるバックアップを一元的に統制するもので、インフラの設置場所を広げる用途ではありません。",
       "references": [
         {
+          "title": "Global Infrastructure Regions & AZs",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/"
         },
         {
+          "title": "App Scaling - AWS Application Auto Scaling - AWS",
           "url": "https://aws.amazon.com/autoscaling/"
         },
         {
+          "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
           "url": "https://aws.amazon.com/backup/"
         },
         {
+          "title": "Provision Infrastructure as Code - AWS CloudFormation - AWS",
           "url": "https://aws.amazon.com/cloudformation/"
         }
       ],
@@ -4162,12 +4430,15 @@
       "explanation": "## 問われている要件\nCloudTrail Lake のダッシュボードで何ができるかを問う問題です。\n\n## 正解の決め手\nダッシュボードを使うと、傾向を可視化できます。可視化が、この機能の役割です。\n\n## 他の選択肢が誤りである理由\n\nWeb サイトへの通信用に、証明書を用意して管理する\n\n証明書の用意と管理は、通信を安全にする別の機能です。ダッシュボードで傾向を見る機能とは目的が異なります。\n\nコンソール用の認証情報で、CLI からアクセスする\n\n認証情報で CLI からアクセスするのは、ログインの仕組みです。ダッシュボードは傾向を可視化するもので、アクセス手段ではありません。\n\n変更できないバックアップを作り、保管庫で守る\n\n変更できないバックアップと保管庫は、ランサムウェアなどに備えるバックアップ側の機能で、ダッシュボードの機能の範囲外です。",
       "references": [
         {
+          "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
           "url": "https://aws.amazon.com/backup/"
         },
         {
+          "title": "Certificate Manager - AWS Certificate Manager - AWS",
           "url": "https://aws.amazon.com/certificate-manager/"
         },
         {
+          "title": "API Logs - Secure Standardized Logging Service - AWS CloudTrail - AWS",
           "url": "https://aws.amazon.com/cloudtrail/"
         }
       ],
@@ -4204,18 +4475,23 @@
       "explanation": "## 問われている要件\n遠隔地の拠点どうしを、暗号化して安全に通信させることです。\n\n## 正解の決め手\n拠点間の通信を暗号化して結ぶ役割を持つのは、Site-to-Site VPN です。ほかの選択肢は、通信経路の暗号化ではなく、監査・認証・保管・設定の雛形に関する機能です。\n\n## まとめ\n「拠点間の暗号化通信」という言葉が出たら、Site-to-Site VPN を思い出してください。",
       "references": [
         {
+          "title": "Amazon Cognito - Customer Identity and Access Management - Machine Identity and Access Management",
           "url": "https://aws.amazon.com/cognito/"
         },
         {
+          "title": "Config Tool – AWS Config – Amazon Web Services",
           "url": "https://aws.amazon.com/config/"
         },
         {
+          "title": "Cloud Database Migration – AWS Database Migration Service (AWS DMS) Features – AWS",
           "url": "https://aws.amazon.com/dms/schema-conversion-tool/"
         },
         {
+          "title": "Virtual Private Network (VPN) – AWS VPN – Amazon Web Services",
           "url": "https://aws.amazon.com/vpn/"
         },
         {
+          "title": "Web Application Firewall - Web API Protection - AWS WAF - AWS",
           "url": "https://aws.amazon.com/waf/"
         }
       ],
@@ -4257,6 +4533,7 @@
       "explanation": "## 正解の決め手\nWell-Architected は、設計の枠組み、分野別のレンズ、評価ツールを一つにまとめた仕組みです。したがって、選択肢 B が適切です。\n\n## 他の選択肢が誤りである理由\n\nサービスごとの料金を一覧で比較するための価格表\n\n料金を比べる資料ではなく、設計の枠組み・レンズ・評価ツールをまとめたものです。\n\nアカウント内の未使用リソースを自動で削除する運用サービス\n\nリソースを自動で削除するサービスではなく、設計を評価するための枠組みを中心にまとめたものです。\n\n監査用のログを長期間保管するためのストレージサービス\n\nログを保管するストレージではなく、設計の枠組み・レンズ・評価ツールの集合です。",
       "references": [
         {
+          "title": "AWS Well-Architected - Build secure, efficient cloud applications",
           "url": "https://aws.amazon.com/architecture/well-architected/"
         }
       ],
@@ -4293,6 +4570,7 @@
       "explanation": "## 正解の決め手\n全体では、39 の Region と 124 の AZ があります。\n\n## 他の選択肢が誤りである理由\n\n39 の Region と 90 の AZ\n\nRegion の数は合っていますが、AZ の数は 124 で、90 ではありません。\n\n25 の Region と 124 の AZ\n\nAZ の数は合っていますが、Region の数は 39 で、25 ではありません。\n\n12 の Region と 39 の AZ\n\nRegion は 39、AZ は 124 で、どちらの数も実際より小さい記述です。",
       "references": [
         {
+          "title": "Global Infrastructure - AWS",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/"
         }
       ],
@@ -4329,12 +4607,15 @@
       "explanation": "## 問われている要件\n変更できないバックアップを前提に、ランサムウェアやアカウントの侵害に備える組み合わせを選びます。\n\n## 正解の決め手\n変更できないバックアップに、マルウェアのスキャンと論理的なエアギャップの保管庫を合わせると、備えが強くなります。\n\n## 他の選択肢が誤りである理由\n\n複合アラームと異常検知による通知\n\n複合アラームと異常検知は監視の機能で、通知はできてもバックアップを守る保管庫やスキャンの代わりにはなりません。\n\n証明書の用意と管理による通信保護\n\n証明書は通信を安全にするためのものです。バックアップをランサムウェアから守る機能ではありません。\n\nメトリクス・ログ・トレースの可視化\n\nメトリクス・ログ・トレースの可視化は、監視とオブザーバビリティの機能です。バックアップを保護する用途ではありません。",
       "references": [
         {
+          "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
           "url": "https://aws.amazon.com/backup/"
         },
         {
+          "title": "Certificate Manager - AWS Certificate Manager - AWS",
           "url": "https://aws.amazon.com/certificate-manager/"
         },
         {
+          "title": "Amazon Monitoring and Observability-Amazon CloudWatch - AWS",
           "url": "https://aws.amazon.com/cloudwatch/"
         }
       ],
@@ -4371,15 +4652,19 @@
       "explanation": "## 問われている要件\nセルフサービスの画面から報告書を入手できるサービスを選ぶ問題です。\n\n## 正解の決め手\nAWS Artifact は、セルフサービスの画面から報告書を取り出せるので、確認にかかる手間を減らせます。AWS の法令遵守や安全性の状況を把握する助けにもなります。\n\n## 他の選択肢が誤りである理由\n\nAmazon CloudWatch\n\nAmazon CloudWatch は、メトリクス・ログ・トレースを集めて可視化する監視のサービスで、報告書を取り出す画面を提供するものではありません。\n\nAWS Backup\n\nAWS Backup は、変更できないバックアップでランサムウェアなどに備えるサービスです。名前から報告書の取得を連想しても、その機能はありません。\n\nAWS Certificate Manager\n\nAWS Certificate Manager は、証明書を用意・管理して通信を安全にするもので、法令遵守の報告書を取り出す用途とは範囲が異なります。",
       "references": [
         {
+          "title": "Security Compliance Management - AWS Artifact - AWS",
           "url": "https://aws.amazon.com/artifact/"
         },
         {
+          "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
           "url": "https://aws.amazon.com/backup/"
         },
         {
+          "title": "Certificate Manager - AWS Certificate Manager - AWS",
           "url": "https://aws.amazon.com/certificate-manager/"
         },
         {
+          "title": "Amazon Monitoring and Observability-Amazon CloudWatch - AWS",
           "url": "https://aws.amazon.com/cloudwatch/"
         }
       ],
@@ -4416,9 +4701,11 @@
       "explanation": "## 正解の決め手\nWell-Architected ツールは、マネジメントコンソールから無償で使える評価の道具です。ワークロードを定期的に見直し、リスクの高い問題を見つける目的で使います。\n\n## 他の選択肢が誤りである理由\n\n有償のサブスクリプション契約を結んだ場合にだけ使える評価ツール\n\nこのツールは有償契約が必要なものではなく、マネジメントコンソールから無償で使えます。\n\nワークロードを別のリージョンへ自動で移行するツール\n\nこのツールの用途は、ワークロードを定期的に評価して高リスクの問題を特定することです。移行を実行するものではありません。\n\n予算を超えたときに、リソースを自動で停止させるツール\n\n予算の目標を超えたときに操作を実行するのは予算管理側の仕組みで、Well-Architected ツールの役割ではありません。",
       "references": [
         {
+          "title": "AWS Well-Architected - Build secure, efficient cloud applications",
           "url": "https://aws.amazon.com/architecture/well-architected/"
         },
         {
+          "title": "Set Custom Cost and Usage Budgets – AWS Budgets – Amazon Web Services",
           "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/"
         }
       ],
@@ -4455,9 +4742,11 @@
       "explanation": "## 正解の決め手\nAWS のコンピューティング上のワークロードは、IAM ロールを通じて一時的な認証情報を受け取れます。そのため、長期の認証情報を配る必要がありません。\n\n## 他の選択肢が誤りである理由\n\nアクセスキーをソースコードに埋め込んで配布する\n\nロールを使えば長期の認証情報を配る必要がないので、キーをコードに埋め込んで配布するのは不要で不適切な方法です。\n\n暗号鍵を管理する機能に、認証情報を登録して配る\n\n鍵を一元管理する機能は、暗号鍵を扱って機密データを保護するためのもので、ワークロードへ認証情報を渡す手段ではありません。\n\n長期のアクセスキーを作り、各サーバーへ手作業で配る\n\n長期の認証情報を作って配るのは、ロールの一時的な認証情報で避けられる方法で、問いの条件とは逆です。",
       "references": [
         {
+          "title": "Fully Managed Message Queuing – Amazon Simple Queue Service – Amazon Web Services",
           "url": "https://aws.amazon.com/sqs/"
         },
         {
+          "title": "Security best practices in IAM - AWS Identity and Access Management",
           "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
         }
       ],
@@ -4494,12 +4783,15 @@
       "explanation": "## 問われている要件\nクラウドを採用することで得られる利点を、2 つ選ぶ問題です。\n\n## 正解の決め手\nクラウドでは、利用者の需要に応じて容量を自動で増減できます。また、新しい製品や販路を開くことで、事業の収益を伸ばすことにもつながります。この 2 つが利点です。\n\n## 他の選択肢が誤りである理由\n\n世界規模で提供するには、インフラを自社で管理する必要がある\n\nクラウドでは、インフラを自分で管理しなくても、アプリケーションを世界規模で広げて提供できます。管理が必要という説明は逆です。\n\n既存のデスクトップアプリは、全面的に書き直さないと Web 型で配信できない\n\n既存のデスクトップアプリは、コードを書き直さずに SaaS 型や Web 型の配信へ変えられます。全面的な書き直しが必須というのは誤解です。\n\nモダナイゼーションを進めるほど、技術的負債が増えて革新に回せる資源が減る\n\nモダナイゼーションは、技術的負債を減らし、資源を革新へ振り向けるためのものです。負債が増えるという説明は逆です。",
       "references": [
         {
+          "title": "Desktops and application streaming - Amazon WorkSpaces applications - AWS",
           "url": "https://aws.amazon.com/appstream2/"
         },
         {
+          "title": "AWS Cloud Adoption Framework",
           "url": "https://aws.amazon.com/cloud-adoption-framework/"
         },
         {
+          "title": "AWS Migration & Modernization | Cloud Transformation",
           "url": "https://aws.amazon.com/cloud-migration/"
         }
       ],
@@ -4540,18 +4832,23 @@
       "explanation": "## 問われている要件\n認証局のようなリソースを中央で管理し、複数のアカウントで証明書を発行することです。\n\n## 正解の決め手\n認証局のリソースを中央で管理し、複数アカウントで証明書を発行できる仕組みが該当します。\n\n## 他の選択肢が誤りである理由\n\n社内ディレクトリを使った、複数アカウントへの接続\n\n社内ディレクトリによるサインオンは、人が複数アカウントへ入る仕組みです。証明書の発行を管理するものではありません。\n\n保存時のデータの自動的な暗号化\n\n保存時の暗号化は、データを自動的に暗号化する機能です。証明書を発行する仕組みとは役割が異なります。\n\nFedRAMP などの準拠を支える構成\n\n準拠を支える構成は、業界や規制の要件に応えるためのものです。証明書の発行を中央で管理する機能ではありません。\n\n遠隔地の拠点どうしを結ぶ暗号化通信\n\n拠点間の暗号化通信は、通信経路を守る機能です。複数アカウントで証明書を発行する管理の仕組みではありません。",
       "references": [
         {
+          "title": "Amazon FSx | Feature-Rich & Highly-Performant File Systems | Amazon Web Services",
           "url": "https://aws.amazon.com/fsx/"
         },
         {
+          "title": "Single-Sign On SAML - SSO Provider - AWS IAM Identity Center - AWS",
           "url": "https://aws.amazon.com/iam/identity-center/"
         },
         {
+          "title": "AI-Powered Business Intelligence – Quick Sight – AWS",
           "url": "https://aws.amazon.com/quicksight/"
         },
         {
+          "title": "Resource Sharing – AWS Resource Access Manager – Amazon Web Services",
           "url": "https://aws.amazon.com/ram/"
         },
         {
+          "title": "Virtual Private Network (VPN) – AWS VPN – Amazon Web Services",
           "url": "https://aws.amazon.com/vpn/"
         }
       ],
@@ -4593,15 +4890,19 @@
       "explanation": "## 問われている要件\nS3 に置いたデータの保存費用を抑える方法を、2 つ選ぶ問題です。\n\n## 正解の決め手\nS3 は保存クラスを使い分けることで、保存の費用を抑えられます。また、ライフサイクル管理を使うと、低頻度アクセスやアーカイブの階層へデータを自動で移せるため、手作業なしで費用を抑えられます。したがって A と D が正解です。\n\n## 前提知識\n保存料金は、オブジェクトのサイズ、1か月のうち保存していた長さ、ストレージクラスの三つで決まります。\n\n## 他の選択肢が誤りである理由\n\n保存していた長さは料金に関係するので、短期間で消去する\n\n保存していた長さは料金を決める要素の 1 つですが、費用を抑える方法は保存クラスの使い分けやライフサイクル管理です。短期間で消すだけでは、必要なデータを失う誤解につながります。\n\nAWS Health API を使い、保存費用を自動で下げる\n\nAWS Health API は、AWS Health の情報をプログラムから扱うためのものです。S3 の保存費用を自動で下げる機能ではありません。\n\nすべてのオブジェクトを、同じ保存クラスのままにしておく\n\n保存クラスを使い分けることで費用を抑えられるので、同じクラスのまま固定するのは、費用の最適化とは逆の方針です。",
       "references": [
         {
+          "title": "Shared File Storage - Amazon Elastic File System (EFS) - AWS",
           "url": "https://aws.amazon.com/efs/"
         },
         {
+          "title": "Status of AWS cloud resources – AWS Health – AWS",
           "url": "https://aws.amazon.com/premiumsupport/technology/aws-health-dashboard/"
         },
         {
+          "title": "Cloud Object Storage – Amazon S3 – Amazon Web Services",
           "url": "https://aws.amazon.com/s3/"
         },
         {
+          "title": "S3 Pricing",
           "url": "https://aws.amazon.com/s3/pricing/"
         }
       ],
@@ -4642,6 +4943,7 @@
       "explanation": "## 問われている要件\nスケーリング機能のコスト面の特徴を、料金の仕組みと容量の増減の両面から選ぶ問題です。\n\n## 正解の決め手\nAWS Auto Scaling 自体は追加料金なしで使え、課金の中心は使ったリソースと監視の料金です。需要が下がると余剰な容量を自動で取り除くため、無駄な支出も避けられます。\n\n## 他の選択肢が誤りである理由\n\n機能自体は追加料金なしで使えるが、需要が下がっても余剰な容量は残り、手動で減らす必要がある\n\n需要が下がると余剰な容量は自動で取り除かれ、無駄な支出を避けられます。手動で減らす必要があるという説明は逆です。\n\n機能の利用に別途の時間課金があり、そのかわり使ったリソース側の料金は発生しない仕組みになっている\n\nスケーリング機能自体は追加料金なしで使えます。課金の中心は、使ったリソースと監視の料金であり、機能への別料金ではありません。\n\n機能自体は追加料金なしで使えるが、課金の対象は監視の料金だけで、使ったリソースの料金は含まれない\n\n課金は監視の料金だけではなく、使ったリソースの料金も中心になります。課金の対象範囲を狭く捉えた誤りです。",
       "references": [
         {
+          "title": "App Scaling - AWS Application Auto Scaling - AWS",
           "url": "https://aws.amazon.com/autoscaling/"
         }
       ],
@@ -4678,6 +4980,7 @@
       "explanation": "## 問われている要件\nこの設問は、Elastic Beanstalk の課金の仕組みを問うています。\n\n## 正解の決め手\nElastic Beanstalk 自体には料金がかからず、アプリが使った AWS リソースの料金だけを支払います。そのため B が正解です。\n\n## 他の選択肢が誤りである理由\n\n環境を作るたびに、固定の初期費用が必要になる\n\nサービス自体には料金がかからないので、環境ごとの固定の初期費用はありません。支払うのは使ったリソースの分だけです。\n\n毎月の最低料金が決まっており、使わなくても請求される\n\n料金は使ったリソースの分だけで、毎月の最低料金のような固定額はありません。使わなければ、そのリソースの料金も発生しません。\n\nリソースの料金とは別に、サービス自体の利用料を時間単位で支払う\n\nサービス自体の利用料は無料で、課金されるのは使ったリソースだけです。サービス利用料を上乗せして払う必要はありません。",
       "references": [
         {
+          "title": "AWS Elastic Beanstalk Platform as a Service",
           "url": "https://aws.amazon.com/elasticbeanstalk/"
         }
       ],
@@ -4714,9 +5017,11 @@
       "explanation": "## 問われている要件\nアクセス頻度が不明、または変わるデータを、自動で安い階層へ移すことが条件です。\n\n## 正解の決め手\nS3 Intelligent-Tiering は、アクセス状況に応じてデータを自動で安い階層へ移す点が特徴です。条件の「自動」と「アクセス頻度が変わる」に合致します。\n\n## 他の選択肢が誤りである理由\n\nテープ保管の代わりとなる長期アーカイブ向けクラス\n\n長期保管向けで、テープ保管の代わりに使う位置づけです。アクセス状況に応じて自動で階層を移す特徴とは別のものです。\n\n階層を移さず同じ階層に置き続けるクラス\n\n条件は、アクセス状況に応じて自動で安い階層へ移すことです。階層を移さない方式は、この条件と逆になります。\n\n利用者が日数を決めて手動で移す運用\n\n手動で移す運用が必要だと考えるのは誤解です。アクセス状況に応じた移動は、自動で行われます。",
       "references": [
         {
+          "title": "Object Storage Classes – Amazon S3",
           "url": "https://aws.amazon.com/s3/storage-classes/"
         },
         {
+          "title": "Secure archive storage – Amazon S3 Glacier storage classes – AWS",
           "url": "https://aws.amazon.com/s3/storage-classes/glacier/"
         }
       ],
@@ -4753,15 +5058,19 @@
       "explanation": "## 問われている要件\nFargate と組み合わせ、データ処理を並列に実行できるサービスを選ぶ問題です。\n\n## 正解の決め手\nFargate は AWS Batch と組み合わせて、データ処理のワークロードを並列に実行できます。\n\n## 他の選択肢が誤りである理由\n\nサーバー管理なしでコードを実行できる関数の実行サービス\n\nコードを実行するサービスですが、Fargate と組み合わせてデータ処理を並列に実行するのは別のサービスです。\n\n多数のインスタンスタイプから選べる仮想サーバーのサービス\n\n仮想サーバーのサービスの特徴はインスタンスタイプとプロセッサーの選択肢の多さで、Fargate との並列処理の組み合わせではありません。\n\nデータレイクとウェアハウスを統合するレイクハウスの考え方\n\nレイクハウスは、データ基盤の分断を減らす考え方であり、処理を実行するサービスではありません。",
       "references": [
         {
+          "title": "Secure and resizable cloud compute – Amazon EC2 – Amazon Web Services",
           "url": "https://aws.amazon.com/ec2/"
         },
         {
+          "title": "Serverless Compute Engine – AWS Fargate – AWS",
           "url": "https://aws.amazon.com/fargate/"
         },
         {
+          "title": "Serverless Computing - AWS Lambda - Amazon Web Services",
           "url": "https://aws.amazon.com/lambda/"
         },
         {
+          "title": "The center for all your data, analytics, and AI – Amazon SageMaker – AWS",
           "url": "https://aws.amazon.com/sagemaker/"
         }
       ],
@@ -4798,12 +5107,15 @@
       "explanation": "## 問われている要件\nWell-Architected ツール、運用上の優秀性の柱、AWS CAF、Migration Acceleration Program について、正しい説明を 2 つ選ぶ問題です。\n\n## 正解の決め手\nWell-Architected ツールは、ワークロードを定期的に評価し、高リスクの問題を見つけるために使います。AWS CAF は、AWS の経験と最良の実践をもとに、事業変革の成果を加速する指針を与えます。\n\n## 他の選択肢が誤りである理由\n\nWell-Architected ツールは、利用した分だけ従量課金される\n\nWell-Architected ツールは、マネジメントコンソールから無償で使えます。従量課金という説明は誤りです。\n\n運用上の優秀性の柱は、手順を固定して改善しないことに重点を置く\n\n運用上の優秀性の柱は、手順の継続的な改善に重点を置きます。改善しないという説明は逆です。\n\nMigration Acceleration Program は、有料の認定試験の名称である\n\nMigration Acceleration Program は、成果を重視してクラウド移行とモダナイゼーションを加速する支援プログラムで、認定試験ではありません。",
       "references": [
         {
+          "title": "AWS Well-Architected - Build secure, efficient cloud applications",
           "url": "https://aws.amazon.com/architecture/well-architected/"
         },
         {
+          "title": "AWS Cloud Adoption Framework",
           "url": "https://aws.amazon.com/cloud-adoption-framework/"
         },
         {
+          "title": "AWS Migration & Modernization | Cloud Transformation",
           "url": "https://aws.amazon.com/cloud-migration/"
         }
       ],
@@ -4844,6 +5156,7 @@
       "explanation": "## 問われている要件\nイベントデータを SQL で調べ、不具合の調査に使えるサービスを選ぶ問いです。\n\n## 正解の決め手\nCloudTrail Lake のイベントデータは、SQL によるクエリで、運用上の問いへの答えや不具合の調査に使えます。\n\n## 他の選択肢が誤りである理由\n\nAWS Artifact\n\n報告書へオンデマンドでアクセスするためのサービスで、イベントデータの調査は目的ではありません。\n\nAWS Backup\n\nバックアップとランサムウェアからの復旧のためのサービスで、SQL でイベントを調べるものではありません。\n\nAmazon CloudWatch\n\nメトリクス・ログ・トレースの監視が中心で、イベントデータを SQL で調べる用途の説明ではありません。",
       "references": [
         {
+          "title": "API Logs - Secure Standardized Logging Service - AWS CloudTrail - AWS",
           "url": "https://aws.amazon.com/cloudtrail/"
         }
       ],
@@ -4880,12 +5193,15 @@
       "explanation": "## 問われている要件\nライセンスの移行を計画するときに、どのような進め方が適切かを問う問題です。\n\n## 正解の決め手\n既存のライセンスを洗い出したうえで、持ち込み方式と利用料込み方式の費用を比べて移行を計画できます。\n\n## 他の選択肢が誤りである理由\n\n持ち込み方式だけを前提にして、利用料込み方式の費用は比べずに進める\n\n持ち込み方式と利用料込み方式の費用を比べて移行を計画するのが正しい進め方です。利用料込み方式を比べない進め方は、条件が逆になっています。\n\n管理の対象を AWS 側のライセンスだけに絞り、オンプレミスのものは外す\n\nライセンスの管理は、AWS とオンプレミスをまたいで行えます。オンプレミスのものを外すという範囲の限定は誤りです。\n\n変革のロードマップは最初に一度だけ決め、その後は更新せずに進める\n\n変革のロードマップは、段階的に更新していくものです。一度決めて固定するという理解は誤りです。",
       "references": [
         {
+          "title": "License Manager Software - Amazon License Manager - AWS",
           "url": "https://aws.amazon.com/license-manager/"
         },
         {
+          "title": "Cloud Business Case & Migration Plan - Amazon Migration Evaluator - AWS",
           "url": "https://aws.amazon.com/migration-evaluator/"
         },
         {
+          "title": "An Overview of the AWS Cloud Adoption Framework - An Overview of the AWS Cloud Adoption Framework",
           "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/welcome.html"
         }
       ],
@@ -4922,18 +5238,23 @@
       "explanation": "## 正解の決め手\nオンプレミスと AWS 上の SaaS を安全につなぐと、ハイブリッドクラウドの構成を実現できます。\n\n## 他の選択肢が誤りである理由\n\n録画済みの動画に字幕を付ける構成\n\nこれは動画に字幕を付ける機能で、オンプレミスと SaaS を安全につなぐことで得られる構成ではありません。\n\nベクトル検索を業務データと同じ場所で行う構成\n\nこれはベクトル検索を業務データと同じ場所で行う話で、オンプレミスとの接続とは別の事項です。\n\n二つの仮想ネットワークの間で通信を経路づける構成\n\nこれは二つのネットワークどうしの通信の経路づけです。オンプレミスと SaaS をつなぐ構成とは別のものです。\n\n投稿を大量かつ即時に自動翻訳する構成\n\nこれは大量の投稿を自動翻訳する機能で、オンプレミスと SaaS の接続から実現する構成ではありません。",
       "references": [
         {
+          "title": "Fast NoSQL Key-Value Database – Amazon DynamoDB – AWS",
           "url": "https://aws.amazon.com/dynamodb/"
         },
         {
+          "title": "VPC Networking – AWS PrivateLink – Amazon Web Services",
           "url": "https://aws.amazon.com/privatelink/"
         },
         {
+          "title": "Amazon Transcribe – Speech to Text - AWS",
           "url": "https://aws.amazon.com/transcribe/"
         },
         {
+          "title": "Machine Translation Service — Amazon Translate — Amazon Web Services",
           "url": "https://aws.amazon.com/translate/"
         },
         {
+          "title": "What is Amazon VPC? - Amazon Virtual Private Cloud",
           "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
         }
       ],
@@ -4975,6 +5296,7 @@
       "explanation": "## 問われている要件\nランサムウェアからの復旧を助ける機能を持つサービスを選ぶ問いです。\n\n## 正解の決め手\nAWS Backup には、ランサムウェアからの復旧を助ける機能があります。変更できないバックアップや、論理的なエアギャップの保管庫などを組み合わせて備えます。\n\n## 他の選択肢が誤りである理由\n\nAWS Artifact\n\nセキュリティ・コンプライアンス報告書へアクセスするためのサービスで、データの復旧機能は持ちません。\n\nAmazon CloudWatch\n\nメトリクスやログを集めて可視化し、アラームで対応を自動化する監視のサービスです。\n\nCloudTrail Lake\n\nイベントデータを SQL で調べる用途のサービスで、バックアップからの復旧とは別です。",
       "references": [
         {
+          "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
           "url": "https://aws.amazon.com/backup/"
         }
       ],
@@ -5011,6 +5333,7 @@
       "explanation": "## 問われている要件\nBilling Conductor を使う組織で、どのアカウントにどのデータが見えるかを問う問題です。\n\n## 正解の決め手\nメンバーアカウントに示されるのは模擬(pro forma)のデータです。管理アカウントだけが、実際の請求対象のデータと模擬のデータを切り替えられます。\n\n## 他の選択肢が誤りである理由\n\nどちらのアカウントにも実際の請求対象のデータだけが示され、模擬のデータは扱えない\n\nBilling Conductor を使うと、メンバーアカウントには模擬のデータが示され、管理アカウントは模擬のデータも扱えます。実際のデータだけという説明は誤りです。\n\nメンバーアカウントには実際のデータが示され、管理アカウントには模擬のデータだけが示される\n\nメンバーアカウントと管理アカウントの関係が逆です。模擬のデータが示されるのはメンバーアカウントで、管理アカウントは両方を切り替えられます。\n\nメンバーアカウントが模擬と実際のデータを切り替えられ、管理アカウントは実際のデータだけを見る\n\nデータを切り替えられるのは管理アカウントの側です。メンバーアカウントに切り替えの権限はなく、模擬のデータが示されます。",
       "references": [
         {
+          "title": "AWS Billing - Amazon Web Services",
           "url": "https://aws.amazon.com/aws-cost-management/aws-billing/"
         }
       ],
@@ -5047,12 +5370,15 @@
       "explanation": "## 問われている要件\nAWS Auto Scaling の基本的な働きを、料金や提供範囲の誤解と区別して選べるかが問われています。\n\n## 正解の決め手\n需要に応じて容量を自動で増減できること、そして可用性、コスト、またはその両方のバランスを目的に選んでスケーリングの方針を自動で作成できることが、この機能の特徴です。選択肢 B と選択肢 D が該当します。\n\n## 他の選択肢が誤りである理由\n\nスケーリング機能そのものに、毎月の別途の利用料金がかかる。\n\nAuto Scaling 自体は追加料金なしで使えます。課金は、使った資源の料金と監視の料金が中心です。\n\nこの機能を使えるのは、北米と欧州のリージョンだけである。\n\nリージョンは北米と欧州だけでなく、南米、中国、アジア太平洋、南アフリカ、中東などにもあり、提供範囲を二つの地域に限る記述は誤りです。\n\n容量の増減は、利用者が手動で操作したときだけ行われる。\n\n容量は、利用者の需要に応じて自動で増減します。手動操作を前提にした記述は、仕組みが逆です。\n## まとめ\n自動で容量を調整し、方針も自動で作れる点と、機能自体には追加料金がかからない点を押さえましょう。",
       "references": [
         {
+          "title": "Global Infrastructure Regions & AZs",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/"
         },
         {
+          "title": "Desktops and application streaming - Amazon WorkSpaces applications - AWS",
           "url": "https://aws.amazon.com/appstream2/"
         },
         {
+          "title": "App Scaling - AWS Application Auto Scaling - AWS",
           "url": "https://aws.amazon.com/autoscaling/"
         }
       ],
@@ -5093,15 +5419,19 @@
       "explanation": "## 問われている要件\n利用者を、固定のアドレス経由でエンドポイントへ接続させることです。\n\n## 正解の決め手\n固定の IP アドレス経由でアプリケーションのエンドポイントへ接続できる機能が、要件に合います。\n\n## 他の選択肢が誤りである理由\n\nライフサイクルのルールで、不要なイメージをアーカイブする\n\nイメージのライフサイクルのルールは、イメージの保管を整理する機能です。接続に使うアドレスは固定されません。\n\n需要に応じて自動で拡張し、一貫した性能を目指す\n\n需要に応じた自動拡張は、可用性と性能に関する機能です。接続先のアドレスを固定する要件には答えていません。\n\n好みのリレーショナルデータベースを、クラウドで展開する\n\nリレーショナルデータベースの展開は、データを扱う基盤の話です。利用者の接続アドレスを固定する機能ではありません。",
       "references": [
         {
+          "title": "Fully Managed Container Registry – Amazon Elastic Container Registry – Amazon Web Services",
           "url": "https://aws.amazon.com/ecr/"
         },
         {
+          "title": "Fully Managed Container Solution – Amazon Elastic Container Service (Amazon ECS) - Amazon Web Services",
           "url": "https://aws.amazon.com/ecs/"
         },
         {
+          "title": "Network Acceleration Service - AWS Global Accelerator - AWS",
           "url": "https://aws.amazon.com/global-accelerator/"
         },
         {
+          "title": "Fully Managed Relational Database – Amazon RDS – AWS",
           "url": "https://aws.amazon.com/rds/"
         }
       ],
@@ -5138,18 +5468,23 @@
       "explanation": "## 問われている要件\nアカウントの守り方とデータの暗号化について、正しい記述を 2 つ見分ける問題です。\n\n## 正解の決め手\nルートユーザーは、ルートの権限が必要な作業だけに使い、日常の作業には使わないことが推奨されます。また、AWS KMS の鍵を使ってサーバー側の暗号化を有効にすると保管中のデータを守れ、鍵は利用者が管理します。\n\n## 他の選択肢が誤りである理由\n\n政府向けリージョンのハードウェア TOTP トークンは、どのアカウントの IAM ユーザーとも共有して使える\n\nこのトークンは、そのアカウントの IAM ユーザーだけが使うものです。ほかのアカウントのユーザーとは共有できません。\n\n音声合成サービスの Polly は、送られた本文の内容を保持し、後から取り出せるように蓄積する\n\nPolly は、送られた本文の内容を保持しません。蓄積して後から取り出せるという説明は誤りです。\n\n専用の接続で送るデータの暗号化は、方式が 1 つに固定されていて、利用者は選べない\n\n専用の接続で送るデータは、暗号化の方式を複数から選べます。固定されているという説明は、実際と逆です。\n## まとめ\n推奨される運用(ルートユーザーの限定利用)と、鍵を利用者が管理する暗号化を押さえましょう。",
       "references": [
         {
+          "title": "Dedicated Network Connections - AWS Direct Connect - AWS",
           "url": "https://aws.amazon.com/directconnect/"
         },
         {
+          "title": "IAM - Multi-Factor Authentication",
           "url": "https://aws.amazon.com/iam/features/mfa/"
         },
         {
+          "title": "Encryption Cryptography Signing - AWS Key Management Service - AWS",
           "url": "https://aws.amazon.com/kms/"
         },
         {
+          "title": "AI Voice Generator and Text-to-Speech Tool - Amazon Polly - AWS",
           "url": "https://aws.amazon.com/polly/"
         },
         {
+          "title": "AWS account root user - AWS Identity and Access Management",
           "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html"
         }
       ],
@@ -5190,15 +5525,19 @@
       "explanation": "## 正解の決め手\n\nサーバーレスや HTTP のバックエンド向けの RESTful API は、HTTP API で作るのが適しています。API を作ることが設問の要件です。\n\n## 他の選択肢が誤りである理由\n\nS3 File Gateway\n\nS3 File Gateway はファイル形式のアクセスを提供するもので、RESTful API を作る機能ではありません。\n\nVPC ピアリング接続\n\nVPC ピアリング接続は、2 つのネットワークの間をつなぐもので、API を公開する側の機能ではなく、設問の条件に合いません。\n\nTraffic Flow のポリシービルダー\n\nポリシーを組み立てる画面上の道具で、バックエンドの API を作る機能ではありません。「ポリシー」の語から混同しやすい誤りです。",
       "references": [
         {
+          "title": "Amazon API Gateway | API Management | Amazon Web Services",
           "url": "https://aws.amazon.com/api-gateway/"
         },
         {
+          "title": "Amazon Route 53 - DNS Service - AWS",
           "url": "https://aws.amazon.com/route53/"
         },
         {
+          "title": "AWS Storage Gateway | Amazon Web Services",
           "url": "https://aws.amazon.com/storagegateway/"
         },
         {
+          "title": "What is Amazon VPC? - Amazon Virtual Private Cloud",
           "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
         }
       ],
@@ -5235,12 +5574,15 @@
       "explanation": "## 問われている要件\nデータ保護と監査について、事実に沿った説明を 2 つ選ぶ問題です。\n\n## 正解の決め手\nデータ保護のポリシーと運用は、リアルタイムの分析と洞察により監視、監査、報告ができます。また、リソースをポリシーと照らして、組織や規制の要件に適合しているかを点検できます。よって C と D が正解です。\n\n## 他の選択肢が誤りである理由\n\n利用者の活動の記録は、運用監査ではなく料金の集計だけに使われる\n\n活動の記録は、アカウントのガバナンス、コンプライアンス、運用監査を支えるために使われます。料金の集計だけという説明は誤解です。\n\n活動のログは規制への準拠を示す材料にならず、報告書は別に作る必要がある\n\nログは規制への準拠を示す材料になり、罰則から組織を守る助けにもなるため、材料にならないという説明は逆です。\n\n秘密鍵の保管では、暗号化と鍵管理の方針を設けないのが標準である\n\n秘密鍵は強力な暗号化と鍵管理の方針で保護して保管されるため、方針を設けないのが標準という説明は誤りです。",
       "references": [
         {
+          "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
           "url": "https://aws.amazon.com/backup/"
         },
         {
+          "title": "Certificate Manager - AWS Certificate Manager - AWS",
           "url": "https://aws.amazon.com/certificate-manager/"
         },
         {
+          "title": "API Logs - Secure Standardized Logging Service - AWS CloudTrail - AWS",
           "url": "https://aws.amazon.com/cloudtrail/"
         }
       ],
@@ -5281,12 +5623,15 @@
       "explanation": "## 問われている要件\nAthena の運用面での特徴を、似た役割のサービスや仕組みと区別して選びます。\n\n## 正解の決め手\nAthena はサーバーレスのため、利用者がインフラを用意・管理する必要がありません。\n\n## 他の選択肢が誤りである理由\n\n分析用のサーバー群を、利用者が用意して管理する必要がある\n\nサーバーレスのため、利用者がインフラを用意・管理する必要はありません。必要とするのは逆です。\n\nインフラをコードで定義し、素早く用意・管理するためのサービスである\n\nインフラをコードで定義して用意・管理するのは CloudFormation の役割で、Athena の説明ではありません。\n\nオンプレミスなどの施設に、AWS のインフラを持ち込むための仕組みである\n\n施設にインフラを持ち込む仕組みは Outposts で、Athena は分析のサービスです。",
       "references": [
         {
+          "title": "Global Infrastructure Regions & AZs",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/"
         },
         {
+          "title": "Interactive SQL - Serverless Query Service - Amazon Athena - AWS",
           "url": "https://aws.amazon.com/athena/"
         },
         {
+          "title": "Provision Infrastructure as Code - AWS CloudFormation - AWS",
           "url": "https://aws.amazon.com/cloudformation/"
         }
       ],
@@ -5323,15 +5668,19 @@
       "explanation": "## 問われている要件\nコンプライアンス関連の報告書や認証を確認する用途に合うサービスの説明を、2 つ選ぶ問題です。\n\n## 正解の決め手\nAWS Artifact は、AWS と ISV のセキュリティ・コンプライアンス報告書へオンデマンドで取得できるサービスです。また、監査人が発行した報告書、認証、認定、第三者による証明を一か所で探せます。この 2 点が選択肢 B と D に当たります。\n\n## 他の選択肢が誤りである理由\n\n利用者の活動をアカウント内で記録し、セキュリティの体制を高める\n\n利用者の活動を記録してセキュリティの体制を高めるのは、**CloudTrail** の説明です。Artifact は報告書を取り出すサービスで、活動の記録は行いません。\n\n指標の変化に応じてアラームを設定し、問題が届く前に対応を自動化できる\n\n指標の変化にアラームを設定して対応を自動化するのは、**CloudWatch** の機能です。Artifact の役割は報告書の提供です。\n\nランサムウェアからの復旧を助ける機能を備えたサービスである\n\nランサムウェアからの復旧を助けるのは、**AWS Backup** の機能です。Artifact を、データ保護のサービスと取り違えた誤りです。\n## まとめ\n「報告書・認証・第三者の証明を取り出す」という言葉が出たら Artifact、と結び付けて覚えましょう。",
       "references": [
         {
+          "title": "Security Compliance Management - AWS Artifact - AWS",
           "url": "https://aws.amazon.com/artifact/"
         },
         {
+          "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
           "url": "https://aws.amazon.com/backup/"
         },
         {
+          "title": "API Logs - Secure Standardized Logging Service - AWS CloudTrail - AWS",
           "url": "https://aws.amazon.com/cloudtrail/"
         },
         {
+          "title": "Amazon Monitoring and Observability-Amazon CloudWatch - AWS",
           "url": "https://aws.amazon.com/cloudwatch/"
         }
       ],
@@ -5372,12 +5721,15 @@
       "explanation": "## 問われている要件\nCloudTrail が何を記録するサービスかを、正しく述べた選択肢を 2 つ選ぶ問題です。\n\n## 正解の決め手\nCloudTrail は、利用者の活動と API の呼び出しをアカウント内で記録し、セキュリティの体制を高めます。さらに、VPC エンドポイントを通るネットワークアクティビティのイベントも記録できます。よって B と E が正解です。\n\n## 他の選択肢が誤りである理由\n\n監査人が発行した報告書や認証を、一か所で探せる資料として提供する\n\n監査人の報告書や認証を一か所で探せるのは、コンプライアンス資料の提供の説明で、活動の記録を担う CloudTrail の役割ではありません。\n\nリソースをデータ保護のポリシーと照らし、コンプライアンスの洞察を提供する\n\nデータ保護のポリシーと運用についてコンプライアンスの洞察を得る機能は、バックアップ側のもので、活動の記録とは別の役割です。\n\nプライベート接続のエンドポイントを通る操作のイベントは、記録の対象外である\n\nエンドポイントを通るネットワークアクティビティのイベントも記録できるため、記録の対象外とする説明は事実と逆です。",
       "references": [
         {
+          "title": "Security Compliance Management - AWS Artifact - AWS",
           "url": "https://aws.amazon.com/artifact/"
         },
         {
+          "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
           "url": "https://aws.amazon.com/backup/"
         },
         {
+          "title": "API Logs - Secure Standardized Logging Service - AWS CloudTrail - AWS",
           "url": "https://aws.amazon.com/cloudtrail/"
         }
       ],
@@ -5418,15 +5770,19 @@
       "explanation": "## 問われている要件\n拠点に AWS のコンピュートなどを広げる構成が合う場面を、2 つ選ぶ問題です。\n\n## 正解の決め手\n近くのパブリッククラウドのサーバーでは間に合わない低遅延の要件、拠点内でのデータ処理、データの所在の要件が、拠点側で動かす用途に合います。\n\n## 他の選択肢が誤りである理由\n\n大量の投稿を、利用者の言語へリアルタイムに自動翻訳したい\n\n自動翻訳は大量のユーザー生成コンテンツをリアルタイムに処理するサービスの用途です。低遅延やデータの所在といった、拠点に広げる理由には当たりません。\n\nVPC を操作する際の署名の生成やエラー処理を、AWS に自動で任せたい\n\nQuery API は VPC を最も直接的に操作できますが、署名の生成やエラー処理などの低レベルな処理は、アプリケーション側で扱う必要があります。\n\nVDI ソフトウェアを、AWS が管理する基盤ではなく自前の物理サーバーだけで動かしたい\n\nサードパーティ製の VDI ソフトウェアは、AWS が管理する基盤の上で動かせます。自前の物理サーバーだけに限る必要はなく、拠点へ広げる理由にもなりません。",
       "references": [
         {
+          "title": "On Premises Private Cloud - AWS Outposts - AWS",
           "url": "https://aws.amazon.com/outposts/"
         },
         {
+          "title": "Machine Translation Service — Amazon Translate — Amazon Web Services",
           "url": "https://aws.amazon.com/translate/"
         },
         {
+          "title": "Virtual Desktop Infrastructure (VDI) - Amazon WorkSpaces - AWS",
           "url": "https://aws.amazon.com/workspaces/"
         },
         {
+          "title": "What is Amazon VPC? - Amazon Virtual Private Cloud",
           "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
         }
       ],
@@ -5467,6 +5823,7 @@
       "explanation": "## 問われている要件\nAmazon が発行した証明書の更新の扱いを問う問題です。\n\n## 正解の決め手\nAmazon が発行した証明書は、更新がマネージドで提供されます。利用者が更新作業を抱え込まずに済みます。\n\n## 他の選択肢が誤りである理由\n\n更新のたびに利用者が手作業で行う必要がある\n\n更新はマネージドで提供されるため、利用者が毎回手作業で行う必要はありません。条件が逆です。\n\n通信の暗号化には使えず、本人確認にのみ使える\n\n証明書は Web サイトやアプリケーションへの通信を安全にするために使えます。暗号化に使えないというのは誤解です。\n\nAWS との合意を承諾したときに限り更新される\n\n合意の確認や承諾は、証明書とは別の仕組みです。更新の条件にはなりません。",
       "references": [
         {
+          "title": "Certificate Manager - AWS Certificate Manager - AWS",
           "url": "https://aws.amazon.com/certificate-manager/"
         }
       ],
@@ -5503,6 +5860,7 @@
       "explanation": "## 問われている要件\nデータ保護のポリシーと運用を対象に、コンプライアンスの洞察と分析を得るサービスを選ぶ問題です。\n\n## 正解の決め手\nAWS Backup は、データ保護のポリシーと運用に関するコンプライアンスの洞察と分析を提供します。リソースをポリシーと照らして点検することもできます。\n\n## 他の選択肢が誤りである理由\n\nAWS CloudTrail\n\nアカウントの運用監査を支えるサービスで、データ保護のポリシーへの適合を点検する用途とは異なります。\n\nAWS Artifact\n\nAWS との合意を確認し承諾するためのサービスです。データ保護の運用を分析する機能ではありません。\n\nAWS Certificate Manager\n\n証明書を用意して管理するのが役割です。データ保護のポリシーと運用の分析は範囲外です。",
       "references": [
         {
+          "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
           "url": "https://aws.amazon.com/backup/"
         }
       ],
@@ -5539,6 +5897,7 @@
       "explanation": "## 問われている要件\n予算の目標を超えたときの、操作の実行方法を問う問題です。\n\n## 正解の決め手\n事前に定めた操作は、自動で実行する方式と、承認の手続きを経て実行する方式から選べます。\n\n## 他の選択肢が誤りである理由\n\n超過時の操作は自動実行だけで、承認の手続きを挟むことはできない\n\n承認の手続きを経て実行する方式も選べるため、自動実行だけという説明は誤りです。\n\n超過時にできるのは通知だけで、操作を実行する機能は用意されていない\n\n超過時には、事前に定めた操作を実行できます。通知だけに限られるわけではありません。\n\n超過のたびに、利用者がその場で操作の内容を一から決めて実行する\n\n操作は事前に定めておくものです。超過のたびに一から決める必要はありません。",
       "references": [
         {
+          "title": "Set Custom Cost and Usage Budgets – AWS Budgets – Amazon Web Services",
           "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/"
         }
       ],
@@ -5575,9 +5934,11 @@
       "explanation": "## 問われている要件\nリージョンが何で、AZ とどう関わるかを、2 つの観点で説明できるかが問われています。\n\n## 正解の決め手\nリージョンは、世界各地でデータセンターをまとめて置いている物理的な場所です。各リージョンには、物理的に分かれた AZ が少なくとも 3 つあります。\n\n## まとめ\n解答例: リージョンは世界各地にあるデータセンターの集まりで、1 つのリージョンの中に、物理的に分かれた AZ が 3 つ以上ある。",
       "references": [
         {
+          "title": "Global Infrastructure - AWS",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/"
         },
         {
+          "title": "Global Infrastructure Regions & AZs",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/"
         }
       ],
@@ -5607,15 +5968,19 @@
       "explanation": "## 問われている要件\nWeb サイトやアプリケーションへの通信を安全にする手段が求められています。\n\n## 正解の決め手\n証明書を用意して管理することで、通信を安全にできます。\n\n## 他の選択肢が誤りである理由\n\nコンソール用の認証情報で CLI からログインする\n\nCLI からのログインは、アクセスの手段です。通信を安全にするには、証明書の用意と管理が必要です。\n\nダッシュボードで傾向を可視化する\n\nダッシュボードは傾向を見るための機能です。通信を安全にする働きはありません。\n\nセルフサービスの画面で報告書を取り出す\n\n報告書の取り出しは、確認の手間を減らすためのものです。通信を安全にする手段ではありません。",
       "references": [
         {
+          "title": "Security Compliance Management - AWS Artifact - AWS",
           "url": "https://aws.amazon.com/artifact/"
         },
         {
+          "title": "Certificate Manager - AWS Certificate Manager - AWS",
           "url": "https://aws.amazon.com/certificate-manager/"
         },
         {
+          "title": "AWS CLI",
           "url": "https://aws.amazon.com/cli/"
         },
         {
+          "title": "API Logs - Secure Standardized Logging Service - AWS CloudTrail - AWS",
           "url": "https://aws.amazon.com/cloudtrail/"
         }
       ],
@@ -5652,12 +6017,15 @@
       "explanation": "## 問われている要件\n管理アカウントから、全体の合計とアカウント別の内訳を確認することです。\n\n## 正解の決め手\n管理アカウントでは、メンバーアカウント全体の料金を集計して見られ、アカウントごとの内訳も確認できます。\n\n## 他の選択肢が誤りである理由\n\nメンバーアカウントごとに支払いプロファイルを設定する\n\n支払いプロファイルは支払いの設定を変える機能で、料金を集計して内訳を見る機能ではありません。\n\n予算の期間を年次にして、上限を設定する\n\n予算は期間と上限を決める機能で、メンバーアカウント全体の集計や内訳を見る機能ではありません。\n\n前日比でコストの変化を比べて、パターンを調べる\n\n前日比の比較は、コストの変化のパターンを見るもので、アカウント別の内訳を示す機能ではありません。",
       "references": [
         {
+          "title": "AWS Billing - Amazon Web Services",
           "url": "https://aws.amazon.com/aws-cost-management/aws-billing/"
         },
         {
+          "title": "Set Custom Cost and Usage Budgets – AWS Budgets – Amazon Web Services",
           "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/"
         },
         {
+          "title": "Cloud Cost Report - AWS Cost Explorer - AWS",
           "url": "https://aws.amazon.com/aws-cost-management/aws-cost-explorer/"
         }
       ],
@@ -5694,6 +6062,7 @@
       "explanation": "## 問われている要件\n予算の期間として選べる単位が問われています。\n\n## 正解の決め手\n予算の期間は、日次・月次・四半期・年次から選び、具体的な上限を設定できます。\n\n## 他の選択肢が誤りである理由\n\n月次、年次の 2 種類だけ\n\n選べる期間は 2 種類ではなく、日次と四半期も含む 4 種類です。\n\n週次、月次、半期、年次\n\n週次と半期は、選べる期間に含まれません。日次と四半期が正しい単位です。\n\n時間単位、日次、月次、年次\n\n時間単位の期間は選べません。日次が最も短い単位で、四半期も選べます。",
       "references": [
         {
+          "title": "Set Custom Cost and Usage Budgets – AWS Budgets – Amazon Web Services",
           "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/"
         }
       ],
@@ -5730,15 +6099,19 @@
       "explanation": "## 問われている要件\nメトリクス・ログ・トレースを一か所に集めて可視化する、監視のサービスを選ぶ問題です。\n\n## 正解の決め手\nAmazon CloudWatch は、AWS 環境全体の監視とオブザーバビリティを担うフルマネージドのサービスです。複合アラームや異常検知なども備えています。\n\n## 他の選択肢が誤りである理由\n\nAWS Artifact\n\nAWS Artifact は、セルフサービスの画面から報告書を取り出して確認の手間を減らすためのサービスで、メトリクスやログの可視化は行いません。\n\nAWS Certificate Manager\n\nAWS Certificate Manager は、証明書を用意・管理して Web サイトやアプリケーションへの通信を安全にするもので、監視の機能ではありません。\n\nAWS Backup\n\nAWS Backup は、変更できないバックアップでランサムウェアなどに備えるためのもので、メトリクスやログを集めて可視化する用途とは範囲が異なります。",
       "references": [
         {
+          "title": "Security Compliance Management - AWS Artifact - AWS",
           "url": "https://aws.amazon.com/artifact/"
         },
         {
+          "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
           "url": "https://aws.amazon.com/backup/"
         },
         {
+          "title": "Certificate Manager - AWS Certificate Manager - AWS",
           "url": "https://aws.amazon.com/certificate-manager/"
         },
         {
+          "title": "Amazon Monitoring and Observability-Amazon CloudWatch - AWS",
           "url": "https://aws.amazon.com/cloudwatch/"
         }
       ],
@@ -5775,6 +6148,7 @@
       "explanation": "## 問われている要件\nPolly に送ったテキストが、サービス側でどう扱われるかが問われています。\n\n## 正解の決め手\n送られた本文の内容を、Polly は保持しません。\n\n## 他の選択肢が誤りである理由\n\n履歴として保存し、あとから参照できる\n\n送られた本文を Polly は保持しないため、履歴として保存して参照することはできません。\n\n一時的に保存し、期間を過ぎたら削除する\n\n一時的であっても本文を保存するわけではなく、保持しないのが正しい扱いです。\n\n個人情報を含む部分だけを保持して残す\n\n本文の一部だけを選んで保持することもなく、内容そのものを保持しません。\n## まとめ\n本文は保持されない、と押さえましょう。",
       "references": [
         {
+          "title": "AI Voice Generator and Text-to-Speech Tool - Amazon Polly - AWS",
           "url": "https://aws.amazon.com/polly/"
         }
       ],
@@ -5811,6 +6185,7 @@
       "explanation": "## 問われている要件\nWell-Architected フレームワークの役割と、2 つの柱(パフォーマンス効率、持続可能性)の重点を、それぞれ述べることが求められています。\n\n## 正解の決め手\nフレームワークは、クラウドでワークロードを設計し運用するための考え方と設計原則を示すものです。パフォーマンス効率の柱は、用途に合った資源の種類と規模を選び、その効率を保つことに重点を置きます。持続可能性の柱は、クラウドのワークロードが環境に与える影響を抑えることに重点を置きます。\n\n## まとめ\n解答の例は次のとおりです。「Well-Architected フレームワークは、クラウドでの設計と運用の考え方や設計原則を示す。パフォーマンス効率の柱は、用途に合った資源の種類と規模を選んで効率を保つことを重視し、持続可能性の柱は、ワークロードが環境に与える影響を抑えることを重視する。」",
       "references": [
         {
+          "title": "AWS Well-Architected - Build secure, efficient cloud applications",
           "url": "https://aws.amazon.com/architecture/well-architected/"
         }
       ],
@@ -5845,18 +6220,23 @@
       "explanation": "## 問われている要件\n\n各選択肢の記述が、サービスや考え方の説明として正しいかを読み分け、正しいものを 2 つ選びます。\n\n## 正解の決め手\n\nCは、Fargate を AWS Batch と組み合わせ、データ処理を並列に動かせるという説明です。Eは、レイクハウスが S3 のデータレイクと Redshift のデータウェアハウスをまとめ、データの分断を減らすという説明です。\n\n## 他の選択肢が誤りである理由\n\nIoT Core は、世界の多くの国へ複数の事業者を経由して SMS を送るための配信サービスである。\n\nIoT Core は、機器をクラウドへ簡単かつ安全につなぐためのサービスです。複数事業者にまたがる SMS 配信は、別の通知系サービスの特徴です。\n\nレイクハウスは、データレイクとデータウェアハウスを分けたまま、別々の基盤で運用し続ける考え方である。\n\nレイクハウスは、データレイクとデータウェアハウスを統合して分断を減らす考え方です。分けたまま運用するという説明は、内容が逆です。\n\n人工知能のエージェントは、問い合わせを担当者へ振り分けるだけで、解決そのものは人手が行う。\n\nエージェントは、問い合わせを人手を介さず自律的に解決します。振り分けだけで解決を人に任せるという理解は、誤解です。\n## まとめ\n\nサービス名と用途の対応、そしてレイクハウスのような考え方の定義を、取り違えないようにしましょう。",
       "references": [
         {
+          "title": "Amazon Connect Customer - AWS",
           "url": "https://aws.amazon.com/connect/"
         },
         {
+          "title": "Serverless Compute Engine – AWS Fargate – AWS",
           "url": "https://aws.amazon.com/fargate/"
         },
         {
+          "title": "Secure IoT Gateway, IoT Gateway Device - AWS IoT Core - AWS",
           "url": "https://aws.amazon.com/iot-core/"
         },
         {
+          "title": "The center for all your data, analytics, and AI – Amazon SageMaker – AWS",
           "url": "https://aws.amazon.com/sagemaker/"
         },
         {
+          "title": "Push Notification Service - Amazon Simple Notification Service (SNS) - AWS",
           "url": "https://aws.amazon.com/sns/"
         }
       ],
@@ -5897,18 +6277,23 @@
       "explanation": "## 問われている要件\n構成から脆弱性を評価し、インシデント後には構成の履歴を確認することです。\n\n## 正解の決め手\n構成を見て脆弱性を評価し、履歴を確認して調べる機能が、この目的に合います。\n\n## 他の選択肢が誤りである理由\n\n定期的なデータ分析による機密データの検出\n\n定期的なデータ分析は、機密データが検出され保護されていることの確認用です。構成の履歴を調べる機能ではありません。\n\n利用者が選んだ、ネットワークアプライアンスの配置\n\nネットワークアプライアンスの配置は、ベンダーの製品を使って守りを固める手段です。構成の履歴を調べる機能ではありません。\n\n自動分析による、複数アカウントでの脅威検出の拡張\n\n自動分析は、手作業を減らしつつ複数アカウントで脅威検出を拡張します。構成の履歴の確認とは目的が異なります。\n\n転送中のデータに対する暗号化への対応\n\n転送中の暗号化は、通信するデータを保護する機能です。構成の評価や、インシデント後の履歴の確認には使いません。",
       "references": [
         {
+          "title": "Config Tool – AWS Config – Amazon Web Services",
           "url": "https://aws.amazon.com/config/"
         },
         {
+          "title": "Load Balancer - Amazon Elastic Load Balancer (ELB) - AWS",
           "url": "https://aws.amazon.com/elasticloadbalancing/"
         },
         {
+          "title": "Amazon FSx | Feature-Rich & Highly-Performant File Systems | Amazon Web Services",
           "url": "https://aws.amazon.com/fsx/"
         },
         {
+          "title": "Intelligent Threat Detection – Amazon GuardDuty – AWS",
           "url": "https://aws.amazon.com/guardduty/"
         },
         {
+          "title": "Sensitive Data Discovery and Protection - Amazon Macie - AWS",
           "url": "https://aws.amazon.com/macie/"
         }
       ],
@@ -5950,15 +6335,19 @@
       "explanation": "## 問われている要件\nデータ分析基盤について、正しい説明を 2 つ選ぶ問題です。\n\n## 正解の決め手\nゼロ ETL 連携を使うと、業務データベースの更新データを、データ移動の仕組みを自分で組まずに Redshift へ送れます。また、レイクハウスは、S3 のデータレイクと Redshift のデータウェアハウスを統合して、データの分断を減らす考え方です。\n\n## 他の選択肢が誤りである理由\n\nテープ保管の代わりになる保存先は、頻繁に取り出すデータ向けの置き場とされている。\n\nテープ保管の代わりに使える、管理しやすい保存先という位置づけです。頻繁に取り出すデータ向けではありません。\n\n設定管理のツールは、業務データベースの更新を分析基盤へ送る役割を持つ。\n\nAppConfig や Parameter Store は、アプリケーションの設定に関わるツールです。データを分析基盤へ送る役割はありません。\n\nデータレイクとデータウェアハウスを別々に運用し、分断を保つ考え方がある。\n\nレイクハウスは、データレイクとデータウェアハウスを統合して分断を減らす考え方です。分断を保つ運用は逆の説明です。",
       "references": [
         {
+          "title": "Cloud Data Warehouse – Amazon Redshift – AWS",
           "url": "https://aws.amazon.com/redshift/"
         },
         {
+          "title": "Secure archive storage – Amazon S3 Glacier storage classes – AWS",
           "url": "https://aws.amazon.com/s3/storage-classes/glacier/"
         },
         {
+          "title": "The center for all your data, analytics, and AI – Amazon SageMaker – AWS",
           "url": "https://aws.amazon.com/sagemaker/"
         },
         {
+          "title": "Centralized Operations Hub – AWS Systems Manager – Amazon Web Services",
           "url": "https://aws.amazon.com/systems-manager/"
         }
       ],
@@ -5999,15 +6388,19 @@
       "explanation": "## 問われている要件\n上位のサポートプランの利用者に、重要度の高い推奨を優先順位付きで届ける「機能」を選ぶ問題です。\n\n## 正解の決め手\nTrusted Advisor Priority は、上位のサポートプラン(Enterprise Support か Unified Operations)の利用者へ、重要度の高い推奨を優先順位付きで届ける機能です。\n\n## 解くための考え方\n「推奨を届ける機能」か、「料金の仕組み」か、「請求の管理」か、「プランそのもの」かを切り分けます。\n\n## 他の選択肢が誤りである理由\n\n節約プラン\n\n節約プランは、一定の使用量を約束する代わりにオンデマンド価格から料金を下げる料金モデルです。推奨を優先順位付きで届ける機能ではありません。\n\n請求の移管(billing transfer)\n\n請求の移管は、複数の組織の請求管理データと請求書を一元的に確認する仕組みです。推奨の配信とは関係がありません。\n\nUnified Operations\n\nUnified Operations は、重要なワークロード向けのサポートプランです。問われているのは機能で、このプランは Priority を使える対象の 1 つにとどまります。",
       "references": [
         {
+          "title": "Amazon EC2 – Secure and resizable compute capacity – AWS",
           "url": "https://aws.amazon.com/ec2/pricing/"
         },
         {
+          "title": "AWS Support plan comparison – AWS Support features – AWS",
           "url": "https://aws.amazon.com/premiumsupport/plans/"
         },
         {
+          "title": "Best Practice Guidance for AWS Optimization - AWS Trusted Advisor",
           "url": "https://aws.amazon.com/premiumsupport/technology/trusted-advisor/"
         },
         {
+          "title": "Consolidating billing for AWS Organizations - AWS Billing",
           "url": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/consolidated-billing.html"
         }
       ],
@@ -6044,15 +6437,19 @@
       "explanation": "## 正解の決め手\n\nS3 File Gateway は、S3 のデータに対し、SMB や NFS というファイル共有の形でのアクセスを提供します。設問の条件に直接合います。\n\n## 他の選択肢が誤りである理由\n\nVPC ピアリング接続\n\nVPC ピアリング接続は、2 つの VPC のリソース間で通信を経路づける機能で、S3 のデータへのファイルアクセスは提供しません。\n\nHTTP API\n\nアクセスの入口に見えても、HTTP API は RESTful API を作るためのもので、SMB や NFS のファイル共有を提供するものではありません。\n\nTraffic Flow のポリシービルダー\n\nルーティングポリシーの実装を支援する機能で、適用範囲がストレージへのファイルアクセスとは異なります。",
       "references": [
         {
+          "title": "Amazon API Gateway | API Management | Amazon Web Services",
           "url": "https://aws.amazon.com/api-gateway/"
         },
         {
+          "title": "Amazon Route 53 - DNS Service - AWS",
           "url": "https://aws.amazon.com/route53/"
         },
         {
+          "title": "AWS Storage Gateway | Amazon Web Services",
           "url": "https://aws.amazon.com/storagegateway/"
         },
         {
+          "title": "What is Amazon VPC? - Amazon Virtual Private Cloud",
           "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
         }
       ],
@@ -6089,6 +6486,7 @@
       "explanation": "## 問われている要件\nMySQL や PostgreSQL と Aurora の間で、移行がどのようにできるかを問う問題です。\n\n## 正解の決め手\nMySQL や PostgreSQL のデータベースは、標準的なツールを使って Aurora へ移行でき、Aurora から移行することもできます。\n\n## 他の選択肢が誤りである理由\n\nAurora への移行はできるが、Aurora から出す移行はできない\n\nAurora から移行することもできるとされており、片方向だけという説明は条件が逆です。\n\nAurora 専用の独自ツールを使わないと、移行はできない\n\n標準的なツールを使って移行できるとされており、独自ツールが必須という説明は誤解です。\n\nMySQL は移行できるが、PostgreSQL は移行の対象にならない\n\nMySQL と PostgreSQL の両方が移行の対象であり、片方に限る説明は適用範囲が違います。",
       "references": [
         {
+          "title": "Relational Database – Amazon Aurora MySQL PostgreSQL – AWS",
           "url": "https://aws.amazon.com/rds/aurora/"
         }
       ],
@@ -6125,12 +6523,15 @@
       "explanation": "## 問われている要件\nアプリの要件をコードで書くだけで、必要なリソースの構成と環境への配置まで自動で行うサービスを選ぶ問題です。\n\n## 正解の決め手\nTypeScript で要件を書くと、必要なリソースを自動で構成し、開発者ごとの環境へ配置するのは Amplify の特徴です。\n\n## 他の選択肢が誤りである理由\n\nAWS Backup\n\n主要なデータストアをサービスをまたいでバックアップするためのサービスで、リソースを構成して配置する役割ではありません。\n\nAWS Auto Scaling\n\n複数のリソースの目標利用率を設定して拡張を調整するもので、要件の記述からリソースを構成するものではありません。\n\nAmazon CloudFront\n\nエッジネットワークからコンテンツを配信するサービスです。リソースの自動構成を行う役割はありません。",
       "references": [
         {
+          "title": "Full Stack Development - Web and Mobile Apps - AWS Amplify",
           "url": "https://aws.amazon.com/amplify/"
         },
         {
+          "title": "App Scaling - AWS Application Auto Scaling - AWS",
           "url": "https://aws.amazon.com/autoscaling/"
         },
         {
+          "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
           "url": "https://aws.amazon.com/backup/"
         }
       ],
@@ -6167,12 +6568,15 @@
       "explanation": "## 問われている要件\nクラウド採用の利点と、設計の柱の重点について、正しい記述を 2 つ選ぶ問題です。\n\n## 正解の決め手\nBは、信頼性・性能・セキュリティの向上によって事業リスクを下げられるという利点を述べています。Eは、環境・社会・ガバナンスの成果を、洞察を活用して高められるという利点を述べています。どちらも、クラウド採用の利点として整理されている内容です。\n\n## 前提知識\nパフォーマンス効率の柱は、用途に合う資源の種類と規模を選び、効率を保つことに重点があります。持続可能性の柱は、ワークロードが環境に与える影響を抑えることに重点があります。\n\n## 解くための考え方\n柱の名前と重点の組み合わせが入れ替わっていないかを確かめます。また、需要の増減に応じた容量の調整が自動でできるかどうかも確認します。\n\n## 他の選択肢が誤りである理由\n\nパフォーマンス効率の柱は、クラウドのワークロードが環境に与える影響を抑えることに重点を置く\n\n環境への影響を抑えることに重点を置くのは持続可能性の柱です。パフォーマンス効率の柱は、用途に合った資源の種類と規模を選び、効率を保つことに重点があります。\n\n需要が下がっても、余剰な容量は自動では取り除かれず、手作業で減らす必要がある\n\n需要が下がると、余剰な容量は自動で取り除かれ、無駄な支出を避けられます。手作業が必要という記述は逆です。\n\nクラウド導入のフレームワークの資料は、電子書籍の形式だけで公開され、他の言語版はない\n\n資料は電子書籍のほか図解や音声版など複数の形式で公開されており、他の言語版もあります。形式も言語も限られるという記述は誤りです。\n\n持続可能性の柱は、用途に合った資源の種類と規模を選び、効率を保つことに重点を置く\n\n用途に合った資源の種類と規模を選び、効率を保つことに重点を置くのは、パフォーマンス効率の柱です。持続可能性の柱は環境への影響の抑制が重点です。\n## まとめ\n柱ごとの重点と、クラウド採用の利点を、取り違えずに覚えておきましょう。",
       "references": [
         {
+          "title": "AWS Well-Architected - Build secure, efficient cloud applications",
           "url": "https://aws.amazon.com/architecture/well-architected/"
         },
         {
+          "title": "App Scaling - AWS Application Auto Scaling - AWS",
           "url": "https://aws.amazon.com/autoscaling/"
         },
         {
+          "title": "AWS Cloud Adoption Framework",
           "url": "https://aws.amazon.com/cloud-adoption-framework/"
         }
       ],
@@ -6218,6 +6622,7 @@
       "explanation": "## 問われている要件\nアカウントの運用監査を支え、VPC エンドポイントを通る通信のイベントも記録できるサービスを選ぶ問題です。\n\n## 正解の決め手\nCloudTrail は、アカウントのガバナンス、コンプライアンス、運用監査を支えるサービスで、VPC エンドポイントを通るネットワークアクティビティのイベントも記録できます。\n\n## 他の選択肢が誤りである理由\n\nAWS Certificate Manager\n\n証明書を用意して管理し、通信を安全にするためのサービスです。VPC エンドポイントを通るイベントの記録は担当しません。\n\nAWS Backup\n\nコンプライアンスの洞察を得られますが、対象はデータ保護のポリシーと運用です。ネットワークアクティビティのイベントを記録するサービスではありません。\n\nAWS Artifact\n\nAWS との合意の確認や承諾などを扱うサービスです。アカウント内のイベントを記録して監査に使う用途とは範囲が違います。",
       "references": [
         {
+          "title": "API Logs - Secure Standardized Logging Service - AWS CloudTrail - AWS",
           "url": "https://aws.amazon.com/cloudtrail/"
         }
       ],
@@ -6254,15 +6659,19 @@
       "explanation": "## 正解の決め手\nAWS Secrets Manager と連携すると、認証情報などの機密情報を一か所で保管・管理できます。\n\n## 他の選択肢が誤りである理由\n\n暗号鍵を一元管理して、機密データを保護して送る機能\n\n鍵を一元管理する機能は暗号鍵の管理が対象で、認証情報などの機密情報を保管する用途とは異なります。\n\n遠隔地の拠点どうしを、暗号化して結ぶ接続機能\n\n拠点どうしを暗号化して結ぶ機能の説明で、機密情報を保管して管理するものではありません。\n\nリスクに応じた適応型認証で、利用者を守る機能\n\n適応型認証は認証時の防御機能で、認証情報を保管して管理する機能とは適用範囲が異なります。",
       "references": [
         {
+          "title": "Amazon Cognito - Customer Identity and Access Management - Machine Identity and Access Management",
           "url": "https://aws.amazon.com/cognito/"
         },
         {
+          "title": "Cloud Database Migration – AWS Database Migration Service (AWS DMS) Features – AWS",
           "url": "https://aws.amazon.com/dms/schema-conversion-tool/"
         },
         {
+          "title": "Fully Managed Message Queuing – Amazon Simple Queue Service – Amazon Web Services",
           "url": "https://aws.amazon.com/sqs/"
         },
         {
+          "title": "Virtual Private Network (VPN) – AWS VPN – Amazon Web Services",
           "url": "https://aws.amazon.com/vpn/"
         }
       ],
@@ -6299,15 +6708,19 @@
       "explanation": "## 正解の決め手\nルートユーザーは全サービスへの完全なアクセス権を持つため、日常の作業には使わないことが強く推奨されます。代わりに、管理者や開発者などの ID を IAM で作成し、必要なリソースへのアクセスだけを与えます。この 2 点が、B と D の内容です。\n\n## 他の選択肢が誤りである理由\n\nAWS が第三者の検証を受けているので、法令や規制を守る責任は利用者側に残らない\n\nAWS が第三者の検証を受けていても、法令や規制を守る責任は利用者にも残ります。検証の有無で利用者の責任がなくなるわけではありません。\n\nルートユーザーの権限は日常の作業向けに調整されているので、普段の運用に使ってよい\n\nルートユーザーは全サービスへの完全なアクセス権を持つので、日常の作業には使わないことが強く推奨されます。権限が限定されているという前提が逆です。\n\nIAM のポリシーは、移行の作業へのアクセスの制御には使えず、通常のリソースだけが対象となる\n\nIAM のポリシーは、移行の作業へのアクセスを制御する用途にも使えます。対象が通常のリソースに限られるという適用範囲の理解は誤りです。",
       "references": [
         {
+          "title": "Cloud Compliance - Amazon Web Services (AWS)",
           "url": "https://aws.amazon.com/compliance/"
         },
         {
+          "title": "Compliance Programs - Amazon Web Services (AWS)",
           "url": "https://aws.amazon.com/compliance/programs/"
         },
         {
+          "title": "Cloud Database Migration - AWS Database Migration Service (AWS DMS) - AWS",
           "url": "https://aws.amazon.com/dms/"
         },
         {
+          "title": "What is IAM? - AWS Identity and Access Management",
           "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html"
         }
       ],
@@ -6348,15 +6761,19 @@
       "explanation": "## 問われている要件\n承認済みの IaC テンプレートを、作成・共有・整理して統制する用途に合うサービスを選ぶ問題です。\n\n## 正解の決め手\nAWS Service Catalog は、承認した IaC テンプレートを作成・共有・整理し、統制するためのサービスです。\n\n## 他の選択肢が誤りである理由\n\nAWS Resource Access Manager\n\nリソースを共有するためのサービスで、承認した IaC テンプレートを作成・整理して統制する役割は、Service Catalog のものです。\n\nAmazon WorkSpaces\n\n完全マネージドの仮想デスクトップ(DaaS)を提供するサービスであり、IaC テンプレートの統制には使いません。\n\nAmazon RDS\n\nパッチ適用やバックアップなど、データベース管理の作業を AWS が引き受けるサービスで、テンプレート統制の用途ではありません。",
       "references": [
         {
+          "title": "Amazon DocumentDB- Serverless, fully managed, MongoDB API-compatible document database",
           "url": "https://aws.amazon.com/documentdb/"
         },
         {
+          "title": "Serverless Event Router – Amazon EventBridge – AWS",
           "url": "https://aws.amazon.com/eventbridge/"
         },
         {
+          "title": "Cloud Management and Governance – AWS Service Catalog – Amazon Web Services",
           "url": "https://aws.amazon.com/servicecatalog/"
         },
         {
+          "title": "Virtual Desktop Infrastructure (VDI) - Amazon WorkSpaces - AWS",
           "url": "https://aws.amazon.com/workspaces/"
         }
       ],
@@ -6393,6 +6810,7 @@
       "explanation": "## 正解の決め手\n各 Region は、物理的に分かれた AZ を少なくとも三つ持ちます。\n\n## 他の選択肢が誤りである理由\n\nAZ は 1 つだけで、Region と同じ単位である。\n\nRegion は物理的に分かれた複数の AZ で構成され、AZ が 1 つだけの Region という前提はありません。\n\n物理的に分かれた AZ を、少なくとも二つ持つ。\n\n最小の数は二つではなく三つです。二つしか持たない Region という記述は、実際より小さい数です。\n\nAZ の数は決まっておらず、空の Region もある。\n\n各 Region には少なくとも三つの AZ があり、数に決まりがない、または AZ のない Region があるという記述は誤りです。",
       "references": [
         {
+          "title": "Global Infrastructure - AWS",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/"
         }
       ],
@@ -6429,15 +6847,19 @@
       "explanation": "## 問われている要件\nアラームが鳴ったときに、原因の所在をアプリケーションと基盤のどちらかに切り分けることです。\n\n## 正解の決め手\n原因の切り分けは、アラーム発生時にアプリケーション側か基盤の AWS リソースかを判別する機能の役割です。\n\n## 他の選択肢が誤りである理由\n\nネットワーク構成を分析する機能\n\nネットワーク構成を分析する機能は、構成を調べるためのものです。アラームの原因を切り分ける機能ではありません。\n\n似た目的のワークロードに共通のガバナンス統制をかける機能\n\n共通のガバナンス統制は、似た目的のワークロードの運用ルールをそろえるものです。原因の切り分けはできません。\n\n利用者が管理する鍵で、保管中のデータを守る機能\n\n鍵によるサーバー側の暗号化は、保管中のデータを守るものです。アラームの原因分析には使いません。",
       "references": [
         {
+          "title": "Encryption Cryptography Signing - AWS Key Management Service - AWS",
           "url": "https://aws.amazon.com/kms/"
         },
         {
+          "title": "Cloud Administration – AWS Organizations – Amazon Web Services",
           "url": "https://aws.amazon.com/organizations/"
         },
         {
+          "title": "Status of AWS cloud resources – AWS Health – AWS",
           "url": "https://aws.amazon.com/premiumsupport/technology/aws-health-dashboard/"
         },
         {
+          "title": "Network Posture Analysis and Managed DDoS Protection - AWS Shield - AWS",
           "url": "https://aws.amazon.com/shield/"
         }
       ],
@@ -6474,12 +6896,15 @@
       "explanation": "## 問われている要件\nControl Tower の料金の考え方を問う問題です。\n\n## 正解の決め手\nControl Tower 自体には追加料金がかかりません。支払うのは、Control Tower の中で使った他の AWS サービスの料金だけです。\n\n## 他の選択肢が誤りである理由\n\nControl Tower 自体の利用料が発生し、加えて他の AWS サービスの料金も支払う\n\nControl Tower 自体には追加料金がかかりません。支払うのは使った他の AWS サービスの料金だけです。\n\n一定量の利用をコミットした場合に限り、Control Tower の料金が割引になる\n\nコミットの代わりに安くなる料金は、コンピュートと機械学習の話です。Control Tower は、もともと追加料金がありません。\n\nEnterprise Support に加入した場合に限り、Control Tower を無料で使える\n\nEnterprise Support は専門家の助言を受けるサポートプランです。Control Tower の無料は、プランの加入が条件ではありません。",
       "references": [
         {
+          "title": "Cloud Security Governance - AWS Control Tower - AWS",
           "url": "https://aws.amazon.com/controltower/"
         },
         {
+          "title": "AWS Support plan comparison – AWS Support features – AWS",
           "url": "https://aws.amazon.com/premiumsupport/plans/"
         },
         {
+          "title": "AWS Product and Service Pricing | Amazon Web Services",
           "url": "https://aws.amazon.com/pricing/"
         }
       ],
@@ -6516,18 +6941,23 @@
       "explanation": "## 問われている要件\n認証情報などの機密情報を、一か所で保管して管理することです。\n\n## 正解の決め手\n機密情報の保管と管理は、AWS Secrets Manager との連携で一か所にまとめられます。\n\n## 他の選択肢が誤りである理由\n\n拠点間を結ぶ暗号化通信の機能\n\n拠点間の暗号化通信は、通信経路を守る機能です。認証情報を一か所で保管・管理する機能ではありません。\n\n複数のアカウントで証明書を発行する中央管理\n\n証明書の発行を中央で管理する機能は、認証局のリソースを扱うものです。認証情報などの機密情報の保管先ではありません。\n\n社内ディレクトリを使ったシングルサインオン\n\nシングルサインオンは、社内ディレクトリの認証情報で複数アカウントへ入る仕組みです。機密情報を保管・管理する機能ではありません。\n\n構成の履歴からセキュリティの状態を調べる機能\n\n構成の履歴の確認は、脆弱性の評価やインシデント後の調査に使います。機密情報を保管する機能ではありません。",
       "references": [
         {
+          "title": "Config Tool – AWS Config – Amazon Web Services",
           "url": "https://aws.amazon.com/config/"
         },
         {
+          "title": "Cloud Database Migration – AWS Database Migration Service (AWS DMS) Features – AWS",
           "url": "https://aws.amazon.com/dms/schema-conversion-tool/"
         },
         {
+          "title": "Single-Sign On SAML - SSO Provider - AWS IAM Identity Center - AWS",
           "url": "https://aws.amazon.com/iam/identity-center/"
         },
         {
+          "title": "Resource Sharing – AWS Resource Access Manager – Amazon Web Services",
           "url": "https://aws.amazon.com/ram/"
         },
         {
+          "title": "Virtual Private Network (VPN) – AWS VPN – Amazon Web Services",
           "url": "https://aws.amazon.com/vpn/"
         }
       ],
@@ -6569,6 +6999,7 @@
       "explanation": "## 問われている要件\n耐久性とマルチリージョンの機能から得られる、可用性の上限の数値を問う問題です。\n\n## 正解の決め手\n耐久性とマルチリージョンの機能により、最大 99.99% の可用性をうたっています。\n\n## 他の選択肢が誤りである理由\n\n最大 99.5% の可用性\n\nうたわれている可用性は最大 99.99% であり、99.5% は数値が異なります。\n\n最大 95% の可用性\n\n95% は、うたわれている最大 99.99% よりかなり低い数値です。\n\n最大 90% の可用性\n\nクラウドの可用性は 1 割程度の停止を見込むものという誤解です。実際は最大 99.99% とされています。",
       "references": [
         {
+          "title": "Valkey-, Memcached-, and Redis OSS-Compatible Cache – Amazon ElastiCache – AWS",
           "url": "https://aws.amazon.com/elasticache/"
         }
       ],
@@ -6605,18 +7036,23 @@
       "explanation": "## 正解の決め手\nストリーミングデータをリアルタイムに分析する用途では、障害に強い継続的なデータパイプラインを作れます。\n\n## 他の選択肢が誤りである理由\n\n二つの仮想ネットワークの間で、通信を経路づける。\n\nこれは二つのネットワークの間の通信の経路づけで、ストリーミングデータの分析とは関係がありません。\n\n録画済みの動画に字幕を付け、会議の内容を記録する。\n\nこれは録画済みの動画に字幕を付ける機能で、イベントのストリーミング分析ではありません。\n\n投稿などの利用者の作る内容を、大量かつ即時に翻訳する。\n\nこれは投稿などの自動翻訳の機能で、ストリーミングデータの分析とは別の用途です。\n\nオブジェクトストレージのデータを、ファイル共有の形で見せる。\n\nこれはストレージのデータをファイルの形で見せる機能で、リアルタイム分析のパイプラインではありません。",
       "references": [
         {
+          "title": "Big Data Platform – Amazon EMR – Amazon Web Services",
           "url": "https://aws.amazon.com/emr/"
         },
         {
+          "title": "AWS Storage Gateway | Amazon Web Services",
           "url": "https://aws.amazon.com/storagegateway/"
         },
         {
+          "title": "Amazon Transcribe – Speech to Text - AWS",
           "url": "https://aws.amazon.com/transcribe/"
         },
         {
+          "title": "Machine Translation Service — Amazon Translate — Amazon Web Services",
           "url": "https://aws.amazon.com/translate/"
         },
         {
+          "title": "What is Amazon VPC? - Amazon Virtual Private Cloud",
           "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
         }
       ],
@@ -6658,15 +7094,19 @@
       "explanation": "## 問われている要件\n秘密情報を複製しておく目的が、どの場面への備えかを選びます。\n\n## 正解の決め手\n秘密情報を複製しておくことで、災害復旧の場面に備えられます。\n\n## 他の選択肢が誤りである理由\n\nコードの作成やテストを手伝ってほしい場面\n\nコード作成の支援は開発者向けの生成 AI の役割で、秘密情報の複製の目的とは別です。\n\n文書の分類モデルを学習させる場面\n\n分類モデルの学習は機械学習の用途であり、複製による備えの範囲に入りません。\n\n世界の多くの国へ SMS を送る場面\n\nSMS の送信はメッセージ配信の用途で、秘密情報を複製しておく目的ではありません。",
       "references": [
         {
+          "title": "Natural Language Processing – Amazon Comprehend – AWS",
           "url": "https://aws.amazon.com/comprehend/"
         },
         {
+          "title": "AI Coding & Dev Tools - Amazon Q - AWS",
           "url": "https://aws.amazon.com/q/"
         },
         {
+          "title": "Cloud Secrets Management - AWS Secrets Manager - AWS",
           "url": "https://aws.amazon.com/secrets-manager/"
         },
         {
+          "title": "Push Notification Service - Amazon Simple Notification Service (SNS) - AWS",
           "url": "https://aws.amazon.com/sns/"
         }
       ],
@@ -6703,15 +7143,19 @@
       "explanation": "## 問われている要件\n投稿を、大量に、リアルタイムで、別の言語にして見せることが求められています。\n\n## 正解の決め手\n投稿などのユーザー生成コンテンツを、大量かつリアルタイムで自動翻訳できる機能が、この要件に直接合います。\n\n## 他の選択肢が誤りである理由\n\n大量の画像や動画を短時間で分析し、人のレビューを補う機能\n\n画像や動画を大量に分析して人のレビューを補う機能であり、投稿の文章を別の言語に変える機能ではありません。\n\nイベントのストリーミングデータを分析する継続的なパイプライン\n\nリアルタイムという語は同じでも、ストリーミングデータを分析してデータパイプラインを作る用途であり、翻訳はしません。\n\nライブ配信とオンデマンドの動画をメディア系サービスで配信する機能\n\nライブとオンデマンドの動画を配信する機能で、映像を届ける用途です。投稿を多言語にする用途とは適用範囲が異なります。",
       "references": [
         {
+          "title": "Low-Latency Content Delivery Network (CDN) - Amazon CloudFront - Amazon Web Services",
           "url": "https://aws.amazon.com/cloudfront/"
         },
         {
+          "title": "Big Data Platform – Amazon EMR – Amazon Web Services",
           "url": "https://aws.amazon.com/emr/"
         },
         {
+          "title": "Image recognition software, ML image analysis, and video analysis – Amazon Rekognition – AWS",
           "url": "https://aws.amazon.com/rekognition/"
         },
         {
+          "title": "Machine Translation Service — Amazon Translate — Amazon Web Services",
           "url": "https://aws.amazon.com/translate/"
         }
       ],
@@ -6748,6 +7192,7 @@
       "explanation": "## 問われている要件\nクラウド採用の利点として、ESG の成果がどう扱われるかを選ぶ問題です。\n\n## 正解の決め手\n利点には、洞察を使って環境・社会・ガバナンスの成果を高めることが含まれます。三つの領域すべてが対象です。\n\n## 他の選択肢が誤りである理由\n\n洞察を使わなくても、環境と社会の成果が自動で改善される\n\n成果を高めるには洞察を使うことが前提です。洞察なしで自動的に改善されるという理解は誤りです。\n\nガバナンスの成果は高められるが、環境と社会の成果には影響しない\n\n環境と社会の成果も高める対象に含まれます。ガバナンスだけに効果があるという説明は、対象の関係が逆です。\n\n洞察を使って、環境の成果だけを高めることができる\n\n対象は環境だけではなく、社会とガバナンスも含みます。成果の対象範囲を狭めた誤りです。",
       "references": [
         {
+          "title": "AWS Cloud Adoption Framework",
           "url": "https://aws.amazon.com/cloud-adoption-framework/"
         }
       ],
@@ -6784,6 +7229,7 @@
       "explanation": "## 問われている要件\n文書からのデータ抽出を自動化する利点を問う問題です。\n\n## 正解の決め手\n文書からのデータ抽出は、手作業と比べて作業時間を大幅に短縮でき、Amazon Textract ではその抽出を短時間で終えられます。したがって B が正解です。\n\n## 他の選択肢が誤りである理由\n\n手作業と同程度の時間で、抽出の品質だけが上がる\n\n手作業と同程度の時間ではありません。作業時間を大幅に短縮できるのが利点です。\n\n文書の量が増えるほど、抽出に必要な時間が長くなる\n\n時間が長くなるのは逆です。手作業と比べて作業時間を短縮できます。\n\n手作業より時間はかかるが、費用は安くなる\n\n手作業より時間がかかるわけではありません。大幅に短縮できる点が利点です。\n## まとめ\n利点は、抽出にかかる時間の大幅な短縮です。",
       "references": [
         {
+          "title": "Intelligently Extract Text & Data with OCR - Amazon Textract - Amazon Web Services",
           "url": "https://aws.amazon.com/textract/"
         }
       ],
@@ -6820,6 +7266,7 @@
       "explanation": "## 問われている要件\nイベントデータに SQL を使って問い合わせ、運用上の問いや不具合の調査に使える機能を探します。\n\n## 正解の決め手\nAWS CloudTrail の機能である CloudTrail Lake は、イベントデータを SQL でクエリでき、運用上の問いへの回答や不具合の調査に役立ちます。\n\n## 他の選択肢が誤りである理由\n\nAWS Artifact\n\n報告書へのアクセスを提供するサービスで、イベントデータへの SQL クエリの機能は持ちません。\n\nAWS Backup\n\nデータ保護とそのコンプライアンスの洞察を扱うサービスで、イベントデータを SQL で調べる機能の範囲ではありません。\n\nAmazon CloudWatch\n\nメトリクスとアラームの監視が中心で、イベントデータに SQL でクエリする機能とは別のものです。",
       "references": [
         {
+          "title": "API Logs - Secure Standardized Logging Service - AWS CloudTrail - AWS",
           "url": "https://aws.amazon.com/cloudtrail/"
         }
       ],
@@ -6856,6 +7303,7 @@
       "explanation": "## 正解の決め手\nCloudFront の拠点は 750 以上あり、これとは別に地域エッジキャッシュが 15 か所あります。この数の組み合わせを示す選択肢 A が適切です。\n\n## 他の選択肢が誤りである理由\n\n150 以上の拠点があり、ほかに地域エッジキャッシュが 3 か所ある\n\n拠点数もキャッシュの数も実際より少なく、750 以上と 15 か所に合いません。\n\n300 以上の拠点があり、ほかに地域エッジキャッシュが 30 か所ある\n\n拠点数が少なすぎ、キャッシュの数も 15 か所とは一致しません。\n\n拠点だけで構成され、地域エッジキャッシュは提供されていない\n\n拠点のほかに、地域エッジキャッシュが 15 か所あるため、提供されないという説明は誤りです。",
       "references": [
         {
+          "title": "Global Infrastructure - AWS",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/"
         }
       ],
@@ -6892,6 +7340,7 @@
       "explanation": "## 問われている要件\nセキュリティ・コンプライアンスの報告書に、必要なときに入手できるサービスを選ぶ問いです。\n\n## 正解の決め手\nAWS Artifact は、AWS と ISV の報告書へオンデマンドでアクセスできるサービスです。セルフサービスの画面から取り出せるので、確認の手間も減らせます。\n\n## 他の選択肢が誤りである理由\n\nAmazon CloudWatch\n\nメトリクス・ログ・トレースを集めて可視化する監視のサービスで、報告書を取り出す用途ではありません。\n\nAWS Backup\n\n変更できないバックアップを作り、ランサムウェアなどに備えるサービスで、報告書の入手には使いません。\n\nCloudTrail Lake\n\nイベントデータを SQL で調べる用途のサービスで、報告書へアクセスするためのものではありません。",
       "references": [
         {
+          "title": "Security Compliance Management - AWS Artifact - AWS",
           "url": "https://aws.amazon.com/artifact/"
         }
       ],
@@ -6928,15 +7377,19 @@
       "explanation": "## 問われている要件\n変革の優先順位づけ、備えの評価、ロードマップの更新という、組織の変革を進める作業に使えるものを選ぶ問題です。\n\n## 正解の決め手\nAWS CAF は、変革の機会の見極めと優先順位づけ、クラウドへの備えの評価と改善、ロードマップの段階的な更新に使えます。\n\n## 他の選択肢が誤りである理由\n\nAWS License Manager\n\n**AWS License Manager** は、ソフトウェアライセンスの管理に使うサービスです。変革の優先順位づけや備えの評価には使いません。\n\nAWS Fargate\n\n**AWS Fargate** は、サーバー管理を AWS に任せるための仕組みです。組織の備えの評価やロードマップの更新が目的ではありません。\n\nインスタンスリフレッシュ\n\nインスタンスリフレッシュは、構成変更やデプロイの手間と複雑さを減らす機能です。対象は運用作業であり、組織の変革計画ではありません。",
       "references": [
         {
+          "title": "Instance Auto Scaling - Amazon EC2 Autoscaling - AWS",
           "url": "https://aws.amazon.com/ec2/autoscaling/"
         },
         {
+          "title": "Serverless Compute Engine – AWS Fargate – AWS",
           "url": "https://aws.amazon.com/fargate/"
         },
         {
+          "title": "License Manager Software - Amazon License Manager - AWS",
           "url": "https://aws.amazon.com/license-manager/"
         },
         {
+          "title": "An Overview of the AWS Cloud Adoption Framework - An Overview of the AWS Cloud Adoption Framework",
           "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/welcome.html"
         }
       ],
@@ -6973,18 +7426,23 @@
       "explanation": "## 問われている要件\n暗号化とセキュリティに関する記述のうち、正しいものを 2 つ選ぶ問題です。\n\n## 正解の決め手\n専用の接続で送るデータは、暗号化の方式を複数から選べます。ビルドの機能では、用意済みの環境か自前の環境かを選べ、成果物を自分の鍵で暗号化できます。\n\n## 他の選択肢が誤りである理由\n\n資格情報や API キーは、各アプリケーションのコードに分散して持たせるのが推奨される\n\n秘密情報は、一元的に保存して管理するのが考え方です。コードに分散させる運用は誤りです。\n\nEC2 の基盤である AWS Nitro System は、セキュリティを後から任意で足す仕組みである\n\nEC2 は Nitro System を基盤に、セキュリティを初めから組み込んでいます。後から任意で足すという説明は逆です。\n\nDDoS 攻撃からの保護は、攻撃の発生源から離れた場所でのみ行える\n\nDDoS 攻撃からは、攻撃の発生源に近い場所で守れます。離れた場所でのみという限定は誤りです。\n## まとめ\n暗号化の選択肢と、一元管理・初めから組み込む・発生源に近い、という考え方を押さえましょう。",
       "references": [
         {
+          "title": "Managed Build Server - AWS CodeBuild - AWS",
           "url": "https://aws.amazon.com/codebuild/"
         },
         {
+          "title": "Dedicated Network Connections - AWS Direct Connect - AWS",
           "url": "https://aws.amazon.com/directconnect/"
         },
         {
+          "title": "Secure and resizable cloud compute – Amazon EC2 – Amazon Web Services",
           "url": "https://aws.amazon.com/ec2/"
         },
         {
+          "title": "Network Acceleration Service - AWS Global Accelerator - AWS",
           "url": "https://aws.amazon.com/global-accelerator/"
         },
         {
+          "title": "Cloud Secrets Management - AWS Secrets Manager - AWS",
           "url": "https://aws.amazon.com/secrets-manager/"
         }
       ],
@@ -7025,6 +7483,7 @@
       "explanation": "## 問われている要件\n導入前に、構成全体の月額費用を見積もる手段を選ぶ問題です。\n\n## 正解の決め手\nPricing Calculator は、単体のサービスだけでなく、複数の構成をまとめた月額費用も見積もれます。\n\n## 他の選択肢が誤りである理由\n\nEnterprise Support\n\nEnterprise Support は、ビジネスクリティカルなワークロード向けに専門家の助言を受けるサポートプランです。構成の月額費用を見積もる機能ではありません。\n\nHealth API\n\nHealth API は、Health の情報をプログラムから扱うためのものです。月額費用の見積もりとは目的が異なります。\n\nre:Post\n\nre:Post は、コミュニティの知識と支援を得る場です。費用を試算する用途は対象外で、見積もりには向きません。\n\nControl Tower\n\nControl Tower 自体は追加料金がかからず、使った他サービスの料金だけを払います。費用を見積もる道具ではなく、料金の側の話です。",
       "references": [
         {
+          "title": "AWS Product and Service Pricing | Amazon Web Services",
           "url": "https://aws.amazon.com/pricing/"
         }
       ],
@@ -7066,15 +7525,19 @@
       "explanation": "## 問われている要件\n可用性の SLA と、数分での容量の拡張という 2 つの特徴をもつものを選びます。\n\n## 正解の決め手\nEC2 は、99.99% の可用性を約束する SLA を掲げ、需要に応じて数分で容量を増やせるとされています。\n\n## 他の選択肢が誤りである理由\n\nサーバーの管理を任せ、アプリ開発に集中できるサービス\n\nサーバーの管理を任せてアプリ開発に集中できるのは Fargate の特徴で、99.99% の SLA と数分での拡張の説明ではありません。\n\n専用ハードウェアなしでマルチキャストのアプリを拡張できるサービス\n\n専用ハードウェアなしでマルチキャストのアプリを拡張できるサービスの特徴で、可用性の SLA とは別の話です。\n\nグローバル基盤の信頼性とセキュリティで本番を動かせるサービス\n\nグローバル基盤の信頼性とセキュリティを生かして本番を動かす、EKS の特徴であり、問われた SLA の特徴とは別です。",
       "references": [
         {
+          "title": "Secure and resizable cloud compute – Amazon EC2 – Amazon Web Services",
           "url": "https://aws.amazon.com/ec2/"
         },
         {
+          "title": "Managed Kubernetes Service - Amazon EKS - AWS",
           "url": "https://aws.amazon.com/eks/"
         },
         {
+          "title": "Serverless Compute Engine – AWS Fargate – AWS",
           "url": "https://aws.amazon.com/fargate/"
         },
         {
+          "title": "Network Gateway – AWS Transit Gateway – Amazon Web Services",
           "url": "https://aws.amazon.com/transit-gateway/"
         }
       ],
@@ -7111,15 +7574,19 @@
       "explanation": "## 問われている要件\nコンピューティングサービスについて、正しい説明を 2 つ選ぶ問題です。\n\n## 正解の決め手\nEC2 は 1,000 を超えるインスタンスタイプを持ち、Intel・AMD・Arm のプロセッサーから選べます。Fargate は AWS Batch と組み合わせると、データ処理のワークロードを並列に実行できます。\n\n## 他の選択肢が誤りである理由\n\n仮想サーバーのインスタンスタイプは数十種類で、プロセッサーは 1 社のものに限られる。\n\nインスタンスタイプは 1,000 を超え、プロセッサーも Intel・AMD・Arm から選べます。数十種類で 1 社限りではありません。\n\nコードを実行するサービスは、サーバーの管理が必要で、固定料金で提供される。\n\nコードを実行するサービスは、利用量に応じた課金で、インフラの管理も不要です。固定料金で管理が必要というのは逆です。\n\n設定管理のツールは、利用量に応じて課金され、インフラを管理せずにコードを実行できる。\n\nコードを実行するサービスの特徴を、設定管理のツールに当てはめた誤りです。設定管理のツールは、アプリケーションの設定に関わるものです。",
       "references": [
         {
+          "title": "Secure and resizable cloud compute – Amazon EC2 – Amazon Web Services",
           "url": "https://aws.amazon.com/ec2/"
         },
         {
+          "title": "Serverless Compute Engine – AWS Fargate – AWS",
           "url": "https://aws.amazon.com/fargate/"
         },
         {
+          "title": "Serverless Computing - AWS Lambda - Amazon Web Services",
           "url": "https://aws.amazon.com/lambda/"
         },
         {
+          "title": "Centralized Operations Hub – AWS Systems Manager – Amazon Web Services",
           "url": "https://aws.amazon.com/systems-manager/"
         }
       ],
@@ -7160,18 +7627,23 @@
       "explanation": "## 問われている要件\nAWS のサービスや仕組みについて、正しい説明を 2 つ見分ける問題です。\n\n## 正解の決め手\nLicense Manager は、ソフトウェアライセンスを AWS とオンプレミスの両方にまたがって管理するためのサービスです。また、全メンバーアカウントの請求を一本化すると、利用量が合算され、大量利用による割引などの効果を得られます。\n\n## 他の選択肢が誤りである理由\n\nEC2 は、99% の可用性を約束する SLA を掲げている。\n\nEC2 の SLA が約束する可用性は、**99%** ではなく、それより高い水準です。数値が事実と異なります。\n\nFargate を使う場合も、利用者がサーバーの管理を自分で担う必要がある。\n\nFargate を使うと、サーバーの管理は AWS に任せられ、利用者はアプリの開発に集中できます。説明は逆です。\n\nSES を使うには、最低料金の支払いと前払いの契約が必要である。\n\nSES の料金は、送ったメールの分だけ支払う方式です。最低料金や前払いの約束は要りません。",
       "references": [
         {
+          "title": "Secure and resizable cloud compute – Amazon EC2 – Amazon Web Services",
           "url": "https://aws.amazon.com/ec2/"
         },
         {
+          "title": "Serverless Compute Engine – AWS Fargate – AWS",
           "url": "https://aws.amazon.com/fargate/"
         },
         {
+          "title": "License Manager Software - Amazon License Manager - AWS",
           "url": "https://aws.amazon.com/license-manager/"
         },
         {
+          "title": "Cloud Administration – AWS Organizations – Amazon Web Services",
           "url": "https://aws.amazon.com/organizations/"
         },
         {
+          "title": "Email Service Provider — Amazon Simple Email Service (Amazon SES) — AWS",
           "url": "https://aws.amazon.com/ses/"
         }
       ],
@@ -7212,15 +7684,19 @@
       "explanation": "## 問われている要件\n多数のネットワークをまたぐ展開で、接続設定の手作業を減らすことです。\n\n## 正解の決め手\n多数の VPC をまたぐ展開では、VPC どうしのピア接続やルート表の手作業を減らせる仕組みが課題に合います。\n\n## 他の選択肢が誤りである理由\n\n仮想サーバーのワークロードを別のリージョンやアカウントへ移す\n\nリージョンやアカウントをまたいでワークロードを移せることは、移行の機能です。ネットワーク間の接続設定を減らす課題の解決にはなりません。\n\n深層学習用に事前構成された環境で、アプリケーションを構築する\n\n事前構成された環境で深層学習のアプリを作るのは、機械学習の開発向けの機能です。ネットワーク接続の課題とは無関係です。\n\n好みのリレーショナルデータベースエンジンをオンプレミスでも展開する\n\nデータベースエンジンの展開先を選べることは、データベースの話です。ネットワーク間の接続の手作業は減りません。",
       "references": [
         {
+          "title": "Rehost applications to AWS - AWS Transform MGN - AWS",
           "url": "https://aws.amazon.com/application-migration-service/"
         },
         {
+          "title": "Machine Learning (ML) on AWS - ML Models and Tools - AWS",
           "url": "https://aws.amazon.com/machine-learning/"
         },
         {
+          "title": "Fully Managed Relational Database – Amazon RDS – AWS",
           "url": "https://aws.amazon.com/rds/"
         },
         {
+          "title": "Network Gateway – AWS Transit Gateway – Amazon Web Services",
           "url": "https://aws.amazon.com/transit-gateway/"
         }
       ],
@@ -7257,12 +7733,15 @@
       "explanation": "## 問われている要件\n低遅延、拠点内でのデータ処理、データの所在という 3 つの条件を同時に満たす方法を選ぶ問題です。\n\n## 正解の決め手\n近くのパブリッククラウドでも間に合わない低遅延には、拠点で動かす用途が合います。AWS のコンピュートなどを拠点に広げれば、遅延、拠点内処理、データの所在の要件に応えられます。\n\n## 他の選択肢が誤りである理由\n\n最寄りのパブリッククラウドのサーバーにデータを集めて処理する\n\n近くのパブリッククラウドのサーバーでは間に合わない低遅延の要件が前提なので、そこへ集める案は条件と逆になります。\n\nEC2 のインスタンスタイプをより大きな型に変更して処理する\n\nインスタンスタイプは資源の組み合わせが異なる用途別の型であり、処理の場所を拠点へ移す手段ではないため、遅延と所在の要件は満たせません。\n\nネットワークとファイアウォールの管理ルールを簡素にして費用を抑える\n\n管理ルールの簡素化と NAT 関連の費用の削減は、運用と費用の話です。低遅延やデータの所在の要件には対応しません。",
       "references": [
         {
+          "title": "Instance Types",
           "url": "https://aws.amazon.com/ec2/instance-types/"
         },
         {
+          "title": "On Premises Private Cloud - AWS Outposts - AWS",
           "url": "https://aws.amazon.com/outposts/"
         },
         {
+          "title": "VPC Networking – AWS PrivateLink – Amazon Web Services",
           "url": "https://aws.amazon.com/privatelink/"
         }
       ],
@@ -7299,15 +7778,19 @@
       "explanation": "## 問われている要件\n復旧後に、元の拠点の問題が解決した時点で何ができるかが問われています。\n\n## 正解の決め手\n元の拠点の問題が解決したら、データの複製を元の拠点へ戻せます。したがって C が正解です。\n\n## 他の選択肢が誤りである理由\n\n新しいイメージを残し、不要なイメージをアーカイブする\n\nライフサイクルのルールは、イメージの保管を整理するものです。元の拠点へデータを戻す操作ではありません。\n\nEC2 のワークロードを、別のリージョンやアカウントへ移す\n\nワークロードを別のリージョンやアカウントへ移す機能は、移動の機能です。復旧後に、複製したデータを元の拠点へ戻す操作とは異なります。\n\n利用者の接続先を、固定の IP アドレスに切り替える\n\n固定の IP アドレスは、利用者がエンドポイントへ接続するための仕組みです。元の拠点へデータを戻すことには当たりません。",
       "references": [
         {
+          "title": "Rehost applications to AWS - AWS Transform MGN - AWS",
           "url": "https://aws.amazon.com/application-migration-service/"
         },
         {
+          "title": "Disaster Recovery Service - AWS Elastic Disaster Recovery - AWS",
           "url": "https://aws.amazon.com/disaster-recovery/"
         },
         {
+          "title": "Fully Managed Container Registry – Amazon Elastic Container Registry – Amazon Web Services",
           "url": "https://aws.amazon.com/ecr/"
         },
         {
+          "title": "Network Acceleration Service - AWS Global Accelerator - AWS",
           "url": "https://aws.amazon.com/global-accelerator/"
         }
       ],
@@ -7344,18 +7827,23 @@
       "explanation": "## 問われている要件\nAWS のセキュリティ、コンプライアンス、監視にまつわる機能の説明のうち、事実として正しいものを 2 つ見分ける問題です。\n\n## 正解の決め手\nBは、AWS Artifact で AWS との合意の確認・承諾・終了・取得ができ、複数のアカウントへ適用できる点が事実と一致します。Dは、Amazon が発行した証明書では更新がマネージドで提供される点が事実と一致します。\n\n## 他の選択肢が誤りである理由\n\nCloudWatch はログの収集に特化しており、メトリクスやトレースの集約、アカウントをまたぐ可観測性には対応していない\n\nCloudWatch はメトリクス・ログ・トレースを集めて可視化するサービスで、複合アラーム、異常検知、アカウントをまたぐ可観測性の機能も備えています。ログ専用ではありません。\n\nCloudTrail Lake にはダッシュボード機能がなく、傾向の可視化には別のサービスが必要である\n\nCloudTrail Lake には、ダッシュボードで傾向を可視化する機能があります。別のサービスを必要とするという説明は逆です。\n\naws login コマンドで CLI から使うには、コンソール用とは別にアクセスキーを発行する必要がある\n\naws login コマンドは、既存のコンソール用の認証情報を使って CLI からアクセスするものです。別にアクセスキーを発行する必要はありません。\n## まとめ\n各サービスの機能は、具体的に何ができるかをセットで覚えておくと、否定的な言い回しの誤答を見抜けます。",
       "references": [
         {
+          "title": "Security Compliance Management - AWS Artifact - AWS",
           "url": "https://aws.amazon.com/artifact/"
         },
         {
+          "title": "Certificate Manager - AWS Certificate Manager - AWS",
           "url": "https://aws.amazon.com/certificate-manager/"
         },
         {
+          "title": "AWS CLI",
           "url": "https://aws.amazon.com/cli/"
         },
         {
+          "title": "API Logs - Secure Standardized Logging Service - AWS CloudTrail - AWS",
           "url": "https://aws.amazon.com/cloudtrail/"
         },
         {
+          "title": "Amazon Monitoring and Observability-Amazon CloudWatch - AWS",
           "url": "https://aws.amazon.com/cloudwatch/"
         }
       ],
@@ -7396,15 +7884,19 @@
       "explanation": "## 問われている要件\n社内ディレクトリの認証情報による、複数アカウントへのシングルサインオンを担うサービスを選びます。\n\n## 正解の決め手\nIAM Identity Center は、社内ディレクトリの認証情報で複数アカウントにサインオンでき、ワークフォースのアクセス管理の推奨サービスとされています。\n\n## 他の選択肢が誤りである理由\n\n私設認証局を中央で管理する仕組み\n\n複数アカウントで証明書を発行するための管理で、シングルサインオンは担いません。\n\n脅威を検出する GuardDuty\n\nアカウントとワークロードを監視して悪意ある活動を検出するサービスで、サインオンは担いません。\n\n保管データを暗号化する仕組み\n\n保管データの暗号化は規制適合を助けるデータ保護で、利用者の認証やサインオンとは別の役割です。",
       "references": [
         {
+          "title": "Security HSM - AWS CloudHSM - AWS",
           "url": "https://aws.amazon.com/cloudhsm/"
         },
         {
+          "title": "Intelligent Threat Detection – Amazon GuardDuty – AWS",
           "url": "https://aws.amazon.com/guardduty/"
         },
         {
+          "title": "Single-Sign On SAML - SSO Provider - AWS IAM Identity Center - AWS",
           "url": "https://aws.amazon.com/iam/identity-center/"
         },
         {
+          "title": "Resource Sharing – AWS Resource Access Manager – Amazon Web Services",
           "url": "https://aws.amazon.com/ram/"
         }
       ],
@@ -7441,12 +7933,15 @@
       "explanation": "## 問われている要件\nデータの所在に関する規制がある場合の、アプリの移行の判断を問うています。\n\n## 正解の決め手\nデータの所在に関する規制を守るため、アプリを元の環境に残すことがあります。そのため C が正解です。\n\n## 他の選択肢が誤りである理由\n\n規制の有無に関係なく、すべてのアプリを早めに移行する\n\n規制を守るために、アプリを元の環境に残すことがあります。規制の有無を無視して一律に移行するのは、条件の読み違いです。\n\n基盤のセキュリティで規制は満たされるため、考慮しない\n\n基盤のセキュリティと信頼性を利用できることは、データの所在の規制を満たすこととは別です。規制は考慮する必要があります。\n\n容量を自動で拡大縮小する仕組みを使えば、規制を避けられる\n\n移行に必要な容量を自動で用意し、需要に合わせて拡大縮小する仕組みは、規制を避ける手段ではありません。",
       "references": [
         {
+          "title": "Cloud Database Migration – AWS Database Migration Service (AWS DMS) Features – AWS",
           "url": "https://aws.amazon.com/dms/schema-conversion-tool/"
         },
         {
+          "title": "Virtual Private Server and Web Hosting–Amazon Lightsail—Amazon Web Services",
           "url": "https://aws.amazon.com/lightsail/"
         },
         {
+          "title": "About the migration strategies - AWS Prescriptive Guidance",
           "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html"
         }
       ],
@@ -7483,9 +7978,11 @@
       "explanation": "## 正解の決め手\nAZ は、1 つ以上の離散したデータセンターからなり、電力・ネットワーク・接続が冗長化されています。\n\n## 他の選択肢が誤りである理由\n\n電力やネットワークを他と共有する、1 台の物理サーバー\n\nAZ は電力やネットワークを冗長化したデータセンターで、共有する 1 台のサーバーという意味ではありません。\n\n複数のリージョンにまたがって構成される、1 つのデータセンター\n\nAZ は 1 つのリージョンを構成する単位で、複数のリージョンにまたがるものではありません。\n\nLocal Zones や Wavelength と同じ意味で使う呼び名\n\nLocal Zones や Wavelength は、Region のほかにワークロードを置く場所の選択肢で、AZ とは別のものです。",
       "references": [
         {
+          "title": "Global Infrastructure - AWS",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/"
         },
         {
+          "title": "Global Infrastructure Regions & AZs",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/"
         }
       ],
@@ -7522,9 +8019,11 @@
       "explanation": "## 問われている要件\nWell-Architected フレームワークの柱のうち、運用上の優秀性とパフォーマンス効率の重点を正しく区別できるかが問われています。\n\n## 正解の決め手\n運用上の優秀性は、システムの稼働と監視、手順の継続的な改善に重点を置く柱です。パフォーマンス効率は、用途に合った資源の種類と規模を選び、効率を保つことに重点を置く柱です。この 2 つの組み合わせが、選択肢 C と選択肢 E です。\n\n## 他の選択肢が誤りである理由\n\n運用上の優秀性の柱は、用途に合った資源の種類と規模を選ぶことに重点を置く。\n\n資源の種類と規模を選ぶのはパフォーマンス効率の柱の重点です。運用上の優秀性は、稼働と監視、手順の継続的な改善に重点を置きます。\n\nこのフレームワークは、事業変革の成果を加速するための指針を与える。\n\n事業変革の成果を加速するための指針を与えるのは AWS CAF です。Well-Architected フレームワークは、ワークロードの設計と運用の考え方と設計原則を示します。\n\nパフォーマンス効率の柱は、システムの稼働と監視、手順の改善に重点を置く。\n\n稼働と監視、手順の改善に重点を置くのは運用上の優秀性の柱です。パフォーマンス効率の柱とは重点が逆になっています。\n## まとめ\n柱ごとに、何に重点を置くかをセットで覚えておきましょう。",
       "references": [
         {
+          "title": "AWS Well-Architected - Build secure, efficient cloud applications",
           "url": "https://aws.amazon.com/architecture/well-architected/"
         },
         {
+          "title": "AWS Cloud Adoption Framework",
           "url": "https://aws.amazon.com/cloud-adoption-framework/"
         }
       ],
@@ -7565,6 +8064,7 @@
       "explanation": "## 問われている要件\nリージョンを構成する AZ の数についての理解が問われています。\n\n## 正解の決め手\nリージョンは、隔離され物理的に離れた三つ以上の AZ で構成されます。\n\n## 他の選択肢が誤りである理由\n\nちょうど二つの AZ で構成される\n\nリージョンは三つ以上の AZ で構成されるため、二つだけという数は誤りです。\n\n一つのデータセンターだけで構成される\n\nリージョンは隔離され物理的に離れた複数の AZ で構成されます。データセンター一つだけではありません。\n\n五つの AZ に固定されて構成される\n\nAZ の数は五つに固定されるのではなく、三つ以上という下限で示されます。",
       "references": [
         {
+          "title": "Global Infrastructure Regions & AZs",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/"
         }
       ],
@@ -7601,6 +8101,7 @@
       "explanation": "## 問われている要件\nレイクハウスが、どのサービスの何を組み合わせた考え方で、何のためのものかを説明する問題です。\n\n## 正解の決め手\nレイクハウスは、Amazon S3 のデータレイクと Amazon Redshift のデータウェアハウスを統合し、データの分断を減らす考え方です。\n\n## まとめ\n解答例: レイクハウスとは、S3 に置いたデータレイクと Redshift のデータウェアハウスを統合し、両者に分かれてしまうデータの分断を減らす考え方である。",
       "references": [
         {
+          "title": "The center for all your data, analytics, and AI – Amazon SageMaker – AWS",
           "url": "https://aws.amazon.com/sagemaker/"
         }
       ],
@@ -7635,18 +8136,23 @@
       "explanation": "## 問われている要件\nAWS のサービスや機能の説明のうち、正しい 2 つを選ぶ問題です。\n\n## 正解の決め手\n画像や動画の大量分析で人のレビューを補えること、ユーザー生成コンテンツを大量かつリアルタイムで自動翻訳できることが正しい説明です。\n\n## 他の選択肢が誤りである理由\n\nVPC を操作する Query API では、署名の生成やエラー処理を AWS が自動で行う\n\nQuery API は最も直接的に VPC を操作できますが、署名の生成やエラー処理などの低レベルな処理は、アプリケーション側で扱う必要があります。\n\nRoute 53 Resolver は、リージョンをまたいで動作するグローバルな DNS サービスである\n\nRoute 53 Resolver は、EC2 上の名前や公開名の再帰的な DNS 検索を行う地域のサービスで、グローバルなサービスではありません。\n\nイベントのストリーミングデータは、バッチ処理でしか分析できない\n\nストリーミングデータはリアルタイムに分析でき、障害に強い継続的なデータパイプラインも作れます。バッチ処理に限る説明は誤りです。",
       "references": [
         {
+          "title": "Big Data Platform – Amazon EMR – Amazon Web Services",
           "url": "https://aws.amazon.com/emr/"
         },
         {
+          "title": "Image recognition software, ML image analysis, and video analysis – Amazon Rekognition – AWS",
           "url": "https://aws.amazon.com/rekognition/"
         },
         {
+          "title": "Amazon Route 53 - DNS Service - AWS",
           "url": "https://aws.amazon.com/route53/"
         },
         {
+          "title": "Machine Translation Service — Amazon Translate — Amazon Web Services",
           "url": "https://aws.amazon.com/translate/"
         },
         {
+          "title": "What is Amazon VPC? - Amazon Virtual Private Cloud",
           "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
         }
       ],
@@ -7687,6 +8193,7 @@
       "explanation": "## 正解の決め手\n信頼性の柱が重んじるのは、求められた動作を保ち続けることと、障害が起きても素早く元に戻ることです。\n\n## 他の選択肢が誤りである理由\n\n運用にかかる費用を最小限に抑え続けること\n\n費用の最小化は別の観点です。信頼性の柱は、機能し続けることと障害からの速やかな回復に重点を置きます。\n\n障害が起きないよう、すべての構成要素を同一の場所に集約すること\n\n障害を前提に、機能を保ち速やかに回復することが重点です。構成要素の集約を求めるものではありません。\n\n利用者数に応じて、容量を手作業で調整すること\n\n信頼性の柱の重点は、要求どおりの動作の継続と障害からの回復です。容量の手作業調整は含まれません。",
       "references": [
         {
+          "title": "AWS Well-Architected - Build secure, efficient cloud applications",
           "url": "https://aws.amazon.com/architecture/well-architected/"
         }
       ],
@@ -7723,15 +8230,19 @@
       "explanation": "## 問われている要件\n複数のアカウントの支払いを 1 か所にまとめる方法を選ぶ問題です。\n\n## 正解の決め手\n複数のアカウントの支払いは、管理アカウントが 1 つにまとめて行えます。請求を統合する役割は、管理アカウントが持ちます。\n\n## 他の選択肢が誤りである理由\n\n費用の最適化の推奨機能を使い、各アカウントの請求を 1 つに合算する\n\n推奨機能は費用の最適化について支援を受けるためのもので、複数アカウントの請求を合算する機能ではありません。\n\n一定の使用量を約束する料金プランを購入し、各アカウントの請求を統合する\n\n使用量を約束する料金プランは、オンデマンド価格からの値引きを得る仕組みです。請求の統合は、管理アカウントが行います。\n\nバッチ処理の計画機能を使い、各アカウントの支払いを 1 回にまとめる\n\nバッチ処理の計画は、処理を実行する基盤をまたいで計画する機能で、適用範囲が支払いの統合とは異なります。",
       "references": [
         {
+          "title": "Amazon EC2 – Secure and resizable compute capacity – AWS",
           "url": "https://aws.amazon.com/ec2/pricing/"
         },
         {
+          "title": "Fully Managed Container Solution – Amazon Elastic Container Service (Amazon ECS) - Amazon Web Services",
           "url": "https://aws.amazon.com/ecs/"
         },
         {
+          "title": "AI-powered cloud support – AWS Support plans – AWS",
           "url": "https://aws.amazon.com/premiumsupport/"
         },
         {
+          "title": "Consolidating billing for AWS Organizations - AWS Billing",
           "url": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/consolidated-billing.html"
         }
       ],
@@ -7768,6 +8279,7 @@
       "explanation": "## 問われている要件\n需要に合わせた自動の増減で、費用がどこまで下がるとされているかを問う問題です。\n\n## 正解の決め手\n容量を細かく自動で増減させると、ピーク時の容量を確保し続ける場合に比べ、費用を最大 90% 抑えられるとされています。\n\n## 他の選択肢が誤りである理由\n\n最大 50% 抑えられる\n\n削減の上限は 90% とされており、50% は数値が異なります。\n\n最大 30% 抑えられる\n\n30% は上限の数値ではありません。示されている上限は 90% です。\n\n最大 10% 抑えられる\n\n自動で増減しても費用はほとんど下がらないという誤解です。実際は最大 90% の削減とされています。",
       "references": [
         {
+          "title": "Amazon DocumentDB- Serverless, fully managed, MongoDB API-compatible document database",
           "url": "https://aws.amazon.com/documentdb/"
         }
       ],
@@ -7804,9 +8316,11 @@
       "explanation": "## 正解の決め手\nリージョンは、隔離されていて物理的にも離れた AZ が 3 つ以上集まって構成されます。\n\n## 他の選択肢が誤りである理由\n\n1 つの AZ のみ\n\nリージョンは 1 つの AZ ではなく、3 つ以上の AZ で構成されます。\n\n2 つの AZ のみ\n\n2 つだけではなく、3 つ以上の AZ で構成されるのがリージョンです。\n\nAZ は持たず、Local Zones だけで構成される\n\nLocal Zones は、リージョンとは別にワークロードを置ける場所の選択肢で、リージョンの構成要素ではありません。",
       "references": [
         {
+          "title": "Global Infrastructure - AWS",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/"
         },
         {
+          "title": "Global Infrastructure Regions & AZs",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/"
         }
       ],
@@ -7843,6 +8357,7 @@
       "explanation": "## 問われている要件\n利用者だけが責任を負う統制の例を選ぶ問題です。\n\n## 正解の決め手\n利用するアプリケーションに基づいて利用者だけが責任を負う統制として、ゾーンの分離が例に挙がります。\n\n## 前提知識\nAWS が担うのは、クラウドを動かす基盤(ハードウェア、ソフトウェア、ネットワーク、施設)の保護です。利用者の責任は、使うサービスやリージョン、法規制などで変わります。\n\n## 他の選択肢が誤りである理由\n\nクラウドを動かすハードウェアの保護\n\nハードウェアの保護は、AWS が担うクラウド基盤の保護に含まれます。利用者だけの責任ではありません。\n\nクラウドを動かす施設の保護\n\n施設の保護も AWS が担う基盤の保護です。利用者が単独で負う統制ではありません。\n\nクラウドを動かすソフトウェアの保護\n\nクラウドを動かすソフトウェアの保護は AWS の担当範囲で、利用者だけの統制の例ではありません。",
       "references": [
         {
+          "title": "Shared Responsibility Model - Amazon Web Services (AWS)",
           "url": "https://aws.amazon.com/compliance/shared-responsibility-model/"
         }
       ],
@@ -7879,6 +8394,7 @@
       "explanation": "## 問われている要件\nAZ がどのような単位かを理解しているかが問われています。\n\n## 正解の決め手\nAZ は一つ以上の離散したデータセンターで、電力、ネットワーク、接続を冗長化しています。\n\n## 他の選択肢が誤りである理由\n\n世界中に置かれる、コンテンツを利用者に近い場所で配信する拠点\n\n配信拠点は Edge の拠点の説明です。AZ は電力やネットワークを冗長化したデータセンターの単位です。\n\n複数のリージョンをまとめて管理するための論理的なグループ\n\n包含関係が逆で、リージョンが三つ以上の AZ で構成されます。\n\n電力とネットワークを共有する、一つのラックだけの小さな単位\n\nAZ は一つ以上のデータセンターで、電力などを冗長化しており、ラック一つの単位ではありません。",
       "references": [
         {
+          "title": "Global Infrastructure Regions & AZs",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/"
         }
       ],
@@ -7915,15 +8431,19 @@
       "explanation": "## 問われている要件\nVPC 自体の機能として当てはまるものを選びます。\n\n## 正解の決め手\nVPC では、接続の監視、通信の検査、インスタンスへのアクセス制限を行えます。\n\n## 他の選択肢が誤りである理由\n\n生成 AI の洞察で、脅威の内容を素早く理解する\n\n生成 AI の洞察は、調査を加速するためのセキュリティ機能です。VPC の機能ではありません。\n\n用意済みのビルド環境を選び、成果物を自分の鍵で暗号化する\n\nビルド環境の選択と成果物の暗号化は、ビルドを扱う機能の特徴です。VPC で行うことではありません。\n\n多数の脆弱性情報源から、ゼロデイの脆弱性を自動で見つける\n\n脆弱性の発見と振り分けの自動化は、脆弱性管理の機能の役割で、VPC の通信制御とは対象が異なります。",
       "references": [
         {
+          "title": "Managed Build Server - AWS CodeBuild - AWS",
           "url": "https://aws.amazon.com/codebuild/"
         },
         {
+          "title": "Security Investigation Visualization - Amazon Detective - AWS",
           "url": "https://aws.amazon.com/detective/"
         },
         {
+          "title": "Automated Software Vulnerability Management - Amazon Inspector - AWS",
           "url": "https://aws.amazon.com/inspector/"
         },
         {
+          "title": "Logically Isolated Virtual Private Cloud—Amazon VPC – Amazon Web Services",
           "url": "https://aws.amazon.com/vpc/"
         }
       ],
@@ -7960,15 +8480,19 @@
       "explanation": "## 問われている要件\n保管用のデータレイクと分析用のデータウェアハウスを別々に持つことで生じる、データの分断を減らす考え方が問われています。\n\n## 正解の決め手\nデータレイクとデータウェアハウスを統合して分断を減らす考え方は、レイクハウスです。\n\n## 他の選択肢が誤りである理由\n\n読み取り専用の複製を増やした負荷分散の構成\n\n読み取り専用のレプリカで負荷を分散するのは、1 つのクラスターを拡張する話です。データレイクとウェアハウスの統合ではありません。\n\n複数の通信事業者を使った文字メッセージの送信\n\n複数の事業者にまたがる冗長性は、文字メッセージ送信の特徴です。データの分断を減らす考え方ではありません。\n\n機器をクラウドへ安全に接続するための仕組み\n\n機器をクラウドへつなぐのは接続のためのサービスの役割で、保管と分析の基盤を統合する考え方とは適用範囲が異なります。",
       "references": [
         {
+          "title": "Secure IoT Gateway, IoT Gateway Device - AWS IoT Core - AWS",
           "url": "https://aws.amazon.com/iot-core/"
         },
         {
+          "title": "Managed Graph Database – Amazon Neptune – AWS",
           "url": "https://aws.amazon.com/neptune/"
         },
         {
+          "title": "The center for all your data, analytics, and AI – Amazon SageMaker – AWS",
           "url": "https://aws.amazon.com/sagemaker/"
         },
         {
+          "title": "Push Notification Service - Amazon Simple Notification Service (SNS) - AWS",
           "url": "https://aws.amazon.com/sns/"
         }
       ],
@@ -8005,15 +8529,19 @@
       "explanation": "## 問われている要件\nVPC を最も直接的に操作でき、その代わりに低レベルな処理を呼び出し側が担う手段を選びます。\n\n## 正解の決め手\nQuery API は、VPC を最も直接的に操作できる一方で、署名の生成やエラー処理をアプリケーション側で扱う必要があります。\n\n## 他の選択肢が誤りである理由\n\nHTTP API(サーバーレス向けの RESTful API を作る手段)\n\nHTTP API は、サーバーレスや HTTP のバックエンド向けの RESTful API を作るための手段です。VPC を直接操作する方法ではありません。\n\nRoute 53 Resolver(再帰的な DNS 検索を行う地域のサービス)\n\nRoute 53 Resolver は、EC2 上の名前や公開名の再帰的な DNS 検索を行う地域の DNS サービスで、VPC を操作する API ではありません。\n\nEC2 のインスタンスタイプ(用途別の仮想サーバー構成の型)\n\nインスタンスタイプは、資源の組み合わせが異なる仮想サーバーの型にすぎません。VPC を操作する方法ではなく、署名の生成とも関係しません。",
       "references": [
         {
+          "title": "Amazon API Gateway | API Management | Amazon Web Services",
           "url": "https://aws.amazon.com/api-gateway/"
         },
         {
+          "title": "Instance Types",
           "url": "https://aws.amazon.com/ec2/instance-types/"
         },
         {
+          "title": "Amazon Route 53 - DNS Service - AWS",
           "url": "https://aws.amazon.com/route53/"
         },
         {
+          "title": "What is Amazon VPC? - Amazon Virtual Private Cloud",
           "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
         }
       ],
@@ -8050,6 +8578,7 @@
       "explanation": "## 問われている要件\nAmazon Lex の課金の仕組みを問う問題です。\n\n## 正解の決め手\nAmazon Lex は、利用した分だけ支払う従量課金で、前払いや最低料金がありません。したがって C が正解です。\n\n## 他の選択肢が誤りである理由\n\n年間契約の前払いが必要で、利用量に応じて割引がある\n\n前払いは必要ありません。利用した分だけを支払う従量課金です。\n\n月ごとの最低料金が設定され、超えた分だけ従量で課金される\n\n最低料金はありません。最低料金を超えた分だけという条件は付きません。\n\n利用者数に応じた固定のライセンス料を、毎月支払う\n\n課金は利用量に応じた従量であり、利用者数に応じた固定のライセンス料ではありません。\n## まとめ\n前払いや最低料金のない従量課金であることを押さえましょう。",
       "references": [
         {
+          "title": "AI Chat Builder - Amazon Lex - AWS",
           "url": "https://aws.amazon.com/lex/"
         }
       ],
@@ -8086,9 +8615,11 @@
       "explanation": "## 問われている要件\n可用性と耐障害性を高めるという目的に合う配置の考え方を選びます。\n\n## 正解の決め手\nアプリを複数のゾーンに分けて配置すると、可用性と耐障害性を高められます。ゾーンは隔離され、物理的にも離れているため、分散させる意味があります。\n\n## 他の選択肢が誤りである理由\n\nアプリを一つのゾーンにまとめて配置する\n\n複数のゾーンに分けて配置すると高められるので、一つにまとめるのは逆の方向です。\n\nアプリを利用者に近い Local Zones だけに配置する\n\nLocal Zones は、リージョンの延長として利用者の近くに置く仕組みです。複数ゾーンに分ける方法とは目的が違います。\n\nアプリを Athena に置き換えてサーバーレスにする\n\nAthena はサーバーレスの分析サービスです。アプリを分散配置して可用性を高める手段ではありません。",
       "references": [
         {
+          "title": "Global Infrastructure Regions & AZs",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/"
         },
         {
+          "title": "Interactive SQL - Serverless Query Service - Amazon Athena - AWS",
           "url": "https://aws.amazon.com/athena/"
         }
       ],
@@ -8125,15 +8656,19 @@
       "explanation": "## 問われている要件\nコンソール用の認証情報を流用して、CLI から AWS にプログラムでアクセスする方法が求められています。\n\n## 正解の決め手\naws login コマンドを使うと、既存のコンソール用の認証情報で CLI からアクセスできます。\n\n## 他の選択肢が誤りである理由\n\n証明書を用意して管理し、通信を安全にする\n\n証明書は通信を安全にするためのもので、CLI からのプログラムによるアクセスの手段ではありません。\n\nダッシュボードで傾向を可視化して確認する\n\nダッシュボードは傾向の可視化のためのものです。CLI からアクセスする手段にはなりません。\n\nセルフサービスの画面から報告書を取り出す\n\n報告書の取り出しは、法令遵守などの確認の手間を減らすためのものです。CLI からのアクセス手段ではありません。",
       "references": [
         {
+          "title": "Security Compliance Management - AWS Artifact - AWS",
           "url": "https://aws.amazon.com/artifact/"
         },
         {
+          "title": "Certificate Manager - AWS Certificate Manager - AWS",
           "url": "https://aws.amazon.com/certificate-manager/"
         },
         {
+          "title": "AWS CLI",
           "url": "https://aws.amazon.com/cli/"
         },
         {
+          "title": "API Logs - Secure Standardized Logging Service - AWS CloudTrail - AWS",
           "url": "https://aws.amazon.com/cloudtrail/"
         }
       ],
@@ -8170,15 +8705,19 @@
       "explanation": "## 問われている要件\nAWS が第三者の検証を受けている事実と、利用者側の責任の関係を正しく理解しているかが問われています。\n\n## 正解の決め手\nAWS は主要な準拠基準に対応しており、利用者が要件を満たす助けになります。ただし、コンプライアンスの法令や規制を守る責任は、利用者にも残ります。\n\n## 他の選択肢が誤りである理由\n\n検証を受けた事業者を使えば、法令や規制を守る責任は利用者から事業者へすべて移る\n\n第三者の検証を受けた事業者を使っても、法令や規制を守る責任は利用者にも残ります。責任がすべて移るというのは誤解です。\n\nルートユーザーで日常の作業を行っても、検証済みの基盤なので要件を満たせる\n\nルートユーザーは完全なアクセス権を持つため、日常の作業には使わないことが強く推奨されます。検証済みの基盤でも、この運用で要件を満たせるとは言えません。\n\n適合要件の第三者検証は、利用者がワークロードごとに自分で依頼して受ける必要がある\n\n適合要件の第三者検証は、AWS が定期的に受けているものです。利用者がワークロードごとに依頼する性質のものではありません。",
       "references": [
         {
+          "title": "Cloud Compliance - Amazon Web Services (AWS)",
           "url": "https://aws.amazon.com/compliance/"
         },
         {
+          "title": "Compliance Programs - Amazon Web Services (AWS)",
           "url": "https://aws.amazon.com/compliance/programs/"
         },
         {
+          "title": "Active Directory – AWS Directory Service – AWS",
           "url": "https://aws.amazon.com/directoryservice/"
         },
         {
+          "title": "What is IAM? - AWS Identity and Access Management",
           "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html"
         }
       ],
@@ -8215,6 +8754,7 @@
       "explanation": "## 問われている要件\nAWS の外にあるワークロードを、AWS の側で監視する方法が問われています。\n\n## 正解の決め手\nAWS の外にあるオンプレミスや他のクラウドのワークロードも、CloudWatch エージェントでテレメトリを取り込んで監視できます。\n\n## 他の選択肢が誤りである理由\n\nCost Explorer のデータを使い、各ワークロードの状態を監視する\n\nCost Explorer は、コストと利用量を見るための機能です。外部のワークロードのテレメトリを取り込む手段ではありません。\n\nAmazon SageMaker を導入し、各ワークロードの状態を監視する\n\nAmazon SageMaker は、機械学習やデータ処理の基盤です。外部のワークロードを監視する手段として、エージェントの代わりにはなりません。\n\n監視できるのはクラウド上の資源だけなので、オンプレミスは対象外とする\n\nエージェントでテレメトリを取り込めば、オンプレミスや他のクラウドのワークロードも監視できます。対象外にする必要はありません。",
       "references": [
         {
+          "title": "Amazon Monitoring and Observability-Amazon CloudWatch - AWS",
           "url": "https://aws.amazon.com/cloudwatch/"
         }
       ],
@@ -8251,6 +8791,7 @@
       "explanation": "## 問われている要件\n可用性と耐障害性を高める配置の考え方が問われています。\n\n## 正解の決め手\n複数の AZ にアプリケーションを分けて置くと、可用性と耐障害性を高められます。\n\n## 他の選択肢が誤りである理由\n\nすべてを単一の AZ に集約して配置する\n\n単一の AZ に集約すると分散にならず、複数の AZ に分ける場合の可用性向上は得られません。\n\n障害に備えて、一つのデータセンターにまとめる\n\n一つのデータセンターにまとめると一か所の障害に弱くなり、複数の AZ に分ける考え方と逆です。\n\nユーザーに近い一つの場所に、全構成を置く\n\n近さを重視して一か所に全構成を置いても、複数の AZ への分散による耐障害性は得られません。",
       "references": [
         {
+          "title": "Global Infrastructure Regions & AZs",
           "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/"
         }
       ],
@@ -8287,12 +8828,15 @@
       "explanation": "## 問われている要件\n複数のサービスにまたがるデータストアのバックアップを担うサービスを選ぶ問題です。\n\n## 正解の決め手\nバケット、ボリューム、データベース、ファイルシステムといった主要なデータストアを、サービスをまたいでバックアップできるのは Backup です。\n\n## 他の選択肢が誤りである理由\n\nAWS Amplify\n\n要件を書くとリソースを自動で構成し、環境へ配置するサービスです。バックアップの役割ではありません。\n\nAWS Auto Scaling\n\n目標の利用率をもとにリソースの拡張を調整するもので、データを保護するバックアップとは目的が異なります。\n\nAmazon CloudFront\n\nエッジネットワークから配信するサービスです。データストアのバックアップを取る役割はありません。",
       "references": [
         {
+          "title": "Full Stack Development - Web and Mobile Apps - AWS Amplify",
           "url": "https://aws.amazon.com/amplify/"
         },
         {
+          "title": "App Scaling - AWS Application Auto Scaling - AWS",
           "url": "https://aws.amazon.com/autoscaling/"
         },
         {
+          "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
           "url": "https://aws.amazon.com/backup/"
         }
       ],
@@ -8329,6 +8873,7 @@
       "explanation": "## 問われている要件\nAWS Glue の位置づけと特徴を、2 つ選ぶ問題です。\n\n## 正解の決め手\nAWS Glue は、サーバーの管理が要らないデータ統合サービスで、分析用のデータを準備する役割を持ちます。この 2 点を述べた D と E が正答です。\n\n## 他の選択肢が誤りである理由\n\n自然言語の指示から、チャットボットの原型を生成するサービスである\n\nチャットボットの生成は別のサービスの用途です。このサービスの役割は、分析用のデータを準備するデータ統合です。\n\n複雑な業務の流れを、画面上で図のように組み立てるサービスである\n\n業務の流れを図で組み立てるのは別の用途です。このサービスは分析用のデータを準備するデータ統合の役割を持ちます。\n\n固定のアドレスを通じて、利用者をアプリケーションに接続するサービスである\n\n固定のアドレスで接続させるのはネットワーク側の話で、このサービスのデータ統合の役割とは別の範囲です。\n\nデータ統合に使うサーバーを、利用者が自分で用意し管理するサービスである\n\nこのサービスはサーバーの管理が要らない形で使えます。利用者がサーバーを用意し管理するという内容は逆です。\n## まとめ\nサービスの名前と役割を結びつけ、データ統合・分析の準備という用途で見分けましょう。",
       "references": [
         {
+          "title": "Serverless Data Integration – AWS Glue – Amazon Web Services",
           "url": "https://aws.amazon.com/glue/"
         }
       ],
@@ -8374,15 +8919,19 @@
       "explanation": "## 問われている要件\nコミュニティによる知識と支援を得られる場を選ぶ問題です。\n\n## 正解の決め手\nコミュニティの知識と支援は re:Post で得られると案内されています。D が該当します。\n\n## 他の選択肢が誤りである理由\n\nAWS Architecture Center\n\n設計の指針となる参照アーキテクチャや構成図、ホワイトペーパーをまとめた場であり、コミュニティによる支援を得る場ではありません。知識の入手先という点で紛らわしいだけです。\n\nAWS Trusted Advisor\n\n推奨の集約や API 連携による資源の最適化に役立つ仕組みです。助言を得られるように見えても、コミュニティによる支援の場ではありません。\n\nAWS Partner Paths\n\nパートナーとして登録する事業者向けの枠組みで、対象は販売や収益の拡大です。一般の利用者が知識を共有し支援を受ける場ではありません。\n## まとめ\nコミュニティによる知識と支援は re:Post、と覚えておきましょう。",
       "references": [
         {
+          "title": "Become an AWS Partner | AWS Partner Network",
           "url": "https://aws.amazon.com/partners/"
         },
         {
+          "title": "AI-powered cloud support – AWS Support plans – AWS",
           "url": "https://aws.amazon.com/premiumsupport/"
         },
         {
+          "title": "Best Practice Guidance for AWS Optimization - AWS Trusted Advisor",
           "url": "https://aws.amazon.com/premiumsupport/technology/trusted-advisor/"
         },
         {
+          "title": "An Overview of the AWS Cloud Adoption Framework - An Overview of the AWS Cloud Adoption Framework",
           "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/welcome.html"
         }
       ],
@@ -8419,6 +8968,7 @@
       "explanation": "## 問われている要件\nMarketplace の ISV を導入前に確認する方法を問う問題です。\n\n## 正解の決め手\nAWS Marketplace で販売する ISV は、そのセキュリティ・コンプライアンス報告書を使って事前に確認できます。\n\n## 他の選択肢が誤りである理由\n\nISV のアカウントの監査記録を直接閲覧して確認する\n\n確認に使うのは報告書です。ISV 側の監査記録を直接見るものではありません。\n\n報告書は確認できないため、導入後に自分で調べる\n\n報告書を使って事前に確認できるため、導入後まで待つ必要はありません。条件が逆です。\n\n報告書で確認できるのは、AWS 自身のサービスだけである\n\n確認の対象は Marketplace で販売する ISV です。AWS 自身のサービスに限る説明は範囲を取り違えています。",
       "references": [
         {
+          "title": "Security Compliance Management - AWS Artifact - AWS",
           "url": "https://aws.amazon.com/artifact/"
         }
       ],
@@ -8455,15 +9005,19 @@
       "explanation": "## 正解の決め手\nSite-to-Site VPN は、遠隔地にある拠点どうしを暗号化して安全に通信させるために使います。\n\n## 他の選択肢が誤りである理由\n\n認証情報などの機密情報を一か所で保管・管理する\n\n認証情報などを一か所で保管・管理する機能の説明で、拠点どうしを暗号化して通信させる用途ではありません。\n\n構成の履歴を確認して、インシデント後の状態を調べる\n\n構成の履歴でセキュリティの状態を調べる機能の説明で、通信を暗号化して拠点を結ぶものではありません。\n\n定期的なデータ分析で、機密データの保護状況を確認する\n\nデータ分析で機密データの検出と保護を確認する機能の説明で、拠点間の通信を結ぶ用途ではありません。",
       "references": [
         {
+          "title": "Config Tool – AWS Config – Amazon Web Services",
           "url": "https://aws.amazon.com/config/"
         },
         {
+          "title": "Cloud Database Migration – AWS Database Migration Service (AWS DMS) Features – AWS",
           "url": "https://aws.amazon.com/dms/schema-conversion-tool/"
         },
         {
+          "title": "Sensitive Data Discovery and Protection - Amazon Macie - AWS",
           "url": "https://aws.amazon.com/macie/"
         },
         {
+          "title": "Virtual Private Network (VPN) – AWS VPN – Amazon Web Services",
           "url": "https://aws.amazon.com/vpn/"
         }
       ],
