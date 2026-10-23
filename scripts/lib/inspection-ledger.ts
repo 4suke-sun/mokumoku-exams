@@ -50,21 +50,23 @@ export function requiredKinds(files: string[]): Kind[] {
   return files.some((f) => DEEP_PATHS.test(f)) ? ["inspector", "inspector-deep"] : ["inspector"];
 }
 
+/** 台帳の 1 件の検査。書き込み(writeLedger)と読み込み(parseLedger)の両方で使う。 */
+function isLedgerEntry(e: unknown): e is LedgerEntry {
+  return (
+    typeof e === "object" &&
+    e !== null &&
+    typeof (e as LedgerEntry).patchId === "string" &&
+    KINDS.includes((e as LedgerEntry).kind) &&
+    VERDICTS.includes((e as LedgerEntry).verdict) &&
+    typeof (e as LedgerEntry).rules === "string"
+  );
+}
+
 export function parseLedger(text: string): Ledger {
   try {
     const parsed = JSON.parse(text) as { entries?: unknown };
     if (!Array.isArray(parsed.entries)) return { entries: [] };
-    return {
-      entries: parsed.entries.filter(
-        (e): e is LedgerEntry =>
-          typeof e === "object" &&
-          e !== null &&
-          typeof (e as LedgerEntry).patchId === "string" &&
-          KINDS.includes((e as LedgerEntry).kind) &&
-          VERDICTS.includes((e as LedgerEntry).verdict) &&
-          typeof (e as LedgerEntry).rules === "string",
-      ),
-    };
+    return { entries: parsed.entries.filter(isLedgerEntry) };
   } catch {
     return { entries: [] };
   }
@@ -110,6 +112,12 @@ export function readLedger(path: string): Ledger {
   return existsSync(path) ? parseLedger(readFileSync(path, "utf8")) : { entries: [] };
 }
 
+/** 台帳を文字列にする。読み込み(parseLedger)と同じ検査に通らない記録があれば、書かずに例外にする(読み込みで黙って落ちる記録を作らない)。 */
+export function serializeLedger(ledger: Ledger): string {
+  if (!ledger.entries.every(isLedgerEntry)) throw new Error("台帳の記録の形が合わない");
+  return `${JSON.stringify(ledger, null, 2)}\n`;
+}
+
 export function writeLedger(path: string, ledger: Ledger): void {
-  writeFileSync(path, `${JSON.stringify(ledger, null, 2)}\n`);
+  writeFileSync(path, serializeLedger(ledger));
 }

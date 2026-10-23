@@ -44,6 +44,30 @@ describe("parseMetrics の検査", () => {
   });
 });
 
+describe("serializeMetric", () => {
+  it("読み込みの検査に通らない記録_書き出さずに例外にする", () => {
+    for (const record of [
+      { type: "agent", at: "t", name: "Bad Name", ms: 1, tokens: 1 },
+      { type: "agent", at: "t", name: "inspector", ms: 1.5, tokens: 1 },
+      { type: "agent", at: "t", name: "inspector", ms: 1, tokens: 1_000_000_000_000 },
+      verify([["lint", -1, true]]),
+    ] as MetricRecord[]) {
+      expect(() => serializeMetric(record)).toThrow();
+    }
+  });
+
+  it("書き出せた記録_どれも読み戻すと同じ内容になる", () => {
+    const records: MetricRecord[] = [
+      verify([
+        ["lint", 0, true],
+        ["test", 999_999_999_999, false],
+      ]),
+      { type: "agent", at: "t", name: "inspector-deep", ms: 0, tokens: 999_999_999_999 },
+    ];
+    expect(parseMetrics(records.map(serializeMetric).join(""))).toEqual(records);
+  });
+});
+
 describe("parseMetrics の verify の記録", () => {
   it("段階の時間が負・小数・上限超え_読み込まず、正しい記録だけ残す", () => {
     const line = (ms: number) =>

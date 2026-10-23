@@ -13,6 +13,7 @@ import {
   patchIdOf,
   requiredKinds,
   rulesHash,
+  serializeLedger,
 } from "./inspection-ledger.ts";
 
 const entry = (over: Partial<LedgerEntry> = {}): LedgerEntry => ({
@@ -73,6 +74,22 @@ describe("ledger", () => {
   it("壊れた台帳_空として読む", () => {
     expect(parseLedger("not json")).toEqual({ entries: [] });
     expect(parseLedger('{"entries":[{"patchId":1}]}')).toEqual({ entries: [] });
+  });
+
+  it("読み込みの検査に通らない記録_書き出さずに例外にする", () => {
+    const bad = [
+      { ...entry(), kind: "other" },
+      { ...entry(), verdict: "ok" },
+      { ...entry(), patchId: 1 },
+    ];
+    for (const e of bad) expect(() => serializeLedger({ entries: [entry(), e as unknown as LedgerEntry] })).toThrow();
+  });
+
+  it("書き出せた台帳_読み戻すと同じ内容になる", () => {
+    const ledger = {
+      entries: [entry(), entry({ kind: "inspector-deep", verdict: "WARN" }), entry({ kind: "mechanical" })],
+    };
+    expect(parseLedger(serializeLedger(ledger))).toEqual(ledger);
   });
 
   it("記録に差分の内容を持たない", () => {
