@@ -132,6 +132,9 @@ const SESSION_LINK_PATTERN: Pattern = {
 };
 
 const NOREPLY = /@users\.noreply\.github\.com$/;
+// Claude の署名の行で使う noreply アドレス。個人情報ではないので、作者・コミッターにも認める(完全一致だけ。大文字小文字は区別しない)。
+// 追加行のメールアドレスの検査(ALLOWED_EMAIL)には足さないので、そのまま書かずに組み立てる。
+export const CLAUDE_NOREPLY = ["noreply", "anthropic.com"].join("@");
 // GitHub 上でマージしたときに、GitHub が作るマージコミットのコミッター(作者ではなく、コミッターにだけ認める)
 const GITHUB_WEB_COMMITTER = "noreply@github.com";
 
@@ -286,12 +289,19 @@ export function checkEntries(
   return { blocks: [...new Set([...blocks, ...scan(entries, PII_CONTENT_PATTERNS)])], warns: [] };
 }
 
-/** 作者とコミッターのメールアドレスが、GitHub の noreply アドレスか(コミッターは、GitHub 上のマージも認める)。 */
+function isNoreplyAuthor(email: string): boolean {
+  return NOREPLY.test(email) || email.toLowerCase() === CLAUDE_NOREPLY;
+}
+
+/**
+ * 作者とコミッターのメールアドレスが、GitHub の noreply アドレスか、Claude の署名用の noreply アドレスか
+ * (コミッターは、GitHub 上のマージも認める)。
+ */
 export function checkAuthors(entries: CommitAuthor[]): string[] {
   const hits: string[] = [];
   for (const { sha, authorEmail, committerEmail } of entries) {
-    if (!NOREPLY.test(authorEmail)) hits.push(`noreply ではない作者アドレス: コミット ${sha}`);
-    if (!NOREPLY.test(committerEmail) && committerEmail !== GITHUB_WEB_COMMITTER)
+    if (!isNoreplyAuthor(authorEmail)) hits.push(`noreply ではない作者アドレス: コミット ${sha}`);
+    if (!isNoreplyAuthor(committerEmail) && committerEmail !== GITHUB_WEB_COMMITTER)
       hits.push(`noreply ではないコミッターアドレス: コミット ${sha}`);
   }
   return hits;

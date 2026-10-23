@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import { CLAUDE_NOREPLY } from "./lib/pr-secrets-check.ts";
 
 const script = fileURLToPath(new URL("./check-push-secrets.ts", import.meta.url));
 const ZERO = "0".repeat(40);
@@ -69,6 +70,19 @@ describe("check-push-secrets(基準のブランチが無い最初の push)", () 
 
   it("noreply ではない作者を止める", () => {
     const dir = makeRepo("someone@example.com", { "a.txt": "ok\n" }, "chore: add");
+    const r = runCheck(dir);
+    expect(r.status).toBe(1);
+    expect(r.stderr).toMatch(/noreply ではない作者アドレス/);
+  });
+
+  it("作者が Claude の署名用の noreply_通す", () => {
+    const dir = makeRepo(CLAUDE_NOREPLY, { "a.txt": "ok\n" }, "chore: add");
+    const r = runCheck(dir);
+    expect(r.status, r.stderr).toBe(0);
+  });
+
+  it("作者が Claude の署名用の noreply に似た別のアドレス_止める", () => {
+    const dir = makeRepo(`support@${CLAUDE_NOREPLY.split("@")[1]}`, { "a.txt": "ok\n" }, "chore: add");
     const r = runCheck(dir);
     expect(r.status).toBe(1);
     expect(r.stderr).toMatch(/noreply ではない作者アドレス/);

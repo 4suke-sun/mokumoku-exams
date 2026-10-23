@@ -88,7 +88,7 @@ PR の場合は、push 前のフックと同じ検査(範囲内の全コミッ�
 printf 'refs/heads/%s %s refs/heads/%s %s\n' "$(git branch --show-current)" "$(git rev-parse HEAD)" "$(git branch --show-current)" 0000000000000000000000000000000000000000 | node scripts/check-push-secrets.ts
 ```
 
-範囲の作者が、GitHub の noreply アドレスであることも確かめる(`git log --format='%h %ae' origin/main..HEAD`)。
+範囲の作者とコミッターが、GitHub の noreply アドレスか、Claude の署名の行(`Co-Authored-By:`)で使う noreply アドレスであることも確かめる(`git log --format='%h %ae %ce' origin/main..HEAD`。コミッターだけは、GitHub 上のマージが付ける noreply も認める。機械検査と同じ)。
 
 PR の下書きに `Closes` がある場合は、`Closes` の Issue と、マイルストーン・リリースノートの最新の版の対応も確かめる(`gh` で読むだけ。CI の PR でも同じ検査が動く):
 

@@ -22,11 +22,11 @@ commit のときに検査した差分は、台帳に記録されていれば読�
 2. push する範囲を決める: `git log --oneline origin/main..HEAD`(新規ブランチ)、
    既存ブランチなら `git log --oneline @{upstream}..HEAD`。**空なら、ここで止める**(push するものがない。
    `/dev-pr` は、このスキルを使わず、push を飛ばす条件を Step 6 で別に判断する。PR の作成が残っているので、push だけを飛ばして先へ進む)
-3. 範囲の全コミットの作者が、GitHub の noreply アドレスであることを確認する:
+3. 範囲の全コミットの作者とコミッターが、GitHub の noreply アドレスか、Claude の署名の行(`Co-Authored-By:`)で使う noreply アドレスであることを確認する:
    ```sh
-   git log --format='%h %ae' origin/main..HEAD
+   git log --format='%h %ae %ce' origin/main..HEAD
    ```
-   `…@users.noreply.github.com` 以外があれば、**止めて報告する**
+   `…@users.noreply.github.com` と Claude の署名用の noreply 以外があれば、**止めて報告する**(コミッターだけは、GitHub 上のマージが付ける noreply も認める。機械検査と同じ)
 4. `git remote get-url origin` が、意図したリポジトリであることを確認する
 
 ## Step 1. 機械的な検査
