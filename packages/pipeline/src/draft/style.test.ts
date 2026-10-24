@@ -211,6 +211,24 @@ describe("スタイル規則", () => {
     expect(rulesOf(bad)).toContain("explanation-heading explanation");
   });
 
+  it("誤りの理由の節_選択肢ごとの組なら通り、組にならない段落があれば止める", () => {
+    const head = "バケットは 100 個までです。\n\n## 他の選択肢が誤りである理由\n\n";
+    const wrongPairs = (d: Draft) => rulesOf(d).filter((r) => r.startsWith("explanation-wrong-pairs"));
+    // 選択肢の本文は、空白と読点・句点を除いて比べる
+    const ok = choiceDraft({ explanation: `${head}10個。\n\n小さすぎる誤りです。\n\n上限は ない\n\n上限はあります。` });
+    expect(wrongPairs(ok)).toEqual([]);
+    // 節がない解説は対象外
+    expect(wrongPairs(choiceDraft())).toEqual([]);
+    const intro = choiceDraft({ explanation: `${head}次のとおりです。\n\n10 個\n\n小さすぎる誤りです。` });
+    expect(wrongPairs(intro)).toEqual(["explanation-wrong-pairs explanation"]);
+    const noReason = choiceDraft({ explanation: `${head}10 個\n\n1,000 個\n\n大きすぎる誤りです。` });
+    expect(wrongPairs(noReason)).toEqual(["explanation-wrong-pairs explanation"]);
+    // 自由記述には選択肢がないので、対象外
+    expect(rulesOf(freeTextDraft({ explanation: `${head}補足です。` })).join(" ")).not.toContain(
+      "explanation-wrong-pairs",
+    );
+  });
+
   it("解説の記号_問題の記号は通り、存在しない記号と単独の大文字は止める", () => {
     const ok = choiceDraft({
       explanation: "正解は B です。A は小さすぎ、C は大きすぎます。AWS の上限とは別の話で、X-Ray とも関係しません。",
