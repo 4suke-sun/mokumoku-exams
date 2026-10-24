@@ -96,6 +96,9 @@ describe("checkEntries", () => {
     const id = `${"a1b2c3d4e5".repeat(2)}f6g7h8`;
     expect(checkEntries(entry(`COGNITO_CLIENT_ID=${id}`)).blocks).toEqual(["Cognito のクライアント ID: f.md:3"]);
     expect(checkEntries(entry(`clientId: "${id}"`)).blocks).toHaveLength(1);
+    // キーを引用符で囲んだ形(JSON など)
+    expect(checkEntries(entry(`"COGNITO_CLIENT_ID": "${id}"`)).blocks).toHaveLength(1);
+    expect(checkEntries(entry(`'clientId': ${id}`)).blocks).toHaveLength(1);
     expect(checkEntries(entry("COGNITO_CLIENT_ID=<クライアント ID>")).blocks).toHaveLength(0);
     expect(checkEntries(entry("COGNITO_CLIENT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxx")).blocks).toHaveLength(0);
     expect(checkEntries(entry(`token ${id}`)).blocks).toHaveLength(0);

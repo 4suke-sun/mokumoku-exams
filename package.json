@@ -19,6 +19,7 @@
     "release": "node scripts/release.ts",
     "verify": "node scripts/verify.ts",
     "lessons": "node scripts/lessons.ts",
+    "mask": "node scripts/mask-output.ts",
     "metrics": "node scripts/metrics.ts",
     "check:branch": "node scripts/check-branch.ts",
     "check:commit": "node scripts/check-commit-secrets.ts",

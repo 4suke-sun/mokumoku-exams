@@ -79,7 +79,7 @@ export const ENV_INFO_PATTERNS: Pattern[] = [
   // クライアント ID は ID の形だけでは他の文字列と区別できないので、名前つきの代入で見る。
   {
     name: "Cognito のクライアント ID",
-    re: /\w*client[_-]?id\w*\s*[:=]\s*['"]?(?!<|\$|x{3}|your|example|\.\.\.)[a-z0-9]{20,}\b/i,
+    re: /\w*client[_-]?id\w*['"]?\s*[:=]\s*['"]?(?!<|\$|x{3}|your|example|\.\.\.)[a-z0-9]{20,}\b/i,
   },
   {
     name: "配信のドメイン",
@@ -114,13 +114,17 @@ const URL_CREDENTIALS = /[a-z][a-z0-9+.-]*:\/\/[^\s/@]*@/gi;
 // 署名の行(Co-Authored-By: 名前 <noreply@…>)の宛先は、定型として通す。文書やテストが例として引用する場合もある。
 const SIGNATURE_LINE = /Co-Authored-By:[^<]*<noreply@[a-z0-9.-]+>/i;
 
+/** 行にある、許可されていないメールアドレス(署名の行は除く)。追加行の検査と、出力を伏せる処理(output-mask.ts)が使う。 */
+export function disallowedEmails(text: string): string[] {
+  if (SIGNATURE_LINE.test(text)) return [];
+  const found = text.replace(URL_CREDENTIALS, "").match(EMAIL) ?? [];
+  return found.filter((address) => !ALLOWED_EMAIL.test(address));
+}
+
 function scanEmails(entries: AddedLine[]): string[] {
   const hits: string[] = [];
   for (const { file, line, text } of entries) {
-    if (SIGNATURE_LINE.test(text)) continue;
-    const found = text.replace(URL_CREDENTIALS, "").match(EMAIL) ?? [];
-    if (found.some((address) => !ALLOWED_EMAIL.test(address)))
-      hits.push(`許可されていないメールアドレス: ${file}:${line}`);
+    if (disallowedEmails(text).length > 0) hits.push(`許可されていないメールアドレス: ${file}:${line}`);
   }
   return hits;
 }

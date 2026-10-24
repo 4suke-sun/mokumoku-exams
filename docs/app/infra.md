@@ -105,7 +105,7 @@ Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCre
    | `HOSTED_ZONE_ID` | (省略可)ドメイン名を置く Route 53 のホストゾーンの ID |
 
 3. デプロイします。`HOSTED_ZONE_ID` を渡したときは、ドメイン名から CloudFront への A と AAAA のレコード(エイリアス)も作ります。
-   渡さないときは、DNS の CNAME などで、ドメイン名を CloudFront のドメイン(出力の `DistributionDomainName`)へ向けます。
+   渡さないときは、DNS の CNAME などで、ドメイン名を CloudFront のドメイン(出力の `DistributionDomainName`。伏せていない出力を人が自分の端末で見る)へ向けます。
 
 - `DOMAIN_NAME` と `CERTIFICATE_ARN` は、そろえて渡します。片方だけ、またはドメイン名なしでホストゾーンだけを渡すと、合成の前に止まります。
 - 独自ドメインを付けても、CloudFront の標準のドメインでも、そのままアクセスできます。
@@ -139,7 +139,7 @@ Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCre
 
    VAPID の鍵は、`npx web-push generate-vapid-keys` で作ります。公開鍵は `.env` に書き、秘密鍵は SSM パラメーターに置きます(「VAPID の秘密鍵」)。秘密鍵は、ほかに書き写しません。
    鍵を作り直すと、それまでの購読には送れなくなります(利用者が、アカウントの画面で購読し直します)。
-   `SITE_URL` には、初回のデプロイのあとに出力される CloudFront のドメイン(`DistributionDomainName`)を `https://` に続けて書き、もう一度デプロイします。独自ドメインを使うときは、`DOMAIN_NAME` のドメインを書きます。
+   `SITE_URL` には、初回のデプロイのあとに出力される CloudFront のドメイン(`DistributionDomainName`。`mask` を通した出力では伏せられるので、伏せていない出力を人が自分の端末で見る)を `https://` に続けて書き、もう一度デプロイします。独自ドメインを使うときは、`DOMAIN_NAME` のドメインを書きます。
 
    値の形は `packages/infra/lib/config.ts` が検査します。足りない、または形が違うと、変数の名前だけを示して止まります(値は表示しません)。
 
@@ -168,16 +168,19 @@ aws ssm put-parameter --type SecureString --name /<パラメーターの名前> 
 デプロイの前に、[デプロイ前のチェックリスト](../pre-deploy-checklist.md)を通します。
 
 ```sh
+set -o pipefail        # パイプの途中のコマンドの失敗を、終了コードに出す(下の mask を通す行のため)
 npm run build          # アプリをビルドする
 npm run build:lambda   # Lambda に載せるアセットを dist/ に作る(dist/lambda、dist/static、dist/public、dist/push)
-npm run synth          # スタックを合成する
-npm run diff -w @mokumoku-exams/infra -- --all     # すべてのスタックの変わる内容を確かめる
-npm run deploy -w @mokumoku-exams/infra -- --all   # すべてのスタックをデプロイする
+npm run synth 2>&1 | npm run -s mask   # スタックを合成する(出力の値を伏せる)
+npm run diff -w @mokumoku-exams/infra -- --all 2>&1 | npm run -s mask   # すべてのスタックの変わる内容を、値を伏せて確かめる
+npm run deploy -w @mokumoku-exams/infra -- --all   # すべてのスタックをデプロイする(人が自分の端末で実行する)
 ```
 
 デプロイの直後に、[デプロイ後の画面確認](../post-deploy-smoke.md)を通します。通るまで、公開へ進みません。
 
 - `npm run synth` / `deploy` / `diff` / `destroy`(`-w @mokumoku-exams/infra`)は、`.env` を読み込んでから `cdkd` を実行します。
+- 合成と差分の出力は、`npm run -s mask` に通して値を伏せます。デプロイ(`deploy`・`destroy`)は、確認の問いが出うるうえ、パイプの相手が先に終わると途中で止まりうるので、`mask` を通さず、人が自分の端末で実行します。デプロイの出力を共有・記録するときは、保存した出力を `npm run -s mask < <ファイル>` に通します。
+  伏せる形と伏せない形、終了コード(`set -o pipefail`)、確認の問いの扱いは、[学びの記録 0004](./lessons/0004-mask-diff-output.md) にあります。出力の配信のドメインも伏せるので、ドメインが要るときは、伏せていない出力を人が自分の端末でだけ見ます。
 - 合成は AWS の認証情報が必要です(`cdkd` がアカウントを調べるため)。CI では合成せず、スタックの単体テスト(スナップショットを含む)で確かめます。
 - `dist/` と `cdk.out/` は gitignore 済みです。
 

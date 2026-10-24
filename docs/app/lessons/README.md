@@ -43,7 +43,7 @@
 - [0001 テストのダミー値は、文字列の連結で組み立てる](./0001-test-dummy-values-concat.md)
 - [0002 外部から読んだ値の解析エラーを、そのまま出力しない](./0002-no-raw-error-output.md)
 - [0003 開発サーバーが自動生成するファイルは、コミット前に中身と置き場を確認する](./0003-generated-files-in-dev-server.md)
-- [0004 デプロイ前の差分の出力は、環境変数の値を伏せてから扱う](./0004-mask-diff-output.md)
+- [0004 デプロイと、デプロイ前の合成・差分の出力は、環境変数の値を伏せてから扱う](./0004-mask-diff-output.md)
 - [0005 Next.js の proxy で返すリダイレクトは、絶対 URL にする](./0005-proxy-redirect-absolute-url.md)
 - [0006 ログインの直後の画面の移動は、ページごと読み込み直す](./0006-reload-after-sign-in.md)
 - [0007 ブラウザの自動操作では、画面が React の受け持ちになるまで待ってから押す](./0007-wait-for-hydration-in-e2e.md)
