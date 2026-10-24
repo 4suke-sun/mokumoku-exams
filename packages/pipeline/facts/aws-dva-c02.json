@@ -170,6 +170,28 @@
       "status": "rejected"
     },
     {
+      "claim": "クロスアカウントアクセス用の IAM ロールは、ある アカウントのリソースへのアクセスを、別のアカウントの信頼されたプリンシパルに与える。ロールは、クロスアカウントアクセスを与える主な方法である。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-010f1e6d41db",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "id_roles"
+          },
+          "contentHash": "19a6459dd5046ded2f0050126c8c00966dbe6d2440cc2884a1f9d4511b417b0c",
+          "section": "iam roles",
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "EC2/オンプレミス向けの構成を指定しないと、CodeDeployDefault.OneAtATime が使われる",
       "confidence": "high",
       "domain": "domain3",
@@ -425,6 +447,28 @@
           "contentHash": "0fbc8cd18dea7e3ca81a44ae7d0a72481499ac6a85bb9880107f815a65367e8a",
           "section": "独立した業務ロジックにモックを使う",
           "url": "https://docs.aws.amazon.com/lambda/latest/dg/testing-guide.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "X-Ray は、同じトレース ID を持つリクエストを処理するすべてのサービスのノードを、1 つのサービスグラフにまとめる。",
+      "confidence": "high",
+      "domain": "domain4",
+      "id": "f-02cfa06af844",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "xray-concepts"
+          },
+          "contentHash": "57a7c6c93d7380d2bc1dea6bbcb69ef9c603444c820f4b39fcdc94e147324ebd",
+          "section": "aws x-ray concepts",
+          "url": "https://docs.aws.amazon.com/xray/latest/devguide/xray-concepts.html"
         }
       ],
       "status": "passed"
@@ -1584,6 +1628,28 @@
       "status": "passed"
     },
     {
+      "claim": "大きなクエリで余計な料金が出ないよう、CloudWatch Logs Insights では、クエリごとに必要なロググループだけを選び、時間範囲をできるだけ狭く指定する。",
+      "confidence": "high",
+      "domain": "domain4",
+      "id": "f-0c4c0b727518",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "CWL_QuerySyntax"
+          },
+          "contentHash": "7b911433370877da74fac89ae34e0e74ef4519a5c29fdc0d394dfd71ca56cea4",
+          "section": "cloudwatch logs insights language query syntax",
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CWL_QuerySyntax.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "最適化の所見は、Compute Optimizer のダッシュボードに表示される",
       "confidence": "high",
       "domain": "domain4",
@@ -1869,6 +1935,28 @@
       "status": "passed"
     },
     {
+      "claim": "API Gateway のステージ変数を使うと、API のステージごとに異なる Lambda 関数名を指定できる。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-0ef78373d26e",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "use-cases"
+          },
+          "contentHash": "e0788fa9cc557c5e5f8417eb74fa1d0a2d6b89888ccc33e20f2d7cf05b06f2aa",
+          "section": "use cases for stage variables",
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/stage-variables.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "ACM の証明書はリージョンごとのリソースで、別のリージョンへコピーできない。",
       "confidence": "high",
       "domain": "domain2",
@@ -1888,6 +1976,28 @@
           "contentHash": "72c5883584a60d162dfde1327c0a57428f6ea31de4169cf3a85532bc5a65a409",
           "section": "Supported Regions",
           "url": "https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "EventBridge のイベントバスは、イベントを受け取り、ゼロ個以上のターゲットへ配信するルーターである。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-0f354fa624da",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "eb-what-is"
+          },
+          "contentHash": "fb9316afe48d24eb829b3724ad8bbcd83944e5168606c34eee37bf4849464e92",
+          "section": "what is amazon eventbridge?",
+          "url": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html"
         }
       ],
       "status": "passed"
@@ -2352,6 +2462,28 @@
           "contentHash": "7170a35163c0d845ae27e549f085247c92f34c893cb46c48c12d6cb5bb76e655",
           "section": "強い整合性の読み取り",
           "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "EventBridge のルールは、イベントパターンに一致したイベントを、指定したターゲットへ送る。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-138c58e3121a",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "eb-rules"
+          },
+          "contentHash": "ee16710f726f42c29f885f40e5aa18c3eae12e70e28484d2f6c0a6e26e3209fe",
+          "section": "rules in amazon eventbridge",
+          "url": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-rules.html"
         }
       ],
       "status": "passed"
@@ -4707,6 +4839,28 @@
       "status": "passed"
     },
     {
+      "claim": "Lambda の関数の暗号化キーは、kmskeyarn のオプションで設定できる。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-233ac7be6326",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "configuration-envvars"
+          },
+          "contentHash": "342336f0f8be024c92b3d7022d5a7d51871c94c64ee6980ea7b5f8be97e07213",
+          "section": "working with lambda environment variables",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "S3 のデータを、新しい DynamoDB の表に取り込める",
       "confidence": "high",
       "domain": "domain1",
@@ -4755,6 +4909,28 @@
         }
       ],
       "status": "rejected"
+    },
+    {
+      "claim": "CloudWatch Logs Insights の parse コマンドは、ログのフィールドからデータを抽出して、クエリで処理できる抽出フィールドを作る。",
+      "confidence": "high",
+      "domain": "domain4",
+      "id": "f-2367ab9ad27e",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "CWL_QuerySyntax"
+          },
+          "contentHash": "7b911433370877da74fac89ae34e0e74ef4519a5c29fdc0d394dfd71ca56cea4",
+          "section": "cloudwatch logs insights language query syntax",
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CWL_QuerySyntax.html"
+        }
+      ],
+      "status": "passed"
     },
     {
       "claim": "REQUEST オーサライザーの例では、一致しない場合にオーサライザー関数が 401 Unauthorized を返し、メソッドの呼び出しは失敗する",
@@ -5405,6 +5581,28 @@
       "status": "passed"
     },
     {
+      "claim": "CodeDeploy のブルー/グリーンデプロイでは、最新のリビジョンを置き換え先のインスタンスに入れ、そのあとでトラフィックを置き換え先へ再ルーティングする。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-288cbd52d84b",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "welcome"
+          },
+          "contentHash": "cf4f7e555f3ce1894813b622bc5f18b6162587a7465099227eca6caa21f9fec1",
+          "section": "what is codedeploy?",
+          "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/welcome.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "artifacts の files は必須で、ビルドの成果物がある場所を並べて指定する",
       "confidence": "high",
       "domain": "domain3",
@@ -5788,6 +5986,28 @@
       "status": "passed"
     },
     {
+      "claim": "Lambda の Duration メトリクスは、関数がイベントの処理に費やした時間をミリ秒で表す。",
+      "confidence": "high",
+      "domain": "domain4",
+      "id": "f-2a53cf01155c",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "monitoring-metrics-types"
+          },
+          "contentHash": "c379301c864b08124da0e87a537c974413e8cd63eb991c5889bcec7666406b86",
+          "section": "types of metrics for lambda event functions",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics-types.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "バケットの設定の変更は、結果整合性として反映される",
       "confidence": "high",
       "domain": "domain1",
@@ -5951,6 +6171,28 @@
           "contentHash": "e0002e3d1e3ba1cd05736d6d593751f2bbd9f71fff75ab5c8bed3602e8fd0a88",
           "section": "Amazon S3 Event Notifications",
           "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventNotifications.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "AWS のサービスへの API リクエストを認可し監視する認証情報を提供するのは、Cognito の ID プールである。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-2b5438364770",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "cognito-user-pools-identity-pools-integration"
+          },
+          "contentHash": "49557d163a9e4a135f1eedc9448a127cb7ff01e36b72a00a346ab6391d1dce7d",
+          "section": "amazon cognito identity pools integration",
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools.html"
         }
       ],
       "status": "passed"
@@ -6144,6 +6386,28 @@
           "contentHash": "dbcd0bc10101e348434813e0b07d1c62c21f0c01af80dd090c4373e8e6d758ba",
           "section": "エンドポイント",
           "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "別のアカウントの ID にシークレットの値へのアクセスを許すには、シークレットにリソースベースのポリシーを付け、暗号化キーにもキーポリシーでそのアカウントの使用を許す。",
+      "confidence": "medium",
+      "domain": "domain2",
+      "id": "f-2cb0b61de2c6",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "auth-and-access_examples_cross"
+          },
+          "contentHash": "ba18c0d8c4197c5bbc421c0b4404c3440166acf0828045cfbe8ebdb1b9c109f6",
+          "section": "access aws secrets manager secrets from a different account",
+          "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/auth-and-access_examples_cross.html"
         }
       ],
       "status": "passed"
@@ -6529,6 +6793,28 @@
           "contentHash": "ed860942f0967748ef7e2094b8f310131482070084b9cf00199e25a14cf30ae5",
           "section": "Solutions catalog",
           "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Step Functions では、ワークフロー(ステートマシン)を作って、分散アプリケーションを組み立て、プロセスの自動化やマイクロサービスのオーケストレーションを行える。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-30a7a8359098",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "welcome"
+          },
+          "contentHash": "4e8648c60b7d3fc2474e5e6dd46e8752b658e717fb0c516f1b504216b57ccead",
+          "section": "what is step functions?",
+          "url": "https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html"
         }
       ],
       "status": "passed"
@@ -6963,6 +7249,28 @@
       "status": "passed"
     },
     {
+      "claim": "予約済み同時実行は、関数がアカウントの同時実行を使い切ることや、下流のリソースを過負荷にすることを防ぐために使える。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-3429f9c41dec",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "reserved-concurrency-concept"
+          },
+          "contentHash": "5177c72660f33883bd88acae91d663fa632fb1cb42871831f16f12fc524154ea",
+          "section": "reserved concurrency",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "AWS 所有キーのローテーションは、サービスごとに異なる。",
       "confidence": "high",
       "domain": "domain2",
@@ -7129,6 +7437,28 @@
           "contentHash": "d6c9e4f8aee8e18d79fb130ea6883b21791de99f70b495d9ea0a4cfeb838be8f",
           "section": "Amplify Hosting features",
           "url": "https://docs.aws.amazon.com/amplify/latest/userguide/welcome.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "S3 のライフサイクルの期限切れアクションは、オブジェクトが期限切れになるタイミングを定め、S3 が期限切れのオブジェクトを削除する。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-34f823c7b85b",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "object-lifecycle-mgmt"
+          },
+          "contentHash": "a2b47f7e7d97c35983f12a5e78bdcfeb088553c750ab4bb25262067d835f5018",
+          "section": "managing the lifecycle of objects",
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html"
         }
       ],
       "status": "passed"
@@ -7833,6 +8163,28 @@
       "status": "passed"
     },
     {
+      "claim": "DynamoDB のパーティション 1 つが提供できる最大の容量は、読み取りが毎秒 3,000 単位、書き込みが毎秒 1,000 単位である。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-38de71f528ba",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "bp-partition-key-design"
+          },
+          "contentHash": "92f51e5b8f3b152f0b692a1da8f09d3cfcaf0b76d2890f3f991be95aa2ba1eb7",
+          "section": "best practices for designing and using partition keys effectively in dynamodb",
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-design.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "Secrets Manager の json-key を省くと、シークレットのテキスト全体を取得する",
       "confidence": "high",
       "domain": "domain2",
@@ -8022,6 +8374,28 @@
           "contentHash": "347af0f16b7b1ed25e467dc6e6264ebba07f0f3edfc7abebfa635a4db307871b",
           "section": "AWS 管理キー",
           "url": "https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "SQS のバッチの一部が失敗したとき、成功したメッセージが再試行されないようにするには、部分的なバッチレスポンスの仕組みを実装する。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-3a0ceaaccb6a",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "with-sqs"
+          },
+          "contentHash": "bf2013e8c65e80bca7d3982fdfbdd7b74e89cc58b00ceec7f8f6bc6bd6583554",
+          "section": "using lambda with amazon sqs",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html"
         }
       ],
       "status": "passed"
@@ -8354,6 +8728,28 @@
           "contentHash": "0586c990cabdaf3ba606677d3bda0392431d861ae3baa7541e8505ed4ccc5e5b",
           "section": "Lambda authorizer authorization workflow",
           "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Lambda のイベントソースマッピングは各イベントを少なくとも一度は処理するので、重複した処理が起こりうる。関数コードは冪等にすることが強く勧められる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-3c398bb5baf5",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "sqs-polling-behavior"
+          },
+          "contentHash": "bf2013e8c65e80bca7d3982fdfbdd7b74e89cc58b00ceec7f8f6bc6bd6583554",
+          "section": "understanding polling and batching behavior for amazon sqs event source mappings",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html"
         }
       ],
       "status": "passed"
@@ -8833,6 +9229,28 @@
           "contentHash": "342336f0f8be024c92b3d7022d5a7d51871c94c64ee6980ea7b5f8be97e07213",
           "section": "環境変数の概要",
           "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Secrets Manager を使うと、アプリケーションのソースコードにハードコードした認証情報が要らなくなる。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-40ca5ed90e6a",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "intro"
+          },
+          "contentHash": "cc5f063d80825d59ebd305ac9a0e00137f9877a814f9aca75b9ba10db9e5f9f5",
+          "section": "what is aws secrets manager?",
+          "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html"
         }
       ],
       "status": "passed"
@@ -9797,6 +10215,28 @@
       "status": "passed"
     },
     {
+      "claim": "DynamoDB のテーブルとローカルセカンダリインデックスの読み取り整合性は、既定が結果整合性で、強力な整合性のある読み取りも選べる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-47656922832c",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "HowItWorks.ReadConsistency"
+          },
+          "contentHash": "7170a35163c0d845ae27e549f085247c92f34c893cb46c48c12d6cb5bb76e655",
+          "section": "dynamodb read consistency",
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "Standard と Express はどちらも多くのサービスとの連携に対応するが、対応するパターンは同じではなく、Express はリクエスト応答のパターンだけに対応する",
       "confidence": "high",
       "domain": "domain1",
@@ -9894,6 +10334,28 @@
       "status": "passed"
     },
     {
+      "claim": "CodeDeploy の事前定義の設定のうち、CodeDeployDefault.OneAtATime は、アプリケーションのリビジョンを一度に 1 つのインスタンスだけにデプロイする。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-482320839ca4",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "deployment-configurations-predefined"
+          },
+          "contentHash": "a66604e562ac23a854af6b916f6af83514e773a16eead0038be216c667f58f9b",
+          "section": "predefined deployment configurations for an ec2/on-premises compute platform",
+          "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/deployment-configurations.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "CPU・ネットワーク・メモリのいずれかが律速になっている関数では、メモリ設定を増やすと性能が大きく改善しうる。",
       "confidence": "high",
       "domain": "domain1",
@@ -9985,6 +10447,28 @@
           "contentHash": "e13db9d9c821e8195c1c5e20b59ab732a32c780a17c0489caac3571cbb542da0",
           "section": "Features",
           "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "SNS のトピックは、既定では発行されたすべてのメッセージを購読者に配る。一部だけを受け取るには、購読にフィルターポリシーを割り当てる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-4932e4df87fa",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "sns-message-filtering"
+          },
+          "contentHash": "f7af88ef3c7dd62e0008dc0b915010e2d128dc3b048bc6828a18ab48ea981daa",
+          "section": "amazon sns message filtering",
+          "url": "https://docs.aws.amazon.com/sns/latest/dg/sns-message-filtering.html"
         }
       ],
       "status": "passed"
@@ -10436,6 +10920,28 @@
           "contentHash": "5ecf1cb7f7ef59aa52a65fddd3f86076fddb9cb15b3d248a1173b59cc1411851",
           "section": "On-demand mode",
           "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/capacity-mode.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "予約済み同時実行を 0 に設定すると、制限を外すまで、その関数はイベントを処理しなくなる(意図的なスロットリング)。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-4c72ab3f8c2c",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "configuration-concurrency"
+          },
+          "contentHash": "ad91ea2b937af2c1cb86a93c4fbb1132ae4c51b58de64b9e53d4b75dc2248fdf",
+          "section": "configuring reserved concurrency for an event function",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html"
         }
       ],
       "status": "passed"
@@ -11936,6 +12442,28 @@
       "status": "passed"
     },
     {
+      "claim": "X-Ray は、共通のリクエストを持つセグメントをトレースにまとめ、トレースを処理して、アプリケーションを視覚的に表すサービスグラフを作る。",
+      "confidence": "high",
+      "domain": "domain4",
+      "id": "f-5566eee3183e",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "xray-concepts"
+          },
+          "contentHash": "57a7c6c93d7380d2bc1dea6bbcb69ef9c603444c820f4b39fcdc94e147324ebd",
+          "section": "aws x-ray concepts",
+          "url": "https://docs.aws.amazon.com/xray/latest/devguide/xray-concepts.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "Lambda を含むアプリケーションでは、複数の構成要素をまとめて検証する統合テストを重視する。",
       "confidence": "high",
       "domain": "domain3",
@@ -12099,6 +12627,28 @@
           "contentHash": "0fbc8cd18dea7e3ca81a44ae7d0a72481499ac6a85bb9880107f815a65367e8a",
           "section": "クラウドでのテスト",
           "url": "https://docs.aws.amazon.com/lambda/latest/dg/testing-guide.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "プロビジョニング済み同時実行は、事前に初期化した実行環境を用意しておき、コールドスタートの遅延を抑えるために使う。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-56a1a5a84c52",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "provisioned-concurrency-concept"
+          },
+          "contentHash": "5177c72660f33883bd88acae91d663fa632fb1cb42871831f16f12fc524154ea",
+          "section": "provisioned concurrency",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html"
         }
       ],
       "status": "passed"
@@ -13053,6 +13603,28 @@
       "status": "passed"
     },
     {
+      "claim": "AWS SAM CLI の sam local invoke を使うと、Lambda 関数をローカルでテストできる。",
+      "confidence": "medium",
+      "domain": "domain3",
+      "id": "f-5e31d3cc206a",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "using-sam-cli-local-invoke-options"
+          },
+          "contentHash": "675a9f9baa90545ecedcb1fac1427ded5f5752d5f004158998bdbcb2275b4e8d",
+          "section": "options",
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/using-sam-cli-local-invoke.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "ノードベースのクラスターでは、ノードの種類と数を正しく選ぶ責任は利用者にある。",
       "confidence": "high",
       "domain": "domain1",
@@ -13094,6 +13666,28 @@
           "contentHash": "6f8e7f11b88d918b911c78978ddecc9e464f9a601e5935cd6f1eba1bd4229c72",
           "section": "料金",
           "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "X-Ray の注釈は、フィルター式で使うために索引付けされるキーと値の組で、コンソールでトレースをまとめる条件などの記録に使う。",
+      "confidence": "high",
+      "domain": "domain4",
+      "id": "f-5e5fe4936580",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "xray-concepts"
+          },
+          "contentHash": "57a7c6c93d7380d2bc1dea6bbcb69ef9c603444c820f4b39fcdc94e147324ebd",
+          "section": "aws x-ray concepts",
+          "url": "https://docs.aws.amazon.com/xray/latest/devguide/xray-concepts.html"
         }
       ],
       "status": "passed"
@@ -13289,6 +13883,28 @@
       "status": "passed"
     },
     {
+      "claim": "CloudWatch Logs Insights の dedup コマンドは、指定したフィールドの値に基づいて、重複した結果を取り除く。",
+      "confidence": "high",
+      "domain": "domain4",
+      "id": "f-6088d9287a81",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "CWL_QuerySyntax"
+          },
+          "contentHash": "7b911433370877da74fac89ae34e0e74ef4519a5c29fdc0d394dfd71ca56cea4",
+          "section": "cloudwatch logs insights language query syntax",
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CWL_QuerySyntax.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "CloudWatch エージェントは、EC2 インスタンス、オンプレミスサーバー、コンテナ化されたアプリケーションから、メトリクス・ログ・トレースを集める。",
       "confidence": "high",
       "domain": "domain4",
@@ -13356,6 +13972,28 @@
           "contentHash": "5110d25ae54f5612fc56fde603acabf1979c3fe1a34f1bfe934c2a66229a884e",
           "section": "プロビジョンドモード",
           "url": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "IAM のポリシーを作るときは、タスクの実行に必要な権限だけを与える最小特権の原則に従う。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-60ed85d44963",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "access_policies"
+          },
+          "contentHash": "0c286bb363d804d7cee8cf712cc24edf260b9a7744f5a6905797ec9bbe7b92a0",
+          "section": "policies and permissions in aws identity and access management",
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html"
         }
       ],
       "status": "passed"
@@ -15055,6 +15693,28 @@
       "status": "passed"
     },
     {
+      "claim": "Lambda を非同期で呼び出すときは、呼び出しの記録を SQS や EventBridge などの下流のリソースへ送るように設定できる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-6a68981c6fd9",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "invocation-async"
+          },
+          "contentHash": "ec15592847642cfd002961f0ff09b4451b787bef1244d1cfd6e0a21e88902458",
+          "section": "invoking a lambda event function asynchronously",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "暗号化メソッドは、キーリングからメッセージ用の平文データキーと、ラッピングキーごとに暗号化されたデータキーの複製を受け取る",
       "confidence": "high",
       "domain": "domain2",
@@ -15221,6 +15881,28 @@
           "contentHash": "a3ab7175d14c3c3d72d73810f41e0fdc92687c6769a584d5dba3c143204bdbcc",
           "section": "ユーザープール(機能)",
           "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Cognito のユーザープールは、サインインの後の多要素認証(MFA)を提供できる。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-6b272a35d4f7",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "cognito-user-pools-features"
+          },
+          "contentHash": "49557d163a9e4a135f1eedc9448a127cb7ff01e36b72a00a346ab6391d1dce7d",
+          "section": "features",
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools.html"
         }
       ],
       "status": "passed"
@@ -15440,6 +16122,28 @@
           "contentHash": "f7af88ef3c7dd62e0008dc0b915010e2d128dc3b048bc6828a18ab48ea981daa",
           "section": "Amazon SNS message filtering",
           "url": "https://docs.aws.amazon.com/sns/latest/dg/sns-message-filtering.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "S3 の署名付き URL の有効期限は、コンソールでは 1 分から 12 時間の範囲で、AWS CLI や SDK では最長 7 日まで設定できる。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-6cf525121ac9",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "PresignedUrl-Expiration"
+          },
+          "contentHash": "4e6f7c5f3d9c826b209fd4e7048c9982125cb75c18ff4d4ab7e470cd4235eecc",
+          "section": "expiration time for presigned urls",
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html"
         }
       ],
       "status": "passed"
@@ -16566,6 +17270,28 @@
       "status": "passed"
     },
     {
+      "claim": "カスタマーマネージドキーは、利用者が作成・所有・管理する KMS キーで、キーポリシーや IAM ポリシー、暗号化素材のローテーションなどを自分で制御できる。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-74072e1443e8",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "customer-mgn-key"
+          },
+          "contentHash": "347af0f16b7b1ed25e467dc6e6264ebba07f0f3edfc7abebfa635a4db307871b",
+          "section": "customer managed keys",
+          "url": "https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "バッチウィンドウを設定すると、最大 5 分までメッセージを蓄積してから関数を呼び出せる",
       "confidence": "high",
       "domain": "domain1",
@@ -17648,6 +18374,28 @@
       "status": "passed"
     },
     {
+      "claim": "Secrets Manager では、シークレットの自動ローテーションを設定でき、シークレットとデータベースなどの認証情報を定期的に更新できる。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-7d2ffc8ae729",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "rotating-secrets"
+          },
+          "contentHash": "ae38d1ec34079b789cabf235a83972bff8c992beb388f02eb8a4a7d124b58864",
+          "section": "rotate aws secrets manager secrets",
+          "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "IAM・IAM Identity Center・AWS STS は追加料金なしで使える。料金が発生するのは、IAM ユーザーや STS の一時認証情報で他の AWS サービスを使ったときである。",
       "confidence": "high",
       "domain": "domain2",
@@ -17788,6 +18536,28 @@
       "status": "passed"
     },
     {
+      "claim": "ElastiCache のサーバーレスキャッシュでは、インスタンスの用意やノード・クラスターの設定が要らず、キャッシュを作れる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-7db522238837",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "WhatIs.Overview"
+          },
+          "contentHash": "459395f39644de8fafb049637bec507e1207c2d649c1f37fa50afba3d70e6f8c",
+          "section": "serverless caching",
+          "url": "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/WhatIs.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "インプレースのデプロイでは、各インスタンスでアプリケーションを止めて最新のリビジョンを入れ、起動して検証する",
       "confidence": "high",
       "domain": "domain3",
@@ -17908,6 +18678,28 @@
       "status": "passed"
     },
     {
+      "claim": "Lambda の同時実行は、1 秒あたりの平均リクエスト数に、リクエストの平均の処理時間(秒)を掛けて見積もれる。",
+      "confidence": "high",
+      "domain": "domain4",
+      "id": "f-7fbb93941106",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "calculating-concurrency"
+          },
+          "contentHash": "5177c72660f33883bd88acae91d663fa632fb1cb42871831f16f12fc524154ea",
+          "section": "calculating concurrency for an event function",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "デプロイ構成は、CodeDeploy のデプロイ中に使う規則と、成功・失敗の条件をまとめたもの",
       "confidence": "high",
       "domain": "domain3",
@@ -17956,6 +18748,50 @@
         }
       ],
       "status": "rejected"
+    },
+    {
+      "claim": "SQS では、デッドレターキューの再処理(redrive)を使って、メッセージをデッドレターキューから移動できる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-80af955bd01a",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "sqs-dead-letter-queues"
+          },
+          "contentHash": "1bad70a471afec919ac98e29a9ddc5d52934d77e336966fbace91e7c06e57b6a",
+          "section": "using dead-letter queues in amazon sqs",
+          "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Kinesis Data Streams のデータレコードは、シーケンス番号、パーティションキー、データ部で構成される。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-80b6969fc734",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "key-concepts"
+          },
+          "contentHash": "426abc2f424e859000ed0b07abfe1e8159c9c3494b2f7cd762f09d3643b08aa8",
+          "section": "amazon kinesis data streams terminology and concepts",
+          "url": "https://docs.aws.amazon.com/streams/latest/dev/key-concepts.html"
+        }
+      ],
+      "status": "passed"
     },
     {
       "claim": "新しいブランチを接続して、本番とステージングの環境を分けて管理できる",
@@ -18026,6 +18862,28 @@
           "contentHash": "4e6f7c5f3d9c826b209fd4e7048c9982125cb75c18ff4d4ab7e470cd4235eecc",
           "section": "署名付き URL でできることの制限",
           "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "既定では、関数がバッチの処理でエラーになると、そのバッチのメッセージはすべて、可視性タイムアウトの後にキューで再び見えるようになる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-8188da4057e8",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "sqs-polling-behavior"
+          },
+          "contentHash": "bf2013e8c65e80bca7d3982fdfbdd7b74e89cc58b00ceec7f8f6bc6bd6583554",
+          "section": "understanding polling and batching behavior for amazon sqs event source mappings",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html"
         }
       ],
       "status": "passed"
@@ -18192,6 +19050,28 @@
           "contentHash": "22a192068b709f9529a736c2317d302920abd2ef0a196f3882569d24c811fc2b",
           "section": "CloudWatch エージェントの概要",
           "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Kinesis Data Streams にデータを書き込むとき、アプリケーションはパーティションキーを指定しなければならない。パーティションキーは、レコードをシャードへ割り当てるために使われる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-82fab7b740bf",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "key-concepts"
+          },
+          "contentHash": "426abc2f424e859000ed0b07abfe1e8159c9c3494b2f7cd762f09d3643b08aa8",
+          "section": "amazon kinesis data streams terminology and concepts",
+          "url": "https://docs.aws.amazon.com/streams/latest/dev/key-concepts.html"
         }
       ],
       "status": "passed"
@@ -19041,6 +19921,28 @@
       "status": "passed"
     },
     {
+      "claim": "遅延読み込みでは、アプリケーションは常に先にキャッシュへデータを要求し、キャッシュにない場合にデータストアから取得して、受け取った値をキャッシュに書き込む。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-88fb25cf52a3",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Strategies.LazyLoading"
+          },
+          "contentHash": "1878a8bee2ffd1f4f0ca5b3902987fa37496588df7f102f9c6bb0187be2713b7",
+          "section": "lazy loading",
+          "url": "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/Strategies.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "キャッシュキーを type だけにすると、department の値が違うリクエストにも、先のリクエストのキャッシュ応答が使われる。",
       "confidence": "high",
       "domain": "domain4",
@@ -19860,6 +20762,28 @@
       "status": "passed"
     },
     {
+      "claim": "AWS SAM CLI の sam sync コマンドは、ローカルの変更を自動的にクラウドへ同期し、開発とクラウドでのテストの流れを速める。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-8ee7a4160c1f",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "what-is-sam"
+          },
+          "contentHash": "c080bcfc94592c2b9e208a2194d90ce0e5968402f5bb92d8f83c8258a0f856ee",
+          "section": "what is the aws serverless application model (aws sam)?",
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "同じトランザクションの中では、同じ項目に対して複数の操作を向けることができない。",
       "confidence": "high",
       "domain": "domain1",
@@ -19980,6 +20904,28 @@
       "status": "passed"
     },
     {
+      "claim": "CodePipeline では、ステージに手動の承認アクションを追加でき、パイプラインの実行は承認されるまで先へ進まない。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-9012e54ea1aa",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "approvals"
+          },
+          "contentHash": "4dda0d373433811b6f5f7e44d91a578d69ae0c50c83aa8354055aa4cac813dc0",
+          "section": "add a manual approval action to a stage",
+          "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/approvals.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "1 つのストリームを、複数のアプリケーションが互いに独立に読める",
       "confidence": "high",
       "domain": "domain1",
@@ -20047,6 +20993,28 @@
           "contentHash": "22a192068b709f9529a736c2317d302920abd2ef0a196f3882569d24c811fc2b",
           "section": "CloudWatch エージェントの概要",
           "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Lambda のエイリアスは、新しいバージョンを指すように更新するか、2 つのバージョンの間でトラフィックを分けるように設定できる。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-909dba162c6f",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "configuration-aliases"
+          },
+          "contentHash": "5656bedab8e4de2e9ea876f9ad70608f3f9b0bf3b38494a0d8fb359d3a13b57f",
+          "section": "create an alias for a lambda event function",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html"
         }
       ],
       "status": "passed"
@@ -20940,6 +21908,28 @@
       "status": "passed"
     },
     {
+      "claim": "STS が発行する一時的なセキュリティ認証情報は、有効期間を数分から数時間に設定でき、失効すると AWS はその認証情報によるアクセスを認めない。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-980b596423ed",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "id_credentials_temp"
+          },
+          "contentHash": "fae5de9fbd01fad29f71b839d4414733ee3e779969bc9af031c0f29e1bc65106",
+          "section": "temporary security credentials in iam",
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "JSON か YAML のテンプレートで EC2 のリソースを作成でき、同じテンプレートを複数のリージョンやアカウントで再利用できる。",
       "confidence": "high",
       "domain": "domain3",
@@ -21006,6 +21996,28 @@
           },
           "contentHash": "347af0f16b7b1ed25e467dc6e6264ebba07f0f3edfc7abebfa635a4db307871b",
           "section": "カスタマーマネージドキー",
+          "url": "https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "KMS のカスタマーマネージドキーでは、自動ローテーションは任意で有効にでき、AWS マネージドキーでは必須で行われる。",
+      "confidence": "medium",
+      "domain": "domain2",
+      "id": "f-9917b4308a2d",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "concepts"
+          },
+          "contentHash": "347af0f16b7b1ed25e467dc6e6264ebba07f0f3edfc7abebfa635a4db307871b",
+          "section": "aws kms keys",
           "url": "https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html"
         }
       ],
@@ -21081,6 +22093,28 @@
           "contentHash": "be755f9170941fdd3358e34a2bae229e529d194de7069f6715fa0102964618be",
           "section": "マルチ属性キー",
           "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "DynamoDB では、グローバルセカンダリインデックスとストリームからの読み取りは、すべて結果整合性である。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-997dd95ee28e",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "HowItWorks.ReadConsistency"
+          },
+          "contentHash": "7170a35163c0d845ae27e549f085247c92f34c893cb46c48c12d6cb5bb76e655",
+          "section": "dynamodb read consistency",
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html"
         }
       ],
       "status": "passed"
@@ -21225,6 +22259,28 @@
           "contentHash": "cc5f063d80825d59ebd305ac9a0e00137f9877a814f9aca75b9ba10db9e5f9f5",
           "section": "料金",
           "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Lambda のレイヤーは、作成したあと、アカウント内の任意の数の関数に適用でき、複数の関数で依存関係を共有できる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-9a6cc71454b6",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "chapter-layers"
+          },
+          "contentHash": "d42aec23cf5aaa3546ec9012e33fc777b35b53693d822e8786d62bd2c123bdfe",
+          "section": "managing lambda event function dependencies with layers",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/chapter-layers.html"
         }
       ],
       "status": "passed"
@@ -22157,6 +23213,28 @@
           "contentHash": "c89f839064a26a0832b99613f691ef312edd02778f951ff24e577766cb822b2f",
           "section": "ID ベースのポリシーとリソースベースのポリシーの評価",
           "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Cognito のユーザープールでは、利用者をグループに追加でき、ID トークンを ID プールに渡すときに、ユーザープールのグループを IAM ロールにリンクできる。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-a17a90fe2f28",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "cognito-user-pools-features"
+          },
+          "contentHash": "49557d163a9e4a135f1eedc9448a127cb7ff01e36b72a00a346ab6391d1dce7d",
+          "section": "features",
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools.html"
         }
       ],
       "status": "passed"
@@ -23330,6 +24408,28 @@
       "status": "passed"
     },
     {
+      "claim": "Secrets Manager では、シークレットを効率よく使うために、対応するキャッシュ用のコンポーネントでシークレットをキャッシュし、必要なときだけ更新することが勧められる。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-aa07adbfb98b",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "best-practices-caching"
+          },
+          "contentHash": "57da63c43fd872584f52cbe5b8b35d4a4554154ecf08dcc26edd5df49aea9d0d",
+          "section": "use caching to retrieve secrets",
+          "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/best-practices.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "Network Flow Monitor は、インスタンスに入れた軽量のソフトウェアエージェントで集めた情報から、パケットロスと遅延を指定した期間で見られる",
       "confidence": "high",
       "domain": "domain4",
@@ -24470,6 +25570,28 @@
       "status": "passed"
     },
     {
+      "claim": "SQS のソースキューの再処理ポリシーで maxReceiveCount を指定すると、その回数まで受信されたメッセージが、デッドレターキューへ移される。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-b20440131ab8",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "policies-for-dead-letter-queues"
+          },
+          "contentHash": "1bad70a471afec919ac98e29a9ddc5d52934d77e336966fbace91e7c06e57b6a",
+          "section": "using policies for dead-letter queues",
+          "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "閲覧者のリクエストは、最も遅延の小さいエッジロケーションへ振り分けられる。そこにコンテンツがなければ、CloudFront はオリジンから取得する",
       "confidence": "high",
       "domain": "domain1",
@@ -24708,6 +25830,28 @@
       "status": "passed"
     },
     {
+      "claim": "CloudWatch のアラームは、指定した期間にわたって 1 つのメトリクスを監視し、しきい値との関係に基づいて、SNS のトピックへの通知などのアクションを実行する。",
+      "confidence": "high",
+      "domain": "domain4",
+      "id": "f-b3e4af642534",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "CloudWatchAlarms"
+          },
+          "contentHash": "5ca53f3a9729de3097aff3d7ef469aeea0eabec4d5e83260334189c835ac6594",
+          "section": "alarms",
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "平文のデータキーは、暗号化に使い終えたら、できるだけ早くメモリから消す。暗号化されたデータキーは、暗号化したデータと一緒に保存できる。",
       "confidence": "high",
       "domain": "domain2",
@@ -24797,6 +25941,28 @@
           "contentHash": "c6e92d3dea128875aaae81cc0057ca2c420f0dddc52aa16dad1b828b6c6b4ca3",
           "section": "新しいアプリケーションバージョンのデプロイ",
           "url": "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Lambda の ConcurrentExecutions メトリクスは、イベントを処理している関数のインスタンスの数を表す。",
+      "confidence": "high",
+      "domain": "domain4",
+      "id": "f-b4ed0ab7088c",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "monitoring-metrics-types"
+          },
+          "contentHash": "c379301c864b08124da0e87a537c974413e8cd63eb991c5889bcec7666406b86",
+          "section": "types of metrics for lambda event functions",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics-types.html"
         }
       ],
       "status": "passed"
@@ -25616,6 +26782,28 @@
       "status": "passed"
     },
     {
+      "claim": "AWS SAM では、テンプレートを CloudFormation に直接デプロイして、リソースを用意できる。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-bc2d2f9f946d",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "what-is-sam"
+          },
+          "contentHash": "c080bcfc94592c2b9e208a2194d90ce0e5968402f5bb92d8f83c8258a0f856ee",
+          "section": "what is the aws serverless application model (aws sam)?",
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "IAM Access Analyzer で、信頼の範囲の外にある主体がロールを引き受けられるかを確認できる。",
       "confidence": "high",
       "domain": "domain2",
@@ -25657,6 +26845,28 @@
           "contentHash": "a3ab7175d14c3c3d72d73810f41e0fdc92687c6769a584d5dba3c143204bdbcc",
           "section": "IDプール",
           "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "バージョンを公開すると、コードとほとんどの設定が固定される。コードと設定を変更できるのは、公開前の関数だけである。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-bcd31f33f5e7",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "configuration-versions-config"
+          },
+          "contentHash": "ab7269d75973acddf654dbf4c55540495c98448539d650c66f182aa4512e5890",
+          "section": "creating function versions",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html"
         }
       ],
       "status": "passed"
@@ -25975,6 +27185,28 @@
       "status": "passed"
     },
     {
+      "claim": "Cognito の ID プールは、フェデレーテッド ID を AWS 認証情報と交換するもので、アプリの利用者に一時的な AWS 認証情報を発行する。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-bf2ccdc525e3",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "cognito-identity"
+          },
+          "contentHash": "40257d6d1329e28410a9fc113b2862194888e81dd9166bca73b1ca4ad5556c21",
+          "section": "amazon cognito identity pools",
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "予約済み同時実行数のような運用上の設定を変えても、新しいバージョンは公開されない。",
       "confidence": "high",
       "domain": "domain4",
@@ -26018,6 +27250,28 @@
           "contentHash": "459395f39644de8fafb049637bec507e1207c2d649c1f37fa50afba3d70e6f8c",
           "section": "Creating a node-based cluster",
           "url": "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/WhatIs.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "ID プールは、まだサインインしていない利用者(ゲスト)にも、範囲を絞ったアクセス権の AWS 認証情報を発行するよう設定できる。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-bfb158fc8df9",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "cognito-identity"
+          },
+          "contentHash": "40257d6d1329e28410a9fc113b2862194888e81dd9166bca73b1ca4ad5556c21",
+          "section": "amazon cognito identity pools",
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html"
         }
       ],
       "status": "passed"
@@ -26365,6 +27619,28 @@
       "status": "passed"
     },
     {
+      "claim": "DynamoDB では、テーブルとセカンダリインデックスのすべてのパーティションキーにわたって、活動が均一になるようにアプリケーションを設計する。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-c1eaa6e24249",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "bp-partition-key-design"
+          },
+          "contentHash": "92f51e5b8f3b152f0b692a1da8f09d3cfcaf0b76d2890f3f991be95aa2ba1eb7",
+          "section": "best practices for designing and using partition keys effectively in dynamodb",
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-design.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "RCP は、組織に属さない ID にも影響しうる",
       "confidence": "medium",
       "domain": "domain2",
@@ -26502,6 +27778,28 @@
           "contentHash": "22aa03967381c45728308b96eb04c584c50738fd80a910f9a72865a494e1199c",
           "section": "AWS Systems Manager Parameter Store(パラメータの型)",
           "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "DynamoDB の Query は、パーティションキーの属性名とその単一の値を指定して項目を探し、そのパーティションキーの値を持つすべての項目を返す。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-c33e4544487d",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Query"
+          },
+          "contentHash": "5eba9eb5826e2887b5c5b2a223d330534572ef31b80d44181d18e76338d52a44",
+          "section": "querying tables in dynamodb",
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.html"
         }
       ],
       "status": "passed"
@@ -26814,6 +28112,28 @@
           "contentHash": "6f8e7f11b88d918b911c78978ddecc9e464f9a601e5935cd6f1eba1bd4229c72",
           "section": "セキュリティ",
           "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Lambda のレイヤーは、ライブラリの依存関係やカスタムランタイムなどの追加のコードやデータを含む .zip のアーカイブである。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-c4f6d5b3bad3",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "chapter-layers"
+          },
+          "contentHash": "d42aec23cf5aaa3546ec9012e33fc777b35b53693d822e8786d62bd2c123bdfe",
+          "section": "managing lambda event function dependencies with layers",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/chapter-layers.html"
         }
       ],
       "status": "passed"
@@ -27396,6 +28716,28 @@
       "status": "passed"
     },
     {
+      "claim": "CodePipeline の承認アクションには、承認者がレビューする対象の URL を指定できる。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-c89c40a9e93c",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "approvals-configuration-options"
+          },
+          "contentHash": "4dda0d373433811b6f5f7e44d91a578d69ae0c50c83aa8354055aa4cac813dc0",
+          "section": "configuration options for manual approval actions in codepipeline",
+          "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/approvals.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "TransactGetItems は Get 操作を最大 100 件まとめ、全件成功か全件失敗のどちらかになる読み取りである。",
       "confidence": "high",
       "domain": "domain1",
@@ -27683,6 +29025,28 @@
       "status": "passed"
     },
     {
+      "claim": "CodePipeline の承認アクションは、パイプラインが止まったときに SNS のトピックへメッセージを発行するよう設定できる。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-caf112fd0269",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "approvals-configuration-options"
+          },
+          "contentHash": "4dda0d373433811b6f5f7e44d91a578d69ae0c50c83aa8354055aa4cac813dc0",
+          "section": "configuration options for manual approval actions in codepipeline",
+          "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/approvals.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "集計を含むクエリの可視化は、ダッシュボードのウィジェットとして追加でき、自動更新の間隔も選べる。",
       "confidence": "high",
       "domain": "domain4",
@@ -27824,6 +29188,28 @@
           "contentHash": "e13db9d9c821e8195c1c5e20b59ab732a32c780a17c0489caac3571cbb542da0",
           "section": "Features",
           "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "AWS SAM のテンプレートは、CloudFormation を拡張したもので、サーバーレスのリソースを簡単な構文で定義できる。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-cbee2fc79eb0",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "what-is-sam"
+          },
+          "contentHash": "c080bcfc94592c2b9e208a2194d90ce0e5968402f5bb92d8f83c8258a0f856ee",
+          "section": "what is the aws serverless application model (aws sam)?",
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html"
         }
       ],
       "status": "passed"
@@ -29204,6 +30590,28 @@
       "status": "passed"
     },
     {
+      "claim": "DynamoDB の GetItem・Query・Scan には ConsistentRead パラメーターがあり、true にすると強力な整合性のある読み取りになる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-d6a9d24cccec",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "HowItWorks.ReadConsistency.Strongly"
+          },
+          "contentHash": "7170a35163c0d845ae27e549f085247c92f34c893cb46c48c12d6cb5bb76e655",
+          "section": "strongly consistent reads",
+          "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "送信元キューと DLQ は、同じアカウントと同じリージョンに置く必要がある",
       "confidence": "high",
       "domain": "domain1",
@@ -29276,6 +30684,28 @@
       "status": "passed"
     },
     {
+      "claim": "SQS のイベントソースマッピングでは、Lambda がキューをポーリングし、関数を同期的に呼び出す。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-d6e65eefb1fc",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "sqs-polling-behavior"
+          },
+          "contentHash": "bf2013e8c65e80bca7d3982fdfbdd7b74e89cc58b00ceec7f8f6bc6bd6583554",
+          "section": "understanding polling and batching behavior for amazon sqs event source mappings",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "索引項目の保管量は、表の主キー、索引のキー属性、射影属性、索引項目ごとの追加分の合計で決まる。",
       "confidence": "high",
       "domain": "domain1",
@@ -29319,6 +30749,28 @@
           "contentHash": "9debb8e75029317d779ed58ca2b3bbc45598e28fca90ab3de455ddd78f7b148e",
           "section": "プライマリキー",
           "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Kinesis Data Streams では、同じパーティションキーのレコードのシーケンス番号は、通常、時間とともに増加する。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-d808ef9901cc",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "key-concepts"
+          },
+          "contentHash": "426abc2f424e859000ed0b07abfe1e8159c9c3494b2f7cd762f09d3643b08aa8",
+          "section": "amazon kinesis data streams terminology and concepts",
+          "url": "https://docs.aws.amazon.com/streams/latest/dev/key-concepts.html"
         }
       ],
       "status": "passed"
@@ -29389,6 +30841,28 @@
           "contentHash": "da4acc32befb7018e9326207136e53ae4409b070141ead1be55a67fa7c445cb1",
           "section": "CORS 設定の評価方法",
           "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/cors.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "書き込みスルーでは、データベースへ書き込むたびに、キャッシュにもデータを追加または更新するので、キャッシュのデータは古くならない。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-d88acb620f4e",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "Strategies.WriteThrough"
+          },
+          "contentHash": "1878a8bee2ffd1f4f0ca5b3902987fa37496588df7f102f9c6bb0187be2713b7",
+          "section": "write-through",
+          "url": "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/Strategies.html"
         }
       ],
       "status": "passed"
@@ -29509,6 +30983,28 @@
           "contentHash": "675a9f9baa90545ecedcb1fac1427ded5f5752d5f004158998bdbcb2275b4e8d",
           "section": "ベストプラクティス",
           "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/using-sam-cli-local-invoke.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "CodeGuru Reviewer は Secrets Manager と連携し、コードの中の保護されていないシークレットを見つけるシークレットディテクターを使える。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-d97ea76bfa40",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "welcome"
+          },
+          "contentHash": "511872163074d15842693325a2d0ebeb484987a4496046c3998f6b25d46a1bd9",
+          "section": "what is amazon codeguru reviewer?",
+          "url": "https://docs.aws.amazon.com/codeguru/latest/reviewer-ug/welcome.html"
         }
       ],
       "status": "passed"
@@ -29875,6 +31371,28 @@
       "status": "rejected"
     },
     {
+      "claim": "CloudWatch Logs Insights の stats コマンドは、ログのフィールドの値を使って、集計の統計を計算する。",
+      "confidence": "high",
+      "domain": "domain4",
+      "id": "f-dc0bb3cef921",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "CWL_QuerySyntax"
+          },
+          "contentHash": "7b911433370877da74fac89ae34e0e74ef4519a5c29fdc0d394dfd71ca56cea4",
+          "section": "cloudwatch logs insights language query syntax",
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CWL_QuerySyntax.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "グローバルテーブルでは、トランザクションの ACID の保証はリージョン内に限られ、リージョンをまたいで保証されない。",
       "confidence": "high",
       "domain": "domain1",
@@ -29918,6 +31436,28 @@
           "contentHash": "9debb8e75029317d779ed58ca2b3bbc45598e28fca90ab3de455ddd78f7b148e",
           "section": "DynamoDB Streams",
           "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "非同期の呼び出しでは、Lambda はイベントをキューに入れ、成功の応答だけを返し、別の処理がキューのイベントを関数へ渡す。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-dda0bb259856",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "invocation-async"
+          },
+          "contentHash": "ec15592847642cfd002961f0ff09b4451b787bef1244d1cfd6e0a21e88902458",
+          "section": "invoking a lambda event function asynchronously",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html"
         }
       ],
       "status": "passed"
@@ -30258,6 +31798,28 @@
           "contentHash": "f178312a606490d4be5993b99699c42bfb14b6618ee359523ab974d19a500e32",
           "section": "Differences between Amazon SQS, Amazon MQ, and Amazon SNS",
           "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Cognito のユーザープールは、OAuth 2.0 を使った Google・Facebook・Amazon・Apple でのサインインに対応している。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-df681ab1f9f8",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "cognito-user-pools-features"
+          },
+          "contentHash": "49557d163a9e4a135f1eedc9448a127cb7ff01e36b72a00a346ab6391d1dce7d",
+          "section": "features",
+          "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools.html"
         }
       ],
       "status": "passed"
@@ -30784,6 +32346,28 @@
           "contentHash": "f54ccfe342cdc5df08cd5d4024c2c57f3092909ee631d127ef99c313f2c0cd1a",
           "section": "関連サービス",
           "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "CodeBuild は、クラウド上のフルマネージドのビルドサービスで、ビルドサーバーを自分で用意し、管理し、拡張する必要がない。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-e32dba8c0667",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "welcome"
+          },
+          "contentHash": "1fb7181ccf64e34f0da128be2d00ac5332d4a7250253a08e34e2d44d56f1b849",
+          "section": "what is aws codebuild?",
+          "url": "https://docs.aws.amazon.com/codebuild/latest/userguide/welcome.html"
         }
       ],
       "status": "passed"
@@ -31462,6 +33046,28 @@
       "status": "passed"
     },
     {
+      "claim": "API Gateway のステージ変数は、認証情報のような機密データに使うことを想定していない。機密データを統合へ渡すには Lambda オーソライザーを使う。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-e819cb918c14",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "stage-variables"
+          },
+          "contentHash": "e0788fa9cc557c5e5f8417eb74fa1d0a2d6b89888ccc33e20f2d7cf05b06f2aa",
+          "section": "use stage variables for a rest api in api gateway",
+          "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/stage-variables.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "IAM Access Analyzer のポリシー検証は 100 を超えるチェックと推奨事項を提供し、ポリシーの作成や確認に使える。",
       "confidence": "high",
       "domain": "domain2",
@@ -31676,6 +33282,28 @@
       "status": "passed"
     },
     {
+      "claim": "一時的な認証情報を使うと、長期の AWS セキュリティ認証情報をアプリケーションに配布したり埋め込んだりしなくてよい。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-e96cfac6a673",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "id_credentials_temp"
+          },
+          "contentHash": "fae5de9fbd01fad29f71b839d4414733ee3e779969bc9af031c0f29e1bc65106",
+          "section": "temporary security credentials in iam",
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "EventBridge は、イベントの取り込み、フィルタリング、変換、配信を一貫した方法で行える",
       "confidence": "high",
       "domain": "domain1",
@@ -31863,6 +33491,28 @@
           "contentHash": "fae5de9fbd01fad29f71b839d4414733ee3e779969bc9af031c0f29e1bc65106",
           "section": "他の AWS サービス",
           "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "カスタマーマネージドキーは、暗号化の操作に使え、その使用状況を CloudTrail のログで監査できる。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-eb7b227158be",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "customer-mgn-key"
+          },
+          "contentHash": "347af0f16b7b1ed25e467dc6e6264ebba07f0f3edfc7abebfa635a4db307871b",
+          "section": "customer managed keys",
+          "url": "https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html"
         }
       ],
       "status": "passed"
@@ -32226,6 +33876,28 @@
       "status": "passed"
     },
     {
+      "claim": "関数に予約済み同時実行を割り当てると、その分の同時実行は他の関数が使えなくなる。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-ee458291958b",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "reserved-concurrency-concept"
+          },
+          "contentHash": "5177c72660f33883bd88acae91d663fa632fb1cb42871831f16f12fc524154ea",
+          "section": "reserved concurrency",
+          "url": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "VPC 用の EC2 権限が必要なのはネットワークインターフェースを作るときだけで、関数を呼び出すだけなら実行ロールからこの権限を外しても呼び出せる",
       "confidence": "high",
       "domain": "domain2",
@@ -32317,6 +33989,28 @@
           "contentHash": "81f14b7fd25de6b13b4b155d1ec3f2d95ff922b3a9c7e29119a4f9e8f9bdbbc2",
           "section": "Features of Amazon OpenSearch Service",
           "url": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/what-is.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "AWS SAM は、インフラストラクチャをコードで定義する(IaC)ことで、サーバーレスアプリケーションを作るためのオープンソースのフレームワークである。",
+      "confidence": "high",
+      "domain": "domain3",
+      "id": "f-ee95f57d5af2",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "what-is-sam"
+          },
+          "contentHash": "c080bcfc94592c2b9e208a2194d90ce0e5968402f5bb92d8f83c8258a0f856ee",
+          "section": "what is the aws serverless application model (aws sam)?",
+          "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html"
         }
       ],
       "status": "passed"
@@ -33530,6 +35224,28 @@
       "status": "rejected"
     },
     {
+      "claim": "S3 のライフサイクルの遷移アクションは、オブジェクトを別のストレージクラスへ移すタイミングを定める。",
+      "confidence": "high",
+      "domain": "domain1",
+      "id": "f-f6df762dbf16",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "object-lifecycle-mgmt"
+          },
+          "contentHash": "a2b47f7e7d97c35983f12a5e78bdcfeb088553c750ab4bb25262067d835f5018",
+          "section": "managing the lifecycle of objects",
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
       "claim": "すべての S3 バケットで既定の暗号化は SSE-S3 で、各オブジェクトは固有のキーで AES-256 により暗号化される",
       "confidence": "high",
       "domain": "domain2",
@@ -34175,6 +35891,28 @@
           "contentHash": "1878a8bee2ffd1f4f0ca5b3902987fa37496588df7f102f9c6bb0187be2713b7",
           "section": "ライトスルー",
           "url": "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/Strategies.html"
+        }
+      ],
+      "status": "passed"
+    },
+    {
+      "claim": "Parameter Store の SecureString 型は、暗号化が必要な設定値に使う。",
+      "confidence": "high",
+      "domain": "domain2",
+      "id": "f-fd40aa65013a",
+      "reasons": [],
+      "scope": {
+        "edition": "C02"
+      },
+      "scopeItems": [],
+      "sources": [
+        {
+          "anchor": {
+            "heading": "systems-manager-parameter-store"
+          },
+          "contentHash": "21dd62f6e50b007acc01edb29679651b1f62de24acbcd1fe97eed6f26f78b23d",
+          "section": "aws systems manager parameter store",
+          "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html"
         }
       ],
       "status": "passed"

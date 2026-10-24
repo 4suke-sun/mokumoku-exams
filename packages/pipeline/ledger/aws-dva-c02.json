@@ -179,7 +179,297 @@
     "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/developer-associate-02.html"
   },
   "recheck": {
-    "facts": [],
+    "facts": [
+      "f-002802fdc04c",
+      "f-008591d4589b",
+      "f-01c9561bb1b3",
+      "f-01d09bbff885",
+      "f-0313cb73f1e6",
+      "f-03a4b31b697d",
+      "f-041b43d95def",
+      "f-045b23cfcbae",
+      "f-05802bd983ad",
+      "f-05fa4108761d",
+      "f-07fea47416fc",
+      "f-08c1c1a07fa9",
+      "f-0abfb2a854dd",
+      "f-0b22172ebb22",
+      "f-0d456903e3c3",
+      "f-0dffa78dd895",
+      "f-0e47ee75cfd5",
+      "f-0ed95d0ce10b",
+      "f-0f6cbe0eb91c",
+      "f-100120b57304",
+      "f-10334aa1e163",
+      "f-115ca1329931",
+      "f-1165e29af911",
+      "f-141073995cb6",
+      "f-147192abd939",
+      "f-149d2d3303d4",
+      "f-1555fab473f6",
+      "f-186740f9a90c",
+      "f-1a24d2357b28",
+      "f-1b1a40546c90",
+      "f-1c9c7dc019bf",
+      "f-1d0c9cc65c6a",
+      "f-1decd6ceb0b7",
+      "f-1e04d52281b8",
+      "f-204357258edd",
+      "f-20b7ed4c07fa",
+      "f-22cb96748a7c",
+      "f-230ce510f654",
+      "f-278c13e65fea",
+      "f-27b04d16a741",
+      "f-28add6a12961",
+      "f-28e140d0c64c",
+      "f-298d5d960e1a",
+      "f-2a831f1b705a",
+      "f-2be85e08818d",
+      "f-2c848a4aba89",
+      "f-2f1fb22d4403",
+      "f-2ff13d54b975",
+      "f-3078b1162dde",
+      "f-31b9bd3c8adb",
+      "f-333f4ded0fa3",
+      "f-3501be243c71",
+      "f-352b06f7fecf",
+      "f-356545249699",
+      "f-35bf5026cdc8",
+      "f-363711534199",
+      "f-371d8adf03a1",
+      "f-38e9ff3d7cae",
+      "f-3a9f86258f6c",
+      "f-3dc5590ad030",
+      "f-3f51a558379a",
+      "f-419ea080fb78",
+      "f-41a4db6cad8c",
+      "f-46beb860c0c4",
+      "f-46dcdb01637a",
+      "f-47af74dc4d7c",
+      "f-49416d29422a",
+      "f-49d0bd2faecf",
+      "f-49eb3186d023",
+      "f-4b0359d6ad60",
+      "f-4d2ef978e626",
+      "f-4d69aa41b815",
+      "f-4d9fb2b87b5d",
+      "f-4de6fc68faa3",
+      "f-4e16dbaf902d",
+      "f-4ee274b1f6ab",
+      "f-4f824ba6fc4a",
+      "f-4fa7609edb3a",
+      "f-50dddeed7e1e",
+      "f-52b41e27630f",
+      "f-5355ad376b15",
+      "f-53773f9456ae",
+      "f-537bb900efe8",
+      "f-53d8172dc9a9",
+      "f-53f19fe095e2",
+      "f-53f61457359f",
+      "f-54377b43cb5c",
+      "f-543d8e24873e",
+      "f-54b130ac83cc",
+      "f-5931d661e879",
+      "f-594627dd1eb8",
+      "f-597ae53f3777",
+      "f-5996815a6176",
+      "f-59d22789b436",
+      "f-59df7c82a7ae",
+      "f-5a298bbb7903",
+      "f-5a7fa6bc06d8",
+      "f-5c1898cd0d58",
+      "f-5ec05013843f",
+      "f-5ef4b2f790b3",
+      "f-618c4a0c072b",
+      "f-61e503574689",
+      "f-61f08f74542a",
+      "f-6231ad83f9fa",
+      "f-63c2398aa5b0",
+      "f-655bb87d4e7e",
+      "f-65639d7c8e1a",
+      "f-658e4090049f",
+      "f-6731c5d27a00",
+      "f-679904fd956f",
+      "f-67c150c4c511",
+      "f-69234eb1c5c1",
+      "f-699501bb6f5b",
+      "f-6ac78801dc2b",
+      "f-6b0aa712c867",
+      "f-6bfa8f2c9fda",
+      "f-6c1090841ac7",
+      "f-6c7f6ab00335",
+      "f-6e720f2050ce",
+      "f-6e9876315718",
+      "f-6f03c5edb112",
+      "f-6f4549cd2a10",
+      "f-6f4a21dda0c9",
+      "f-704cabb7ea8f",
+      "f-711b0ec99db0",
+      "f-72c03509e2b6",
+      "f-72dd63a6dea1",
+      "f-732f003eea8a",
+      "f-733d8515afa2",
+      "f-73836b89f8d7",
+      "f-73af58b58b99",
+      "f-73fd7d08170d",
+      "f-754e20a5bbb6",
+      "f-75d09c83220d",
+      "f-75e02e43f544",
+      "f-76b9fa2c15f2",
+      "f-7798846fbee5",
+      "f-77a4d7d83dbf",
+      "f-7812cfaa3f32",
+      "f-781697cab244",
+      "f-784536a3d3b8",
+      "f-789e2cdac269",
+      "f-79f7c3f00223",
+      "f-7af97dbdd689",
+      "f-7d900ebc86af",
+      "f-83673156f895",
+      "f-837d9f61969c",
+      "f-83d8227a542b",
+      "f-846275cdf122",
+      "f-84696876d6df",
+      "f-85ce88a0e14b",
+      "f-87908a93f8f2",
+      "f-879d60f76c33",
+      "f-8a989ae07c65",
+      "f-8b1c3eb905ad",
+      "f-8bc58eb62a53",
+      "f-8be135f52cef",
+      "f-8ca8e2230769",
+      "f-8cc010c579d0",
+      "f-8e75b172ef13",
+      "f-8f106d0c316b",
+      "f-8f5a2042185c",
+      "f-8ff515a7380f",
+      "f-9064958bd519",
+      "f-91ac9976e382",
+      "f-943db107a1d0",
+      "f-944387e25add",
+      "f-945147393ced",
+      "f-96024161e8c9",
+      "f-9636ee227587",
+      "f-963e60f0f697",
+      "f-968d8f0f161d",
+      "f-98a05ab34dca",
+      "f-994ab478daa6",
+      "f-99cdd2698852",
+      "f-9a7417050c13",
+      "f-9a80d03ca24f",
+      "f-9cacf39e6b75",
+      "f-9d278888a8d9",
+      "f-9d31ee1d51d3",
+      "f-9e896034f406",
+      "f-9f0f4cde6ae0",
+      "f-a041ce3c8fd4",
+      "f-a13a1c79f090",
+      "f-a19ea63375ae",
+      "f-a23e0b2f5702",
+      "f-a3755ff15718",
+      "f-a4aba6fe646f",
+      "f-a78a6fdd0a9a",
+      "f-a82b72b71cc7",
+      "f-a831e4a3b93d",
+      "f-a8c2a7a8da5e",
+      "f-aa202475368b",
+      "f-aa995d378b48",
+      "f-ac693556a719",
+      "f-adbc047dd535",
+      "f-adc2b7e64e12",
+      "f-ae793de6f2b9",
+      "f-b0dd056713d5",
+      "f-b14590660f46",
+      "f-b19c3311727b",
+      "f-b286f63d0389",
+      "f-b290c969b4d1",
+      "f-b3a0927cbf72",
+      "f-b4d44f15c3d0",
+      "f-b8f61299195e",
+      "f-ba62fa07f2ae",
+      "f-bccc138d8822",
+      "f-bce15a64c038",
+      "f-bd062aa869de",
+      "f-bd894dbf6d8e",
+      "f-be8dceabe84c",
+      "f-c00b2f837bd8",
+      "f-c0dc04638b9b",
+      "f-c29db11a50d7",
+      "f-c2c00a84b6c1",
+      "f-c32d41e1e733",
+      "f-c443ffd8b8ce",
+      "f-c5605f9b457d",
+      "f-c5632385857e",
+      "f-c602bfd9abc2",
+      "f-c68dc81e42da",
+      "f-c7774a4fa786",
+      "f-c796c4ff2c94",
+      "f-c7f4a09d46f5",
+      "f-c873e66768c4",
+      "f-c8aa7b6dee63",
+      "f-c9b65cc8f296",
+      "f-c9e0823899b2",
+      "f-ca7c0bdcf904",
+      "f-cb36d405b4e5",
+      "f-ccb6a0fcc54c",
+      "f-ccf7df77630b",
+      "f-cd02369254f1",
+      "f-cd12ae0bb2f1",
+      "f-ce5892ae6add",
+      "f-cf8e879029a1",
+      "f-cfa22a97ab3c",
+      "f-cfa9321ec756",
+      "f-d0069c4bcbc9",
+      "f-d05480aa601d",
+      "f-d1cc031304a6",
+      "f-d1cc913f73a2",
+      "f-d58519022c43",
+      "f-d6e8013e673b",
+      "f-d7fd4bf25aca",
+      "f-d8a76d89e447",
+      "f-d94daf21cbcb",
+      "f-d988c764de33",
+      "f-daa68608fbfb",
+      "f-db15267554fe",
+      "f-dc89d4ce0f9d",
+      "f-dd9adbc3429b",
+      "f-de25c01bce08",
+      "f-de7715f62073",
+      "f-dec11387a92d",
+      "f-ded612c88c91",
+      "f-df91d2e7713c",
+      "f-df9e899a5a9f",
+      "f-e099d2170622",
+      "f-e11b7f55ebdb",
+      "f-e1216087ae71",
+      "f-e28ce5dfe235",
+      "f-e47e4b806bd5",
+      "f-e4ed0b2390dc",
+      "f-e63a58a53b83",
+      "f-e6679864c921",
+      "f-e6706beaa329",
+      "f-e894d59c9167",
+      "f-e8b6bfea81a0",
+      "f-e97e8856a393",
+      "f-ed40bbbf0c4d",
+      "f-edf8dfebe408",
+      "f-ee759434927b",
+      "f-f035310e54d8",
+      "f-f1d069ab5b4a",
+      "f-f28fe60a4f53",
+      "f-f31ca2ea55d7",
+      "f-f324214e5579",
+      "f-f333a88501e0",
+      "f-f35a93d49c86",
+      "f-f4108a5eed95",
+      "f-f5afdad4afe6",
+      "f-f9110587869a",
+      "f-fa90ab138abe",
+      "f-fc65dcc7efa5",
+      "f-fd8bca127c66",
+      "f-fe1e1763dc8d",
+      "f-ff617f1a4486"
+    ],
     "questions": []
   },
   "sources": [
@@ -208,14 +498,14 @@
       ],
       "claims": [],
       "contentHash": "45456ae7648acb2e9c2fb6c140452cf8f0b2d3014fd2a0c84b549d3441af92b7",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html"
     },
     {
@@ -243,14 +533,14 @@
       ],
       "claims": [],
       "contentHash": "e3e688dc1a314383dc0e828a8b976586d5c0556582968afc2401a326167d437a",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-changesets.html"
     },
     {
@@ -278,14 +568,14 @@
       ],
       "claims": [],
       "contentHash": "55e44e6092826f51f92c091afa5dc87bd9f32477217b6f8eaebe1f36e1de1e6d",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html"
     },
     {
@@ -313,14 +603,14 @@
       ],
       "claims": [],
       "contentHash": "74f7522af12208d0198cdd2025e4ea7d7abd6de686844dfc68d16c04707f51c1",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html"
     },
     {
@@ -383,14 +673,14 @@
       ],
       "claims": [],
       "contentHash": "1bad70a471afec919ac98e29a9ddc5d52934d77e336966fbace91e7c06e57b6a",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html"
     },
     {
@@ -418,14 +708,14 @@
       ],
       "claims": [],
       "contentHash": "3c99ffc4c0d6e8d64070bb39ae0ef9647e3b290636178981e68b853597a0c7e2",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-fifo-queues.html"
     },
     {
@@ -453,14 +743,14 @@
       ],
       "claims": [],
       "contentHash": "a1dc39924f32c06dc395d0ac89b1afc2b6c71187bb5e06d26e4c8eaecdd9c0b4",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-short-and-long-polling.html"
     },
     {
@@ -488,14 +778,14 @@
       ],
       "claims": [],
       "contentHash": "bac1ddd7349065223d1a93a3b864c27b9153abfd27a4531ed358972f10ed8510",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html"
     },
     {
@@ -523,14 +813,14 @@
       ],
       "claims": [],
       "contentHash": "f178312a606490d4be5993b99699c42bfb14b6618ee359523ab974d19a500e32",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
     },
     {
@@ -558,14 +848,14 @@
       ],
       "claims": [],
       "contentHash": "3c8eebd192f26659f4191ccc094e9144fb7e3482c59bf17c5345a17d5e735f2e",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html"
     },
     {
@@ -593,14 +883,14 @@
       ],
       "claims": [],
       "contentHash": "a8f9688d11ea02b2877a7d5cbf0bdc4f45f0a5a029925d241094f536d18fcb7b",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AnalyzingLogData.html"
     },
     {
@@ -627,15 +917,50 @@
         }
       ],
       "claims": [],
-      "contentHash": "8b8c053cc85b2bd835727262770ba1a79d99e934330eabf0c00e006fefcd3191",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "7b911433370877da74fac89ae34e0e74ef4519a5c29fdc0d394dfd71ca56cea4",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CWL_QuerySyntax.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "8b8c053cc85b2bd835727262770ba1a79d99e934330eabf0c00e006fefcd3191",
+      "fetchedAt": "2026-10-24",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-DVA-C02"
+      },
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/MonitoringLogData.html"
     },
     {
@@ -663,14 +988,14 @@
       ],
       "claims": [],
       "contentHash": "e13db9d9c821e8195c1c5e20b59ab732a32c780a17c0489caac3571cbb542da0",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html"
     },
     {
@@ -698,14 +1023,14 @@
       ],
       "claims": [],
       "contentHash": "f6e26380aa44d3298a070fcf95554302c70a56ed59656608e1763c8930b1d4ec",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/mask-sensitive-log-data.html"
     },
     {
@@ -733,14 +1058,14 @@
       ],
       "claims": [],
       "contentHash": "2ad43cffa05da721f51628b6d317d59394f746e77165ffef697599bbfb29ddfb",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Embedded_Metric_Format.html"
     },
     {
@@ -768,14 +1093,14 @@
       ],
       "claims": [],
       "contentHash": "22a192068b709f9529a736c2317d302920abd2ef0a196f3882569d24c811fc2b",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-19",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html"
     },
     {
@@ -802,15 +1127,15 @@
         }
       ],
       "claims": [],
-      "contentHash": "ed860942f0967748ef7e2094b8f310131482070084b9cf00199e25a14cf30ae5",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "8302c79b1498b8e744bed9b2c4c258ae7f15d82074848a3ed8962987bfbb92f3",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html"
     },
     {
@@ -838,14 +1163,14 @@
       ],
       "claims": [],
       "contentHash": "5ca53f3a9729de3097aff3d7ef469aeea0eabec4d5e83260334189c835ac6594",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html"
     },
     {
@@ -872,15 +1197,15 @@
         }
       ],
       "claims": [],
-      "contentHash": "f560a39794da4d6568c9e8f8646e5d21dbde63cb40880a4c79330788f2410d2f",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "64d424e5ed005bf182ab710b869a8a6cf3a7442132d50b992cc5a8ff20cf77ca",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AmazonECR/latest/userguide/what-is-ecr.html"
     },
     {
@@ -908,14 +1233,14 @@
       ],
       "claims": [],
       "contentHash": "4804254e74cb22518973a37c7eedc006f04a5d689180463de9b3b8f11aceb493",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html"
     },
     {
@@ -943,14 +1268,14 @@
       ],
       "claims": [],
       "contentHash": "1878a8bee2ffd1f4f0ca5b3902987fa37496588df7f102f9c6bb0187be2713b7",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/Strategies.html"
     },
     {
@@ -978,14 +1303,14 @@
       ],
       "claims": [],
       "contentHash": "459395f39644de8fafb049637bec507e1207c2d649c1f37fa50afba3d70e6f8c",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/WhatIs.html"
     },
     {
@@ -1013,14 +1338,14 @@
       ],
       "claims": [],
       "contentHash": "cbdfd91c7d48d12256f358091462f2c8f0d4c963c4db34c9862ac57cbcb5cca9",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/CHAP_AuroraOverview.html"
     },
     {
@@ -1047,15 +1372,15 @@
         }
       ],
       "claims": [],
-      "contentHash": "025c9d70240859616439733484013f2ecb953592b6f8baae66e6573f1f2cc4be",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "dad388b601749dc28c07c77b63a008352109fd39f7ee4a2bcfa63460293f45f3",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html"
     },
     {
@@ -1083,14 +1408,14 @@
       ],
       "claims": [],
       "contentHash": "1583a9671685d2e647c0c4a126eec938213cebc3af142781b8b64664adee6e61",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html"
     },
     {
@@ -1118,14 +1443,14 @@
       ],
       "claims": [],
       "contentHash": "e0002e3d1e3ba1cd05736d6d593751f2bbd9f71fff75ab5c8bed3602e8fd0a88",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventNotifications.html"
     },
     {
@@ -1153,14 +1478,14 @@
       ],
       "claims": [],
       "contentHash": "0eef1182fc35c64aba32ccc071588cd726d37f5d2ccc639003116f4a6a89908b",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html"
     },
     {
@@ -1188,14 +1513,14 @@
       ],
       "claims": [],
       "contentHash": "37eda5874f5577bc02552d465e45ecf935b2048b880212de47f65242cb1e16f1",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
     },
     {
@@ -1223,14 +1548,14 @@
       ],
       "claims": [],
       "contentHash": "da4acc32befb7018e9326207136e53ae4409b070141ead1be55a67fa7c445cb1",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/cors.html"
     },
     {
@@ -1258,14 +1583,14 @@
       ],
       "claims": [],
       "contentHash": "69c3cbba7a976efc7d37f933d113a2f48eff409ff27800614db1c4b08aee95b4",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html"
     },
     {
@@ -1292,15 +1617,50 @@
         }
       ],
       "claims": [],
-      "contentHash": "804c6016538b1111a9b028c032dce2810baa0dd2785043ce6cf273cb5b6735e8",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "a2b47f7e7d97c35983f12a5e78bdcfeb088553c750ab4bb25262067d835f5018",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "804c6016538b1111a9b028c032dce2810baa0dd2785043ce6cf273cb5b6735e8",
+      "fetchedAt": "2026-10-24",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-DVA-C02"
+      },
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/serv-side-encryption.html"
     },
     {
@@ -1328,14 +1688,14 @@
       ],
       "claims": [],
       "contentHash": "4e6f7c5f3d9c826b209fd4e7048c9982125cb75c18ff4d4ab7e470cd4235eecc",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html"
     },
     {
@@ -1363,14 +1723,14 @@
       ],
       "claims": [],
       "contentHash": "0c286bb363d804d7cee8cf712cc24edf260b9a7744f5a6905797ec9bbe7b92a0",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html"
     },
     {
@@ -1398,14 +1758,14 @@
       ],
       "claims": [],
       "contentHash": "8b97534d790da8647c2b58e497060630ce5f2b01ce46e2d2deac2070ada0f338",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
     },
     {
@@ -1433,14 +1793,14 @@
       ],
       "claims": [],
       "contentHash": "fae5de9fbd01fad29f71b839d4414733ee3e779969bc9af031c0f29e1bc65106",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html"
     },
     {
@@ -1468,14 +1828,14 @@
       ],
       "claims": [],
       "contentHash": "19a6459dd5046ded2f0050126c8c00966dbe6d2440cc2884a1f9d4511b417b0c",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html"
     },
     {
@@ -1503,14 +1863,14 @@
       ],
       "claims": [],
       "contentHash": "0b05ce16085793e6747bd721df75ec0dd278b22df6ff7450dc92fb22e9edf605",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html"
     },
     {
@@ -1538,14 +1898,14 @@
       ],
       "claims": [],
       "contentHash": "c89f839064a26a0832b99613f691ef312edd02778f951ff24e577766cb822b2f",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html"
     },
     {
@@ -1573,14 +1933,14 @@
       ],
       "claims": [],
       "contentHash": "8682dd049e4315193ae5d2e34ca5ba406fec62db47646c28fce4c5acc285305a",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html"
     },
     {
@@ -1608,14 +1968,14 @@
       ],
       "claims": [],
       "contentHash": "2372a3fc49a065c771a6830d161d9ece1993b75bd7d8c5116dbb8b957ae5dbd7",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-16",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/STS/latest/APIReference/welcome.html"
     },
     {
@@ -1643,14 +2003,14 @@
       ],
       "claims": [],
       "contentHash": "72c5883584a60d162dfde1327c0a57428f6ea31de4169cf3a85532bc5a65a409",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html"
     },
     {
@@ -1678,14 +2038,14 @@
       ],
       "claims": [],
       "contentHash": "a77c092567e8368a971d2ef81b9b31df93d1db0ff473b4e4299dec91840edafa",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAX.html"
     },
     {
@@ -1712,15 +2072,15 @@
         }
       ],
       "claims": [],
-      "contentHash": "be755f9170941fdd3358e34a2bae229e529d194de7069f6715fa0102964618be",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "6f1fc68b2bb374f5fc40003b04a2411963dfdbe78c572edd477bc98891f8eff3",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html"
     },
     {
@@ -1747,15 +2107,15 @@
         }
       ],
       "claims": [],
-      "contentHash": "9debb8e75029317d779ed58ca2b3bbc45598e28fca90ab3de455ddd78f7b148e",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "c6ef2421d8578a65de2d6f95f56fdf5df9722fc6e5e16c9209c88c9d2211822b",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html"
     },
     {
@@ -1783,14 +2143,14 @@
       ],
       "claims": [],
       "contentHash": "7170a35163c0d845ae27e549f085247c92f34c893cb46c48c12d6cb5bb76e655",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html"
     },
     {
@@ -1818,14 +2178,14 @@
       ],
       "claims": [],
       "contentHash": "6f8e7f11b88d918b911c78978ddecc9e464f9a601e5935cd6f1eba1bd4229c72",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html"
     },
     {
@@ -1853,14 +2213,14 @@
       ],
       "claims": [],
       "contentHash": "7ff7437073dc662a0b334680c1120deb44f4bdc21bfba213a1ee72a628824c24",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LSI.html"
     },
     {
@@ -1888,14 +2248,14 @@
       ],
       "claims": [],
       "contentHash": "5eba9eb5826e2887b5c5b2a223d330534572ef31b80d44181d18e76338d52a44",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.html"
     },
     {
@@ -1922,15 +2282,15 @@
         }
       ],
       "claims": [],
-      "contentHash": "b179c5334be11de25f526737cff134eca863bf95364f456127939a3e5f62cc95",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "ac26e312eddd98a0d0bb2441df2f025c10dbde214f3b33e525ef23f6b629b107",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Scan.html"
     },
     {
@@ -1958,14 +2318,14 @@
       ],
       "claims": [],
       "contentHash": "dbcd0bc10101e348434813e0b07d1c62c21f0c01af80dd090c4373e8e6d758ba",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html"
     },
     {
@@ -1993,14 +2353,14 @@
       ],
       "claims": [],
       "contentHash": "be4547f657d2f3eabe3bf794cfbe3cd0d20ff9dd6a374554c67ab85c8e47e4b8",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html"
     },
     {
@@ -2027,15 +2387,50 @@
         }
       ],
       "claims": [],
-      "contentHash": "5ecf1cb7f7ef59aa52a65fddd3f86076fddb9cb15b3d248a1173b59cc1411851",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "92f51e5b8f3b152f0b692a1da8f09d3cfcaf0b76d2890f3f991be95aa2ba1eb7",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
+      "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-design.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "5ecf1cb7f7ef59aa52a65fddd3f86076fddb9cb15b3d248a1173b59cc1411851",
+      "fetchedAt": "2026-10-24",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-DVA-C02"
+      },
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/capacity-mode.html"
     },
     {
@@ -2063,14 +2458,14 @@
       ],
       "claims": [],
       "contentHash": "cfd15d1ed6c8c6f519c7cb053e156f1dba9e5bde187d83cbbd08ee30c831d4e9",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/specifying-conditions.html"
     },
     {
@@ -2097,15 +2492,15 @@
         }
       ],
       "claims": [],
-      "contentHash": "d5d31626168cf2483eb831d6b4eef812ebe06296b6eb12657a3b11e3739cb898",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "8d40c61ff21181a1fb00abd5d9047b1350afd15c2925af7a2ce4ea7676fa4655",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html"
     },
     {
@@ -2133,14 +2528,14 @@
       ],
       "claims": [],
       "contentHash": "20811c19a9717c30fbfbaa39885818dff8f0eb1b59585496dfeb06ef1fb5a3c1",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/q-in-IDE-chat.html"
     },
     {
@@ -2203,14 +2598,14 @@
       ],
       "claims": [],
       "contentHash": "254d88209eeeed92d67a040eda3b78a30946dc6cb04c8ee6029f99fe578d774b",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/what-is.html"
     },
     {
@@ -2238,14 +2633,14 @@
       ],
       "claims": [],
       "contentHash": "d6c9e4f8aee8e18d79fb130ea6883b21791de99f70b495d9ea0a4cfeb838be8f",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/amplify/latest/userguide/welcome.html"
     },
     {
@@ -2273,14 +2668,14 @@
       ],
       "claims": [],
       "contentHash": "738be4c483fe712e9b17845bed25841133b2d2f764e1cd6ac2ca94ed23eb5513",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-caching.html"
     },
     {
@@ -2308,14 +2703,14 @@
       ],
       "claims": [],
       "contentHash": "38e32eeb520586da45d9f0f2b36c1cedc46ddd0a1a8e144c17582eaff35a03ab",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html"
     },
     {
@@ -2343,14 +2738,14 @@
       ],
       "claims": [],
       "contentHash": "c510eff4b4d24c7fa985526fa2b4abef793be6dc2a0eee7bc9b44f85a4c57886",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-integrate-with-cognito.html"
     },
     {
@@ -2378,14 +2773,14 @@
       ],
       "claims": [],
       "contentHash": "0586c990cabdaf3ba606677d3bda0392431d861ae3baa7541e8505ed4ccc5e5b",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html"
     },
     {
@@ -2413,14 +2808,14 @@
       ],
       "claims": [],
       "contentHash": "73a9ddcd27518b7a630d8e55fea2432b93ecc15c02c755d11e67210b8b58f020",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/canary-release.html"
     },
     {
@@ -2448,14 +2843,14 @@
       ],
       "claims": [],
       "contentHash": "ed3dcd8756b7247351a034f4cd4b254f33cc7904d4bd2e31a95ed034cbebfede",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-stages.html"
     },
     {
@@ -2483,14 +2878,14 @@
       ],
       "claims": [],
       "contentHash": "e0788fa9cc557c5e5f8417eb74fa1d0a2d6b89888ccc33e20f2d7cf05b06f2aa",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/stage-variables.html"
     },
     {
@@ -2518,14 +2913,14 @@
       ],
       "claims": [],
       "contentHash": "a8a34ed3346f5828b6d4101321960e9a5fd6a4c3a6a8a914c62c6c34f083f1dd",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html"
     },
     {
@@ -2553,14 +2948,14 @@
       ],
       "claims": [],
       "contentHash": "27394e41d2d11a4101f43e073d814f342241d310da95f6d09e02b0d50ecad42c",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/appconfig/latest/userguide/what-is-appconfig.html"
     },
     {
@@ -2588,14 +2983,14 @@
       ],
       "claims": [],
       "contentHash": "f623c887f7c51ba6b4f1b128a4333e08ca02f234d7c16a62369a5e0b2b77c225",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/appsync/latest/devguide/what-is-appsync.html"
     },
     {
@@ -2623,14 +3018,14 @@
       ],
       "claims": [],
       "contentHash": "2c2c45127212218dcf6ad7caf871f49c1828e83f453a56673b999854789bae2f",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/athena/latest/ug/what-is.html"
     },
     {
@@ -2658,14 +3053,14 @@
       ],
       "claims": [],
       "contentHash": "2c37e523f82ba7557c314d703e81b62727c5b844541809a434fd0f6f3fd272af",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-16",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/developer-associate-02-domain1.html"
     },
     {
@@ -2693,14 +3088,14 @@
       ],
       "claims": [],
       "contentHash": "4c72ff28765bbaede2f70c17b159e001c2ee4520f22956c054a16b5296924ca9",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-16",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/developer-associate-02-domain2.html"
     },
     {
@@ -2728,14 +3123,14 @@
       ],
       "claims": [],
       "contentHash": "a92d1ac8baa560b5bd17f8815f533ddab0978804f90dccbf1eb8f4813428ff35",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-16",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/developer-associate-02-domain3.html"
     },
     {
@@ -2763,14 +3158,14 @@
       ],
       "claims": [],
       "contentHash": "f3425c187771e79f70e32fa4d785e882853652a412e2b51c86e811bb1809ca6f",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-16",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/developer-associate-02-domain4.html"
     },
     {
@@ -2798,14 +3193,14 @@
       ],
       "claims": [],
       "contentHash": "17217d2da3090b3c5996a06a6618efdbec1db888b7c767f73dca337f4f2444a9",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-16",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/developer-associate-02.html"
     },
     {
@@ -2833,14 +3228,14 @@
       ],
       "claims": [],
       "contentHash": "132aa063386fbb4ec36884d8c8d7a2ec8f551121366076e8440e5fb9493c3cb3",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-16",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/dva-02-in-scope-services.html"
     },
     {
@@ -2868,14 +3263,14 @@
       ],
       "claims": [],
       "contentHash": "967e9cfbc252760f0214fbd5106e2a5f522f520cc6dbe2c3fe3de1dfddb8328c",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-16",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/dva-02-out-of-scope-services.html"
     },
     {
@@ -2903,14 +3298,14 @@
       ],
       "claims": [],
       "contentHash": "e241e0009f80e6e7e967afa8d91a0f76fa0a0bf2f3ecc54d5fa60721d01a1d37",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-16",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/dva-technologies-concepts.html"
     },
     {
@@ -2938,14 +3333,14 @@
       ],
       "claims": [],
       "contentHash": "92ca8fba6b9e4f419348db66902346b18bcc188ac401a6c6974de66f950f22d2",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-19",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html"
     },
     {
@@ -2973,14 +3368,14 @@
       ],
       "claims": [],
       "contentHash": "4cc9a8f2cb19befa6091f2eb4310cc4564d6d2e29288207327a411e247efc034",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/cdk/v2/guide/home.html"
     },
     {
@@ -3008,14 +3403,14 @@
       ],
       "claims": [],
       "contentHash": "d53c773403cfc6b1b65fc54e684c92d1331a12e1ca088b454e7d6ca7fb3306e1",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html"
     },
     {
@@ -3043,14 +3438,14 @@
       ],
       "claims": [],
       "contentHash": "fbdcf93260bd30b6894d8bc7f042b32346726aecd2e38612183432a5ec06a227",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/cloudshell/latest/userguide/welcome.html"
     },
     {
@@ -3078,14 +3473,14 @@
       ],
       "claims": [],
       "contentHash": "873629f161f5ccad6363b6c09aeccd36e090fabb48dea1521428219f866bde3d",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/codeartifact/latest/ug/welcome.html"
     },
     {
@@ -3112,15 +3507,15 @@
         }
       ],
       "claims": [],
-      "contentHash": "2cbb26a8515390f7b7cab12f4730a76f2debc92843120f0b21531cbf07b41ff8",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "6f8ff2a4e3f90f6f455a69775613086465a10c6e83eabbf215a8c7818e949298",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html"
     },
     {
@@ -3147,15 +3542,15 @@
         }
       ],
       "claims": [],
-      "contentHash": "8609e9a7abe32bea3684cc05fce308de1339076533b6f34851e2dead79296e00",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "1fb7181ccf64e34f0da128be2d00ac5332d4a7250253a08e34e2d44d56f1b849",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/codebuild/latest/userguide/welcome.html"
     },
     {
@@ -3183,14 +3578,14 @@
       ],
       "claims": [],
       "contentHash": "a66604e562ac23a854af6b916f6af83514e773a16eead0038be216c667f58f9b",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/deployment-configurations.html"
     },
     {
@@ -3218,14 +3613,14 @@
       ],
       "claims": [],
       "contentHash": "0b201a8106e8d51e114dc0ca25ce268167465338eaee424118ddbda41fc0c432",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file.html"
     },
     {
@@ -3253,14 +3648,14 @@
       ],
       "claims": [],
       "contentHash": "cf4f7e555f3ce1894813b622bc5f18b6162587a7465099227eca6caa21f9fec1",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/welcome.html"
     },
     {
@@ -3288,14 +3683,14 @@
       ],
       "claims": [],
       "contentHash": "64266d39e6b4742565886ba4f7cade9548d227f1cea46f56843582dad92ac863",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/codeguru/latest/profiler-ug/what-is-codeguru-profiler.html"
     },
     {
@@ -3322,15 +3717,85 @@
         }
       ],
       "claims": [],
-      "contentHash": "bc68d108e14140a1a9f5d158e82fa0c2ced609cb0131ff319562a64da2d038e9",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "511872163074d15842693325a2d0ebeb484987a4496046c3998f6b25d46a1bd9",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
+      "url": "https://docs.aws.amazon.com/codeguru/latest/reviewer-ug/welcome.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "4dda0d373433811b6f5f7e44d91a578d69ae0c50c83aa8354055aa4cac813dc0",
+      "fetchedAt": "2026-10-24",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-DVA-C02"
+      },
+      "updatedAt": "2026-10-24",
+      "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/approvals.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "bc68d108e14140a1a9f5d158e82fa0c2ced609cb0131ff319562a64da2d038e9",
+      "fetchedAt": "2026-10-24",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-DVA-C02"
+      },
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/welcome.html"
     },
     {
@@ -3357,15 +3822,15 @@
         }
       ],
       "claims": [],
-      "contentHash": "a2b09052cc91e9c40aa804b75c2cb3bc517699521c95a188365768125286bf65",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "40257d6d1329e28410a9fc113b2862194888e81dd9166bca73b1ca4ad5556c21",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html"
     },
     {
@@ -3392,15 +3857,15 @@
         }
       ],
       "claims": [],
-      "contentHash": "fef1ceaed1f8ebf605a7ee52c90ad56737c8b9e694a918be8f2599de6020e37b",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "f8aa08c86a3c7ec7c386e02d15b618042977d6bfe0e8bc51d279a64237b7a0ac",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-working-with-lambda-triggers.html"
     },
     {
@@ -3427,15 +3892,15 @@
         }
       ],
       "claims": [],
-      "contentHash": "e343f91497ce5e0dac65f5cf6fe02b700347faee90c1ea45c600163b4283708a",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "49557d163a9e4a135f1eedc9448a127cb7ff01e36b72a00a346ab6391d1dce7d",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools.html"
     },
     {
@@ -3462,15 +3927,15 @@
         }
       ],
       "claims": [],
-      "contentHash": "efadaf9b1ca4f5819b27350113774419b7ca4455d7d7381c6e565b4356664195",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "b03124649234ca7551036677bc1db03932258075e490af37552eded2683efec1",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-post-authentication.html"
     },
     {
@@ -3497,15 +3962,15 @@
         }
       ],
       "claims": [],
-      "contentHash": "a3ab7175d14c3c3d72d73810f41e0fdc92687c6769a584d5dba3c143204bdbcc",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "22d262728987c8937612286ce9248089f3735ec3984d87d6c89dda5d929da271",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html"
     },
     {
@@ -3533,14 +3998,14 @@
       ],
       "claims": [],
       "contentHash": "5412f5b3af3db135609a0df86e9e4ca0bd4bce214e5a892dc11d7ab30c9e1299",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/compute-optimizer/latest/ug/what-is-compute-optimizer.html"
     },
     {
@@ -3568,14 +4033,14 @@
       ],
       "claims": [],
       "contentHash": "f59da8e55c0ed26712eb65f60e5ee37eb9a704e2909e65e51712e915bda0126c",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/ebs/latest/userguide/what-is-ebs.html"
     },
     {
@@ -3603,14 +4068,14 @@
       ],
       "claims": [],
       "contentHash": "5af30941ebf771ea17e668065f33c18b16c3de4dfd7926ea0e9dd27b98f7c045",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/efs/latest/ug/whatisefs.html"
     },
     {
@@ -3638,14 +4103,14 @@
       ],
       "claims": [],
       "contentHash": "c36487cc08e247bfcbf1b12decedcafe41d94685e8185e6e8fca78a332571a37",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html"
     },
     {
@@ -3673,14 +4138,14 @@
       ],
       "claims": [],
       "contentHash": "cc98e0d7bb33843c156c59efc5a5d23b83a1b304199b908215cb2648dffe4c11",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/Welcome.html"
     },
     {
@@ -3707,15 +4172,15 @@
         }
       ],
       "claims": [],
-      "contentHash": "c6e92d3dea128875aaae81cc0057ca2c420f0dddc52aa16dad1b828b6c6b4ca3",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "b8e9344f0e5ac7854f43234c70ed53fa4a681840ee5333a33e7de636880e83ed",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html"
     },
     {
@@ -3743,14 +4208,14 @@
       ],
       "claims": [],
       "contentHash": "f54ccfe342cdc5df08cd5d4024c2c57f3092909ee631d127ef99c313f2c0cd1a",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html"
     },
     {
@@ -3778,14 +4243,14 @@
       ],
       "claims": [],
       "contentHash": "7fbce1a003f41e95fc330052a565f66395cd6eebad8424890cae96117cb03e6b",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-16",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/how-it-works.html"
     },
     {
@@ -3813,14 +4278,14 @@
       ],
       "claims": [],
       "contentHash": "ee16710f726f42c29f885f40e5aa18c3eae12e70e28484d2f6c0a6e26e3209fe",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-rules.html"
     },
     {
@@ -3847,15 +4312,15 @@
         }
       ],
       "claims": [],
-      "contentHash": "e1ca5cd7a8ffe54a7c752b94146f2589d6df376cd3699d0bedb6aaca1bed5542",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "fb9316afe48d24eb829b3724ad8bbcd83944e5168606c34eee37bf4849464e92",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html"
     },
     {
@@ -3883,14 +4348,14 @@
       ],
       "claims": [],
       "contentHash": "347af0f16b7b1ed25e467dc6e6264ebba07f0f3edfc7abebfa635a4db307871b",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html"
     },
     {
@@ -3918,14 +4383,14 @@
       ],
       "claims": [],
       "contentHash": "ae6079a3132b58dc6541a559dd757f93210ed79f0a868571d5bbb271f754cf26",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/kms/latest/developerguide/data-keys.html"
     },
     {
@@ -3953,14 +4418,14 @@
       ],
       "claims": [],
       "contentHash": "07358f157e84adc2521026c9848010a6ca71680063f1bcb79d079d2dbb459d44",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html"
     },
     {
@@ -3988,14 +4453,14 @@
       ],
       "claims": [],
       "contentHash": "d42aec23cf5aaa3546ec9012e33fc777b35b53693d822e8786d62bd2c123bdfe",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/chapter-layers.html"
     },
     {
@@ -4023,14 +4488,14 @@
       ],
       "claims": [],
       "contentHash": "5656bedab8e4de2e9ea876f9ad70608f3f9b0bf3b38494a0d8fb359d3a13b57f",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html"
     },
     {
@@ -4057,15 +4522,50 @@
         }
       ],
       "claims": [],
-      "contentHash": "342336f0f8be024c92b3d7022d5a7d51871c94c64ee6980ea7b5f8be97e07213",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "ad91ea2b937af2c1cb86a93c4fbb1132ae4c51b58de64b9e53d4b75dc2248fdf",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "342336f0f8be024c92b3d7022d5a7d51871c94c64ee6980ea7b5f8be97e07213",
+      "fetchedAt": "2026-10-24",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-DVA-C02"
+      },
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html"
     },
     {
@@ -4093,14 +4593,14 @@
       ],
       "claims": [],
       "contentHash": "8f3613531e4ae2d6259494baee9c7de89b58103bd1fd76de431c00edb06ac1d5",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html"
     },
     {
@@ -4128,14 +4628,14 @@
       ],
       "claims": [],
       "contentHash": "ab7269d75973acddf654dbf4c55540495c98448539d650c66f182aa4512e5890",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html"
     },
     {
@@ -4163,14 +4663,14 @@
       ],
       "claims": [],
       "contentHash": "60d704c3357e63e88845c30a3f18da9dd0a40c3673b6a286f23479772469187b",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html"
     },
     {
@@ -4198,14 +4698,14 @@
       ],
       "claims": [],
       "contentHash": "ec15592847642cfd002961f0ff09b4451b787bef1244d1cfd6e0a21e88902458",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html"
     },
     {
@@ -4233,14 +4733,14 @@
       ],
       "claims": [],
       "contentHash": "5110d25ae54f5612fc56fde603acabf1979c3fe1a34f1bfe934c2a66229a884e",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html"
     },
     {
@@ -4268,14 +4768,14 @@
       ],
       "claims": [],
       "contentHash": "5177c72660f33883bd88acae91d663fa632fb1cb42871831f16f12fc524154ea",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html"
     },
     {
@@ -4338,14 +4838,14 @@
       ],
       "claims": [],
       "contentHash": "25d416c4578c97dbc3abdc990de4ff78cfb916e038e4a3867aa23828f1fd5327",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs-view.html"
     },
     {
@@ -4372,15 +4872,50 @@
         }
       ],
       "claims": [],
-      "contentHash": "77ae6b24a3245c5198c9f7e28994108f3d8c089c14651cefc7c683dc2c292b41",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "c379301c864b08124da0e87a537c974413e8cd63eb991c5889bcec7666406b86",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics-types.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "77ae6b24a3245c5198c9f7e28994108f3d8c089c14651cefc7c683dc2c292b41",
+      "fetchedAt": "2026-10-24",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-DVA-C02"
+      },
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html"
     },
     {
@@ -4408,14 +4943,14 @@
       ],
       "claims": [],
       "contentHash": "0fbc8cd18dea7e3ca81a44ae7d0a72481499ac6a85bb9880107f815a65367e8a",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/testing-guide.html"
     },
     {
@@ -4443,14 +4978,14 @@
       ],
       "claims": [],
       "contentHash": "a9a1f03ed5452570fa1e1788cbae1234009650c8df9f8e819c29485683ac447b",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
     },
     {
@@ -4478,14 +5013,14 @@
       ],
       "claims": [],
       "contentHash": "bf2013e8c65e80bca7d3982fdfbdd7b74e89cc58b00ceec7f8f6bc6bd6583554",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html"
     },
     {
@@ -4513,14 +5048,14 @@
       ],
       "claims": [],
       "contentHash": "5d02acaf53377d2d893e86d50dd2608465a518e98dab9635c023c7914a9a5b3f",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html"
     },
     {
@@ -4547,15 +5082,15 @@
         }
       ],
       "claims": [],
-      "contentHash": "81f14b7fd25de6b13b4b155d1ec3f2d95ff922b3a9c7e29119a4f9e8f9bdbbc2",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "509b2005ae5c3dc24efa0f93eb062dc18302e761a376775fb9bdfa536e4842ba",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/what-is.html"
     },
     {
@@ -4583,14 +5118,14 @@
       ],
       "claims": [],
       "contentHash": "0050d9b3ba441c3274814773e0e0093fa299eea62ddcf440403362c34a9c569f",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/privateca/latest/userguide/PcaWelcome.html"
     },
     {
@@ -4618,14 +5153,14 @@
       ],
       "claims": [],
       "contentHash": "9f5a207310f50d7335e1a528ab197126a908df26f01a7a9b18ef3b6f4ac89beb",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-16",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/sdkref/latest/guide/feature-retry-behavior.html"
     },
     {
@@ -4652,15 +5187,85 @@
         }
       ],
       "claims": [],
-      "contentHash": "cc5f063d80825d59ebd305ac9a0e00137f9877a814f9aca75b9ba10db9e5f9f5",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "ba18c0d8c4197c5bbc421c0b4404c3440166acf0828045cfbe8ebdb1b9c109f6",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
+      "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/auth-and-access_examples_cross.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "57da63c43fd872584f52cbe5b8b35d4a4554154ecf08dcc26edd5df49aea9d0d",
+      "fetchedAt": "2026-10-24",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-DVA-C02"
+      },
+      "updatedAt": "2026-10-24",
+      "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/best-practices.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "cc5f063d80825d59ebd305ac9a0e00137f9877a814f9aca75b9ba10db9e5f9f5",
+      "fetchedAt": "2026-10-24",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-DVA-C02"
+      },
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html"
     },
     {
@@ -4688,14 +5293,14 @@
       ],
       "claims": [],
       "contentHash": "ae38d1ec34079b789cabf235a83972bff8c992beb388f02eb8a4a7d124b58864",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets.html"
     },
     {
@@ -4723,14 +5328,14 @@
       ],
       "claims": [],
       "contentHash": "e2cbd5f552a7cf018cf915a699bc06d331deb6f342786a854c49c262ae5177e0",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-local-generate-event.html"
     },
     {
@@ -4758,14 +5363,14 @@
       ],
       "claims": [],
       "contentHash": "675a9f9baa90545ecedcb1fac1427ded5f5752d5f004158998bdbcb2275b4e8d",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/using-sam-cli-local-invoke.html"
     },
     {
@@ -4793,14 +5398,14 @@
       ],
       "claims": [],
       "contentHash": "c080bcfc94592c2b9e208a2194d90ce0e5968402f5bb92d8f83c8258a0f856ee",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html"
     },
     {
@@ -4828,14 +5433,14 @@
       ],
       "claims": [],
       "contentHash": "f7af88ef3c7dd62e0008dc0b915010e2d128dc3b048bc6828a18ab48ea981daa",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/sns/latest/dg/sns-message-filtering.html"
     },
     {
@@ -4863,14 +5468,14 @@
       ],
       "claims": [],
       "contentHash": "9c66ba9d878b38bc393ca7d3ba5d716f701a324d1b9b339af3f8354f52d08bd8",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/sns/latest/dg/welcome.html"
     },
     {
@@ -4897,15 +5502,15 @@
         }
       ],
       "claims": [],
-      "contentHash": "00b2b6ca937d32e829f05ce735218ae5d739771f2070ecb24f8bdd0cb277d8ed",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "4e8648c60b7d3fc2474e5e6dd46e8752b658e717fb0c516f1b504216b57ccead",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html"
     },
     {
@@ -4933,14 +5538,14 @@
       ],
       "claims": [],
       "contentHash": "fc409fa73adbd1550a3613b79ee2f6ee5019d225ee3760160eaea118d4e69f44",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/streams/latest/dev/introduction.html"
     },
     {
@@ -4968,14 +5573,14 @@
       ],
       "claims": [],
       "contentHash": "426abc2f424e859000ed0b07abfe1e8159c9c3494b2f7cd762f09d3643b08aa8",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/streams/latest/dev/key-concepts.html"
     },
     {
@@ -5002,15 +5607,15 @@
         }
       ],
       "claims": [],
-      "contentHash": "22aa03967381c45728308b96eb04c584c50738fd80a910f9a72865a494e1199c",
-      "fetchedAt": "2026-10-19",
+      "contentHash": "21dd62f6e50b007acc01edb29679651b1f62de24acbcd1fe97eed6f26f78b23d",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html"
     },
     {
@@ -5038,14 +5643,14 @@
       ],
       "claims": [],
       "contentHash": "229e4d45835eab1cd2f035ee6c549dd2dec86e7f6b9aa0123e02bd8aa20bd320",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
     },
     {
@@ -5073,14 +5678,14 @@
       ],
       "claims": [],
       "contentHash": "095d63c8316fab1e36d7d4d8a6e877b4c40b0b96914f2131aec076af4153d77f",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/waf/latest/developerguide/what-is-aws-waf.html"
     },
     {
@@ -5143,15 +5748,50 @@
       ],
       "claims": [],
       "contentHash": "2741daeb86551680d94ff1a23b24115fa14a3da347d74ab10c4b21649ed8cad0",
-      "fetchedAt": "2026-10-19",
+      "fetchedAt": "2026-10-24",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-DVA-C02"
       },
-      "updatedAt": "2026-10-17",
+      "updatedAt": "2026-10-24",
       "url": "https://docs.aws.amazon.com/xray/latest/devguide/aws-xray.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "57a7c6c93d7380d2bc1dea6bbcb69ef9c603444c820f4b39fcdc94e147324ebd",
+      "fetchedAt": "2026-10-24",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-DVA-C02"
+      },
+      "updatedAt": "2026-10-24",
+      "url": "https://docs.aws.amazon.com/xray/latest/devguide/xray-concepts.html"
     }
   ]
 }

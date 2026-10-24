@@ -524,6 +524,46 @@
     {
       "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/MonitoringLogData.html",
       "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-design.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/best-practices.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/approvals.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CWL_QuerySyntax.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/xray/latest/devguide/xray-concepts.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics-types.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/auth-and-access_examples_cross.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/codeguru/latest/reviewer-ug/welcome.html",
+      "kind": "official-doc"
     }
   ],
   "guidePages": [
