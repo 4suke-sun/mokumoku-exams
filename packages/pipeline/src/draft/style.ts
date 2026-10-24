@@ -1,4 +1,4 @@
-import { containsUrl, HEADING_KINDS, normalizeHeading } from "../contract.ts";
+import { containsUrl, HEADING_KINDS, normalizeHeading, unpairedWrongParagraphs } from "../contract.ts";
 import { compact } from "../text.ts";
 import { type ChoiceDraft, type Draft, isChoiceDraft } from "./schema.ts";
 import { similarity } from "./similarity.ts";
@@ -9,7 +9,7 @@ import { similarity } from "./similarity.ts";
  */
 
 /** 規則の集合を変えたら上げる。下書きの依頼の鍵に入るので、上げると依頼のキャッシュが切れる */
-export const STYLE_VERSION = 3;
+export const STYLE_VERSION = 4;
 
 export type Severity = "block" | "warn";
 
@@ -221,6 +221,15 @@ export const STYLE_RULES: readonly StyleRule[] = [
       )
         ? ["explanation"]
         : [],
+  },
+  {
+    name: "explanation-wrong-pairs",
+    appliesTo: "choice",
+    severity: "block",
+    summary:
+      "解説の「他の選択肢が誤りである理由」の節は、誤答の選択肢の本文と同じ段落の次に、その理由の段落を置く組だけで書く(組にならない段落を置かない。本文の比べ方は、空白と読点・句点を除く)",
+    // アプリが選択肢ごとの小カードにする組の作り方(データの契約の pairChoices)と同じ判定で見る
+    check: onChoice((d) => (unpairedWrongParagraphs(d.explanation, d.choices) > 0 ? ["explanation"] : [])),
   },
   {
     name: "explanation-key-reference",

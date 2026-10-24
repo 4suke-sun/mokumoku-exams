@@ -25,7 +25,9 @@ export function metricsPath(gitCommonDir: string): string {
   return join(gitCommonDir, METRICS_FILE);
 }
 
+/** 1 件を 1 行にする。読み込み(parseMetrics)と同じ検査に通らない記録は、書かずに例外にする(書けたのに読めない行を作らない)。 */
 export function serializeMetric(record: MetricRecord): string {
+  if (toMetric(record) === null) throw new Error("計測の記録の形が合わない");
   return `${JSON.stringify(record)}\n`;
 }
 
@@ -39,25 +41,34 @@ function isStage(value: unknown): value is VerifyStage {
   return typeof s.name === "string" && isCount(s.ms) && typeof s.ok === "boolean";
 }
 
+/** 1 件の検査。書き込み(serializeMetric)と読み込み(parseMetrics)の両方で使う。形が合わなければ null。 */
+function toMetric(value: unknown): MetricRecord | null {
+  if (typeof value !== "object" || value === null) return null;
+  const r = value as Record<string, unknown>;
+  if (typeof r.at !== "string") return null;
+  if (r.type === "verify" && Array.isArray(r.stages) && r.stages.every(isStage)) {
+    return { type: "verify", at: r.at, stages: r.stages };
+  }
+  if (
+    r.type === "agent" &&
+    typeof r.name === "string" &&
+    AGENT_NAME.test(r.name) &&
+    isCount(r.ms) &&
+    isCount(r.tokens)
+  ) {
+    return { type: "agent", at: r.at, name: r.name, ms: r.ms, tokens: r.tokens };
+  }
+  return null;
+}
+
 /** 記録を読む。壊れた行・形の合わない行は飛ばす。 */
 export function parseMetrics(text: string): MetricRecord[] {
   const out: MetricRecord[] = [];
   for (const line of text.split("\n")) {
     if (line.trim() === "") continue;
     try {
-      const r = JSON.parse(line) as Record<string, unknown>;
-      if (typeof r.at !== "string") continue;
-      if (r.type === "verify" && Array.isArray(r.stages) && r.stages.every(isStage)) {
-        out.push({ type: "verify", at: r.at, stages: r.stages });
-      } else if (
-        r.type === "agent" &&
-        typeof r.name === "string" &&
-        AGENT_NAME.test(r.name) &&
-        isCount(r.ms) &&
-        isCount(r.tokens)
-      ) {
-        out.push({ type: "agent", at: r.at, name: r.name, ms: r.ms, tokens: r.tokens });
-      }
+      const record = toMetric(JSON.parse(line));
+      if (record) out.push(record);
     } catch {
       // 壊れた行は読まない
     }

@@ -114,7 +114,9 @@ export function parseInbox(text: string): InboxRecord[] {
   return records;
 }
 
+/** 1 件を 1 行にする。読み込み(parseInbox)と同じ検査に通らない記録は、書かずに例外にする(書けたのに読めない行を作らない)。 */
 export function serializeRecord(record: InboxRecord): string {
+  if (toRecord(record) === null) throw new Error("受け箱の記録の形が合わない");
   return `${JSON.stringify(record)}\n`;
 }
 

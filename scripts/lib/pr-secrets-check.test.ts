@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  CLAUDE_NOREPLY,
   checkAuthors,
   checkEntries,
   checkProseBodies,
@@ -95,6 +96,9 @@ describe("checkEntries", () => {
     const id = `${"a1b2c3d4e5".repeat(2)}f6g7h8`;
     expect(checkEntries(entry(`COGNITO_CLIENT_ID=${id}`)).blocks).toEqual(["Cognito のクライアント ID: f.md:3"]);
     expect(checkEntries(entry(`clientId: "${id}"`)).blocks).toHaveLength(1);
+    // キーを引用符で囲んだ形(JSON など)
+    expect(checkEntries(entry(`"COGNITO_CLIENT_ID": "${id}"`)).blocks).toHaveLength(1);
+    expect(checkEntries(entry(`'clientId': ${id}`)).blocks).toHaveLength(1);
     expect(checkEntries(entry("COGNITO_CLIENT_ID=<クライアント ID>")).blocks).toHaveLength(0);
     expect(checkEntries(entry("COGNITO_CLIENT_ID=xxxxxxxxxxxxxxxxxxxxxxxxxx")).blocks).toHaveLength(0);
     expect(checkEntries(entry(`token ${id}`)).blocks).toHaveLength(0);
@@ -223,6 +227,31 @@ describe("checkAuthors", () => {
     expect(checkAuthors([{ sha: "eeeeeee", authorEmail: "noreply@github.com", committerEmail: ok }])).toEqual([
       "noreply ではない作者アドレス: コミット eeeeeee",
     ]);
+  });
+
+  it("作者・コミッターが Claude の署名用の noreply_通す", () => {
+    const upper = CLAUDE_NOREPLY.toUpperCase();
+    expect(checkAuthors([{ sha: "fffffff", authorEmail: CLAUDE_NOREPLY, committerEmail: CLAUDE_NOREPLY }])).toEqual([]);
+    expect(checkAuthors([{ sha: "fffffff", authorEmail: upper, committerEmail: ok }])).toEqual([]);
+  });
+
+  it("Claude の署名用の noreply に似た形_作者・コミッターのどちらでも止める", () => {
+    const [local, domain] = CLAUDE_NOREPLY.split("@");
+    for (const email of [
+      `x${CLAUDE_NOREPLY}`,
+      `${CLAUDE_NOREPLY}x`,
+      `${CLAUDE_NOREPLY}.example.com`,
+      `${local}@sub.${domain}`,
+      `support@${domain}`,
+      ` ${CLAUDE_NOREPLY}`,
+    ]) {
+      expect(checkAuthors([{ sha: "1111111", authorEmail: email, committerEmail: ok }])).toEqual([
+        "noreply ではない作者アドレス: コミット 1111111",
+      ]);
+      expect(checkAuthors([{ sha: "2222222", authorEmail: ok, committerEmail: email }])).toEqual([
+        "noreply ではないコミッターアドレス: コミット 2222222",
+      ]);
+    }
   });
 
   it("noreply 以外のコミッターを止める", () => {

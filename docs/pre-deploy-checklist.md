@@ -54,7 +54,7 @@
 
 | 項目 | 確認の方法 |
 | --- | --- |
-| 変わる内容が、意図したものだけである | `npm run diff -w @mokumoku-exams/infra -- --all` の出力を読む。環境変数の値(合言葉など)が出るので、値を伏せてから扱う([lessons/0004](./app/lessons/0004-mask-diff-output.md)) |
+| 変わる内容が、意図したものだけである | `npm run diff -w @mokumoku-exams/infra -- --all` の出力を、`set -o pipefail` のうえで `2>&1 \| npm run -s mask` に通して読む。環境変数の値(合言葉など)が出るので、伏せた出力だけを扱う。伏せない形と、終了コードの扱いは [lessons/0004](./app/lessons/0004-mask-diff-output.md) |
 
 ## 7. ビルドとテスト
 

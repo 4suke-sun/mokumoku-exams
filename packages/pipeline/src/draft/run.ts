@@ -77,6 +77,7 @@ import {
   DraftsError,
   type DraftsFile,
   draftWorkDir,
+  HUMAN_REJECTED,
   readDrafts,
   readState,
   type UnmetReason,
@@ -379,6 +380,10 @@ function requestStep(
     }
     const selected = selectFacts(cards, usage, settings.maxFactsPerRequest, sourceUsage);
     const count = Math.min(remaining, settings.maxPerRequest);
+    // 人の却下は、出し直しの回数(上限の maxRounds)に数えず、鍵に入れて足りない分の依頼を出す
+    const humanRejected = drafts.drafts.filter(
+      (d) => d.planItemId === item.id && d.status === "rejected" && d.reasons.includes(HUMAN_REJECTED),
+    ).length;
     const key = requestKey({
       examCode,
       planItemId: item.id,
@@ -386,6 +391,7 @@ function requestStep(
       round,
       facts: selected,
       definitionHash: stamp.definitionHash,
+      humanRejected,
     });
     if (state.done.includes(key)) {
       cached++;

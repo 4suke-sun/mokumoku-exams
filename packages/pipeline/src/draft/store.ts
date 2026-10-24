@@ -145,6 +145,9 @@ export function writeState(path: string, state: DraftState): void {
   writeJson(path, { ...state, done: [...new Set(state.done)].sort() });
 }
 
+/** 人が却下した下書きの理由コード */
+export const HUMAN_REJECTED = "human-rejected";
+
 /**
  * 人の判断を、下書きの状態に反映する。却下した下書きは不採用にし、本文を持たない(ほかの不採用と同じ)。
  * 保留の解除と承認は、保留の下書きを通過にする。
@@ -158,7 +161,7 @@ export function applyDraftDecisions(
     const decision = decisionOf(d.id);
     if (decision === "reject" && d.status !== "rejected") {
       changed++;
-      return { ...d, status: "rejected", reasons: ["human-rejected"], draft: null };
+      return { ...d, status: "rejected", reasons: [HUMAN_REJECTED], draft: null };
     }
     if ((decision === "release" || decision === "approve") && d.status === "held") {
       changed++;

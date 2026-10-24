@@ -78,8 +78,29 @@ describe("parseInbox", () => {
   });
 
   it("版の形が不正な行_読み込まない(読み込み側で版の形を検査する)", () => {
-    const bad = serializeRecord(candidate({ version: "latest" }));
+    const bad = `${JSON.stringify(candidate({ version: "latest" }))}\n`;
     expect(parseInbox(bad)).toEqual([]);
+  });
+
+  it("読み込みの検査に通らない記録_書き出さずに例外にする", () => {
+    for (const record of [
+      candidate({ version: "latest" }),
+      candidate({ key: "Bad Key" }),
+      candidate({ what: "改行を\n含む" }),
+      candidate({ should: "あ".repeat(201) }),
+      { type: "closed", at: "t", key: "stale-input", ref: "" } as InboxRecord,
+    ]) {
+      expect(() => serializeRecord(record)).toThrow();
+    }
+  });
+
+  it("書き出せた記録_どれも読み戻すと同じ内容になる", () => {
+    const records: InboxRecord[] = [
+      candidate(),
+      candidate({ version: "unknown", what: "あ".repeat(200) }),
+      { type: "closed", at: "t", key: "stale-input", ref: "#1(起票済み)" },
+    ];
+    expect(parseInbox(records.map(serializeRecord).join(""))).toEqual(records);
   });
 
   it("書き出した行_読み戻すと同じ内容になる", () => {

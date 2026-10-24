@@ -1,8 +1,10 @@
 import { cpSync, existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import { unpairedWrongParagraphs } from "../contract.ts";
 import { decisionsPath, writeDecisions } from "../decisions/decisions.ts";
 import { provenancePath, readProvenance } from "../draft/provenance.ts";
+import type { ChoiceDraft } from "../draft/schema.ts";
 import { readDrafts } from "../draft/store.ts";
 import {
   baseConfig,
@@ -60,13 +62,13 @@ function retire(root: string, ids: string[]) {
 }
 
 /** 計画 → 依頼 → 取り込みまで進め、通過した下書きを 1 件作る。approve なら承認も記録する */
-async function prepared(root: string, approve = true, verified = true) {
+async function prepared(root: string, approve = true, verified = true, overrides: Partial<ChoiceDraft> = {}) {
   await runMain(root, ["plan", EXAM]);
   await runMain(root, ["draft", EXAM]);
   const request = readChoiceRequests(root).find((q) => q.kind === "single") as ReturnType<
     typeof readChoiceRequests
   >[number];
-  writeOutput(root, request, [draftFor(request)]);
+  writeOutput(root, request, [draftFor(request, overrides)]);
   await runMain(root, ["draft", EXAM, "--import"]);
   const id = readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0]?.id as string;
   if (verified) markVerified(root, id);
@@ -189,6 +191,32 @@ describe("export", () => {
     const r = await runMain(root, ["export", EXAM, "--dry-run"]);
     expect(r.out).toContain("追加 1 件");
     expect(readFileSync(questionsFile(root), "utf8")).toBe(before);
+  });
+});
+
+describe("書き出しと解説の誤りの理由の節", () => {
+  const lead = "Widget Store では、アカウントがリージョンごとに作れるバケットは 100 個までと定められています。";
+
+  it("誤りの理由の節が選択肢ごとの組の形_書き出した問題の節も、選択肢ごとの組にできる", async () => {
+    const root = exportRoot();
+    const explanation = `${lead}\n\n## 他の選択肢が誤りである理由\n\n10 個\n\n上限の数値が実際より小さい誤りです。\n\n1,000 個\n\n上限の数値が実際より大きい誤りです。`;
+    await prepared(root, true, true, { explanation });
+    const r = await runMain(root, ["export", EXAM]);
+    expect(r.out).toContain("書き出し: 追加 1 件");
+    const added = JSON.parse(readFileSync(questionsFile(root), "utf8")).questions[90];
+    expect(added.explanation).toBe(explanation);
+    expect(unpairedWrongParagraphs(added.explanation, added.choices)).toBe(0);
+  });
+
+  it("誤りの理由の節に選択肢ごとの組にならない段落がある_取り込みで不採用になり、書き出さない", async () => {
+    const root = exportRoot();
+    const explanation = `${lead}\n\n## 他の選択肢が誤りである理由\n\nほかの選択肢は、上限の数値が違います。`;
+    const id = await prepared(root, true, true, { explanation });
+    const record = readDrafts(workPath(root, "drafts.json"), EXAM).drafts.find((d) => d.id === id);
+    expect(record).toMatchObject({ status: "rejected", reasons: ["style:explanation-wrong-pairs"] });
+    const r = await runMain(root, ["export", EXAM]);
+    expect(r.out).toContain("追加 0 件");
+    expect(JSON.parse(readFileSync(questionsFile(root), "utf8")).questions).toHaveLength(90);
   });
 });
 

@@ -26,7 +26,7 @@ description: git commit の前に、ステージした差分とコミットメ�
 1. `git status --short` と `git diff --cached --stat` を見る。**何もステージされていなければ、ここで止める。**
 2. ステージは、意図したパスだけを指定して行う。`git add -A` / `git add .` は使わない
 3. ブランチが `main` なら、コミットしない(ブランチを切ってから)。ブランチ名は `<prefix>/#<Issue番号>-…`
-4. `git config user.email` が、GitHub の noreply アドレス(`…@users.noreply.github.com`)であることを確認する
+4. `git config user.email` が、GitHub の noreply アドレス(`…@users.noreply.github.com`)か、Claude の署名の行(`Co-Authored-By:`)で使う noreply アドレスであることを確認する
 5. 仕様・名前・数・振る舞いを変える差分では、検査に出す前に、同じことを書いている箇所を洗い出して、同じ差分でまとめて直す。
    変えた語(関数・設定・項目の名前、理由コード、画面の文言、旧い前提を表す語)で、リポジトリの全体を検索する(`git grep --untracked`。未追跡の新しいファイルも含める。
    文書、`CLAUDE.md`、スキルとエージェントの定義、コードとコメント、画面の文言、`data/` のヘルプの本文などを含む)。
@@ -103,7 +103,7 @@ git commit -F .drafts/commit-msg.txt
   node scripts/inspection-ledger.ts record HEAD mechanical,inspector OK
   ```
 
-- コミット後、`git log -1 --format='%an <%ae>'` で、作者が noreply アドレスであることを確認する。違えば、
+- コミット後、`git log -1 --format='%an <%ae>'` で、作者が Step 0 の 4 の noreply アドレスであることを確認する。違えば、
   `git config user.email` を直して `git commit --amend --reset-author`(push 前のローカルのみ)
 - `git commit --no-verify` は使わない。フックが止めたら、指摘を直す
 

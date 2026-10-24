@@ -43,7 +43,7 @@
 ## 開発ルール
 
 - コミット・PR タイトルは Conventional Commits。ブランチ名は `<prefix>/#<Issue番号>-…`。
-- 作者は GitHub の noreply アドレスのみ。コミット前に `git config user.email` を確認する。
+- 作者・コミッターは、GitHub の noreply アドレスか、Claude の署名の行(`Co-Authored-By:`)で使う noreply アドレスのみ。コミット前に `git config user.email` を確認する。
 - lint / build / test はルートから実行でき、CI で回す。
 - 並行する作業は、`git worktree` で作業ツリーを分ける(同じ作業ディレクトリで並行しない)。作り方、依存の扱い、並列の上限、
   直列にする条件は [CONTRIBUTING.md](CONTRIBUTING.md) の「並行する作業」。
@@ -55,7 +55,7 @@
 ## 書いてはいけないもの(コード・ドキュメント・コミット・Issue・PR のすべて)
 
 - **機密情報**: 認証情報、アクセスキー、トークン、パスワード、シークレットの値。
-- **個人情報**: 氏名、メールアドレス(GitHub の noreply を除く)、電話番号、所属など。
+- **個人情報**: 氏名、メールアドレス(GitHub の noreply と、Claude の署名用の noreply を除く)、電話番号、所属など。
 - **環境情報**: AWS のプロファイル名、アカウント ID、リソース ID、ホストゾーン ID、独自ドメイン、証明書 ARN、
   社内・個人環境のパスなど。書くときは `example.com` などのプレースホルダーにする。
 - **経緯や外部の名称**: 社外・非公開の名称、このリポジトリの外の事情や経緯を示す語。

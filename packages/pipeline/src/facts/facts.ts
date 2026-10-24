@@ -82,8 +82,13 @@ interface Paths {
   cardsMd: string;
 }
 
+/** 事実カードの作業用の置き場(資格ごと) */
+export function factsWorkDir(config: Config, rootDir: string, examCode: string): string {
+  return resolve(rootDir, config.workDir, "facts", examCode.toLowerCase());
+}
+
 function pathsFor(config: Config, rootDir: string, examCode: string): Paths {
-  const work = resolve(rootDir, config.workDir, "facts", examCode.toLowerCase());
+  const work = factsWorkDir(config, rootDir, examCode);
   return {
     ledger: ledgerPath(resolve(rootDir, config.ledgerDir), examCode),
     facts: factsPath(resolve(rootDir, config.factsDir), examCode),
@@ -99,7 +104,8 @@ function pathsFor(config: Config, rootDir: string, examCode: string): Paths {
 
 type State = Record<string, number>;
 
-function readState(path: string): State {
+/** 依頼の鍵ごとの失敗の回数を読む */
+export function readState(path: string): State {
   if (!existsSync(path)) return {};
   try {
     const raw = JSON.parse(readFileSync(path, "utf8")) as unknown;
@@ -108,6 +114,36 @@ function readState(path: string): State {
   } catch {
     return {};
   }
+}
+
+/**
+ * まだ事実カードを抽出していない出典の URL。依頼の段と同じ見分け方で、取得済みの active な出典(試験ガイドを除く)のうち、
+ * 今の本文と今のエージェントの定義で抽出済みでないもの。再試行の上限に達した出典は除く(依頼しないので、繰り返しても減らない)。
+ */
+export function pendingSources(
+  ledger: LedgerFile,
+  facts: FactsFile,
+  stamp: AgentStamp,
+  state: State,
+  maxAttempts: number,
+): string[] {
+  return ledger.sources
+    .filter((source) => {
+      if (!needsExtraction(source, facts, stamp)) return false;
+      const key = requestKey(source.url, source.contentHash as string, stamp.definitionHash);
+      return (state[key] ?? 0) < maxAttempts;
+    })
+    .map((s) => s.url)
+    .sort();
+}
+
+/** 依頼の対象の出典か(取得済みの active な出典で、試験ガイドでなく、今の本文と定義で抽出済みでない) */
+function needsExtraction(source: LedgerFile["sources"][number], facts: FactsFile, stamp: AgentStamp): boolean {
+  if (source.status !== "active" || source.contentHash === null) return false;
+  // 試験ガイドのページは、分野・出題範囲の材料(台帳の guide)で、事実カードの根拠にしない
+  if (source.kind === "exam-guide") return false;
+  const hash = source.contentHash;
+  return !facts.extracted.some((e) => e.url === source.url && e.contentHash === hash && sameDefinition(e.agent, stamp));
 }
 
 export async function runFacts(options: FactsOptions): Promise<ExitCode> {
@@ -170,11 +206,9 @@ function requestStep(
   let missingBody = 0;
   let limited = false;
   for (const source of [...ledger.sources].sort((a, b) => (a.url < b.url ? -1 : 1))) {
-    if (source.status !== "active" || source.contentHash === null) continue;
-    // 試験ガイドのページは、分野・出題範囲の材料(台帳の guide)で、事実カードの根拠にしない
-    if (source.kind === "exam-guide") continue;
+    if (source.status !== "active" || source.contentHash === null || source.kind === "exam-guide") continue;
     const hash = source.contentHash;
-    if (facts.extracted.some((e) => e.url === source.url && e.contentHash === hash && sameDefinition(e.agent, stamp))) {
+    if (!needsExtraction(source, facts, stamp)) {
       skipped++;
       continue;
     }

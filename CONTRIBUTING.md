@@ -26,6 +26,7 @@ npm install   # 依存を入れ、検査フック(.githooks)を有効にしま�
 | `npm run validate:data` | 資格マスタ・問題データ・カリキュラム・使い方ページのデータの検査(仕様: `docs/data-spec.md`) |
 | `npm run lessons -- <add\|list\|repeats\|draft\|close>` | 引っかかりの受け箱(`.git` の共有領域)の記録と集計。手順は `docs/lessons-workflow.md` |
 | `npm run metrics` | 手元の計測の集計(`verify` の段階ごとの時間、サブエージェントの時間とトークン、検査の台帳の内訳)。`-- agent <役> <ミリ秒> <トークン>` で記録を足す |
+| `npm run -s mask` | 標準入力の出力から値を伏せて出す(コミット・push・PR の検査と同じ正規表現と許可されていないメールアドレス、数字だけの 12 桁、`.env` の 4 文字以上の値、拒否リストの語。伏せきれない行は出さない)。合成と差分の出力を読むときに通す。伏せない形と注意は `docs/app/lessons/0004-mask-diff-output.md` |
 | `npm run check:lessons` | 学びの記録(`docs/app/lessons/`)の書式の検査。`-- --write` で一覧を更新 |
 | `npm run check:test-titles` | テストの題(`it` / `test`)の形の検査。`-- --write` で、直した題を基準から消す |
 | `npm run check:docs` | 文書の相対リンクの先と、`npm run <名前>` のスクリプトが実在することの検査(対象: `README.md`、`CLAUDE.md`、`CONTRIBUTING.md`、`docs/`、`.claude/skills/`、`packages/*/README.md`) |
@@ -84,7 +85,7 @@ Closes #12
 ```
 
 - `Closes #<番号>` は、番号ごとに 1 行ずつ書きます(カンマ区切りは、最初の 1 つしか閉じません)。
-- 作者のメールアドレスは、GitHub の noreply アドレスにします。
+- 作者のメールアドレスは、GitHub の noreply アドレスにします。Claude の署名の行(`Co-Authored-By:`)で使う noreply アドレスも認めます(完全一致だけ)。
 
 ## テスト
 

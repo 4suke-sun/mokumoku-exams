@@ -72,8 +72,10 @@ export function styleRuleSummaries(kind: DraftRequest["kind"]): DraftRequest["st
 }
 
 /**
- * 依頼の鍵。入力(計画の項目、書かせる数、出し直しの回数、事実カードの ID と主張、規則と依頼の版、エージェントの定義のハッシュ)から決まる。
- * 同じ入力では同じ鍵になり、取り込み済みの鍵は、再び依頼しない。
+ * 依頼の鍵。入力(計画の項目、書かせる数、出し直しの回数、事実カードの ID と主張、規則と依頼の版、エージェントの定義のハッシュ、
+ * 人が却下した下書きの数)から決まる。同じ入力では同じ鍵になり、取り込み済みの鍵は、再び依頼しない。
+ * 人が却下した数は、1 件以上のときだけ鍵に入れる(却下のない項目の鍵は、これを足す前と変わらない)。
+ * 却下が増えると鍵が変わるので、却下で足りなくなった分の依頼が、取り込み済みの依頼と同じ鍵で飛ばされない。
  */
 export function requestKey(input: {
   examCode: string;
@@ -83,6 +85,8 @@ export function requestKey(input: {
   facts: readonly { id: string; claim: string }[];
   /** エージェントの定義のハッシュ。定義が変わると鍵が変わる */
   definitionHash: string;
+  /** 計画の項目の、人が却下した下書きの数 */
+  humanRejected?: number;
 }): string {
   const canonical = JSON.stringify({
     examCode: input.examCode,
@@ -93,6 +97,7 @@ export function requestKey(input: {
     styleVersion: STYLE_VERSION,
     requestVersion: REQUEST_VERSION,
     definitionHash: input.definitionHash,
+    ...(input.humanRejected ? { humanRejected: input.humanRejected } : {}),
   });
   return sha256(Buffer.from(canonical)).slice(0, 16);
 }

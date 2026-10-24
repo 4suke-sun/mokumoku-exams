@@ -2,8 +2,15 @@ import { cpSync, existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
+import { emptyLedger, ledgerPath, writeLedger } from "../collect/ledger.ts";
+import { entry } from "../collect/test-helpers.ts";
 import { EXIT } from "../exit-codes.ts";
+import { requestKey } from "../facts/extract.ts";
+import { emptyFacts, factsPath, writeFacts } from "../facts/schema.ts";
+import { DOC_HASH, DOC_URL } from "../facts/test-helpers.ts";
 import { main } from "../main.ts";
+import { readAgentStamp } from "../shared/agents.ts";
+import { installAgentDefinitions } from "../shared/test-helpers.ts";
 import { planPath, readPlan } from "./schema.ts";
 
 const repoRoot = resolve(import.meta.dirname, "../../../..");
@@ -122,5 +129,50 @@ describe("plan コマンド", () => {
     expect(soon).toBeDefined();
     const r = await run(setupRoot(), ["plan", soon?.examCode ?? ""]);
     expect(r.code).toBe(EXIT.inputError);
+  });
+});
+
+describe("plan コマンドの入口の検査", () => {
+  const FACT_AGENT = readAgentStamp(repoRoot, "fact-extractor");
+
+  /** 取得済みの出典が 1 件ある台帳を置く。extracted なら、その出典を今の定義で抽出済みにする */
+  function setupWithSource(extracted: boolean) {
+    const root = setupRoot();
+    installAgentDefinitions(root);
+    writeLedger(ledgerPath(join(root, config.ledgerDir), CODE), {
+      ...emptyLedger(CODE),
+      sources: [entry({ url: DOC_URL, contentHash: DOC_HASH })],
+    });
+    writeFacts(factsPath(join(root, config.factsDir), CODE), {
+      ...emptyFacts(CODE),
+      extracted: extracted ? [{ url: DOC_URL, contentHash: DOC_HASH, agent: FACT_AGENT }] : [],
+    });
+    return root;
+  }
+
+  it("事実カードを抽出していない出典が残る_計画を書かずに止める", async () => {
+    const root = setupWithSource(false);
+    const r = await run(root, ["plan", CODE]);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain(`事実カードの未処理: ${DOC_URL}`);
+    expect(r.err).toContain("事実カードの未処理: 出典 1 件");
+    expect(existsSync(planPath(join(root, config.workDir), CODE))).toBe(false);
+  });
+
+  it("出典をすべて抽出済み_計画を書く", async () => {
+    const root = setupWithSource(true);
+    const r = await run(root, ["plan", CODE]);
+    expect(r.code, r.err).toBe(EXIT.ok);
+    expect(r.plan()).not.toBeNull();
+  });
+
+  it("抽出していない出典が再試行の上限に達している_止めずに計画を書く", async () => {
+    const root = setupWithSource(false);
+    const key = requestKey(DOC_URL, DOC_HASH, FACT_AGENT.definitionHash);
+    const stateDir = join(root, config.workDir, "facts", CODE.toLowerCase());
+    mkdirSync(stateDir, { recursive: true });
+    writeFileSync(join(stateDir, "state.json"), JSON.stringify({ [key]: config.facts.maxAttempts }));
+    const r = await run(root, ["plan", CODE]);
+    expect(r.code, r.err).toBe(EXIT.ok);
   });
 });

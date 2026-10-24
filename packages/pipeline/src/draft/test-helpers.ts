@@ -140,7 +140,12 @@ export function setupDraftRoot(options: { cards?: FactCard[]; questions?: unknow
         claim: `架空の主張 ${n}`,
       }),
     );
-  writeFacts(factsPath(join(root, baseConfig.factsDir), EXAM), { ...emptyFacts(EXAM), cards });
+  // 事実カードは、台帳の出典から抽出済み(出題計画は、未処理の出典が残ると止まる)
+  writeFacts(factsPath(join(root, baseConfig.factsDir), EXAM), {
+    ...emptyFacts(EXAM),
+    extracted: [{ url: DOC_URL, contentHash: DOC_HASH }],
+    cards,
+  });
   // 事実カードの根拠の出典が、台帳にある
   writeLedger(ledgerPath(join(root, baseConfig.ledgerDir), EXAM), {
     ...emptyLedger(EXAM),

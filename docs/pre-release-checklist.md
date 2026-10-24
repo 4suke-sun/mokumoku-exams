@@ -11,9 +11,9 @@
 | 全履歴の追加行・ファイル名・メッセージ・作者に、認証情報や環境固有の値がない | すべてのブランチを対象に、`node scripts/check-push-secrets.ts` を実行する(下の「全履歴の検査」)。終了コードが 0 |
 | 個人固有の語(拒否リスト)が、履歴のどこにもない | `.pr-secrets-denylist` の語を、全履歴の差分・コミットメッセージに対して `git log --all -p` と `grep -F -f` で数える(タグは軽量タグで、タグ自体のメッセージはない)。0 件。語は報告に書かない |
 | アクセスキー・秘密鍵の形の文字列がない | `git log --all -p` の出力に、`AKIA`・`ASIA`・`-----BEGIN … PRIVATE KEY` の形が 0 件 |
-| メールアドレスが、GitHub の noreply と `example.com` だけ | 追加行のメールアドレスを集計して確かめる |
+| メールアドレスが、GitHub の noreply と `example.com` と、署名の行の宛先だけ | 追加行のメールアドレスを集計して確かめる |
 | アカウント ID・ARN・配信のドメインが、プレースホルダーだけ | 追加行の 12 桁の数字、`arn:aws:…:<12 桁>:`、`cloudfront.net` などのドメインを集計して確かめる。実値がなく、`123456789012`・`xxxx.cloudfront.net` のような例だけ |
-| 作者・コミッターが、意図したものだけ | `git log --all --format='%an|%cn|%ce' \| sort \| uniq -c`。メールアドレスは noreply だけ。表示名は、公開してよいニックネームだけ |
+| 作者・コミッターが、意図したものだけ | `git log --all --format='%an|%ae|%cn|%ce' \| sort \| uniq -c`。メールアドレスは、GitHub の noreply と、Claude の署名の行(`Co-Authored-By:`)で使う noreply アドレスだけ。表示名は、公開してよいニックネームだけ |
 | Issue・PR・リリースの本文に、上と同じものがない | `gh issue list` / `gh pr list` / `gh release list` の本文を、同じ観点で確かめる(コメントも含める) |
 | `.env`・`.drafts/`・`.pr-secrets-denylist` が、追跡されていない | `git ls-files` に、これらが出ない |
 | 公開リポジトリの Secrets・変数に、不要な値がない | リポジトリの設定の Secrets and variables を開き、使っていないものを消す |

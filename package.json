@@ -19,6 +19,7 @@
     "release": "node scripts/release.ts",
     "verify": "node scripts/verify.ts",
     "lessons": "node scripts/lessons.ts",
+    "mask": "node scripts/mask-output.ts",
     "metrics": "node scripts/metrics.ts",
     "check:branch": "node scripts/check-branch.ts",
     "check:commit": "node scripts/check-commit-secrets.ts",
@@ -38,9 +39,9 @@
     "@biomejs/biome": "2.5.15",
     "@mokumoku-exams/data-schema": "*",
     "@types/node": "22.20.5",
-    "@vitest/coverage-v8": "5.0.4",
+    "@vitest/coverage-v8": "5.0.5",
     "typescript": "7.0.2",
-    "vitest": "5.0.4",
+    "vitest": "5.0.5",
     "zod": "4.6.7"
   },
   "workspaces": [
