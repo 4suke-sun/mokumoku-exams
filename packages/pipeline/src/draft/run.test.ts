@@ -406,6 +406,27 @@ describe("draft の取り込み", () => {
     expect(r.out).toContain("kind-mismatch");
   });
 
+  it("取り込み済みの依頼の下書きを人が却下した_同じ数・同じ回の鍵でも、足りない分の依頼が出る", async () => {
+    const root = setupDraftRoot();
+    const request = await firstRequest(root);
+    writeOutput(root, request, [draftFor(request)]);
+    await runMain(root, ["draft", EXAM, "--import"]);
+    const id = readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0]?.id as string;
+    const { decisionsPath, writeDecisions } = await import("../decisions/decisions.ts");
+    writeDecisions(decisionsPath(join(root, baseConfig.decisionsDir), EXAM), {
+      examCode: EXAM,
+      decisions: [{ target: "draft", id, decision: "reject", reason: "wrong-answer" }],
+    });
+    const again = await runMain(root, ["draft", EXAM]);
+    const redo = readRequests(root).find((q) => q.planItemId === request.planItemId);
+    // 却下で、項目の足りない数は最初の依頼と同じに戻る。それでも鍵が変わり、依頼が出る
+    expect(redo?.count).toBe(request.count);
+    expect(redo?.requestKey).not.toBe(request.requestKey);
+    expect(again.out).toContain("取り込み済みの入力で飛ばした 0 件");
+    // 人の却下は、出し直しの回数に数えない
+    expect(readState(workPath(root, "state.json")).rounds[request.planItemId] ?? 0).toBe(0);
+  });
+
   it("全件が不採用_出し直しの依頼が出て_回数の上限で止まる", async () => {
     const root = setupDraftRoot();
     let request = await firstRequest(root);
