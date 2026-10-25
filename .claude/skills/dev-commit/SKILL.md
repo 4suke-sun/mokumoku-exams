@@ -53,11 +53,14 @@ node scripts/check-commit-secrets.ts
 
 検査役に依頼する前に、ステージした差分とメッセージ案のハッシュを控える(`.claude/skills/dev-commit/reconfirm.md`)。
 
-検査役は Bash を持たない。先に、検査役が読む入力を書き出す:
+検査役は Bash を持たない。先に、検査役が読む入力を書き出す。出力の最後の行が、入力のスタンプ(`スタンプ: …`)で、検査役は報告に書き写す:
 
 ```sh
 node scripts/prepare-inspection.ts --cached
 ```
+
+入力を書き出し直す前と、片づける前に、走っている検査役(起動して、まだ報告が返っていないもの)が 1 つもないことを確かめる。
+走っている検査役がいるまま作り直すと、検査役が古い入力や、一部が欠けた入力で判定する。
 
 検査役(`subagent_type: inspector`)に依頼する内容:
 
@@ -65,9 +68,9 @@ node scripts/prepare-inspection.ts --cached
 - 「`.claude/skills/dev-commit/checklist.md` を読み、その項目に沿って、`.drafts/inspect/` のファイルと
   `.drafts/commit-msg.txt` を確認する」
 - Step 0 の 5 で検索した語と、直さないと決めた箇所(場所と理由)。検査役は、渡された語でリポジトリを検索して確かめてよい
-- 「報告は、チェックリストの『報告のしかた(必ず守る)』に従う(値を引用しない。最後に `判定: OK/WARN/BLOCK`)」
+- 「報告は、チェックリストの『報告のしかた(必ず守る)』に従う(値を引用しない。`.drafts/inspect/stamp.txt` のスタンプを書き写す。最後に `判定: OK/WARN/BLOCK`)」
 
-検査が終わったら、書き出したファイルを消す: `node scripts/prepare-inspection.ts --clean`
+書き出したファイルは、Step 5 のスタンプの確認が済むまで消さない(確認のあとに `node scripts/prepare-inspection.ts --clean`)。
 
 差分に次のパスが含まれるときは、`inspector-deep`(Sonnet)も別に起動し、`inspector` と**両方**の判定を合わせる
 (最も重い判定を採用する)。`scripts/`、`.githooks/`、`.github/workflows/`、`.claude/`。検査の仕組みそのものを変える差分は、
@@ -87,6 +90,14 @@ node scripts/prepare-inspection.ts --cached
 ## Step 5. コミット
 
 commit の直前に、差分とメッセージ案のハッシュをもう一度取り、検査のときと一致することを確かめる。
+あわせて、検査役の報告のスタンプが、いまの入力と一致することを確かめる(`inspector-deep` も使ったときは、報告ごとに、それぞれのスタンプで実行する)。
+一致しなければ、止める。入力を書き出し直して、検査をやり直す(検査を片づける前に確かめる。片づけたあとは一致しない):
+
+```sh
+node scripts/prepare-inspection.ts --verify <報告のスタンプ>
+```
+
+確認が済んだら、書き出したファイルを消す(`node scripts/prepare-inspection.ts --clean`)。
 
 ```sh
 git commit -F .drafts/commit-msg.txt

@@ -22,7 +22,7 @@ commit・push・PR・Issue の前に、文面を書く作成役と、確かめ�
 | 開発本体 | メインのセッション | Sonnet 5.5 または Opus 5.5 | 実装・設計 |
 
 - 検査役の道具は、Read / Grep / Glob だけにします(Bash は持たせません)。検査役が読む入力(差分・コミットのログ・ブランチ名・拒否リストの置き場)は、
-  メインのセッションが `.drafts/inspect/` に書き出します(`scripts/prepare-inspection.ts`)。検査が終わったら消します。
+  メインのセッションが `.drafts/inspect/` に書き出します(`scripts/prepare-inspection.ts`)。検査役の報告のスタンプをいまの入力と照合してから消します。
 - 作成役が書いてよいのは `.drafts/` の下だけです(`commit-writer` は `.drafts/commit-msg.txt` だけ)。
 - モデルの選定は、新しい仕組みやワークフローを組むときに行います。都度の判断では変えません。
 

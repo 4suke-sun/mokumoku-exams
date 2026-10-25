@@ -48,14 +48,17 @@ printf 'refs/heads/%s %s refs/heads/%s %s\n' "$(git branch --show-current)" "$(g
 node scripts/prepare-inspection.ts --range <Step 0 で決めた範囲>
 ```
 
+出力の最後の行が、入力のスタンプ(`スタンプ: …`)。入力を書き出し直す前と、片づける前に、走っている検査役がないことを確かめる。
+
 検査役に依頼する内容:
 
 - 作業ディレクトリ
 - 「`.claude/skills/dev-commit/checklist.md` を読み、その項目に沿って、`.drafts/inspect/` のファイル
   (範囲の全コミットの差分。検査済みで `covered.txt` に挙げられたコミットの差分は除く。**コミットメッセージ、ブランチ名**)を確認する。最後のコミットだけで済ませない」
-- 「報告は、チェックリストの『報告のしかた(必ず守る)』に従う(値を引用しない。最後に `判定: OK/WARN/BLOCK`)」
+- 「報告は、チェックリストの『報告のしかた(必ず守る)』に従う(値を引用しない。`.drafts/inspect/stamp.txt` のスタンプを書き写す。最後に `判定: OK/WARN/BLOCK`)」
 
-検査が終わったら、書き出したファイルを消す: `node scripts/prepare-inspection.ts --clean`
+検査役の報告のスタンプが、いまの入力と一致することを確かめる(`node scripts/prepare-inspection.ts --verify <報告のスタンプ>`。`inspector-deep` も使ったときは、報告ごとに、それぞれのスタンプで実行する)。
+一致しなければ、止めて、入力を書き出し直して検査をやり直す。確かめたら、書き出したファイルを消す: `node scripts/prepare-inspection.ts --clean`
 
 範囲の差分に次のパスが含まれるときは、`inspector-deep`(Sonnet)も別に起動し、`inspector` と**両方**の判定を合わせる
 (最も重い判定を採用する)。`scripts/`、`.githooks/`、`.github/workflows/`、`.claude/`。検査の仕組みそのものを変える差分は、
