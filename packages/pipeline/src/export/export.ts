@@ -129,7 +129,8 @@ function formatJson(text: string, rootDir: string): string {
       "--indent-width=2",
       "--line-width=120",
     ],
-    { input: text, cwd: rootDir, encoding: "utf8", stdio: ["pipe", "pipe", "ignore"] },
+    // 問題データは 1MB を超えうる。既定の出力の上限(1MB)では、整形の出力が切れて失敗する
+    { input: text, cwd: rootDir, encoding: "utf8", stdio: ["pipe", "pipe", "ignore"], maxBuffer: 64 * 1024 * 1024 },
   );
 }
 
