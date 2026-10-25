@@ -3,17 +3,18 @@ import { join } from "node:path";
 import { z } from "zod";
 import { REASON, SHA256 } from "../collect/ledger.ts";
 import { EXAM_CODE, sourceUrlReason } from "../contract.ts";
-import { FACT_ID } from "../draft/schema.ts";
+import { DRAFT_ID, FACT_ID } from "../draft/schema.ts";
 import { PathsError } from "../shared/errors.ts";
 import { writeFileAtomic } from "../shared/fs.ts";
+
+/** 下書きの ID の形は、下書きのスキーマ(draft/schema.ts)に一本化し、ここから再び公開する */
+export { DRAFT_ID };
 
 /**
  * 人の判断の記録。資格ごとに 1 つの JSON をコミットし、各段階が読む。
  * 持つのは、対象(ID か、出典の URL と本文のハッシュ)、判断、理由コードだけ。誰が判断したかは持たない。
  * 事実カードと下書きの ID は内容から決まるので、同じ内容を作り直すと判断が引き継がれ、内容が変わると引き継がれない。
  */
-
-export const DRAFT_ID = z.string().regex(/^d-[0-9a-f]{12}$/);
 
 /** 出典: 日付が古いだけで止まった出典を、記録した本文のハッシュと同じ間だけ受け入れる */
 const SourceDecisionSchema = z.strictObject({

@@ -3,7 +3,7 @@ import { sha256 } from "../collect/fetcher.ts";
 import type { FactCard } from "../facts/schema.ts";
 import { DIFFICULTIES } from "../plan/schema.ts";
 import { AgentStampSchema } from "../shared/agents.ts";
-import { DISTRACTOR_TYPES, DraftSchema, FACT_ID } from "./schema.ts";
+import { DISTRACTOR_TYPES, DRAFT_ID, DraftSchema, FACT_ID } from "./schema.ts";
 import { STYLE_RULES, STYLE_VERSION } from "./style.ts";
 
 /** 依頼の形が変わったら上げる。鍵に入るので、上げると依頼のキャッシュが切れる */
@@ -47,6 +47,26 @@ export const DraftRequestSchema = z.strictObject({
   outputPath: z.string().min(1),
   /** 依頼を出した時点の、エージェントの定義(役・モデルの ID・定義のハッシュ) */
   agent: AgentStampSchema.optional(),
+  /**
+   * 直しの依頼(ブラッシュアップ役。draft --revise)のときだけ持つ。保留の下書きを、保留の理由と検証の指摘、
+   * 根拠の節の場所、周辺の事実カード(facts)を材料に直させる。書かせる数は 1
+   */
+  revise: z
+    .strictObject({
+      /** 直す下書きの ID */
+      draftId: DRAFT_ID,
+      /** 直す下書きの本文(保留の下書きは本文を持つ) */
+      draft: DraftSchema,
+      /** 保留の理由コード */
+      reasons: z.array(z.string().min(1).max(64)).max(40),
+      /** 検証の指摘(理由コードと場所。本文は含まない) */
+      findings: z.array(z.strictObject({ code: z.string().min(1), where: z.string().min(1) })).max(40),
+      /** 根拠の節の場所(出典の URL、人が読む節の名前、見出し)。本文は載せない */
+      sections: z
+        .array(z.strictObject({ url: z.string().min(1), section: z.string().min(1), heading: z.string().min(1) }))
+        .max(10),
+    })
+    .optional(),
 });
 
 export type DraftRequest = z.infer<typeof DraftRequestSchema>;
@@ -76,6 +96,7 @@ export function styleRuleSummaries(kind: DraftRequest["kind"]): DraftRequest["st
  * 人が却下した下書きの数)から決まる。同じ入力では同じ鍵になり、取り込み済みの鍵は、再び依頼しない。
  * 人が却下した数は、1 件以上のときだけ鍵に入れる(却下のない項目の鍵は、これを足す前と変わらない)。
  * 却下が増えると鍵が変わるので、却下で足りなくなった分の依頼が、取り込み済みの依頼と同じ鍵で飛ばされない。
+ * 直しの依頼は、直す下書きの ID を鍵に入れる(補充の依頼と同じ鍵にならない)。
  */
 export function requestKey(input: {
   examCode: string;
@@ -87,6 +108,8 @@ export function requestKey(input: {
   definitionHash: string;
   /** 計画の項目の、人が却下した下書きの数 */
   humanRejected?: number;
+  /** 直しの依頼のとき、直す下書きの ID */
+  reviseOf?: string;
 }): string {
   const canonical = JSON.stringify({
     examCode: input.examCode,
@@ -98,6 +121,7 @@ export function requestKey(input: {
     requestVersion: REQUEST_VERSION,
     definitionHash: input.definitionHash,
     ...(input.humanRejected ? { humanRejected: input.humanRejected } : {}),
+    ...(input.reviseOf !== undefined ? { reviseOf: input.reviseOf } : {}),
   });
   return sha256(Buffer.from(canonical)).slice(0, 16);
 }

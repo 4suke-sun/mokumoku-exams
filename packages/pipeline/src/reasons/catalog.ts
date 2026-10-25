@@ -75,6 +75,11 @@ const EXACT: Readonly<Record<string, ReasonInfo>> = {
     pattern: "人の確認で、内容や出典の扱いに問題があった",
     suggestion: "却下の理由コード(人の判断の記録)を、種類ごとに見る",
   },
+  revised: {
+    meaning: "直した下書き(ブラッシュアップ役の出力)に置き換わった",
+    pattern: "保留の下書きを直し、直した下書きが取り込みを通った",
+    suggestion: "欠陥ではない。直した下書きの記録(revisionOf)の側を見る(理由の集計には入れない)",
+  },
   "kind-mismatch": {
     meaning: "下書きの種別が、依頼の種別と違う",
     pattern: "単一選択の依頼に複数選択を書く",

@@ -7,11 +7,11 @@ import { AgentStampSchema } from "../shared/agents.ts";
 import { PathsError } from "../shared/errors.ts";
 import { writeFileAtomic, writeJson } from "../shared/fs.ts";
 import { VerificationSchema } from "../verify/schema.ts";
-import { DraftSchema } from "./schema.ts";
+import { DRAFT_ID, DraftSchema, FACT_ID } from "./schema.ts";
 
 /**
  * 下書きの置き場(作業用の置き場。コミットしない)。
- * 通った下書きの本文は持つが、不採用の下書きは本文を持たない(ID と理由コードだけ)。
+ * 通った下書きの本文は持つが、不採用の下書きは本文を持たない(ID と理由コードだけ。人の却下と、直して置き換えた下書きは、根拠の事実カードの ID も残す)。
  */
 
 export const DRAFT_STATUSES = ["passed", "held", "rejected"] as const;
@@ -21,7 +21,7 @@ export type DraftStatus = (typeof DRAFT_STATUSES)[number];
 const REASON = z.string().regex(/^[a-z0-9]+(?:[:-][a-z0-9]+)*$/);
 
 export const DraftRecordSchema = z.strictObject({
-  id: z.string().regex(/^d-[0-9a-f]{12}$/),
+  id: DRAFT_ID,
   planItemId: z.string().regex(/^p-[0-9a-f]{12}$/),
   domain: z.string().regex(/^domain[1-9][0-9]?$/),
   difficulty: z.enum(DIFFICULTIES),
@@ -38,6 +38,13 @@ export const DraftRecordSchema = z.strictObject({
   similarity: z.number().min(0).max(1).optional(),
   /** 検証の段階の結果(検証前はない)。検証を通った合格は、verdict が pass のもの */
   verification: VerificationSchema.optional(),
+  /** 直した下書き(ブラッシュアップ役の出力)のとき、直す前の下書きの ID */
+  revisionOf: DRAFT_ID.optional(),
+  /**
+   * 本文を持たなくなった下書き(人の却下、直したことによる置き換え)の、根拠にした事実カードの ID。
+   * 補充の依頼で、同じカードを使われていない扱いに戻さないため(ID だけで、本文は持たない)
+   */
+  factIds: z.array(FACT_ID).max(10).optional(),
 });
 
 export const DraftsFileSchema = z.strictObject({
@@ -148,8 +155,17 @@ export function writeState(path: string, state: DraftState): void {
 /** 人が却下した下書きの理由コード */
 export const HUMAN_REJECTED = "human-rejected";
 
+/** 直した下書きに置き換わった、直す前の下書きの理由コード */
+export const REVISED = "revised";
+
+/** 下書きの根拠にした事実カードの ID。本文を持たない下書きは、残した ID(なければ空) */
+export function usedFactIds(record: DraftRecord): readonly string[] {
+  return record.draft?.factIds ?? record.factIds ?? [];
+}
+
 /**
  * 人の判断を、下書きの状態に反映する。却下した下書きは不採用にし、本文を持たない(ほかの不採用と同じ)。
+ * 根拠にした事実カードの ID だけは残し、補充の依頼で同じカードを先に選ばないようにする。
  * 保留の解除と承認は、保留の下書きを通過にする。
  */
 export function applyDraftDecisions(
@@ -161,7 +177,14 @@ export function applyDraftDecisions(
     const decision = decisionOf(d.id);
     if (decision === "reject" && d.status !== "rejected") {
       changed++;
-      return { ...d, status: "rejected", reasons: [HUMAN_REJECTED], draft: null };
+      const factIds = usedFactIds(d);
+      return {
+        ...d,
+        status: "rejected",
+        reasons: [HUMAN_REJECTED],
+        draft: null,
+        ...(factIds.length > 0 ? { factIds: [...factIds] } : {}),
+      };
     }
     if ((decision === "release" || decision === "approve") && d.status === "held") {
       changed++;

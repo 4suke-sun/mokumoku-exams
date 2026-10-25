@@ -30,6 +30,7 @@ npm test -w @mokumoku-exams/pipeline
   - `facts`: 出典から事実カードを作る。手順は [事実カードの作法と運用手順](../../docs/fact-cards.md)
   - `plan`: 分野の配点から目標の問題数を出し、既存の問題との差を計画にする。手順は [出題計画と下書きの手順](../../docs/drafting.md)
   - `draft`: 計画と事実カードから、選択式と自由記述の問題の下書きを作る(依頼 → エージェント → `--import` → `--check` → 人の確認 `--review`・`--decide`)。依頼は `--domain=<分野のコード>` で 1 分野に絞れる。
+    保留の選択式の下書きは、`--revise` でブラッシュアップ役(`question-reviser`)に直させられる(直した下書きは新しい下書きとして取り込み、検証からやり直す)。
     手順は [出題計画と下書きの手順](../../docs/drafting.md)、作り方の決まりは [作問のスタイルガイド](../../docs/question-style.md)
   - `verify`: 下書きを、根拠にした出典の節だけから検証する(依頼 → エージェント `question-verifier` → `--import`)。選択肢ごとの正誤の再導出と、解説の確認。手順は [出題計画と下書きの手順](../../docs/drafting.md) の「検証」
   - `status`: 段階ごとの状態を表示する。依頼待ち・取り込み待ち・通過・保留・不採用・書き出し済みの件数、理由コードごとの件数、再検証の印、計画の項目ごとの未達の理由、役のモデルと定義のハッシュ、依頼待ちの件数 × 役のモデルの見積もり。読むだけで、何も書かない。`pipeline-run` スキルが、止まったときに人に見せる
@@ -45,7 +46,7 @@ npm test -w @mokumoku-exams/pipeline
 - 共通部品(`src/shared/`): 依頼 → 取り込みの流れ(依頼の一覧、失敗の回数、`request-stale`、後始末。`request-flow.ts`)、
   資格コードの検査と資格マスタの読み込み(`exam.ts`)、書き出し(`fs.ts`)、項目のパスだけを持つ誤りの基底(`errors.ts`)、
   文字の 2 つ組の類似度(`similarity.ts`)、本文の写しの検出(`copy.ts`。試験ガイド・事実カード・下書きが同じ関数を使う)、エージェントの定義の読み込み(`agents.ts`)。段階ごとに違う検査は、各段階に残します。
-- エージェントの定義: 役(`guide-extractor` `fact-extractor` `question-drafter` `question-verifier` `source-scout`)と `.claude/agents/<役>.md` の対応は `src/shared/agents.ts` が持ちます。
+- エージェントの定義: 役(`guide-extractor` `fact-extractor` `question-drafter` `question-reviser` `question-verifier` `source-scout`)と `.claude/agents/<役>.md` の対応は `src/shared/agents.ts` が持ちます。
   依頼のファイルに、役の名前・モデルの ID・定義のハッシュ(`agent`)を書き、依頼の鍵にハッシュを入れます。ハッシュは、モデルの ID と指示の本文から決め、
   説明文(`description`)の直しでは変わりません。取り込んだ結果(試験ガイドの `guide.agent`、事実カードの `extracted[].agent`、下書きの `agent`)にも同じ記録が残ります。
 - ログの作法: 出力は「種類」と「場所(項目名や位置)」だけです。環境値・鍵・本文、入力した引数の文字列は出しません。
