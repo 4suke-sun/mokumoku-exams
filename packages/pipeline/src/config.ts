@@ -144,6 +144,8 @@ export const ConfigSchema = z.strictObject({
             minPerService: z.number().int().min(0).max(1000),
             /** 1 つのサービスが出る問題の割合の上限 */
             maxShare: z.number().gt(0).max(1),
+            /** サービスが 2 つ以上出る問題の割合の下限。score の束の警告に使う(持たなければ見ない) */
+            minMultiServiceShare: z.number().min(0).max(1).optional(),
           })
           .optional(),
       }),

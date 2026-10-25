@@ -64,7 +64,10 @@
     "typeMix": { "single": 0.75, "multiple": 0.2, "free-text": 0.05 },
     "overrides": {
       "AWS-CLF-C02": { "targetTotal": 200 },
-      "AWS-DVA-C02": { "targetTotal": 200, "services": { "minPerService": 2, "maxShare": 0.15 } }
+      "AWS-DVA-C02": {
+        "targetTotal": 200,
+        "services": { "minPerService": 2, "maxShare": 0.15, "minMultiServiceShare": 0.3 }
+      }
     }
   },
   "checks": {
