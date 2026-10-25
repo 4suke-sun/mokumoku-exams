@@ -26,9 +26,11 @@ import { applyDraftDecisions, type DraftRecord, DraftsError, draftWorkDir, readD
 import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { FactsError, type FactsFile, factsPath, readFacts } from "../facts/schema.ts";
 import { type Output, report } from "../log.ts";
+import { readExistingTexts } from "../plan/run.ts";
 import { readSampling, SamplingError, samplingPath } from "../sampling/store.ts";
 import { readAgentStamp } from "../shared/agents.ts";
 import { isVerified } from "../verify/schema.ts";
+import { criteriaAccepted } from "./criteria.ts";
 
 /**
  * export コマンド: 人が承認し、来歴の検査を通った下書きを、data/questions.<コード>.json に追加する(ADR 0014)。
@@ -198,7 +200,31 @@ export function runExport(options: ExportOptions): ExitCode {
     sampling.evalDefinitionHash === readAgentStamp(rootDir, "question-verifier").definitionHash
       ? new Set(sampling.draft.notReviewed)
       : new Set<string>();
-  const selection = selectExportable(drafts, decisions, provenance, blockedIds, autoAccepted);
+  // 基準を満たした下書きは、承認なしで書き出せる(設定 review.autoApprove に挙げた試験だけ)
+  const published = readExistingTexts(config, rootDir, examCode);
+  if (published === "invalid") {
+    report(output, "問題データの誤り", `questions.${examCode.toLowerCase()}.json`);
+    return EXIT.checkFailed;
+  }
+  const byCriteria = config.review.autoApprove.includes(examCode)
+    ? criteriaAccepted({
+        drafts,
+        examCode,
+        targets: config.plan.overrides[examCode]?.services,
+        services: ledger.guide?.services ?? [],
+        publishedTexts: published,
+      })
+    : new Set<string>();
+  const selection = selectExportable(
+    drafts,
+    decisions,
+    provenance,
+    blockedIds,
+    new Set([...autoAccepted, ...byCriteria]),
+  );
+  const criteriaUsed = selection.ready.filter(
+    (d) => byCriteria.has(d.id) && draftDecision(decisions, d.id) !== "approve",
+  ).length;
 
   const original = existsSync(paths.questions) ? readFileSync(paths.questions, "utf8") : null;
   const current = original === null ? { examCode, questions: [] as unknown[] } : JSON.parse(original);
@@ -223,7 +249,7 @@ export function runExport(options: ExportOptions): ExitCode {
   report(
     output,
     "情報",
-    `書き出し: 追加 ${added.length} 件、承認待ち ${selection.notApproved} 件、検証前・検証で止まった ${selection.unverified} 件、来歴の検査で止めた ${selection.blocked} 件、書き出し済み ${selection.exported} 件`,
+    `書き出し: 追加 ${added.length} 件、承認待ち ${selection.notApproved} 件、検証前・検証で止まった ${selection.unverified} 件、来歴の検査で止めた ${selection.blocked} 件、書き出し済み ${selection.exported} 件、追加のうち基準を満たして承認なし ${criteriaUsed} 件`,
   );
   if (dryRun) {
     report(output, "書き込みをしない(dry-run)");

@@ -98,6 +98,11 @@ export const ConfigSchema = z.strictObject({
     maxRejectRate: z.number().min(0).max(1),
     /** 戻すかを判断するのに必要な、人の判断の最小の件数 */
     minDecisions: z.number().int().positive(),
+    /**
+     * 基準を満たした下書きを、人の承認なしで書き出せる試験(export/criteria.ts)。
+     * 基準を満たさない下書きは、これまでどおり人の承認が要る。挙げない試験は変わらない
+     */
+    autoApprove: z.array(z.string().regex(EXAM_CODE)).default([]),
   }),
   /** 検証役の評価 */
   eval: z.strictObject({
