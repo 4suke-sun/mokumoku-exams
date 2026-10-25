@@ -43,7 +43,8 @@
     "nearHoldMargin": 0.15,
     "highRiskScore": 2,
     "maxRejectRate": 0.2,
-    "minDecisions": 5
+    "minDecisions": 5,
+    "autoApprove": ["AWS-DVA-C02"]
   },
   "eval": {
     "seed": 1,
@@ -65,7 +66,7 @@
     "overrides": {
       "AWS-CLF-C02": { "targetTotal": 200 },
       "AWS-DVA-C02": {
-        "targetTotal": 200,
+        "targetTotal": 457,
         "services": { "minPerService": 2, "maxShare": 0.15, "minMultiServiceShare": 0.3 }
       }
     }
