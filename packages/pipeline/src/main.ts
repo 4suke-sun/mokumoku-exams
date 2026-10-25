@@ -47,12 +47,13 @@ export const KNOWN_FLAGS = [
   "--check",
   "--review",
   "--decide",
+  "--revise",
 ];
 /** コマンドごとに、受け付ける動作のオプション(同時には 1 つだけ) */
 const MODE_FLAGS: Record<string, readonly string[]> = {
   collect: ["--import-guide", "--candidates", "--import-candidates"],
   facts: ["--import", "--coverage", "--report"],
-  draft: ["--import", "--check", "--review", "--decide"],
+  draft: ["--import", "--check", "--review", "--decide", "--revise"],
   verify: ["--import"],
   eval: ["--import"],
 };
@@ -94,6 +95,7 @@ function helpText(): string {
     "draft <資格コード> --check          下書きの来歴(根拠の事実カードと出典)を検査する",
     "draft <資格コード> --review         通過・保留の下書きと、人が却下した下書きの表と、判断を書き込むシートを出す",
     "draft <資格コード> --decide         判断を書き込んだシートを、人の判断の記録に取り込む",
+    "draft <資格コード> --revise         保留の下書きごとに、ブラッシュアップ役への直しの依頼を書く",
     "verify <資格コード>                 下書きごとに、根拠の節だけを読んで正誤を再導出する検証の依頼を書く",
     "verify <資格コード> --import       検証役の出力を、下書きの宣言と照合して取り込む",
     "eval <資格コード>                   人が承認した下書きから評価用のデータを作り、検証役の評価の依頼を書く",
@@ -170,7 +172,8 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
         score: "使い方: score <資格コード>\n",
         reasons: "使い方: reasons <資格コード>\n",
         eval: "使い方: eval <資格コード> [--import]\n",
-        draft: "使い方: draft <資格コード> [--domain=<分野のコード> | --import | --check | --review | --decide]\n",
+        draft:
+          "使い方: draft <資格コード> [--domain=<分野のコード> | --import | --check | --review | --decide | --revise]\n",
       };
       const usage = usages[command.name] ?? "";
       output.out(`${command.name}: ${command.summary}\n${usage}\nオプション: --dry-run, --help\n`);
@@ -312,7 +315,9 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
             ? "review"
             : flags.includes("--decide")
               ? "decide"
-              : "request";
+              : flags.includes("--revise")
+                ? "revise"
+                : "request";
       return runDraft({
         config,
         rootDir,

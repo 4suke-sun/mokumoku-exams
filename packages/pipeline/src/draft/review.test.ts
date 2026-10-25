@@ -3,6 +3,7 @@ import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { decisionsPath, readDecisions } from "../decisions/decisions.ts";
 import { EXIT } from "../exit-codes.ts";
+import { DOC_URL } from "../facts/test-helpers.ts";
 import { readDrafts } from "./store.ts";
 import {
   baseConfig,
@@ -42,6 +43,8 @@ describe("draft --review と --decide", () => {
     expect(md).toContain("(正答)");
     expect(md).toContain("架空の主張");
     expect(md).toMatch(/\| 出典 \| https:\/\//);
+    // 検証役が読む根拠の節の場所(出典の URL・節の名前・見出し)が載る
+    expect(md).toContain(`| 検証の節 | ${DOC_URL}(節: Quotas and limits、見出し: quotas) |`);
     expect(md).toContain((draft?.questionText ?? "").slice(0, 10));
     expect(readSheet(root).items).toEqual([{ id, decision: null, reason: null }]);
   });

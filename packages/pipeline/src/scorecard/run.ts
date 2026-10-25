@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, relative, resolve } from "node:path";
+import { LedgerError, ledgerPath, readLedger } from "../collect/ledger.ts";
 import type { Config } from "../config.ts";
 import { QuestionsFileSchema } from "../contract.ts";
 import { EXIT, type ExitCode } from "../exit-codes.ts";
@@ -14,11 +15,12 @@ import {
   scoreBatch,
   scoreQuestion,
 } from "./score.ts";
+import { serviceSpread, spreadWarnings } from "./services.ts";
 
 /**
  * score コマンド: 公開している問題データを、書き方の点数票で採点する(docs/exam-style/scorecard.md)。
- * 読むだけで、何も書かない。モデルは呼ばない。重さは「警告」で、不合格でも終了コードは 0 にする。
- * 出力は、問題の ID・項目の ID・点数・割合・字数・件数だけで、設問文や選択肢の本文は出さない。
+ * 読むだけで、何も書かない。モデルは呼ばない。重さは「警告」で、不合格でも終了コードは 0 にする(入力の誤りと、台帳が読めないときを除く)。
+ * 出力は、問題の ID・項目の ID・点数・割合・字数・件数と、試験ガイドの対象サービスの名前だけで、設問文や選択肢の本文は出さない。
  */
 
 export interface ScoreOptions {
@@ -108,5 +110,60 @@ export function runScore({ config, rootDir, examCode, output }: ScoreOptions): E
     "点数票",
     `束の測定値: 複数選択 ${percent(m.multiShare)}、状況つき ${percent(m.situationShare)}、設問文の中央値 ${round1(m.stemMedian)} 字(p90 ${m.stemP90} 字)、選択肢の形 名称 ${percent(m.nameShare)} / 語句 ${percent(m.phraseShare)} / 文 ${percent(m.sentenceShare)}、書き出しの最大の偏り ${percent(m.openerTopShare)}`,
   );
-  return EXIT.ok;
+  return reportServices({ config, rootDir, examCode, output }, inputs) ? EXIT.ok : EXIT.checkFailed;
+}
+
+/** サービスの多い順に挙げる件数 */
+const TOP_SERVICES = 5;
+
+/**
+ * 束のサービスの分布を報告する(点数には入れない)。対象サービスの一覧(台帳の試験ガイド)がなければ、その旨だけを報告する。
+ * 試験ごとの目安(plan.overrides の services)があれば、外れた点を「束の警告」として報告する(終了コードは変えない)。
+ * 台帳が読めなければ false(誤りは報告済み)
+ */
+function reportServices({ config, rootDir, examCode, output }: ScoreOptions, inputs: readonly ScoreInput[]): boolean {
+  let services: string[];
+  try {
+    services = readLedger(ledgerPath(resolve(rootDir, config.ledgerDir), examCode), examCode).guide?.services ?? [];
+  } catch (error) {
+    if (!(error instanceof LedgerError)) throw error;
+    for (const p of error.paths) report(output, "台帳の誤り", p);
+    return false;
+  }
+  if (services.length === 0) {
+    report(output, "点数票", "束のサービス: 試験ガイドの対象サービスの一覧がないので測らない");
+    return true;
+  }
+  const spread = serviceSpread(
+    inputs.map((q) => [q.stem, ...q.choices].join("\n")),
+    services,
+  );
+  const top = spread.ranking
+    .slice(0, TOP_SERVICES)
+    .map((r) => `${r.service} ${percent(r.share)}`)
+    .join("、");
+  report(
+    output,
+    "点数票",
+    `束のサービス: 一覧 ${services.length} 件のうち出る ${spread.coveredServices} 件、サービスが出る設問 ${percent(spread.mentionedShare)}、` +
+      `2 つ以上のサービスが出る設問 ${percent(spread.multiShare)}、多い順 ${top === "" ? "なし" : top}`,
+  );
+  const targets = config.plan.overrides[examCode]?.services;
+  if (targets === undefined) return true;
+  const warnings = spreadWarnings(spread, targets);
+  for (const r of warnings.overShare) {
+    report(
+      output,
+      "点数票",
+      `束の警告: サービスの偏り ${r.service} ${percent(r.share)}(上限 ${percent(targets.maxShare)})`,
+    );
+  }
+  if (warnings.multiShort && targets.minMultiServiceShare !== undefined) {
+    report(
+      output,
+      "点数票",
+      `束の警告: 2 つ以上のサービスが出る設問 ${percent(spread.multiShare)}(下限 ${percent(targets.minMultiServiceShare)})`,
+    );
+  }
+  return true;
 }

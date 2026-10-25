@@ -16,6 +16,8 @@ import {
  */
 
 export const FACT_ID = z.string().regex(/^f-[0-9a-f]{12}$/);
+/** 下書きの ID(資格・計画の項目・根拠・設問文から決まる。draftId) */
+export const DRAFT_ID = z.string().regex(/^d-[0-9a-f]{12}$/);
 
 const text = (max: number) => z.string().max(max).regex(/\S/);
 

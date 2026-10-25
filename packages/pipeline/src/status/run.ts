@@ -1,4 +1,4 @@
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { LedgerError, type LedgerFile, ledgerPath, readLedger } from "../collect/ledger.ts";
 import type { Config } from "../config.ts";
@@ -39,6 +39,20 @@ function queue(requestsDir: string, outDir: string): { waiting: number; toImport
     waiting: requests.filter((f) => !outs.has(f)).length,
     toImport: requests.filter((f) => outs.has(f)).length,
   };
+}
+
+/** 依頼待ちのうち、直しの依頼(revise を持つもの)の数。読めない依頼は数えない(取り込みが request-invalid で止める) */
+function reviseWaiting(requestsDir: string, outDir: string): number {
+  const outs = new Set(existsSync(outDir) ? readdirSync(outDir).filter((f) => f.endsWith(".json")) : []);
+  return listRequestFiles(requestsDir).filter((f) => {
+    if (outs.has(f)) return false;
+    try {
+      const raw = JSON.parse(readFileSync(join(requestsDir, f), "utf8")) as { revise?: unknown } | null;
+      return raw !== null && typeof raw === "object" && raw.revise !== undefined;
+    } catch {
+      return false;
+    }
+  }).length;
 }
 
 function countBy(values: readonly string[]): [string, number][] {
@@ -132,6 +146,10 @@ export function runStatus(options: StatusOptions): ExitCode {
   line(plan === null ? "出題計画 なし" : `出題計画 項目 ${plan.items.length} 件`);
 
   const draftQueue = queue(join(draftWorkDir(work, examCode), "requests"), join(draftWorkDir(work, examCode), "out"));
+  const reviseQueue = reviseWaiting(
+    join(draftWorkDir(work, examCode), "requests"),
+    join(draftWorkDir(work, examCode), "out"),
+  );
   const draftCount = (status: string) => drafts.drafts.filter((r) => r.status === status).length;
   const exported = provenance.entries.filter((e) => e.questionId !== undefined).length;
   line(
@@ -158,7 +176,8 @@ export function runStatus(options: StatusOptions): ExitCode {
     "source-scout": candidateQueue.waiting,
     "guide-extractor": guide.waiting,
     "fact-extractor": factQueue.waiting,
-    "question-drafter": draftQueue.waiting,
+    "question-drafter": draftQueue.waiting - reviseQueue,
+    "question-reviser": reviseQueue,
     "question-verifier": verifyQueue.waiting,
   };
   for (const role of PIPELINE_ROLES) {

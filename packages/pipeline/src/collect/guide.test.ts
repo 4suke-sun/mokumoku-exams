@@ -22,6 +22,7 @@ function extract(overrides: Partial<GuideExtract> = {}): GuideExtract {
       { number: 1, name: "アルファの分野", weightPercent: 60, scope: ["アルファの基本を説明できる"] },
       { number: 2, name: "ベータの分野", weightPercent: 40, scope: [] },
     ],
+    services: [],
     ...overrides,
   };
 }
@@ -267,5 +268,39 @@ describe("試験ガイドの本番の値(出題数・試験時間・合格点・
     const d = diffWithMaster(imported({ scoredQuestionCount: 50 }), master, values);
     expect(d.examMismatch).toEqual([]);
     expect(d.examMissingInMaster).toEqual([]);
+  });
+});
+
+describe("試験ガイドの対象サービスの一覧", () => {
+  const services = "In-scope services: AWS Lambda, Amazon Simple Queue Service (Amazon SQS)";
+  const run = (names: string[], text = services) =>
+    importGuide(extract({ services: names }), ledger, [], () => text, "2026-10-13");
+
+  it("本文に出る名前_そのまま台帳に持つ(本文の写しの検査の対象にしない)", () => {
+    const r = run(["AWS Lambda", "Amazon Simple Queue Service (Amazon SQS)"]);
+    expect(r.ok && r.guide.services).toEqual(["AWS Lambda", "Amazon Simple Queue Service (Amazon SQS)"]);
+  });
+
+  it("本文で改行をまたぐ名前_空白をそろえて比べ、通す", () => {
+    expect(run(["AWS Lambda"], "AWS\n  Lambda").ok).toBe(true);
+  });
+
+  it("一覧が空_台帳に項目を持たない", () => {
+    const r = run([]);
+    expect(r.ok && "services" in r.guide).toBe(false);
+  });
+
+  it("本文にない名前_止める", () => {
+    expect(run(["AWS Lambda", "Amazon Kinesis"])).toEqual({ ok: false, reason: "service-not-in-source" });
+  });
+
+  it("同じ名前が重なる_止める", () => {
+    expect(run(["AWS Lambda", "AWS Lambda"])).toEqual({ ok: false, reason: "service-duplicate" });
+  });
+
+  it("名前のほかの文が入る(句点・日本語・長すぎる)_形の検査で止める", () => {
+    for (const bad of ["AWS Lambda。サーバーレス", "ラムダ", `A${"a".repeat(80)}`]) {
+      expect(run([bad])).toEqual({ ok: false, reason: "extract-invalid" });
+    }
   });
 });

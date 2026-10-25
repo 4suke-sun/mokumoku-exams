@@ -1,5 +1,5 @@
 import type { DecisionsFile } from "../decisions/decisions.ts";
-import type { DraftsFile } from "../draft/store.ts";
+import { type DraftsFile, REVISED } from "../draft/store.ts";
 import type { FactsFile } from "../facts/schema.ts";
 import { describeReason } from "./catalog.ts";
 
@@ -84,7 +84,10 @@ interface Item {
 export function aggregate(examCode: string, facts: FactsFile, drafts: DraftsFile, decisions: DecisionsFile): Summary {
   const items: Item[] = [
     ...facts.cards.map((c): Item => ({ ...c, base: "facts", verdict: null })),
-    ...drafts.drafts.map((d): Item => ({ ...d, base: "draft", verdict: d.verification?.verdict ?? null })),
+    // 直した下書きに置き換わった下書き(理由 revised)は、欠陥による不採用ではなく、直した下書きの側で数えるので、集計に入れない
+    ...drafts.drafts
+      .filter((d) => !d.reasons.includes(REVISED))
+      .map((d): Item => ({ ...d, base: "draft", verdict: d.verification?.verdict ?? null })),
   ];
   const humanDecisions = decisions.decisions.flatMap((d) =>
     d.target === "source" ? [] : [{ target: d.target, id: d.id, decision: d.decision, reason: d.reason }],

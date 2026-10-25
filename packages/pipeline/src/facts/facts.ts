@@ -140,7 +140,7 @@ export function pendingSources(
 /** 依頼の対象の出典か(取得済みの active な出典で、試験ガイドでなく、今の本文と定義で抽出済みでない) */
 function needsExtraction(source: LedgerFile["sources"][number], facts: FactsFile, stamp: AgentStamp): boolean {
   if (source.status !== "active" || source.contentHash === null) return false;
-  // 試験ガイドのページは、分野・出題範囲の材料(台帳の guide)で、事実カードの根拠にしない
+  // 試験ガイドのページは、分野・出題範囲・対象サービスの一覧の材料(台帳の guide)で、事実カードの根拠にしない
   if (source.kind === "exam-guide") return false;
   const hash = source.contentHash;
   return !facts.extracted.some((e) => e.url === source.url && e.contentHash === hash && sameDefinition(e.agent, stamp));

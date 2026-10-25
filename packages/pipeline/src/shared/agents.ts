@@ -12,6 +12,7 @@ export const PIPELINE_ROLES = [
   "guide-extractor",
   "fact-extractor",
   "question-drafter",
+  "question-reviser",
   "question-verifier",
   "source-scout",
 ] as const;

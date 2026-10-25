@@ -15,9 +15,11 @@ import {
   writeDecisions,
 } from "../decisions/decisions.ts";
 import { EXIT, type ExitCode } from "../exit-codes.ts";
-import { FactsError, type FactsFile, factsPath, readFacts } from "../facts/schema.ts";
+import { type FactCard, FactsError, type FactsFile, factsPath, readFacts } from "../facts/schema.ts";
 import { type Output, report } from "../log.ts";
+import { readExistingTexts } from "../plan/run.ts";
 import { PlanError, type PlanFile, planPath, readPlan } from "../plan/schema.ts";
+import { servicePriority, serviceStatus } from "../plan/services.ts";
 import { planFor, recordedOrComputed } from "../sampling/load.ts";
 import type { SamplingPlan } from "../sampling/plan.ts";
 import { recordOf, writeSampling } from "../sampling/store.ts";
@@ -70,6 +72,7 @@ import {
   renderDraftReview,
   reviewCounts,
 } from "./review.ts";
+import { evidenceLocations, reviseFacts, reviseTargets } from "./revise.ts";
 import { assembleQuestion, DISTRACTOR_TYPES, draftId, isChoiceDraft, schemaProblems } from "./schema.ts";
 import {
   applyDraftDecisions,
@@ -78,9 +81,11 @@ import {
   type DraftsFile,
   draftWorkDir,
   HUMAN_REJECTED,
+  REVISED,
   readDrafts,
   readState,
   type UnmetReason,
+  usedFactIds,
   writeDrafts,
   writeState,
 } from "./store.ts";
@@ -91,10 +96,11 @@ import { evaluateStyle, STYLE_VERSION } from "./style.ts";
  * - draft <資格コード>            計画の項目ごとに、下書きの依頼を作業用の置き場に書く(同じ入力は依頼しない)
  * - draft <資格コード> --import   エージェントの出力を検査して取り込む(形、スタイル規則、根拠の事実カード、来歴)
  * - draft <資格コード> --check    下書きの来歴を検査する(来歴のない下書きは、検証の段階へ進めない)
- * モデルは呼ばない。下書きはエージェント(question-drafter)が書く(ADR 0009)。data/ は変えない。
+ * - draft <資格コード> --revise   保留の選択式の下書きごとに、直しの依頼を書く(取り込みは --import)
+ * モデルは呼ばない。下書きはエージェント(question-drafter)が書き、直しはエージェント(question-reviser)が書く(ADR 0009・0019)。data/ は変えない。
  */
 
-export type DraftMode = "request" | "import" | "check" | "review" | "decide";
+export type DraftMode = "request" | "revise" | "import" | "check" | "review" | "decide";
 
 export interface DraftOptions {
   config: Config;
@@ -180,14 +186,22 @@ export function runDraft(options: DraftOptions): ExitCode {
   for (const d of orphanDecisions(decisions, { draftIds: drafts.drafts.map((x) => x.id) })) {
     if (d.target === "draft") report(output, "判断の対象なし", `draft ${d.id}`);
   }
-  const needsAgent = options.mode === "request" || options.mode === "import";
-  const stamp = needsAgent ? readAgentStampOrReport(output, rootDir, "question-drafter") : null;
-  if (needsAgent && stamp === null) return EXIT.checkFailed;
+  const needsDrafter = options.mode === "request" || options.mode === "import";
+  const needsReviser = options.mode === "revise" || options.mode === "import";
+  const stamp = needsDrafter ? readAgentStampOrReport(output, rootDir, "question-drafter") : null;
+  if (needsDrafter && stamp === null) return EXIT.checkFailed;
+  const reviser = needsReviser ? readAgentStampOrReport(output, rootDir, "question-reviser") : null;
+  if (needsReviser && reviser === null) return EXIT.checkFailed;
   switch (options.mode) {
     case "request":
       return requestStep(options, paths, master.domains, facts, drafts, ledger, stamp as AgentStamp);
+    case "revise":
+      return reviseStep(options, paths, master.domains, facts, drafts, ledger, decisions, reviser as AgentStamp);
     case "import":
-      return importStep(options, paths, facts, drafts, ledger, provenance, stamp as AgentStamp);
+      return importStep(options, paths, facts, drafts, ledger, provenance, decisions, {
+        drafter: stamp as AgentStamp,
+        reviser: reviser as AgentStamp,
+      });
     case "check":
       return checkStep(options, facts, drafts, provenance, ledger, master.exam.vendor, decisions);
     case "review":
@@ -294,6 +308,31 @@ function decideStep(
   return EXIT.ok;
 }
 
+/**
+ * 対象サービスの目標(試験ごとの設定 plan.overrides の services)と、試験ガイドの対象サービスの一覧がそろうときだけ、
+ * 事実カードを選ぶ順の重みを返す(plan/services.ts)。数えるのは、公開済みの問題と、不採用でない本文のある下書き。
+ * そろわなければ、重みをすべて同じにする(サービスで寄せない)
+ */
+function servicePriorityOf(
+  options: DraftOptions,
+  ledger: LedgerFile,
+  drafts: DraftsFile,
+): ((card: FactCard) => number) | "invalid" {
+  const { config, rootDir, examCode } = options;
+  const targets = config.plan.overrides[examCode]?.services;
+  const services = ledger.guide?.services ?? [];
+  if (targets === undefined || services.length === 0) return () => 0;
+  const published = readExistingTexts(config, rootDir, examCode);
+  if (published === "invalid") return "invalid";
+  const drafted = drafts.drafts.flatMap((d) =>
+    d.draft === null || d.status === "rejected"
+      ? []
+      : [[d.draft.questionText, ...(isChoiceDraft(d.draft) ? d.draft.choices.map((c) => c.text) : [])].join("\n")],
+  );
+  const status = serviceStatus([...published, ...drafted], services, targets);
+  return (card) => servicePriority(card, services, status);
+}
+
 function requestStep(
   options: DraftOptions,
   paths: Paths,
@@ -319,10 +358,11 @@ function requestStep(
     return EXIT.inputError;
   }
   const state = readState(paths.state);
+  // 事実カードごとに、下書きの根拠にされた回数を数える。人が却下した下書きと、直して置き換えた下書きの根拠も数える
+  // (本文はないが、残した ID で数える)。同じカードが補充の依頼で、使われていない扱いに戻って再び選ばれないようにするため
   const usage = new Map<string, number>();
   for (const d of drafts.drafts) {
-    if (d.draft === null) continue;
-    for (const id of d.draft.factIds) usage.set(id, (usage.get(id) ?? 0) + 1);
+    for (const id of usedFactIds(d)) usage.set(id, (usage.get(id) ?? 0) + 1);
   }
   // 出典ごとに、根拠にされた回数を数える(不採用の下書きは数えない)。使われていない出典の事実カードを先に選ぶため
   const cardById = new Map(facts.cards.map((c) => [c.id, c]));
@@ -342,6 +382,11 @@ function requestStep(
     }
   }
   const settings = config.draft;
+  const priority = servicePriorityOf(options, ledger, drafts);
+  if (priority === "invalid") {
+    report(output, "問題データの誤り", `questions.${examCode.toLowerCase()}.json`);
+    return EXIT.checkFailed;
+  }
   const styleGuides = styleGuidePaths(examCode);
   let requested = 0;
   let satisfied = 0;
@@ -378,7 +423,7 @@ function requestStep(
       exhausted++;
       continue;
     }
-    const selected = selectFacts(cards, usage, settings.maxFactsPerRequest, sourceUsage);
+    const selected = selectFacts(cards, usage, settings.maxFactsPerRequest, sourceUsage, priority);
     const count = Math.min(remaining, settings.maxPerRequest);
     // 人の却下は、出し直しの回数(上限の maxRounds)に数えず、鍵に入れて足りない分の依頼を出す
     const humanRejected = drafts.drafts.filter(
@@ -460,6 +505,107 @@ function requestStep(
   return limited || exhausted > 0 || noFacts.size > 0 ? EXIT.checkFailed : EXIT.ok;
 }
 
+/**
+ * 直しの依頼を書く(draft --revise。ブラッシュアップ役 question-reviser)。保留の選択式の下書きで、人の判断がまだないものごとに、
+ * 元の下書き、保留の理由、検証の指摘、根拠の節の場所、元の根拠と周辺の事実カードを載せた依頼を 1 件ずつ書く。書かせる数は 1。
+ * 元の根拠の事実カードが使えなくなった下書きは、直しの材料がそろわないので依頼しない(作り直しは、通常の依頼で行う)。
+ */
+function reviseStep(
+  options: DraftOptions,
+  paths: Paths,
+  masterDomains: { code: string; name: string }[],
+  facts: FactsFile,
+  drafts: DraftsFile,
+  ledger: LedgerFile,
+  decisions: DecisionsFile,
+  stamp: AgentStamp,
+): ExitCode {
+  const { config, rootDir, examCode, output, dryRun } = options;
+  const state = readState(paths.state);
+  const usage = new Map<string, number>();
+  for (const d of drafts.drafts) for (const id of usedFactIds(d)) usage.set(id, (usage.get(id) ?? 0) + 1);
+  const styleGuides = styleGuidePaths(examCode);
+  let requested = 0;
+  let pending = 0;
+  let cached = 0;
+  let skipped = 0;
+  let limited = false;
+  const targets = reviseTargets(drafts, (id) => draftDecision(decisions, id));
+  for (const record of targets) {
+    const candidates = facts.cards.filter((c) => c.domain === record.domain && usableFact(c, ledger));
+    if (!record.draft.factIds.every((id) => candidates.some((c) => c.id === id))) {
+      report(output, "直しの保留", `${record.id} fact-not-usable`);
+      skipped++;
+      continue;
+    }
+    const selected = reviseFacts(record, candidates, usage, config.draft.maxFactsPerRequest);
+    const key = requestKey({
+      examCode,
+      planItemId: record.planItemId,
+      count: 1,
+      round: 0,
+      facts: selected,
+      definitionHash: stamp.definitionHash,
+      reviseOf: record.id,
+    });
+    if (state.done.includes(key)) {
+      cached++;
+      continue;
+    }
+    if ((state.attempts[key] ?? 0) >= config.draft.maxAttempts) {
+      report(output, "再試行の上限", `${record.id} max-attempts`);
+      skipped++;
+      continue;
+    }
+    const requestPath = join(paths.requestsDir, `${key}.json`);
+    if (existsSync(requestPath)) {
+      pending++;
+      continue;
+    }
+    if (requested >= config.maxItemsPerRun) {
+      limited = true;
+      break;
+    }
+    const kind = record.draft.questionType;
+    const request: DraftRequest = {
+      examCode,
+      requestKey: key,
+      planItemId: record.planItemId,
+      domain: { code: record.domain, name: masterDomains.find((d) => d.code === record.domain)?.name ?? record.domain },
+      difficulty: record.difficulty,
+      kind,
+      count: 1,
+      facts: selected.map((c) => ({ id: c.id, claim: c.claim, confidence: c.confidence, scope: c.scope })),
+      // 正答の位置は、元の下書きのものを保つ(正答の位置の偏りを変えない)
+      answerPositions: [[...record.draft.correctAnswers].sort()],
+      distractorTypes: [...DISTRACTOR_TYPES],
+      styleVersion: STYLE_VERSION,
+      ...(styleGuides !== null ? { styleGuides } : {}),
+      styleRules: styleRuleSummaries(kind),
+      outputPath: relative(rootDir, join(paths.outDir, `${key}.json`)),
+      agent: stamp,
+      revise: {
+        draftId: record.id,
+        draft: record.draft,
+        reasons: record.reasons,
+        findings: (record.verification?.findings ?? []).map((f) => ({ code: f.code, where: f.where })),
+        sections: evidenceLocations(record.draft.factIds, facts),
+      },
+    };
+    if (!dryRun) writeJson(requestPath, request);
+    report(output, "直しの依頼", relative(rootDir, requestPath));
+    requested++;
+  }
+  report(
+    output,
+    "情報",
+    `直しの依頼 ${requested} 件、依頼済みで待っている ${pending} 件、取り込み済みの入力で飛ばした ${cached} 件、依頼しなかった ${skipped} 件(対象 ${targets.length} 件)`,
+  );
+  if (dryRun) report(output, "書き込みをしない(dry-run)");
+  if (limited) report(output, "件数の上限", "maxItemsPerRun(再実行で続きから進む)");
+  return limited || skipped > 0 ? EXIT.checkFailed : EXIT.ok;
+}
+
 function uniqueSorted(values: string[]): string[] {
   return [...new Set(values)].sort();
 }
@@ -471,10 +617,15 @@ function importStep(
   current: DraftsFile,
   ledger: LedgerFile,
   provenance: ProvenanceFile,
-  stamp: AgentStamp,
+  decisions: DecisionsFile,
+  stamps: { drafter: AgentStamp; reviser: AgentStamp },
 ): ExitCode {
   const { config, rootDir, examCode, output, dryRun } = options;
   const ctx: FlowContext = { output, stopLabel: "下書きの取り込みの停止", dryRun };
+  // 直しの依頼で取り込んだ下書きが置き換える、直す前の下書きの ID(直す前 → 直した下書き)
+  const revised = new Map<string, string>();
+  // 直しで設問文と根拠の事実カードを変えなかった下書きは、直す前と同じ ID になる。その記録を、直した内容で置き換える(ID → 直した記録)
+  const inPlace = new Map<string, DraftRecord>();
   const state = readState(paths.state);
   // 取得した本文の作業用キャッシュ(下書きの写しの検査に使う。本文を書き足さない。読むと更新時刻が変わり、壊れた本文は消える)
   const cache = new BodyCache(join(resolve(rootDir, config.workDir), "cache"), config.cache, Date.now);
@@ -514,8 +665,22 @@ function importStep(
       failures++;
       continue;
     }
+    // 直しの依頼はブラッシュアップ役、それ以外は下書きの作成役の定義で作った下書き
+    const stamp = request.revise !== undefined ? stamps.reviser : stamps.drafter;
     // 依頼のあとにエージェントの定義が変わった(記録のない古い依頼を含む)。出力の形を見る前に、依頼を作り直す
     if (definitionChanged(request, stamp)) {
+      discardStale(ctx, key, join(paths.requestsDir, file), outPath);
+      continue;
+    }
+    // 直しの依頼のあとに、直す下書きが保留でなくなった(人が判断した、ほかの直しで置き換わった)。直しの意味がないので依頼を捨てる
+    const reviseOf = request.revise?.draftId;
+    if (
+      reviseOf !== undefined &&
+      (revised.has(reviseOf) ||
+        inPlace.has(reviseOf) ||
+        current.drafts.find((d) => d.id === reviseOf)?.status !== "held" ||
+        draftDecision(decisions, reviseOf) !== undefined)
+    ) {
       discardStale(ctx, key, join(paths.requestsDir, file), outPath);
       continue;
     }
@@ -600,8 +765,10 @@ function importStep(
         report(output, "下書きの不採用", `${id} ${r}`);
       }
       // 重複の検出: 公開済みの問題や下書きとほぼ同じなら落とし、近ければ保留にして確かめる
+      // 直した下書きは、直す前の下書きとは比べない(同じ問いを直したものなので、似ているのが当然)
+      const others = reviseOf === undefined ? pool : pool.filter((c) => c.ref !== reviseOf);
       const dups =
-        reasons.length === 0 ? findDuplicates(candidateOf(id, "draft", draft), pool, config.draft.similarity) : [];
+        reasons.length === 0 ? findDuplicates(candidateOf(id, "draft", draft), others, config.draft.similarity) : [];
       for (const f of dups.filter((d) => d.level === "duplicate")) {
         reasons.push(`duplicate:${f.kind}-${f.source}`);
         report(output, "下書きの不採用", `${id} duplicate-${f.kind} ${f.other} ${f.score.toFixed(2)}`);
@@ -642,13 +809,27 @@ function importStep(
         warnings,
         draft: held || reasons.length === 0 ? draft : null,
         agent: stamp,
-        similarity: maxSimilarity(candidateOf(id, "draft", draft), pool),
+        similarity: maxSimilarity(candidateOf(id, "draft", draft), others),
+        ...(reviseOf !== undefined ? { revisionOf: reviseOf } : {}),
       });
       // 以降の下書きは、この下書きとも比べる
       if (held || reasons.length === 0) pool.push(candidateOf(id, "draft", draft));
     }
     const known = new Set([...current.drafts, ...incoming].map((d) => d.id));
     for (const record of batch) {
+      if (reviseOf !== undefined && record.id === reviseOf) {
+        // 同じ ID の直し。不採用でなければ、直す前の記録を置き換える(検証の結果は持たないので、検証からやり直す)。
+        // 不採用なら、直す前の下書きは保留のまま残る
+        if (record.status !== "rejected") {
+          const { revisionOf: _self, ...replaced } = record;
+          inPlace.set(record.id, replaced);
+          if (record.status === "passed") accepted++;
+          else heldCount++;
+        } else {
+          rejected++;
+        }
+        continue;
+      }
       if (known.has(record.id)) continue;
       known.add(record.id);
       incoming.push(record);
@@ -658,8 +839,14 @@ function importStep(
     }
     const takenHere = batch.filter((r) => r.status !== "rejected").length;
     state.done.push(key);
-    // 全件が不採用だったときだけ、計画の項目の依頼を出し直す(回数に上限がある)
-    if (takenHere === 0) state.rounds[request.planItemId] = (state.rounds[request.planItemId] ?? 0) + 1;
+    if (reviseOf !== undefined) {
+      // 直した下書きが不採用でなければ、直す前の下書きを置き換える。不採用なら、直す前の下書きは保留のまま残る
+      const taken = batch.find((r) => r.status !== "rejected" && incoming.includes(r));
+      if (taken !== undefined) revised.set(reviseOf, taken.id);
+    } else if (takenHere === 0) {
+      // 全件が不採用だったときだけ、計画の項目の依頼を出し直す(回数に上限がある)。直しの依頼は数えない
+      state.rounds[request.planItemId] = (state.rounds[request.planItemId] ?? 0) + 1;
+    }
     doneFiles.push(file);
   }
 
@@ -672,18 +859,37 @@ function importStep(
     report(output, "書き込みをしない(dry-run)");
     return failures > 0 ? EXIT.checkFailed : EXIT.ok;
   }
-  const next: DraftsFile = { examCode, drafts: [...current.drafts, ...incoming] };
+  // 直した下書きに置き換わった下書きは、不採用(理由 revised)にして本文を持たない。根拠の事実カードの ID だけを残す
+  const kept = current.drafts.map((d): DraftRecord => {
+    const replaced = inPlace.get(d.id);
+    if (replaced !== undefined) return replaced;
+    if (!revised.has(d.id)) return d;
+    const factIds = usedFactIds(d);
+    return {
+      ...d,
+      status: "rejected",
+      reasons: [REVISED],
+      draft: null,
+      ...(factIds.length > 0 ? { factIds: [...factIds] } : {}),
+    };
+  });
+  for (const [from, to] of revised) report(output, "直しの取り込み", `${from} → ${to}`);
+  for (const id of inPlace.keys()) report(output, "直しの取り込み", `${id}(同じ ID で置き換え)`);
+  const next: DraftsFile = { examCode, drafts: [...kept, ...incoming] };
   // 捨てた出力の分が entries に残っていても、取り込んだ下書き(incoming)の ID だけを使うので、来歴には入らない
-  const added = incoming.filter((d) => d.status !== "rejected").flatMap((d) => entries.get(d.id) ?? []);
+  const added = [...incoming.filter((d) => d.status !== "rejected"), ...inPlace.values()].flatMap(
+    (d) => entries.get(d.id) ?? [],
+  );
   // 来歴を先に書く。下書きより先に来歴があっても害はなく、逆は「来歴のない下書き」になる
-  if (added.length > 0) {
-    const ids = new Set(added.map((e) => e.draftId));
+  // 置き換わった下書きの来歴は外す(不採用の下書きは来歴を持たない)
+  if (added.length > 0 || revised.size > 0) {
+    const ids = new Set([...added.map((e) => e.draftId), ...revised.keys()]);
     writeProvenance(paths.provenance, {
       examCode,
       entries: [...provenance.entries.filter((e) => !ids.has(e.draftId)), ...added],
     });
   }
-  if (incoming.length > 0) writeDrafts(paths.drafts, next);
+  if (incoming.length > 0 || revised.size > 0 || inPlace.size > 0) writeDrafts(paths.drafts, next);
   // 正解の偏り: 選択式の下書き(通過・保留)と公開済みの問題を合わせて、データの検査と同じ指標としきい値で数える。報告だけで止めない
   const choiceDrafts = next.drafts.flatMap((d) =>
     d.status !== "rejected" && d.draft !== null && isChoiceDraft(d.draft) ? [d.draft] : [],

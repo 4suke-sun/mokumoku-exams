@@ -4,11 +4,13 @@ import { type Decision, type DecisionsFile, DRAFT_ID, draftDecision } from "../d
 import type { FactsFile } from "../facts/schema.ts";
 import type { SamplingPlan } from "../sampling/plan.ts";
 import type { ProvenanceFile } from "./provenance.ts";
+import { evidenceLocations } from "./revise.ts";
 import type { DraftRecord, DraftsFile } from "./store.ts";
 
 /**
  * 人が通過と保留の下書き(と、人が却下した下書き)をすべて確かめるための表と、判断を書き込むシート。
- * 表には、設問文・選択肢・正答・解説、根拠にした事実カードの主張(出典の言い換え)と節、出典の URL、警告と保留の理由コードを載せる。
+ * 表には、設問文・選択肢・正答・解説、根拠にした事実カードの主張(出典の言い換え)と節、検証役が読む根拠の節の場所(出典の URL・節の名前・見出し)、
+ * 出典の URL、警告と保留の理由コード、直した下書きの直す前の下書きの ID を載せる。
  * 取得した本文の写しは載せない。表とシートは作業用の置き場に出し、コミットしない。
  */
 
@@ -71,6 +73,7 @@ export function renderDraftReview(
     lines.push(`## ${record.id}`, "", "| 項目 | 内容 |", "| --- | --- |");
     lines.push(`| 状態 | ${record.status}(人の判断: ${decision}) |`);
     lines.push(`| 分野・難易度・種別 | ${record.domain} / ${record.difficulty} / ${d?.questionType ?? "-"} |`);
+    if (record.revisionOf !== undefined) lines.push(`| 直す前の下書き | ${record.revisionOf} |`);
     if (d !== null) {
       lines.push(`| 設問文 | ${cell(d.questionText)} |`);
       if ("choices" in d) {
@@ -93,6 +96,10 @@ export function renderDraftReview(
             : `| 根拠 ${id} | (事実カードがない) |`,
         );
       }
+    }
+    // 検証役が読む根拠の節の場所(出典の URL と見出し)。確認のときに、同じ節を読み直せるようにする。本文は載せない
+    for (const loc of d !== null ? evidenceLocations(d.factIds, facts) : []) {
+      lines.push(`| 検証の節 | ${cell(loc.url)}(節: ${cell(loc.section)}、見出し: ${cell(loc.heading)}) |`);
     }
     const entry = provenance.entries.find((e) => e.draftId === record.id);
     for (const s of entry?.sources ?? []) lines.push(`| 出典 | ${cell(s.url)} |`);

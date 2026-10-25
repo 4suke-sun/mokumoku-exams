@@ -38,6 +38,20 @@ describe("事実カードの選び方", () => {
     const selected = selectFacts(cards, new Map([["f-00000000000b", 1]]), 1, new Map([[URL_A, 5]]));
     expect(selected.map((c) => c.id)).toEqual(["f-00000000000a"]);
   });
+
+  it("重みを渡す_使われていない数が同じなら、重みの小さいカードを、出典の偏りより先に選ぶ", () => {
+    const cards = [cardFrom("f-00000000000a", URL_A), cardFrom("f-00000000000b", URL_B)];
+    const priority = (c: FactCard) => (c.id === "f-00000000000a" ? 1 : 0);
+    const selected = selectFacts(cards, new Map(), 1, new Map([[URL_B, 5]]), priority);
+    expect(selected.map((c) => c.id)).toEqual(["f-00000000000b"]);
+  });
+
+  it("重みを渡す_まだ使われていないカードを、重みより先に選ぶ", () => {
+    const cards = [cardFrom("f-00000000000a", URL_A), cardFrom("f-00000000000b", URL_B)];
+    const priority = (c: FactCard) => (c.id === "f-00000000000a" ? 1 : 0);
+    const selected = selectFacts(cards, new Map([["f-00000000000b", 1]]), 1, new Map(), priority);
+    expect(selected.map((c) => c.id)).toEqual(["f-00000000000a"]);
+  });
 });
 
 describe("正答の位置の割り当て", () => {

@@ -176,3 +176,58 @@ describe("plan コマンドの入口の検査", () => {
     expect(r.code, r.err).toBe(EXIT.ok);
   });
 });
+
+describe("plan コマンドの対象サービスの目標", () => {
+  const services = ["AWS Lambda", "Amazon DynamoDB"];
+
+  /** 対象サービスの一覧を持つ台帳を置き、目標を持つ設定で plan を実行する */
+  async function runWithServices(root: string, withList: boolean) {
+    writeLedger(ledgerPath(join(root, config.ledgerDir), CODE), {
+      ...emptyLedger(CODE),
+      guide: {
+        sourceUrl: DOC_URL,
+        contentHash: DOC_HASH,
+        pages: [],
+        importedAt: "2026-10-25",
+        ...(withList ? { services } : {}),
+        domains: [{ code: "domain1", name: "a", weight: 1, scope: [] }],
+      },
+    });
+    const withTargets = {
+      ...config,
+      plan: {
+        ...config.plan,
+        overrides: { ...config.plan.overrides, [CODE]: { services: { minPerService: 1, maxShare: 0.5 } } },
+      },
+    };
+    const configPath = join(root, "pipeline.config.json");
+    let out = "";
+    let err = "";
+    writeFileSync(configPath, JSON.stringify(withTargets));
+    const code = await main({
+      argv: ["plan", CODE, "--dry-run"],
+      env: {},
+      output: { out: (t) => (out += t), err: (t) => (err += t) },
+      configPath,
+      rootDir: root,
+    });
+    return { code, out, err };
+  }
+
+  it("一覧と目標がある_下限に届かないサービスと、上限を超えるサービスを報告する", async () => {
+    const q = (id: number, text: string) => ({ ...question(id, "domain1", "medium"), questionText: text });
+    const root = setupRoot({ examCode: CODE, questions: [q(1, "Lambda の設問"), q(2, "Lambda の別の設問")] });
+    const r = await runWithServices(root, true);
+    expect(r.code, r.err).toBe(EXIT.ok);
+    expect(r.out).toContain("対象サービスの目標: 一覧 2 件、下限(1 問)に届かない 1 件、割合の上限(50%)を超える 1 件");
+    expect(r.out).toContain("下限に届かないサービス: Amazon DynamoDB 0 問");
+    expect(r.out).toContain("上限を超えるサービス: AWS Lambda 2/2 問");
+  });
+
+  it("目標はあるが一覧がない_取り込み直しを促し、計画は作る", async () => {
+    const root = setupRoot();
+    const r = await runWithServices(root, false);
+    expect(r.code, r.err).toBe(EXIT.ok);
+    expect(r.out).toContain("対象サービスの目標: 試験ガイドの対象サービスの一覧がない");
+  });
+});
