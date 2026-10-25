@@ -154,6 +154,15 @@ shasum -a 256 <下書きファイル>
 git rev-parse HEAD && git rev-list --count origin/main..HEAD
 ```
 
+承認の直後に、メインのセッションが承認の印を書く(`.git` の下。有効 60 分。サブエージェントには書かせない。フックが止めるのは、サブエージェントからの `scripts/approval.ts grant` という直接の形だけ)。印がないと、フック(`scripts/approval-hook.ts`)が
+push と、`gh pr create`・`gh issue create`、題・本文を変える `gh pr edit`・`gh issue edit` を止める(ラベルやマイルストーンだけの編集は止めない。`post-issues.ts` の中の投稿は、スクリプトの封印が止める)。印は、PR は範囲(ブランチ、末尾のコミット、コミット数)と下書きのハッシュを、
+Issue は下書きのハッシュを覆う:
+
+```sh
+node scripts/approval.ts grant pr <下書きファイル>      # PR(push も覆う)
+node scripts/approval.ts grant issue <下書きファイル>   # Issue
+```
+
 一覧から Issue を投稿するときは(承認の前に見せる `--dry-run` のコマンドは、Step 6)、承認の直後に、一覧へ封印(下書きのハッシュと、一覧の項目 action・number・milestone・labels のハッシュ)を記録する。投稿は、封印と一致する下書きだけを行う:
 
 ```sh
@@ -196,7 +205,9 @@ node scripts/post-issues.ts .drafts/issues/manifest.json --seal
      下書きや一覧の項目を直したときは、検査と承認をやり直し、`--reseal` で封印し直す
    - 既存の Issue の編集では、ラベルは追加だけ。マイルストーンを付けるときは、ラベル `later` を外す
 
-4. `gh pr create` の前に動くフックはない。下書きの機械検査(`scripts/check-pr-secrets.ts`)は、Step 2 で承認の前に済ませてある
+4. `gh pr create` などの前に、承認の印を確かめるフックが動く(`.claude/settings.json`)。印がない、期限が切れた、範囲や下書きが承認のときと違うときは止まる。
+   止まったときは、印の書き直しで回避せず、理由を人に伝えて、機械的な検査からやり直す。
+   下書きの機械検査(`scripts/check-pr-secrets.ts`)は、Step 2 で承認の前に済ませてある
 5. 作ったら、CI の結果を確認する。**最新のコミットの CI が通るまで、マージしない**
 6. マージは、このスキルの範囲外(人の指示があるときだけ行う)
 

@@ -82,6 +82,13 @@ node scripts/prepare-inspection.ts --range <Step 0 で決めた範囲>
 承認が出るまで、push しない。承認の時点で、範囲の末尾のコミットとコミット数を控え、push の直前にもう一度取って比べる。
 承認後の再確認は、`.claude/skills/dev-commit/reconfirm.md` に従う。
 
+人が承認したら、その直後に、メインのセッションが承認の印を書く(`.git` の下。有効 60 分)。印がないと、フック(`scripts/approval-hook.ts`)が push を止める:
+
+```sh
+node scripts/approval.ts grant push                      # 新しいブランチ(範囲の起点は origin/main)
+node scripts/approval.ts grant push --base @{upstream}   # upstream のあるブランチ(Step 0 で決めた範囲と同じ起点)
+```
+
 ## Step 5. push
 
 push の直前に、範囲の末尾のコミットとコミット数をもう一度取り、Step 4 の承認の時点と一致することを確かめる(`.claude/skills/dev-commit/reconfirm.md`)。
@@ -91,6 +98,7 @@ git push -u origin "$(git branch --show-current)"
 ```
 
 - `--force` / `--force-with-lease` は、このスキルでは実行しない。必要なら、理由を説明して人の承認を待つ
+- フックが止めたときは、承認の印の書き直しで回避せず、理由(印がない・期限切れ・範囲が承認のときと違う)を人に伝えて、Step 0 からやり直す
 - push が失敗したら、原因を確認してから、1 回だけ再試行する
 - PR も出すなら、push の前に `/dev-pr` を使う(push も含めて、検査と承認が 1 回になる)。このスキルで先に push したあとに PR だけ出すときも、`/dev-pr` を使う
 
