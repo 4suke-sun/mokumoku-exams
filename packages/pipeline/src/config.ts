@@ -131,6 +131,21 @@ export const ConfigSchema = z.strictObject({
         targetTotal: z.number().int().positive().optional(),
         difficultyMix: DifficultyMixSchema.optional(),
         typeMix: TypeMixSchema.optional(),
+        /**
+         * 対象サービスごとの目標(試験ガイドの対象サービスの一覧を使う)。事実カードの選び方で寄せる(plan/services.ts)。
+         * 持たない試験は、サービスで寄せない
+         */
+        services: z
+          .strictObject({
+            /**
+             * 各サービスが出る問題の数の下限。下書きの依頼の重みは、公開済みの問題と、不採用でない本文のある下書きの合計で数える。
+             * plan の報告は、公開済みの問題だけで数える
+             */
+            minPerService: z.number().int().min(0).max(1000),
+            /** 1 つのサービスが出る問題の割合の上限 */
+            maxShare: z.number().gt(0).max(1),
+          })
+          .optional(),
       }),
     ),
   }),

@@ -111,6 +111,7 @@ export function factSource(card: FactCard): string {
 
 /**
  * 依頼に載せる事実カードを選ぶ。通過したカードのうち、まだ下書きの根拠にされていないものを先に、
+ * 重み(priority。対象サービスの目標。plan/services.ts)の小さいものを先に、
  * 根拠にされた回数の少ない出典のものを先に、確度の高いものを先に、ID の順に並べる。
  * そのうえで、同じ出典のカードが続かないよう、出典を 1 巡ずつ回して上限まで取る。同じ入力なら同じ選び方になる。
  */
@@ -119,10 +120,12 @@ export function selectFacts(
   usage: ReadonlyMap<string, number>,
   max: number,
   sourceUsage: ReadonlyMap<string, number> = new Map(),
+  priority: (card: FactCard) => number = () => 0,
 ): FactCard[] {
   const sorted = [...cards].sort(
     (a, b) =>
       (usage.get(a.id) ?? 0) - (usage.get(b.id) ?? 0) ||
+      priority(a) - priority(b) ||
       (sourceUsage.get(factSource(a)) ?? 0) - (sourceUsage.get(factSource(b)) ?? 0) ||
       CONFIDENCE_ORDER[a.confidence] - CONFIDENCE_ORDER[b.confidence] ||
       (a.id < b.id ? -1 : a.id > b.id ? 1 : 0),

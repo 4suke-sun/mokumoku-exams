@@ -42,3 +42,4 @@
 - [0015 作問パイプラインの役のモデルを表で固定し、検証役は下書きの役と別のモデルにする](./0015-pipeline-agent-roles-and-models.md)
 - [0016 作問パイプラインの役のモデルの表に、出典の候補を挙げる役を足す](./0016-pipeline-source-scout-role.md)
 - [0017 事実カードの台帳には、アンカーの引用を残さない](./0017-fact-ledger-without-anchor-quotes.md)
+- [0018 試験ガイドの対象サービスの一覧を事実として持ち、事実カードの選び方でサービスの目標に寄せる](./0018-exam-guide-service-list-and-targets.md)

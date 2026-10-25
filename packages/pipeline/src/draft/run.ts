@@ -15,9 +15,11 @@ import {
   writeDecisions,
 } from "../decisions/decisions.ts";
 import { EXIT, type ExitCode } from "../exit-codes.ts";
-import { FactsError, type FactsFile, factsPath, readFacts } from "../facts/schema.ts";
+import { type FactCard, FactsError, type FactsFile, factsPath, readFacts } from "../facts/schema.ts";
 import { type Output, report } from "../log.ts";
+import { readExistingTexts } from "../plan/run.ts";
 import { PlanError, type PlanFile, planPath, readPlan } from "../plan/schema.ts";
+import { servicePriority, serviceStatus } from "../plan/services.ts";
 import { planFor, recordedOrComputed } from "../sampling/load.ts";
 import type { SamplingPlan } from "../sampling/plan.ts";
 import { recordOf, writeSampling } from "../sampling/store.ts";
@@ -294,6 +296,31 @@ function decideStep(
   return EXIT.ok;
 }
 
+/**
+ * 対象サービスの目標(試験ごとの設定 plan.overrides の services)と、試験ガイドの対象サービスの一覧がそろうときだけ、
+ * 事実カードを選ぶ順の重みを返す(plan/services.ts)。数えるのは、公開済みの問題と、不採用でない本文のある下書き。
+ * そろわなければ、重みをすべて同じにする(サービスで寄せない)
+ */
+function servicePriorityOf(
+  options: DraftOptions,
+  ledger: LedgerFile,
+  drafts: DraftsFile,
+): ((card: FactCard) => number) | "invalid" {
+  const { config, rootDir, examCode } = options;
+  const targets = config.plan.overrides[examCode]?.services;
+  const services = ledger.guide?.services ?? [];
+  if (targets === undefined || services.length === 0) return () => 0;
+  const published = readExistingTexts(config, rootDir, examCode);
+  if (published === "invalid") return "invalid";
+  const drafted = drafts.drafts.flatMap((d) =>
+    d.draft === null || d.status === "rejected"
+      ? []
+      : [[d.draft.questionText, ...(isChoiceDraft(d.draft) ? d.draft.choices.map((c) => c.text) : [])].join("\n")],
+  );
+  const status = serviceStatus([...published, ...drafted], services, targets);
+  return (card) => servicePriority(card, services, status);
+}
+
 function requestStep(
   options: DraftOptions,
   paths: Paths,
@@ -342,6 +369,11 @@ function requestStep(
     }
   }
   const settings = config.draft;
+  const priority = servicePriorityOf(options, ledger, drafts);
+  if (priority === "invalid") {
+    report(output, "問題データの誤り", `questions.${examCode.toLowerCase()}.json`);
+    return EXIT.checkFailed;
+  }
   const styleGuides = styleGuidePaths(examCode);
   let requested = 0;
   let satisfied = 0;
@@ -378,7 +410,7 @@ function requestStep(
       exhausted++;
       continue;
     }
-    const selected = selectFacts(cards, usage, settings.maxFactsPerRequest, sourceUsage);
+    const selected = selectFacts(cards, usage, settings.maxFactsPerRequest, sourceUsage, priority);
     const count = Math.min(remaining, settings.maxPerRequest);
     // 人の却下は、出し直しの回数(上限の maxRounds)に数えず、鍵に入れて足りない分の依頼を出す
     const humanRejected = drafts.drafts.filter(

@@ -1,5 +1,6 @@
 import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
+import type { z } from "zod";
 import { LedgerError, ledgerPath, readLedger } from "../collect/ledger.ts";
 import type { Config } from "../config.ts";
 import { QuestionsFileSchema } from "../contract.ts";
@@ -11,6 +12,7 @@ import { readAgentStampOrReport } from "../shared/agents.ts";
 import { prepareExam } from "../shared/exam.ts";
 import { buildPlan, type ExistingQuestion, resolveSettings } from "./plan.ts";
 import { PlanError, planPath, writePlan } from "./schema.ts";
+import { serviceStatus } from "./services.ts";
 
 export interface PlanOptions {
   config: Config;
@@ -20,12 +22,10 @@ export interface PlanOptions {
   output: Output;
 }
 
-/** 公開済みの問題を読み取り専用で読む。ファイルがなければ空。本文は使わない */
-export function readExistingQuestions(
-  config: Config,
-  rootDir: string,
-  examCode: string,
-): ExistingQuestion[] | "invalid" {
+type PublishedQuestion = z.infer<typeof QuestionsFileSchema>["questions"][number];
+
+/** 公開済みの問題を読み取り専用で読む。ファイルがなければ空 */
+function readPublished(config: Config, rootDir: string, examCode: string): PublishedQuestion[] | "invalid" {
   const file = resolve(rootDir, dirname(config.examsFile), `questions.${examCode.toLowerCase()}.json`);
   if (!existsSync(file)) return [];
   let raw: unknown;
@@ -35,12 +35,25 @@ export function readExistingQuestions(
     return "invalid";
   }
   const parsed = QuestionsFileSchema.safeParse(raw);
-  if (!parsed.success) return "invalid";
-  return parsed.data.questions.map((q) => ({
-    domain: q.domain,
-    difficulty: q.difficulty,
-    kind: q.questionType,
-  }));
+  return parsed.success ? parsed.data.questions : "invalid";
+}
+
+/** 公開済みの問題の、計画に使う項目だけを読む。本文は使わない */
+export function readExistingQuestions(
+  config: Config,
+  rootDir: string,
+  examCode: string,
+): ExistingQuestion[] | "invalid" {
+  const questions = readPublished(config, rootDir, examCode);
+  if (questions === "invalid") return "invalid";
+  return questions.map((q) => ({ domain: q.domain, difficulty: q.difficulty, kind: q.questionType }));
+}
+
+/** 公開済みの問題の本文(設問文と選択肢)を、問題ごとに 1 つの文字列で読む。対象サービスの数え上げに使う */
+export function readExistingTexts(config: Config, rootDir: string, examCode: string): string[] | "invalid" {
+  const questions = readPublished(config, rootDir, examCode);
+  if (questions === "invalid") return "invalid";
+  return questions.map((q) => [q.questionText, ...("choices" in q ? q.choices.map((c) => c.text) : [])].join("\n"));
 }
 
 /**
@@ -67,6 +80,45 @@ function countPendingSources(options: PlanOptions): number | null {
     else throw error;
     return null;
   }
+}
+
+/**
+ * 対象サービスの目標(試験ごとの設定)と、試験ガイドの対象サービスの一覧がそろうとき、公開済みの問題で、
+ * 下限に届かないサービスと、割合の上限を超えるサービスを報告する。目標は下書きの依頼で事実カードの選び方に効く(計画の項目は変えない)。
+ * 読めなければ false(誤りは報告済み)
+ */
+function reportServices(options: PlanOptions): boolean {
+  const { config, rootDir, examCode, output } = options;
+  const targets = config.plan.overrides[examCode]?.services;
+  if (targets === undefined) return true;
+  let services: string[];
+  try {
+    services = readLedger(ledgerPath(resolve(rootDir, config.ledgerDir), examCode), examCode).guide?.services ?? [];
+  } catch (error) {
+    if (!(error instanceof LedgerError)) throw error;
+    for (const p of error.paths) report(output, "台帳の誤り", p);
+    return false;
+  }
+  if (services.length === 0) {
+    report(output, "対象サービスの目標", "試験ガイドの対象サービスの一覧がない(collect で試験ガイドを取り込み直す)");
+    return true;
+  }
+  const texts = readExistingTexts(config, rootDir, examCode);
+  if (texts === "invalid") {
+    report(output, "問題データの誤り", `questions.${examCode.toLowerCase()}.json`);
+    return false;
+  }
+  const status = serviceStatus(texts, services, targets);
+  report(
+    output,
+    "対象サービスの目標",
+    `一覧 ${services.length} 件、下限(${targets.minPerService} 問)に届かない ${status.below.length} 件、` +
+      `割合の上限(${Math.round(targets.maxShare * 100)}%)を超える ${status.above.length} 件`,
+  );
+  for (const s of status.below) report(output, "下限に届かないサービス", `${s} ${status.counts.get(s) ?? 0} 問`);
+  for (const s of status.above)
+    report(output, "上限を超えるサービス", `${s} ${status.counts.get(s) ?? 0}/${status.total} 問`);
+  return true;
 }
 
 /** plan コマンド: 分野の配点から目標の問題数を出し、既存の問題との差を、作業用の置き場に書く。data/ は変えない */
@@ -114,6 +166,7 @@ export function runPlan(options: PlanOptions): ExitCode {
     "情報",
     `目標 ${plan.targetTotal} 件、既存 ${plan.existingTotal} 件、計画の項目 ${plan.items.length} 件`,
   );
+  if (!reportServices(options)) return EXIT.checkFailed;
   const path = planPath(resolve(rootDir, config.workDir), examCode);
   if (dryRun) {
     report(output, "書き込みをしない(dry-run)");

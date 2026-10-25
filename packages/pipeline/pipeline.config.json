@@ -62,7 +62,10 @@
     "targetMultiplier": 3,
     "difficultyMix": { "easy": 0.3, "medium": 0.5, "hard": 0.2 },
     "typeMix": { "single": 0.75, "multiple": 0.2, "free-text": 0.05 },
-    "overrides": { "AWS-CLF-C02": { "targetTotal": 200 }, "AWS-DVA-C02": { "targetTotal": 200 } }
+    "overrides": {
+      "AWS-CLF-C02": { "targetTotal": 200 },
+      "AWS-DVA-C02": { "targetTotal": 200, "services": { "minPerService": 2, "maxShare": 0.15 } }
+    }
   },
   "checks": {
     "freshnessDays": 365

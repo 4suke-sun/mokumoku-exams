@@ -1,8 +1,11 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { ledgerPath, readLedger, writeLedger } from "../collect/ledger.ts";
 import { CRITERION_NAME_MAX, KEYWORD_MAX } from "../contract.ts";
 import { EXIT } from "../exit-codes.ts";
+import { card, DOC_HASH, DOC_URL } from "../facts/test-helpers.ts";
+import { planPath, readPlan } from "../plan/schema.ts";
 import { readAgentStamp } from "../shared/agents.ts";
 import { DraftRequestSchema } from "./request.ts";
 import { pathCode } from "./run.ts";
@@ -161,6 +164,73 @@ function existingQuestion() {
     explanation: "架空の解説です。",
   };
 }
+
+describe("draft の依頼の対象サービスの目標", () => {
+  const LAMBDA = "f-aaaaaaaaaaa1";
+  const DYNAMO = "f-aaaaaaaaaaa2";
+
+  /** 分野 1 に、Lambda と DynamoDB の事実カードを 1 件ずつ置き、公開済みの問題には Lambda だけを出す */
+  function setup(withList: boolean) {
+    const others = [2, 3, 4].map((n) =>
+      card({ id: `f-${String(n).repeat(12)}`, domain: `domain${n}`, claim: `架空の主張 ${n}` }),
+    );
+    const root = setupDraftRoot({
+      cards: [
+        card({ id: LAMBDA, domain: "domain1", claim: "架空の主張 Lambda の上限" }),
+        card({ id: DYNAMO, domain: "domain1", claim: "架空の主張 DynamoDB の上限" }),
+        ...others,
+      ],
+      questions: { examCode: EXAM, questions: [{ ...existingQuestion(), questionText: "Lambda の架空の設問" }] },
+    });
+    const path = ledgerPath(join(root, baseConfig.ledgerDir), EXAM);
+    const ledger = readLedger(path, EXAM);
+    writeLedger(path, {
+      ...ledger,
+      guide: {
+        sourceUrl: DOC_URL,
+        contentHash: DOC_HASH,
+        pages: [],
+        importedAt: "2026-10-25",
+        ...(withList ? { services: ["AWS Lambda", "Amazon DynamoDB"] } : {}),
+        domains: [{ code: "domain1", name: "a", weight: 1, scope: [] }],
+      },
+    });
+    return root;
+  }
+
+  const overrides = (targets: boolean) => ({
+    draft: { ...baseConfig.draft, maxFactsPerRequest: 1 },
+    plan: {
+      ...baseConfig.plan,
+      overrides: targets ? { [EXAM]: { services: { minPerService: 1, maxShare: 0.5 } } } : {},
+    },
+  });
+  /** 計画の分野 1 の最初の項目の依頼に載った事実カード。同じ実行のあとの依頼は、使った数を足してから選ぶので比べない */
+  const firstFacts = (root: string) => {
+    const plan = readPlan(planPath(join(root, baseConfig.workDir), EXAM));
+    const first = plan?.items.find((i) => i.domain === "domain1");
+    return readRequests(root)
+      .find((r) => r.planItemId === first?.id)
+      ?.facts.map((f) => f.id);
+  };
+
+  it("目標と一覧がある_下限に届かないサービスの事実カードを先に選ぶ", async () => {
+    const root = setup(true);
+    expect((await prepare(root, overrides(true))).code).toBe(EXIT.ok);
+    expect(firstFacts(root)).toEqual([DYNAMO]);
+  });
+
+  it("目標がない・一覧がない_サービスで寄せず、ID の順に選ぶ", async () => {
+    for (const [list, targets] of [
+      [true, false],
+      [false, true],
+    ] as const) {
+      const root = setup(list);
+      expect((await prepare(root, overrides(targets))).code).toBe(EXIT.ok);
+      expect(firstFacts(root)).toEqual([LAMBDA]);
+    }
+  });
+});
 
 describe("draft の取り込み", () => {
   async function firstRequest(root: string, overrides: Record<string, unknown> = {}) {

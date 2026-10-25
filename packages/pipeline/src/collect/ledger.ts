@@ -39,6 +39,19 @@ export const REGION = z.string().regex(/^[a-z0-9-]{1,32}$/);
 
 export const Paraphrase = z.string().min(1).refine(withinParaphraseLimit, "言い換えが長すぎる");
 
+/**
+ * 試験ガイドの対象サービスの名前 1 件。本文の引用ではなく、サービス名という事実として持つ(docs/source-policy.md)。
+ * 名前のほかの文が入らないよう、長さと文字を絞る
+ */
+export const ServiceName = z
+  .string()
+  .min(1)
+  .max(80)
+  .regex(/^[A-Za-z0-9][A-Za-z0-9 .&()/+'-]*$/);
+
+/** 対象サービスの一覧の件数の上限 */
+export const MAX_SERVICES = 300;
+
 const ClaimSchema = z.strictObject({
   id: ID,
   /** 根拠にした主張の言い換え(自分の言葉の短い文) */
@@ -84,7 +97,7 @@ const GuideDomainSchema = z.strictObject({
   scope: z.array(Paraphrase).max(40),
 });
 
-/** 試験ガイドから取り込んだ、分野・配点・出題範囲 */
+/** 試験ガイドから取り込んだ、分野・配点・出題範囲・本番の値・対象サービスの一覧 */
 export const GuideRecordSchema = z.strictObject({
   sourceUrl: SourceUrl,
   contentHash: SHA256,
@@ -106,6 +119,8 @@ export const GuideRecordSchema = z.strictObject({
     .optional(),
   /** 抽出に使ったエージェントの定義(役・モデルの ID・定義のハッシュ。古い記録にはない) */
   agent: AgentStampSchema.optional(),
+  /** 試験ガイドの対象サービスの一覧(サービスの名前だけ)。ガイドが示さないとき、古い記録にはない */
+  services: z.array(ServiceName).max(MAX_SERVICES).optional(),
   domains: z.array(GuideDomainSchema).min(1).max(20),
 });
 

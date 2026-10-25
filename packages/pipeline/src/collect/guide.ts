@@ -1,11 +1,11 @@
 import { z } from "zod";
 import type { AgentStamp } from "../shared/agents.ts";
 import { detectCopy } from "../shared/copy.ts";
-import type { GuideRecord, LedgerFile } from "./ledger.ts";
+import { type GuideRecord, type LedgerFile, MAX_SERVICES, ServiceName } from "./ledger.ts";
 import { withinParaphraseLimit } from "./text-limits.ts";
 
 /**
- * 試験ガイドの取り込み(ADR 0009)。分野・配点・出題範囲の抽出は、エージェントが作業用の置き場に書く。
+ * 試験ガイドの取り込み(ADR 0009・0018)。分野・配点・出題範囲・本番の値・対象サービスの一覧の抽出は、エージェントが作業用の置き場に書く。
  * CLI は、書かれたものを検査してから台帳に取り込み、資格マスタとの差分を報告する。マスタは書き換えない。
  */
 
@@ -48,6 +48,8 @@ export const GuideExtractSchema = z.strictObject({
   passingScore: ExamNumber.optional(),
   /** スコアの上限(満点) */
   totalScore: ExamNumber.optional(),
+  /** 試験ガイドの対象サービスの一覧(サービスの名前だけ)。ガイドが示さないときは空 */
+  services: z.array(ServiceName).max(MAX_SERVICES).default([]),
 });
 
 export type GuideExtract = z.infer<typeof GuideExtractSchema>;
@@ -81,7 +83,9 @@ export type GuideStopReason =
   | "domain-numbering"
   | "weight-sum-mismatch"
   | "exam-values-invalid"
-  | "verbatim-copy";
+  | "verbatim-copy"
+  | "service-duplicate"
+  | "service-not-in-source";
 
 /**
  * 抽出の結果を検査し、台帳に入れる形にする。止めるときは理由コードを返す。
@@ -139,6 +143,15 @@ export function importGuide(
     return { ok: false, reason: "verbatim-copy" };
   }
 
+  // サービスの名前は、本文の写しの検査の対象にしない(固有の名前で、言い換えられない)。
+  // 代わりに、名前が本文のどこかにそのまま出ることを確かめ、本文にない名前を足していないことを見る
+  const spaced = (t: string) => t.replace(/\s+/g, " ");
+  if (new Set(extract.services).size !== extract.services.length) return { ok: false, reason: "service-duplicate" };
+  const flat = plains.map(spaced);
+  if (extract.services.some((name) => !flat.some((b) => b.includes(spaced(name))))) {
+    return { ok: false, reason: "service-not-in-source" };
+  }
+
   return {
     ok: true,
     guide: {
@@ -148,6 +161,7 @@ export function importGuide(
       importedAt: today,
       ...(agent !== undefined ? { agent } : {}),
       ...examValues(extract),
+      ...(extract.services.length > 0 ? { services: extract.services } : {}),
       domains: [...extract.domains]
         .sort((a, b) => a.number - b.number)
         .map((d) => ({
