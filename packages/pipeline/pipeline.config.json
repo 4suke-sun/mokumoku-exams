@@ -66,7 +66,7 @@
     "overrides": {
       "AWS-CLF-C02": { "targetTotal": 200 },
       "AWS-DVA-C02": {
-        "targetTotal": 200,
+        "targetTotal": 457,
         "services": { "minPerService": 2, "maxShare": 0.15, "minMultiServiceShare": 0.3 }
       }
     }
