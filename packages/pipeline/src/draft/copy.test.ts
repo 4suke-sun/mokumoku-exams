@@ -28,7 +28,7 @@ describe("誤答の選択肢の解説", () => {
       examCode: EXAM,
       domain: "domain1",
       difficulty: "medium",
-      referenceUrls: [],
+      references: [],
     }) as { choices: { key: string; explanation?: string }[] };
     const byKey = Object.fromEntries(q.choices.map((c) => [c.key, c.explanation]));
     expect(byKey.A).toBe("上限の数値が実際より小さい誤りです");
@@ -45,7 +45,7 @@ describe("誤答の選択肢の解説", () => {
       examCode: EXAM,
       domain: "domain1",
       difficulty: "medium",
-      referenceUrls: [],
+      references: [],
     }) as {
       choices: { key: string; explanation?: string }[];
     };

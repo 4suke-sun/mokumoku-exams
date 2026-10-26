@@ -261,7 +261,8 @@ describe("収集から書き出しまでの通し", () => {
     const data = JSON.parse(readFileSync(join(root, "data/questions.aws-aib-c01.json"), "utf8"));
     expect(data.questions).toHaveLength(90 + approved);
     expect(data.questions.at(-1).questionId).toBe(`AIB-${String(90 + approved).padStart(4, "0")}`);
-    expect(data.questions.at(-1).references).toEqual([{ url: DOC }]);
+    // 出典の題は、台帳の公式ページの題(取得した本文の title 要素)
+    expect(data.questions.at(-1).references).toEqual([{ url: DOC, title: "Synthetic service guide" }]);
 
     // 同じ入力で各段階を再実行しても、依頼と書き出しの差分が増えない
     const snapshot = readFileSync(join(root, "data/questions.aws-aib-c01.json"), "utf8");

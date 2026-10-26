@@ -40,6 +40,7 @@ import {
   writeLedger,
 } from "./ledger.ts";
 import { inScope, loadPlan, type Plan, planPath } from "./plan.ts";
+import { titleField } from "./title.ts";
 
 /**
  * collect コマンド: 計画に沿って、取得、キャッシュ、台帳の更新、検査を順に行う。
@@ -230,6 +231,7 @@ async function collectStep(
         url,
         kind: kindOf.get(url) ?? "official-doc",
         target,
+        ...titleField(fetched.ok ? html : null, before?.title),
         fetchedAt: today,
         contentHash: fetched.ok ? fetched.hash : (before?.contentHash ?? null),
         updatedAt,

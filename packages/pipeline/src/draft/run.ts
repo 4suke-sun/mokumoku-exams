@@ -741,7 +741,7 @@ function importStep(
             examCode,
             domain: request.domain.code,
             difficulty: request.difficulty,
-            referenceUrls: urls,
+            references: urls.map((url) => ({ url })),
           }),
         );
         // 形の検査を通っても、データの検査に落ちた下書きは、その下書きだけを不採用にする(場所だけを持ち、値は含めない)

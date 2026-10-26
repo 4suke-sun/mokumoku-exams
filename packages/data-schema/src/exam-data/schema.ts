@@ -302,9 +302,12 @@ export function hostAllowedForVendor(host: string, vendor: string): boolean {
   return REFERENCE_HOST_VENDORS[host]?.includes(vendor) ?? false;
 }
 
+/** 出典の題: 空白だけではなく、URL を含まず、REFERENCE_TITLE_MAX 文字以内。 */
+export const ReferenceTitle = prose.max(REFERENCE_TITLE_MAX);
+
 /** 出典: 公式ドキュメントへのリンク。題は任意(ないときは、画面にホスト名を出す)。 */
 export const ReferenceSchema = z.strictObject({
-  title: prose.max(REFERENCE_TITLE_MAX).optional(),
+  title: ReferenceTitle.optional(),
   url: z
     .string()
     .max(REFERENCE_URL_MAX)

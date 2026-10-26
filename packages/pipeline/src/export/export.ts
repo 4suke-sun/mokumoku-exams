@@ -33,8 +33,9 @@ import { isVerified } from "../verify/schema.ts";
 import { criteriaAccepted } from "./criteria.ts";
 
 /**
- * export コマンド: 人が承認し、来歴の検査を通った下書きを、data/questions.<コード>.json に追加する(ADR 0014)。
- * - 出典(references)は、来歴の出典の URL だけ(許可ドメインの https、重ねない、10 件まで)。題は付けない
+ * export コマンド: 人が承認し、来歴の検査を通った下書きを、data/questions.<コード>.json に追加する(ADR 0020)。
+ * - 出典(references)は、来歴の出典の URL(許可ドメインの https、重ねない、10 件まで)と、台帳の出典の題(公式ページの `<title>`)。
+ *   台帳に題がなければ、題なしで書き出して報告する(ADR 0020)
  * - 問題 ID は、資格マスタの idPrefix で、今の問題・退役した ID・書き出し済みの来歴の ID を含めた最大の番号の次から採番する
  * - 書いたあとにデータの検査を通し、失敗したら書き出し前の内容に戻す
  * - 書き出した問題の ID を来歴に書き戻し、同じ下書きを再び書き出さない
@@ -90,13 +91,19 @@ export function selectExportable(
   return { ready, notApproved, unverified, blocked, exported };
 }
 
-/** 出典の URL を、来歴から選ぶ。出典に使えない URL と、ベンダーに許されないホストを落とし、重ねず、10 件まで */
-export function referenceUrls(urls: readonly string[], vendor: string): string[] {
-  const kept: string[] = [];
-  for (const url of urls) {
+/**
+ * 出典を、来歴から選ぶ。出典に使えない URL と、ベンダーに許されないホストを落とし、重ねず、10 件まで。
+ * 題は、台帳の出典の題(公式ページの `<title>`)。台帳に題がなければ、題なしで返す(書き出しは止めない。報告で数える)。
+ */
+export function references(
+  sources: readonly { url: string; title?: string }[],
+  vendor: string,
+): { url: string; title?: string }[] {
+  const kept: { url: string; title?: string }[] = [];
+  for (const { url, title } of sources) {
     if (sourceUrlReason(url) !== null) continue;
     if (!hostAllowedForVendor(new URL(url).hostname, vendor)) continue;
-    if (!kept.includes(url)) kept.push(url);
+    if (!kept.some((k) => k.url === url)) kept.push(title === undefined ? { url } : { url, title });
     if (kept.length === MAX_REFERENCES) break;
   }
   return kept;
@@ -116,7 +123,7 @@ export function allocateIds(prefix: string, used: readonly string[], count: numb
 }
 
 /** Biome で JSON を整形する(既存の data/ のファイルと同じ整形にそろえる) */
-function formatJson(text: string, rootDir: string): string {
+export function formatJson(text: string, rootDir: string): string {
   const require = createRequire(import.meta.url);
   const biome = join(dirname(require.resolve("@biomejs/biome/package.json")), "bin", "biome");
   return execFileSync(
@@ -242,7 +249,13 @@ export function runExport(options: ExportOptions): ExitCode {
       examCode,
       domain: d.domain,
       difficulty: d.difficulty,
-      referenceUrls: referenceUrls(entry?.sources.map((s) => s.url) ?? [], exam.vendor),
+      references: references(
+        (entry?.sources ?? []).flatMap((s) => {
+          const source = ledger.sources.find((l) => l.url === s.url);
+          return [{ url: s.url, ...(source?.title !== undefined ? { title: source.title } : {}) }];
+        }),
+        exam.vendor,
+      ),
     }) as Record<string, unknown>;
     return { draftId: d.id, question: { ...question, questionId: ids[i] as string } };
   });
@@ -252,6 +265,15 @@ export function runExport(options: ExportOptions): ExitCode {
     "情報",
     `書き出し: 追加 ${added.length} 件、承認待ち ${selection.notApproved} 件、検証前・検証で止まった ${selection.unverified} 件、来歴の検査で止めた ${selection.blocked} 件、書き出し済み ${selection.exported} 件、追加のうち基準を満たして承認なし ${criteriaUsed} 件`,
   );
+  // 台帳に題のない出典は、題なしで書き出す。あとで collect --titles で台帳に題を足し、export --titles で問題に足す
+  const untitled = new Set(
+    added.flatMap((a) =>
+      ((a.question as { references?: { url: string; title?: string }[] }).references ?? []).flatMap((r) =>
+        r.title === undefined ? [r.url] : [],
+      ),
+    ),
+  );
+  for (const url of untitled) report(output, "題が取れない出典", url);
   if (dryRun) {
     report(output, "書き込みをしない(dry-run)");
     return EXIT.ok;
