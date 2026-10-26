@@ -49,6 +49,9 @@ export const CHECK_SCRIPTS = [
   "check:retired-ids",
 ];
 
+/** CI の `app` ジョブが、build のあとに実行する検査(verify でも、build のあとに実行する) */
+export const POST_BUILD_CHECKS = ["check:unpublished-bundle"];
+
 const WORKSPACE_NAMES: Record<keyof Selection, string> = {
   app: "@mokumoku-exams/app",
   infra: "@mokumoku-exams/infra",
@@ -68,6 +71,8 @@ export function buildStages(selection: Selection): Stage[] {
     npm("test(data-schema)", ["test", "-w", "@mokumoku-exams/data-schema"]),
     ...selected.map((k) => npm(`test(${k})`, ["test", "-w", WORKSPACE_NAMES[k]])),
     ...selected.map((k) => npm(`build(${k})`, ["run", "build", "-w", WORKSPACE_NAMES[k], "--if-present"])),
+    // 非公開の問題が、アプリのビルド成果物に含まれないこと(CI の app ジョブと同じ。先に build が要る)
+    ...(selection.app ? POST_BUILD_CHECKS.map((name) => npm(name, ["run", name])) : []),
   ];
   return stages;
 }

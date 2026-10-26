@@ -18,6 +18,7 @@ import { runPlan } from "./plan/run.ts";
 import { runReasons } from "./reasons/run.ts";
 import { runScore } from "./scorecard/run.ts";
 import { runStatus } from "./status/run.ts";
+import { runUnpublish } from "./unpublish/run.ts";
 import { runVerify } from "./verify/run.ts";
 
 export interface Context {
@@ -114,6 +115,7 @@ function helpText(): string {
     "judge <資格コード> --import        判定役の出力を依頼と照合して取り込み、判定の結果(公開・書き直しで復帰できる・非公開)を書く",
     "judge-eval <資格コード>             人が承認した下書きから評価用のデータを作り、判定役の評価の依頼を書く",
     "judge-eval <資格コード> --import   判定役の出力を期待する判定と照合し、検出率・誤検出率などのレポートを書く",
+    "unpublish <資格コード>              判定の結果で、公開のままにしない問題を、公開の問題データから非公開のファイル(data/unpublished.<コード>.json)へ移す。出題の下限を下回る移し方は、何も書かずに止める",
     "reasons <資格コード>                不採用と差し戻しの理由を、理由コード・論点・段階ごとに集計し、下書きの指示の改善に使える形で書く。記録は変えない",
     "status <資格コード>                 段階ごとの状態(依頼待ち・取り込み待ち・通過・保留・不採用の件数、役のモデル)を表示する。読むだけ",
     "score <資格コード>                  公開している選択式の問題を、書き方の点数票(問題ごと・束)で採点する。読むだけ。本文は出さない",
@@ -157,6 +159,7 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
       command?.name === "eval" ||
       command?.name === "judge" ||
       command?.name === "judge-eval" ||
+      command?.name === "unpublish" ||
       command?.name === "export";
     const maxArgs = takesExam ? 2 : 1;
     if (positional.length > maxArgs || command === undefined) {
@@ -190,6 +193,7 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
         eval: "使い方: eval <資格コード> [--import]\n",
         judge: "使い方: judge <資格コード> [--import]\n",
         "judge-eval": "使い方: judge-eval <資格コード> [--import]\n",
+        unpublish: "使い方: unpublish <資格コード>\n",
         draft:
           "使い方: draft <資格コード> [--domain=<分野のコード> | --import | --check | --review | --decide | --revise]\n",
       };
@@ -310,6 +314,14 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
             output,
             today: () => new Date().toISOString().slice(0, 10),
           });
+    }
+    if (command.name === "unpublish") {
+      const examCode = positional[1];
+      if (examCode === undefined) {
+        report(output, "入力の誤り", "資格コードの指定がない");
+        return EXIT.inputError;
+      }
+      return runUnpublish({ config, rootDir, examCode, dryRun, output });
     }
     if (command.name === "reasons") {
       const examCode = positional[1];

@@ -73,6 +73,18 @@ describe("直前チェック", () => {
     expect(screen.getByRole("button", { name: "一覧" }).getAttribute("aria-pressed")).toBe("true");
   });
 
+  it("ブックマークに、いまの公開の問題にない ID(非公開にした問題など)がある_その問題を取りに行かず、本文も ID も出さない", async () => {
+    stubBookmarks(["TEST-0001", "TEST-0099"]);
+    render(<BookmarkCheck exam={exam} order={order} />);
+    expect(await screen.findByText("問題文 1")).toBeTruthy();
+    const calls = (fetch as unknown as { mock: { calls: [string, RequestInit?][] } }).mock.calls;
+    const asked = calls
+      .filter(([url]) => url === "/api/questions")
+      .map(([, init]) => JSON.parse(String(init?.body)).questionIds);
+    expect(asked).toEqual([["TEST-0001"]]);
+    expect(document.body.textContent ?? "").not.toContain("TEST-0099");
+  });
+
   it("カードに切り替える_表は問題だけで_めくると正解と解説を出す", async () => {
     stubBookmarks(["TEST-0001", "TEST-0003"]);
     render(<BookmarkCheck exam={exam} order={order} />);

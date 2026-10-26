@@ -6,7 +6,13 @@
 import type { ZodError } from "zod";
 import { checkAnswerBias } from "./bias.ts";
 import type { PublishedExam } from "./schema.ts";
-import { ExamsFileSchema, QuestionsFileSchema, REFERENCE_HOST_VENDORS, VendorsFileSchema } from "./schema.ts";
+import {
+  ExamsFileSchema,
+  QuestionsFileSchema,
+  REFERENCE_HOST_VENDORS,
+  UnpublishedFileSchema,
+  VendorsFileSchema,
+} from "./schema.ts";
 import { EXAM_CODE, QUESTION_ID } from "./shape.ts";
 
 export interface DataFile {
@@ -17,6 +23,8 @@ export interface DataFile {
 export const EXAMS_FILE = "exams.json";
 export const VENDORS_FILE = "vendors.json";
 const QUESTIONS_FILE = /^questions\.(.+)\.json$/;
+/** 非公開の問題のファイル(アプリは読まない。`questions.` で始めない) */
+export const UNPUBLISHED_FILE = /^unpublished\.(.+)\.json$/;
 
 const KIND: Record<string, string> = {
   invalid_type: "型が違います",
@@ -38,10 +46,15 @@ function formatPath(path: PropertyKey[]): string {
 
 /** 問題の位置(questions[i])から、問題の ID を取り出す(ID の形のときだけ)。 */
 function questionIdAt(data: unknown, path: PropertyKey[]): string | null {
-  if (path[0] !== "questions" || typeof path[1] !== "number") return null;
-  const questions = (data as { questions?: unknown } | null)?.questions;
-  if (!Array.isArray(questions)) return null;
-  const id = (questions[path[1]] as { questionId?: unknown } | undefined)?.questionId;
+  if (typeof path[1] !== "number") return null;
+  const root = data as { questions?: unknown; entries?: unknown } | null;
+  const question =
+    path[0] === "questions" && Array.isArray(root?.questions)
+      ? (root.questions[path[1]] as { questionId?: unknown } | undefined)
+      : path[0] === "entries" && Array.isArray(root?.entries)
+        ? (root.entries[path[1]] as { question?: { questionId?: unknown } } | undefined)?.question
+        : undefined;
+  const id = question?.questionId;
   return typeof id === "string" && QUESTION_ID.test(id) ? id : null;
 }
 
@@ -74,6 +87,7 @@ export function validateHostVendors(
  * データ全体を検査する。
  * - exams: 資格マスタ(無ければ null)
  * - questionFiles: questions.<コード>.json の一覧
+ * - unpublishedFiles: unpublished.<コード>.json(非公開の問題)の一覧。公開の問題と ID が重ならないことなどを検査する
  * - vendors: ベンダーの略称の一覧(vendors.json)。資格のベンダーと試験コードの先頭が一致するかを検査する
  * - warnings: 止めはしないが確認してほしいもの(最長の選択肢が正解の割合など)を、ここに足す
  */
@@ -82,6 +96,7 @@ export function validateDataSet(
   questionFiles: DataFile[],
   vendors?: unknown | null,
   warnings: string[] = [],
+  unpublishedFiles: DataFile[] = [],
 ): string[] {
   const errors: string[] = [];
 
@@ -118,6 +133,8 @@ export function validateDataSet(
 
   const byCode = new Map(parsedExams.data.exams.map((e) => [e.examCode, e]));
   const seenFiles = new Set<string>();
+  /** 資格ごとの、公開している問題の ID(非公開の問題との重なりの検査に使う) */
+  const publishedIds = new Map<string, Set<string>>();
 
   for (const file of [...questionFiles].sort((a, b) => a.name.localeCompare(b.name))) {
     const match = QUESTIONS_FILE.exec(file.name);
@@ -147,10 +164,15 @@ export function validateDataSet(
       errors.push(`${file.name}: 公開中ではない資格(近日公開)に問題データがあります`);
       continue;
     }
+    publishedIds.set(code, new Set(parsed.data.questions.map((q) => q.questionId)));
     errors.push(...checkAgainstExam(file.name, parsed.data.questions, exam));
     const bias = checkAnswerBias(file.name, parsed.data.questions);
     errors.push(...bias.errors);
     warnings.push(...bias.warnings);
+  }
+
+  for (const file of [...unpublishedFiles].sort((a, b) => a.name.localeCompare(b.name))) {
+    errors.push(...checkUnpublishedFile(file, byCode, publishedIds));
   }
 
   parsedExams.data.exams.forEach((exam, i) => {
@@ -161,6 +183,49 @@ export function validateDataSet(
     }
   });
 
+  return errors;
+}
+
+/**
+ * 非公開の問題のファイル 1 つを検査する。形(スキーマ)、資格マスタとの照合(分野、ID の接頭辞)、
+ * 退役した ID との重なり、公開している問題との重なりを見る。本番モードの出題数は、公開の問題だけで数える(ここでは見ない)。
+ */
+function checkUnpublishedFile(
+  file: DataFile,
+  byCode: ReadonlyMap<
+    string,
+    { status: string; idPrefix?: string; domains?: { code: string }[]; retiredQuestionIds?: string[] }
+  >,
+  publishedIds: ReadonlyMap<string, ReadonlySet<string>>,
+): string[] {
+  const match = UNPUBLISHED_FILE.exec(file.name);
+  const fileCode = match?.[1];
+  if (fileCode === undefined || fileCode !== fileCode.toLowerCase() || !EXAM_CODE.test(fileCode.toUpperCase())) {
+    return [`${file.name}: ファイル名が unpublished.<コード(英小文字と数字)>.json の形ではありません`];
+  }
+  const code = fileCode.toUpperCase();
+  const parsed = UnpublishedFileSchema.safeParse(file.data);
+  if (!parsed.success) return formatIssues(file.name, parsed.error, file.data);
+  const errors: string[] = [];
+  if (parsed.data.examCode !== code) errors.push(`${file.name}: examCode がファイル名のコードと一致しません`);
+  const exam = byCode.get(code);
+  if (!exam) return [...errors, `${file.name}: 資格マスタにない資格の非公開の問題です`];
+  if (exam.status !== "published") {
+    return [...errors, `${file.name}: 公開中ではない資格(近日公開)に非公開の問題があります`];
+  }
+  const domains = new Set((exam.domains ?? []).map((d) => d.code));
+  const retired = new Set(exam.retiredQuestionIds ?? []);
+  const published = publishedIds.get(code) ?? new Set<string>();
+  parsed.data.entries.forEach((entry, i) => {
+    const q = entry.question;
+    const at = `${file.name}: entries[${i}](${q.questionId}).question`;
+    if (retired.has(q.questionId)) errors.push(`${at}.questionId: 退役した問題 ID を、非公開の問題が使っています`);
+    if (published.has(q.questionId)) errors.push(`${at}.questionId: 公開している問題と ID が重なっています`);
+    if (exam.idPrefix !== undefined && !q.questionId.startsWith(`${exam.idPrefix}-`)) {
+      errors.push(`${at}.questionId: ID の接頭辞が、資格マスタの idPrefix と一致しません`);
+    }
+    if (!domains.has(q.domain)) errors.push(`${at}.domain: 資格マスタにない分野です`);
+  });
   return errors;
 }
 

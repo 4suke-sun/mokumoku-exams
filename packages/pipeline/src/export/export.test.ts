@@ -149,6 +149,45 @@ describe("export", () => {
     expect(data.questions.at(-1).questionId).toBe("AIB-0096");
   });
 
+  it("非公開の問題がある_非公開の ID も使用済みとして、その次から採番する。書き出したあとの検査も、非公開のファイルを含めて通す", async () => {
+    const root = exportRoot();
+    const hidden = existing("AIB-0098", "非公開にした架空の設問");
+    writeFileSync(
+      join(root, "data/unpublished.aws-aib-c01.json"),
+      JSON.stringify({
+        examCode: EXAM,
+        entries: [{ verdict: "rewritable", reasons: ["judge:choices-weak"], question: hidden }],
+      }),
+    );
+    await prepared(root);
+    const r = await runMain(root, ["export", EXAM]);
+    expect(r.code, r.err).toBe(EXIT.ok);
+    const data = JSON.parse(readFileSync(questionsFile(root), "utf8"));
+    expect(data.questions.at(-1).questionId).toBe("AIB-0099");
+  });
+
+  it("非公開の問題の ID が、公開の問題と重なる_書き出しを取り消す", async () => {
+    const root = exportRoot();
+    writeFileSync(
+      join(root, "data/unpublished.aws-aib-c01.json"),
+      JSON.stringify({
+        examCode: EXAM,
+        entries: [
+          {
+            verdict: "rewritable",
+            reasons: ["judge:choices-weak"],
+            question: existing("AIB-0001", "重なる ID の設問"),
+          },
+        ],
+      }),
+    );
+    await prepared(root);
+    const before = readFileSync(questionsFile(root), "utf8");
+    const r = await runMain(root, ["export", EXAM]);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(readFileSync(questionsFile(root), "utf8")).toBe(before);
+  });
+
   it("書き出したあとのデータの検査に落ちる_書き出しを取り消し、来歴にも ID を書かない", async () => {
     const root = exportRoot();
     const draftId = await prepared(root);

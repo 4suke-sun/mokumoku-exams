@@ -36,7 +36,7 @@ import { criteriaAccepted } from "./criteria.ts";
  * export コマンド: 人が承認し、来歴の検査を通った下書きを、data/questions.<コード>.json に追加する(ADR 0020)。
  * - 出典(references)は、来歴の出典の URL(許可ドメインの https、重ねない、10 件まで)と、台帳の出典の題(公式ページの `<title>`)。
  *   台帳に題がなければ、題なしで書き出して報告する(ADR 0020)
- * - 問題 ID は、資格マスタの idPrefix で、今の問題・退役した ID・書き出し済みの来歴の ID を含めた最大の番号の次から採番する
+ * - 問題 ID は、資格マスタの idPrefix で、今の問題・非公開の問題・退役した ID・書き出し済みの来歴の ID を含めた最大の番号の次から採番する
  * - 書いたあとにデータの検査を通し、失敗したら書き出し前の内容に戻す
  * - 書き出した問題の ID を来歴に書き戻し、同じ下書きを再び書き出さない
  * - 差分レポートは作業用の置き場にだけ書く(本文・出典の本文・環境固有の値を載せない)
@@ -237,8 +237,17 @@ export function runExport(options: ExportOptions): ExitCode {
   const original = existsSync(paths.questions) ? readFileSync(paths.questions, "utf8") : null;
   const current = original === null ? { examCode, questions: [] as unknown[] } : JSON.parse(original);
   const currentIds: string[] = (current.questions as { questionId: string }[]).map((q) => q.questionId);
+  // 非公開の問題(data/unpublished.<コード>.json)の ID も、使用済みにする(公開に戻すときに、ID が重ならないように)
+  const unpublishedPath = join(dirname(paths.questions), `unpublished.${examCode.toLowerCase()}.json`);
+  const unpublishedIds: string[] = existsSync(unpublishedPath)
+    ? (
+        (JSON.parse(readFileSync(unpublishedPath, "utf8")) as { entries?: { question?: { questionId?: string } }[] })
+          .entries ?? []
+      ).flatMap((e) => (typeof e.question?.questionId === "string" ? [e.question.questionId] : []))
+    : [];
   const used = [
     ...currentIds,
+    ...unpublishedIds,
     ...(exam.retiredQuestionIds ?? []),
     ...provenance.entries.flatMap((e) => (e.questionId !== undefined ? [e.questionId] : [])),
   ];
@@ -295,7 +304,11 @@ export function runExport(options: ExportOptions): ExitCode {
       .filter((f) => /^questions\..+\.json$/.test(f))
       .sort()
       .map((name) => ({ name, data: JSON.parse(readFileSync(join(dataDir, name), "utf8")) as unknown }));
-    errors = validateDataSet(examsRaw, questionFiles);
+    const unpublishedFiles = readdirSync(dataDir)
+      .filter((f) => /^unpublished\..+\.json$/.test(f))
+      .sort()
+      .map((name) => ({ name, data: JSON.parse(readFileSync(join(dataDir, name), "utf8")) as unknown }));
+    errors = validateDataSet(examsRaw, questionFiles, undefined, [], unpublishedFiles);
   } catch (error) {
     restore();
     throw error;

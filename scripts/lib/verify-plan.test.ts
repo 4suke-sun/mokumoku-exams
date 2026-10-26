@@ -10,6 +10,7 @@ import {
   formatResult,
   INFRA_PATTERN,
   PIPELINE_PATTERN,
+  POST_BUILD_CHECKS,
   selectWorkspaces,
 } from "./verify-plan.ts";
 
@@ -69,9 +70,9 @@ describe("CIの指定との一致", () => {
     expect(ci).toContain(`flag '${PIPELINE_PATTERN}'`);
   });
 
-  it("checkの検査_CIのcheckジョブが実行するnpmスクリプトと集合として一致する", () => {
+  it("checkの検査_CIが実行するnpmスクリプト(checkジョブと、appジョブのbuild後の検査)と集合として一致する", () => {
     const inCi = [...ci.matchAll(/^\s*- run: npm run (check:[a-z-]+)\s*$/gm)].map((m) => m[1]).sort();
-    expect(inCi).toEqual([...CHECK_SCRIPTS].sort());
+    expect(inCi).toEqual([...CHECK_SCRIPTS, ...POST_BUILD_CHECKS].sort());
   });
 });
 
@@ -91,7 +92,7 @@ describe("buildStages", () => {
 
   it("appを選ぶ_appのテストとbuildを加える", () => {
     const stages = names(buildStages({ app: true, infra: false, pipeline: false }));
-    expect(stages.slice(-3)).toEqual(["test(data-schema)", "test(app)", "build(app)"]);
+    expect(stages.slice(-4)).toEqual(["test(data-schema)", "test(app)", "build(app)", ...POST_BUILD_CHECKS]);
   });
 
   it("infraとpipelineを選ぶ_テストとbuildを加える", () => {

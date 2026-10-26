@@ -46,3 +46,4 @@
 - [0019 作問パイプラインの役のモデルの表に、保留の下書きを直す役を足す](./0019-pipeline-reviser-role.md)
 - [0020 書き出しは、出典の URL と公式ページの題を公開データに載せる](./0020-export-references-with-titles.md)
 - [0021 作問パイプラインの役のモデルの表に、公開の問題の質を判定する役を足す](./0021-pipeline-judge-role.md)
+- [0022 非公開の問題は、アプリが読まない別のファイルに持つ](./0022-unpublished-questions-in-separate-file.md)

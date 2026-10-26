@@ -447,6 +447,50 @@ export const QuestionsFileSchema = z
     });
   });
 
+/** 非公開にした問題の判定。書き直して公開に戻せるものと、戻せないもの */
+export const UNPUBLISH_VERDICTS = ["rewritable", "unpublish"] as const;
+
+/** 非公開にした理由の記録(`<段階>:<コード>`。例: 判定の段階の理由コード) */
+export const UNPUBLISH_REASON = /^[a-z]+:[a-z]+(?:-[a-z]+)*$/;
+
+/** 非公開の 1 件。問題の本文はそのまま持ち、判定と理由を添える(公開に戻すときは、`question` をそのまま公開のファイルへ移す) */
+export const UnpublishedEntrySchema = z.strictObject({
+  verdict: z.enum(UNPUBLISH_VERDICTS),
+  reasons: z.array(z.string().regex(UNPUBLISH_REASON)).min(1).max(10),
+  question: QuestionSchema,
+});
+
+/**
+ * 非公開の問題のファイル(data/unpublished.<コード>.json)。アプリは読まず、配信に含まれない(docs/data-spec.md の「13. 非公開の問題」)。
+ * ファイル名を `questions.` で始めないのは、アプリの読み込みと、問題データの検査が `questions.*.json` を対象にするため。
+ */
+export const UnpublishedFileSchema = z
+  .strictObject({
+    examCode: z.string().regex(EXAM_CODE),
+    entries: z.array(UnpublishedEntrySchema).min(1),
+  })
+  .superRefine((file, ctx) => {
+    const ids = new Set<string>();
+    file.entries.forEach((entry, i) => {
+      const q = entry.question;
+      if (ids.has(q.questionId)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["entries", i, "question", "questionId"],
+          message: "問題の ID が重複しています",
+        });
+      }
+      ids.add(q.questionId);
+      if (q.examCode !== file.examCode) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["entries", i, "question", "examCode"],
+          message: "ファイルの資格コードと一致しません",
+        });
+      }
+    });
+  });
+
 export type Reference = z.infer<typeof ReferenceSchema>;
 export type Exam = z.infer<typeof ExamSchema>;
 export type PublishedExam = z.infer<typeof PublishedExamSchema>;
@@ -456,3 +500,5 @@ export type ChoiceQuestion = z.infer<typeof ChoiceQuestionSchema>;
 export type FreeTextQuestion = z.infer<typeof FreeTextQuestionSchema>;
 export type Rubric = z.infer<typeof RubricSchema>;
 export type QuestionsFile = z.infer<typeof QuestionsFileSchema>;
+export type UnpublishedEntry = z.infer<typeof UnpublishedEntrySchema>;
+export type UnpublishedFile = z.infer<typeof UnpublishedFileSchema>;

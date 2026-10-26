@@ -27,5 +27,7 @@ export {
   RubricSchema,
   type SourceUrlReason,
   sourceUrlReason,
+  UNPUBLISH_VERDICTS,
+  UnpublishedFileSchema,
 } from "@mokumoku-exams/data-schema/exam-data/schema";
 export { validateDataSet } from "@mokumoku-exams/data-schema/exam-data/validate";

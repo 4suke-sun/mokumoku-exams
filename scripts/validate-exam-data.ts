@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * 資格マスタ(exams.json)と問題データ(questions.<コード>.json)の検査。
+ * 資格マスタ(exams.json)と問題データ(questions.<コード>.json)、非公開の問題(unpublished.<コード>.json)の検査。
  *   node scripts/validate-exam-data.ts [データのフォルダ(既定: data)]
  * 失敗したら終了コード 1。引数が不正なら 2。報告は、場所と種類だけ(入力の値は出さない)。
  */
@@ -38,11 +38,18 @@ try {
     .filter((n) => n.startsWith("questions.") && n.endsWith(".json"))
     .map((name) => ({ name, data: read(name) }));
 
+  const unpublishedFiles: DataFile[] = readdirSync(dir)
+    .filter((n) => n.startsWith("unpublished.") && n.endsWith(".json"))
+    .map((name) => ({ name, data: read(name) }));
+
   blocks.push(...unreadable);
   const vendorsPath = join(dir, "vendors.json");
   const vendors = existsSync(vendorsPath) ? read("vendors.json") : null;
   if (unreadable.length === 0)
-    blocks.push(...validateDataSet(exams, questionFiles, vendors, warns), ...validateHostVendors(vendors));
+    blocks.push(
+      ...validateDataSet(exams, questionFiles, vendors, warns, unpublishedFiles),
+      ...validateHostVendors(vendors),
+    );
 } catch {
   blocks.push(`${dir} を検査できませんでした(フォルダの読み込みに失敗)`);
 }
