@@ -124,6 +124,24 @@ export const ConfigSchema = z.strictObject({
     /** 依頼 1 件の取り込みを、形の検査に通らずにやり直せる回数の上限 */
     maxAttempts: z.number().int().positive(),
   }),
+  /** 判定(公開している問題の質の判定)と、判定役の評価 */
+  judge: z.strictObject({
+    /** 依頼 1 件の取り込みを、形の検査に通らずにやり直せる回数の上限 */
+    maxAttempts: z.number().int().positive(),
+    /** 判定役の評価(docs/evaluation.md) */
+    eval: z.strictObject({
+      /** 評価用のデータを作る乱数の種(同じ種なら同じデータ) */
+      seed: z.number().int().min(0),
+      /** 仕込む欠陥の種類ごとの件数の目安 */
+      perKind: z.number().int().min(1).max(50),
+      /** 指標の目標 */
+      targets: z.strictObject({
+        detectionOverall: z.number().min(0).max(1),
+        detectionPerKind: z.number().min(0).max(1),
+        falsePositiveMax: z.number().min(0).max(1),
+      }),
+    }),
+  }),
   /** 出題計画。目標の問題数と、難易度・種別の配分(試験ごとに overrides で上書きする) */
   plan: z.strictObject({
     /** 目標の問題数 = 本番の出題数 × この倍率(問題の蓄えを、1 回の出題より多くする) */

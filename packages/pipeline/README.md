@@ -23,7 +23,7 @@ npm test -w @mokumoku-exams/pipeline
 
 ## コマンドと設定
 
-- コマンドは段階ごとにあります(`collect` `facts` `plan` `draft` `verify` `export`)と、状態を表示する `status` です。解説は `draft` で書きます(ADR 0013)。
+- コマンドは段階ごとにあります(`collect` `facts` `plan` `draft` `verify` `judge` `export`)と、状態を表示する `status` です。解説は `draft` で書きます(ADR 0013)。
   どれも実装済みです。実装していないコマンドを足したときは、「未実装」を標準エラーに出し、終了コード 2(入力の誤り)で終わります(`--help` は 0)。
   - `collect`: 一次情報の収集と台帳。手順は [一次情報の収集と台帳の運用](../../docs/source-collection.md)
   - `collect <資格コード> --titles`: 題のない台帳の出典だけを取得し、公式ページの `<title>` を題として足す(本文のハッシュ・取得日・状態は変えない)。`export <資格コード> --titles`: 公開している問題の、題のない出典に、同じ URL の題か台帳の題を足す([ADR 0020](../../docs/app/adr/0020-export-references-with-titles.md))
@@ -36,6 +36,8 @@ npm test -w @mokumoku-exams/pipeline
   - `verify`: 下書きを、根拠にした出典の節だけから検証する(依頼 → エージェント `question-verifier` → `--import`)。選択肢ごとの正誤の再導出と、解説の確認。手順は [出題計画と下書きの手順](../../docs/drafting.md) の「検証」
   - `status`: 段階ごとの状態を表示する。依頼待ち・取り込み待ち・通過・保留・不採用・書き出し済みの件数、理由コードごとの件数、再検証の印、計画の項目ごとの未達の理由、役のモデルと定義のハッシュ、依頼待ちの件数 × 役のモデルの見積もり。読むだけで、何も書かない。`pipeline-run` スキルが、止まったときに人に見せる
   - `eval`: 検証役の見落としと誤検出を測る(人が承認した下書きから評価用のデータを作り、検証と同じ形の依頼 → エージェント → `--import`)。指標と目標は [検証役の評価](../../docs/evaluation.md)
+  - `judge`: 公開している選択式の問題を、資格別の判定の基準(LLM の観点)に照らして、公開・書き直しで復帰できる・非公開に判定する(依頼 → エージェント `question-judge` → `--import`)。結果は作業用の置き場に、問題の ID・判定・理由コード・指摘の場所・点数と減点の項目・各種ハッシュだけで書き、本文は持たない。`data/` は変えない([判定の基準](../../docs/exam-style/README.md)、[ADR 0021](../../docs/app/adr/0021-pipeline-judge-role.md))
+  - `judge-eval`: 判定役の見落としと誤検出を測る(人が承認した下書きに欠陥を仕込んで評価用のデータを作り、依頼 → エージェント → `--import`)。指標と目標は [判定役の評価](../../docs/evaluation.md) の「6」
   - `score`: 公開している選択式の問題を、書き方の点数票(問題ごと・束)で採点する。読むだけで、何も書かない。出力は問題の ID・項目の ID・点数・割合・字数・件数と、試験ガイドの対象サービスの名前(束のサービスの分布)だけで、本文は出さない。帯は資格ごとに持つ([資格ごとの出題スタイル](../../docs/exam-style/README.md))
   - `reasons`: 不採用と差し戻しの理由を、理由コード・論点・段階ごとに集計し、下書きの指示の改善に使える形で書く(元の記録は変えず、作業用の置き場に集計を書く)。手順は [出題計画と下書きの手順](../../docs/drafting.md) の「理由の集計」
   - `export`: 人が承認し(抜き取りで確認しないと記録したものは、記録で代える)、検証と来歴の検査を通った下書きを、`data/questions.<コード>.json` に追加する。手順は [出題計画と下書きの手順](../../docs/drafting.md) の「書き出し」
@@ -47,7 +49,7 @@ npm test -w @mokumoku-exams/pipeline
 - 共通部品(`src/shared/`): 依頼 → 取り込みの流れ(依頼の一覧、失敗の回数、`request-stale`、後始末。`request-flow.ts`)、
   資格コードの検査と資格マスタの読み込み(`exam.ts`)、書き出し(`fs.ts`)、項目のパスだけを持つ誤りの基底(`errors.ts`)、
   文字の 2 つ組の類似度(`similarity.ts`)、本文の写しの検出(`copy.ts`。試験ガイド・事実カード・下書きが同じ関数を使う)、エージェントの定義の読み込み(`agents.ts`)。段階ごとに違う検査は、各段階に残します。
-- エージェントの定義: 役(`guide-extractor` `fact-extractor` `question-drafter` `question-reviser` `question-verifier` `source-scout`)と `.claude/agents/<役>.md` の対応は `src/shared/agents.ts` が持ちます。
+- エージェントの定義: 役(`guide-extractor` `fact-extractor` `question-drafter` `question-reviser` `question-verifier` `question-judge` `source-scout`)と `.claude/agents/<役>.md` の対応は `src/shared/agents.ts` が持ちます。
   依頼のファイルに、役の名前・モデルの ID・定義のハッシュ(`agent`)を書き、依頼の鍵にハッシュを入れます。ハッシュは、モデルの ID と指示の本文から決め、
   説明文(`description`)の直しでは変わりません。取り込んだ結果(試験ガイドの `guide.agent`、事実カードの `extracted[].agent`、下書きの `agent`)にも同じ記録が残ります。
 - ログの作法: 出力は「種類」と「場所(項目名や位置)」だけです。環境値・鍵・本文、入力した引数の文字列は出しません。

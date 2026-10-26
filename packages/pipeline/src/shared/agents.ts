@@ -14,6 +14,7 @@ export const PIPELINE_ROLES = [
   "question-drafter",
   "question-reviser",
   "question-verifier",
+  "question-judge",
   "source-scout",
 ] as const;
 export type PipelineRole = (typeof PIPELINE_ROLES)[number];

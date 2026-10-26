@@ -172,6 +172,9 @@ export function runStatus(options: StatusOptions): ExitCode {
     line(`検証の理由 ${reason} ${n} 件`);
   }
 
+  const judgeQueue = queue(join(work, "judge", code, "requests"), join(work, "judge", code, "out"));
+  line(`判定 依頼待ち ${judgeQueue.waiting} 件、取り込み待ち ${judgeQueue.toImport} 件`);
+
   const waitingByRole: Record<PipelineRole, number> = {
     "source-scout": candidateQueue.waiting,
     "guide-extractor": guide.waiting,
@@ -179,6 +182,7 @@ export function runStatus(options: StatusOptions): ExitCode {
     "question-drafter": draftQueue.waiting - reviseQueue,
     "question-reviser": reviseQueue,
     "question-verifier": verifyQueue.waiting,
+    "question-judge": judgeQueue.waiting,
   };
   for (const role of PIPELINE_ROLES) {
     const stamp = stamps.get(role) as AgentStamp;
