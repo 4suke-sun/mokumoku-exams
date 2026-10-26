@@ -50,4 +50,6 @@
 - [0008 事実カードのアンカーは、HTML の見出しの要素から取る](./0008-anchor-from-html-headings.md)
 - [0009 設問文の重複の比較では、共通の決まり文句を外してから比べる](./0009-strip-stem-boilerplate.md)
 - [0010 テストのダミーは、認証情報や ID の形に見えない中立の値にする](./0010-test-dummy-credential-shape.md)
+- [0011 部分的にステージするときは、作業ツリーの同じファイルも整形する](./0011-format-worktree-when-partial-stage.md)
+- [0012 判定の単位を変えたら、依存するテストの期待を先に洗い出す](./0012-list-tests-before-changing-judgment-unit.md)
 <!-- lessons:end -->
