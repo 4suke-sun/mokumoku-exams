@@ -32,6 +32,7 @@
     "check:pr-closes": "node scripts/check-pr-closes.ts",
     "check:boundary": "node scripts/check-pipeline-boundary.ts",
     "check:retired-ids": "node scripts/check-retired-ids.ts",
+    "check:unpublished-bundle": "node scripts/check-unpublished-bundle.ts data packages/app/.next",
     "validate:data": "node scripts/validate-exam-data.ts && node scripts/validate-curriculum-data.ts && node scripts/validate-summary-data.ts && node scripts/validate-help-data.ts",
     "build:lambda": "node scripts/build-lambda-asset.ts",
     "synth": "npm run synth -w @mokumoku-exams/infra"

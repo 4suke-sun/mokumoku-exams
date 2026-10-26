@@ -2,7 +2,7 @@
 /**
  * 手元の検査を、PR の前にまとめて通す。
  *   node scripts/verify.ts
- * lint、型検査、CI の check ジョブと同じ check:*(scripts/lib/verify-plan.ts の CHECK_SCRIPTS)、validate:data、関係するテスト、関係する build を順に実行し、失敗した段階の名前を示して
+ * lint、型検査、CI の check ジョブと同じ check:*(scripts/lib/verify-plan.ts の CHECK_SCRIPTS)、validate:data、関係するテスト、関係する build(アプリを選んだときは、build のあとの check:unpublished-bundle も)を順に実行し、失敗した段階の名前を示して
  * 終了コード 1 で止まる。段階ごとの時間も表示する(遅い・止まる段階の切り分けのため)。
  * 関係するワークスペースは、`origin/main` との差分と、未コミット・未追跡の変更から選ぶ(CI と同じ規則)。
  * 段階ごとの時間は、手元の計測(node scripts/metrics.ts)のために記録する。

@@ -124,6 +124,8 @@ jobs:
       - run: npm run build
       # Lambda に載せる成果物の作成の失敗を、デプロイの前に見つける(先に npm run build が要る)
       - run: npm run build:lambda
+      # 非公開の問題(data/unpublished.<コード>.json)が、ビルド成果物(.next)に含まれないことを確かめる(先に npm run build が要る)
+      - run: npm run check:unpublished-bundle
       # カバレッジを測って、ログとジョブのまとめに出す(しきい値は設けない)
       - run: npm run test:coverage -w @mokumoku-exams/app
       - name: カバレッジをジョブのまとめに出す
