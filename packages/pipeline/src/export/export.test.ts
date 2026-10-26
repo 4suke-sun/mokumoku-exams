@@ -18,7 +18,7 @@ import {
   writeOutput,
 } from "../draft/test-helpers.ts";
 import { EXIT } from "../exit-codes.ts";
-import { allocateIds, referenceUrls } from "./export.ts";
+import { allocateIds, references } from "./export.ts";
 
 const repoRoot = resolve(import.meta.dirname, "../../../..");
 
@@ -235,9 +235,37 @@ describe("採番と出典", () => {
       "https://docs.aws.amazon.com/c.html?x=1",
       ...Array.from({ length: 12 }, (_, i) => `https://docs.aws.amazon.com/p${i}.html`),
     ];
-    const kept = referenceUrls(urls, "AWS");
-    expect(kept[0]).toBe("https://docs.aws.amazon.com/a.html");
+    const kept = references(
+      urls.map((url) => ({ url })),
+      "AWS",
+    );
+    expect(kept[0]?.url).toBe("https://docs.aws.amazon.com/a.html");
     expect(kept).toHaveLength(10);
-    expect(kept.some((u) => u.includes("unlisted") || u.includes("?"))).toBe(false);
+    expect(kept.some((r) => r.url.includes("unlisted") || r.url.includes("?"))).toBe(false);
+  });
+
+  it("台帳に題がある出典_題を付け、題がない出典は題なしで残す", () => {
+    const kept = references(
+      [
+        { url: "https://docs.aws.amazon.com/a.html", title: "A の題 - AWS" },
+        { url: "https://docs.aws.amazon.com/b.html" },
+      ],
+      "AWS",
+    );
+    expect(kept).toEqual([
+      { url: "https://docs.aws.amazon.com/a.html", title: "A の題 - AWS" },
+      { url: "https://docs.aws.amazon.com/b.html" },
+    ]);
+  });
+
+  it("同じ URL が題の違いで 2 回ある_最初の 1 件だけ残す", () => {
+    const kept = references(
+      [
+        { url: "https://docs.aws.amazon.com/a.html", title: "最初の題" },
+        { url: "https://docs.aws.amazon.com/a.html", title: "後の題" },
+      ],
+      "AWS",
+    );
+    expect(kept).toEqual([{ url: "https://docs.aws.amazon.com/a.html", title: "最初の題" }]);
   });
 });

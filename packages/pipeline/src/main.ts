@@ -2,12 +2,14 @@ import { writeFileSync } from "node:fs";
 import { runCandidates } from "./collect/candidates.ts";
 import { type CollectDeps, runCollect } from "./collect/collect.ts";
 import { defaultDeps, Fetcher } from "./collect/fetcher.ts";
+import { runTitles } from "./collect/title.ts";
 import { COMMANDS } from "./commands.ts";
 import { type Config, ConfigError, loadConfig } from "./config.ts";
 import { runDraft } from "./draft/run.ts";
 import { runEval } from "./eval/run.ts";
 import { EXIT, type ExitCode } from "./exit-codes.ts";
 import { runExport } from "./export/export.ts";
+import { runFillTitles } from "./export/titles.ts";
 import { type FactsMode, runFacts } from "./facts/facts.ts";
 import { type Output, report, reportInternalError } from "./log.ts";
 import { runPlan } from "./plan/run.ts";
@@ -41,6 +43,7 @@ export const KNOWN_FLAGS = [
   "--import-guide",
   "--candidates",
   "--import-candidates",
+  "--titles",
   "--import",
   "--coverage",
   "--report",
@@ -51,7 +54,8 @@ export const KNOWN_FLAGS = [
 ];
 /** コマンドごとに、受け付ける動作のオプション(同時には 1 つだけ) */
 const MODE_FLAGS: Record<string, readonly string[]> = {
-  collect: ["--import-guide", "--candidates", "--import-candidates"],
+  collect: ["--import-guide", "--candidates", "--import-candidates", "--titles"],
+  export: ["--titles"],
   facts: ["--import", "--coverage", "--report"],
   draft: ["--import", "--check", "--review", "--decide", "--revise"],
   verify: ["--import"],
@@ -83,6 +87,8 @@ function helpText(): string {
     "collect <資格コード>                 計画に沿って一次情報を集め、台帳に記録する",
     "collect <資格コード> --import-guide  エージェントが抽出した試験ガイドを検査し、台帳に取り込む",
     "collect <資格コード> --candidates   出題範囲の項目ごとに、公式の文書を出典の候補として挙げる依頼を書く",
+    "collect <資格コード> --titles       題のない台帳の出典に、公式ページの題を足す(取得するのは題のない出典だけ)",
+    "export <資格コード> --titles        題のない問題の出典に、台帳と他の問題の題を足す",
     "collect <資格コード> --import-candidates  エージェントが挙げた候補を検査し、候補の一覧を書く(計画には入れない)",
     "facts <資格コード>                   出典ごとに、事実カードの抽出の依頼を書く",
     "facts <資格コード> --import         エージェントが抽出した事実カードを検査し、取り込む",
@@ -163,10 +169,10 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
     }
     if (help) {
       const usages: Record<string, string> = {
-        collect: "使い方: collect <資格コード> [--import-guide | --candidates | --import-candidates]\n",
+        collect: "使い方: collect <資格コード> [--import-guide | --candidates | --import-candidates | --titles]\n",
         facts: "使い方: facts <資格コード> [--import | --coverage | --report]\n",
         plan: "使い方: plan <資格コード>\n",
-        export: "使い方: export <資格コード>\n",
+        export: "使い方: export <資格コード> [--titles]\n",
         verify: "使い方: verify <資格コード> [--import]\n",
         status: "使い方: status <資格コード>\n",
         score: "使い方: score <資格コード>\n",
@@ -194,6 +200,16 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
           mode: flags.includes("--import-candidates") ? "import" : "request",
           dryRun,
           output,
+        });
+      }
+      if (flags.includes("--titles")) {
+        return await runTitles({
+          config,
+          rootDir,
+          examCode,
+          dryRun,
+          output,
+          deps: collectDeps ?? defaultCollectDeps(config),
         });
       }
       return await runCollect({
@@ -244,7 +260,9 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
         report(output, "入力の誤り", "資格コードの指定がない");
         return EXIT.inputError;
       }
-      return runExport({ config, rootDir, examCode, dryRun, output });
+      return flags.includes("--titles")
+        ? runFillTitles({ config, rootDir, examCode, dryRun, output })
+        : runExport({ config, rootDir, examCode, dryRun, output });
     }
     if (command.name === "eval") {
       const examCode = positional[1];

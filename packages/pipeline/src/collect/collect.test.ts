@@ -93,7 +93,14 @@ describe("collect", () => {
     expect(readdirSync(cacheDir)).toContain(`${sha256(Buffer.from(fixture("guide.html")))}.body`);
     const ledgerText = readFileSync(join(root, config.ledgerDir, "aws-aib-c01.json"), "utf8");
     const reportText = readFileSync(join(root, config.workDir, "collect/aws-aib-c01/report.json"), "utf8");
-    for (const text of [ledgerText, reportText, r.out, r.err]) expect(text).not.toContain("Synthetic");
+    for (const text of [ledgerText, reportText, r.out, r.err]) {
+      expect(text).not.toContain("Domain 1: Alpha topics");
+      expect(text).not.toContain("Synthetic text without an update date");
+    }
+    // 題(`<title>`)は台帳に持つ。本文は持たない
+    expect(ledger.sources.find((s) => s.url === GUIDE)?.title).toBe("Synthetic exam guide");
+    expect(ledger.sources.find((s) => s.url === ONE)?.title).toBe("Synthetic doc");
+    expect(ledger.sources.find((s) => s.url === TWO)?.title).toBeUndefined();
     // 止めた出典があるので、検査の失敗で終わる。理由コードを出す
     expect(r.code).toBe(EXIT.checkFailed);
     expect(r.err).toContain(`出典の検査: ${TWO} liveness fail dead-link`);
@@ -507,5 +514,46 @@ describe("collect --import-guide", () => {
     expect(r.code).toBe(EXIT.checkFailed);
     expect(r.err).toContain("試験ガイドの取り込みの停止: weight-sum-mismatch");
     expect(r.ledger().guide).toBeNull();
+  });
+
+  describe("題を足す(--titles)", () => {
+    it("題のない台帳の出典_題のない出典だけを取得し、題以外の項目を変えない", async () => {
+      const root = setupRoot();
+      const first = await run(root, ["collect", CODE]);
+      const ledgerFile = join(root, config.ledgerDir, "aws-aib-c01.json");
+      const original = readLedger(ledgerFile, CODE);
+      // 題を持つ出典と、取得に失敗した出典(題なし)を作る
+      const stripped = {
+        ...original,
+        sources: original.sources.map((s) => {
+          const { title: _title, ...rest } = s;
+          return s.url === GUIDE ? s : rest;
+        }),
+      };
+      writeFileSync(ledgerFile, serializeLedger(stripped));
+      const second = await run(root, ["collect", CODE, "--titles"]);
+      expect(first.code).toBe(EXIT.checkFailed);
+      // 題のない 2 件だけを取得する(TWO は取れず、題なしのまま)
+      expect(second.net.requests.filter((u) => !u.endsWith("robots.txt")).sort()).toEqual([ONE, TWO].sort());
+      const after = second.ledger();
+      expect(after.sources.find((s) => s.url === ONE)?.title).toBe("Synthetic doc");
+      expect(after.sources.find((s) => s.url === TWO)?.title).toBeUndefined();
+      expect(second.out).toContain(`題が取れない出典: ${TWO}`);
+      expect(second.code).toBe(EXIT.checkFailed);
+      // 題以外は変わらない
+      for (const s of after.sources) {
+        const { title: _t, ...rest } = s;
+        const { title: _o, ...before } = original.sources.find((o) => o.url === s.url) as typeof s;
+        expect(rest).toEqual(before);
+      }
+    });
+
+    it("ドライラン_取得も書き込みもしない", async () => {
+      const root = setupRoot();
+      await run(root, ["collect", CODE]);
+      const r = await run(root, ["collect", CODE, "--titles", "--dry-run"]);
+      expect(r.net.requests).toEqual([]);
+      expect(r.code).toBe(EXIT.ok);
+    });
   });
 });

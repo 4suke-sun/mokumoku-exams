@@ -48,14 +48,17 @@ printf 'refs/heads/%s %s refs/heads/%s %s\n' "$(git branch --show-current)" "$(g
 node scripts/prepare-inspection.ts --range <Step 0 で決めた範囲>
 ```
 
+出力の最後の行が、入力のスタンプ(`スタンプ: …`)。入力を書き出し直す前と、片づける前に、走っている検査役がないことを確かめる。
+
 検査役に依頼する内容:
 
 - 作業ディレクトリ
 - 「`.claude/skills/dev-commit/checklist.md` を読み、その項目に沿って、`.drafts/inspect/` のファイル
   (範囲の全コミットの差分。検査済みで `covered.txt` に挙げられたコミットの差分は除く。**コミットメッセージ、ブランチ名**)を確認する。最後のコミットだけで済ませない」
-- 「報告は、チェックリストの『報告のしかた(必ず守る)』に従う(値を引用しない。最後に `判定: OK/WARN/BLOCK`)」
+- 「報告は、チェックリストの『報告のしかた(必ず守る)』に従う(値を引用しない。`.drafts/inspect/stamp.txt` のスタンプを書き写す。最後に `判定: OK/WARN/BLOCK`)」
 
-検査が終わったら、書き出したファイルを消す: `node scripts/prepare-inspection.ts --clean`
+検査役の報告のスタンプが、いまの入力と一致することを確かめる(`node scripts/prepare-inspection.ts --verify <報告のスタンプ>`。`inspector-deep` も使ったときは、報告ごとに、それぞれのスタンプで実行する)。
+一致しなければ、止めて、入力を書き出し直して検査をやり直す。確かめたら、書き出したファイルを消す: `node scripts/prepare-inspection.ts --clean`
 
 範囲の差分に次のパスが含まれるときは、`inspector-deep`(Sonnet)も別に起動し、`inspector` と**両方**の判定を合わせる
 (最も重い判定を採用する)。`scripts/`、`.githooks/`、`.github/workflows/`、`.claude/`。検査の仕組みそのものを変える差分は、
@@ -82,6 +85,13 @@ node scripts/prepare-inspection.ts --range <Step 0 で決めた範囲>
 承認が出るまで、push しない。承認の時点で、範囲の末尾のコミットとコミット数を控え、push の直前にもう一度取って比べる。
 承認後の再確認は、`.claude/skills/dev-commit/reconfirm.md` に従う。
 
+人が承認したら、その直後に、メインのセッションが承認の印を書く(`.git` の下。有効 60 分)。印がないと、フック(`scripts/approval-hook.ts`)が push を止める:
+
+```sh
+node scripts/approval.ts grant push                      # 新しいブランチ(範囲の起点は origin/main)
+node scripts/approval.ts grant push --base @{upstream}   # upstream のあるブランチ(Step 0 で決めた範囲と同じ起点)
+```
+
 ## Step 5. push
 
 push の直前に、範囲の末尾のコミットとコミット数をもう一度取り、Step 4 の承認の時点と一致することを確かめる(`.claude/skills/dev-commit/reconfirm.md`)。
@@ -91,6 +101,7 @@ git push -u origin "$(git branch --show-current)"
 ```
 
 - `--force` / `--force-with-lease` は、このスキルでは実行しない。必要なら、理由を説明して人の承認を待つ
+- フックが止めたときは、承認の印の書き直しで回避せず、理由(印がない・期限切れ・範囲が承認のときと違う)を人に伝えて、Step 0 からやり直す
 - push が失敗したら、原因を確認してから、1 回だけ再試行する
 - PR も出すなら、push の前に `/dev-pr` を使う(push も含めて、検査と承認が 1 回になる)。このスキルで先に push したあとに PR だけ出すときも、`/dev-pr` を使う
 

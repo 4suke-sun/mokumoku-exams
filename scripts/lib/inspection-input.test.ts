@@ -1,5 +1,5 @@
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -186,5 +186,71 @@ describe("prepare-inspection", () => {
 
   it("引数がない_使い方を出して終了コード 2", () => {
     expect(run(makeRepo()).status).toBe(2);
+  });
+
+  describe("スタンプ", () => {
+    const stampOfRun = (stdout: string) => /^スタンプ: ([0-9a-f]+)$/m.exec(stdout)?.[1] ?? "";
+
+    it("書き出し_スタンプを出力と stamp.txt に添える", () => {
+      const dir = makeRepo();
+      const r = run(dir, "--cached");
+      expect(stampOfRun(r.stdout)).toMatch(/^[0-9a-f]{16}$/);
+      expect(read(dir, "stamp.txt")).toContain(`スタンプ: ${stampOfRun(r.stdout)}`);
+    });
+
+    it("入力が変わっていない_報告のスタンプと一致して通る", () => {
+      const dir = makeRepo();
+      const stamp = stampOfRun(run(dir, "--cached").stdout);
+      expect(run(dir, "--verify", stamp).status).toBe(0);
+    });
+
+    it("報告のスタンプが違う_止める", () => {
+      const dir = makeRepo();
+      run(dir, "--cached");
+      const r = run(dir, "--verify", "0000000000000000");
+      expect(r.status).toBe(1);
+      expect(r.stderr).toContain("スタンプ");
+    });
+
+    it("検査のあとにステージの差分が変わった_止める", () => {
+      const dir = makeRepo();
+      const stamp = stampOfRun(run(dir, "--cached").stdout);
+      writeFileSync(join(dir, "a.txt"), "first\nsecond\nthird\n");
+      git(dir, "add", "-A");
+      const r = run(dir, "--verify", stamp);
+      expect(r.status).toBe(1);
+      expect(r.stderr).toContain("差分が変わっています");
+    });
+
+    it("入力のファイルが書き換わった_止める", () => {
+      const dir = makeRepo();
+      const stamp = stampOfRun(run(dir, "--cached").stdout);
+      writeFileSync(join(dir, ".drafts/inspect/diff.patch"), "古い入力\n");
+      expect(run(dir, "--verify", stamp).status).toBe(1);
+    });
+
+    it("入力のファイルが欠けた_止める", () => {
+      const dir = makeRepo();
+      const stamp = stampOfRun(run(dir, "--cached").stdout);
+      rmSync(join(dir, ".drafts/inspect/commits.txt"));
+      expect(run(dir, "--verify", stamp).status).toBe(1);
+    });
+
+    it("入力が片づけられた_止める", () => {
+      const dir = makeRepo();
+      const stamp = stampOfRun(run(dir, "--cached").stdout);
+      run(dir, "--clean");
+      expect(run(dir, "--verify", stamp).status).toBe(1);
+    });
+
+    it("範囲の入力でコミットが増えた_止める", () => {
+      const dir = makeRepo();
+      git(dir, "commit", "-q", "-m", "chore: second");
+      const stamp = stampOfRun(run(dir, "--range", "HEAD~1..HEAD").stdout);
+      expect(run(dir, "--verify", stamp).status).toBe(0);
+      writeFileSync(join(dir, "a.txt"), "first\nsecond\nthird\n");
+      git(dir, "commit", "-q", "-am", "chore: third");
+      expect(run(dir, "--verify", stamp).status).toBe(1);
+    });
   });
 });

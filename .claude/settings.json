@@ -18,5 +18,19 @@
       "Bash(gh label create*)"
     ],
     "deny": ["Bash(git*--force*)", "Bash(git*--no-verify*)"]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash|Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"$(git rev-parse --show-toplevel)/scripts/approval-hook.ts\"",
+            "onFailure": "block"
+          }
+        ]
+      }
+    ]
   }
 }

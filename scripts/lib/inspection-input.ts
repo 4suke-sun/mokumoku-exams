@@ -1,10 +1,12 @@
-import { mkdirSync, rmSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { git } from "./git-check.ts";
 import { coveredCommits } from "./inspection-covered.ts";
 import { findDenylistPaths } from "./local-denylist.ts";
 
 export const INSPECT_DIR = ".drafts/inspect";
+export const STAMP_FILE = "stamp.txt";
 
 export type InspectionMode = { kind: "cached" } | { kind: "range"; range: string } | { kind: "pr"; base: string };
 
@@ -26,11 +28,7 @@ function safeCovered(range: string, root: string): string[] {
  * 範囲(push・PR)では、commit のときに検査した差分(台帳にある)の本文は省き、covered.txt に挙げる。
  * コミットのメッセージと作者は、検査済みでも、毎回 commits.txt に出す。
  */
-export function prepareInspection(mode: InspectionMode, root: string): string[] {
-  const dir = join(root, INSPECT_DIR);
-  rmSync(dir, { recursive: true, force: true });
-  mkdirSync(dir, { recursive: true });
-
+export function buildInspection(mode: InspectionMode, root: string): Record<string, string> {
   const range = mode.kind === "range" ? mode.range : mode.kind === "pr" ? `${mode.base}..HEAD` : null;
   // マージコミットの内容(競合の解消など)は、コミットごとの差分に出ないので、マージを含む範囲は台帳を使わず、すべて読む。
   const hasMerges = range !== null && git(["rev-list", "--merges", range]).trim() !== "";
@@ -79,8 +77,57 @@ export function prepareInspection(mode: InspectionMode, root: string): string[] 
         ? `${denylist.join("\n")}\n`
         : "なし(拒否リストが見つからない。照合できなかったと報告すること)\n",
   };
+  return files;
+}
+
+/** 入力全体のスタンプ。検査役の報告に書き写させ、検査した入力といまの入力が同じかを確かめるのに使う。 */
+export function stampOf(files: Record<string, string>): string {
+  const hash = createHash("sha256");
+  for (const name of Object.keys(files).sort()) hash.update(`${name}\0${files[name]}\0`);
+  return hash.digest("hex").slice(0, 16);
+}
+
+/** 入力を書き出し、スタンプを stamp.txt に添える。戻り値は書き出したファイル名とスタンプ。 */
+export function prepareInspection(mode: InspectionMode, root: string): { names: string[]; stamp: string } {
+  const files = buildInspection(mode, root);
+  const dir = join(root, INSPECT_DIR);
+  rmSync(dir, { recursive: true, force: true });
+  mkdirSync(dir, { recursive: true });
   for (const [name, text] of Object.entries(files)) writeFileSync(join(dir, name), text);
-  return Object.keys(files);
+  const stamp = stampOf(files);
+  writeFileSync(join(dir, STAMP_FILE), `スタンプ: ${stamp}\nモード: ${JSON.stringify(mode)}\n`);
+  return { names: [...Object.keys(files), STAMP_FILE], stamp };
+}
+
+export type VerifyResult = { ok: true } | { ok: false; reason: string };
+
+/**
+ * 検査役の報告のスタンプが、いまの入力と一致するかを確かめる。次のどれかなら、一致しない:
+ * 入力のファイルが書き出しのあとに変わった・欠けた、いまの差分から作り直した入力が変わっている、報告のスタンプが違う。
+ */
+export function verifyInspection(reported: string, root: string): VerifyResult {
+  let stamp: string;
+  let mode: InspectionMode;
+  try {
+    const text = readFileSync(join(root, INSPECT_DIR, STAMP_FILE), "utf8");
+    stamp = /^スタンプ: ([0-9a-f]+)$/m.exec(text)?.[1] ?? "";
+    mode = JSON.parse(/^モード: (.+)$/m.exec(text)?.[1] ?? "") as InspectionMode;
+    if (!stamp) throw new Error("no stamp");
+  } catch {
+    return { ok: false, reason: "入力のスタンプが読めません(入力が片づけられたか、書き出されていません)" };
+  }
+  if (reported !== stamp) return { ok: false, reason: "報告のスタンプが、入力のスタンプと違います" };
+  try {
+    const expected = buildInspection(mode, root);
+    const onDisk: Record<string, string> = {};
+    for (const name of Object.keys(expected)) onDisk[name] = readFileSync(join(root, INSPECT_DIR, name), "utf8");
+    if (stampOf(onDisk) !== stamp)
+      return { ok: false, reason: "入力のファイルが、書き出しのあとに変わったか欠けています" };
+    if (stampOf(expected) !== stamp) return { ok: false, reason: "検査のあとに、差分が変わっています" };
+  } catch {
+    return { ok: false, reason: "入力のファイルが欠けているか、差分を作り直せませんでした" };
+  }
+  return { ok: true };
 }
 
 export function cleanInspection(root: string): void {

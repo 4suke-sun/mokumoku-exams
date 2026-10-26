@@ -123,7 +123,7 @@ export function assembleQuestion(
     examCode: string;
     domain: string;
     difficulty: "easy" | "medium" | "hard";
-    referenceUrls: readonly string[];
+    references: readonly { url: string; title?: string }[];
   },
 ): unknown {
   const common = {
@@ -135,7 +135,7 @@ export function assembleQuestion(
     questionText: draft.questionText,
     explanation: draft.explanation,
     ...(draft.supplement !== undefined ? { supplement: draft.supplement } : {}),
-    ...(context.referenceUrls.length > 0 ? { references: context.referenceUrls.map((url) => ({ url })) } : {}),
+    ...(context.references.length > 0 ? { references: context.references.map((r) => ({ ...r })) } : {}),
   };
   if (!isChoiceDraft(draft)) return { ...common, rubric: draft.rubric };
   // 誤答の選択肢の解説は、誤答の設計の理由を使う(選択肢に解説が書かれていれば、それを優先する)

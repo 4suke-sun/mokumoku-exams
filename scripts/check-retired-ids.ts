@@ -12,7 +12,9 @@ import { checkRemovedIds, type QuestionsSnapshot } from "./lib/retired-ids-check
 
 const DATA = "data";
 const base = process.argv[2] ?? "origin/main";
-const git = (args: string[]) => execFileSync("git", args, { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] });
+// 問題データは 1MB を超えうる。既定の出力の上限では、git show の出力が切れて失敗する
+const git = (args: string[]) =>
+  execFileSync("git", args, { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"], maxBuffer: 256 * 1024 * 1024 });
 const idsOf = (text: string): string[] =>
   ((JSON.parse(text) as { questions?: { questionId?: unknown }[] }).questions ?? []).flatMap((q) =>
     typeof q.questionId === "string" ? [q.questionId] : [],

@@ -112,15 +112,18 @@ Issue だけの場合も、拒否リストの置き場を検査役に渡すた�
 node scripts/prepare-inspection.ts --cached
 ```
 
+出力の最後の行が、入力のスタンプ(`スタンプ: …`)。入力を書き出し直す前と、片づける前に、走っている検査役がないことを確かめる。
+
 検査役に依頼する内容:
 
 - 作業ディレクトリと、下書きファイルのパス
 - 「`.claude/skills/dev-commit/checklist.md` を読み、その項目に沿って、下書きと、PR の場合は `.drafts/inspect/` のファイル
   (基準との差分。検査済みで `covered.txt` に挙げられたコミットの差分は除く。全コミットのメッセージ、ブランチ名)を確認する」
 - Step 0 の 8 で検索した語と、食い違いを直さないと決めた箇所(場所と理由)。検査役は、渡された語でリポジトリを検索して確かめてよい
-- 「報告は、チェックリストの『報告のしかた(必ず守る)』に従う(値を引用しない。最後に `判定: OK/WARN/BLOCK`)」
+- 「報告は、チェックリストの『報告のしかた(必ず守る)』に従う(値を引用しない。`.drafts/inspect/stamp.txt` のスタンプを書き写す。最後に `判定: OK/WARN/BLOCK`)」
 
-検査が終わったら、書き出したファイルを消す: `node scripts/prepare-inspection.ts --clean`
+検査役の報告のスタンプが、いまの入力と一致することを確かめる(`node scripts/prepare-inspection.ts --verify <報告のスタンプ>`。`inspector-deep` も使ったときは、報告ごとに、それぞれのスタンプで実行する)。
+一致しなければ、止めて、入力を書き出し直して検査をやり直す。確かめたら、書き出したファイルを消す: `node scripts/prepare-inspection.ts --clean`
 
 PR の差分に次のパスが含まれるときは、`inspector-deep`(Sonnet)も別に起動し、`inspector` と**両方**の判定を合わせる
 (最も重い判定を採用する)。`scripts/`、`.githooks/`、`.github/workflows/`、`.claude/`。検査の仕組みそのものを変える差分は、
@@ -152,6 +155,15 @@ PR の差分に次のパスが含まれるときは、`inspector-deep`(Sonnet)�
 ```sh
 shasum -a 256 <下書きファイル>
 git rev-parse HEAD && git rev-list --count origin/main..HEAD
+```
+
+承認の直後に、メインのセッションが承認の印を書く(`.git` の下。有効 60 分。サブエージェントには書かせない。フックが止めるのは、サブエージェントからの `scripts/approval.ts grant` という直接の形だけ)。印がないと、フック(`scripts/approval-hook.ts`)が
+push と、`gh pr create`・`gh issue create`、題・本文を変える `gh pr edit`・`gh issue edit` を止める(ラベルやマイルストーンだけの編集は止めない。`post-issues.ts` の中の投稿は、スクリプトの封印が止める)。印は、PR は範囲(ブランチ、末尾のコミット、コミット数)と下書きのハッシュを、
+Issue は下書きのハッシュを覆う:
+
+```sh
+node scripts/approval.ts grant pr <下書きファイル>      # PR(push も覆う)
+node scripts/approval.ts grant issue <下書きファイル>   # Issue
 ```
 
 一覧から Issue を投稿するときは(承認の前に見せる `--dry-run` のコマンドは、Step 6)、承認の直後に、一覧へ封印(下書きのハッシュと、一覧の項目 action・number・milestone・labels のハッシュ)を記録する。投稿は、封印と一致する下書きだけを行う:
@@ -196,7 +208,9 @@ node scripts/post-issues.ts .drafts/issues/manifest.json --seal
      下書きや一覧の項目を直したときは、検査と承認をやり直し、`--reseal` で封印し直す
    - 既存の Issue の編集では、ラベルは追加だけ。マイルストーンを付けるときは、ラベル `later` を外す
 
-4. `gh pr create` の前に動くフックはない。下書きの機械検査(`scripts/check-pr-secrets.ts`)は、Step 2 で承認の前に済ませてある
+4. `gh pr create` などの前に、承認の印を確かめるフックが動く(`.claude/settings.json`)。印がない、期限が切れた、範囲や下書きが承認のときと違うときは止まる。
+   止まったときは、印の書き直しで回避せず、理由を人に伝えて、機械的な検査からやり直す。
+   下書きの機械検査(`scripts/check-pr-secrets.ts`)は、Step 2 で承認の前に済ませてある
 5. 作ったら、CI の結果を確認する。**最新のコミットの CI が通るまで、マージしない**
 6. マージは、このスキルの範囲外(人の指示があるときだけ行う)
 

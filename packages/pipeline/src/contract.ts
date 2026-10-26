@@ -22,6 +22,8 @@ export {
   QUESTION_ID,
   QuestionsFileSchema,
   REFERENCE_HOST_VENDORS,
+  REFERENCE_TITLE_MAX,
+  ReferenceTitle,
   RubricSchema,
   type SourceUrlReason,
   sourceUrlReason,

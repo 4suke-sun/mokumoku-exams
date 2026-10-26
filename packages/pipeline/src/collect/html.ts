@@ -20,6 +20,23 @@ export function extractLinks(html: string, base: string): string[] {
   return [...links];
 }
 
+const ENTITIES: Record<string, string> = { amp: "&", lt: "<", gt: ">", quot: '"', apos: "'", nbsp: " " };
+
+function decodeEntities(text: string): string {
+  return text.replace(/&(?:#(\d{1,7})|#x([0-9a-f]{1,6})|([a-z]+));/gi, (whole, dec, hex, name) => {
+    const code = dec !== undefined ? Number(dec) : hex !== undefined ? Number.parseInt(hex, 16) : null;
+    if (code !== null) return code > 0 && code <= 0x10ffff ? String.fromCodePoint(code) : whole;
+    return ENTITIES[String(name).toLowerCase()] ?? whole;
+  });
+}
+
+/** ページの `<title>`(実体参照を戻し、空白をそろえたもの)。なければ null。長さと形の検査は、使う側で行う。 */
+export function extractTitle(html: string): string | null {
+  const m = /<title\b[^>]*>([\s\S]*?)<\/title>/i.exec(html);
+  const text = m?.[1] === undefined ? "" : decodeEntities(m[1]).replace(/\s+/g, " ").trim();
+  return text === "" ? null : text;
+}
+
 function toIsoDate(value: string): string | null {
   const t = Date.parse(value);
   if (Number.isNaN(t)) return null;

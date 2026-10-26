@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
-import { EXAM_CODE, sourceUrlReason } from "../contract.ts";
+import { EXAM_CODE, ReferenceTitle, sourceUrlReason } from "../contract.ts";
 import { AgentStampSchema } from "../shared/agents.ts";
 import { PathsError } from "../shared/errors.ts";
 import { writeFileAtomic } from "../shared/fs.ts";
@@ -9,7 +9,7 @@ import { withinParaphraseLimit, withinQuoteLimit, withinQuotesTotal } from "./te
 
 /**
  * 出典の台帳(ADR 0006)。資格ごとに 1 つの JSON をコミットする。
- * 持つのはリンク、取得の記録、本文のハッシュ、短い言い換えだけで、本文は持たない。
+ * 持つのはリンク、公式ページの題、取得の記録、本文のハッシュ、短い言い換えだけで、本文は持たない。
  */
 
 export const SOURCE_KINDS = ["exam-guide", "official-doc", "standard"] as const;
@@ -76,6 +76,11 @@ export const SourceEntrySchema = z.strictObject({
     edition: z.string().min(1).max(16).optional(),
     region: REGION.optional(),
   }),
+  /**
+   * 公式ページの題(`<title>`)。書き出しで、問題の出典の題に使う。本文ではなく短い文字列で、データの契約の出典の題と同じ規則
+   * (URL を含まない、200 文字以内)。取得できなかった出典、古い記録にはない
+   */
+  title: ReferenceTitle.optional(),
   /** 最後に取得を試みた日。まだ一度も取得していなければ null */
   fetchedAt: ISO_DATE.nullable(),
   /** 最後に取得できた本文のハッシュ(sha256)。取得できていなければ null */
