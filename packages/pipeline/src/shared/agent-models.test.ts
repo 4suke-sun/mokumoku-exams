@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 import { PIPELINE_ROLES, readAgentStamp } from "./agents.ts";
 
 const repoRoot = resolve(import.meta.dirname, "../../../..");
-const ADR = resolve(repoRoot, "docs/app/adr/0019-pipeline-reviser-role.md");
+const ADR = resolve(repoRoot, "docs/app/adr/0021-pipeline-judge-role.md");
 
 /** ADR の表のモデルの表記と、エージェントの定義の完全な ID の対応 */
 const MODEL_IDS: Record<string, string> = {
@@ -28,7 +28,7 @@ function adrModels(): Map<string, string> {
 }
 
 describe("パイプラインの役のモデル", () => {
-  it("すべての役が ADR 0019 の表にあり_定義の model: と表のモデルが一致する", () => {
+  it("すべての役が ADR 0021 の表にあり_定義の model: と表のモデルが一致する", () => {
     const table = adrModels();
     expect([...table.keys()].sort()).toEqual([...PIPELINE_ROLES].sort());
     for (const role of PIPELINE_ROLES) {
@@ -38,9 +38,12 @@ describe("パイプラインの役のモデル", () => {
     }
   });
 
-  it("検証役のモデル_下書きの役と異なる", () => {
-    expect(readAgentStamp(repoRoot, "question-verifier").model).not.toBe(
-      readAgentStamp(repoRoot, "question-drafter").model,
+  it("検証役と判定役のモデル_下書きの役と異なり_判定役はブラッシュアップ役とも異なる", () => {
+    const drafter = readAgentStamp(repoRoot, "question-drafter").model;
+    expect(readAgentStamp(repoRoot, "question-verifier").model).not.toBe(drafter);
+    expect(readAgentStamp(repoRoot, "question-judge").model).not.toBe(drafter);
+    expect(readAgentStamp(repoRoot, "question-judge").model).not.toBe(
+      readAgentStamp(repoRoot, "question-reviser").model,
     );
   });
 

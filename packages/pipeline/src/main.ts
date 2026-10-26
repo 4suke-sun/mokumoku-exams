@@ -11,6 +11,8 @@ import { EXIT, type ExitCode } from "./exit-codes.ts";
 import { runExport } from "./export/export.ts";
 import { runFillTitles } from "./export/titles.ts";
 import { type FactsMode, runFacts } from "./facts/facts.ts";
+import { runJudge } from "./judge/run.ts";
+import { runJudgeEval } from "./judge-eval/run.ts";
 import { type Output, report, reportInternalError } from "./log.ts";
 import { runPlan } from "./plan/run.ts";
 import { runReasons } from "./reasons/run.ts";
@@ -60,6 +62,8 @@ const MODE_FLAGS: Record<string, readonly string[]> = {
   draft: ["--import", "--check", "--review", "--decide", "--revise"],
   verify: ["--import"],
   eval: ["--import"],
+  judge: ["--import"],
+  "judge-eval": ["--import"],
 };
 
 function defaultCollectDeps(config: Config): CollectDeps {
@@ -106,6 +110,10 @@ function helpText(): string {
     "verify <資格コード> --import       検証役の出力を、下書きの宣言と照合して取り込む",
     "eval <資格コード>                   人が承認した下書きから評価用のデータを作り、検証役の評価の依頼を書く",
     "eval <資格コード> --import         検証役の出力を期待する判定と照合し、検出率・誤検出率などのレポートを書く",
+    "judge <資格コード>                  公開している選択式の問題ごとに、判定の基準に照らす判定の依頼を書く",
+    "judge <資格コード> --import        判定役の出力を依頼と照合して取り込み、判定の結果(公開・書き直しで復帰できる・非公開)を書く",
+    "judge-eval <資格コード>             人が承認した下書きから評価用のデータを作り、判定役の評価の依頼を書く",
+    "judge-eval <資格コード> --import   判定役の出力を期待する判定と照合し、検出率・誤検出率などのレポートを書く",
     "reasons <資格コード>                不採用と差し戻しの理由を、理由コード・論点・段階ごとに集計し、下書きの指示の改善に使える形で書く。記録は変えない",
     "status <資格コード>                 段階ごとの状態(依頼待ち・取り込み待ち・通過・保留・不採用の件数、役のモデル)を表示する。読むだけ",
     "score <資格コード>                  公開している選択式の問題を、書き方の点数票(問題ごと・束)で採点する。読むだけ。本文は出さない",
@@ -147,6 +155,8 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
       command?.name === "score" ||
       command?.name === "reasons" ||
       command?.name === "eval" ||
+      command?.name === "judge" ||
+      command?.name === "judge-eval" ||
       command?.name === "export";
     const maxArgs = takesExam ? 2 : 1;
     if (positional.length > maxArgs || command === undefined) {
@@ -178,6 +188,8 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
         score: "使い方: score <資格コード>\n",
         reasons: "使い方: reasons <資格コード>\n",
         eval: "使い方: eval <資格コード> [--import]\n",
+        judge: "使い方: judge <資格コード> [--import]\n",
+        "judge-eval": "使い方: judge-eval <資格コード> [--import]\n",
         draft:
           "使い方: draft <資格コード> [--domain=<分野のコード> | --import | --check | --review | --decide | --revise]\n",
       };
@@ -279,6 +291,25 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
         output,
         today: () => new Date().toISOString().slice(0, 10),
       });
+    }
+    if (command.name === "judge" || command.name === "judge-eval") {
+      const examCode = positional[1];
+      if (examCode === undefined) {
+        report(output, "入力の誤り", "資格コードの指定がない");
+        return EXIT.inputError;
+      }
+      const mode = flags.includes("--import") ? "import" : "request";
+      return command.name === "judge"
+        ? runJudge({ config, rootDir, examCode, mode, dryRun, output })
+        : runJudgeEval({
+            config,
+            rootDir,
+            examCode,
+            mode,
+            dryRun,
+            output,
+            today: () => new Date().toISOString().slice(0, 10),
+          });
     }
     if (command.name === "reasons") {
       const examCode = positional[1];

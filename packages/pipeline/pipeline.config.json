@@ -59,6 +59,18 @@
   "verify": {
     "maxAttempts": 3
   },
+  "judge": {
+    "maxAttempts": 3,
+    "eval": {
+      "seed": 1,
+      "perKind": 3,
+      "targets": {
+        "detectionOverall": 0.9,
+        "detectionPerKind": 0.8,
+        "falsePositiveMax": 0.2
+      }
+    }
+  },
   "plan": {
     "targetMultiplier": 3,
     "difficultyMix": { "easy": 0.3, "medium": 0.5, "hard": 0.2 },

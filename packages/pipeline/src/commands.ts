@@ -12,6 +12,8 @@ export const COMMANDS: readonly CommandSpec[] = [
   { name: "verify", summary: "下書きを検証する" },
   { name: "export", summary: "承認した下書きを data/ に書き出す" },
   { name: "eval", summary: "検証役の見落としと誤検出を測る" },
+  { name: "judge", summary: "公開している問題を、判定の基準に照らして判定する" },
+  { name: "judge-eval", summary: "判定役の見落としと誤検出を測る" },
   { name: "reasons", summary: "不採用と差し戻しの理由を集計する(記録は変えない)" },
   { name: "status", summary: "段階ごとの状態を表示する(読むだけ)" },
   { name: "score", summary: "公開している問題の書き方を、点数票で採点する(読むだけ)" },
