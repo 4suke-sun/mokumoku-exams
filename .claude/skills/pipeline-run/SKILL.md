@@ -75,7 +75,7 @@ description: 作問パイプラインを、収集から検証・人の確認ま�
 1. `npm run pipeline -- judge <資格コード>` で、問題ごとの判定の依頼を書く。同じ入力は出し直されない。件数の上限(`maxItemsPerRun`)で止まったら、取り込みのあとに続きを書く。
 2. 依頼のファイルごとに、別の `question-judge` を起動する(同時は 4 まで。依頼のファイルの場所だけを渡す)。
 3. `npm run pipeline -- judge <資格コード> --import` で取り込む。停止(`output-invalid`、`location-unknown`、`publish-with-findings` など)は、同じ依頼を出し直させる(出し直せる回数は `judge.maxAttempts` まで)。
-4. 判定の結果(`pipeline-work/judge/<コード>/results.json`)と、要約(判定ごとの件数、理由コードごとの問数)を人に見せる。非公開へ移すのは、この手順の外である。
+4. 判定の結果(`pipeline-work/judge/<コード>/results.json`)と、要約(判定ごとの件数、理由コードごとの問数)を人に見せる。非公開へ移すのは、結果を人が読んだあとの `unpublish <資格コード>`(人が指示したときだけ。`data/` を変える)で、この手順の外である。
 
 判定役の指示かモデル、判定の基準を変えたときは、`judge-eval <資格コード>` で評価を流す(人が `/pipeline-run <資格コード> judge-eval` と指示したときだけ。手順は `judge` と同じ形で、取り込みは `judge-eval <資格コード> --import`)。
 レポート(`pipeline-work/judge-eval/<コード>/report.md`)を人に見せ、目標を下回ったときは、変更を取り入れない([判定役の評価](../../../docs/evaluation.md))。

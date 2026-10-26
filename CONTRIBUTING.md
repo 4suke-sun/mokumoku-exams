@@ -36,9 +36,9 @@ npm install   # 依存を入れ、検査フック(.githooks)を有効にしま�
 
 ### 手元の検査(PR の前)
 
-PR を出す前に、`npm run verify` を通します。`verify` の各検査は、CI でもそれぞれ実行されます(`check:*` は CI の `check` ジョブのステップ、ワークスペースごとのテストは `app`・`infra`・`pipeline` のジョブ(`data-schema` のテストは `check` ジョブ)、build は `app` のジョブ。`verify` 自体は CI で動きません)。
+PR を出す前に、`npm run verify` を通します。`verify` の各検査は、CI でもそれぞれ実行されます(`check:*` は CI の `check` ジョブのステップ(build のあとの `check:unpublished-bundle` だけは `app` ジョブのステップ)、ワークスペースごとのテストは `app`・`infra`・`pipeline` のジョブ(`data-schema` のテストは `check` ジョブ)、build は `app` のジョブ。`verify` 自体は CI で動きません)。
 
-- `verify` が順に実行するもの: `lint`、`typecheck`、`check:release-notes`・`check:lessons`・`check:test-titles`・`check:docs`・`check:env`・`check:boundary`・`check:retired-ids`(CI の `check` ジョブが実行するもの。フック用の `check:branch`・`check:commit` と、`check:pr-closes` は含まない)、`validate:data`、関係するテスト、関係するワークスペースの `build`。失敗した段階の名前を示して、終了コード 1 で止まります。段階ごとの時間も表示します。
+- `verify` が順に実行するもの: `lint`、`typecheck`、`check:release-notes`・`check:lessons`・`check:test-titles`・`check:docs`・`check:env`・`check:boundary`・`check:retired-ids`(CI の `check` ジョブが実行するもの。フック用の `check:branch`・`check:commit` と、`check:pr-closes` は含まない)、`validate:data`、関係するテスト、関係するワークスペースの `build`、アプリを選んだときは、build のあとの `check:unpublished-bundle`(非公開の問題がビルド成果物に含まれないこと)。失敗した段階の名前を示して、終了コード 1 で止まります。段階ごとの時間も表示します。
 - 関係するワークスペース(app / infra / pipeline)は、`origin/main` との差分と、未コミット・未追跡の変更から選びます。`origin/main` がないなど、変更が分からないときは、すべて選びます。選び方は、CI の `changes` ジョブと同じです(指定の文字列が CI とずれないことは、テストが確かめます)。契約(`packages/data-schema`)、ルートの設定、`scripts/`、CI の定義が変わったときは、すべて選びます。`scripts/` のテストと `packages/data-schema` のテストは、常に実行します。
 - テストが途中で止まったとき(失敗や、時間の上限による中断)は、止まった 1 件だけを流し直して通っても、後ろのテストの結果は分かりません。ワークスペースごとにすべて流し直して、全件の結果を確かめてから push します。`npm run test:all` で、最初の失敗で止まらずに、すべての結果を 1 回で見られます。ただし、終わらない段階があると、`test:all` もそこで止まります(時間の上限は設けていません)。その段階は、「テストが止まる・遅いとき」の手順で原因を確かめます。
 - `verify` に含まないもの: `npm run test:e2e`(ブラウザを使う通し確認で重い。CI の `e2e` ジョブが通す。画面の動きを変えたときは、手元でも実行する)、`check:pr-closes`(PR の番号が要る。PR の前は `npm run check:pr-closes -- --body-file <下書き>` で下書きを検査する)。
@@ -49,7 +49,7 @@ CI の `changes` ジョブが、変更したパスから、動かすジョブを
 
 | 動かすジョブ | 変更したパス |
 | --- | --- |
-| `app`(ビルド、`build:lambda`、テスト) | `packages/app/`、`data/`(`data/release-notes.json` だけの変更でも動く。アプリがこのファイルを読むため) |
+| `app`(ビルド、`build:lambda`、`check:unpublished-bundle`、テスト) | `packages/app/`、`data/`(`data/release-notes.json` だけの変更でも動く。アプリがこのファイルを読むため) |
 | `e2e` | `packages/app/`、`data/`(`data/release-notes.json` だけの変更では動かない) |
 | `infra` | `packages/infra/` |
 | `pipeline` | `packages/pipeline/`、`docs/`、`.claude/agents/`、`data/exams.json`(pipeline のテストが読むファイル) |
