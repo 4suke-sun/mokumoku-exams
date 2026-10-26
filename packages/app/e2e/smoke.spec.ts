@@ -1,5 +1,5 @@
 import AxeBuilder from "@axe-core/playwright";
-import { type Browser, type BrowserContext, expect, type Page, test } from "@playwright/test";
+import { type Browser, type BrowserContext, expect, type Locator, type Page, test } from "@playwright/test";
 import {
   FAKE_ADMIN_EMAIL,
   FAKE_ADMIN_PHRASE,
@@ -31,6 +31,15 @@ async function stubHistory(page: Page) {
     if (pathname === "/api/history/result") return route.fulfill(json({ result: saved.at(-1) }));
     return route.fulfill(json({}, 503));
   });
+}
+
+// 画面の移動を待つ確認は、押し直しと長めの待ちの形にそろえる。開発サーバーが画面を初めて組み立てるときや、読み込みの直後は、
+// 押しても移らないことがある。1 回の待ちを長めにとり(移動が遅いだけのときに、押し直しを重ねない)、全体の上限の中で押し直す
+async function clickUntilUrl(page: Page, target: Locator, url: RegExp) {
+  await expect(async () => {
+    await target.click();
+    await expect(page).toHaveURL(url, { timeout: 15_000 });
+  }).toPass({ timeout: 60_000 });
 }
 
 // 読み込みが終わる前に押すと、フォームがページごと送信されてしまう。React が受け持つまで待つ
@@ -107,11 +116,11 @@ test("資格の一覧から出題と結果まで_通して進める", async ({ p
   await login(page);
 
   await page.goto("/exams");
-  await page
-    .getByRole("link", { name: /サンプル資格\(動作確認用\)/ })
-    .first()
-    .click();
-  await expect(page).toHaveURL(/\/exams\/EX-SMP-XX$/);
+  await clickUntilUrl(
+    page,
+    page.getByRole("link", { name: /サンプル資格\(動作確認用\)/ }).first(),
+    /\/exams\/EX-SMP-XX$/,
+  );
 
   // 読み込みが終わる前の押下は効かないので、選ばれるまで押し直す
   const normal = page.getByRole("button", { name: "通常出題" });
@@ -119,8 +128,7 @@ test("資格の一覧から出題と結果まで_通して進める", async ({ p
     await normal.click();
     await expect(normal).toHaveAttribute("aria-pressed", "true", { timeout: 2_000 });
   }).toPass();
-  await page.getByRole("button", { name: "出題を始める" }).click();
-  await expect(page).toHaveURL(/\/exams\/EX-SMP-XX\/play/);
+  await clickUntilUrl(page, page.getByRole("button", { name: "出題を始める" }), /\/exams\/EX-SMP-XX\/play/);
 
   await answerAndFinish(page);
 
@@ -144,11 +152,7 @@ test("主要な画面_WCAG 2.1 AA の自動検査で違反がない", async ({ p
   const start = page.getByRole("button", { name: "セクション 1 を解く" });
   await expect(start).toBeVisible();
   await expectAccessible(page, "セクションの一覧");
-  // 開発サーバーが出題の画面を初めて組み立てるときは、移るまで数秒かかる。押し直しを重ねないよう、長めに待つ
-  await expect(async () => {
-    await start.click();
-    await expect(page).toHaveURL(/\/exams\/EX-SMP-XX\/play/, { timeout: 15_000 });
-  }).toPass({ timeout: 60_000 });
+  await clickUntilUrl(page, start, /\/exams\/EX-SMP-XX\/play/);
   await expect(page.getByRole("progressbar", { name: "進み具合" })).toBeVisible();
   await expectAccessible(page, "出題");
 
@@ -164,10 +168,7 @@ test("セクションの進捗_別の端末(保存のない新しいブラウザ
   await login(page);
   await page.goto("/exams/EX-SMP-XX/sections");
   const start = page.getByRole("button", { name: "セクション 1 を解く" });
-  await expect(async () => {
-    await start.click();
-    await expect(page).toHaveURL(/\/exams\/EX-SMP-XX\/play/, { timeout: 3_000 });
-  }).toPass();
+  await clickUntilUrl(page, start, /\/exams\/EX-SMP-XX\/play/);
   // 進捗の保存は、結果の画面へ移るときに、待たずに送られる。保存が終わる前に最初のブラウザを閉じると、送信が切れる
   const saved = page.waitForResponse(
     (response) => response.request().method() === "PUT" && new URL(response.url()).pathname === "/api/history/sections",
@@ -242,10 +243,7 @@ async function switchAccountsInSameBrowser(browser: Browser, switchAccount: (pag
   await login(page);
   await page.goto("/exams/EX-SMP-XX/sections");
   const start = page.getByRole("button", { name: "セクション 1 を解く" });
-  await expect(async () => {
-    await start.click();
-    await expect(page).toHaveURL(/\/exams\/EX-SMP-XX\/play/, { timeout: 3_000 });
-  }).toPass();
+  await clickUntilUrl(page, start, /\/exams\/EX-SMP-XX\/play/);
   await answerAndFinish(page);
   await expect(page).toHaveURL(/\/exams\/EX-SMP-XX\/result/);
   await page.goto("/exams/EX-SMP-XX");
@@ -254,8 +252,7 @@ async function switchAccountsInSameBrowser(browser: Browser, switchAccount: (pag
     await normal.click();
     await expect(normal).toHaveAttribute("aria-pressed", "true", { timeout: 2_000 });
   }).toPass();
-  await page.getByRole("button", { name: "出題を始める" }).click();
-  await expect(page).toHaveURL(/\/exams\/EX-SMP-XX\/play/);
+  await clickUntilUrl(page, page.getByRole("button", { name: "出題を始める" }), /\/exams\/EX-SMP-XX\/play/);
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "前回の続き" })).toBeVisible();
   const keysOfA = await page.evaluate(() => Object.keys(localStorage));
