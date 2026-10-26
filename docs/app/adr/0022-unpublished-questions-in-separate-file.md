@@ -10,13 +10,13 @@
 アプリには、非公開の問題を載せない。画面で隠すのではなく、配信の対象から外す。
 
 アプリは、ビルド時に `data/questions.<資格コード>.json` を読み込む(`loadQuestions` の動的な `import`)。バンドラは、この形の `import` を、`data/` の `questions.*.json` すべてを対象にする読み込みとして扱う。
-問題データの検査(`validate:data`)と、削除した ID の検査(`check:retired-ids`)も、`questions.*.json` の名前を対象にする。
+問題データの検査(`validate:data`)と、削除した ID の検査(`check:retired-ids`)も、公開の問題のファイルとして `questions.*.json` の名前を対象にする(非公開のファイルの扱いは、次の「決定」)。
 
 ## 決定
 
 - 非公開の問題は、`data/unpublished.<資格コードの英小文字>.json` に持つ。ファイル名を `questions.` で始めない。
   - アプリの読み込み(`questions.<コード>.json`)とバンドラの対象に入らない。配信に載らないことが、名前の形で守られる。
-  - 既存の検査(`questions.*.json` を対象にするもの)に、非公開の問題が混ざらない。非公開の問題の検査は、別に足す。
+  - 公開の問題の検査の対象(`questions.*.json`)は変えない。非公開の問題は、`validate:data` と `check:retired-ids` が、非公開のファイルを別に読んで検査する。
 - 1 件の形は、`{ verdict, reasons, question }` とする。`question` は、公開の問題と同じ形で、本文を変えずに持つ。`verdict` は `rewritable`(書き直して戻せる)か `unpublish`(同じ内容では直らない)、`reasons` は非公開にした理由(判定の段階の理由コード)。
   公開に戻すときは、`question` をそのまま公開のファイルへ移す。ID は変わらない。
 - 非公開は、削除 + 退役とは別の状態にする。退役した ID は復帰しない。非公開の ID は復帰できる。
