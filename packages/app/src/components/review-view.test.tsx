@@ -56,6 +56,9 @@ describe("ReviewView", () => {
     expect(screen.getByText("TEST-0001 / 連続正解 1 / 2")).toBeTruthy();
     expect(screen.queryByText("問題文 3")).toBeNull();
     expect(screen.queryByText("ほかの資格")).toBeNull();
+    // 非公開にした問題も、いまのデータにない ID と同じに扱う: ID も、一覧にも「外す」ボタンにも出さない
+    expect(document.body.textContent ?? "").not.toContain("TEST-0099");
+    expect(screen.queryByRole("button", { name: /TEST-0099/ })).toBeNull();
   });
 
   it("復習する_待ちの問題だけで出題を始める", async () => {

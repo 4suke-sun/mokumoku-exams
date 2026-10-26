@@ -14,6 +14,7 @@ import {
   REFERENCES_MAX,
   referenceUrlProblem,
   sourceUrlReason,
+  UnpublishedFileSchema,
 } from "./schema.ts";
 import { validateDataSet, validateHostVendors } from "./validate.ts";
 
@@ -770,5 +771,108 @@ describe("validateDataSet(ファイルをまたぐ検査)", () => {
     const errors = validateDataSet(exams(), files(questionsFile([q])));
     expect(errors.length).toBeGreaterThan(0);
     expect(errors.join("\n")).not.toContain(marker);
+  });
+});
+
+const entry = (
+  n: number,
+  overrides: Record<string, unknown> = {},
+  questionOverrides: Record<string, unknown> = {},
+) => ({
+  verdict: "rewritable",
+  reasons: ["judge:choices-weak"],
+  question: question(n, questionOverrides),
+  ...overrides,
+});
+const unpublishedFile = (entries: unknown[] = [entry(3)]) => ({ examCode: "EX-SMP-XX", entries });
+const unpublished = (data: unknown = unpublishedFile(), name = "unpublished.ex-smp-xx.json") => [{ name, data }];
+
+describe("非公開の問題のスキーマ", () => {
+  it("判定と理由を持つ 1 件_通る", () => {
+    expect(UnpublishedFileSchema.safeParse(unpublishedFile()).success).toBe(true);
+  });
+
+  it("未知の判定・理由がない・理由の形が違う・未知の項目_止める", () => {
+    expect(UnpublishedFileSchema.safeParse(unpublishedFile([entry(3, { verdict: "publish" })])).success).toBe(false);
+    expect(UnpublishedFileSchema.safeParse(unpublishedFile([entry(3, { reasons: [] })])).success).toBe(false);
+    expect(UnpublishedFileSchema.safeParse(unpublishedFile([entry(3, { reasons: ["Bad Reason"] })])).success).toBe(
+      false,
+    );
+    expect(UnpublishedFileSchema.safeParse(unpublishedFile([entry(3, { note: "メモ" })])).success).toBe(false);
+  });
+
+  it("問題がスキーマに合わない_止める。ID の重複と、ファイルの資格コードとの不一致も止める", () => {
+    expect(UnpublishedFileSchema.safeParse(unpublishedFile([entry(3, {}, { correctAnswers: ["Z"] })])).success).toBe(
+      false,
+    );
+    expect(UnpublishedFileSchema.safeParse(unpublishedFile([entry(3), entry(3)])).success).toBe(false);
+    expect(UnpublishedFileSchema.safeParse(unpublishedFile([entry(3, {}, { examCode: "EX-OTH-XX" })])).success).toBe(
+      false,
+    );
+    expect(UnpublishedFileSchema.safeParse({ examCode: "EX-SMP-XX", entries: [] }).success).toBe(false);
+  });
+
+  it("非公開の問題の形_公開の問題の形とそろい_そのまま公開のファイルへ移せる", () => {
+    const moved = QuestionsFileSchema.safeParse(questionsFile([question(1), question(2), question(3)]));
+    expect(moved.success).toBe(true);
+    expect(entry(3).question).toEqual(question(3));
+  });
+});
+
+describe("validateDataSet(非公開の問題)", () => {
+  const run = (unpublishedFiles: { name: string; data: unknown }[], examList: unknown[] = [published()]) =>
+    validateDataSet(exams(examList), files(), undefined, [], unpublishedFiles);
+
+  it("非公開のファイルがない・正しい_エラーはない", () => {
+    expect(run([])).toEqual([]);
+    expect(run(unpublished())).toEqual([]);
+  });
+
+  it("非公開の問題がある_本番モードの出題数は、公開の問題だけで数える", () => {
+    const errors = validateDataSet(
+      exams([published({ officialQuestionCount: 3 })]),
+      files(questionsFile([question(1), question(2)])),
+      undefined,
+      [],
+      unpublished(),
+    );
+    expect(errors.join("\n")).toContain("選択式の問題数が、本番モードの出題数(officialQuestionCount)に足りません");
+  });
+
+  it("公開している問題と ID が重なる・非公開の中で ID が重なる_止める", () => {
+    const overlap = run(unpublished(unpublishedFile([entry(2)])));
+    expect(overlap.join("\n")).toContain("公開している問題と ID が重なっています");
+    const dup = run(unpublished(unpublishedFile([entry(3), entry(3)])));
+    expect(dup.join("\n")).toContain("問題の ID が重複しています");
+  });
+
+  it("退役した ID を、非公開の問題が使っている_止める", () => {
+    const errors = run(unpublished(), [published({ retiredQuestionIds: ["SAMPLE-0003"] })]);
+    expect(errors.join("\n")).toContain("退役した問題 ID を、非公開の問題が使っています");
+  });
+
+  it("分野が資格マスタにない・ID の接頭辞が違う_止める", () => {
+    const badDomain = run(unpublished(unpublishedFile([entry(3, {}, { domain: "domain9" })])));
+    expect(badDomain.join("\n")).toContain("資格マスタにない分野です");
+    const badPrefix = run(unpublished(unpublishedFile([entry(3, {}, { questionId: "OTHER-0003" })])));
+    expect(badPrefix.join("\n")).toContain("ID の接頭辞が、資格マスタの idPrefix と一致しません");
+  });
+
+  it("ファイル名の形が違う・examCode がファイル名と違う・資格マスタにない資格_止める", () => {
+    expect(run(unpublished(unpublishedFile(), "unpublished.EX-SMP-XX.json")).join("\n")).toContain(
+      "ファイル名が unpublished.<コード(英小文字と数字)>.json の形ではありません",
+    );
+    expect(
+      run(unpublished({ examCode: "EX-OTH-XX", entries: [entry(3, {}, { examCode: "EX-OTH-XX" })] })).join("\n"),
+    ).toContain("examCode がファイル名のコードと一致しません");
+    expect(run(unpublished(unpublishedFile(), "unpublished.ex-oth-xx.json")).join("\n")).toContain(
+      "資格マスタにない資格の非公開の問題です",
+    );
+  });
+
+  it("報告_問題の本文を含まず、場所と種類だけを出す", () => {
+    const errors = run(unpublished(unpublishedFile([entry(2)])));
+    expect(errors.join("\n")).not.toContain("設問 2");
+    expect(errors.join("\n")).toContain("unpublished.ex-smp-xx.json: entries[0](SAMPLE-0002).question.questionId");
   });
 });

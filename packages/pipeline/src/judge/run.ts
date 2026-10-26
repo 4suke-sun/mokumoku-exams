@@ -21,7 +21,7 @@ import {
 } from "../shared/request-flow.ts";
 import { checkJudgeOutput } from "./check.ts";
 import { type Criteria, readCriteria } from "./criteria.ts";
-import { contentHash, type JudgeInput, toScoreInput } from "./input.ts";
+import { contentHash, inputFromQuestion, type JudgeInput, toScoreInput } from "./input.ts";
 import { buildJudgeRequest, JudgeRequestSchema, judgeKey } from "./request.ts";
 import {
   JUDGE_VERDICTS,
@@ -90,20 +90,7 @@ function loadInputs(file: string): JudgeInput[] | null {
   const parsed = QuestionsFileSchema.safeParse(JSON.parse(readFileSync(file, "utf8")));
   if (!parsed.success) return null;
   return parsed.data.questions
-    .flatMap((q) =>
-      q.questionType === "free-text"
-        ? []
-        : [
-            {
-              questionId: q.questionId,
-              kind: q.questionType,
-              questionText: q.questionText,
-              choices: q.choices.map((c) => ({ key: c.key, text: c.text })),
-              correctAnswers: [...q.correctAnswers],
-              explanation: q.explanation,
-            },
-          ],
-    )
+    .flatMap((q) => inputFromQuestion(q) ?? [])
     .sort((a, b) => (a.questionId < b.questionId ? -1 : 1));
 }
 

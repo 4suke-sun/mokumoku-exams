@@ -15,6 +15,26 @@ export interface JudgeInput {
   explanation: string;
 }
 
+/** 公開している問題から、判定の入力を作る。自由記述は判定しない(null) */
+export function inputFromQuestion(q: {
+  questionId: string;
+  questionType: string;
+  questionText: string;
+  explanation: string;
+  choices?: readonly { key: string; text: string }[];
+  correctAnswers?: readonly string[];
+}): JudgeInput | null {
+  if (q.questionType !== "single" && q.questionType !== "multiple") return null;
+  return {
+    questionId: q.questionId,
+    kind: q.questionType,
+    questionText: q.questionText,
+    choices: (q.choices ?? []).map((c) => ({ key: c.key, text: c.text })),
+    correctAnswers: [...(q.correctAnswers ?? [])],
+    explanation: q.explanation,
+  };
+}
+
 /** 内容のハッシュ。問題が変わったかを確かめる */
 export function contentHash(input: JudgeInput): string {
   return sha256(
