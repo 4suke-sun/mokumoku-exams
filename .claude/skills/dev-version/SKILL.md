@@ -50,7 +50,7 @@ Issue ごとに、実装 → lint / 型検査 / テスト → `/dev-commit` の�
 
 ## Step 3. 版の締めの準備
 
-1. ルートで、lint・型検査・テスト・ビルド・E2E(画面に触れた版)を通す。
+1. ルートで、lint・型検査・テスト・ビルド・E2E(画面に触れた版)を通す。テストが途中で止まったときは、止まった 1 件だけで済ませず、`npm run test:all` で全件の結果を確かめる(`CONTRIBUTING.md` の「手元の検査(PR の前)」)。
 2. `data/release-notes.json` に、版のエントリを足し(`npm run check:release-notes`)、`/dev-commit` でコミットする。
 3. `/dev-pr` の Step 0〜4 で、PR の下書きを作り、機械検査と検査役を通す(承認の依頼は、次の Step で行う)。
 
