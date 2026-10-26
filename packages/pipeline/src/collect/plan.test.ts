@@ -74,4 +74,27 @@ describe("収集の計画の検査", () => {
     expect(inScope(p, "https://docs.aws.amazon.com/other/a.html")).toBe(false);
     expect(inScope(p, "https://docs.aws.amazon.com/guide/private/a.html")).toBe(false);
   });
+
+  it("範囲の接頭辞と除外の両方に当たる_より細かい接頭辞が範囲にあっても、除外が優先する", () => {
+    const p = plan({
+      scope: {
+        prefixes: ["https://docs.aws.amazon.com/guide/", "https://docs.aws.amazon.com/guide/private/"],
+        maxDepth: 1,
+      },
+    });
+    expect(inScope(p, "https://docs.aws.amazon.com/guide/private/a.html")).toBe(false);
+    expect(inScope(p, "https://docs.aws.amazon.com/guide/public/a.html")).toBe(true);
+  });
+
+  it("範囲の接頭辞が入れ子_計画の誤りにせず、どれかに当たれば範囲の中", () => {
+    const nested = plan({
+      scope: {
+        prefixes: ["https://docs.aws.amazon.com/guide/", "https://docs.aws.amazon.com/guide/sub/"],
+        maxDepth: 1,
+      },
+      exclude: [],
+    });
+    expect(checkPlan(nested, CODE).problems).toEqual([]);
+    expect(inScope(nested, "https://docs.aws.amazon.com/guide/sub/a.html")).toBe(true);
+  });
 });
