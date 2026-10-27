@@ -6,6 +6,7 @@ import { QuestionsFileSchema } from "../contract.ts";
 import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { type Output, report } from "../log.ts";
 import { prepareExam } from "../shared/exam.ts";
+import { hasScopeLists, type ScopeLists, scopeFindings, scopeListsOf } from "../shared/scope.ts";
 import { PASSING, resolveProfile } from "./profiles.ts";
 import {
   batchPasses,
@@ -21,6 +22,7 @@ import { serviceSpread, spreadWarnings } from "./services.ts";
  * score コマンド: 公開している問題データを、書き方の点数票で採点する(docs/exam-style/scorecard.md)。
  * 読むだけで、何も書かない。モデルは呼ばない。重さは「警告」で、不合格でも終了コードは 0 にする(入力の誤りと、台帳が読めないときを除く)。
  * 出力は、問題の ID・項目の ID・点数・割合・字数・件数と、試験ガイドの対象サービスの名前だけで、設問文や選択肢の本文は出さない。
+ * 範囲の検査(対象外サービス、一覧にない名前)は、問題の ID と件数だけを出す。
  */
 
 export interface ScoreOptions {
@@ -113,6 +115,29 @@ export function runScore({ config, rootDir, examCode, output }: ScoreOptions): E
   return reportServices({ config, rootDir, examCode, output }, inputs) ? EXIT.ok : EXIT.checkFailed;
 }
 
+/** 範囲の検査で、問題の ID を挙げる件数の上限 */
+const SCOPE_IDS = 20;
+
+/**
+ * 範囲の検査(ADR 0024)の結果を報告する(点数には入れない。終了コードも変えない)。判定の候補として、人が見る。
+ * 出すのは、問題の ID と件数だけ(サービスの名前も、本文も出さない)。一覧がなければ、何も出さない。
+ */
+function reportScope(output: Output, inputs: readonly ScoreInput[], lists: ScopeLists): void {
+  if (!hasScopeLists(lists)) return;
+  const found = inputs.map((q) => ({ id: q.id, f: scopeFindings(q, lists) }));
+  const ids = (pick: (f: ReturnType<typeof scopeFindings>) => boolean) => {
+    const hit = found.filter((x) => pick(x.f)).map((x) => x.id);
+    const shown = hit.slice(0, SCOPE_IDS).join(", ");
+    return `${hit.length} 問${hit.length === 0 ? "" : `(${shown}${hit.length > SCOPE_IDS ? ", ..." : ""})`}`;
+  };
+  report(
+    output,
+    "点数票",
+    `範囲の検査: 対象外のサービスが設問文・正答に出る ${ids((f) => f.outOfScopeSubject)}、誤答だけに出る ${ids((f) => f.outOfScopeDistractor)}、` +
+      `一覧にないサービスらしい名前が出る ${lists.inScope.length === 0 ? "(対象サービスの一覧がないので測らない)" : ids((f) => f.unlisted !== null)}`,
+  );
+}
+
 /** サービスの多い順に挙げる件数 */
 const TOP_SERVICES = 5;
 
@@ -122,14 +147,16 @@ const TOP_SERVICES = 5;
  * 台帳が読めなければ false(誤りは報告済み)
  */
 function reportServices({ config, rootDir, examCode, output }: ScoreOptions, inputs: readonly ScoreInput[]): boolean {
-  let services: string[];
+  let lists: ScopeLists;
   try {
-    services = readLedger(ledgerPath(resolve(rootDir, config.ledgerDir), examCode), examCode).guide?.services ?? [];
+    lists = scopeListsOf(readLedger(ledgerPath(resolve(rootDir, config.ledgerDir), examCode), examCode).guide);
   } catch (error) {
     if (!(error instanceof LedgerError)) throw error;
     for (const p of error.paths) report(output, "台帳の誤り", p);
     return false;
   }
+  reportScope(output, inputs, lists);
+  const services = [...lists.inScope];
   if (services.length === 0) {
     report(output, "点数票", "束のサービス: 試験ガイドの対象サービスの一覧がないので測らない");
     return true;

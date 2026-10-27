@@ -138,3 +138,79 @@ describe("score コマンドの束のサービスの分布", () => {
     expect(r.out).toContain("束のサービス: 試験ガイドの対象サービスの一覧がないので測らない");
   });
 });
+
+describe("score コマンドの範囲の検査", () => {
+  const CODE = "AWS-AIB-C01";
+  const baseConfig = JSON.parse(readFileSync(configPath, "utf8"));
+
+  /** 20 問: 設問文に対象外、誤答だけに対象外、一覧にない名前が 1 問ずつ。残りは何も出ない */
+  function setup(guide: { services?: string[]; excludedServices?: string[] } | null) {
+    const root = mkdtempSync(join(tmpdir(), "pipeline-score-scope-"));
+    mkdirSync(join(root, "data"));
+    cpSync(join(repoRoot, "data/exams.json"), join(root, "data/exams.json"));
+    const make = (n: number, stem: string, a: string) => ({
+      questionId: `AIB-${String(n).padStart(4, "0")}`,
+      examCode: CODE,
+      domain: "domain1",
+      questionType: "single",
+      difficulty: "medium",
+      questionText: stem,
+      choices: [
+        { key: "A", text: a },
+        { key: "B", text: "選択肢 B" },
+      ],
+      correctAnswers: ["B"],
+      explanation: "架空の解説",
+    });
+    const questions = [
+      make(1, "Amazon Kinesis を使う架空の設問", "選択肢 A"),
+      make(2, "架空の設問", "Amazon Kinesis"),
+      make(3, "AWS Glue を使う架空の設問", "選択肢 A"),
+      // 束の採点は 20 問から。残りは何も出ない問題
+      ...Array.from({ length: 17 }, (_, i) => make(i + 4, `AWS Lambda を使う架空の設問 ${i}`, "選択肢 A")),
+    ];
+    writeFileSync(join(root, "data/questions.aws-aib-c01.json"), JSON.stringify({ examCode: CODE, questions }));
+    writeFileSync(join(root, "pipeline.config.json"), JSON.stringify(baseConfig));
+    writeLedger(ledgerPath(join(root, baseConfig.ledgerDir), CODE), {
+      ...emptyLedger(CODE),
+      guide:
+        guide === null
+          ? null
+          : {
+              sourceUrl: DOC_URL,
+              contentHash: DOC_HASH,
+              pages: [],
+              importedAt: "2026-10-25",
+              ...guide,
+              domains: [{ code: "domain1", name: "a", weight: 1, scope: [] }],
+            },
+    });
+    return root;
+  }
+  const runIn = (root: string) => run(["score", CODE], root, join(root, "pipeline.config.json"));
+
+  it("一覧がある_該当する問題の ID と件数だけを出し(名前と本文は出さない)_終了コードは 0", async () => {
+    const r = await runIn(setup({ services: ["AWS Lambda"], excludedServices: ["Amazon Kinesis"] }));
+    expect(r.code, r.err).toBe(EXIT.ok);
+    expect(r.out).toContain(
+      "範囲の検査: 対象外のサービスが設問文・正答に出る 1 問(AIB-0001)、誤答だけに出る 1 問(AIB-0002)、一覧にないサービスらしい名前が出る 1 問(AIB-0003)",
+    );
+    expect(r.out).not.toContain("Kinesis");
+    expect(r.out).not.toContain("Glue");
+  });
+
+  it("対象サービスの一覧がなく対象外の一覧だけがある_対象外の検査だけをする", async () => {
+    const r = await runIn(setup({ excludedServices: ["Amazon Kinesis"] }));
+    expect(r.code, r.err).toBe(EXIT.ok);
+    expect(r.out).toContain(
+      "設問文・正答に出る 1 問(AIB-0001)、誤答だけに出る 1 問(AIB-0002)、一覧にないサービスらしい名前が出る (対象サービスの一覧がないので測らない)",
+    );
+    expect(r.out).toContain("束のサービス: 試験ガイドの対象サービスの一覧がないので測らない");
+  });
+
+  it("一覧がない_範囲の検査を出さない", async () => {
+    const r = await runIn(setup(null));
+    expect(r.code, r.err).toBe(EXIT.ok);
+    expect(r.out).not.toContain("範囲の検査");
+  });
+});

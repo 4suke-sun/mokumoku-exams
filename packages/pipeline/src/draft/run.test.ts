@@ -825,6 +825,79 @@ describe("draft の誤答の検査", () => {
   });
 });
 
+describe("draft の範囲の検査", () => {
+  /** 試験ガイドの一覧を台帳に持つ資格で、取り込みの依頼まで進める。lists がなければ一覧を持たない */
+  async function setup(lists?: { services?: string[]; excludedServices?: string[] }) {
+    const root = setupDraftRoot();
+    if (lists !== undefined) {
+      const path = ledgerPath(join(root, baseConfig.ledgerDir), EXAM);
+      writeLedger(path, {
+        ...readLedger(path, EXAM),
+        guide: {
+          sourceUrl: DOC_URL,
+          contentHash: DOC_HASH,
+          pages: [],
+          importedAt: "2026-10-25",
+          ...lists,
+          domains: [{ code: "domain1", name: "a", weight: 1, scope: [] }],
+        },
+      });
+    }
+    await prepare(root);
+    const request = readChoiceRequests(root)[0] as ReturnType<typeof readRequests>[number];
+    return { root, request };
+  }
+  const LISTS = { services: ["Widget Store"], excludedServices: ["Amazon Kinesis"] };
+  const withChoice = (key: string, text: string) =>
+    choiceDraft().choices.map((c) => (c.key === key ? { ...c, text } : c));
+
+  it("対象外のサービスが設問文に出る下書き_不採用になり_理由コードで報告される", async () => {
+    const { root, request } = await setup(LISTS);
+    const base = draftFor(request);
+    writeOutput(root, request, [{ ...base, questionText: `Amazon Kinesis と ${base.questionText}` }]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.out).toContain("scope:out-of-scope-subject");
+    const record = readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0];
+    expect(record?.status).toBe("rejected");
+    expect(record?.reasons).toContain("scope:out-of-scope-subject");
+    expect(record?.draft).toBeNull();
+  });
+
+  it("対象外のサービスが正答の選択肢に出る下書き_不採用になる", async () => {
+    const { root, request } = await setup(LISTS);
+    writeOutput(root, request, [draftFor(request, { choices: withChoice("B", "Amazon Kinesis") })]);
+    await runMain(root, ["draft", EXAM, "--import"]);
+    expect(readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0]?.reasons).toContain("scope:out-of-scope-subject");
+  });
+
+  it("対象外のサービスが誤答の選択肢だけに出る下書き_通過し_警告として報告される(名前は出さない)", async () => {
+    const { root, request } = await setup(LISTS);
+    writeOutput(root, request, [draftFor(request, { choices: withChoice("A", "Amazon Kinesis") })]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.out).toContain("scope-out-of-scope-distractor choices");
+    expect(r.out).not.toContain("Kinesis");
+    const record = readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0];
+    expect(record?.status).toBe("passed");
+    expect(record?.warnings).toContainEqual({ rule: "scope-out-of-scope-distractor", path: "choices" });
+  });
+
+  it("一覧にないサービスらしい名前が出る下書き_通過し_警告として報告される", async () => {
+    const { root, request } = await setup(LISTS);
+    writeOutput(root, request, [draftFor(request, { choices: withChoice("A", "AWS Glue") })]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.out).toContain("scope-unlisted-service");
+    expect(readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0]?.status).toBe("passed");
+  });
+
+  it("試験ガイドの一覧がない_範囲の検査をしない", async () => {
+    const { root, request } = await setup();
+    writeOutput(root, request, [draftFor(request, { choices: withChoice("B", "Amazon Kinesis") })]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.out).not.toContain("scope");
+    expect(readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0]?.status).toBe("passed");
+  });
+});
+
 describe("draft の重複の検出", () => {
   function published(stems: string[]) {
     const q = (n: number, stem: string, type: "single" | "multiple") => ({

@@ -38,6 +38,7 @@ import {
   listRequestFiles,
   reportStop,
 } from "../shared/request-flow.ts";
+import { scopeFindings, scopeListsOf } from "../shared/scope.ts";
 import { copyCheck } from "./copy.ts";
 import { candidateOf, findDuplicates, maxSimilarity, readPublishedCandidates, readPublishedChoices } from "./dedupe.ts";
 import { checkDistractors } from "./distractors.ts";
@@ -917,6 +918,18 @@ function importStep(
           })
         : { blockers: [], warnings: [], ambiguous: [] };
       for (const f of distractors.blockers) reasons.push(`distractor:${f.code}`);
+      // 範囲の検査(ADR 0024): 対象外のサービスが主題・正答なら不採用。誤答だけ、一覧にない名前は警告
+      const scope = isChoiceDraft(draft)
+        ? scopeFindings(
+            {
+              stem: draft.questionText,
+              choices: draft.choices.map((c) => c.text),
+              correct: draft.correctAnswers.map((a) => draft.choices.findIndex((c) => c.key === a)),
+            },
+            scopeListsOf(ledger.guide),
+          )
+        : { outOfScopeSubject: false, outOfScopeDistractor: false, unlisted: null };
+      if (scope.outOfScopeSubject) reasons.push("scope:out-of-scope-subject");
       if (reasons.length === 0) {
         const urls = uniqueSorted(
           draft.factIds.flatMap((fid) => facts.cards.find((c) => c.id === fid)?.sources.map((s) => s.url) ?? []),
@@ -981,6 +994,8 @@ function importStep(
         ...verdict.warnings.map((f) => ({ rule: f.rule, path: f.path })),
         ...distractors.warnings.map((f) => ({ rule: f.code, path: f.path })),
         ...scorecardWarnings(draft, examCode),
+        ...(scope.outOfScopeDistractor ? [{ rule: "scope-out-of-scope-distractor", path: "choices" }] : []),
+        ...(scope.unlisted !== null ? [{ rule: "scope-unlisted-service", path: scope.unlisted }] : []),
       ];
       for (const w of warnings) report(output, "下書きの警告", `${id} ${w.rule} ${w.path}`);
       // 正答が複数になりうる候補は、モデルによる検査(検証の段階)で確かめるまで、先へ進めない
