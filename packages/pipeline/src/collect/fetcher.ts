@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import type { Config } from "../config.ts";
 import { sourceUrlReason } from "../contract.ts";
+import { contentHashOf } from "./content-hash.ts";
 import { isAllowed, type RobotsRules, rulesFor } from "./robots.ts";
 
 /**
@@ -24,7 +25,7 @@ export type FetchResult =
       /** リダイレクトのあとの URL */
       finalUrl: string;
       body: Buffer;
-      /** 本文の sha256(16 進) */
+      /** 本文のハッシュ(16 進。content-hash.ts。HTML は見える本文、それ以外は生のバイト列の sha256) */
       hash: string;
       contentType: string | null;
       /** Last-Modified ヘッダー(更新日の手がかり) */
@@ -219,7 +220,7 @@ export class Fetcher {
         ok: true,
         finalUrl: url.toString(),
         body: r.body,
-        hash: sha256(r.body),
+        hash: contentHashOf(r.body),
         contentType: r.headers.get("content-type"),
         lastModified: r.headers.get("last-modified"),
       };

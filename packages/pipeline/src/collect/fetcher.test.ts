@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { Fetcher, sha256 } from "./fetcher.ts";
+import { contentHashOf } from "./content-hash.ts";
+import { Fetcher } from "./fetcher.ts";
 import { fakeNet, fixture, ROBOTS_OK, testFetchConfig } from "./test-helpers.ts";
 
 const DOCS = "https://docs.aws.amazon.com";
@@ -15,7 +16,7 @@ describe("取得器", () => {
     const r = await new Fetcher(testFetchConfig, net.deps).get(`${DOCS}/guide/a.html`);
     expect(r.ok).toBe(true);
     if (!r.ok) return;
-    expect(r.hash).toBe(sha256(Buffer.from(body)));
+    expect(r.hash).toBe(contentHashOf(Buffer.from(body)));
     expect(r.lastModified).toContain("2026");
     expect(net.userAgents.every((ua) => ua === testFetchConfig.userAgent)).toBe(true);
   });

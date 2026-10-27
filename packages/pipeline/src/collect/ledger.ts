@@ -83,7 +83,7 @@ export const SourceEntrySchema = z.strictObject({
   title: ReferenceTitle.optional(),
   /** 最後に取得を試みた日。まだ一度も取得していなければ null */
   fetchedAt: ISO_DATE.nullable(),
-  /** 最後に取得できた本文のハッシュ(sha256)。取得できていなければ null */
+  /** 最後に取得できた本文のハッシュ(HTML は見える本文、それ以外は生のバイト列の sha256。ADR 0025)。取得できていなければ null */
   contentHash: SHA256.nullable(),
   /** 出典が示す更新日。取れなければ null */
   updatedAt: ISO_DATE.nullable(),

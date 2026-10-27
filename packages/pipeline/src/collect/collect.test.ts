@@ -8,7 +8,8 @@ import { factsPath, writeFacts } from "../facts/schema.ts";
 import { main } from "../main.ts";
 import { readAgentStamp } from "../shared/agents.ts";
 import { installAgentDefinitions } from "../shared/test-helpers.ts";
-import { Fetcher, sha256 } from "./fetcher.ts";
+import { contentHashOf } from "./content-hash.ts";
+import { Fetcher } from "./fetcher.ts";
 import { emptyLedger, readLedger, serializeLedger } from "./ledger.ts";
 import { entry, type FakeResponse, fakeNet, fixture, ROBOTS_OK, testFetchConfig } from "./test-helpers.ts";
 
@@ -90,7 +91,7 @@ describe("collect", () => {
     expect(ledger.sources.find((s) => s.url === GUIDE)?.updatedAt).toBe("2026-06-01");
     // 本文はキャッシュにだけあり、台帳と報告にはない
     const cacheDir = join(root, config.workDir, "cache");
-    expect(readdirSync(cacheDir)).toContain(`${sha256(Buffer.from(fixture("guide.html")))}.body`);
+    expect(readdirSync(cacheDir)).toContain(`${contentHashOf(Buffer.from(fixture("guide.html")))}.body`);
     const ledgerText = readFileSync(join(root, config.ledgerDir, "aws-aib-c01.json"), "utf8");
     const reportText = readFileSync(join(root, config.workDir, "collect/aws-aib-c01/report.json"), "utf8");
     for (const text of [ledgerText, reportText, r.out, r.err]) {
@@ -175,6 +176,35 @@ describe("collect", () => {
     expect(r.ledger().sources[0]?.claims).toHaveLength(1);
   });
 
+  it("飾りだけが変わった出典の取り直し_ハッシュが変わらず、再検証の印も変化の報告も付かない", async () => {
+    const root = setupRoot({ ...plan, scope: { prefixes: [BASE], maxDepth: 0 } });
+    const first = await run(root, ["collect", CODE]);
+    const hash = first.ledger().sources[0]?.contentHash;
+    expect(hash).toBe(contentHashOf(Buffer.from(fixture("guide.html"))));
+    const ledgerFile = join(root, config.ledgerDir, "aws-aib-c01.json");
+    const withClaim = first.ledger();
+    writeFileSync(
+      ledgerFile,
+      serializeLedger({
+        ...withClaim,
+        sources: withClaim.sources.map((s) => ({
+          ...s,
+          claims: [{ id: "c1", paraphrase: "言い換え", quotes: [], factRefs: ["f1"] }],
+        })),
+      }),
+    );
+    // head のタイトルと更新日のメタ、本文の外のコメントだけが変わる
+    const decorated = fixture("guide.html")
+      .replace("Synthetic exam guide</title>", "Synthetic exam guide (updated)</title>")
+      .replace('content="2026-06-01"', 'content="2026-10-14"')
+      .replace("</body>", "<!-- generated 2026-10-14 --></body>");
+    expect(decorated).not.toBe(fixture("guide.html"));
+    const second = await run(root, ["collect", CODE], { ...routes, [GUIDE]: { body: decorated } }, {}, "2026-10-14");
+    expect(second.ledger().sources[0]?.contentHash).toBe(hash);
+    expect(second.ledger().recheck).toEqual({ facts: [], questions: [] });
+    expect(second.out + second.err).not.toContain("出典の変化");
+  });
+
   it("本文が変わった出典_来歴をたどって根拠にした下書きの件数を報告し_下書きには印を持たせない", async () => {
     const root = setupRoot({ ...plan, scope: { prefixes: [BASE], maxDepth: 0 } });
     const before = {
@@ -214,7 +244,7 @@ describe("collect", () => {
     const before = await run(root, ["collect", CODE], routes, strict);
     expect(before.ledger().sources[0]?.status).not.toBe("active");
     expect(before.err).toContain(`出典の検査: ${GUIDE} freshness fail stale`);
-    const hash = sha256(Buffer.from(fixture("guide.html")));
+    const hash = contentHashOf(Buffer.from(fixture("guide.html")));
     writeDecisions(decisionsPath(join(root, config.decisionsDir), CODE), {
       examCode: CODE,
       decisions: [{ target: "source", url: GUIDE, contentHash: hash, decision: "accept", reason: "stale-but-correct" }],
@@ -223,7 +253,10 @@ describe("collect", () => {
     expect(accepted.ledger().sources[0]?.status).toBe("active");
     // 検査の記録は不合格のまま残る(受け入れたことは、判断の記録が持つ)
     expect(accepted.ledger().sources[0]?.checks.find((c) => c.name === "freshness")?.result).toBe("fail");
-    const changed = { ...routes, [GUIDE]: { body: fixture("guide.html").replace("Synthetic", "Changed") } };
+    const changed = {
+      ...routes,
+      [GUIDE]: { body: fixture("guide.html").replace("Alpha topics", "Alpha topics changed") },
+    };
     const after = await run(root, ["collect", CODE], changed, strict, "2026-10-15");
     expect(after.ledger().sources[0]?.status).not.toBe("active");
     expect(after.err).toContain(`判断の対象なし: source ${GUIDE}`);
@@ -298,7 +331,7 @@ describe("collect --import-guide", () => {
   }
 
   function writeExtract(root: string, domains: unknown, extra: Record<string, unknown> = {}) {
-    const hash = sha256(Buffer.from(fixture("guide.html")));
+    const hash = contentHashOf(Buffer.from(fixture("guide.html")));
     writeFileSync(
       join(root, config.workDir, "guide/aws-aib-c01.extract.json"),
       JSON.stringify({ examCode: CODE, sourceUrl: GUIDE, contentHash: hash, domains, ...extra }),
@@ -375,11 +408,11 @@ describe("collect --import-guide", () => {
     expect(first.net.requests).toContain(ONE);
     const requestPath = join(root, config.workDir, "guide/aws-aib-c01.request.json");
     const request = JSON.parse(readFileSync(requestPath, "utf8"));
-    const pageHash = sha256(Buffer.from(fixture("doc.html")));
+    const pageHash = contentHashOf(Buffer.from(fixture("doc.html")));
     expect(request.pages).toEqual([
       { url: ONE, contentHash: pageHash, bodyPath: `pipeline-work/cache/${pageHash}.body` },
     ]);
-    const hash = sha256(Buffer.from(fixture("guide.html")));
+    const hash = contentHashOf(Buffer.from(fixture("guide.html")));
     writeFileSync(
       join(root, config.workDir, "guide/aws-aib-c01.extract.json"),
       JSON.stringify({

@@ -16,6 +16,7 @@ import { runJudgeEval } from "./judge-eval/run.ts";
 import { type Output, report, reportInternalError } from "./log.ts";
 import { runPlan } from "./plan/run.ts";
 import { runReasons } from "./reasons/run.ts";
+import { runRehash } from "./rehash/run.ts";
 import { runRestore } from "./restore/run.ts";
 import { runScore } from "./scorecard/run.ts";
 import { runStatus } from "./status/run.ts";
@@ -56,6 +57,7 @@ export const KNOWN_FLAGS = [
   "--decide",
   "--revise",
   "--rewrite",
+  "--refetch",
 ];
 /** コマンドごとに、受け付ける動作のオプション(同時には 1 つだけ) */
 const MODE_FLAGS: Record<string, readonly string[]> = {
@@ -67,6 +69,7 @@ const MODE_FLAGS: Record<string, readonly string[]> = {
   eval: ["--import"],
   judge: ["--import"],
   "judge-eval": ["--import"],
+  rehash: ["--refetch"],
 };
 
 function defaultCollectDeps(config: Config): CollectDeps {
@@ -123,6 +126,8 @@ function helpText(): string {
     "reasons <資格コード>                不採用と差し戻しの理由を、理由コード・論点・段階ごとに集計し、下書きの指示の改善に使える形で書く。記録は変えない",
     "status <資格コード>                 段階ごとの状態(依頼待ち・取り込み待ち・通過・保留・不採用の件数、役のモデル)を表示する。読むだけ",
     "score <資格コード>                  公開している選択式の問題を、書き方の点数票(問題ごと・束)で採点する。読むだけ。本文は出さない",
+    "rehash <資格コード>                 出典の本文のハッシュを、キャッシュの本文から新しい定義へ移し、台帳・事実カード・来歴・判断の記録を書き換える。再検証の印は付けない",
+    "rehash <資格コード> --refetch       本文がキャッシュにない現在の出典を、取り直して、新しい定義のハッシュを採用する",
     "export <資格コード>                 承認し、検証を通った下書きを、data/ の問題データに書き出す",
     "",
     "終了コード: 0 成功 / 1 検査の失敗 / 2 入力の誤り / 3 内部の誤り",
@@ -159,6 +164,7 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
       command?.name === "verify" ||
       command?.name === "status" ||
       command?.name === "score" ||
+      command?.name === "rehash" ||
       command?.name === "reasons" ||
       command?.name === "eval" ||
       command?.name === "judge" ||
@@ -194,6 +200,7 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
         verify: "使い方: verify <資格コード> [--import]\n",
         status: "使い方: status <資格コード>\n",
         score: "使い方: score <資格コード>\n",
+        rehash: "使い方: rehash <資格コード> [--refetch]\n",
         reasons: "使い方: reasons <資格コード>\n",
         eval: "使い方: eval <資格コード> [--import]\n",
         judge: "使い方: judge <資格コード> [--import]\n",
@@ -320,6 +327,22 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
             output,
             today: () => new Date().toISOString().slice(0, 10),
           });
+    }
+    if (command.name === "rehash") {
+      const examCode = positional[1];
+      if (examCode === undefined) {
+        report(output, "入力の誤り", "資格コードの指定がない");
+        return EXIT.inputError;
+      }
+      return await runRehash({
+        config,
+        rootDir,
+        examCode,
+        refetch: flags.includes("--refetch"),
+        dryRun,
+        output,
+        deps: collectDeps ?? defaultCollectDeps(config),
+      });
     }
     if (command.name === "unpublish") {
       const examCode = positional[1];

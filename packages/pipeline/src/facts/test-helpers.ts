@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { sha256 } from "../collect/fetcher.ts";
+import { contentHashOf } from "../collect/content-hash.ts";
 import type { FactCard } from "./schema.ts";
 
 export function factsFixture(name: string): string {
@@ -10,7 +10,7 @@ export function factsFixture(name: string): string {
 export const DOC_URL = "https://docs.aws.amazon.com/guide/service.html";
 /** card() の根拠が、本文の中で照合される引用(台帳には残さない。照合のときだけ渡す) */
 export const DOC_QUOTE = "up to 100 buckets per account";
-export const DOC_HASH = sha256(Buffer.from(factsFixture("service-doc.html")));
+export const DOC_HASH = contentHashOf(Buffer.from(factsFixture("service-doc.html")));
 
 /** 事実カード(テスト用の既定値。fixture の本文に合う、通る内容) */
 export function card(overrides: Partial<FactCard> = {}): FactCard {
