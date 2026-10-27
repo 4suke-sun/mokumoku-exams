@@ -49,7 +49,7 @@ export const ServiceName = z
   .max(80)
   .regex(/^[A-Za-z0-9][A-Za-z0-9 .&()/+'-]*$/);
 
-/** 対象サービスの一覧の件数の上限 */
+/** 対象サービス・対象外サービスの、それぞれの一覧の件数の上限 */
 export const MAX_SERVICES = 300;
 
 const ClaimSchema = z.strictObject({
@@ -126,6 +126,8 @@ export const GuideRecordSchema = z.strictObject({
   agent: AgentStampSchema.optional(),
   /** 試験ガイドの対象サービスの一覧(サービスの名前だけ)。ガイドが示さないとき、古い記録にはない */
   services: z.array(ServiceName).max(MAX_SERVICES).optional(),
+  /** 試験ガイドが対象外と示すサービスの一覧(サービスの名前だけ)。ガイドが示さないとき、古い記録にはない */
+  excludedServices: z.array(ServiceName).max(MAX_SERVICES).optional(),
   domains: z.array(GuideDomainSchema).min(1).max(20),
 });
 
