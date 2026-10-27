@@ -134,6 +134,15 @@ describe("抜き取りの計画", () => {
     expect(plan.fact.notReviewed).toEqual([]);
   });
 
+  it("非公開の問題の書き直しの下書き_抜き取りでも必ず確認する(率 0 でも、確認しないものに入れない)", () => {
+    const drafts = [...many(9), passed(10, { rewriteOf: "AIB-0001" })];
+    const plan = computeSampling(input(drafts, { settings: { ...settings, rate: 0 } }));
+    expect(plan.mode).toBe("sample");
+    expect(plan.draft.reviewed).toContain(id(10));
+    expect(plan.draft.notReviewed).not.toContain(id(10));
+    expect(plan.draft.reviewed.length + plan.draft.notReviewed.length).toBe(10);
+  });
+
   it("切り替えの条件_評価のレポートがない・目標を満たさない・検証役の定義が変わった_全件の確認のままで、理由を持つ", () => {
     const run = (overrides: Partial<SamplingInput>) => computeSampling(input(many(10), overrides));
     expect(run({ evalSummary: null })).toMatchObject({ mode: "full", fallback: "eval-missing" });

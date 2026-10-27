@@ -1,7 +1,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { z } from "zod";
-import { EXAM_CODE } from "../contract.ts";
+import { EXAM_CODE, QUESTION_ID } from "../contract.ts";
 import { DIFFICULTIES } from "../plan/schema.ts";
 import { AgentStampSchema } from "../shared/agents.ts";
 import { PathsError } from "../shared/errors.ts";
@@ -40,6 +40,11 @@ export const DraftRecordSchema = z.strictObject({
   verification: VerificationSchema.optional(),
   /** 直した下書き(ブラッシュアップ役の出力)のとき、直す前の下書きの ID */
   revisionOf: DRAFT_ID.optional(),
+  /**
+   * 非公開の問題を書き直した下書きのとき、その問題の ID(ID を引き継ぐ。ADR 0023)。直した下書き(revisionOf)とは別の関係で、
+   * 書き出し(export)では採番せず、公開への復帰(restore)で、この ID のまま非公開のファイルから公開のファイルへ移す
+   */
+  rewriteOf: z.string().regex(QUESTION_ID).optional(),
   /**
    * 本文を持たなくなった下書き(人の却下、直したことによる置き換え)の、根拠にした事実カードの ID。
    * 補充の依頼で、同じカードを使われていない扱いに戻さないため(ID だけで、本文は持たない)

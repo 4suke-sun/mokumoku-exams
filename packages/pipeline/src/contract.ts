@@ -28,6 +28,7 @@ export {
   type SourceUrlReason,
   sourceUrlReason,
   UNPUBLISH_VERDICTS,
+  type UnpublishedFile,
   UnpublishedFileSchema,
 } from "@mokumoku-exams/data-schema/exam-data/schema";
 export { validateDataSet } from "@mokumoku-exams/data-schema/exam-data/validate";

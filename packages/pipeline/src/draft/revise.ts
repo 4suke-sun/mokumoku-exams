@@ -63,9 +63,10 @@ export function evidenceLocations(factIds: readonly string[], facts: FactsFile):
  * 直しの依頼に載せる事実カード。元の下書きの根拠のカードを先に(使えるものだけ)、続けて周辺のカードを、
  * 元の根拠と同じ出典のもの、同じ出題範囲の項目のもの、それ以外の順に、それぞれ根拠にされた回数の少ないもの、ID の順に並べ、max 件まで取る。
  * candidates は、同じ分野の使える(通過した、再検証の印がない、出典が使える)カード。
+ * 書き直しの依頼(非公開の問題)も、元の根拠の事実カードの ID を渡して、同じ選び方にする。
  */
 export function reviseFacts(
-  original: RevisableRecord,
+  original: { draft: { factIds: readonly string[] } },
   candidates: readonly FactCard[],
   usage: ReadonlyMap<string, number>,
   max: number,

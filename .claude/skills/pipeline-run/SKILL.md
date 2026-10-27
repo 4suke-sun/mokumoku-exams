@@ -50,6 +50,7 @@ description: 作問パイプラインを、収集から検証・人の確認ま�
 | 検証(再導出) | `verify <資格コード>` | `question-verifier` | `verify <資格コード> --import` |
 | 検証(解説の確認) | `verify <資格コード>`(もう一度) | `question-verifier` | `verify <資格コード> --import` |
 | 直し(任意) | `draft <資格コード> --revise` | `question-reviser` | `draft <資格コード> --import`、続けて `draft <資格コード> --check`。直した下書きは、検証からやり直す |
+| 書き直し(任意。非公開の問題) | `draft <資格コード> --rewrite` | `question-reviser` | `draft <資格コード> --import`、続けて `draft <資格コード> --check`。書き直した下書きは、検証からやり直し、人の確認と判定のあと `restore <資格コード>` で戻す(`docs/question-production.md` の 7.7) |
 
 1. 依頼を書く CLI を呼び、報告された依頼のファイル(`...の依頼: <パス>`)を集める。依頼が 0 件なら、その段階は済み(または前の段階を待っている)。
 2. **依頼ごとに別のエージェントを起動する。** 各エージェントには、**依頼のファイルの場所だけ**を渡す(本文や指示を足さない)。同時に起動する数は、4 までにする。
@@ -75,7 +76,7 @@ description: 作問パイプラインを、収集から検証・人の確認ま�
 1. `npm run pipeline -- judge <資格コード>` で、問題ごとの判定の依頼を書く。同じ入力は出し直されない。件数の上限(`maxItemsPerRun`)で止まったら、取り込みのあとに続きを書く。
 2. 依頼のファイルごとに、別の `question-judge` を起動する(同時は 4 まで。依頼のファイルの場所だけを渡す)。
 3. `npm run pipeline -- judge <資格コード> --import` で取り込む。停止(`output-invalid`、`location-unknown`、`publish-with-findings` など)は、同じ依頼を出し直させる(出し直せる回数は `judge.maxAttempts` まで)。
-4. 判定の結果(`pipeline-work/judge/<コード>/results.json`)と、要約(判定ごとの件数、理由コードごとの問数)を人に見せる。非公開へ移すのは、結果を人が読んだあとの `unpublish <資格コード>`(人が指示したときだけ。`data/` を変える)で、この手順の外である。
+4. 判定の結果(`pipeline-work/judge/<コード>/results.json`)と、要約(判定ごとの件数、理由コードごとの問数)を人に見せる。非公開へ移すのは、結果を人が読んだあとの `unpublish <資格コード>`(人が指示したときだけ。`data/` を変える)で、この手順の外である。非公開の問題の書き直しと、公開へ戻す `restore` も、人が指示したときだけ行う(`docs/question-production.md` の 7.7)。
 
 判定役の指示かモデル、判定の基準を変えたときは、`judge-eval <資格コード>` で評価を流す(人が `/pipeline-run <資格コード> judge-eval` と指示したときだけ。手順は `judge` と同じ形で、取り込みは `judge-eval <資格コード> --import`)。
 レポート(`pipeline-work/judge-eval/<コード>/report.md`)を人に見せ、目標を下回ったときは、変更を取り入れない([判定役の評価](../../../docs/evaluation.md))。

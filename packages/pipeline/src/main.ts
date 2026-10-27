@@ -16,6 +16,7 @@ import { runJudgeEval } from "./judge-eval/run.ts";
 import { type Output, report, reportInternalError } from "./log.ts";
 import { runPlan } from "./plan/run.ts";
 import { runReasons } from "./reasons/run.ts";
+import { runRestore } from "./restore/run.ts";
 import { runScore } from "./scorecard/run.ts";
 import { runStatus } from "./status/run.ts";
 import { runUnpublish } from "./unpublish/run.ts";
@@ -54,13 +55,14 @@ export const KNOWN_FLAGS = [
   "--review",
   "--decide",
   "--revise",
+  "--rewrite",
 ];
 /** コマンドごとに、受け付ける動作のオプション(同時には 1 つだけ) */
 const MODE_FLAGS: Record<string, readonly string[]> = {
   collect: ["--import-guide", "--candidates", "--import-candidates", "--titles"],
   export: ["--titles"],
   facts: ["--import", "--coverage", "--report"],
-  draft: ["--import", "--check", "--review", "--decide", "--revise"],
+  draft: ["--import", "--check", "--review", "--decide", "--revise", "--rewrite"],
   verify: ["--import"],
   eval: ["--import"],
   judge: ["--import"],
@@ -107,6 +109,7 @@ function helpText(): string {
     "draft <資格コード> --review         通過・保留の下書きと、人が却下した下書きの表と、判断を書き込むシートを出す",
     "draft <資格コード> --decide         判断を書き込んだシートを、人の判断の記録に取り込む",
     "draft <資格コード> --revise         保留の下書きごとに、ブラッシュアップ役への直しの依頼を書く",
+    "draft <資格コード> --rewrite        非公開の問題(判定が書き直しで復帰できる)ごとに、ブラッシュアップ役への書き直しの依頼を書く(取り込みは --import)",
     "verify <資格コード>                 下書きごとに、根拠の節だけを読んで正誤を再導出する検証の依頼を書く",
     "verify <資格コード> --import       検証役の出力を、下書きの宣言と照合して取り込む",
     "eval <資格コード>                   人が承認した下書きから評価用のデータを作り、検証役の評価の依頼を書く",
@@ -115,6 +118,7 @@ function helpText(): string {
     "judge <資格コード> --import        判定役の出力を依頼と照合して取り込み、判定の結果(公開・書き直しで復帰できる・非公開)を書く",
     "judge-eval <資格コード>             人が承認した下書きから評価用のデータを作り、判定役の評価の依頼を書く",
     "judge-eval <資格コード> --import   判定役の出力を期待する判定と照合し、検出率・誤検出率などのレポートを書く",
+    "restore <資格コード>                書き直した非公開の問題を、承認・検証・判定・同じ内容の確かめを通ったものだけ、同じ ID のまま公開の問題データへ戻す。何かに落ちたものは戻さない",
     "unpublish <資格コード>              判定の結果で、公開のままにしない問題を、公開の問題データから非公開のファイル(data/unpublished.<コード>.json)へ移す。出題の下限を下回る移し方は、何も書かずに止める",
     "reasons <資格コード>                不採用と差し戻しの理由を、理由コード・論点・段階ごとに集計し、下書きの指示の改善に使える形で書く。記録は変えない",
     "status <資格コード>                 段階ごとの状態(依頼待ち・取り込み待ち・通過・保留・不採用の件数、役のモデル)を表示する。読むだけ",
@@ -160,6 +164,7 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
       command?.name === "judge" ||
       command?.name === "judge-eval" ||
       command?.name === "unpublish" ||
+      command?.name === "restore" ||
       command?.name === "export";
     const maxArgs = takesExam ? 2 : 1;
     if (positional.length > maxArgs || command === undefined) {
@@ -194,8 +199,9 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
         judge: "使い方: judge <資格コード> [--import]\n",
         "judge-eval": "使い方: judge-eval <資格コード> [--import]\n",
         unpublish: "使い方: unpublish <資格コード>\n",
+        restore: "使い方: restore <資格コード>\n",
         draft:
-          "使い方: draft <資格コード> [--domain=<分野のコード> | --import | --check | --review | --decide | --revise]\n",
+          "使い方: draft <資格コード> [--domain=<分野のコード> | --import | --check | --review | --decide | --revise | --rewrite]\n",
       };
       const usage = usages[command.name] ?? "";
       output.out(`${command.name}: ${command.summary}\n${usage}\nオプション: --dry-run, --help\n`);
@@ -323,6 +329,14 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
       }
       return runUnpublish({ config, rootDir, examCode, dryRun, output });
     }
+    if (command.name === "restore") {
+      const examCode = positional[1];
+      if (examCode === undefined) {
+        report(output, "入力の誤り", "資格コードの指定がない");
+        return EXIT.inputError;
+      }
+      return runRestore({ config, rootDir, examCode, dryRun, output });
+    }
     if (command.name === "reasons") {
       const examCode = positional[1];
       if (examCode === undefined) {
@@ -378,7 +392,9 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
               ? "decide"
               : flags.includes("--revise")
                 ? "revise"
-                : "request";
+                : flags.includes("--rewrite")
+                  ? "rewrite"
+                  : "request";
       return runDraft({
         config,
         rootDir,

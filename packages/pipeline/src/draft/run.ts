@@ -16,6 +16,7 @@ import {
 } from "../decisions/decisions.ts";
 import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { type FactCard, FactsError, type FactsFile, factsPath, readFacts } from "../facts/schema.ts";
+import { contentHash, inputFromQuestion } from "../judge/input.ts";
 import { type Output, report } from "../log.ts";
 import { readExistingTexts } from "../plan/run.ts";
 import { PlanError, type PlanFile, planPath, readPlan } from "../plan/schema.ts";
@@ -73,6 +74,14 @@ import {
   reviewCounts,
 } from "./review.ts";
 import { evidenceLocations, reviseFacts, reviseTargets } from "./revise.ts";
+import {
+  identityOf,
+  readUnpublished,
+  rewritePlanItemId,
+  rewriteTargets,
+  sameContentProblems,
+  topicsOf,
+} from "./rewrite.ts";
 import { assembleQuestion, DISTRACTOR_TYPES, draftId, isChoiceDraft, schemaProblems } from "./schema.ts";
 import {
   applyDraftDecisions,
@@ -97,10 +106,11 @@ import { evaluateStyle, STYLE_VERSION } from "./style.ts";
  * - draft <資格コード> --import   エージェントの出力を検査して取り込む(形、スタイル規則、根拠の事実カード、来歴)
  * - draft <資格コード> --check    下書きの来歴を検査する(来歴のない下書きは、検証の段階へ進めない)
  * - draft <資格コード> --revise   保留の選択式の下書きごとに、直しの依頼を書く(取り込みは --import)
+ * - draft <資格コード> --rewrite  非公開の問題(判定が「書き直しで復帰できる」)ごとに、書き直しの依頼を書く(取り込みは --import。ADR 0023)
  * モデルは呼ばない。下書きはエージェント(question-drafter)が書き、直しはエージェント(question-reviser)が書く(ADR 0009・0019)。data/ は変えない。
  */
 
-export type DraftMode = "request" | "revise" | "import" | "check" | "review" | "decide";
+export type DraftMode = "request" | "revise" | "rewrite" | "import" | "check" | "review" | "decide";
 
 export interface DraftOptions {
   config: Config;
@@ -187,7 +197,7 @@ export function runDraft(options: DraftOptions): ExitCode {
     if (d.target === "draft") report(output, "判断の対象なし", `draft ${d.id}`);
   }
   const needsDrafter = options.mode === "request" || options.mode === "import";
-  const needsReviser = options.mode === "revise" || options.mode === "import";
+  const needsReviser = options.mode === "revise" || options.mode === "rewrite" || options.mode === "import";
   const stamp = needsDrafter ? readAgentStampOrReport(output, rootDir, "question-drafter") : null;
   if (needsDrafter && stamp === null) return EXIT.checkFailed;
   const reviser = needsReviser ? readAgentStampOrReport(output, rootDir, "question-reviser") : null;
@@ -197,6 +207,8 @@ export function runDraft(options: DraftOptions): ExitCode {
       return requestStep(options, paths, master.domains, facts, drafts, ledger, stamp as AgentStamp);
     case "revise":
       return reviseStep(options, paths, master.domains, facts, drafts, ledger, decisions, reviser as AgentStamp);
+    case "rewrite":
+      return rewriteStep(options, paths, master.domains, facts, drafts, ledger, provenance, reviser as AgentStamp);
     case "import":
       return importStep(options, paths, facts, drafts, ledger, provenance, decisions, {
         drafter: stamp as AgentStamp,
@@ -606,6 +618,137 @@ function reviseStep(
   return limited || skipped > 0 ? EXIT.checkFailed : EXIT.ok;
 }
 
+/**
+ * 書き直しの依頼を書く(draft --rewrite。ブラッシュアップ役 question-reviser。ADR 0023)。非公開のファイルの問題で、判定が「書き直しで復帰できる」ものごとに、
+ * 現行の本文、判定の理由コード、根拠の節の場所、元の根拠と周辺の事実カードを載せた依頼を 1 件ずつ書く。書かせる数は 1。
+ * 来歴のない問題(パイプラインで作っていない問題)と、元の根拠の事実カードが使えなくなった問題は、材料がそろわないので依頼しない。
+ */
+function rewriteStep(
+  options: DraftOptions,
+  paths: Paths,
+  masterDomains: { code: string; name: string }[],
+  facts: FactsFile,
+  drafts: DraftsFile,
+  ledger: LedgerFile,
+  provenance: ProvenanceFile,
+  stamp: AgentStamp,
+): ExitCode {
+  const { config, rootDir, examCode, output, dryRun } = options;
+  const unpublished = readUnpublished(config, rootDir, examCode);
+  if (unpublished === "invalid") {
+    report(output, "問題データの誤り", `unpublished.${examCode.toLowerCase()}.json`);
+    return EXIT.checkFailed;
+  }
+  const state = readState(paths.state);
+  const usage = new Map<string, number>();
+  for (const d of drafts.drafts) for (const id of usedFactIds(d)) usage.set(id, (usage.get(id) ?? 0) + 1);
+  const styleGuides = styleGuidePaths(examCode);
+  let requested = 0;
+  let pending = 0;
+  let cached = 0;
+  let skipped = 0;
+  let limited = false;
+  const targets = rewriteTargets(unpublished, drafts.drafts);
+  for (const target of targets) {
+    const { question } = target.entry;
+    const id = question.questionId;
+    if (question.questionType === "free-text") continue;
+    const own = provenance.entries.find((e) => e.questionId === id);
+    if (own === undefined) {
+      report(output, "書き直しの保留", `${id} no-provenance`);
+      skipped++;
+      continue;
+    }
+    const candidates = facts.cards.filter((c) => c.domain === question.domain && usableFact(c, ledger));
+    if (!own.factIds.every((fid) => candidates.some((c) => c.id === fid))) {
+      report(output, "書き直しの保留", `${id} fact-not-usable`);
+      skipped++;
+      continue;
+    }
+    const selected = reviseFacts(
+      { draft: { factIds: own.factIds } },
+      candidates,
+      usage,
+      config.draft.maxFactsPerRequest,
+    );
+    const planItemId = rewritePlanItemId(id);
+    const key = requestKey({
+      examCode,
+      planItemId,
+      count: 1,
+      round: 0,
+      facts: selected,
+      definitionHash: stamp.definitionHash,
+      rewriteOf: { questionId: id, contentHash: target.contentHash, round: target.round },
+    });
+    if (state.done.includes(key)) {
+      cached++;
+      continue;
+    }
+    if ((state.attempts[key] ?? 0) >= config.draft.maxAttempts) {
+      report(output, "再試行の上限", `${id} max-attempts`);
+      skipped++;
+      continue;
+    }
+    const requestPath = join(paths.requestsDir, `${key}.json`);
+    if (existsSync(requestPath)) {
+      pending++;
+      continue;
+    }
+    if (requested >= config.maxItemsPerRun) {
+      limited = true;
+      break;
+    }
+    const kind = question.questionType;
+    const request: DraftRequest = {
+      examCode,
+      requestKey: key,
+      planItemId,
+      domain: {
+        code: question.domain,
+        name: masterDomains.find((d) => d.code === question.domain)?.name ?? question.domain,
+      },
+      difficulty: question.difficulty ?? "medium",
+      kind,
+      count: 1,
+      facts: selected.map((c) => ({ id: c.id, claim: c.claim, confidence: c.confidence, scope: c.scope })),
+      // 正答の位置は、元の問題のものを保つ
+      answerPositions: [[...question.correctAnswers].sort()],
+      distractorTypes: [...DISTRACTOR_TYPES],
+      styleVersion: STYLE_VERSION,
+      ...(styleGuides !== null ? { styleGuides } : {}),
+      styleRules: styleRuleSummaries(kind),
+      outputPath: relative(rootDir, join(paths.outDir, `${key}.json`)),
+      agent: stamp,
+      rewrite: {
+        questionId: id,
+        verdict: "rewritable",
+        question: {
+          questionType: kind,
+          questionText: question.questionText,
+          choices: question.choices.map((c) => ({ key: c.key, text: c.text })),
+          correctAnswers: [...question.correctAnswers],
+          explanation: question.explanation,
+        },
+        factIds: own.factIds,
+        reasons: target.entry.reasons,
+        sections: evidenceLocations(own.factIds, facts),
+      },
+    };
+    if (!dryRun) writeJson(requestPath, request);
+    report(output, "書き直しの依頼", relative(rootDir, requestPath));
+    requested++;
+  }
+  report(
+    output,
+    "情報",
+    `書き直しの依頼 ${requested} 件、依頼済みで待っている ${pending} 件、取り込み済みの入力で飛ばした ${cached} 件、依頼しなかった ${skipped} 件(対象 ${targets.length} 件)`,
+  );
+  if (dryRun) report(output, "書き込みをしない(dry-run)");
+  if (limited) report(output, "件数の上限", "maxItemsPerRun(再実行で続きから進む)");
+  return limited || skipped > 0 ? EXIT.checkFailed : EXIT.ok;
+}
+
 function uniqueSorted(values: string[]): string[] {
   return [...new Set(values)].sort();
 }
@@ -633,6 +776,11 @@ function importStep(
   const published = readPublishedCandidates(config, rootDir, examCode);
   if (published === "invalid") {
     report(output, "問題データの誤り", `questions.${examCode.toLowerCase()}.json`);
+    return EXIT.checkFailed;
+  }
+  const unpublished = readUnpublished(config, rootDir, examCode);
+  if (unpublished === "invalid") {
+    report(output, "問題データの誤り", `unpublished.${examCode.toLowerCase()}.json`);
     return EXIT.checkFailed;
   }
   // 重複を比べる相手: 公開済みの問題(読み取り専用)と、不採用でない下書き
@@ -665,8 +813,8 @@ function importStep(
       failures++;
       continue;
     }
-    // 直しの依頼はブラッシュアップ役、それ以外は下書きの作成役の定義で作った下書き
-    const stamp = request.revise !== undefined ? stamps.reviser : stamps.drafter;
+    // 直しと書き直しの依頼はブラッシュアップ役、それ以外は下書きの作成役の定義で作った下書き
+    const stamp = request.revise !== undefined || request.rewrite !== undefined ? stamps.reviser : stamps.drafter;
     // 依頼のあとにエージェントの定義が変わった(記録のない古い依頼を含む)。出力の形を見る前に、依頼を作り直す
     if (definitionChanged(request, stamp)) {
       discardStale(ctx, key, join(paths.requestsDir, file), outPath);
@@ -684,6 +832,43 @@ function importStep(
       discardStale(ctx, key, join(paths.requestsDir, file), outPath);
       continue;
     }
+    // 書き直しの依頼のあとに、非公開の問題が変わった(公開へ戻った、本文が変わった、判定が変わった)、または、ほかの書き直しの下書きが生きている。依頼を捨てる
+    const rewriteEntry = request.rewrite?.questionId;
+    if (request.rewrite !== undefined) {
+      const entry = unpublished?.entries.find((e) => e.question.questionId === request.rewrite?.questionId);
+      const input = entry === undefined ? null : inputFromQuestion(entry.question);
+      const rewritten = [...current.drafts, ...incoming].some(
+        (d) => d.rewriteOf === request.rewrite?.questionId && d.status !== "rejected",
+      );
+      if (
+        entry === undefined ||
+        entry.verdict !== "rewritable" ||
+        input === null ||
+        requestKey({
+          examCode,
+          planItemId: request.planItemId,
+          count: 1,
+          round: 0,
+          facts: request.facts,
+          definitionHash: stamp.definitionHash,
+          rewriteOf: {
+            questionId: request.rewrite.questionId,
+            contentHash: contentHash(input),
+            round: current.drafts.filter(
+              (d) => d.rewriteOf === request.rewrite?.questionId && d.reasons.includes(HUMAN_REJECTED),
+            ).length,
+          },
+        }) !== key ||
+        rewritten
+      ) {
+        discardStale(ctx, key, join(paths.requestsDir, file), outPath);
+        continue;
+      }
+    }
+    // 書き直しの下書きを直した下書きも、元の問題の ID を引き継ぐ(同じ内容かの比較も、元の問題と行う)
+    const rewriteId = rewriteEntry ?? current.drafts.find((d) => d.id === reviseOf)?.rewriteOf;
+    const rewriteOriginal =
+      rewriteId === undefined ? undefined : unpublished?.entries.find((e) => e.question.questionId === rewriteId);
     const fail = (reason: string) => {
       failOutput(ctx, key, reason, outPath, state.attempts);
       failures++;
@@ -736,6 +921,24 @@ function importStep(
         const urls = uniqueSorted(
           draft.factIds.flatMap((fid) => facts.cards.find((c) => c.id === fid)?.sources.map((s) => s.url) ?? []),
         ).slice(0, 10);
+        // 書き直しは、元の問題と、分野・出典・論点が同じでなければならない(ADR 0023)。元の問題が非公開のファイルにないときも、書き直しとして取り込まない
+        if (rewriteId !== undefined) {
+          const originFactIds = provenance.entries.find((e) => e.questionId === rewriteId)?.factIds ?? [];
+          if (rewriteOriginal === undefined || originFactIds.length === 0) reasons.push("rewrite:original-missing");
+          else {
+            const before = identityOf({
+              domain: rewriteOriginal.question.domain,
+              referenceUrls: (rewriteOriginal.question.references ?? []).map((r) => r.url),
+              topics: topicsOf(originFactIds, facts),
+            });
+            const after = identityOf({
+              domain: request.domain.code,
+              referenceUrls: urls,
+              topics: topicsOf(draft.factIds, facts),
+            });
+            reasons.push(...sameContentProblems(before, after));
+          }
+        }
         const problems = schemaProblems(
           assembleQuestion(draft, {
             examCode,
@@ -811,6 +1014,7 @@ function importStep(
         agent: stamp,
         similarity: maxSimilarity(candidateOf(id, "draft", draft), others),
         ...(reviseOf !== undefined ? { revisionOf: reviseOf } : {}),
+        ...(rewriteId !== undefined ? { rewriteOf: rewriteId } : {}),
       });
       // 以降の下書きは、この下書きとも比べる
       if (held || reasons.length === 0) pool.push(candidateOf(id, "draft", draft));
@@ -843,8 +1047,8 @@ function importStep(
       // 直した下書きが不採用でなければ、直す前の下書きを置き換える。不採用なら、直す前の下書きは保留のまま残る
       const taken = batch.find((r) => r.status !== "rejected" && incoming.includes(r));
       if (taken !== undefined) revised.set(reviseOf, taken.id);
-    } else if (takenHere === 0) {
-      // 全件が不採用だったときだけ、計画の項目の依頼を出し直す(回数に上限がある)。直しの依頼は数えない
+    } else if (request.rewrite === undefined && takenHere === 0) {
+      // 全件が不採用だったときだけ、計画の項目の依頼を出し直す(回数に上限がある)。直しと書き直しの依頼は数えない
       state.rounds[request.planItemId] = (state.rounds[request.planItemId] ?? 0) + 1;
     }
     doneFiles.push(file);
