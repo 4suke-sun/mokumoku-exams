@@ -248,6 +248,7 @@ npm run pipeline -- export <試験コード>
 | `fact-not-in-request` | 不採用 | 根拠の事実カードが、依頼にない |
 | `style:<規則>` | 不採用 | 止めるスタイル規則に違反した([スタイルガイド](./question-style.md)) |
 | `distractor:<コード>` | 不採用 | 誤答の設計がない、理由や根拠が足りない |
+| `scope:out-of-scope-subject` | 不採用 | 試験ガイドが対象外と示すサービスが、設問文か正答の選択肢に出る(範囲の検査。台帳に試験ガイドの対象外サービスの一覧があるときだけ。[ADR 0024](./app/adr/0024-scope-check-by-exam-guide-service-lists.md)) |
 | `provenance:<コード>` | 不採用 | 来歴を作れない(`fact-not-found`・`fact-not-passed`・`source-not-in-ledger`) |
 | `data-invalid:<場所>` | 不採用 | 問題データに組み立てると、データの契約に合わない。場所は、項目の名前と番号をハイフンでつないだもの(例: `rubric-passing-points`、`choices-0-key`。全体なら `root`。値は含めない) |
 | `long-copy` | 不採用 | 設問文・選択肢・解説・誤答の理由が、根拠の出典の本文を長く写している |
@@ -266,6 +267,8 @@ npm run pipeline -- export <試験コード>
 | `revised` | 不採用 | 直した下書き(ブラッシュアップ役の出力)に置き換わった。欠陥による不採用ではないので、理由の集計に入れない(「直し」) |
 | `rewrite:domain-changed` / `rewrite:references-changed` / `rewrite:topic-changed` | 不採用 | 書き直した問題の分野 / 出典の URL の集合 / 論点が、元の問題と違う(「書き直し(非公開の問題)」) |
 | `rewrite:original-missing` | 不採用 | 書き直しの元の問題が、非公開のファイルにない、または来歴がない |
+
+範囲の検査の警告(下書きは止めない。場所だけを持ち、サービスの名前は持たない): `scope-out-of-scope-distractor`(対象外のサービスが誤答の選択肢だけに出る。誤答の作り方として自然な場合がある)、`scope-unlisted-service`(対象にも対象外にもない、「Amazon」か「AWS」で始まるサービスらしい名前が出る。場所は、出た所が設問文なら `questionText`、選択肢だけなら `choices`。一覧の抽出漏れか新しい名前かを人が確かめる。対象サービスの一覧があるときだけ)。
 
 `similar-existing` の比べる相手は、公開済みの問題のすべてです(足す方針のため、公開済みの問題を相手から外しません)。
 

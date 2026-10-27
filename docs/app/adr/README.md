@@ -48,3 +48,4 @@
 - [0021 作問パイプラインの役のモデルの表に、公開の問題の質を判定する役を足す](./0021-pipeline-judge-role.md)
 - [0022 非公開の問題は、アプリが読まない別のファイルに持つ](./0022-unpublished-questions-in-separate-file.md)
 - [0023 非公開の問題の書き直しは、パイプラインが扱い、元の ID のまま公開へ戻す](./0023-rewrite-unpublished-questions.md)
+- [0024 試験ガイドの対象サービス・対象外サービスの一覧で、問題の範囲を検査する](./0024-scope-check-by-exam-guide-service-lists.md)

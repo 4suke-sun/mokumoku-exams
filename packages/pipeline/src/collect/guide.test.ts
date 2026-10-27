@@ -23,6 +23,7 @@ function extract(overrides: Partial<GuideExtract> = {}): GuideExtract {
       { number: 2, name: "ベータの分野", weightPercent: 40, scope: [] },
     ],
     services: [],
+    excludedServices: [],
     ...overrides,
   };
 }
@@ -296,6 +297,40 @@ describe("試験ガイドの対象サービスの一覧", () => {
 
   it("同じ名前が重なる_止める", () => {
     expect(run(["AWS Lambda", "AWS Lambda"])).toEqual({ ok: false, reason: "service-duplicate" });
+  });
+
+  describe("対象外サービスの一覧", () => {
+    const text = "In scope: AWS Lambda. Out of scope: Amazon Kinesis, Amazon SageMaker";
+    const runBoth = (names: string[], excluded: string[], body = text) =>
+      importGuide(extract({ services: names, excludedServices: excluded }), ledger, [], () => body, "2026-10-13");
+
+    it("本文に出る名前_台帳に持つ", () => {
+      const r = runBoth(["AWS Lambda"], ["Amazon Kinesis", "Amazon SageMaker"]);
+      expect(r.ok && r.guide.excludedServices).toEqual(["Amazon Kinesis", "Amazon SageMaker"]);
+    });
+
+    it("一覧が空_台帳に項目を持たない", () => {
+      const r = runBoth(["AWS Lambda"], []);
+      expect(r.ok && "excludedServices" in r.guide).toBe(false);
+    });
+
+    it("本文にない名前_止める", () => {
+      expect(runBoth(["AWS Lambda"], ["Amazon Redshift"])).toEqual({ ok: false, reason: "service-not-in-source" });
+    });
+
+    it("同じ名前が重なる_止める", () => {
+      expect(runBoth(["AWS Lambda"], ["Amazon Kinesis", "Amazon Kinesis"])).toEqual({
+        ok: false,
+        reason: "service-duplicate",
+      });
+    });
+
+    it("対象と対象外の両方にある名前_止める", () => {
+      expect(runBoth(["AWS Lambda", "Amazon Kinesis"], ["Amazon Kinesis"])).toEqual({
+        ok: false,
+        reason: "service-overlap",
+      });
+    });
   });
 
   it("名前のほかの文が入る(句点・日本語・長すぎる)_形の検査で止める", () => {

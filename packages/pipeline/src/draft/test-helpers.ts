@@ -230,7 +230,10 @@ export function draftFor(request: DraftRequest, overrides: Partial<ChoiceDraft> 
 
 /** 選択式の依頼だけ(自由記述の依頼を除く) */
 export function readChoiceRequests(root: string): DraftRequest[] {
-  return readRequests(root).filter((q) => q.kind !== "free-text");
+  // 依頼の並びは鍵(定義のハッシュを含む)の順で、定義を変えると変わる。[0] に頼るテストが単一選択を得るよう、単一選択を先にする
+  return readRequests(root)
+    .filter((q) => q.kind !== "free-text")
+    .sort((a, b) => Number(b.kind === "single") - Number(a.kind === "single"));
 }
 
 /** 自由記述の依頼に対する、通る下書き */

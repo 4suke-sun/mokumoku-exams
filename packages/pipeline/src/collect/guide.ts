@@ -5,7 +5,7 @@ import { type GuideRecord, type LedgerFile, MAX_SERVICES, ServiceName } from "./
 import { withinParaphraseLimit } from "./text-limits.ts";
 
 /**
- * 試験ガイドの取り込み(ADR 0009・0018)。分野・配点・出題範囲・本番の値・対象サービスの一覧の抽出は、エージェントが作業用の置き場に書く。
+ * 試験ガイドの取り込み(ADR 0009・0018・0024)。分野・配点・出題範囲・本番の値・対象サービスと対象外サービスの一覧の抽出は、エージェントが作業用の置き場に書く。
  * CLI は、書かれたものを検査してから台帳に取り込み、資格マスタとの差分を報告する。マスタは書き換えない。
  */
 
@@ -50,6 +50,8 @@ export const GuideExtractSchema = z.strictObject({
   totalScore: ExamNumber.optional(),
   /** 試験ガイドの対象サービスの一覧(サービスの名前だけ)。ガイドが示さないときは空 */
   services: z.array(ServiceName).max(MAX_SERVICES).default([]),
+  /** 試験ガイドが対象外と示すサービスの一覧(サービスの名前だけ)。ガイドが示さないときは空 */
+  excludedServices: z.array(ServiceName).max(MAX_SERVICES).default([]),
 });
 
 export type GuideExtract = z.infer<typeof GuideExtractSchema>;
@@ -85,7 +87,8 @@ export type GuideStopReason =
   | "exam-values-invalid"
   | "verbatim-copy"
   | "service-duplicate"
-  | "service-not-in-source";
+  | "service-not-in-source"
+  | "service-overlap";
 
 /**
  * 抽出の結果を検査し、台帳に入れる形にする。止めるときは理由コードを返す。
@@ -148,8 +151,16 @@ export function importGuide(
   const spaced = (t: string) => t.replace(/\s+/g, " ");
   if (new Set(extract.services).size !== extract.services.length) return { ok: false, reason: "service-duplicate" };
   const flat = plains.map(spaced);
-  if (extract.services.some((name) => !flat.some((b) => b.includes(spaced(name))))) {
+  if (new Set(extract.excludedServices).size !== extract.excludedServices.length) {
+    return { ok: false, reason: "service-duplicate" };
+  }
+  const named = [...extract.services, ...extract.excludedServices];
+  if (named.some((name) => !flat.some((b) => b.includes(spaced(name))))) {
     return { ok: false, reason: "service-not-in-source" };
+  }
+  // 同じ名前が対象と対象外の両方にあると、範囲の検査が成り立たない
+  if (extract.excludedServices.some((name) => extract.services.includes(name))) {
+    return { ok: false, reason: "service-overlap" };
   }
 
   return {
@@ -162,6 +173,7 @@ export function importGuide(
       ...(agent !== undefined ? { agent } : {}),
       ...examValues(extract),
       ...(extract.services.length > 0 ? { services: extract.services } : {}),
+      ...(extract.excludedServices.length > 0 ? { excludedServices: extract.excludedServices } : {}),
       domains: [...extract.domains]
         .sort((a, b) => a.number - b.number)
         .map((d) => ({

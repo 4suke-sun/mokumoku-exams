@@ -1,8 +1,10 @@
-import { existsSync, readFileSync, writeFileSync } from "node:fs";
-import { join } from "node:path";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
+import { emptyLedger, ledgerPath, writeLedger } from "../collect/ledger.ts";
 import { baseConfig, runMain } from "../draft/test-helpers.ts";
 import { EXIT } from "../exit-codes.ts";
+import { DOC_HASH, DOC_URL } from "../facts/test-helpers.ts";
 import { type JudgeResults, JudgeResultsSchema } from "./schema.ts";
 import {
   EXAM,
@@ -24,7 +26,7 @@ describe("judge の依頼", () => {
     const r = await runMain(root, ["judge", EXAM]);
     expect(r.code, r.err).toBe(EXIT.ok);
     const requests = readJudgeRequests(root);
-    expect(requests.map((q) => q.questionId)).toEqual(["AIB-0001", "AIB-0002"]);
+    expect(requests.map((q) => q.questionId).sort()).toEqual(["AIB-0001", "AIB-0002"]);
     const good = requests.find((q) => q.questionId === "AIB-0001");
     const weak = requests.find((q) => q.questionId === "AIB-0002");
     expect(good?.machine).toEqual({ total: 100, lost: [], candidate: false });
@@ -43,6 +45,39 @@ describe("judge の依頼", () => {
     expect(Object.keys(good ?? {})).not.toContain("sections");
     expect(good?.agent.role).toBe("question-judge");
     expect(r.out).toContain("依頼 2 件");
+  });
+
+  it("台帳に試験ガイドの一覧がある_依頼の判定の基準の末尾に載せ_一覧が変わると判定をやり直す", async () => {
+    const root = setupJudgeRoot([goodQuestion(1)]);
+    const path = ledgerPath(join(root, baseConfig.ledgerDir), EXAM);
+    const guide = (excludedServices: string[]) => ({
+      sourceUrl: DOC_URL,
+      contentHash: DOC_HASH,
+      pages: [],
+      importedAt: "2026-10-25",
+      services: ["AWS Lambda"],
+      excludedServices,
+      domains: [{ code: "domain1", name: "a", weight: 1, scope: [] }],
+    });
+    writeLedger(path, { ...emptyLedger(EXAM), guide: guide(["Amazon Kinesis"]) });
+    await runMain(root, ["judge", EXAM]);
+    const first = readJudgeRequests(root)[0];
+    expect(first?.criteria.text).toContain("対象のサービス: AWS Lambda");
+    expect(first?.criteria.text).toContain("対象外のサービス: Amazon Kinesis");
+    writeLedger(path, { ...emptyLedger(EXAM), guide: guide(["Amazon Kinesis", "Amazon SageMaker"]) });
+    await runMain(root, ["judge", EXAM]);
+    const keys = readJudgeRequests(root).map((q) => q.criteriaHash);
+    expect(new Set(keys).size).toBe(2);
+  });
+
+  it("台帳が壊れている_台帳の誤りとして止まる", async () => {
+    const root = setupJudgeRoot([goodQuestion(1)]);
+    const path = ledgerPath(join(root, baseConfig.ledgerDir), EXAM);
+    mkdirSync(dirname(path), { recursive: true });
+    writeFileSync(path, "{壊れた JSON");
+    const r = await runMain(root, ["judge", EXAM]);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain("台帳の誤り");
   });
 
   it("自由記述の問題_判定しない", async () => {

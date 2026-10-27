@@ -1,6 +1,6 @@
 import { resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { extractCriteria, readCriteria } from "./criteria.ts";
+import { extractCriteria, readCriteria, withScope } from "./criteria.ts";
 
 const repoRoot = resolve(import.meta.dirname, "../../../..");
 
@@ -46,5 +46,32 @@ describe("資格の判定の基準", () => {
   it("帯のない資格・文書がない資格_null", () => {
     expect(readCriteria(repoRoot, "EX-SMP-XX")).toBeNull();
     expect(readCriteria("/nonexistent-root-for-test", "AWS-CLF-C02")).toBeNull();
+  });
+});
+
+describe("判定の基準への範囲の一覧", () => {
+  const base = readCriteria(repoRoot, "AWS-AIB-C01");
+
+  it("一覧がある_基準の末尾に対象と対象外を足し_ハッシュは一覧を含む", () => {
+    if (base === null) throw new Error("基準がない");
+    const a = withScope(base, { inScope: ["AWS Lambda"], outOfScope: ["Amazon Kinesis"] });
+    expect(a.text.startsWith(base.text)).toBe(true);
+    expect(a.text).toContain("対象のサービス: AWS Lambda");
+    expect(a.text).toContain("対象外のサービス: Amazon Kinesis");
+    expect(a.hash).not.toBe(base.hash);
+    const b = withScope(base, { inScope: ["AWS Lambda"], outOfScope: ["Amazon Kinesis", "Amazon SageMaker"] });
+    expect(b.hash).not.toBe(a.hash);
+  });
+
+  it("対象外の一覧だけがある_対象の行を足さない", () => {
+    if (base === null) throw new Error("基準がない");
+    const a = withScope(base, { inScope: [], outOfScope: ["Amazon Kinesis"] });
+    expect(a.text).not.toContain("対象のサービス:");
+    expect(a.text).toContain("対象外のサービス: Amazon Kinesis");
+  });
+
+  it("一覧がない_基準をそのまま返す", () => {
+    if (base === null) throw new Error("基準がない");
+    expect(withScope(base, { inScope: [], outOfScope: [] })).toBe(base);
   });
 });

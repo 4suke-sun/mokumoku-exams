@@ -204,6 +204,15 @@ const PREFIXES: readonly (readonly [string, ReasonInfo])[] = [
     },
   ],
   [
+    "scope:",
+    {
+      meaning: "対象外のサービス(試験ガイドが対象外と示すもの)が、設問文か正答の選択肢に出る",
+      pattern: "対象外のサービスを主題にする、正答にする",
+      suggestion:
+        "主題と正答は、依頼の事実カードの範囲(対象のサービス)に収める。対象外のサービスは、誤答の選択肢に限る",
+    },
+  ],
+  [
     "distractor:",
     {
       meaning: "誤答の設計がない、または理由や根拠が足りない",
