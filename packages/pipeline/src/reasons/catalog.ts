@@ -140,6 +140,26 @@ const EXACT: Readonly<Record<string, ReasonInfo>> = {
     pattern: "節の文を、語順のまま日本語にする",
     suggestion: "設問文・選択肢・解説を、語順と構成を変えて自分の言葉で書く",
   },
+  "rewrite:domain-changed": {
+    meaning: "書き直した問題の分野が、元の問題と違う",
+    pattern: "書き直しで、別の分野の事実カードを根拠にする",
+    suggestion: "分野は依頼の domain のままにする(書き直しは問いを変えない)",
+  },
+  "rewrite:references-changed": {
+    meaning: "書き直した問題の出典の URL の集合が、元の問題と違う",
+    pattern: "元の根拠と別の出典の事実カードを足す、元の根拠を外す",
+    suggestion: "根拠は、元の根拠(rewrite.factIds)と、同じ出典・同じ出題範囲の項目のカードだけにする",
+  },
+  "rewrite:topic-changed": {
+    meaning: "書き直した問題の論点(根拠の事実カードの出題範囲の項目の組)が、元の問題と違う",
+    pattern: "別の出題範囲の項目の事実カードを足す、元の根拠を外す",
+    suggestion: "根拠は、元の根拠(rewrite.factIds)と、同じ出典・同じ出題範囲の項目のカードだけにする",
+  },
+  "rewrite:original-missing": {
+    meaning: "書き直しの元の問題が、非公開のファイルにない、または来歴がない",
+    pattern: "元の根拠の来歴がない、または書き直しの下書きを直す途中で、元の問題が非公開のファイルから消えた",
+    suggestion: "(運用)依頼を作り直す。元の問題の来歴を確かめる",
+  },
   "judge:type-mismatch": {
     meaning: "判定役の判定: 設問の型が、その資格の型から外れる(観点 J1)",
     pattern: "状況を落とした設問、設定の細部を問う設問、型に合わない選択肢",

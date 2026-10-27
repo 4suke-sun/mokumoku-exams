@@ -74,6 +74,10 @@ export function renderDraftReview(
     lines.push(`| 状態 | ${record.status}(人の判断: ${decision}) |`);
     lines.push(`| 分野・難易度・種別 | ${record.domain} / ${record.difficulty} / ${d?.questionType ?? "-"} |`);
     if (record.revisionOf !== undefined) lines.push(`| 直す前の下書き | ${record.revisionOf} |`);
+    if (record.rewriteOf !== undefined)
+      lines.push(
+        `| 書き直す非公開の問題(承認すると、判定が公開なら、この ID のまま公開へ戻る) | ${record.rewriteOf} |`,
+      );
     if (d !== null) {
       lines.push(`| 設問文 | ${cell(d.questionText)} |`);
       if ("choices" in d) {

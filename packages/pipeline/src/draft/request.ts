@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { sha256 } from "../collect/fetcher.ts";
+import { QUESTION_ID } from "../contract.ts";
 import type { FactCard } from "../facts/schema.ts";
 import { DIFFICULTIES } from "../plan/schema.ts";
 import { AgentStampSchema } from "../shared/agents.ts";
@@ -67,6 +68,34 @@ export const DraftRequestSchema = z.strictObject({
         .max(10),
     })
     .optional(),
+  /**
+   * 書き直しの依頼(ブラッシュアップ役。draft --rewrite。ADR 0023)のときだけ持つ。非公開の問題を、判定の理由コードと、
+   * 根拠の節の場所、元の根拠と周辺の事実カード(facts)を材料に直させる。書かせる数は 1。問題の ID は変わらない
+   */
+  rewrite: z
+    .strictObject({
+      /** 書き直す問題の ID(非公開のファイルにある) */
+      questionId: z.string().regex(QUESTION_ID),
+      /** 非公開にしたときの判定。書き直しの対象は rewritable だけ */
+      verdict: z.literal("rewritable"),
+      /** 現行の本文 */
+      question: z.strictObject({
+        questionType: z.enum(["single", "multiple"]),
+        questionText: z.string().min(1),
+        choices: z.array(z.strictObject({ key: z.string().regex(/^[A-Z]$/), text: z.string().min(1) })).min(2),
+        correctAnswers: z.array(z.string().regex(/^[A-Z]$/)).min(1),
+        explanation: z.string().min(1),
+      }),
+      /** 元の根拠の事実カードの ID(来歴から。facts の先頭に載る)。書き直しの根拠は、これと同じ出典・同じ出題範囲にとどめる */
+      factIds: z.array(FACT_ID).min(1).max(10),
+      /** 判定の理由コード(judge:*) */
+      reasons: z.array(z.string().min(1).max(64)).min(1).max(10),
+      /** 根拠の節の場所(出典の URL、人が読む節の名前、見出し)。本文は載せない */
+      sections: z
+        .array(z.strictObject({ url: z.string().min(1), section: z.string().min(1), heading: z.string().min(1) }))
+        .max(10),
+    })
+    .optional(),
 });
 
 export type DraftRequest = z.infer<typeof DraftRequestSchema>;
@@ -96,7 +125,7 @@ export function styleRuleSummaries(kind: DraftRequest["kind"]): DraftRequest["st
  * 人が却下した下書きの数)から決まる。同じ入力では同じ鍵になり、取り込み済みの鍵は、再び依頼しない。
  * 人が却下した数は、1 件以上のときだけ鍵に入れる(却下のない項目の鍵は、これを足す前と変わらない)。
  * 却下が増えると鍵が変わるので、却下で足りなくなった分の依頼が、取り込み済みの依頼と同じ鍵で飛ばされない。
- * 直しの依頼は、直す下書きの ID を鍵に入れる(補充の依頼と同じ鍵にならない)。
+ * 直しの依頼は、直す下書きの ID を鍵に入れる(補充の依頼と同じ鍵にならない)。書き直しの依頼は、問題の ID と現行の本文のハッシュと、その問題の書き直しの下書きを人が却下した数を鍵に入れる。
  */
 export function requestKey(input: {
   examCode: string;
@@ -110,6 +139,8 @@ export function requestKey(input: {
   humanRejected?: number;
   /** 直しの依頼のとき、直す下書きの ID */
   reviseOf?: string;
+  /** 書き直しの依頼のとき、書き直す問題の ID と、その問題の書き直しの下書きを人が却下した数(数が増えると鍵が変わる) */
+  rewriteOf?: { questionId: string; contentHash: string; round: number };
 }): string {
   const canonical = JSON.stringify({
     examCode: input.examCode,
@@ -122,6 +153,7 @@ export function requestKey(input: {
     definitionHash: input.definitionHash,
     ...(input.humanRejected ? { humanRejected: input.humanRejected } : {}),
     ...(input.reviseOf !== undefined ? { reviseOf: input.reviseOf } : {}),
+    ...(input.rewriteOf !== undefined ? { rewriteOf: input.rewriteOf } : {}),
   });
   return sha256(Buffer.from(canonical)).slice(0, 16);
 }

@@ -68,6 +68,8 @@ export function selectExportable(
   const ready: DraftRecord[] = [];
   for (const d of drafts) {
     if (d.status !== "passed" || d.draft === null) continue;
+    // 非公開の問題を書き直した下書きは、採番して足さない。公開への復帰(restore)が、元の ID のまま戻す(ADR 0023)
+    if (d.rewriteOf !== undefined) continue;
     const entry = provenance.entries.find((e) => e.draftId === d.id);
     if (entry?.questionId !== undefined) {
       exported++;

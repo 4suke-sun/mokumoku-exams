@@ -112,6 +112,16 @@ export function selectReview(
   };
 }
 
+/** 指定した ID は、抜き取りでも必ず確認するものにする */
+function forceReview(group: SamplingGroup, ids: readonly string[]): SamplingGroup {
+  const forced = new Set(ids);
+  return {
+    ...group,
+    reviewed: [...group.reviewed, ...group.notReviewed.filter((id) => forced.has(id))].sort(byString),
+    notReviewed: group.notReviewed.filter((id) => !forced.has(id)),
+  };
+}
+
 const scopeKey = (domain: string, item: number) => `${domain}#${item}`;
 
 /** 事実カードの論点(分野と出題範囲の項目の組) */
@@ -206,10 +216,14 @@ export function computeSampling(input: SamplingInput): SamplingPlan {
     ...base,
     mode: "sample",
     fallback: null,
-    draft: selectReview(
-      passedDrafts.map((d) => ({ id: d.id, score: draftScore(d) })),
-      settings,
-      "draft",
+    draft: forceReview(
+      selectReview(
+        passedDrafts.map((d) => ({ id: d.id, score: draftScore(d) })),
+        settings,
+        "draft",
+      ),
+      // 非公開の問題を書き直した下書きは、公開へ戻る前に、人が必ず確認する(抜き取りにしない。ADR 0023)
+      passedDrafts.filter((d) => d.rewriteOf !== undefined).map((d) => d.id),
     ),
     fact: selectReview(
       passedFacts.map((c) => ({ id: c.id, score: factScore(c) })),

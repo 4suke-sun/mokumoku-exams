@@ -85,6 +85,18 @@ describe("直前チェック", () => {
     expect(document.body.textContent ?? "").not.toContain("TEST-0099");
   });
 
+  it("非公開にした問題が同じ ID で公開へ戻った_保存したブックマークが、そのまま再び一覧に出る", async () => {
+    stubBookmarks(["TEST-0001", "TEST-0003"]);
+    const hidden = order.filter((id) => id !== "TEST-0003");
+    const first = render(<BookmarkCheck exam={exam} order={hidden} />);
+    expect(await screen.findByText("問題文 1")).toBeTruthy();
+    expect(screen.queryByText("問題文 3")).toBeNull();
+    first.unmount();
+    stubBookmarks(["TEST-0001", "TEST-0003"]);
+    render(<BookmarkCheck exam={exam} order={order} />);
+    expect(await screen.findByText("問題文 3")).toBeTruthy();
+  });
+
   it("カードに切り替える_表は問題だけで_めくると正解と解説を出す", async () => {
     stubBookmarks(["TEST-0001", "TEST-0003"]);
     render(<BookmarkCheck exam={exam} order={order} />);

@@ -15,6 +15,7 @@ export const COMMANDS: readonly CommandSpec[] = [
   { name: "judge", summary: "公開している問題を、判定の基準に照らして判定する" },
   { name: "judge-eval", summary: "判定役の見落としと誤検出を測る" },
   { name: "unpublish", summary: "判定の結果で、公開のままにしない問題を、非公開のファイルへ移す" },
+  { name: "restore", summary: "書き直して確かめた非公開の問題を、同じ ID のまま公開へ戻す" },
   { name: "reasons", summary: "不採用と差し戻しの理由を集計する(記録は変えない)" },
   { name: "status", summary: "段階ごとの状態を表示する(読むだけ)" },
   { name: "score", summary: "公開している問題の書き方を、点数票で採点する(読むだけ)" },

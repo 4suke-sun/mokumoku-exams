@@ -2,6 +2,9 @@ import { existsSync, readFileSync } from "node:fs";
 import { dirname, join, relative, resolve } from "node:path";
 import type { Config } from "../config.ts";
 import { QuestionsFileSchema } from "../contract.ts";
+import { DecisionsError, decisionsPath, draftDecision, readDecisions } from "../decisions/decisions.ts";
+import { isChoiceDraft } from "../draft/schema.ts";
+import { DraftsError, draftWorkDir, readDrafts } from "../draft/store.ts";
 import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { type Output, report } from "../log.ts";
 import { resolveProfile } from "../scorecard/profiles.ts";
@@ -19,9 +22,10 @@ import {
   readJsonFile,
   reportStop,
 } from "../shared/request-flow.ts";
+import { isVerified } from "../verify/schema.ts";
 import { checkJudgeOutput } from "./check.ts";
 import { type Criteria, readCriteria } from "./criteria.ts";
-import { contentHash, inputFromQuestion, type JudgeInput, toScoreInput } from "./input.ts";
+import { contentHash, inputFromDraft, inputFromQuestion, type JudgeInput, toScoreInput } from "./input.ts";
 import { buildJudgeRequest, JudgeRequestSchema, judgeKey } from "./request.ts";
 import {
   JUDGE_VERDICTS,
@@ -94,6 +98,32 @@ function loadInputs(file: string): JudgeInput[] | null {
     .sort((a, b) => (a.questionId < b.questionId ? -1 : 1));
 }
 
+/**
+ * 書き直した問題の下書き(非公開の問題の書き直し。ADR 0023)。検証を通った選択式の下書きを、元の問題の ID で判定に出す。
+ * 判定の結果は、公開への復帰(restore)が、問題の ID・本文のハッシュ・判定の基準・判定役の定義で照合する。
+ * 読めないときは null
+ */
+function loadRewriteInputs(config: Config, rootDir: string, examCode: string, output: Output): JudgeInput[] | null {
+  try {
+    const work = resolve(rootDir, config.workDir);
+    const drafts = readDrafts(join(draftWorkDir(work, examCode), "drafts.json"), examCode);
+    const decisions = readDecisions(decisionsPath(resolve(rootDir, config.decisionsDir), examCode), examCode);
+    const inputs: JudgeInput[] = [];
+    for (const d of drafts.drafts) {
+      if (d.rewriteOf === undefined || d.status !== "passed" || d.draft === null || !isChoiceDraft(d.draft)) continue;
+      if (!isVerified(d.verification, draftDecision(decisions, d.id))) continue;
+      if (inputs.some((i) => i.questionId === d.rewriteOf)) continue;
+      inputs.push(inputFromDraft(d.rewriteOf, d.draft));
+    }
+    return inputs;
+  } catch (error) {
+    if (error instanceof DraftsError) for (const p of error.paths) report(output, "下書きの誤り", p);
+    else if (error instanceof DecisionsError) for (const p of error.paths) report(output, "判断の記録の誤り", p);
+    else throw error;
+    return null;
+  }
+}
+
 interface Context {
   options: JudgeOptions;
   paths: Paths;
@@ -117,11 +147,17 @@ export function runJudge(options: JudgeOptions): ExitCode {
     report(output, "入力の誤り", "問題データがない");
     return EXIT.inputError;
   }
-  const inputs = loadInputs(paths.questions);
-  if (inputs === null) {
+  const published = loadInputs(paths.questions);
+  if (published === null) {
     report(output, "問題データの誤り", relative(rootDir, paths.questions));
     return EXIT.inputError;
   }
+  const rewrites = loadRewriteInputs(config, rootDir, examCode, output);
+  if (rewrites === null) return EXIT.checkFailed;
+  // 公開の問題と、書き直した問題(まだ非公開の問題の ID)を合わせて判定する。公開の問題と ID が重なる書き直しは出さない
+  const inputs = [...published, ...rewrites.filter((r) => !published.some((p) => p.questionId === r.questionId))].sort(
+    (a, b) => (a.questionId < b.questionId ? -1 : 1),
+  );
   if (inputs.length === 0) {
     report(output, "入力の誤り", "選択式の問題がない");
     return EXIT.inputError;
@@ -280,7 +316,7 @@ function importStep(ctx: Context): ExitCode {
     doneFiles.push(file);
   }
 
-  // 公開している問題にない ID の結果は残さない(問題が削除・非公開になった)。並びは ID の順
+  // 判定に出す問題(公開の問題と、書き直した問題)にない ID の結果は残さない(問題が削除・非公開になった)。並びは ID の順
   const known = new Set(inputs.map((i) => i.questionId));
   entries = entries.filter((e) => known.has(e.questionId)).sort((a, b) => (a.questionId < b.questionId ? -1 : 1));
   reportSummary(output, entries, inputs, criteria, stamp);
