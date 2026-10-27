@@ -25,7 +25,7 @@ import { type DraftRecord, DraftsError, draftWorkDir, readDrafts } from "../draf
 import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { formatJson, references } from "../export/export.ts";
 import { FactsError, type FactsFile, factsPath, readFacts } from "../facts/schema.ts";
-import { readCriteria } from "../judge/criteria.ts";
+import { readCriteriaWithScope } from "../judge/criteria.ts";
 import { contentHash, inputFromQuestion } from "../judge/input.ts";
 import { readJudgeResults } from "../judge/run.ts";
 import { type Output, report } from "../log.ts";
@@ -89,7 +89,8 @@ export function runRestore(options: RestoreOptions): ExitCode {
     report(output, "問題データの誤り", relative(rootDir, paths.questions));
     return EXIT.inputError;
   }
-  const criteria = readCriteria(rootDir, examCode);
+  const criteria = readCriteriaWithScope(config, rootDir, examCode, output);
+  if (criteria === undefined) return EXIT.checkFailed;
   if (criteria === null) {
     report(output, "入力の誤り", "判定の基準がない(資格別の文書に「判定の基準」の節がない)");
     return EXIT.inputError;

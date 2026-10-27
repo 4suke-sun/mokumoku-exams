@@ -4,7 +4,7 @@ import type { Config } from "../config.ts";
 import { QuestionsFileSchema, UnpublishedFileSchema, validateDataSet } from "../contract.ts";
 import { EXIT, type ExitCode } from "../exit-codes.ts";
 import { formatJson } from "../export/export.ts";
-import { readCriteria } from "../judge/criteria.ts";
+import { readCriteriaWithScope } from "../judge/criteria.ts";
 import { contentHash, inputFromQuestion } from "../judge/input.ts";
 import { readJudgeResults } from "../judge/run.ts";
 import { JUDGE_VERDICTS } from "../judge/schema.ts";
@@ -108,7 +108,8 @@ export function runUnpublish(options: UnpublishOptions): ExitCode {
     report(output, "入力の誤り", "判定の結果がない(先に judge を実行して取り込む)");
     return EXIT.inputError;
   }
-  const criteria = readCriteria(rootDir, examCode);
+  const criteria = readCriteriaWithScope(config, rootDir, examCode, output);
+  if (criteria === undefined) return EXIT.checkFailed;
   if (criteria === null) {
     report(output, "入力の誤り", "判定の基準がない(資格別の文書に「判定の基準」の節がない)");
     return EXIT.inputError;

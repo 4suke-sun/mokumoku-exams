@@ -24,7 +24,7 @@ import {
 } from "../shared/request-flow.ts";
 import { isVerified } from "../verify/schema.ts";
 import { checkJudgeOutput } from "./check.ts";
-import { type Criteria, readCriteria } from "./criteria.ts";
+import { type Criteria, readCriteriaWithScope } from "./criteria.ts";
 import { contentHash, inputFromDraft, inputFromQuestion, type JudgeInput, toScoreInput } from "./input.ts";
 import { buildJudgeRequest, JudgeRequestSchema, judgeKey } from "./request.ts";
 import {
@@ -162,7 +162,8 @@ export function runJudge(options: JudgeOptions): ExitCode {
     report(output, "入力の誤り", "選択式の問題がない");
     return EXIT.inputError;
   }
-  const criteria = readCriteria(rootDir, examCode);
+  const criteria = readCriteriaWithScope(config, rootDir, examCode, output);
+  if (criteria === undefined) return EXIT.checkFailed;
   if (criteria === null) {
     report(output, "入力の誤り", "判定の基準がない(資格別の文書に「判定の基準」の節がない)");
     return EXIT.inputError;
