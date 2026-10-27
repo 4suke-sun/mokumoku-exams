@@ -18,7 +18,7 @@
           "anchor": {
             "heading": "Challenges: structured data vs. unstructured data"
           },
-          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
           "section": "構造化データと非構造化データの課題",
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
         }
@@ -42,7 +42,7 @@
           "anchor": {
             "heading": "How does AI work?"
           },
-          "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b",
           "section": "AI の仕組み",
           "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
         }
@@ -66,7 +66,7 @@
           "anchor": {
             "heading": "Why is prompt engineering important?"
           },
-          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
           "section": "プロンプトエンジニアリングが重要な理由",
           "url": "https://aws.amazon.com/what-is/prompt-engineering/"
         }
@@ -90,7 +90,7 @@
           "anchor": {
             "heading": "What are machine learning use cases?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習の用途",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -114,7 +114,7 @@
           "anchor": {
             "heading": "How can AWS help Generative AI?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "AWS による生成AIの支援",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -138,7 +138,7 @@
           "anchor": {
             "heading": "What are the types of AI agents?"
           },
-          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1",
           "section": "AIエージェントの種類",
           "url": "https://aws.amazon.com/what-is/ai-agents/"
         }
@@ -162,7 +162,7 @@
           "anchor": {
             "heading": "How can AWS help with your AI agent requirements?"
           },
-          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1",
           "section": "AWS での AI エージェント",
           "url": "https://aws.amazon.com/what-is/ai-agents/"
         }
@@ -186,7 +186,7 @@
           "anchor": {
             "heading": "Summary of differences: structured data vs. unstructured data"
           },
-          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
           "section": "構造化データと非構造化データの比較表",
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
         }
@@ -211,7 +211,7 @@
           "anchor": {
             "heading": "Technologies: structured data vs. unstructured data"
           },
-          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
           "section": "構造化データと非構造化データの技術",
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
         }
@@ -235,7 +235,7 @@
           "anchor": {
             "heading": "Why is prompt engineering important?"
           },
-          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
           "section": "プロンプトエンジニアリングが重要な理由",
           "url": "https://aws.amazon.com/what-is/prompt-engineering/"
         }
@@ -259,7 +259,7 @@
           "anchor": {
             "heading": "Generative AI"
           },
-          "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b",
           "section": "生成AI",
           "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
         }
@@ -283,7 +283,7 @@
           "anchor": {
             "heading": "How does Retrieval-Augmented Generation work?"
           },
-          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408",
           "section": "RAG の仕組み",
           "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
         }
@@ -307,7 +307,7 @@
           "anchor": {
             "heading": "What is a prompt?"
           },
-          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
           "section": "プロンプトとは",
           "url": "https://aws.amazon.com/what-is/prompt-engineering/"
         }
@@ -331,7 +331,7 @@
           "anchor": {
             "heading": "How can you implement machine learning in your organization?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習の導入",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -355,7 +355,7 @@
           "anchor": {
             "heading": "model-monitor-how-it-works"
           },
-          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44",
           "section": "仕組み",
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
         }
@@ -379,7 +379,7 @@
           "anchor": {
             "heading": "Key differences: structured data vs. unstructured data"
           },
-          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
           "section": "構造化データと非構造化データの主な違い（保存）",
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
         }
@@ -403,7 +403,7 @@
           "anchor": {
             "heading": "What are the benefits of machine learning?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習の利点",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -427,7 +427,7 @@
           "anchor": {
             "heading": "What are prompt engineering techniques?"
           },
-          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
           "section": "プロンプトエンジニアリングの技法",
           "url": "https://aws.amazon.com/what-is/prompt-engineering/"
         }
@@ -451,7 +451,7 @@
           "anchor": {
             "heading": "What is a prompt?"
           },
-          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
           "section": "プロンプトとは",
           "url": "https://aws.amazon.com/what-is/prompt-engineering/"
         }
@@ -475,7 +475,7 @@
           "anchor": {
             "heading": "What are machine learning use cases?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習の用途",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -499,7 +499,7 @@
           "anchor": {
             "heading": "How do generative AI models work?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AIモデルの仕組み",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -523,7 +523,7 @@
           "anchor": {
             "heading": "What Is Artificial Intelligence (AI)?"
           },
-          "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b",
           "section": "AI とは",
           "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
         }
@@ -547,7 +547,7 @@
           "anchor": {
             "heading": "How does machine learning work?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習の仕組み",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -571,7 +571,7 @@
           "anchor": {
             "heading": "model-monitor-how-it-works"
           },
-          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44",
           "section": "注意事項",
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
         }
@@ -595,7 +595,7 @@
           "anchor": {
             "heading": "How do generative AI models work?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AIモデルの仕組み",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -621,7 +621,7 @@
           "anchor": {
             "heading": "How can AWS support your Retrieval-Augmented Generation requirements?"
           },
-          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408",
           "section": "AWS による RAG の支援",
           "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
         }
@@ -645,7 +645,7 @@
           "anchor": {
             "heading": "model-monitor-how-it-works"
           },
-          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44",
           "section": "仕組み",
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
         }
@@ -669,7 +669,7 @@
           "anchor": {
             "heading": "How did generative AI technology evolve?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AI技術の発展",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -693,7 +693,7 @@
           "anchor": {
             "heading": "Summary of differences: structured data vs. unstructured data"
           },
-          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
           "section": "構造化データと非構造化データの比較表",
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
         }
@@ -717,7 +717,7 @@
           "anchor": {
             "heading": "What are the key components of AI agent architecture?"
           },
-          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1",
           "section": "AIエージェントの構成要素",
           "url": "https://aws.amazon.com/what-is/ai-agents/"
         }
@@ -741,7 +741,7 @@
           "anchor": {
             "heading": "What are the key components of AI application architecture?"
           },
-          "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b",
           "section": "AI アプリケーションの構成要素",
           "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
         }
@@ -765,7 +765,7 @@
           "anchor": {
             "heading": "How does generative AI work?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AIの仕組み",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -787,7 +787,7 @@
           "anchor": {
             "heading": "model-monitor-how-it-works"
           },
-          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44",
           "section": "注意事項",
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
         }
@@ -811,7 +811,7 @@
           "anchor": {
             "heading": "What are the benefits of generative AI?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AIの利点",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -835,7 +835,7 @@
           "anchor": {
             "heading": "What are the challenges of using AI agents?"
           },
-          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1",
           "section": "AIエージェントの課題",
           "url": "https://aws.amazon.com/what-is/ai-agents/"
         }
@@ -859,7 +859,7 @@
           "anchor": {
             "heading": "What are the limitations of generative AI?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AIの限界",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -883,7 +883,7 @@
           "anchor": {
             "heading": "What is the difference between Retrieval-Augmented Generation and semantic search?"
           },
-          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408",
           "section": "RAG と意味検索の違い",
           "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
         }
@@ -907,7 +907,7 @@
           "anchor": {
             "heading": "What are prompt engineering techniques?"
           },
-          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
           "section": "プロンプトエンジニアリングの技法",
           "url": "https://aws.amazon.com/what-is/prompt-engineering/"
         }
@@ -931,7 +931,7 @@
           "anchor": {
             "heading": "Challenges: structured data vs. unstructured data"
           },
-          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
           "section": "構造化データと非構造化データの課題",
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
         }
@@ -953,7 +953,7 @@
           "anchor": {
             "heading": "What are the limitations of generative AI?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AIの限界",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -975,7 +975,7 @@
           "anchor": {
             "heading": "model-monitor-how-it-works"
           },
-          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44",
           "section": "注意事項",
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
         }
@@ -999,7 +999,7 @@
           "anchor": {
             "heading": "What are the benefits of using AI agents?"
           },
-          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1",
           "section": "AIエージェントの利点",
           "url": "https://aws.amazon.com/what-is/ai-agents/"
         }
@@ -1021,7 +1021,7 @@
           "anchor": {
             "heading": "How can AWS support your generative AI requirements?"
           },
-          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
           "section": "AWS による生成AIの支援",
           "url": "https://aws.amazon.com/what-is/prompt-engineering/"
         }
@@ -1045,7 +1045,7 @@
           "anchor": {
             "heading": "What are generative AI examples?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AIの活用例",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -1069,7 +1069,7 @@
           "anchor": {
             "heading": "What are machine learning use cases?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習の用途",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -1093,7 +1093,7 @@
           "anchor": {
             "heading": "What are the key principles that define AI agents?"
           },
-          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1",
           "section": "AIエージェントの主な原則",
           "url": "https://aws.amazon.com/what-is/ai-agents/"
         }
@@ -1117,7 +1117,7 @@
           "anchor": {
             "heading": "How can AWS help with your AI agent requirements?"
           },
-          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1",
           "section": "AWS での AI エージェント",
           "url": "https://aws.amazon.com/what-is/ai-agents/"
         }
@@ -1141,7 +1141,7 @@
           "anchor": {
             "heading": "What are the benefits of generative AI?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AIの利点",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -1165,7 +1165,7 @@
           "anchor": {
             "heading": "model-monitor"
           },
-          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44",
           "section": "概要",
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
         }
@@ -1189,7 +1189,7 @@
           "anchor": {
             "heading": "How can AWS help with your AI agent requirements?"
           },
-          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1",
           "section": "AWS での AI エージェント",
           "url": "https://aws.amazon.com/what-is/ai-agents/"
         }
@@ -1213,7 +1213,7 @@
           "anchor": {
             "heading": "Generative AI"
           },
-          "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b",
           "section": "生成AI",
           "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
         }
@@ -1237,7 +1237,7 @@
           "anchor": {
             "heading": "What are some prompt engineering use cases?"
           },
-          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
           "section": "プロンプトエンジニアリングの用途",
           "url": "https://aws.amazon.com/what-is/prompt-engineering/"
         }
@@ -1261,7 +1261,7 @@
           "anchor": {
             "heading": "What are the types of machine learning algorithms?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習のアルゴリズムの種類",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -1285,7 +1285,7 @@
           "anchor": {
             "heading": "How do generative AI models work?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AIモデルの仕組み",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -1307,7 +1307,7 @@
           "anchor": {
             "heading": "How can AWS help Generative AI?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "AWS による生成AIの支援",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -1331,7 +1331,7 @@
           "anchor": {
             "heading": "What are the challenges in machine learning implementation?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習導入の課題",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -1355,7 +1355,7 @@
           "anchor": {
             "heading": "What is the difference between machine learning vs. artificial intelligence?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "AIと機械学習の違い",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -1379,7 +1379,7 @@
           "anchor": {
             "heading": "What are foundation models in generative AI?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "基盤モデル",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -1403,7 +1403,7 @@
           "anchor": {
             "heading": "What are the benefits of generative AI?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AIの利点",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -1427,7 +1427,7 @@
           "anchor": {
             "heading": "What are the key components of AI application architecture?"
           },
-          "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b",
           "section": "AI アプリケーションの構成要素",
           "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
         }
@@ -1451,7 +1451,7 @@
           "anchor": {
             "heading": "Summary of differences: structured data vs. unstructured data"
           },
-          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
           "section": "構造化データと非構造化データの比較表",
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
         }
@@ -1475,7 +1475,7 @@
           "anchor": {
             "heading": "Challenges: structured data vs. unstructured data"
           },
-          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
           "section": "構造化データと非構造化データの課題",
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
         }
@@ -1499,7 +1499,7 @@
           "anchor": {
             "heading": "What is the difference between machine learning vs. deep learning?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習と深層学習の違い",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -1523,7 +1523,7 @@
           "anchor": {
             "heading": "What are the key components of AI application architecture?"
           },
-          "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b",
           "section": "AI アプリケーションの構成要素",
           "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
         }
@@ -1547,7 +1547,7 @@
           "anchor": {
             "heading": "Key differences: structured data vs. unstructured data"
           },
-          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
           "section": "構造化データと非構造化データの主な違い",
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
         }
@@ -1571,7 +1571,7 @@
           "anchor": {
             "heading": "What’s the Difference Between Structured Data and Unstructured Data?"
           },
-          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
           "section": "構造化データと非構造化データの違い（導入）",
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
         }
@@ -1595,7 +1595,7 @@
           "anchor": {
             "heading": "What are prompt engineering techniques?"
           },
-          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
           "section": "プロンプトエンジニアリングの技法",
           "url": "https://aws.amazon.com/what-is/prompt-engineering/"
         }
@@ -1619,7 +1619,7 @@
           "anchor": {
             "heading": "How does Retrieval-Augmented Generation work?"
           },
-          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408",
           "section": "RAG の仕組み",
           "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
         }
@@ -1643,7 +1643,7 @@
           "anchor": {
             "heading": "Technologies: structured data vs. unstructured data"
           },
-          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
           "section": "構造化データと非構造化データの技術",
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
         }
@@ -1668,7 +1668,7 @@
           "anchor": {
             "heading": "What is the difference between machine learning, deep learning, and artificial intelligence?"
           },
-          "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b",
           "section": "AI・機械学習・深層学習の違い",
           "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
         }
@@ -1690,7 +1690,7 @@
           "anchor": {
             "heading": "How can AWS support your generative AI requirements?"
           },
-          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
           "section": "AWS による生成AIの支援",
           "url": "https://aws.amazon.com/what-is/prompt-engineering/"
         }
@@ -1712,7 +1712,7 @@
           "anchor": {
             "heading": "model-monitor-how-it-works"
           },
-          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44",
           "section": "注意事項",
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
         }
@@ -1736,7 +1736,7 @@
           "anchor": {
             "heading": "What are the key components of AI agent architecture?"
           },
-          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1",
           "section": "AIエージェントの構成要素",
           "url": "https://aws.amazon.com/what-is/ai-agents/"
         }
@@ -1760,7 +1760,7 @@
           "anchor": {
             "heading": "What are some prompt engineering best practices?"
           },
-          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
           "section": "プロンプトエンジニアリングの最良の実践",
           "url": "https://aws.amazon.com/what-is/prompt-engineering/"
         }
@@ -1784,7 +1784,7 @@
           "anchor": {
             "heading": "What is the difference between machine learning, deep learning, and artificial intelligence?"
           },
-          "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b",
           "section": "AI・機械学習・深層学習の違い",
           "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
         }
@@ -1808,7 +1808,7 @@
           "anchor": {
             "heading": "When to use: structured data vs. unstructured data"
           },
-          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
           "section": "構造化データと非構造化データの使い分け",
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
         }
@@ -1832,7 +1832,7 @@
           "anchor": {
             "heading": "What is Machine Learning?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習とは",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -1856,7 +1856,7 @@
           "anchor": {
             "heading": "How does Retrieval-Augmented Generation work?"
           },
-          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408",
           "section": "RAG の仕組み",
           "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
         }
@@ -1880,7 +1880,7 @@
           "anchor": {
             "heading": "What are some prompt engineering best practices?"
           },
-          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
           "section": "プロンプトエンジニアリングの最良の実践",
           "url": "https://aws.amazon.com/what-is/prompt-engineering/"
         }
@@ -1904,7 +1904,7 @@
           "anchor": {
             "heading": "model-monitor"
           },
-          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44",
           "section": "概要",
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
         }
@@ -1928,7 +1928,7 @@
           "anchor": {
             "heading": "model-monitor"
           },
-          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44",
           "section": "概要",
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
         }
@@ -1952,7 +1952,7 @@
           "anchor": {
             "heading": "What are generative AI examples?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AIの活用例",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -1976,7 +1976,7 @@
           "anchor": {
             "heading": "What are the best practices in generative AI adoption?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AI導入のベストプラクティス",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -2000,7 +2000,7 @@
           "anchor": {
             "heading": "model-monitor"
           },
-          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44",
           "section": "監視の種類",
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
         }
@@ -2024,7 +2024,7 @@
           "anchor": {
             "heading": "What are the key components of AI application architecture?"
           },
-          "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b",
           "section": "AI アプリケーションの構成要素",
           "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
         }
@@ -2048,7 +2048,7 @@
           "anchor": {
             "heading": "What is a prompt?"
           },
-          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
           "section": "プロンプトとは",
           "url": "https://aws.amazon.com/what-is/prompt-engineering/"
         }
@@ -2072,7 +2072,7 @@
           "anchor": {
             "heading": "How can AWS help with your AI agent requirements?"
           },
-          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1",
           "section": "AWS での AI エージェント",
           "url": "https://aws.amazon.com/what-is/ai-agents/"
         }
@@ -2096,7 +2096,7 @@
           "anchor": {
             "heading": "Why is prompt engineering important?"
           },
-          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
           "section": "プロンプトエンジニアリングが重要な理由",
           "url": "https://aws.amazon.com/what-is/prompt-engineering/"
         }
@@ -2120,7 +2120,7 @@
           "anchor": {
             "heading": "What are generative AI examples?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AIの活用例",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -2144,7 +2144,7 @@
           "anchor": {
             "heading": "When to use: structured data vs. unstructured data"
           },
-          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
           "section": "構造化データと非構造化データの使い分け",
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
         }
@@ -2168,7 +2168,7 @@
           "anchor": {
             "heading": "model-monitor"
           },
-          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44",
           "section": "監視の種類",
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
         }
@@ -2190,7 +2190,7 @@
           "anchor": {
             "heading": "model-monitor"
           },
-          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44",
           "section": "概要の注意書き",
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
         }
@@ -2214,7 +2214,7 @@
           "anchor": {
             "heading": "When to use: structured data vs. unstructured data"
           },
-          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
           "section": "構造化データと非構造化データの使い分け",
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
         }
@@ -2238,7 +2238,7 @@
           "anchor": {
             "heading": "What is prompt engineering?"
           },
-          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
           "section": "プロンプトエンジニアリングとは",
           "url": "https://aws.amazon.com/what-is/prompt-engineering/"
         }
@@ -2262,7 +2262,7 @@
           "anchor": {
             "heading": "What are the limitations of generative AI?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AIの限界",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -2286,7 +2286,7 @@
           "anchor": {
             "heading": "What is Retrieval-Augmented Generation?"
           },
-          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408",
           "section": "RAG の定義",
           "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
         }
@@ -2308,7 +2308,7 @@
           "anchor": {
             "heading": "How can AWS support your generative AI requirements?"
           },
-          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
           "section": "AWS による生成AIの支援",
           "url": "https://aws.amazon.com/what-is/prompt-engineering/"
         }
@@ -2333,7 +2333,7 @@
           "anchor": {
             "heading": "What are the best practices in generative AI adoption?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AI導入のベストプラクティス",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -2357,7 +2357,7 @@
           "anchor": {
             "heading": "What are the types of AI agents?"
           },
-          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1",
           "section": "AIエージェントの種類",
           "url": "https://aws.amazon.com/what-is/ai-agents/"
         }
@@ -2381,7 +2381,7 @@
           "anchor": {
             "heading": "model-monitor"
           },
-          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44",
           "section": "監視の種類",
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
         }
@@ -2405,7 +2405,7 @@
           "anchor": {
             "heading": "What are the limitations of generative AI?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AIの限界",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -2429,7 +2429,7 @@
           "anchor": {
             "heading": "How does machine learning work?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習の仕組み",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -2453,7 +2453,7 @@
           "anchor": {
             "heading": "What are AI Agents?"
           },
-          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1",
           "section": "AIエージェントの定義",
           "url": "https://aws.amazon.com/what-is/ai-agents/"
         }
@@ -2479,7 +2479,7 @@
           "anchor": {
             "heading": "How can AWS support your Retrieval-Augmented Generation requirements?"
           },
-          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408",
           "section": "AWS による RAG の支援",
           "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
         }
@@ -2503,7 +2503,7 @@
           "anchor": {
             "heading": "What are the types of machine learning algorithms?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習のアルゴリズムの種類",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -2527,7 +2527,7 @@
           "anchor": {
             "heading": "What are the benefits of machine learning?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習の利点",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -2551,7 +2551,7 @@
           "anchor": {
             "heading": "model-monitor-how-it-works"
           },
-          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44",
           "section": "仕組み",
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
         }
@@ -2575,7 +2575,7 @@
           "anchor": {
             "heading": "Summary of differences: structured data vs. unstructured data"
           },
-          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
           "section": "構造化データと非構造化データの比較表",
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
         }
@@ -2599,7 +2599,7 @@
           "anchor": {
             "heading": "What are the key components of AI agent architecture?"
           },
-          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1",
           "section": "AIエージェントの構成要素",
           "url": "https://aws.amazon.com/what-is/ai-agents/"
         }
@@ -2623,7 +2623,7 @@
           "anchor": {
             "heading": "What’s the Difference Between Structured Data and Unstructured Data?"
           },
-          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
           "section": "構造化データと非構造化データの違い（導入）",
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
         }
@@ -2647,7 +2647,7 @@
           "anchor": {
             "heading": "What is the difference between machine learning vs. deep learning?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習と深層学習の違い",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -2671,7 +2671,7 @@
           "anchor": {
             "heading": "What are the benefits of Retrieval-Augmented Generation?"
           },
-          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408",
           "section": "RAG の利点",
           "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
         }
@@ -2693,7 +2693,7 @@
           "anchor": {
             "heading": "When was generative AI created?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AIが生まれた時期",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -2717,7 +2717,7 @@
           "anchor": {
             "heading": "What are generative AI examples?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AIの活用例",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -2741,7 +2741,7 @@
           "anchor": {
             "heading": "What are the challenges in machine learning implementation?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習導入の課題",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -2765,7 +2765,7 @@
           "anchor": {
             "heading": "Why is Retrieval-Augmented Generation important?"
           },
-          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408",
           "section": "RAG が重要な理由",
           "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
         }
@@ -2789,7 +2789,7 @@
           "anchor": {
             "heading": "What is the difference between AI and Generative AI?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "AIと生成AIの違い",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -2813,7 +2813,7 @@
           "anchor": {
             "heading": "Key differences: structured data vs. unstructured data"
           },
-          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
           "section": "構造化データと非構造化データの主な違い（保存）",
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
         }
@@ -2839,7 +2839,7 @@
           "anchor": {
             "heading": "How can AWS support your Retrieval-Augmented Generation requirements?"
           },
-          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408",
           "section": "AWS による RAG の支援",
           "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
         }
@@ -2863,7 +2863,7 @@
           "anchor": {
             "heading": "What is Retrieval-Augmented Generation?"
           },
-          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408",
           "section": "RAG の定義",
           "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
         }
@@ -2887,7 +2887,7 @@
           "anchor": {
             "heading": "What are generative AI examples?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AIの活用例",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -2911,7 +2911,7 @@
           "anchor": {
             "heading": "Why is Retrieval-Augmented Generation important?"
           },
-          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408",
           "section": "RAG が重要な理由",
           "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
         }
@@ -2935,7 +2935,7 @@
           "anchor": {
             "heading": "What are the best practices in generative AI adoption?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AI導入のベストプラクティス",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -2959,7 +2959,7 @@
           "anchor": {
             "heading": "How did generative AI technology evolve?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AI技術の発展",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -2983,7 +2983,7 @@
           "anchor": {
             "heading": "What are prompt engineering techniques?"
           },
-          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
           "section": "プロンプトエンジニアリングの技法",
           "url": "https://aws.amazon.com/what-is/prompt-engineering/"
         }
@@ -3005,7 +3005,7 @@
           "anchor": {
             "heading": "What is generative AI training for beginners?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "初心者向けの生成AIの学習",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -3029,7 +3029,7 @@
           "anchor": {
             "heading": "What are the limitations of generative AI?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AIの限界",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -3053,7 +3053,7 @@
           "anchor": {
             "heading": "What are the challenges in machine learning implementation?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習導入の課題",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -3077,7 +3077,7 @@
           "anchor": {
             "heading": "model-monitor-how-it-works"
           },
-          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44",
           "section": "仕組み",
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
         }
@@ -3101,7 +3101,7 @@
           "anchor": {
             "heading": "What are prompt engineering techniques?"
           },
-          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
           "section": "プロンプトエンジニアリングの技法",
           "url": "https://aws.amazon.com/what-is/prompt-engineering/"
         }
@@ -3125,7 +3125,7 @@
           "anchor": {
             "heading": "What are some prompt engineering best practices?"
           },
-          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
           "section": "プロンプトエンジニアリングの最良の実践",
           "url": "https://aws.amazon.com/what-is/prompt-engineering/"
         }
@@ -3149,7 +3149,7 @@
           "anchor": {
             "heading": "What are the types of machine learning algorithms?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習のアルゴリズムの種類",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -3173,7 +3173,7 @@
           "anchor": {
             "heading": "Technologies: structured data vs. unstructured data"
           },
-          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
           "section": "構造化データと非構造化データの技術",
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
         }
@@ -3197,7 +3197,7 @@
           "anchor": {
             "heading": "What are the key principles that define AI agents?"
           },
-          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1",
           "section": "AIエージェントの主な原則",
           "url": "https://aws.amazon.com/what-is/ai-agents/"
         }
@@ -3221,7 +3221,7 @@
           "anchor": {
             "heading": "What are AI Agents?"
           },
-          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1",
           "section": "AIエージェントの定義",
           "url": "https://aws.amazon.com/what-is/ai-agents/"
         }
@@ -3245,7 +3245,7 @@
           "anchor": {
             "heading": "What are the types of machine learning algorithms?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習のアルゴリズムの種類",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -3269,7 +3269,7 @@
           "anchor": {
             "heading": "What are generative AI examples?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AIの活用例",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -3293,7 +3293,7 @@
           "anchor": {
             "heading": "What are the benefits of generative AI?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AIの利点",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -3317,7 +3317,7 @@
           "anchor": {
             "heading": "What is a prompt?"
           },
-          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
           "section": "プロンプトとは",
           "url": "https://aws.amazon.com/what-is/prompt-engineering/"
         }
@@ -3341,7 +3341,7 @@
           "anchor": {
             "heading": "How does generative AI work?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AIの仕組み",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -3365,7 +3365,7 @@
           "anchor": {
             "heading": "When to use: structured data vs. unstructured data"
           },
-          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
           "section": "構造化データと非構造化データの使い分け",
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
         }
@@ -3389,7 +3389,7 @@
           "anchor": {
             "heading": "What are the benefits of Retrieval-Augmented Generation?"
           },
-          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408",
           "section": "RAG の利点",
           "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
         }
@@ -3413,7 +3413,7 @@
           "anchor": {
             "heading": "What are the challenges in machine learning implementation?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習導入の課題",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -3437,7 +3437,7 @@
           "anchor": {
             "heading": "What are the benefits of Retrieval-Augmented Generation?"
           },
-          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408",
           "section": "RAG の利点",
           "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
         }
@@ -3461,7 +3461,7 @@
           "anchor": {
             "heading": "What is the difference between Retrieval-Augmented Generation and semantic search?"
           },
-          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408",
           "section": "RAG と意味検索の違い",
           "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
         }
@@ -3485,7 +3485,7 @@
           "anchor": {
             "heading": "Technologies: structured data vs. unstructured data"
           },
-          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
           "section": "構造化データと非構造化データの技術",
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
         }
@@ -3507,7 +3507,7 @@
           "anchor": {
             "heading": "How can AWS support your generative AI requirements?"
           },
-          "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
           "section": "AWS による生成AIの支援",
           "url": "https://aws.amazon.com/what-is/prompt-engineering/"
         }
@@ -3531,7 +3531,7 @@
           "anchor": {
             "heading": "What is the difference between machine learning, deep learning, and artificial intelligence?"
           },
-          "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b",
           "section": "AI・機械学習・深層学習の違い",
           "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
         }
@@ -3555,7 +3555,7 @@
           "anchor": {
             "heading": "model-monitor"
           },
-          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44",
           "section": "監視の種類",
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
         }
@@ -3579,7 +3579,7 @@
           "anchor": {
             "heading": "What is Retrieval-Augmented Generation?"
           },
-          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408",
           "section": "RAG の定義",
           "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
         }
@@ -3603,7 +3603,7 @@
           "anchor": {
             "heading": "Key differences: structured data vs. unstructured data"
           },
-          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
           "section": "構造化データと非構造化データの主な違い",
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
         }
@@ -3627,7 +3627,7 @@
           "anchor": {
             "heading": "What is Generative AI?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AIとは",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -3651,7 +3651,7 @@
           "anchor": {
             "heading": "What are the types of machine learning algorithms?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習のアルゴリズムの種類",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -3675,7 +3675,7 @@
           "anchor": {
             "heading": "How can AWS help with your AI agent requirements?"
           },
-          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1",
           "section": "AWS での AI エージェント",
           "url": "https://aws.amazon.com/what-is/ai-agents/"
         }
@@ -3699,7 +3699,7 @@
           "anchor": {
             "heading": "How does Retrieval-Augmented Generation work?"
           },
-          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408",
           "section": "RAG の仕組み",
           "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
         }
@@ -3725,7 +3725,7 @@
           "anchor": {
             "heading": "How can AWS support your Retrieval-Augmented Generation requirements?"
           },
-          "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408",
           "section": "AWS による RAG の支援",
           "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
         }
@@ -3749,7 +3749,7 @@
           "anchor": {
             "heading": "What’s the Difference Between Structured Data and Unstructured Data?"
           },
-          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
           "section": "構造化データと非構造化データの違い（導入）",
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
         }
@@ -3773,7 +3773,7 @@
           "anchor": {
             "heading": "model-monitor"
           },
-          "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44",
           "section": "監視の種類",
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
         }
@@ -3797,7 +3797,7 @@
           "anchor": {
             "heading": "What are the best practices in generative AI adoption?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AI導入のベストプラクティス",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -3821,7 +3821,7 @@
           "anchor": {
             "heading": "How does generative AI work?"
           },
-          "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
           "section": "生成AIの仕組み",
           "url": "https://aws.amazon.com/what-is/generative-ai/"
         }
@@ -3847,7 +3847,7 @@
           "anchor": {
             "heading": "When to use: structured data vs. unstructured data"
           },
-          "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
           "section": "構造化データと非構造化データの使い分け",
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
         }
@@ -3871,7 +3871,7 @@
           "anchor": {
             "heading": "What are the challenges of using AI agents?"
           },
-          "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1",
           "section": "AIエージェントの課題",
           "url": "https://aws.amazon.com/what-is/ai-agents/"
         }
@@ -3895,7 +3895,7 @@
           "anchor": {
             "heading": "What is the difference between machine learning vs. artificial intelligence?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "AIと機械学習の違い",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -3919,7 +3919,7 @@
           "anchor": {
             "heading": "What are the challenges in machine learning implementation?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習導入の課題",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -3943,7 +3943,7 @@
           "anchor": {
             "heading": "Are machine learning models deterministic?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習モデルは決定的か",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -3967,7 +3967,7 @@
           "anchor": {
             "heading": "How does machine learning work?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習の仕組み",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -3991,7 +3991,7 @@
           "anchor": {
             "heading": "What are the challenges in machine learning implementation?"
           },
-          "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
           "section": "機械学習導入の課題",
           "url": "https://aws.amazon.com/what-is/machine-learning/"
         }
@@ -4002,35 +4002,35 @@
   "examCode": "AWS-AIB-C01",
   "extracted": [
     {
-      "contentHash": "f7e270c81d5223017ba09ce1c080dbb4ed1005c9d5c9113156da435ec9e75791",
+      "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
       "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
     },
     {
-      "contentHash": "7ddd5a896e96bfed6596c16a87aa40fa7f9df672dfa54e036b4b73e5942ac9fd",
+      "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1",
       "url": "https://aws.amazon.com/what-is/ai-agents/"
     },
     {
-      "contentHash": "214f677a6ef323010c69bd167d4ce0310b5c3339e4d97034af0d000c26b90f3b",
+      "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b",
       "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
     },
     {
-      "contentHash": "f2d68faff12571b46c8760fd5f44fc4bb48b6f26419686966556afa5f77c58fe",
+      "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
       "url": "https://aws.amazon.com/what-is/generative-ai/"
     },
     {
-      "contentHash": "765b601d8bb6cd280be4a3fb1937c5ae88636d7cbaa7ba13bb7a47e7e8db621e",
+      "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
       "url": "https://aws.amazon.com/what-is/machine-learning/"
     },
     {
-      "contentHash": "08eb45b96780fb5499f0cfa9d3c57dbf59ba320f4c3ead24c3b69aacab011631",
+      "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
       "url": "https://aws.amazon.com/what-is/prompt-engineering/"
     },
     {
-      "contentHash": "5d735853472a6d696df91d0652eaac040ba9f983977106540567a6fa1d12ff83",
+      "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408",
       "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
     },
     {
-      "contentHash": "9f9947df7e10c75cf7bc2b8f8182a554470fef7efd23b061429eadc6b2c11aff",
+      "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44",
       "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
     }
   ]
