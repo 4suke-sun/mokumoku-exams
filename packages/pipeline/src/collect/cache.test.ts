@@ -1,8 +1,9 @@
-import { chmodSync, existsSync, mkdtempSync, readdirSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readdirSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { BodyCache } from "./cache.ts";
+import { contentHashOf, rawSha256 } from "./content-hash.ts";
 import { sha256 } from "./fetcher.ts";
 
 const DAY = 24 * 60 * 60 * 1000;
@@ -24,6 +25,41 @@ describe("本文のキャッシュ", () => {
     expect(cache.has(hash)).toBe(true);
     expect(cache.read(hash)?.equals(body)).toBe(true);
     expect(cache.read("0".repeat(64))).toBeNull();
+  });
+
+  it("HTML の本文_見える本文のハッシュをキーにし、見える本文が同じなら同じキーで、あとから書いた本文が残る", () => {
+    const { cache } = setup();
+    const a = Buffer.from(
+      "<html><head><meta name=a content=1></head><body><main>本文</main><nav>案内 1</nav></body></html>",
+    );
+    const b = Buffer.from(
+      "<html><head><meta name=a content=2></head><body><main>本文</main><nav>案内 2</nav></body></html>",
+    );
+    const hash = cache.write(a);
+    expect(hash).toBe(contentHashOf(a));
+    expect(hash).not.toBe(rawSha256(a));
+    expect(cache.write(b)).toBe(hash);
+    expect(cache.read(hash)?.equals(b)).toBe(true);
+  });
+
+  it("旧い定義の名前(生のバイト列のハッシュ)のファイル_そのまま読める", () => {
+    const { dir, cache } = setup();
+    const body = Buffer.from("<html><body><main>旧い定義で保存した本文</main></body></html>");
+    const legacy = rawSha256(body);
+    mkdirSync(dir, { recursive: true });
+    writeFileSync(join(dir, `${legacy}.body`), body);
+    expect(cache.has(legacy)).toBe(true);
+    expect(cache.read(legacy)?.equals(body)).toBe(true);
+  });
+
+  it("peek_壊れたファイルを消さず、壊れていなければ読める", () => {
+    const { dir, cache } = setup();
+    const hash = cache.write(Buffer.from("a"));
+    expect(cache.peek(hash)?.equals(Buffer.from("a"))).toBe(true);
+    writeFileSync(join(dir, `${hash}.body`), "tampered");
+    expect(cache.peek(hash)).toBeNull();
+    expect(existsSync(join(dir, `${hash}.body`))).toBe(true);
+    expect(cache.peek("0".repeat(64))).toBeNull();
   });
 
   it("ハッシュの形でないキー_受け付けない(置き場の外を指せない)", () => {

@@ -3,7 +3,8 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { BodyCache } from "../collect/cache.ts";
-import { Fetcher, sha256 } from "../collect/fetcher.ts";
+import { contentHashOf } from "../collect/content-hash.ts";
+import { Fetcher } from "../collect/fetcher.ts";
 import { emptyLedger, type LedgerFile, ledgerPath, readLedger, writeLedger } from "../collect/ledger.ts";
 import { entry, fakeNet, testFetchConfig } from "../collect/test-helpers.ts";
 import { decisionsPath, writeDecisions } from "../decisions/decisions.ts";
@@ -399,7 +400,7 @@ describe("facts --import", () => {
     expect(keep && drop).toBeTruthy();
     // 本文が変わった(上限が 100 から 150 になった)
     const body = factsFixture("service-doc.html").replace("100 buckets", "150 buckets");
-    const hash = sha256(Buffer.from(body));
+    const hash = contentHashOf(Buffer.from(body));
     cacheBody(root, body);
     const ledgerFile = ledgerPath(join(root, config.ledgerDir), CODE);
     const marked = readLedger(ledgerFile, CODE);

@@ -49,3 +49,4 @@
 - [0022 非公開の問題は、アプリが読まない別のファイルに持つ](./0022-unpublished-questions-in-separate-file.md)
 - [0023 非公開の問題の書き直しは、パイプラインが扱い、元の ID のまま公開へ戻す](./0023-rewrite-unpublished-questions.md)
 - [0024 試験ガイドの対象サービス・対象外サービスの一覧で、問題の範囲を検査する](./0024-scope-check-by-exam-guide-service-lists.md)
+- [0025 出典の変更の検出を、見える本文のハッシュで行う](./0025-source-content-hash-of-visible-text.md)

@@ -19,4 +19,5 @@ export const COMMANDS: readonly CommandSpec[] = [
   { name: "reasons", summary: "不採用と差し戻しの理由を集計する(記録は変えない)" },
   { name: "status", summary: "段階ごとの状態を表示する(読むだけ)" },
   { name: "score", summary: "公開している問題の書き方を、点数票で採点する(読むだけ)" },
+  { name: "rehash", summary: "出典の本文のハッシュを、新しい定義へ移す(再検証の印は付けない)" },
 ];

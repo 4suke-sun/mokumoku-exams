@@ -2,7 +2,8 @@ import { cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, 
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
-import { Fetcher, sha256 } from "../collect/fetcher.ts";
+import { contentHashOf } from "../collect/content-hash.ts";
+import { Fetcher } from "../collect/fetcher.ts";
 import { ledgerPath, readLedger, writeLedger } from "../collect/ledger.ts";
 import { type FakeResponse, fakeNet, fixture, ROBOTS_OK, testFetchConfig } from "../collect/test-helpers.ts";
 import { draftWorkDir, readDrafts } from "../draft/store.ts";
@@ -112,7 +113,7 @@ function writeGuide(root: string) {
     JSON.stringify({
       examCode: CODE,
       sourceUrl: GUIDE,
-      contentHash: sha256(Buffer.from(fixture("guide.html"))),
+      contentHash: contentHashOf(Buffer.from(fixture("guide.html"))),
       pages: [],
       domains: [
         { number: 1, name: "分野 1", weightPercent: 24, scope: ["上限の数え方"] },
@@ -150,7 +151,7 @@ const wrongNumberCard = { ...goodCard, claim: "Widget Store では、バケッ�
 
 /** エージェントの代わりに、事実カードの抽出を書く */
 function writeFacts(root: string, cards: unknown[]) {
-  const hash = sha256(Buffer.from(factsFixture("service-doc.html")));
+  const hash = contentHashOf(Buffer.from(factsFixture("service-doc.html")));
   const dir = work(root, "facts/aws-aib-c01/out");
   mkdirSync(dir, { recursive: true });
   writeFileSync(

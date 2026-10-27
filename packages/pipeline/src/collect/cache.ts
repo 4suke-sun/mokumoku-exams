@@ -10,10 +10,11 @@ import {
   writeFileSync,
 } from "node:fs";
 import { join } from "node:path";
-import { sha256 } from "./fetcher.ts";
+import { contentHashOf, rawSha256 } from "./content-hash.ts";
 
 /**
- * 取得した本文の作業用キャッシュ。作業用の置き場(gitignore 済み)の中にだけ置き、本文のハッシュをキーにする。
+ * 取得した本文の作業用キャッシュ。作業用の置き場(gitignore 済み)の中にだけ置き、本文のハッシュ(content-hash.ts)をキーにする。
+ * 見える本文が同じ 2 つの HTML は、同じキーになり、あとから書いた本文が残る。旧い定義(生のバイト列の sha256)の名前のファイルも、読める。
  * 書き込みは一時ファイルから置き換えるので、途中で止まっても壊れたファイルを残さない。
  */
 
@@ -45,12 +46,12 @@ export class BodyCache {
     return existsSync(this.path(hash));
   }
 
-  /** 読み出す。中身のハッシュが合わなければ、壊れたものとして消して null を返す。読んだものは新しい扱いにする */
+  /** 読み出す。中身のハッシュが、名前と合わなければ(新旧どちらの定義でも)、壊れたものとして消して null を返す。読んだものは新しい扱いにする */
   read(hash: string): Buffer | null {
     const path = this.path(hash);
     if (!existsSync(path)) return null;
     const body = readFileSync(path);
-    if (sha256(body) !== hash) {
+    if (contentHashOf(body) !== hash && rawSha256(body) !== hash) {
       rmSync(path, { force: true });
       return null;
     }
@@ -59,9 +60,17 @@ export class BodyCache {
     return body;
   }
 
+  /** 読み出す。read と違い、何も変えない(壊れたものを消さず、新しい扱いにもしない)。壊れたものは null */
+  peek(hash: string): Buffer | null {
+    const path = this.path(hash);
+    if (!existsSync(path)) return null;
+    const body = readFileSync(path);
+    return contentHashOf(body) === hash || rawSha256(body) === hash ? body : null;
+  }
+
   /** 書き込み、ハッシュを返す */
   write(body: Buffer): string {
-    const hash = sha256(body);
+    const hash = contentHashOf(body);
     const path = this.path(hash);
     mkdirSync(this.dir, { recursive: true });
     const tmp = `${path}.${process.pid}.${this.now()}.tmp`;
