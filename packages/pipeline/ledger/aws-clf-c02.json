@@ -2,15 +2,15 @@
   "examCode": "AWS-CLF-C02",
   "guide": {
     "agent": {
-      "definitionHash": "247c589606569d96f1af5ad352dac95317fff8f6abed0965bb4dd1412067e7fd",
+      "definitionHash": "e852ec29473856c75d44f0b228d99428e2f751c8a75a2ba51a66f87b1026f73f",
       "model": "claude-haiku-5-5",
       "role": "guide-extractor"
     },
-    "contentHash": "27a5d74297e5b8a5dfeff3bcc5c4d48da7b9873b8e6c0bee51a82bcdccf786e1",
+    "contentHash": "9ced9ac29988fc2c76d5356f296e3f15049c92e40f2d33c290b89454300f1029",
     "domains": [
       {
         "code": "domain1",
-        "name": "クラウドの基礎知識",
+        "name": "クラウドの基本概念",
         "scope": [
           "クラウドを採用すると得られる価値を、自分の言葉で説明する",
           "拠点の世界的な広がりが、展開の速さと到達範囲にもたらす効果を捉える",
@@ -74,7 +74,7 @@
       },
       {
         "code": "domain4",
-        "name": "請求、料金、サポート",
+        "name": "料金・請求・サポート",
         "scope": [
           "コンピューティングの購入方式（オンデマンド、予約、スポット、節約プランなど）を場面ごとに使い分ける",
           "予約の柔軟性と、複数アカウントをまとめて管理する場合の扱いを説明する",
@@ -97,7 +97,57 @@
       "scoredQuestionCount": 50,
       "totalScore": 1000
     },
-    "importedAt": "2026-10-18",
+    "excludedServices": [
+      "Amazon AppFlow",
+      "AWS Clean Rooms",
+      "AWS Data Exchange",
+      "Amazon DataZone",
+      "Amazon Managed Streaming for Apache Kafka (Amazon MSK)",
+      "AWS AppFabric",
+      "Amazon Simple Workflow Service",
+      "AWS Copilot",
+      "AWS Wavelength",
+      "AWS Application Cost Profiler",
+      "Amazon DevPay",
+      "AWS Activate",
+      "AWS IQ",
+      "Amazon Managed Services (AMS)",
+      "AWS Billing Conductor",
+      "Amazon Keyspaces (for Apache Cassandra)",
+      "Amazon MemoryDB for Redis OSS",
+      "AWS AppConfig",
+      "AWS Application Composer",
+      "AWS CodeArtifact",
+      "AWS CodeDeploy",
+      "Amazon CodeGuru",
+      "AWS CloudShell",
+      "AWS Device Farm",
+      "Amazon GameLift",
+      "AWS IoT Device Defender",
+      "AWS IoT Greengrass",
+      "Amazon Fraud Detector",
+      "Amazon Personalize",
+      "AWS Chatbot",
+      "Amazon Data Lifecycle Manager",
+      "AWS Launch Wizard",
+      "AWS Elemental Appliances and Software",
+      "AWS Elemental MediaConnect",
+      "AWS Elemental MediaConvert",
+      "AWS Elemental MediaLive",
+      "AWS Elemental MediaPackage",
+      "AWS Elemental MediaTailor",
+      "Amazon Interactive Video Service (Amazon IVS)",
+      "AWS Migration Hub Refactor Spaces",
+      "AWS Transfer Family",
+      "AWS Cloud Map",
+      "AWS Network Access Analyzer",
+      "AWS Ground Station",
+      "Amazon VPC Lattice",
+      "Amazon Cloud Directory",
+      "AWS Network Firewall",
+      "Amazon FSx for Lustre"
+    ],
+    "importedAt": "2026-10-28",
     "pages": [
       {
         "contentHash": "66926a60e5b6afa386473413b4760571b808e832209b180743fca2a468746523",
@@ -108,18 +158,212 @@
         "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02-domain2.html"
       },
       {
-        "contentHash": "1df7d894bfc7933ec2d5a7ae5c2952e765dd6bd4aa47fdd724285c5666332cb5",
+        "contentHash": "319146a6bc3f23aff8c92a962f160fcae994bce8e1a268fa292d12603ab0211d",
         "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02-domain3.html"
       },
       {
-        "contentHash": "7fdee04ac8a872aa4759768282e1c0b5c711fa7e3cceafdfcf76908e8a3c856f",
+        "contentHash": "ef83910213299081ff2db42c2a7ed8bddef4a105a1a7f2b79b8e070a4b7d2e6c",
         "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02-domain4.html"
+      },
+      {
+        "contentHash": "5e94c5a92680fb0998ecd9839f6ffcdf4c18bb1034b2ed6b14a2f672997c1c45",
+        "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/clf-02-in-scope-services.html"
+      },
+      {
+        "contentHash": "aac7037f61c9aa9f8e5fc21b120a8fa1bc9b859f0c335ed973f02aafb23cd3e4",
+        "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/clf-02-out-of-scope-services.html"
+      },
+      {
+        "contentHash": "2ba48efe0fb92b82d061077bf0ad922eb0440efb0537d4ed08c67585846b84e5",
+        "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/clf-technologies-concepts.html"
       }
+    ],
+    "services": [
+      "Amazon Athena",
+      "Amazon EMR",
+      "AWS Glue",
+      "Amazon Kinesis",
+      "Amazon OpenSearch Service",
+      "Amazon Quick",
+      "Amazon Redshift",
+      "Amazon EventBridge",
+      "Amazon Simple Notification Service (Amazon SNS)",
+      "Amazon Simple Queue Service (Amazon SQS)",
+      "AWS Step Functions",
+      "Amazon Connect",
+      "Amazon Simple Email Service (Amazon SES)",
+      "AWS Budgets",
+      "AWS Cost and Usage Reports",
+      "AWS Cost Explorer",
+      "AWS Marketplace",
+      "AWS Batch",
+      "Amazon EC2",
+      "AWS Elastic Beanstalk",
+      "Amazon Lightsail",
+      "AWS Outposts",
+      "Amazon Elastic Container Registry (Amazon ECR)",
+      "Amazon Elastic Container Service (Amazon ECS)",
+      "Amazon Elastic Kubernetes Service (Amazon EKS)",
+      "AWS Support",
+      "Amazon Aurora",
+      "Amazon DocumentDB",
+      "Amazon DynamoDB",
+      "Amazon ElastiCache",
+      "Amazon Neptune",
+      "Amazon RDS",
+      "AWS CLI",
+      "AWS CodeBuild",
+      "AWS CodePipeline",
+      "AWS X-Ray",
+      "Amazon AppStream 2.0",
+      "Amazon WorkSpaces",
+      "Amazon WorkSpaces Secure Browser",
+      "AWS Amplify",
+      "AWS IoT Core",
+      "Amazon Comprehend",
+      "Amazon Lex",
+      "Amazon Polly",
+      "Amazon Q",
+      "Amazon Rekognition",
+      "Amazon SageMaker AI",
+      "Amazon Textract",
+      "Amazon Transcribe",
+      "Amazon Translate",
+      "AWS Auto Scaling",
+      "AWS CloudFormation",
+      "AWS CloudTrail",
+      "Amazon CloudWatch",
+      "AWS Compute Optimizer",
+      "AWS Config",
+      "AWS Control Tower",
+      "AWS Health Dashboard",
+      "AWS License Manager",
+      "AWS Management Console",
+      "AWS Organizations",
+      "AWS Service Catalog",
+      "Service Quotas",
+      "AWS Systems Manager",
+      "AWS Trusted Advisor",
+      "AWS Well-Architected Tool",
+      "AWS Application Discovery Service",
+      "AWS Application Migration Service",
+      "AWS Database Migration Service (AWS DMS)",
+      "Migration Evaluator",
+      "AWS Migration Hub",
+      "AWS Schema Conversion Tool (AWS SCT)",
+      "Amazon API Gateway",
+      "Amazon CloudFront",
+      "AWS Direct Connect",
+      "AWS Global Accelerator",
+      "AWS PrivateLink",
+      "Amazon Route 53",
+      "AWS Transit Gateway",
+      "Amazon VPC",
+      "AWS VPN",
+      "AWS Site-to-Site VPN",
+      "AWS Client VPN",
+      "AWS Artifact",
+      "AWS Certificate Manager (ACM)",
+      "AWS CloudHSM",
+      "Amazon Cognito",
+      "Amazon Detective",
+      "AWS Directory Service",
+      "AWS Firewall Manager",
+      "Amazon GuardDuty",
+      "AWS Identity and Access Management (IAM)",
+      "AWS IAM Identity Center",
+      "Amazon Inspector",
+      "AWS Key Management Service (AWS KMS)",
+      "Amazon Macie",
+      "AWS Resource Access Manager (AWS RAM)",
+      "AWS Secrets Manager",
+      "AWS Security Hub",
+      "AWS Shield",
+      "AWS WAF",
+      "AWS Fargate",
+      "AWS Lambda",
+      "AWS Backup",
+      "Amazon Elastic Block Store (Amazon EBS)",
+      "Amazon Elastic File System (Amazon EFS)",
+      "AWS Elastic Disaster Recovery",
+      "Amazon FSx",
+      "Amazon S3",
+      "Amazon S3 Glacier",
+      "AWS Storage Gateway"
     ],
     "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02.html"
   },
   "recheck": {
-    "facts": [],
+    "facts": [
+      "f-02edf59157bf",
+      "f-0f7b923ad9c4",
+      "f-14f9825ce92a",
+      "f-16163d787c65",
+      "f-17261371eeb0",
+      "f-18a7faaf9e59",
+      "f-1aa9a83a5ca7",
+      "f-1f6b9cc2d495",
+      "f-204646266229",
+      "f-2046b7437dbd",
+      "f-205b91f7067e",
+      "f-2262a2195510",
+      "f-26aeb979d514",
+      "f-2de88288921b",
+      "f-36d21adac19d",
+      "f-395fa29a43e8",
+      "f-3b38d4df5f19",
+      "f-3dcab3c8cc76",
+      "f-3fd784d18163",
+      "f-42874d5116ae",
+      "f-459751300f2b",
+      "f-465fa251fa95",
+      "f-527cbc43921c",
+      "f-532d388b9dc7",
+      "f-5a6a0d80cb37",
+      "f-5c0d06d3e38e",
+      "f-5c8e11473911",
+      "f-5f50c5a23816",
+      "f-5ff30cde4fd8",
+      "f-62a60aa8a12d",
+      "f-6315e6f99131",
+      "f-66a6f7e754cd",
+      "f-67c6107476eb",
+      "f-6873b0072ec9",
+      "f-698f73e3efe5",
+      "f-6b5337b2576a",
+      "f-72446d688426",
+      "f-7425ce521c78",
+      "f-75118c6d448b",
+      "f-7658e17c1670",
+      "f-7c58849cad99",
+      "f-7fd33a3e2176",
+      "f-80e45e619d84",
+      "f-8d7020a35480",
+      "f-8da0f9e8bdb7",
+      "f-917aef7758b3",
+      "f-9460a758bed8",
+      "f-9ce6d0d7cd24",
+      "f-a03fecfeb075",
+      "f-ac1bf7d8f1c4",
+      "f-b2e88d61e2e1",
+      "f-b6e2d15ee833",
+      "f-bbef98b1328b",
+      "f-c3b35d6b63a4",
+      "f-c6e97d3957cf",
+      "f-caed92206211",
+      "f-cccf88b8ad22",
+      "f-cea146b1b771",
+      "f-cf3f42cbe81d",
+      "f-d63473eaaffe",
+      "f-dd3a213a663a",
+      "f-e318b66e9274",
+      "f-e511e797fd30",
+      "f-e545b8bfcbe7",
+      "f-f373ce47e8ee",
+      "f-f61812b37598",
+      "f-f8a6d2e6b240",
+      "f-f91241d75975"
+    ],
     "questions": []
   },
   "sources": [
@@ -148,14 +392,15 @@
       ],
       "claims": [],
       "contentHash": "ec0f35fbb5468655148a802cf7bcb18cb3366f19e3a932ea470eee0801f4fb81",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Global Infrastructure - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/about-aws/global-infrastructure/"
     },
     {
@@ -183,14 +428,15 @@
       ],
       "claims": [],
       "contentHash": "a2a900d8efd76653544f3bb5d09c4513ea4edf8beaef292c9031b6c24babbbc6",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Global Infrastructure Regions & AZs",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/about-aws/global-infrastructure/regions_az/"
     },
     {
@@ -218,14 +464,15 @@
       ],
       "claims": [],
       "contentHash": "1e598e42e3d3985cd241600dbe11aaa270cd5a778ec36c9d3ca36b86289a1c9c",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Full Stack Development - Web and Mobile Apps - AWS Amplify",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/amplify/"
     },
     {
@@ -253,14 +500,15 @@
       ],
       "claims": [],
       "contentHash": "c640d26bfba95e2d1f1c390f9f39daeceef359512ffe9dca277520c546baf091",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Amazon API Gateway | API Management | Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/api-gateway/"
     },
     {
@@ -287,15 +535,16 @@
         }
       ],
       "claims": [],
-      "contentHash": "ed21b5f7598f91173246ac41b66cce9f06fa7da9db7054139c970d820448dc91",
-      "fetchedAt": "2026-10-18",
+      "contentHash": "6653320c72c9ad50182455069bacce88415740ef34acc3fe6f30f7118d08b309",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Smash tech debt and get AI ready – AWS Transform – AWS",
+      "updatedAt": "2026-10-26",
       "url": "https://aws.amazon.com/application-discovery/"
     },
     {
@@ -323,14 +572,15 @@
       ],
       "claims": [],
       "contentHash": "7c9aff99fa436b56b4fe1054df15e2c360a22390ebfb7ba6046977c1e58d60dd",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Rehost applications to AWS - AWS Transform MGN - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/application-migration-service/"
     },
     {
@@ -358,14 +608,15 @@
       ],
       "claims": [],
       "contentHash": "29454626300f65d2a689b170dcd736490003bcecf68b0fcb712225a8feab9e60",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Desktops and application streaming - Amazon WorkSpaces applications - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/appstream2/"
     },
     {
@@ -393,14 +644,15 @@
       ],
       "claims": [],
       "contentHash": "48dfb4781382f9c464791cf567c2b089d66702db5027d469cad517986e548e61",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "AWS Well-Architected - Build secure, efficient cloud applications",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/architecture/well-architected/"
     },
     {
@@ -428,14 +680,15 @@
       ],
       "claims": [],
       "contentHash": "fcbb43960e4c18eb76dcf24fdf112d9c45ab450f5d19d96376206b778e4e3053",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Security Compliance Management - AWS Artifact - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/artifact/"
     },
     {
@@ -463,14 +716,15 @@
       ],
       "claims": [],
       "contentHash": "fdeff50df9f4b69272acd3009d66373836d4d40f1b882649ff8f565332e1ef8f",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Interactive SQL - Serverless Query Service - Amazon Athena - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/athena/"
     },
     {
@@ -498,14 +752,15 @@
       ],
       "claims": [],
       "contentHash": "6a5f7ceae03002b36655bf12793b1621afcbf315e2eeb0db20e7dae3ccb2dd37",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "App Scaling - AWS Application Auto Scaling - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/autoscaling/"
     },
     {
@@ -533,14 +788,15 @@
       ],
       "claims": [],
       "contentHash": "a58b8449a5575756ed4f7a0445011e2a8eb0fcbd31020676842bef238884bfc3",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "AWS Billing - Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/aws-cost-management/aws-billing/"
     },
     {
@@ -568,14 +824,15 @@
       ],
       "claims": [],
       "contentHash": "d47d84f40faa9c2e93238880381ffb11cb0bc98c18cec3a2d320b5db1471928b",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Set Custom Cost and Usage Budgets – AWS Budgets – Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/aws-cost-management/aws-budgets/"
     },
     {
@@ -603,14 +860,15 @@
       ],
       "claims": [],
       "contentHash": "c68f239b0b19ef836e60d31832d2ad46e6dff8ad615ecfd42b35831957862c3b",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Cloud Usage Report - AWS Cost and Usage Reports - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/aws-cost-management/aws-cost-and-usage-reporting/"
     },
     {
@@ -638,14 +896,15 @@
       ],
       "claims": [],
       "contentHash": "9256787d216c1d73d31ef22f4fb7e70e7c20d996373d4869eae97da78c589c28",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Cloud Cost Report - AWS Cost Explorer - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/aws-cost-management/aws-cost-explorer/"
     },
     {
@@ -672,15 +931,16 @@
         }
       ],
       "claims": [],
-      "contentHash": "58d44164a0e15abc0c6d3a3261b6e3ca3bc50e48223dc8744ecee2d9b42bd943",
-      "fetchedAt": "2026-10-18",
+      "contentHash": "d9162c4ff2adcdb8c1129a483caec0d8f7ffa148553156d1ea289d0f73e5b51a",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Backup As A Service - Centralized Backups - AWS Backup - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/backup/"
     },
     {
@@ -708,14 +968,15 @@
       ],
       "claims": [],
       "contentHash": "19ed49db1820391438a3abafeb3be460881cfe800b1c88f671e496320714db6e",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Efficient Batch Processing - AWS Batch - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/batch/"
     },
     {
@@ -743,14 +1004,15 @@
       ],
       "claims": [],
       "contentHash": "f836de3f56940f8cdc1bf4a4d3c51548efebd89fb582c0605f4375449593b154",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Certificate Manager - AWS Certificate Manager - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/certificate-manager/"
     },
     {
@@ -778,14 +1040,15 @@
       ],
       "claims": [],
       "contentHash": "b40f0bc113e6b68af96d87db8ae27b932b03c6c0b1431ff8e89fdc18e0270468",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "AWS CLI",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/cli/"
     },
     {
@@ -813,14 +1076,15 @@
       ],
       "claims": [],
       "contentHash": "495cdd103ba9889c8b221fd64e4bf40ec61450c28c6ff0a7f4ed99952dc4c818",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "AWS Cloud Adoption Framework",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/cloud-adoption-framework/"
     },
     {
@@ -847,15 +1111,16 @@
         }
       ],
       "claims": [],
-      "contentHash": "deab148d08335787e4af41b5738c572e0ebf86fc3626485974848c32875b46ac",
-      "fetchedAt": "2026-10-18",
+      "contentHash": "83cf9fd79544c669d28e86d70d445754fb852f75de2282341eda66d524218daf",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "AWS Migration & Modernization | Cloud Transformation",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/cloud-migration/"
     },
     {
@@ -883,14 +1148,15 @@
       ],
       "claims": [],
       "contentHash": "5105ae3bcc37854358599234c1c1c3aae577400a1b21b5cde5e7c205260c93fb",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Provision Infrastructure as Code - AWS CloudFormation - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/cloudformation/"
     },
     {
@@ -917,15 +1183,16 @@
         }
       ],
       "claims": [],
-      "contentHash": "8932cbb1c8a5028f41a5ed84f1e13772ddc2701020ed976d26dae4ad881eac49",
-      "fetchedAt": "2026-10-18",
+      "contentHash": "31aa4fc20be1a11589ab73e5ad279550601f1b4d8fa0f4598728f406d1e314e9",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Low-Latency Content Delivery Network (CDN) - Amazon CloudFront - Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/cloudfront/"
     },
     {
@@ -953,14 +1220,15 @@
       ],
       "claims": [],
       "contentHash": "e1c0258ec4db4bd9a7caa7856e59a99b53e269c75526679948d978335f0359d4",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Security HSM - AWS CloudHSM - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/cloudhsm/"
     },
     {
@@ -988,14 +1256,15 @@
       ],
       "claims": [],
       "contentHash": "b3805a6a3aa996f8603c07d98b2e11545e902c9f968f8ad7e69f52ba8a936305",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "API Logs - Secure Standardized Logging Service - AWS CloudTrail - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/cloudtrail/"
     },
     {
@@ -1023,14 +1292,15 @@
       ],
       "claims": [],
       "contentHash": "4a8f1b0d0f61037d4090e3580c76b1f7ef9f255a7cedda534c547a45af0ff3f1",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Amazon Monitoring and Observability-Amazon CloudWatch - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/cloudwatch/"
     },
     {
@@ -1058,14 +1328,15 @@
       ],
       "claims": [],
       "contentHash": "e7e7f2a31f042c64c69935f83d9afe18c161db6d0ec779c9502cf145b1a07bc8",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Managed Build Server - AWS CodeBuild - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/codebuild/"
     },
     {
@@ -1093,14 +1364,15 @@
       ],
       "claims": [],
       "contentHash": "ace26a69354ae1c90086e996674909732dd5726e964a35eca81dd13224ef28da",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Software Deployment Service - Amazon CodeDeploy - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/codedeploy/"
     },
     {
@@ -1128,14 +1400,15 @@
       ],
       "claims": [],
       "contentHash": "64a0f8fa88d2a525c1a7ff4c5e9c6f27e2afc5dd9680d375157d88a99ebd2226",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "CI/CD Pipeline – AWS CodePipeline – AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/codepipeline/"
     },
     {
@@ -1163,14 +1436,15 @@
       ],
       "claims": [],
       "contentHash": "4763cfae2d95fbb1f319ef6fc63f1980e26b021a1559811206c4ed026309d811",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Amazon Cognito - Customer Identity and Access Management - Machine Identity and Access Management",
+      "updatedAt": "2026-10-26",
       "url": "https://aws.amazon.com/cognito/"
     },
     {
@@ -1198,14 +1472,15 @@
       ],
       "claims": [],
       "contentHash": "d8b1f9497978ec09486f9472e03f904ad27d0c09ce0547dc632f831998fafc03",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Cloud Compliance - Amazon Web Services (AWS)",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/compliance/"
     },
     {
@@ -1232,15 +1507,16 @@
         }
       ],
       "claims": [],
-      "contentHash": "072eaf3727222756b7b13c1e030c9d9722a2083c4fa13e34abba2df014366857",
-      "fetchedAt": "2026-10-18",
+      "contentHash": "3433d7fdacd5e118580402ee1812463a5788013c1431e8a1f1aa07cc389cd3d0",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Compliance Programs - Amazon Web Services (AWS)",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/compliance/programs/"
     },
     {
@@ -1268,14 +1544,15 @@
       ],
       "claims": [],
       "contentHash": "1ac37409c61c45ba50b410440ba433d48dce442698d999e85fd86ee0445e30b8",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Shared Responsibility Model - Amazon Web Services (AWS)",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/compliance/shared-responsibility-model/"
     },
     {
@@ -1303,14 +1580,15 @@
       ],
       "claims": [],
       "contentHash": "0acaa2630342ec40e814c14fffcda5ba7f1d4baa25f06c1b6f1e7a4d8bde9fab",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Natural Language Processing – Amazon Comprehend – AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/comprehend/"
     },
     {
@@ -1338,14 +1616,15 @@
       ],
       "claims": [],
       "contentHash": "5344262f88f1842f2c3aee8356e9014e050ed98abd7b2b527cb30e465f3a18bc",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Web Optimizer - Workload Rightsizing - AWS Compute Optimizer - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/compute-optimizer/"
     },
     {
@@ -1373,14 +1652,15 @@
       ],
       "claims": [],
       "contentHash": "fa177426d97f2809089cd4d0e4b89a8f720f2c1af2b141edb3f4a18869bf7261",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Config Tool – AWS Config – Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/config/"
     },
     {
@@ -1407,15 +1687,16 @@
         }
       ],
       "claims": [],
-      "contentHash": "7e1f4e0a9d39fa41bfa1e273b8d4ebe504f3ff26eafd3432a14b774631f95ab8",
-      "fetchedAt": "2026-10-18",
+      "contentHash": "f9d6253b8e6b717d1983f49e44a50926056d777c2162bb0c24df6faaf4007a66",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Amazon Connect Customer - AWS",
+      "updatedAt": "2026-10-26",
       "url": "https://aws.amazon.com/connect/"
     },
     {
@@ -1443,14 +1724,15 @@
       ],
       "claims": [],
       "contentHash": "724e5a76a41e2644a8a68bb2dde5fa04bf5dfbfcb562794253bbafd6c04e7a83",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "AWS Management Console",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/console/"
     },
     {
@@ -1478,14 +1760,15 @@
       ],
       "claims": [],
       "contentHash": "d30171211f1d43abba011d7812151c222a09a7556eaefb1f74e4abc5058ce219",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Cloud Security Governance - AWS Control Tower - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/controltower/"
     },
     {
@@ -1513,14 +1796,15 @@
       ],
       "claims": [],
       "contentHash": "bf01a2eee6dcfba51f5af1a2688d76c9f492e29b7d085804477f7946d6391dd4",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Security Investigation Visualization - Amazon Detective - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/detective/"
     },
     {
@@ -1551,7 +1835,7 @@
       ],
       "claims": [],
       "contentHash": null,
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "unreachable",
       "target": {
@@ -1586,14 +1870,15 @@
       ],
       "claims": [],
       "contentHash": "19f8dacf060d973b7a518fc1f711131f72146e5da0f886ff0f4fd3e73b294cfc",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Dedicated Network Connections - AWS Direct Connect - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/directconnect/"
     },
     {
@@ -1621,14 +1906,15 @@
       ],
       "claims": [],
       "contentHash": "86fbc12d4d44bd5804950fbfd413203dfb673b0b9b02142a9ca2f7a492ff83f7",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Active Directory – AWS Directory Service – AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/directoryservice/"
     },
     {
@@ -1656,14 +1942,15 @@
       ],
       "claims": [],
       "contentHash": "ffbc33181b4c46cd06ddd11f24dc20af45e0972bfe862266e9f8cbb160dbc1b8",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Disaster Recovery Service - AWS Elastic Disaster Recovery - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/disaster-recovery/"
     },
     {
@@ -1691,14 +1978,15 @@
       ],
       "claims": [],
       "contentHash": "bbda3e1927712b853401d70a5554566f357d373ff2d44931d16cf8a4235050a4",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Cloud Database Migration - AWS Database Migration Service (AWS DMS) - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/dms/"
     },
     {
@@ -1726,14 +2014,15 @@
       ],
       "claims": [],
       "contentHash": "5ebf0836bcdd011a1f72d0567f7c498b52383f95b565f5dc98a2c0adfe405054",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Cloud Database Migration – AWS Database Migration Service (AWS DMS) Features – AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/dms/schema-conversion-tool/"
     },
     {
@@ -1761,14 +2050,15 @@
       ],
       "claims": [],
       "contentHash": "b05f97bc58f10b7b37f13643926bcfd9a62fd891ccb8b59542bd04fc33bd3fb3",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Amazon DocumentDB- Serverless, fully managed, MongoDB API-compatible document database",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/documentdb/"
     },
     {
@@ -1796,14 +2086,15 @@
       ],
       "claims": [],
       "contentHash": "c72ad04f1ebabbcd45fa70064cfd6d4e82774c188bd29f47fc6302656f082f35",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Fast NoSQL Key-Value Database – Amazon DynamoDB – AWS",
+      "updatedAt": "2026-10-26",
       "url": "https://aws.amazon.com/dynamodb/"
     },
     {
@@ -1831,14 +2122,15 @@
       ],
       "claims": [],
       "contentHash": "e26ccf0815b82c6a0dfd248d7835d1ffdb0b25cc548e242557526c324dddadfe",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "High-Performance Block Storage – Amazon EBS – Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/ebs/"
     },
     {
@@ -1866,14 +2158,15 @@
       ],
       "claims": [],
       "contentHash": "85d0b4c5710315f6ca85b3c447515295d200776025f9f50a2a08710cf5ad5d35",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Secure and resizable cloud compute – Amazon EC2 – Amazon Web Services",
+      "updatedAt": "2026-10-26",
       "url": "https://aws.amazon.com/ec2/"
     },
     {
@@ -1901,14 +2194,15 @@
       ],
       "claims": [],
       "contentHash": "8134a3e6cfd5f8b468797b0128376983a54d6cde97216b622024854133c365ff",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Instance Auto Scaling - Amazon EC2 Autoscaling - AWS",
+      "updatedAt": "2026-10-26",
       "url": "https://aws.amazon.com/ec2/autoscaling/"
     },
     {
@@ -1936,14 +2230,15 @@
       ],
       "claims": [],
       "contentHash": "cb5f76bcd92ba0936dcb3b28f0f8c7ed44656a537f9dd2283068ea07f229c64c",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Dedicated Server Hosting - Amazon EC2 Dedicated Hosts - AWS",
+      "updatedAt": "2026-10-26",
       "url": "https://aws.amazon.com/ec2/dedicated-hosts/"
     },
     {
@@ -1971,14 +2266,15 @@
       ],
       "claims": [],
       "contentHash": "82b749609572e912d22b7ef89faf286452ffca65c4600c8e4da8a131441d2b4c",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Instance Types",
+      "updatedAt": "2026-10-26",
       "url": "https://aws.amazon.com/ec2/instance-types/"
     },
     {
@@ -2006,14 +2302,15 @@
       ],
       "claims": [],
       "contentHash": "8f94e9a9ba1c067316e3911dfecd89aa450410628a52f7fea5c989e73dfbe561",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Amazon EC2 – Secure and resizable compute capacity – AWS",
+      "updatedAt": "2026-10-26",
       "url": "https://aws.amazon.com/ec2/pricing/"
     },
     {
@@ -2041,14 +2338,15 @@
       ],
       "claims": [],
       "contentHash": "e045bf5d185a93cd8ee4ec7b35bac598cd2dc6f06651fc67245eebc376fae2d1",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Amazon EC2 - Secure and resizable compute capacity – Amazon Web Services",
+      "updatedAt": "2026-10-26",
       "url": "https://aws.amazon.com/ec2/pricing/reserved-instances/"
     },
     {
@@ -2076,14 +2374,15 @@
       ],
       "claims": [],
       "contentHash": "4e258d17d5b00e21dca8bac5cb635b583351464852b82fe71ab7451a59b68018",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Save up-to 90% on On-Demand Prices – Amazon EC2 Spot Instances – Amazon Web Services",
+      "updatedAt": "2026-10-26",
       "url": "https://aws.amazon.com/ec2/spot/"
     },
     {
@@ -2111,14 +2410,15 @@
       ],
       "claims": [],
       "contentHash": "cfdefe5d85d0df2284b106b2fbe1ae18c0e41c6dae761f92558e851ccca19a6f",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Learn Cloud Economics - Value of Cloud - Cloud ROI Framework - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/economics/"
     },
     {
@@ -2146,14 +2446,15 @@
       ],
       "claims": [],
       "contentHash": "d85ca855cd0474b3118b08ea18ba02a7e6d9d170d1866d0ddeb172de248d850d",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Fully Managed Container Registry – Amazon Elastic Container Registry – Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/ecr/"
     },
     {
@@ -2181,14 +2482,15 @@
       ],
       "claims": [],
       "contentHash": "9dc942dc78bd641ab44872eb81a12916e7062939c783f633dbf615e57c013969",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Fully Managed Container Solution – Amazon Elastic Container Service (Amazon ECS) - Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/ecs/"
     },
     {
@@ -2216,14 +2518,15 @@
       ],
       "claims": [],
       "contentHash": "8d12fb26e7a8154b55cd0f18b6816ac62a5e8d076ae17c82c406a3ce98a4cff6",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Shared File Storage - Amazon Elastic File System (EFS) - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/efs/"
     },
     {
@@ -2251,14 +2554,15 @@
       ],
       "claims": [],
       "contentHash": "ba8b881b4e969260fd1bfe3bf03f409aa46993baba4d8141dffc7c851b9ef1f3",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Managed Kubernetes Service - Amazon EKS - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/eks/"
     },
     {
@@ -2286,14 +2590,15 @@
       ],
       "claims": [],
       "contentHash": "35300066bd6bde561a78efb46ab01e2c4910d4cdab7ab695436a6518afcaf3ed",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Valkey-, Memcached-, and Redis OSS-Compatible Cache – Amazon ElastiCache – AWS",
+      "updatedAt": "2026-10-26",
       "url": "https://aws.amazon.com/elasticache/"
     },
     {
@@ -2321,14 +2626,15 @@
       ],
       "claims": [],
       "contentHash": "81446dfe1063187560bc6520d1a98ab32fc2a2e99c63fc895470d32161b89e86",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "AWS Elastic Beanstalk Platform as a Service",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/elasticbeanstalk/"
     },
     {
@@ -2356,14 +2662,15 @@
       ],
       "claims": [],
       "contentHash": "f5e189a14ded81eb87b1bb76da8dcc34ca9859576768ced0b6db3345c0c69a7b",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Load Balancer - Amazon Elastic Load Balancer (ELB) - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/elasticloadbalancing/"
     },
     {
@@ -2391,14 +2698,15 @@
       ],
       "claims": [],
       "contentHash": "4aa52a99f20b959ed6fe3685c6ae33d54b5a88a99fc1d18c504344506593796e",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Big Data Platform – Amazon EMR – Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/emr/"
     },
     {
@@ -2426,14 +2734,15 @@
       ],
       "claims": [],
       "contentHash": "96f96923801444cc55b4293ba42b937d8df8bf49fd36dfaec827401dea4a16c5",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Serverless Event Router – Amazon EventBridge – AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/eventbridge/"
     },
     {
@@ -2461,14 +2770,15 @@
       ],
       "claims": [],
       "contentHash": "7c010dd3917181487b1cc031ff91f3bbf9c4f1c3d084357c6bec85e7a5625072",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Serverless Compute Engine – AWS Fargate – AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/fargate/"
     },
     {
@@ -2496,14 +2806,15 @@
       ],
       "claims": [],
       "contentHash": "fa3facef8f884ab74b9a0ea4d65d2ac9c083bab0fb5d1b36fed309022bb4b7d0",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Centrally Manage Cloud Firewall Rules - AWS Firewall Manager - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/firewall-manager/"
     },
     {
@@ -2531,14 +2842,15 @@
       ],
       "claims": [],
       "contentHash": "fc6ef165c7475caeebfcf31dbe4979bae32423abad6b0f9bcf9695aee5a6f234",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Amazon FSx | Feature-Rich & Highly-Performant File Systems | Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/fsx/"
     },
     {
@@ -2566,14 +2878,15 @@
       ],
       "claims": [],
       "contentHash": "999b07b1f28da852d2561b9aa73ec01b96b5f79b303e24ad9890dc3b3412f542",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Network Acceleration Service - AWS Global Accelerator - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/global-accelerator/"
     },
     {
@@ -2601,14 +2914,15 @@
       ],
       "claims": [],
       "contentHash": "12535eed80ae0675dda8d74bae0448959b0b1b6991ee9b74d8d6500548bc8309",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Serverless Data Integration – AWS Glue – Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/glue/"
     },
     {
@@ -2636,14 +2950,15 @@
       ],
       "claims": [],
       "contentHash": "74ede21382b67a10a834f1462cc6019d954641924eb5ca7f2d4322470c71fa89",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Intelligent Threat Detection – Amazon GuardDuty – AWS",
+      "updatedAt": "2026-10-26",
       "url": "https://aws.amazon.com/guardduty/"
     },
     {
@@ -2671,14 +2986,15 @@
       ],
       "claims": [],
       "contentHash": "926d5163dd2f49f73b8da209ef57e0ee346064db7d09a52e2be28be83fe95bf5",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "AWS Hybrid Cloud | On Premises & Edge | Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/hybrid/"
     },
     {
@@ -2706,14 +3022,15 @@
       ],
       "claims": [],
       "contentHash": "74d86e8758c4ad1932af231f30aea7d3620409751c506262c8af4cdd2b194094",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "IAM - Multi-Factor Authentication",
+      "updatedAt": "2026-10-26",
       "url": "https://aws.amazon.com/iam/features/mfa/"
     },
     {
@@ -2741,14 +3058,15 @@
       ],
       "claims": [],
       "contentHash": "64778ece949062b71cfd3916f72fe039d16445c3c3280bf508c9e415e0d1bc33",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Single-Sign On SAML - SSO Provider - AWS IAM Identity Center - AWS",
+      "updatedAt": "2026-10-26",
       "url": "https://aws.amazon.com/iam/identity-center/"
     },
     {
@@ -2776,14 +3094,15 @@
       ],
       "claims": [],
       "contentHash": "9fb47a9b0be8cd0d37a7306f71c304df7f36f7c9d3b7a0cbf627f306a2307016",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Automated Software Vulnerability Management - Amazon Inspector - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/inspector/"
     },
     {
@@ -2811,14 +3130,15 @@
       ],
       "claims": [],
       "contentHash": "5e609b76deb7e504c16a515b09f604df7a79d960b57bc2ef74ad5620a947b90a",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Secure IoT Gateway, IoT Gateway Device - AWS IoT Core - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/iot-core/"
     },
     {
@@ -2846,14 +3166,15 @@
       ],
       "claims": [],
       "contentHash": "7e1eaa4fac73e3fe87e3a6973c260dd482c9890ac626c3212521444c43334f50",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Process and Analyze Streaming Data – Amazon Kinesis – Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/kinesis/"
     },
     {
@@ -2881,14 +3202,15 @@
       ],
       "claims": [],
       "contentHash": "fb2daf358931f76bd9dcc6801e58daa62192729eb19e5b435d326184bf4dfce2",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Encryption Cryptography Signing - AWS Key Management Service - AWS",
+      "updatedAt": "2026-10-26",
       "url": "https://aws.amazon.com/kms/"
     },
     {
@@ -2916,14 +3238,15 @@
       ],
       "claims": [],
       "contentHash": "65bcc8432bc76ecf1cf0419d61497b6de169877e3b08228e3a37e38f17f2535b",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Serverless Computing - AWS Lambda - Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/lambda/"
     },
     {
@@ -2951,14 +3274,15 @@
       ],
       "claims": [],
       "contentHash": "0022568b16c930cd455943d4ab1d481ca6e704a1c2eee777f244ad8e43e0eac7",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "AI Chat Builder - Amazon Lex - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/lex/"
     },
     {
@@ -2986,14 +3310,15 @@
       ],
       "claims": [],
       "contentHash": "96ce83e2d0e73842af716ff2f528d210d77c86e26715dfb06ab481f13d734ff9",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "License Manager Software - Amazon License Manager - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/license-manager/"
     },
     {
@@ -3021,14 +3346,15 @@
       ],
       "claims": [],
       "contentHash": "3046e3fcdac77b6b52de5a8096a9126441aa66bbf85ecb1b3654faec7e8d4186",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Virtual Private Server and Web Hosting–Amazon Lightsail—Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/lightsail/"
     },
     {
@@ -3056,14 +3382,15 @@
       ],
       "claims": [],
       "contentHash": "f36d432fd4c7334bd7c651d6e777b4bdc5cea48029672e9dfa5442e926f81819",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Machine Learning (ML) on AWS - ML Models and Tools - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/machine-learning/"
     },
     {
@@ -3091,14 +3418,15 @@
       ],
       "claims": [],
       "contentHash": "010e3cc429586440c18494876f16fa43ad55b7e7cc5e6678f015f46e0e29d997",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Sensitive Data Discovery and Protection - Amazon Macie - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/macie/"
     },
     {
@@ -3125,14 +3453,15 @@
         }
       ],
       "claims": [],
-      "contentHash": "39afb9acade5f341263636a58253fb53461215da741f00869525254e26a95ecc",
-      "fetchedAt": "2026-10-18",
+      "contentHash": "d1f4fcc1817ae54f5014ffa331768289bd283c069e8678b55aa6fbb270a4a115",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
+      "title": "AWS Marketplace: Homepage",
       "updatedAt": null,
       "url": "https://aws.amazon.com/marketplace"
     },
@@ -3161,14 +3490,15 @@
       ],
       "claims": [],
       "contentHash": "c65572f82784f8f72be358f34606d7571ca50bc2ad48dd4dff3f90f2d6cf744c",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Cloud Business Case & Migration Plan - Amazon Migration Evaluator - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/migration-evaluator/"
     },
     {
@@ -3195,15 +3525,16 @@
         }
       ],
       "claims": [],
-      "contentHash": "ed21b5f7598f91173246ac41b66cce9f06fa7da9db7054139c970d820448dc91",
-      "fetchedAt": "2026-10-18",
+      "contentHash": "6653320c72c9ad50182455069bacce88415740ef34acc3fe6f30f7118d08b309",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Smash tech debt and get AI ready – AWS Transform – AWS",
+      "updatedAt": "2026-10-26",
       "url": "https://aws.amazon.com/migration-hub/"
     },
     {
@@ -3231,14 +3562,15 @@
       ],
       "claims": [],
       "contentHash": "00b52380e01ade143bf03da1ec046346816e5f708416d096ef5250a45db6c186",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Managed Graph Database – Amazon Neptune – AWS",
+      "updatedAt": "2026-10-26",
       "url": "https://aws.amazon.com/neptune/"
     },
     {
@@ -3265,15 +3597,16 @@
         }
       ],
       "claims": [],
-      "contentHash": "f0f8dd954db1654b3238383693325fb3d003d0748108b034a5a4c15e42863485",
-      "fetchedAt": "2026-10-18",
+      "contentHash": "583b183a759b4f15ec0aa0aacc5bfa7550f4bf3a87fb0956eb2cc3520446e2d2",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Real-Time Retrieval Engine for AI, Search & Analytics - Amazon OpenSearch Service - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/opensearch-service/"
     },
     {
@@ -3301,14 +3634,15 @@
       ],
       "claims": [],
       "contentHash": "f1dfd9abc556b2ab699838ecfccbe5e1e86ff8a2ed7843e4d2eadee7c104850c",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Cloud Administration – AWS Organizations – Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/organizations/"
     },
     {
@@ -3336,14 +3670,15 @@
       ],
       "claims": [],
       "contentHash": "2af48cd5940d15fe0eb3a9227c56a648a226661a043ff28236b21ea84896da74",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "On Premises Private Cloud - AWS Outposts - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/outposts/"
     },
     {
@@ -3370,15 +3705,16 @@
         }
       ],
       "claims": [],
-      "contentHash": "0b03e3f1c03c5bab443bdc184a172038a0dba62348a1c3bc7de8ca32505f70c2",
-      "fetchedAt": "2026-10-18",
+      "contentHash": "aa0b7740dc8d0b0cdeaeb10f940eee4d749133d337dd3ae4904a21a0c9c10325",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Become an AWS Partner | AWS Partner Network",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/partners/"
     },
     {
@@ -3406,14 +3742,15 @@
       ],
       "claims": [],
       "contentHash": "0385dfa8e556b91fa38eaff877846a63ff5d4695101931f1ffb9ac561574a4dd",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "AI Voice Generator and Text-to-Speech Tool - Amazon Polly - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/polly/"
     },
     {
@@ -3441,14 +3778,15 @@
       ],
       "claims": [],
       "contentHash": "663fcb9cb65412f306212cf66f4f321136a0589b9ce0b596f842d99d7f350a2d",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "AI-powered cloud support – AWS Support plans – AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/premiumsupport/"
     },
     {
@@ -3476,14 +3814,15 @@
       ],
       "claims": [],
       "contentHash": "25cffaf1f9e0902342818d9d5068dff327bffc2017a5412b163b4d28cc13caea",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "AWS Support plan comparison – AWS Support features – AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/premiumsupport/plans/"
     },
     {
@@ -3511,14 +3850,15 @@
       ],
       "claims": [],
       "contentHash": "f8bf6e68c4432c668604e64adbb6f0b6190a7def78b7f3fa8b1f4cbc86afaa08",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Status of AWS cloud resources – AWS Health – AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/premiumsupport/technology/aws-health-dashboard/"
     },
     {
@@ -3546,14 +3886,15 @@
       ],
       "claims": [],
       "contentHash": "eea7825be3194c90fd70feb8828c4cfaa3a9c5a629c56d6e4b0503985cd108cb",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Best Practice Guidance for AWS Optimization - AWS Trusted Advisor",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/premiumsupport/technology/trusted-advisor/"
     },
     {
@@ -3581,14 +3922,15 @@
       ],
       "claims": [],
       "contentHash": "b7d89fb089bba85c23aa994e101ecd26c68d5cd7748cdd93f440d4a5ef0da991",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "AWS Product and Service Pricing | Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/pricing/"
     },
     {
@@ -3616,14 +3958,15 @@
       ],
       "claims": [],
       "contentHash": "e1556c621399133a5a5d727019d451222d6739ba32769519810a5462a49e11cc",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "VPC Networking – AWS PrivateLink – Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/privatelink/"
     },
     {
@@ -3651,14 +3994,15 @@
       ],
       "claims": [],
       "contentHash": "563ab09a8ff41ea43b42de31aeeaa178d0ee2396fce4281e08938b49ba20cf1e",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "AI Coding & Dev Tools - Amazon Q - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/q/"
     },
     {
@@ -3686,14 +4030,15 @@
       ],
       "claims": [],
       "contentHash": "35bd321cdb39c3a5afd57dec6d084ebf01fab7648c0b87efd53eced8f43bae19",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "AI-Powered Business Intelligence – Quick Sight – AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/quicksight/"
     },
     {
@@ -3721,13 +4066,14 @@
       ],
       "claims": [],
       "contentHash": "74c174769786f22b522f0de402f72aeb434204799f4d4b1bda2de9711fd7657a",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
+      "title": "Resource Sharing – AWS Resource Access Manager – Amazon Web Services",
       "updatedAt": "2026-10-16",
       "url": "https://aws.amazon.com/ram/"
     },
@@ -3756,14 +4102,15 @@
       ],
       "claims": [],
       "contentHash": "6ef8f9bc35aba41c6f62899693e315f83495a4af885b63f55b44173fa5dade9b",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Fully Managed Relational Database – Amazon RDS – AWS",
+      "updatedAt": "2026-10-26",
       "url": "https://aws.amazon.com/rds/"
     },
     {
@@ -3791,14 +4138,15 @@
       ],
       "claims": [],
       "contentHash": "a9080161130d6760415ef9432c708d92eadf9e228d4507514e0eb6a56c004977",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Relational Database – Amazon Aurora MySQL PostgreSQL – AWS",
+      "updatedAt": "2026-10-26",
       "url": "https://aws.amazon.com/rds/aurora/"
     },
     {
@@ -3826,14 +4174,15 @@
       ],
       "claims": [],
       "contentHash": "2e1b676f9e6a1161fe6ffa261733362d0182b50429e7eabb3b5ecb2079795659",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Cloud Data Warehouse – Amazon Redshift – AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/redshift/"
     },
     {
@@ -3861,14 +4210,15 @@
       ],
       "claims": [],
       "contentHash": "9c5d756fd3f89982d961bf784a80f37bb2422ebde0f264cc069929ac457f867e",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Image recognition software, ML image analysis, and video analysis – Amazon Rekognition – AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/rekognition/"
     },
     {
@@ -3896,14 +4246,15 @@
       ],
       "claims": [],
       "contentHash": "3fee77e04024aa1a052173418c80c9d531885e1dab21bc542d840e4d881cba3c",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Amazon Route 53 - DNS Service - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/route53/"
     },
     {
@@ -3930,15 +4281,16 @@
         }
       ],
       "claims": [],
-      "contentHash": "a7fb42ae1cd568bbf16275435267f9c87155a313645428c99755c322205ef736",
-      "fetchedAt": "2026-10-18",
+      "contentHash": "e222e9786f809d3da8ea7dda05fa40e467e4fbcbf2b89bd36defbb6a82c3a14d",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Cloud Object Storage – Amazon S3 – Amazon Web Services",
+      "updatedAt": "2026-10-26",
       "url": "https://aws.amazon.com/s3/"
     },
     {
@@ -3966,14 +4318,15 @@
       ],
       "claims": [],
       "contentHash": "07791e040e0bc85c0062ee9055846b4fd868dfb214058ff90ef297943d7a25ef",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "S3 Pricing",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/s3/pricing/"
     },
     {
@@ -4001,14 +4354,15 @@
       ],
       "claims": [],
       "contentHash": "3581902db6ef586f703f10e32024bb2a478fe76b2d316138d10d9848c0952a61",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Object Storage Classes – Amazon S3",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/s3/storage-classes/"
     },
     {
@@ -4036,14 +4390,15 @@
       ],
       "claims": [],
       "contentHash": "ba959e7209766ab08d6d22fd5273ad664cb2ba229b4ffcab1870110402ce9ce7",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Secure archive storage – Amazon S3 Glacier storage classes – AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/s3/storage-classes/glacier/"
     },
     {
@@ -4071,14 +4426,15 @@
       ],
       "claims": [],
       "contentHash": "25bfe50ed096b1cf063a88eaff43fa5286a73a50239ff5e6eb27ae97713efbd1",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "The center for all your data, analytics, and AI – Amazon SageMaker – AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/sagemaker/"
     },
     {
@@ -4106,14 +4462,15 @@
       ],
       "claims": [],
       "contentHash": "60bce13952aaaf5f2c3c41088639edad7f68a05d3e0d822a902577e7e63a8d38",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Cloud Cost Savings – Savings Plans – Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/savingsplans/"
     },
     {
@@ -4141,14 +4498,15 @@
       ],
       "claims": [],
       "contentHash": "5883c03a36f88af4ec77ee071d584ce0a0d21b9c259935db75ea9329500ad949",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Cloud Secrets Management - AWS Secrets Manager - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/secrets-manager/"
     },
     {
@@ -4176,14 +4534,15 @@
       ],
       "claims": [],
       "contentHash": "37ab2ebc2dc9d4c4a20178dc3fda065782d7b55a03fd7a66748e633fe49fa827",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "AWS Security Hub - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/security-hub/"
     },
     {
@@ -4211,14 +4570,15 @@
       ],
       "claims": [],
       "contentHash": "728f02ebeb038d532b2df921bffa5700abbf9b6b281a39cfc81583c89b96b819",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Cloud Security – Amazon Web Services (AWS)",
+      "updatedAt": "2026-10-28",
       "url": "https://aws.amazon.com/security/"
     },
     {
@@ -4246,14 +4606,15 @@
       ],
       "claims": [],
       "contentHash": "29be28c3bb97efb8555d54f6a28daacfa1b1bd1a7c5af0882293e318fd9592e3",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Cloud Management and Governance – AWS Service Catalog – Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/servicecatalog/"
     },
     {
@@ -4280,15 +4641,16 @@
         }
       ],
       "claims": [],
-      "contentHash": "8b012ce2cc56a5b8d793a37f0551cbabe79a3e443fddf958287b31c456ee6e11",
-      "fetchedAt": "2026-10-18",
+      "contentHash": "1b1178e898d0424cf4de03842268386e0ce39cc09553c74b1e912722a6f6c4b4",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Email Service Provider — Amazon Simple Email Service (Amazon SES) — AWS",
+      "updatedAt": "2026-10-26",
       "url": "https://aws.amazon.com/ses/"
     },
     {
@@ -4316,14 +4678,15 @@
       ],
       "claims": [],
       "contentHash": "32a7cb033d36cac1428640d85d9b9e1ddef06ad726d9cc9e20af77f1af466cc3",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Network Posture Analysis and Managed DDoS Protection - AWS Shield - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/shield/"
     },
     {
@@ -4351,14 +4714,15 @@
       ],
       "claims": [],
       "contentHash": "35ba88babaa7f74de5b4a3c32a2891b27f82bf1c21cb8cf4a2a373eb37dddd9a",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Push Notification Service - Amazon Simple Notification Service (SNS) - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/sns/"
     },
     {
@@ -4386,14 +4750,15 @@
       ],
       "claims": [],
       "contentHash": "7fe3c2bda04a715cd8b8450a5923e578febc229733009818d9bd48648e312c73",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Fully Managed Message Queuing – Amazon Simple Queue Service – Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/sqs/"
     },
     {
@@ -4421,14 +4786,15 @@
       ],
       "claims": [],
       "contentHash": "455097e1867b80a7242bb4436aedb0954801a5afd53783143582a10deb41e76e",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Serverless Workflow Orchestration – AWS Step Functions – Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/step-functions/"
     },
     {
@@ -4456,14 +4822,15 @@
       ],
       "claims": [],
       "contentHash": "5c1ac4487a00f0dbe8a100d98776e6d22d3cdc48941b5e0e86c0c14fb6704527",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "AWS Storage Gateway | Amazon Web Services",
+      "updatedAt": "2026-10-26",
       "url": "https://aws.amazon.com/storagegateway/"
     },
     {
@@ -4491,14 +4858,15 @@
       ],
       "claims": [],
       "contentHash": "6708ab07edc5d5477d4e7a122a85b77675a9d566a9ae48a5b856ad49054c16a0",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Centralized Operations Hub – AWS Systems Manager – Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/systems-manager/"
     },
     {
@@ -4526,14 +4894,15 @@
       ],
       "claims": [],
       "contentHash": "29736f7a3f7d224b07bbfe7b2c55a857acef304943abe2d2f183606e82cfdcab",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Intelligently Extract Text & Data with OCR - Amazon Textract - Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/textract/"
     },
     {
@@ -4561,14 +4930,15 @@
       ],
       "claims": [],
       "contentHash": "ab293e6ab8ed46721912b7f0ba5a301454177b887fa103c854a865e8c2c4f94f",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Amazon Transcribe – Speech to Text - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/transcribe/"
     },
     {
@@ -4596,14 +4966,15 @@
       ],
       "claims": [],
       "contentHash": "527fd23ab41ed57e65a0af12ce70149a9355a39070370ffa2ce7792dda214085",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Network Gateway – AWS Transit Gateway – Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/transit-gateway/"
     },
     {
@@ -4631,14 +5002,15 @@
       ],
       "claims": [],
       "contentHash": "82efdc22c2e01b9432526d159a0d90b3e2d40cd1deed6cf6f651492227799278",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Machine Translation Service — Amazon Translate — Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/translate/"
     },
     {
@@ -4666,14 +5038,15 @@
       ],
       "claims": [],
       "contentHash": "f5149b0030a2cddc296cc3d1c64c026e3938ff5e0ee5a524d410d5c2d609d8d4",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Logically Isolated Virtual Private Cloud—Amazon VPC – Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/vpc/"
     },
     {
@@ -4701,14 +5074,15 @@
       ],
       "claims": [],
       "contentHash": "c63d4bb9e67d75a836d08565732d5fe099580e4f8e64fdbcd5398d1a894bbf47",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Virtual Private Network (VPN) – AWS VPN – Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/vpn/"
     },
     {
@@ -4736,14 +5110,15 @@
       ],
       "claims": [],
       "contentHash": "c5cc9c3375cea35bb65dfb92d01aef80132bab3e16d7f8942e9aec737bbdfd24",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Web Application Firewall - Web API Protection - AWS WAF - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/waf/"
     },
     {
@@ -4771,14 +5146,15 @@
       ],
       "claims": [],
       "contentHash": "d8eb427de3192321ae9b126ec3bfe04fa0d164f749ffeedafae6e58c0c997e41",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Optimized IT Architecture Tools – AWS Well-Architected Tool – Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/well-architected-tool/"
     },
     {
@@ -4806,14 +5182,15 @@
       ],
       "claims": [],
       "contentHash": "cff32d39109656fca531d9cf1b7b2859131b1ae75ed60e3942a400a74e57fd3f",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "What is Cloud Computing? - Cloud Computing Services, Benefits, and Types - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/what-is-cloud-computing/"
     },
     {
@@ -4841,14 +5218,15 @@
       ],
       "claims": [],
       "contentHash": "a38db66c2ffcbafa3d31f47300e6581620d3d0e49719cfe5dedab940257cf8b8",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Virtual Desktop Infrastructure (VDI) - Amazon WorkSpaces - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/workspaces/"
     },
     {
@@ -4876,14 +5254,15 @@
       ],
       "claims": [],
       "contentHash": "950ba76850bf7736c5bb9e956eda4a43839681cd0e618659a45df877c68bd7d0",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Application Observability (APM) - Amazon CloudWatch Application Signals - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/xray/"
     },
     {
@@ -4911,14 +5290,15 @@
       ],
       "claims": [],
       "contentHash": "7e517b50a1ea1cbc9c17cbc6075c340f6e8ed0efb0cf53c9b603a3677c403cc6",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-17",
+      "title": "Security best practices in IAM - AWS Identity and Access Management",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
     },
     {
@@ -4946,14 +5326,15 @@
       ],
       "claims": [],
       "contentHash": "0ab78620039d1f7f626beeb2b216955b2d6dbe3dcb768129cea57a267487cc4c",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-17",
+      "title": "Set an account password policy for IAM users - AWS Identity and Access Management",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_passwords_account-policy.html"
     },
     {
@@ -4981,14 +5362,15 @@
       ],
       "claims": [],
       "contentHash": "a6970d197c180f54d6818444899953cbb08fb0457e8bd7dc72e0342321eb1904",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-17",
+      "title": "AWS account root user - AWS Identity and Access Management",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_root-user.html"
     },
     {
@@ -5016,14 +5398,15 @@
       ],
       "claims": [],
       "contentHash": "ed02beef021e689e291d70917f5f7053b1863c00b4091bef1676baa5f47e3325",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-17",
+      "title": "What is IAM? - AWS Identity and Access Management",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html"
     },
     {
@@ -5054,7 +5437,7 @@
       ],
       "claims": [],
       "contentHash": null,
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "unreachable",
       "target": {
@@ -5088,15 +5471,124 @@
         }
       ],
       "claims": [],
-      "contentHash": "66926a60e5b6afa386473413b4760571b808e832209b180743fca2a468746523",
-      "fetchedAt": "2026-10-18",
+      "contentHash": "5e94c5a92680fb0998ecd9839f6ffcdf4c18bb1034b2ed6b14a2f672997c1c45",
+      "fetchedAt": "2026-10-28",
       "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "In-Scope AWS Services - AWS Certified Cloud Practitioner",
+      "updatedAt": "2026-10-27",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/clf-02-in-scope-services.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "aac7037f61c9aa9f8e5fc21b120a8fa1bc9b859f0c335ed973f02aafb23cd3e4",
+      "fetchedAt": "2026-10-28",
+      "kind": "exam-guide",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "title": "Out-of-Scope AWS Services - AWS Certified Cloud Practitioner",
+      "updatedAt": "2026-10-27",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/clf-02-out-of-scope-services.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "2ba48efe0fb92b82d061077bf0ad922eb0440efb0537d4ed08c67585846b84e5",
+      "fetchedAt": "2026-10-28",
+      "kind": "exam-guide",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "title": "Technologies and Concepts - AWS Certified Cloud Practitioner",
+      "updatedAt": "2026-10-27",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/clf-technologies-concepts.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "66926a60e5b6afa386473413b4760571b808e832209b180743fca2a468746523",
+      "fetchedAt": "2026-10-28",
+      "kind": "exam-guide",
+      "status": "active",
+      "target": {
+        "edition": "C02",
+        "examCode": "AWS-CLF-C02"
+      },
+      "title": "Content Domain 1: Cloud Concepts - AWS Certified Cloud Practitioner",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02-domain1.html"
     },
     {
@@ -5124,14 +5616,15 @@
       ],
       "claims": [],
       "contentHash": "ff09ddb1bfc2d209c4345687927a96847dbac0435b8343ec26975d4d2c023372",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Content Domain 2: Security and Compliance - AWS Certified Cloud Practitioner",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02-domain2.html"
     },
     {
@@ -5158,15 +5651,16 @@
         }
       ],
       "claims": [],
-      "contentHash": "1df7d894bfc7933ec2d5a7ae5c2952e765dd6bd4aa47fdd724285c5666332cb5",
-      "fetchedAt": "2026-10-18",
+      "contentHash": "319146a6bc3f23aff8c92a962f160fcae994bce8e1a268fa292d12603ab0211d",
+      "fetchedAt": "2026-10-28",
       "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Content Domain 3: Cloud Technology and Services - AWS Certified Cloud Practitioner",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02-domain3.html"
     },
     {
@@ -5193,15 +5687,16 @@
         }
       ],
       "claims": [],
-      "contentHash": "7fdee04ac8a872aa4759768282e1c0b5c711fa7e3cceafdfcf76908e8a3c856f",
-      "fetchedAt": "2026-10-18",
+      "contentHash": "ef83910213299081ff2db42c2a7ed8bddef4a105a1a7f2b79b8e070a4b7d2e6c",
+      "fetchedAt": "2026-10-28",
       "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Content Domain 4: Billing, Pricing, and Support - AWS Certified Cloud Practitioner",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02-domain4.html"
     },
     {
@@ -5228,15 +5723,16 @@
         }
       ],
       "claims": [],
-      "contentHash": "27a5d74297e5b8a5dfeff3bcc5c4d48da7b9873b8e6c0bee51a82bcdccf786e1",
-      "fetchedAt": "2026-10-18",
+      "contentHash": "9ced9ac29988fc2c76d5356f296e3f15049c92e40f2d33c290b89454300f1029",
+      "fetchedAt": "2026-10-28",
       "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "AWS Certified Cloud Practitioner (CLF-C02) - AWS Certified Cloud Practitioner",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/cloud-practitioner-02/cloud-practitioner-02.html"
     },
     {
@@ -5264,14 +5760,15 @@
       ],
       "claims": [],
       "contentHash": "b5b5effe9518f07cc662dd4b24ab491cb25419bf0992415de5d6181095d8049f",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-17",
+      "title": "Consolidating billing for AWS Organizations - AWS Billing",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/consolidated-billing.html"
     },
     {
@@ -5299,14 +5796,15 @@
       ],
       "claims": [],
       "contentHash": "c30db3ddbc35da5c775c6d987bee182459f9cc6e6104b0d8c1afa38366fa72e1",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-17",
+      "title": "Organizing and tracking costs using AWS cost allocation tags - AWS Billing",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/cost-alloc-tags.html"
     },
     {
@@ -5334,14 +5832,15 @@
       ],
       "claims": [],
       "contentHash": "a62fd21e12e739d7b311a9ae7c142a35059325c515fcb46fdf0944f815288a3c",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "About the migration strategies - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/large-migration-guide/migration-strategies.html"
     },
     {
@@ -5369,14 +5868,15 @@
       ],
       "claims": [],
       "contentHash": "6befbb3b9438c3e4a9e2e4395a0541330e99714ea1cb0752f4e1c7e199118dd0",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-17",
+      "title": "What is Amazon VPC? - Amazon Virtual Private Cloud",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
     },
     {
@@ -5404,14 +5904,15 @@
       ],
       "claims": [],
       "contentHash": "03e2e869245f23fa18312d602b515da945c3ac6f9cee2875960ebacede983fc2",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-17",
+      "title": "AWS Well-Architected Framework - AWS Well-Architected Framework",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/wellarchitected/latest/framework/welcome.html"
     },
     {
@@ -5439,14 +5940,15 @@
       ],
       "claims": [],
       "contentHash": "83d07718be3442bd68b1ac4369caf85fa09886d0fc1f0b4ceff8a81a024fb636",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "Six advantages of cloud computing - Overview of Amazon Web Services",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-overview/six-advantages-of-cloud-computing.html"
     },
     {
@@ -5474,14 +5976,15 @@
       ],
       "claims": [],
       "contentHash": "fef2153d0ad84764510edb6ff655d45883973d27718af01fed1495dd9cfa146a",
-      "fetchedAt": "2026-10-18",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C02",
         "examCode": "AWS-CLF-C02"
       },
-      "updatedAt": "2026-10-16",
+      "title": "An Overview of the AWS Cloud Adoption Framework - An Overview of the AWS Cloud Adoption Framework",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-aws-cloud-adoption-framework/welcome.html"
     }
   ]
