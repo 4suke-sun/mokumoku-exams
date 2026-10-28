@@ -2,7 +2,7 @@
   "examCode": "AWS-DVA-C02",
   "guide": {
     "agent": {
-      "definitionHash": "d4a9d47ee5e00495d15cb6efc3525952c93ede935e75d2e1e01f3cbbc9a2ec17",
+      "definitionHash": "e852ec29473856c75d44f0b228d99428e2f751c8a75a2ba51a66f87b1026f73f",
       "model": "claude-haiku-5-5",
       "role": "guide-extractor"
     },
@@ -84,11 +84,11 @@
           "AWS のサービスとツールで、デプロイ済みのコードをテストする",
           "外部依存に対する結合テストを書き、API をモックする",
           "API Gateway のステージなど、開発用のエンドポイントでアプリケーションをテストする",
-          "既存の環境へアプリケーションスタックの更新をデプロイする(別のステージング環境への SAM テンプレートのデプロイなど)",
+          "既存の環境へ、スタック更新を配備する(ステージング環境への SAM テンプレートなど)",
           "イベント駆動型のアプリケーションをテストする",
           "Lambda、API Gateway、SAM リソース向けのテストイベント(JSON ペイロード)を作る",
           "さまざまな環境へ API リソースをデプロイする",
-          "承認済みのバージョンを使う環境を作り、結合テストに使う(Lambda のエイリアス、コンテナのタグ、Amplify のブランチなど)",
+          "承認済みのバージョンを使う結合テスト用の環境を作る(Lambda のエイリアス、コンテナのタグなど)",
           "IaC テンプレート(SAM、CloudFormation)を実装してデプロイする",
           "API Gateway など、個別のサービスで開発・テスト・本番の環境を管理する",
           "Amazon Q Developer で自動テストを生成する",
@@ -101,7 +101,7 @@
           "オーケストレーションされたワークフローで、複数の環境へコードをデプロイする",
           "既存のデプロイ戦略を使ってロールバックする",
           "ラベルとブランチで、バージョンとリリースを管理する",
-          "既存のランタイム設定を使い、動的なデプロイを行う(API Gateway のステージ変数を Lambda で使うなど)",
+          "既存のランタイム設定で、動的なデプロイを行う(API Gateway のステージ変数など)",
           "ブルー/グリーン、カナリア、ローリングなどのデプロイ戦略を設定する"
         ],
         "weight": 0.24
@@ -144,7 +144,26 @@
       "timeMinutes": 130,
       "totalScore": 1000
     },
-    "importedAt": "2026-10-25",
+    "excludedServices": [
+      "Amazon Quick Sight",
+      "Amazon Chime",
+      "Amazon Connect",
+      "Amazon WorkMail",
+      "Amazon AppStream 2.0",
+      "Amazon WorkSpaces",
+      "Amazon GameLift",
+      "Amazon Polly",
+      "Amazon Rekognition",
+      "AWS Managed Services (AMS)",
+      "Amazon Elastic Transcoder",
+      "AWS Application Discovery Service",
+      "AWS Application Migration Service",
+      "AWS Shield Advanced",
+      "AWS Shield Standard",
+      "AWS Snow Family",
+      "AWS Storage Gateway"
+    ],
+    "importedAt": "2026-10-28",
     "pages": [
       {
         "contentHash": "1ea91a74aaa144e716bab128a1d97064b94e187023f61cb6ea3e7a4ac0a18baa",
@@ -256,7 +275,7 @@
       ],
       "claims": [],
       "contentHash": "51d14795454663d034c1dd3f5c82a2c213da8947add97a8303c515ce908bac3d",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -264,7 +283,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is CloudFormation? - AWS CloudFormation",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html"
     },
     {
@@ -292,7 +311,7 @@
       ],
       "claims": [],
       "contentHash": "abab3e97b54fef28cd45c03fef3c122ec48e55e4f412d682be7cff5b6fbf9fd4",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -300,7 +319,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Update CloudFormation stacks using change sets - AWS CloudFormation",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-changesets.html"
     },
     {
@@ -328,7 +347,7 @@
       ],
       "claims": [],
       "contentHash": "e04e1552e26235342f6b77560847398efea8051c8ed484fabbcfd4ce6932b274",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -336,7 +355,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon EC2? - Amazon Elastic Compute Cloud",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/concepts.html"
     },
     {
@@ -364,7 +383,7 @@
       ],
       "claims": [],
       "contentHash": "3a34ec57842aa62c6649615ab523194b759f3f435cccd50216da5252e4c17032",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -372,7 +391,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Amazon EC2 key pairs and Amazon EC2 instances - Amazon Elastic Compute Cloud",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html"
     },
     {
@@ -436,7 +455,7 @@
       ],
       "claims": [],
       "contentHash": "c17e08c1fa2a6ab54d96023f538560dfede23c09431c2ef396f369c10e8b3dd1",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -444,7 +463,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Using dead-letter queues in Amazon SQS - Amazon Simple Queue Service",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-dead-letter-queues.html"
     },
     {
@@ -472,7 +491,7 @@
       ],
       "claims": [],
       "contentHash": "dcbb658afe1e1b0d3783677b618acd227a922a5e99c74fc3d3fe129a1b7405ce",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -480,7 +499,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Amazon SQS FIFO queues - Amazon Simple Queue Service",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-fifo-queues.html"
     },
     {
@@ -508,7 +527,7 @@
       ],
       "claims": [],
       "contentHash": "3a9886ce715aa93d13748ab434baca3e7f7685d977a1b401dbbefe17fc6cf6e3",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -516,7 +535,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Amazon SQS short and long polling - Amazon Simple Queue Service",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-short-and-long-polling.html"
     },
     {
@@ -544,7 +563,7 @@
       ],
       "claims": [],
       "contentHash": "f9cdfdef8a3d3a00ca5bed4e8638828a55293fa1af352d52cce9175bbfdff2d9",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -552,7 +571,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Amazon SQS visibility timeout - Amazon Simple Queue Service",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/sqs-visibility-timeout.html"
     },
     {
@@ -580,7 +599,7 @@
       ],
       "claims": [],
       "contentHash": "e3526cdec56eaff51e33ef24855ff653687a84e2e7eaf79b1330fd7fbd4994c7",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -588,7 +607,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon Simple Queue Service? - Amazon Simple Queue Service",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/AWSSimpleQueueService/latest/SQSDeveloperGuide/welcome.html"
     },
     {
@@ -616,7 +635,7 @@
       ],
       "claims": [],
       "contentHash": "6a5de211535fbaafd7a7e3a7b23781626b61df9a547dae7589a8380457e5a043",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -624,7 +643,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon CloudFront? - Amazon CloudFront",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html"
     },
     {
@@ -652,7 +671,7 @@
       ],
       "claims": [],
       "contentHash": "c2e87ede2475166155c188c626cb5e95285f93b4573a856cc8cfdd23ed3e6948",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -660,7 +679,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Analyzing log data with CloudWatch Logs Insights - Amazon CloudWatch Logs",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/AnalyzingLogData.html"
     },
     {
@@ -688,7 +707,7 @@
       ],
       "claims": [],
       "contentHash": "6d08d4b2d000683258c86751a97b27237f259ab17c025009189cff65e9eddb0c",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -696,7 +715,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "CloudWatch Logs Insights language query syntax - Amazon CloudWatch Logs",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/CWL_QuerySyntax.html"
     },
     {
@@ -724,7 +743,7 @@
       ],
       "claims": [],
       "contentHash": "f2a2bff7c75c5b32a6f010f7b844327d927149aaa15fc09f9e99f76739ec6ece",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -732,7 +751,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Creating metrics from log events using filters - Amazon CloudWatch Logs",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/MonitoringLogData.html"
     },
     {
@@ -760,7 +779,7 @@
       ],
       "claims": [],
       "contentHash": "e00837dc22a68aab32a7e201916d2d78ecb9b891e89310f5801733fc8ddda54a",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -768,7 +787,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon CloudWatch Logs? - Amazon CloudWatch Logs",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/WhatIsCloudWatchLogs.html"
     },
     {
@@ -796,7 +815,7 @@
       ],
       "claims": [],
       "contentHash": "86de979dd9c1f9ccca7691122ad3eb62c7cd189085554ba99528c3c416ab37f5",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -804,7 +823,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Help protect sensitive log data with masking - Amazon CloudWatch Logs",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/logs/mask-sensitive-log-data.html"
     },
     {
@@ -832,7 +851,7 @@
       ],
       "claims": [],
       "contentHash": "58d8e8603cb4a1ff7f3b1b1cc1f5395cb215b3535bd5f62ada90ad2304f4a289",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -840,7 +859,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Embedding metrics within logs - Amazon CloudWatch",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Embedded_Metric_Format.html"
     },
     {
@@ -868,7 +887,7 @@
       ],
       "claims": [],
       "contentHash": "4d84c2cd2c43de32483fa5be574168133c01d1e6d129f2eb75790e7a43024ec3",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -876,7 +895,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Collect metrics, logs, and traces using the CloudWatch agent - Amazon CloudWatch",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html"
     },
     {
@@ -904,7 +923,7 @@
       ],
       "claims": [],
       "contentHash": "178d6a8c5b47d0bcf51f3994503e3d379679b504d985a379713bc985fafbfd72",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -912,7 +931,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon CloudWatch? - Amazon CloudWatch",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html"
     },
     {
@@ -940,7 +959,7 @@
       ],
       "claims": [],
       "contentHash": "b4f08122783bba942984f74a6223520700cb393ba2f547c27b929df9b290b726",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -948,7 +967,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Metrics concepts - Amazon CloudWatch",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch_concepts.html"
     },
     {
@@ -976,7 +995,7 @@
       ],
       "claims": [],
       "contentHash": "65046d6774581f931568ffda0d65c5d76fa9b4401fec7c6b196f16e21efb6251",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -984,7 +1003,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon Elastic Container Registry? - Amazon ECR",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/AmazonECR/latest/userguide/what-is-ecr.html"
     },
     {
@@ -1012,7 +1031,7 @@
       ],
       "claims": [],
       "contentHash": "34ea6c6ee90776cf5d8cd0995dbda19ea7a86f24da632319c7543bbfd8d119d3",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1020,7 +1039,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon Elastic Container Service? - Amazon Elastic Container Service",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/AmazonECS/latest/developerguide/Welcome.html"
     },
     {
@@ -1048,7 +1067,7 @@
       ],
       "claims": [],
       "contentHash": "bf5da3a057bb084d4911befb48e87580b6e2f94d48ae92a499f25fd1e99b6f8f",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1056,7 +1075,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Caching strategies for Memcached - Amazon ElastiCache",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/Strategies.html"
     },
     {
@@ -1084,7 +1103,7 @@
       ],
       "claims": [],
       "contentHash": "a5632db20365e74433c41870ea65deb9b330958357b3a8f13dd310d8d779a7cf",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1092,7 +1111,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon ElastiCache? - Amazon ElastiCache",
-      "updatedAt": "2026-10-25",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/AmazonElastiCache/latest/dg/WhatIs.html"
     },
     {
@@ -1120,7 +1139,7 @@
       ],
       "claims": [],
       "contentHash": "ec7c494e3fdc7db68feedaa49a57587c07e48b6f63cbc1cadddc59918524181a",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1128,7 +1147,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon Aurora? - Amazon Aurora",
-      "updatedAt": "2026-10-25",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/CHAP_AuroraOverview.html"
     },
     {
@@ -1156,7 +1175,7 @@
       ],
       "claims": [],
       "contentHash": "cce48ed0dc3c1efc9d402ff985711c3b01b15b75d3eaa1b958f397bc4e148d1a",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1164,7 +1183,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon Relational Database Service (Amazon RDS)? - Amazon Relational Database Service",
-      "updatedAt": "2026-10-25",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Welcome.html"
     },
     {
@@ -1192,7 +1211,7 @@
       ],
       "claims": [],
       "contentHash": "a6acff74933d0fa2d252d7b2d38ddb7b0fd35e728f8fa8561cb366d0bb51f327",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1200,7 +1219,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Amazon RDS Proxy - Amazon Relational Database Service",
-      "updatedAt": "2026-10-25",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html"
     },
     {
@@ -1228,7 +1247,7 @@
       ],
       "claims": [],
       "contentHash": "7d5a10f1b7a77f624b2e900de8c1501e57c39bbedd14456cf837abb06f79c6c0",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1236,7 +1255,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Amazon S3 Event Notifications - Amazon Simple Storage Service",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/EventNotifications.html"
     },
     {
@@ -1264,7 +1283,7 @@
       ],
       "claims": [],
       "contentHash": "cdab45439bd0fe83ca1ef62e27abe9f4f7420444f41b4fbceb5af46b6c8eeb26",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1272,7 +1291,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Retaining multiple versions of objects with S3 Versioning - Amazon Simple Storage Service",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html"
     },
     {
@@ -1300,7 +1319,7 @@
       ],
       "claims": [],
       "contentHash": "46aba19821120111b729ff6fd8e087c99952af7f55affc86530a8ab697f5f018",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1308,7 +1327,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon S3? - Amazon Simple Storage Service",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Welcome.html"
     },
     {
@@ -1336,7 +1355,7 @@
       ],
       "claims": [],
       "contentHash": "a4c9c35cb6877f2fa12904a9514fba7b217078d7b9e8ba75e537ba99272bf57d",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1344,7 +1363,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Using cross-origin resource sharing (CORS) - Amazon Simple Storage Service",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/cors.html"
     },
     {
@@ -1372,7 +1391,7 @@
       ],
       "claims": [],
       "contentHash": "3c66064e2dd74690082b921890e2e6030197ad193504f33913996ee96f1d884c",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1380,7 +1399,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Uploading and copying objects using multipart upload in Amazon S3 - Amazon Simple Storage Service",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/mpuoverview.html"
     },
     {
@@ -1408,7 +1427,7 @@
       ],
       "claims": [],
       "contentHash": "36357d609318e3f1330c65265b85c7e7d061321e58137bbfe7f4f879ad5cb98e",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1416,7 +1435,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Managing the lifecycle of objects - Amazon Simple Storage Service",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/object-lifecycle-mgmt.html"
     },
     {
@@ -1444,7 +1463,7 @@
       ],
       "claims": [],
       "contentHash": "e865784615f1b809176e90dd1f3ebf073947b5e4b478d450c6eb030eb3f312cd",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1452,7 +1471,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Protecting data with server-side encryption - Amazon Simple Storage Service",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/serv-side-encryption.html"
     },
     {
@@ -1480,7 +1499,7 @@
       ],
       "claims": [],
       "contentHash": "2b88107db25b13df7a9a19aa52ae01f658a6c1a12c40e11468e8ce7e1873b3f7",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1488,7 +1507,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Download and upload objects with presigned URLs - Amazon Simple Storage Service",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/using-presigned-url.html"
     },
     {
@@ -1516,7 +1535,7 @@
       ],
       "claims": [],
       "contentHash": "65aed4aa1bdbda31308fc0e3852588dcec3505ab0cdc43c2141dd8c931f18889",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1524,7 +1543,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Policies and permissions in AWS Identity and Access Management - AWS Identity and Access Management",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/access_policies.html"
     },
     {
@@ -1552,7 +1571,7 @@
       ],
       "claims": [],
       "contentHash": "7e517b50a1ea1cbc9c17cbc6075c340f6e8ed0efb0cf53c9b603a3677c403cc6",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1560,7 +1579,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Security best practices in IAM - AWS Identity and Access Management",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/best-practices.html"
     },
     {
@@ -1588,7 +1607,7 @@
       ],
       "claims": [],
       "contentHash": "fd50cdb259ea20d0d40c5fe6329f111e32c06ec9a17b685865244240e48ecced",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1596,7 +1615,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Temporary security credentials in IAM - AWS Identity and Access Management",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_temp.html"
     },
     {
@@ -1624,7 +1643,7 @@
       ],
       "claims": [],
       "contentHash": "fbff095b91679e65c7e8de8f76943370b90414111b000ee6149ebee7f6dd7be5",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1632,7 +1651,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "IAM roles - AWS Identity and Access Management",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_roles.html"
     },
     {
@@ -1660,7 +1679,7 @@
       ],
       "claims": [],
       "contentHash": "ed02beef021e689e291d70917f5f7053b1863c00b4091bef1676baa5f47e3325",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1668,7 +1687,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is IAM? - AWS Identity and Access Management",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/introduction.html"
     },
     {
@@ -1696,7 +1715,7 @@
       ],
       "claims": [],
       "contentHash": "4dddadd50c06cd3c4258eedaf5a59576e4f5008fc0380243fa2835fe40da5263",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1704,7 +1723,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Policy evaluation logic - AWS Identity and Access Management",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html"
     },
     {
@@ -1732,7 +1751,7 @@
       ],
       "claims": [],
       "contentHash": "c158b3d6c5b5d3d8fa29e63012efa7c3df503e3054d8b50cbbc404b04d6942d9",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1740,7 +1759,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon Route 53? - Amazon Route 53",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/Welcome.html"
     },
     {
@@ -1768,7 +1787,7 @@
       ],
       "claims": [],
       "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1776,7 +1795,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "AWS Security Token Service",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/STS/latest/APIReference/welcome.html"
     },
     {
@@ -1804,7 +1823,7 @@
       ],
       "claims": [],
       "contentHash": "eb7fc672d42a6c6367202c6fe0060aa430ce50148e95e1064b6245ddb5bc3638",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1812,7 +1831,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is AWS Certificate Manager? - AWS Certificate Manager",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html"
     },
     {
@@ -1840,7 +1859,7 @@
       ],
       "claims": [],
       "contentHash": "aa9e4118b7738f24de08792052a860858fbecf98887ba132438940c8e3ba9e7f",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1848,7 +1867,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "In-memory acceleration with DynamoDB Accelerator (DAX) - Amazon DynamoDB",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DAX.html"
     },
     {
@@ -1876,7 +1895,7 @@
       ],
       "claims": [],
       "contentHash": "7cce35c1d04c25040db45a09a050cb599cd2d57426493c3b3bc9f6c7a87af140",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1884,7 +1903,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Using Global Secondary Indexes in DynamoDB - Amazon DynamoDB",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/GSI.html"
     },
     {
@@ -1912,7 +1931,7 @@
       ],
       "claims": [],
       "contentHash": "4ee2caca1ad127263ef20989db91f708babe3cef58cc1a61ac4db18aeca66011",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1920,7 +1939,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Core components of Amazon DynamoDB - Amazon DynamoDB",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.CoreComponents.html"
     },
     {
@@ -1948,7 +1967,7 @@
       ],
       "claims": [],
       "contentHash": "728fe96e41e359ceaadd40abb88abc6af9ee7fde45257024ba8e088bad3b2f3a",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1956,7 +1975,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "DynamoDB read consistency - Amazon DynamoDB",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/HowItWorks.ReadConsistency.html"
     },
     {
@@ -1984,7 +2003,7 @@
       ],
       "claims": [],
       "contentHash": "626bd49110902e49da42b1bfe3fcf95dfce8d1a3b5619e30cb7cc83a568633ba",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1992,7 +2011,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon DynamoDB? - Amazon DynamoDB",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Introduction.html"
     },
     {
@@ -2020,7 +2039,7 @@
       ],
       "claims": [],
       "contentHash": "68536418fd3399603bab7a186031fe01a274227bd4ae14f7019f89f97c768311",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2028,7 +2047,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Local secondary indexes - Amazon DynamoDB",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/LSI.html"
     },
     {
@@ -2056,7 +2075,7 @@
       ],
       "claims": [],
       "contentHash": "a31ae6a410b94debcf575b50db34230f6347afd819d562bda8d573fd4e05fd64",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2064,7 +2083,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Querying tables in DynamoDB - Amazon DynamoDB",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Query.html"
     },
     {
@@ -2092,7 +2111,7 @@
       ],
       "claims": [],
       "contentHash": "d2228b342bf49cdeb1e8c0436301cb61cfdac7b23d068c1ce37bd5b1d6bc1c55",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2100,7 +2119,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Scanning tables in DynamoDB - Amazon DynamoDB",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Scan.html"
     },
     {
@@ -2128,7 +2147,7 @@
       ],
       "claims": [],
       "contentHash": "de9b1d9baaff8062669761af6868b1cc5707492e21042b0c21f5a7f2f27342bf",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2136,7 +2155,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Change data capture for DynamoDB Streams - Amazon DynamoDB",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/Streams.html"
     },
     {
@@ -2164,7 +2183,7 @@
       ],
       "claims": [],
       "contentHash": "d72e65084e493eed6040b1c7c36375269c1eed2f94c3bc1051aea17db2878c4a",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2172,7 +2191,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Using time to live (TTL) in DynamoDB - Amazon DynamoDB",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/TTL.html"
     },
     {
@@ -2200,7 +2219,7 @@
       ],
       "claims": [],
       "contentHash": "cedd7539636de4075d5b379ad34d6507d60b1af4efc30da320e2fc4a3f58a307",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2208,7 +2227,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Best practices for designing and using partition keys effectively in DynamoDB - Amazon DynamoDB",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/bp-partition-key-design.html"
     },
     {
@@ -2236,7 +2255,7 @@
       ],
       "claims": [],
       "contentHash": "4e6d46c72d3462abeef85abe86695132f05d20a11da9378c6c36934e4bd1b021",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2244,7 +2263,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "DynamoDB throughput capacity - Amazon DynamoDB",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/capacity-mode.html"
     },
     {
@@ -2272,7 +2291,7 @@
       ],
       "claims": [],
       "contentHash": "3e00bd3984175321ae0ba0d0e76478f842484b12aa4ecb6a3885df9b410c19a0",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2280,7 +2299,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Using IAM policy conditions for fine-grained access control - Amazon DynamoDB",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/specifying-conditions.html"
     },
     {
@@ -2308,7 +2327,7 @@
       ],
       "claims": [],
       "contentHash": "95e86e1241a3fd9d0b1dbf83bbe67a7b27fc63768c8983f45dd7a9872225e6e4",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2316,7 +2335,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Amazon DynamoDB Transactions: How it works - Amazon DynamoDB",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/transaction-apis.html"
     },
     {
@@ -2344,7 +2363,7 @@
       ],
       "claims": [],
       "contentHash": "911a09c901a6102af84d8a55fd986b52cfce5e12cb49245d4deb6331324aa7c2",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2352,7 +2371,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Chatting with Amazon Q Developer about code - Amazon Q Developer",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/q-in-IDE-chat.html"
     },
     {
@@ -2416,7 +2435,7 @@
       ],
       "claims": [],
       "contentHash": "b549f04c18414e1a9caf07152fa1b12b349e0fd5a973ecc8d1192558a9b02b87",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2424,7 +2443,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon Q Developer? - Amazon Q Developer",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/amazonq/latest/qdeveloper-ug/what-is.html"
     },
     {
@@ -2452,7 +2471,7 @@
       ],
       "claims": [],
       "contentHash": "574de669289f3b653c37faa8e440a9af8aa29b106ee1905a92743494ca2cecca",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2460,7 +2479,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Welcome to AWS Amplify Hosting - AWS Amplify Hosting",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/amplify/latest/userguide/welcome.html"
     },
     {
@@ -2488,7 +2507,7 @@
       ],
       "claims": [],
       "contentHash": "985cc70993114097dead94e5d779f4acd41b489cfc0bb175bd6968b38e327449",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2496,7 +2515,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Cache settings for REST APIs in API Gateway - Amazon API Gateway",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-caching.html"
     },
     {
@@ -2524,7 +2543,7 @@
       ],
       "claims": [],
       "contentHash": "95fe4fa673db86db01c7a12b978f61fc270338c26d97a2cfc5e7855a90f9fdc1",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2532,7 +2551,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Throttle requests to your REST APIs for better throughput in API Gateway - Amazon API Gateway",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-request-throttling.html"
     },
     {
@@ -2560,7 +2579,7 @@
       ],
       "claims": [],
       "contentHash": "d38098150a70fd6e37f97e97de71f20151493692b3beb1d380294527c88b7275",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2568,7 +2587,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Control access to REST APIs using Amazon Cognito user pools as an authorizer - Amazon API Gateway",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-integrate-with-cognito.html"
     },
     {
@@ -2596,7 +2615,7 @@
       ],
       "claims": [],
       "contentHash": "26f0cdf907c2f539689763338d7cf82a2cfe2db199246be31baecdfb9f4db235",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2604,7 +2623,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Use API Gateway Lambda authorizers - Amazon API Gateway",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/apigateway-use-lambda-authorizer.html"
     },
     {
@@ -2632,7 +2651,7 @@
       ],
       "claims": [],
       "contentHash": "4f55c6e187b004abd4a951f345ef8fc315c9d3514b409c7abdac0e34fe368966",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2640,7 +2659,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Set up an API Gateway canary release deployment - Amazon API Gateway",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/canary-release.html"
     },
     {
@@ -2668,7 +2687,7 @@
       ],
       "claims": [],
       "contentHash": "342cbe46a897181a309f781dd3d23ac485095af18bebfdac07a802d6c01f8d47",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2676,7 +2695,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Set up a stage for a REST API in API Gateway - Amazon API Gateway",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/set-up-stages.html"
     },
     {
@@ -2704,7 +2723,7 @@
       ],
       "claims": [],
       "contentHash": "25aff0c2d1e35832a1d9278a94c161f09932cb3b6675d91732b35bdedd693f46",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2712,7 +2731,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Use stage variables for a REST API in API Gateway - Amazon API Gateway",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/stage-variables.html"
     },
     {
@@ -2740,7 +2759,7 @@
       ],
       "claims": [],
       "contentHash": "43a57e3275f9317c2b155e3bf4debb9f5bc982cb066f671919de048e1df98c54",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2748,7 +2767,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon API Gateway? - Amazon API Gateway",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/apigateway/latest/developerguide/welcome.html"
     },
     {
@@ -2776,7 +2795,7 @@
       ],
       "claims": [],
       "contentHash": "06620e6adb233e6594d7addf2b8ba78f39e1fb071ec2cddf6b5ab844dfb3804c",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2784,7 +2803,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is AWS AppConfig? - AWS AppConfig",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/appconfig/latest/userguide/what-is-appconfig.html"
     },
     {
@@ -2812,7 +2831,7 @@
       ],
       "claims": [],
       "contentHash": "6ad8e04acc16f3178d2eba7e0da06770b19883a9d31589182ae74a2e03a305ee",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2820,7 +2839,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is AWS AppSync? - AWS AppSync GraphQL",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/appsync/latest/devguide/what-is-appsync.html"
     },
     {
@@ -2848,7 +2867,7 @@
       ],
       "claims": [],
       "contentHash": "2adc80e55fe024a4a792452a0e4e86bed03ddd04b3e44727099a8707c4b9d0e9",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2856,7 +2875,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon Athena? - Amazon Athena",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/athena/latest/ug/what-is.html"
     },
     {
@@ -2884,7 +2903,7 @@
       ],
       "claims": [],
       "contentHash": "1ea91a74aaa144e716bab128a1d97064b94e187023f61cb6ea3e7a4ac0a18baa",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "exam-guide",
       "status": "active",
       "target": {
@@ -2892,7 +2911,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Content Domain 1: Development with AWS Services - AWS Certified Developer - Associate",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/developer-associate-02-domain1.html"
     },
     {
@@ -2920,7 +2939,7 @@
       ],
       "claims": [],
       "contentHash": "daa878516c2d175d47ee8f7e6cfeb5ec690498b4b4819623623578d7e679a03a",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "exam-guide",
       "status": "active",
       "target": {
@@ -2928,7 +2947,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Content Domain 2: Security - AWS Certified Developer - Associate",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/developer-associate-02-domain2.html"
     },
     {
@@ -2956,7 +2975,7 @@
       ],
       "claims": [],
       "contentHash": "8f2a14a60b16cfe55d1b1a793f4bee7fd3073a22e2045ffa81781653b90dd6f7",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "exam-guide",
       "status": "active",
       "target": {
@@ -2964,7 +2983,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Content Domain 3: Deployment - AWS Certified Developer - Associate",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/developer-associate-02-domain3.html"
     },
     {
@@ -2992,7 +3011,7 @@
       ],
       "claims": [],
       "contentHash": "89d9ddc50a8f051bd5f2341619407df0968e38db92e81b760d7d5b4dec6b707f",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "exam-guide",
       "status": "active",
       "target": {
@@ -3000,7 +3019,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Content Domain 4: Troubleshooting and Optimization - AWS Certified Developer - Associate",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/developer-associate-02-domain4.html"
     },
     {
@@ -3028,7 +3047,7 @@
       ],
       "claims": [],
       "contentHash": "8f95eabd384c78dced3fb11e5a61f84ce207dff0797da0ac13373c0690870c3a",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "exam-guide",
       "status": "active",
       "target": {
@@ -3036,7 +3055,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "AWS Certified Developer - Associate (DVA-C02) - AWS Certified Developer - Associate",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/developer-associate-02.html"
     },
     {
@@ -3064,7 +3083,7 @@
       ],
       "claims": [],
       "contentHash": "ac923bee3e09d2fbd0b97d295bff7908cccefadb460893ced55f8f9ac0da7277",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "exam-guide",
       "status": "active",
       "target": {
@@ -3072,7 +3091,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "In-Scope AWS Services - AWS Certified Developer - Associate",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/dva-02-in-scope-services.html"
     },
     {
@@ -3100,7 +3119,7 @@
       ],
       "claims": [],
       "contentHash": "ad0a9e8a578bcb108f71788aa92304c7d7827a05ee4019cd3297d376f1300206",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "exam-guide",
       "status": "active",
       "target": {
@@ -3108,7 +3127,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Out-of-Scope AWS Services - AWS Certified Developer - Associate",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/dva-02-out-of-scope-services.html"
     },
     {
@@ -3136,7 +3155,7 @@
       ],
       "claims": [],
       "contentHash": "0bf0995f8864d287fe6e5ab6c28d084d6616ca3c2b6f2f6b6302bc99f4fc7025",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "exam-guide",
       "status": "active",
       "target": {
@@ -3144,7 +3163,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Technologies and Concepts - AWS Certified Developer - Associate",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/dva-technologies-concepts.html"
     },
     {
@@ -3172,7 +3191,7 @@
       ],
       "claims": [],
       "contentHash": "1f573b5252f820907cb38469b3637d8195dac1935f7e8a5b20a698b6c42ba92a",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3180,7 +3199,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What Is AWS CloudTrail? - AWS CloudTrail",
-      "updatedAt": "2026-10-25",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html"
     },
     {
@@ -3208,7 +3227,7 @@
       ],
       "claims": [],
       "contentHash": "a05f1996d2c498059e2c44bb17f80c82694ca92755e48a08fdc9274f1cf58e4b",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3216,7 +3235,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is the AWS CDK? - AWS Cloud Development Kit (AWS CDK) v2",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/cdk/v2/guide/home.html"
     },
     {
@@ -3244,7 +3263,7 @@
       ],
       "claims": [],
       "contentHash": "cc1f63f672b852e9bb1ad056faf1f9b60e472ce9bc0ca65f164c0e569d2b5636",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3252,7 +3271,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is the AWS Command Line Interface? - AWS Command Line Interface",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html"
     },
     {
@@ -3280,7 +3299,7 @@
       ],
       "claims": [],
       "contentHash": "89fff180f9bd7950569deb39cfdf1dbce704195338b65f98feab9c80b0bb556a",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3288,7 +3307,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is AWS CloudShell? - AWS CloudShell",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/cloudshell/latest/userguide/welcome.html"
     },
     {
@@ -3316,7 +3335,7 @@
       ],
       "claims": [],
       "contentHash": "94a7ec9518216c981e3c906a3635a6a885e91b0a91222c19bb151824bc101c7d",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3324,7 +3343,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is AWS CodeArtifact? - CodeArtifact",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/codeartifact/latest/ug/welcome.html"
     },
     {
@@ -3352,7 +3371,7 @@
       ],
       "claims": [],
       "contentHash": "f4a97b801bbc597a5d2625f063413cc8fb9ff7d2401910eb41d207c0dab88f15",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3360,7 +3379,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Build specification reference for CodeBuild - AWS CodeBuild",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/codebuild/latest/userguide/build-spec-ref.html"
     },
     {
@@ -3388,7 +3407,7 @@
       ],
       "claims": [],
       "contentHash": "c5bb30189c37df29750d798c32026bad4523c3acd4934fb70a853a5abde22999",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3396,7 +3415,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is AWS CodeBuild? - AWS CodeBuild",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/codebuild/latest/userguide/welcome.html"
     },
     {
@@ -3424,7 +3443,7 @@
       ],
       "claims": [],
       "contentHash": "514548d485f86f901f1f3cdc3b61d712abdbbe93fbed467240c021ad07ae3b23",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3432,7 +3451,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Working with deployment configurations in CodeDeploy - AWS CodeDeploy",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/deployment-configurations.html"
     },
     {
@@ -3460,7 +3479,7 @@
       ],
       "claims": [],
       "contentHash": "bb81edb9c6dd85f82defb7f48206b7a803e251e3b347b7e4b01536ec0fda41b8",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3468,7 +3487,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "CodeDeploy AppSpec file reference - AWS CodeDeploy",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/reference-appspec-file.html"
     },
     {
@@ -3496,7 +3515,7 @@
       ],
       "claims": [],
       "contentHash": "a110a269b07b352755e4af266ad8ae608a7c8beb9f2d1f9df6b19e58d5e8f341",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3504,7 +3523,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is CodeDeploy? - AWS CodeDeploy",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/codedeploy/latest/userguide/welcome.html"
     },
     {
@@ -3532,7 +3551,7 @@
       ],
       "claims": [],
       "contentHash": "5abc7d0ef55cdf3721137beb8376c06358c4a8acd022ff089f9d520657fcd741",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3540,7 +3559,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon CodeGuru Profiler? - Amazon CodeGuru Profiler",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/codeguru/latest/profiler-ug/what-is-codeguru-profiler.html"
     },
     {
@@ -3568,7 +3587,7 @@
       ],
       "claims": [],
       "contentHash": "aa351f8ef36ee4d291abad7a61ccd772e82c1a332942762b181e216729220e35",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3576,7 +3595,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon CodeGuru Reviewer? - Amazon CodeGuru Reviewer",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/codeguru/latest/reviewer-ug/welcome.html"
     },
     {
@@ -3604,7 +3623,7 @@
       ],
       "claims": [],
       "contentHash": "81ead4ce614fbe8f54023f4c62a6d008ddf26e31c1282faea020b81d2f1de049",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3612,7 +3631,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Add a manual approval action to a stage - AWS CodePipeline",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/approvals.html"
     },
     {
@@ -3640,7 +3659,7 @@
       ],
       "claims": [],
       "contentHash": "a95a2205b006c60d045ef65ef073ced9d5b7f574a076cd06244bf0b2dafc3f7b",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3648,7 +3667,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is AWS CodePipeline? - AWS CodePipeline",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/codepipeline/latest/userguide/welcome.html"
     },
     {
@@ -3676,7 +3695,7 @@
       ],
       "claims": [],
       "contentHash": "11a4636d5d4d307d107de240519a0138df8b935bb7a4e9669c2b4ca09eb28f8d",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3684,7 +3703,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Amazon Cognito identity pools - Amazon Cognito",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-identity.html"
     },
     {
@@ -3712,7 +3731,7 @@
       ],
       "claims": [],
       "contentHash": "c8739595ca11b22770fd2340f333344466e30a20b05fa0a23ee423b5b4f425cd",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3720,7 +3739,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Customizing user pool workflows with Lambda triggers - Amazon Cognito",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools-working-with-lambda-triggers.html"
     },
     {
@@ -3748,7 +3767,7 @@
       ],
       "claims": [],
       "contentHash": "7dc9d182bc8c5d1d3adb6b2467b4c4cc7a4b027201ee6af62e78a3170c9f46ba",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3756,7 +3775,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Authenticating users with Amazon Cognito user pools - Amazon Cognito",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/cognito-user-pools.html"
     },
     {
@@ -3784,7 +3803,7 @@
       ],
       "claims": [],
       "contentHash": "dfb44624fd82a463ccf2d33100b4750e634396e026efe4a4b807460b24a68fa7",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3792,7 +3811,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Post authentication Lambda trigger - Amazon Cognito",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-lambda-post-authentication.html"
     },
     {
@@ -3820,7 +3839,7 @@
       ],
       "claims": [],
       "contentHash": "ae497282b5a1b0682c9311b34248541ad1e7bedb439d96a8d4f15f787de4b890",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3828,7 +3847,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon Cognito? - Amazon Cognito",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/cognito/latest/developerguide/what-is-amazon-cognito.html"
     },
     {
@@ -3856,7 +3875,7 @@
       ],
       "claims": [],
       "contentHash": "f9617ae9ddb8cfd88df586c8fcdf4cbd97d88e68408742d70500db27f232a816",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3864,7 +3883,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is AWS Compute Optimizer? - AWS Compute Optimizer",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/compute-optimizer/latest/ug/what-is-compute-optimizer.html"
     },
     {
@@ -3892,7 +3911,7 @@
       ],
       "claims": [],
       "contentHash": "d5f7c30f3ca9fd78605af5af746645164d36b48584f7676f0f4f84b3003a5d99",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3900,7 +3919,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon Elastic Block Store? - Amazon EBS",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/ebs/latest/userguide/what-is-ebs.html"
     },
     {
@@ -3928,7 +3947,7 @@
       ],
       "claims": [],
       "contentHash": "cc5fbeb09b645bbdbfdd37ce6de2d753f0445c64d01e672aca0be0a90fb3dd11",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3936,7 +3955,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon Elastic File System? - Amazon Elastic File System",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/efs/latest/ug/whatisefs.html"
     },
     {
@@ -3964,7 +3983,7 @@
       ],
       "claims": [],
       "contentHash": "1d976aeff8050cfb0249c5eae0d8c13711ebb7fdbb66f952c16ab577af5af6bf",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3972,7 +3991,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon EKS? - Amazon EKS",
-      "updatedAt": "2026-10-25",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html"
     },
     {
@@ -4000,7 +4019,7 @@
       ],
       "claims": [],
       "contentHash": "cda5214f725ed656bee1210442376a9096f38ec9c8b54bdbfec72b9789f236af",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4008,7 +4027,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is AWS Elastic Beanstalk? - AWS Elastic Beanstalk",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/Welcome.html"
     },
     {
@@ -4036,7 +4055,7 @@
       ],
       "claims": [],
       "contentHash": "8c43583c3dd54fe5b63306227b8563ffc9158ff62e8190848fd82f358f8507d5",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4044,7 +4063,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Deploying applications to Elastic Beanstalk environments - AWS Elastic Beanstalk",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/elasticbeanstalk/latest/dg/using-features.deploy-existing-version.html"
     },
     {
@@ -4072,7 +4091,7 @@
       ],
       "claims": [],
       "contentHash": "d87688a09fc80ad7cce87c8028db15e27d5e84d73a8d4ef294fb4fa2828c5d39",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4080,7 +4099,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Elastic Load Balancing? - Elastic Load Balancing",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/userguide/what-is-load-balancing.html"
     },
     {
@@ -4108,7 +4127,7 @@
       ],
       "claims": [],
       "contentHash": "6304bdf39ad03b24b61c70eb359a19d5b74f88e615d69caba5f6c077d5403c42",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4116,7 +4135,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "How the AWS Encryption SDK works - AWS Encryption SDK",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/encryption-sdk/latest/developer-guide/how-it-works.html"
     },
     {
@@ -4144,7 +4163,7 @@
       ],
       "claims": [],
       "contentHash": "eff3778a0e39babb88a28cd66a4ebadced2f9499e622e4cc357fc4f19ea198e0",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4152,7 +4171,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Rules in Amazon EventBridge - Amazon EventBridge",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-rules.html"
     },
     {
@@ -4180,7 +4199,7 @@
       ],
       "claims": [],
       "contentHash": "ef46e4ce0b1b66856beaed3e670c17cd2b59acccf3fa7f62af6b92556f4aa46d",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4188,7 +4207,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What Is Amazon EventBridge? - Amazon EventBridge",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html"
     },
     {
@@ -4216,7 +4235,7 @@
       ],
       "claims": [],
       "contentHash": "09eebe95eb72062229d2de8b88a33291f06a7670fad9f34570fbbd37cc2f50ce",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4224,7 +4243,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "AWS KMS keys - AWS Key Management Service",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/kms/latest/developerguide/concepts.html"
     },
     {
@@ -4252,7 +4271,7 @@
       ],
       "claims": [],
       "contentHash": "ebcadf4497ec1043bc69c8d9b1e7e00ef4589ba01e80c65e865417a4f50d36cb",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4260,7 +4279,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Generate data keys - AWS Key Management Service",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/kms/latest/developerguide/data-keys.html"
     },
     {
@@ -4288,7 +4307,7 @@
       ],
       "claims": [],
       "contentHash": "83034bb1334152740c8145c3e31e354e6ba45bba9b105540722a7792517f247d",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4296,7 +4315,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "AWS Key Management Service - AWS Key Management Service",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html"
     },
     {
@@ -4324,7 +4343,7 @@
       ],
       "claims": [],
       "contentHash": "2c7108fd90ebd3bc22ad2290c05b30309da27b417aaa1f007dba63c4d1d287f8",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4332,7 +4351,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Managing Lambda Event Function dependencies with layers - AWS Lambda",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/chapter-layers.html"
     },
     {
@@ -4360,7 +4379,7 @@
       ],
       "claims": [],
       "contentHash": "834eaea6575c915136199a6f495922a2389b5225d8fb83b7afd350fb850ec8f3",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4368,7 +4387,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Create an alias for a Lambda Event Function - AWS Lambda",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-aliases.html"
     },
     {
@@ -4396,7 +4415,7 @@
       ],
       "claims": [],
       "contentHash": "d462f902dc11bfb3ae4bfcb24b6756568df14370c41570e4d0c41041cccd0032",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4404,7 +4423,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Configuring reserved concurrency for an Event Function - AWS Lambda",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-concurrency.html"
     },
     {
@@ -4432,7 +4451,7 @@
       ],
       "claims": [],
       "contentHash": "60a0184526b75a44fbe699749f2b9a9d0c23d66b18716b223542221cc2ff3a7e",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4440,7 +4459,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Working with Lambda environment variables - AWS Lambda",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-envvars.html"
     },
     {
@@ -4468,7 +4487,7 @@
       ],
       "claims": [],
       "contentHash": "cc540873013851c238330de3b6d0bb69c03a802615f515b405c3d86f5ea1870c",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4476,7 +4495,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Configure Lambda Event Function memory - AWS Lambda",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-memory.html"
     },
     {
@@ -4504,7 +4523,7 @@
       ],
       "claims": [],
       "contentHash": "ba31eef24bfe8300d97262a77d9c3024a74fca701d2f3c4a9527db3cb5cf60ce",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4512,7 +4531,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Manage Lambda Event Function versions - AWS Lambda",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-versions.html"
     },
     {
@@ -4540,7 +4559,7 @@
       ],
       "claims": [],
       "contentHash": "733659cb0197c4b892487af4a59de1f7550a31a2880b58234d4fcd3e6bdd41e0",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4548,7 +4567,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Giving Lambda Event Functions access to resources in an Amazon VPC - AWS Lambda",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/configuration-vpc.html"
     },
     {
@@ -4576,7 +4595,7 @@
       ],
       "claims": [],
       "contentHash": "6d5a20d0453069cc1f14e0400377ac577c0992665aed118f0020cf4ffb952d03",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4584,7 +4603,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Invoking a Lambda Event Function asynchronously - AWS Lambda",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-async.html"
     },
     {
@@ -4612,7 +4631,7 @@
       ],
       "claims": [],
       "contentHash": "ecf2782c5fb186b52281e0d5d888c8f49c343f69c59557b2b72102309cb71ddc",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4620,7 +4639,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "How Lambda processes records from stream and queue-based event sources - AWS Lambda",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/invocation-eventsourcemapping.html"
     },
     {
@@ -4648,7 +4667,7 @@
       ],
       "claims": [],
       "contentHash": "0205bc5c8215446b150037ead9dbb64ad1594d3e39307ab15703b8e0c55227c7",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4656,7 +4675,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Understanding Lambda Event Function scaling - AWS Lambda",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html"
     },
     {
@@ -4720,7 +4739,7 @@
       ],
       "claims": [],
       "contentHash": "0091d06a6bf0e4c18063f3032146531080aa17ee551a29cc812c7f5b95b2ca57",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4728,7 +4747,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Viewing CloudWatch logs for Lambda Event Functions - AWS Lambda",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/monitoring-cloudwatchlogs-view.html"
     },
     {
@@ -4756,7 +4775,7 @@
       ],
       "claims": [],
       "contentHash": "2e00b992376b01f9766201a2bc9a885a4320d9eaae3afc4a3ce039f2e30e6a87",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4764,7 +4783,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Types of metrics for Lambda Event Functions - AWS Lambda",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/monitoring-metrics-types.html"
     },
     {
@@ -4792,7 +4811,7 @@
       ],
       "claims": [],
       "contentHash": "6af78c828f3fba74c1c9718952a9bdd389291996c16e3ce34494a2bd2fb27f53",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4800,7 +4819,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Visualize Lambda Event Function invocations using AWS X-Ray - AWS Lambda",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/services-xray.html"
     },
     {
@@ -4828,7 +4847,7 @@
       ],
       "claims": [],
       "contentHash": "7755b9ad20cc9ea8bba42eb1c5deaf645464cb1b009fc5a2f060593b428ecbb8",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4836,7 +4855,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "How to test serverless functions and applications - AWS Lambda",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/testing-guide.html"
     },
     {
@@ -4864,7 +4883,7 @@
       ],
       "claims": [],
       "contentHash": "5e83c528598367c318f3d9f1204cd368fb8b235af3907c687b91732a83871530",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4872,7 +4891,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is AWS Lambda? - AWS Lambda",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/welcome.html"
     },
     {
@@ -4900,7 +4919,7 @@
       ],
       "claims": [],
       "contentHash": "180582bcb6c3bfb7e445224c3a25e0c7ee0504cee3779340e122ef93df200531",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4908,7 +4927,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Using Lambda with Amazon SQS - AWS Lambda",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/lambda/latest/dg/with-sqs.html"
     },
     {
@@ -4936,7 +4955,7 @@
       ],
       "claims": [],
       "contentHash": "323dc2714e18736c9e569604f1ba1030ed3bad9a57aad19bb0a99a94c57eec99",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4944,7 +4963,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon Macie? - Amazon Macie",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html"
     },
     {
@@ -4972,7 +4991,7 @@
       ],
       "claims": [],
       "contentHash": "cdcf4a047c7b2e7d171206f7246af24aa5c148f767a968d76d2b9042c8d99ba6",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -4980,7 +4999,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon OpenSearch Service? - Amazon OpenSearch Service",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/opensearch-service/latest/developerguide/what-is.html"
     },
     {
@@ -5008,7 +5027,7 @@
       ],
       "claims": [],
       "contentHash": "d307f956b24f0c4f18794e40616b95bcffe16631901fe33b712628e64df58120",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -5016,7 +5035,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is AWS Private CA? - AWS Private Certificate Authority",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/privateca/latest/userguide/PcaWelcome.html"
     },
     {
@@ -5044,7 +5063,7 @@
       ],
       "claims": [],
       "contentHash": "6b73d9c027a64316081928da8b8fafb506d7de0e8cdea9a3b597ba0b544c8dc1",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -5052,7 +5071,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Retry behavior - AWS SDKs and Tools",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/sdkref/latest/guide/feature-retry-behavior.html"
     },
     {
@@ -5080,7 +5099,7 @@
       ],
       "claims": [],
       "contentHash": "3c1225fda30dc9e6736a89204c8e8dbe9a8c5a1012ea6d9ec6a52faa0e7b6cb4",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -5088,7 +5107,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Access AWS Secrets Manager secrets from a different account - AWS Secrets Manager",
-      "updatedAt": "2026-10-25",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/auth-and-access_examples_cross.html"
     },
     {
@@ -5116,7 +5135,7 @@
       ],
       "claims": [],
       "contentHash": "ce85a6371e7fb148fccd97a5f1909450f486650b14f0f96f2a6272ae0b300c04",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -5124,7 +5143,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "AWS Secrets Manager best practices - AWS Secrets Manager",
-      "updatedAt": "2026-10-25",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/best-practices.html"
     },
     {
@@ -5152,7 +5171,7 @@
       ],
       "claims": [],
       "contentHash": "3c31ee9febff5ce163c4cc61b5239ee1523ddc3c32d5e5749d366e36a5936034",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -5160,7 +5179,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is AWS Secrets Manager? - AWS Secrets Manager",
-      "updatedAt": "2026-10-25",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html"
     },
     {
@@ -5188,7 +5207,7 @@
       ],
       "claims": [],
       "contentHash": "d8c8d506f9ff8cf65d9b3c68feb16e63b3f66251b7c6ffe1aaa13f66da15fc1e",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -5196,7 +5215,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Rotate AWS Secrets Manager secrets - AWS Secrets Manager",
-      "updatedAt": "2026-10-25",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/rotating-secrets.html"
     },
     {
@@ -5224,7 +5243,7 @@
       ],
       "claims": [],
       "contentHash": "a92f06d812ffefd0d52fea00a4735ac2fa5b1dd20296d79ddbee8117c6cf36bc",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -5232,7 +5251,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "sam local generate-event - AWS Serverless Application Model",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-local-generate-event.html"
     },
     {
@@ -5260,7 +5279,7 @@
       ],
       "claims": [],
       "contentHash": "20e0698c10bfd5b30a1114c812e6a3aca465983c82af583967aeaf72e0c7cbfe",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -5268,7 +5287,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Introduction to testing with sam local invoke - AWS Serverless Application Model",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/using-sam-cli-local-invoke.html"
     },
     {
@@ -5296,7 +5315,7 @@
       ],
       "claims": [],
       "contentHash": "1f728eeb2c8a7b8f0cfb11b0f4893f5905a6597733ee7c8bb45568bbd5d82e4d",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -5304,7 +5323,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is the AWS Serverless Application Model (AWS SAM)? - AWS Serverless Application Model",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/what-is-sam.html"
     },
     {
@@ -5332,7 +5351,7 @@
       ],
       "claims": [],
       "contentHash": "6a2bb3c33bf1d36825cb4a7a17618afb8a79686ce191023caca70d2a503a9864",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -5340,7 +5359,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Amazon SNS message filtering - Amazon Simple Notification Service",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/sns/latest/dg/sns-message-filtering.html"
     },
     {
@@ -5368,7 +5387,7 @@
       ],
       "claims": [],
       "contentHash": "accdbf92342d49be57a44efb2dc48d32d8ba640b54fcfa7114e540f5c621ff3e",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -5376,7 +5395,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon SNS? - Amazon Simple Notification Service",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/sns/latest/dg/welcome.html"
     },
     {
@@ -5404,7 +5423,7 @@
       ],
       "claims": [],
       "contentHash": "2b5e50183d5f143a25a8b9a0b60e8e1d34c9648702c72367010c869888258266",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -5412,7 +5431,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Step Functions? - AWS Step Functions",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/step-functions/latest/dg/welcome.html"
     },
     {
@@ -5440,7 +5459,7 @@
       ],
       "claims": [],
       "contentHash": "5c400afab12002311f71b8f77ad256ad2aafb44c238e78c4075760fa127d710a",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -5448,7 +5467,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon Kinesis Data Streams? - Amazon Kinesis Data Streams",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/streams/latest/dev/introduction.html"
     },
     {
@@ -5476,7 +5495,7 @@
       ],
       "claims": [],
       "contentHash": "0879297120603a305e4a14b0f6f3cdad47f13f3d4f67ecdb4711bbf07b798001",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -5484,7 +5503,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "Amazon Kinesis Data Streams Terminology and concepts - Amazon Kinesis Data Streams",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/streams/latest/dev/key-concepts.html"
     },
     {
@@ -5512,7 +5531,7 @@
       ],
       "claims": [],
       "contentHash": "77a3cd5606a8b0a771b406fcdc3ce3fe7687f7da43b30cad3b3999d1e2706e3b",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -5520,7 +5539,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "AWS Systems Manager Parameter Store - AWS Systems Manager",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-parameter-store.html"
     },
     {
@@ -5548,7 +5567,7 @@
       ],
       "claims": [],
       "contentHash": "6befbb3b9438c3e4a9e2e4395a0541330e99714ea1cb0752f4e1c7e199118dd0",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -5556,7 +5575,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is Amazon VPC? - Amazon Virtual Private Cloud",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
     },
     {
@@ -5584,7 +5603,7 @@
       ],
       "claims": [],
       "contentHash": "17e658e4614111066f8a1c27a098056ce962cf080fa628911984a5b2152d4323",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -5592,7 +5611,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What are AWS WAF, AWS Shield Advanced, AWS Shield network security director and AWS Firewall Manager? - AWS WAF, AWS Firewall Manager, AWS Shield Advanced, and AWS Shield network security director",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/waf/latest/developerguide/what-is-aws-waf.html"
     },
     {
@@ -5656,7 +5675,7 @@
       ],
       "claims": [],
       "contentHash": "633131179ab468b29e27376b6beeb2070919fb58936d475a151a87384a02f540",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -5664,7 +5683,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "What is AWS X-Ray? - AWS X-Ray",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/xray/latest/devguide/aws-xray.html"
     },
     {
@@ -5692,7 +5711,7 @@
       ],
       "claims": [],
       "contentHash": "d6ad1562b128e724de2c5e488713bf120eb5d30d1095f47542f1cf9b7ac5639f",
-      "fetchedAt": "2026-10-25",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -5700,7 +5719,7 @@
         "examCode": "AWS-DVA-C02"
       },
       "title": "AWS X-Ray concepts - AWS X-Ray",
-      "updatedAt": "2026-10-24",
+      "updatedAt": "2026-10-27",
       "url": "https://docs.aws.amazon.com/xray/latest/devguide/xray-concepts.html"
     }
   ]
