@@ -42,10 +42,15 @@ describe("score コマンド", () => {
 
   it("出力_公開している問題の設問文や選択肢の本文を含まない", async () => {
     const data = JSON.parse(readFileSync(resolve(repoRoot, "data/questions.aws-clf-c02.json"), "utf8"));
+    const guide = JSON.parse(
+      readFileSync(resolve(repoRoot, "packages/pipeline/ledger/aws-clf-c02.json"), "utf8"),
+    ).guide;
+    // 点数票は、束のサービスの分布として、試験ガイドの対象サービスの一覧のサービス名を出す。選択肢の本文が、そのサービス名と同じものは、本文の漏えいではない
+    const serviceNames = new Set<string>(guide?.services ?? []);
     const r = await run(["score", "AWS-CLF-C02"]);
     for (const q of data.questions.slice(0, 20)) {
       expect(r.out).not.toContain(q.questionText);
-      for (const c of q.choices ?? []) expect(r.out).not.toContain(c.text);
+      for (const c of q.choices ?? []) if (!serviceNames.has(c.text)) expect(r.out).not.toContain(c.text);
     }
   });
 
