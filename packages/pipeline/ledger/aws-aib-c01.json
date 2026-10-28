@@ -1,6 +1,11 @@
 {
   "examCode": "AWS-AIB-C01",
   "guide": {
+    "agent": {
+      "definitionHash": "e852ec29473856c75d44f0b228d99428e2f751c8a75a2ba51a66f87b1026f73f",
+      "model": "claude-haiku-5-5",
+      "role": "guide-extractor"
+    },
     "contentHash": "c6c5fd1de34018697e41cbe3e9840d50f9668e28937ae6000ae23dbc19edf330",
     "domains": [
       {
@@ -90,7 +95,25 @@
         "weight": 0.24
       }
     ],
-    "importedAt": "2026-10-13",
+    "exam": {
+      "passingScore": 700,
+      "timeMinutes": 130,
+      "totalScore": 1000
+    },
+    "excludedServices": [
+      "Amazon EC2",
+      "AWS Lambda",
+      "Amazon VPC",
+      "Amazon CloudFront",
+      "Amazon RDS",
+      "Amazon S3",
+      "Amazon Elastic Container Service",
+      "Amazon Elastic Kubernetes Service",
+      "AWS CodePipeline",
+      "AWS CloudFormation",
+      "AWS Key Management Service"
+    ],
+    "importedAt": "2026-10-28",
     "pages": [
       {
         "contentHash": "4cd5ef2b2a300a1ac414e25dfa5b9d960386ebbef4073140d8f3f060132003f6",
@@ -107,7 +130,29 @@
       {
         "contentHash": "d77b91b2a2f65383904ec6cd3ce8e256c46da75609e8cb79df9f8589f0f5ad08",
         "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
+      },
+      {
+        "contentHash": "e7943b2a0c9917dee5fcf00d70f7fa170a837408575dec7a38896cf957cefb97",
+        "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-in-scope-services.html"
+      },
+      {
+        "contentHash": "fc4d7a2576195efdebb640f231d9675b0ed8c7dd14743159bc3134070479da35",
+        "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-out-of-scope-services.html"
+      },
+      {
+        "contentHash": "40d8feb86e5263af28e1358c3489ea4a4e842e2d4b25036c4df3b24fa7c13000",
+        "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-technologies-concepts.html"
       }
+    ],
+    "services": [
+      "Amazon Bedrock",
+      "Amazon SageMaker AI",
+      "Amazon Quick",
+      "AWS Cloud Adoption Framework (AWS CAF)",
+      "AWS shared responsibility model",
+      "AWS Cost Explorer",
+      "AWS Marketplace",
+      "AWS Pricing Calculator"
     ],
     "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01.html"
   },
@@ -141,14 +186,15 @@
       ],
       "claims": [],
       "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
-      "fetchedAt": "2026-10-15",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-08",
+      "title": "Structured Data vs Unstructured Data - Difference Between Collectible Data - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/"
     },
     {
@@ -176,14 +222,15 @@
       ],
       "claims": [],
       "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1",
-      "fetchedAt": "2026-10-15",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-08",
+      "title": "What are AI Agents?- Agents in Artificial Intelligence Explained - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/what-is/ai-agents/"
     },
     {
@@ -211,14 +258,15 @@
       ],
       "claims": [],
       "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b",
-      "fetchedAt": "2026-10-15",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-08",
+      "title": "What is AI? - Artificial Intelligence Explained - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/what-is/artificial-intelligence/"
     },
     {
@@ -246,14 +294,15 @@
       ],
       "claims": [],
       "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
-      "fetchedAt": "2026-10-15",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-08",
+      "title": "What is Generative AI? - Gen AI Explained - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/what-is/generative-ai/"
     },
     {
@@ -281,14 +330,15 @@
       ],
       "claims": [],
       "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
-      "fetchedAt": "2026-10-15",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-08",
+      "title": "What is Machine Learning? - ML Technology Explained - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/what-is/machine-learning/"
     },
     {
@@ -316,14 +366,15 @@
       ],
       "claims": [],
       "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
-      "fetchedAt": "2026-10-15",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-08",
+      "title": "What is Prompt Engineering? - AI Prompt Engineering Explained - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/what-is/prompt-engineering/"
     },
     {
@@ -351,14 +402,15 @@
       ],
       "claims": [],
       "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408",
-      "fetchedAt": "2026-10-15",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-08",
+      "title": "What is RAG? - Retrieval-Augmented Generation AI Explained - AWS",
+      "updatedAt": "2026-10-27",
       "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/"
     },
     {
@@ -386,14 +438,15 @@
       ],
       "claims": [],
       "contentHash": "4cd5ef2b2a300a1ac414e25dfa5b9d960386ebbef4073140d8f3f060132003f6",
-      "fetchedAt": "2026-10-15",
+      "fetchedAt": "2026-10-28",
       "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-15",
+      "title": "Content Domain 1: AI Fundamentals and Literacy - AWS Certified AI Business Strategist",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain1.html"
     },
     {
@@ -421,14 +474,15 @@
       ],
       "claims": [],
       "contentHash": "f580cfe2a443562d10fd7124b0f213de8bfe1b14901036d187bdf8fd95da1143",
-      "fetchedAt": "2026-10-15",
+      "fetchedAt": "2026-10-28",
       "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-15",
+      "title": "Content Domain 2: AI Strategy and Business Value Creation - AWS Certified AI Business Strategist",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.html"
     },
     {
@@ -456,14 +510,15 @@
       ],
       "claims": [],
       "contentHash": "037a234a8683af8e85cda75553efce285f995926a5fbff21e949f7c780a98f66",
-      "fetchedAt": "2026-10-15",
+      "fetchedAt": "2026-10-28",
       "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-15",
+      "title": "Content Domain 3: AI Governance and Responsible AI Leadership - AWS Certified AI Business Strategist",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain3.html"
     },
     {
@@ -491,14 +546,15 @@
       ],
       "claims": [],
       "contentHash": "d77b91b2a2f65383904ec6cd3ce8e256c46da75609e8cb79df9f8589f0f5ad08",
-      "fetchedAt": "2026-10-15",
+      "fetchedAt": "2026-10-28",
       "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-15",
+      "title": "Content Domain 4: Business Readiness, Leadership, and AI Transformation - AWS Certified AI Business Strategist",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
     },
     {
@@ -526,14 +582,15 @@
       ],
       "claims": [],
       "contentHash": "c6c5fd1de34018697e41cbe3e9840d50f9668e28937ae6000ae23dbc19edf330",
-      "fetchedAt": "2026-10-15",
+      "fetchedAt": "2026-10-28",
       "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-15",
+      "title": "AWS Certified AI Business Strategist (AIB-C01) - AWS Certified AI Business Strategist",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01.html"
     },
     {
@@ -561,14 +618,15 @@
       ],
       "claims": [],
       "contentHash": "e7943b2a0c9917dee5fcf00d70f7fa170a837408575dec7a38896cf957cefb97",
-      "fetchedAt": "2026-10-15",
+      "fetchedAt": "2026-10-28",
       "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-15",
+      "title": "In-scope AWS services and features - AWS Certified AI Business Strategist",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-in-scope-services.html"
     },
     {
@@ -595,15 +653,51 @@
         }
       ],
       "claims": [],
-      "contentHash": "fc4d7a2576195efdebb640f231d9675b0ed8c7dd14743159bc3134070479da35",
-      "fetchedAt": "2026-10-15",
+      "contentHash": "e6b75b235b2d5b2755b9feb5dc8106775dc4b5bb9550177f454900bcec08c19f",
+      "fetchedAt": "2026-10-28",
       "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-15",
+      "updatedAt": "2026-10-28",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-in-scope-services.md"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "fc4d7a2576195efdebb640f231d9675b0ed8c7dd14743159bc3134070479da35",
+      "fetchedAt": "2026-10-28",
+      "kind": "exam-guide",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Out-of-scope AWS services and features - AWS Certified AI Business Strategist",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-out-of-scope-services.html"
     },
     {
@@ -630,15 +724,51 @@
         }
       ],
       "claims": [],
-      "contentHash": "40d8feb86e5263af28e1358c3489ea4a4e842e2d4b25036c4df3b24fa7c13000",
-      "fetchedAt": "2026-10-15",
+      "contentHash": "53bac564a3ed414aadb2ae1c1970fe0f4bd7f2c878a6e26823a6f2e6c44f7e56",
+      "fetchedAt": "2026-10-28",
       "kind": "exam-guide",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-15",
+      "updatedAt": "2026-10-28",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-out-of-scope-services.md"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "40d8feb86e5263af28e1358c3489ea4a4e842e2d4b25036c4df3b24fa7c13000",
+      "fetchedAt": "2026-10-28",
+      "kind": "exam-guide",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Technologies and concepts that might appear on the exam - AWS Certified AI Business Strategist",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-technologies-concepts.html"
     },
     {
@@ -665,15 +795,51 @@
         }
       ],
       "claims": [],
+      "contentHash": "83666c090c6b3d39da36cf4f1b87e193bdbfbf58653f417ec7ebf469349b7e27",
+      "fetchedAt": "2026-10-28",
+      "kind": "exam-guide",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "updatedAt": "2026-10-28",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-technologies-concepts.md"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
       "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44",
-      "fetchedAt": "2026-10-15",
+      "fetchedAt": "2026-10-28",
       "kind": "official-doc",
       "status": "active",
       "target": {
         "edition": "C01",
         "examCode": "AWS-AIB-C01"
       },
-      "updatedAt": "2026-10-15",
+      "title": "Data and model quality monitoring with Amazon SageMaker Model Monitor - Amazon SageMaker AI",
+      "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
     }
   ]
