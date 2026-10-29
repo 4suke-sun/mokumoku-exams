@@ -7,7 +7,7 @@ import { entry } from "../collect/test-helpers.ts";
 import { emptyFacts, type FactCard, factsPath, writeFacts } from "../facts/schema.ts";
 import { card, DOC_HASH, DOC_URL, factsFixture } from "../facts/test-helpers.ts";
 import { main } from "../main.ts";
-import { installAgentDefinitions } from "../shared/test-helpers.ts";
+import { installAgentDefinitions, withoutExamSettings } from "../shared/test-helpers.ts";
 import type { DraftRequest } from "./request.ts";
 import type { ChoiceDraft, Draft, FreeTextDraft } from "./schema.ts";
 import { draftWorkDir } from "./store.ts";
@@ -120,7 +120,10 @@ export function markVerified(root: string, id: string, verdict: "pass" | "hold" 
   writeFileSync(path, JSON.stringify(file));
 }
 const repoRoot = resolve(import.meta.dirname, "../../../..");
-export const baseConfig = JSON.parse(readFileSync(resolve(import.meta.dirname, "../../pipeline.config.json"), "utf8"));
+export const baseConfig = withoutExamSettings(
+  JSON.parse(readFileSync(resolve(import.meta.dirname, "../../pipeline.config.json"), "utf8")),
+  EXAM,
+);
 
 /** 各分野に通過した事実カードが 1 件ずつある作業ディレクトリ */
 export function setupDraftRoot(options: { cards?: FactCard[]; questions?: unknown } = {}) {
