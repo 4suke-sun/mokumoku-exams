@@ -191,8 +191,10 @@ export const EXAM_OVERRIDES: Readonly<Record<string, ExamOverride>> = {
       openerPrefixChars: 8,
     },
   },
-  // Data Engineer Associate: 状況の問が約 3 分の 2、知識の問が約 3 分の 1(ベンダー共通の帯のまま)
-  "DBX-DEA-2605": {},
+  // Data Engineer Associate: 状況の問が約 6 割、知識の問が約 4 割。すべて単一選択
+  "DBX-DEA-2605": {
+    batch: { multiShare: [0, 0], situationShare: [0.5, 0.75], stemMedian: [120, 180] },
+  },
 };
 
 /** 資格の書き方の指針の文書(リポジトリ直下からの相対パス)。ベンダー共通の文書、資格別の文書の順。帯のない資格は null */

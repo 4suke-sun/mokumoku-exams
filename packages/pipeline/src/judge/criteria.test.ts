@@ -31,7 +31,7 @@ describe("判定の基準の取り出し", () => {
 });
 
 describe("資格の判定の基準", () => {
-  it.each(["AWS-CLF-C02", "AWS-DVA-C02", "AWS-AIB-C01"])(
+  it.each(["AWS-CLF-C02", "AWS-DVA-C02", "AWS-AIB-C01", "DBX-DEA-2605"])(
     "%s_資格別の文書に節があり_ハッシュが 64 桁で決まる",
     (code) => {
       const a = readCriteria(repoRoot, code);
@@ -39,7 +39,7 @@ describe("資格の判定の基準", () => {
       expect(a).not.toBeNull();
       expect(a?.hash).toMatch(/^[0-9a-f]{64}$/);
       expect(b?.hash).toBe(a?.hash);
-      expect(a?.path).toMatch(/^docs\/exam-style\/aws-[a-z]+\.md$/);
+      expect(a?.path).toMatch(/^docs\/exam-style\/(aws|dbx)-[a-z]+\.md$/);
     },
   );
 

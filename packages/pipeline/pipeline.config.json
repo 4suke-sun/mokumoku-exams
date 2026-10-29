@@ -82,7 +82,7 @@
         "targetTotal": 457,
         "services": { "minPerService": 2, "maxShare": 0.15, "minMultiServiceShare": 0.3 }
       },
-      "DBX-DEA-2605": { "targetTotal": 180, "typeMix": { "single": 0.9, "multiple": 0.1, "free-text": 0 } }
+      "DBX-DEA-2605": { "targetTotal": 180, "typeMix": { "single": 1, "multiple": 0, "free-text": 0 } }
     }
   },
   "checks": {
