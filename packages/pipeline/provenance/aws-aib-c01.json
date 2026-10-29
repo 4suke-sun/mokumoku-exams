@@ -593,6 +593,7 @@
     },
     {
       "draftId": "d-6abdd73a0c28",
+      "questionId": "AIB-0246",
       "factIds": [
         "f-20c02d8a15c4"
       ],
@@ -751,6 +752,7 @@
     },
     {
       "draftId": "d-8481bdb697f7",
+      "questionId": "AIB-0247",
       "factIds": [
         "f-20c02d8a15c4",
         "f-f1e5f7891440"
@@ -892,6 +894,7 @@
     },
     {
       "draftId": "d-a0d06446329a",
+      "questionId": "AIB-0248",
       "factIds": [
         "f-1402e20e2dcb",
         "f-83193c7589c6",
@@ -912,6 +915,7 @@
     },
     {
       "draftId": "d-a2063030b84c",
+      "questionId": "AIB-0249",
       "factIds": [
         "f-f1e5f7891440"
       ],
@@ -940,6 +944,7 @@
     },
     {
       "draftId": "d-a4b885f56531",
+      "questionId": "AIB-0250",
       "factIds": [
         "f-f1e5f7891440"
       ],
@@ -1092,6 +1097,7 @@
     },
     {
       "draftId": "d-c7d215dee270",
+      "questionId": "AIB-0251",
       "factIds": [
         "f-f1e5f7891440"
       ],
@@ -1319,6 +1325,7 @@
     },
     {
       "draftId": "d-efc595b9d5b5",
+      "questionId": "AIB-0252",
       "factIds": [
         "f-00830094f60c",
         "f-0baa032b6a09",

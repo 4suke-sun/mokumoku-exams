@@ -177,6 +177,12 @@
     },
     {
       "target": "draft",
+      "id": "d-6abdd73a0c28",
+      "decision": "approve",
+      "reason": "held-approved-by-human"
+    },
+    {
+      "target": "draft",
       "id": "d-6b9fcfadd6c1",
       "decision": "reject",
       "reason": "legacy-not-reviewable"
@@ -213,6 +219,12 @@
     },
     {
       "target": "draft",
+      "id": "d-8481bdb697f7",
+      "decision": "approve",
+      "reason": "held-approved-by-human"
+    },
+    {
+      "target": "draft",
       "id": "d-86b3fd4b13eb",
       "decision": "approve",
       "reason": "auto-approved-accepted"
@@ -243,9 +255,27 @@
     },
     {
       "target": "draft",
+      "id": "d-a0d06446329a",
+      "decision": "approve",
+      "reason": "held-approved-by-human"
+    },
+    {
+      "target": "draft",
+      "id": "d-a2063030b84c",
+      "decision": "approve",
+      "reason": "held-approved-by-human"
+    },
+    {
+      "target": "draft",
       "id": "d-a254bbcedf3c",
       "decision": "reject",
       "reason": "legacy-not-reviewable"
+    },
+    {
+      "target": "draft",
+      "id": "d-a4b885f56531",
+      "decision": "approve",
+      "reason": "held-approved-by-human"
     },
     {
       "target": "draft",
@@ -282,6 +312,12 @@
       "id": "d-be494062fde0",
       "decision": "approve",
       "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-c7d215dee270",
+      "decision": "approve",
+      "reason": "held-approved-by-human"
     },
     {
       "target": "draft",
@@ -348,6 +384,12 @@
       "id": "d-e8ccd226e122",
       "decision": "approve",
       "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-efc595b9d5b5",
+      "decision": "approve",
+      "reason": "held-approved-by-human"
     }
   ]
 }

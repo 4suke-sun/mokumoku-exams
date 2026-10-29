@@ -1079,6 +1079,53 @@
       "verdict": "rewritable",
       "reasons": ["judge:type-mismatch"],
       "question": {
+        "questionId": "AIB-0105",
+        "examCode": "AWS-AIB-C01",
+        "domain": "domain2",
+        "difficulty": "medium",
+        "questionText": "社内に生成 AI の経験者がおらず、企画の進め方に不安があります。外部の専門家の支援を受けることにしましたが、依頼する内容を絞り込む必要があります。依頼として最も適切なものはどれですか。",
+        "explanation": "この問題は、社内に経験がない状況で外部専門家に何を頼むべきかを問うものです。\n\n正解がCである理由は、進め方の設計と、社内で判断すべき点の整理を支援してもらうと、社内に判断の材料が残り、支援が終わったあとも自走できるためです。外部の知見は、答えを代わりに出してもらうためではなく、判断の枠組みを作るために使うのが効果的です。\n\n前提知識\n\n外部知見の使いどころ\n\n経験がない領域では、進め方そのものが分からないために検討が止まりがちです。外部の専門家には、検討の順序、確認すべき観点、ありがちなつまずきを整理してもらいます。判断の材料が社内に残る形で支援を受けると、次の取り組みでは自社だけで進められます。\n\n他の選択肢が誤りである理由：\n\nモデルの精度を評価する方法を検証してもらう。この検証は自社では行えない\n\n精度の評価は外部の知見が有効ですが、企画の進め方の不安には応えられません。\n\n生成 AI の利用ルールを自社に代わって策定してもらう\n\n利用ルールは自社の業務と方針に沿って自社が定めるべきものです。\n\n完成した仕組みの運用を、引き続き担当してもらう\n\n運用を委ね続けると社内に知見が残らず、依存が長引きます。",
+        "supplement": "「答えをもらう」より「判断の枠組みをもらう」ほうが、次に役立ちます。",
+        "references": [
+          {
+            "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
+            "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
+          },
+          {
+            "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
+            "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
+          }
+        ],
+        "questionType": "single",
+        "choices": [
+          {
+            "key": "A",
+            "text": "モデルの精度を評価する方法を検証してもらう。この検証は自社では行えない。",
+            "explanation": "精度の評価は外部の知見が有効であるが、企画の進め方の不安には応えられないため不正解。"
+          },
+          {
+            "key": "B",
+            "text": "生成 AI の利用ルールを自社に代わって策定してもらう。",
+            "explanation": "利用ルールは自社の業務と方針に沿って自社が定めるべきものであるため不正解。"
+          },
+          {
+            "key": "C",
+            "text": "進め方の設計と、社内で判断すべき点の整理を支援してもらう。",
+            "explanation": "進め方の設計と判断すべき点の整理は、社内に経験がない場合に最も効果を発揮するため正解。"
+          },
+          {
+            "key": "D",
+            "text": "完成した仕組みの運用を、引き続き担当してもらう。",
+            "explanation": "運用の継続的な担当は、社内に知見が残らず依存が長引くため不正解。"
+          }
+        ],
+        "correctAnswers": ["C"]
+      }
+    },
+    {
+      "verdict": "rewritable",
+      "reasons": ["judge:type-mismatch"],
+      "question": {
         "questionId": "AIB-0110",
         "examCode": "AWS-AIB-C01",
         "domain": "domain2",
@@ -1677,6 +1724,105 @@
     },
     {
       "verdict": "rewritable",
+      "reasons": ["judge:choices-weak", "judge:situation-unnatural", "judge:type-mismatch"],
+      "question": {
+        "questionId": "AIB-0158",
+        "examCode": "AWS-AIB-C01",
+        "domain": "domain4",
+        "difficulty": "medium",
+        "questionText": "生成 AI のトランスフォーメーションの目標を定めることになりました。目標として適切なものはどれですか。2 つ選んでください。",
+        "explanation": "この問題は、トランスフォーメーションの目標の定め方を問うものです。\n\n正解がBとEである理由は、達成したい状態を定め、それを確かめる指標をあわせて定めると、目指す方向と進み具合の確認が一対になり、取り組みを判断できるためです。仕組みの数や利用者の割合は手段であり、目標そのものではありません。\n\n前提知識\n\n目標の定め方\n\n目標は、業務がどう変わるかという状態で定めます。あわせて、その状態に近づいているかを確かめる指標を定めます。目標は、経営層が示す全社の方向と、部門の取り組みをつなぐ形にし、定期的に見直す時期を決めておきます。\n\n他の選択肢が誤りである理由：\n\n仕組みを使う担当者の割合を、唯一の目標にする\n\n利用者の割合だけでは、業務の成果を判断できません。\n\n他社と同じ構成を導入することを目標にする\n\n他社と同じ構成は、自社の課題に基づかないため目標になりません。\n\n導入する仕組みの数を目標として定める\n\n仕組みの数は手段であり、達成したい状態を表しません。",
+        "supplement": "「手段を目標にしない」だけで、計画の質が大きく変わります。",
+        "references": [
+          {
+            "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
+            "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
+          },
+          {
+            "title": "AWS Well-Architected フレームワーク",
+            "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/framework/welcome.html"
+          }
+        ],
+        "questionType": "multiple",
+        "choices": [
+          {
+            "key": "A",
+            "text": "仕組みを使う担当者の割合を、唯一の目標にする。",
+            "explanation": "利用者の割合だけでは、業務の成果を判断できないため不正解。"
+          },
+          {
+            "key": "B",
+            "text": "業務の成果を高めるために、達成したい状態を定める。",
+            "explanation": "達成したい状態を定めることが、目指す方向を示すため正解。"
+          },
+          {
+            "key": "C",
+            "text": "他社と同じ構成を導入することを目標にする。",
+            "explanation": "他社と同じ構成は自社の課題に基づかないため、目標にならないため不正解。"
+          },
+          {
+            "key": "D",
+            "text": "導入する仕組みの数を目標として定める。",
+            "explanation": "仕組みの数は手段であり、達成したい状態を表さないため不正解。"
+          },
+          {
+            "key": "E",
+            "text": "達成を確かめるための指標をあわせて定める。",
+            "explanation": "達成を確かめる指標をあわせて定めると、進み具合を判断できるため正解。"
+          }
+        ],
+        "correctAnswers": ["B", "E"]
+      }
+    },
+    {
+      "verdict": "rewritable",
+      "reasons": ["judge:situation-unnatural", "judge:type-mismatch"],
+      "question": {
+        "questionId": "AIB-0159",
+        "examCode": "AWS-AIB-C01",
+        "domain": "domain4",
+        "difficulty": "easy",
+        "questionText": "生成 AI のトランスフォーメーションへの投資について、経営層に説明することになりました。説明として最も適切なものはどれですか。",
+        "explanation": "この問題は、経営層への投資の説明に何を含めるかを問うものです。\n\n正解がBである理由は、投資の目的、期待する成果、判断の前提を示すと、経営層が投資の妥当性を判断できるためです。技術の詳細は、判断に必要な範囲で補足として添えます。\n\n前提知識\n\n投資の説明の組み立て\n\n投資の説明では、何のために行うか、何が期待できるか、どのような前提に立っているかを示します。成果は、金額や時間など確かめられる形で示し、前提が成り立たなくなった場合の影響も添えます。判断を仰ぐ事項がある場合は、選択肢と推奨案をあわせて示します。\n\n他の選択肢が誤りである理由：\n\n取り組みの一覧と、それぞれの担当者を示す\n\n一覧と担当者の説明では、投資の妥当性を判断できません。\n\n利用する技術の詳細と、構成を選んだ理由を示す\n\n技術の詳細は、投資の判断に必要な情報とは限りません。\n\n他社の投資額と比較して、額の多寡を示す\n\n他社との比較だけでは、自社の目的に沿うかを判断できません。",
+        "supplement": "「目的・成果・前提」の三点で、投資の説明は組み立てます。",
+        "references": [
+          {
+            "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
+            "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
+          },
+          {
+            "title": "AWS のコスト最適化 - Well-Architected",
+            "url": "https://docs.aws.amazon.com/ja_jp/wellarchitected/latest/cost-optimization-pillar/welcome.html"
+          }
+        ],
+        "questionType": "single",
+        "choices": [
+          {
+            "key": "A",
+            "text": "取り組みの一覧と、それぞれの担当者を示す。",
+            "explanation": "一覧と担当者の説明では、投資の妥当性を判断できないため不正解。"
+          },
+          {
+            "key": "B",
+            "text": "投資の目的と、期待する成果および前提を示す。",
+            "explanation": "目的と期待する成果、前提を示すと、投資の判断につながるため正解。"
+          },
+          {
+            "key": "C",
+            "text": "利用する技術の詳細と、構成を選んだ理由を示す。",
+            "explanation": "技術の詳細は、投資の判断に必要な情報とは限らないため不正解。"
+          },
+          {
+            "key": "D",
+            "text": "他社の投資額と比較して、額の多寡を示す。",
+            "explanation": "他社との比較だけでは、自社の目的に沿うかを判断できないため不正解。"
+          }
+        ],
+        "correctAnswers": ["B"]
+      }
+    },
+    {
+      "verdict": "rewritable",
       "reasons": ["judge:choices-weak", "judge:type-mismatch"],
       "question": {
         "questionId": "AIB-0161",
@@ -1855,6 +2001,136 @@
           }
         ],
         "correctAnswers": ["A"]
+      }
+    },
+    {
+      "verdict": "rewritable",
+      "reasons": ["judge:choices-weak", "judge:type-mismatch"],
+      "question": {
+        "questionId": "AIB-0174",
+        "examCode": "AWS-AIB-C01",
+        "domain": "domain4",
+        "difficulty": "medium",
+        "questionText": "データ戦略の一環として、社内でのデータ共有の枠組みを整備する意義として最も適切なものはどれですか。",
+        "explanation": "この問題は、データ共有の枠組みを整備する目的を問うものです。\n\n正解がAである理由は、データ共有の枠組みが、どのデータを誰がどの条件で利用できるのか、誰が管理責任を負うのかを明確にするものだからです。これにより、部門をまたいだ活用を進めながら、機密情報の保護や規制対応も同時に実現できます。\n\n前提知識\n\nデータ共有の枠組み\n\n利用できる範囲と条件、管理責任を明確にします。無条件の開放や全面禁止は、いずれも活用と保護のバランスを欠きます。\n\n他の選択肢が誤りである理由：\n\nすべてのデータを無条件に全社に開放すること\n\n無条件の開放は、機密情報の保護や規制対応を損ないます。\n\nデータの利用を全面的に禁止すること\n\n全面禁止は、AI 活用の前提となるデータ利用そのものを不可能にします。\n\nデータの所有権を曖昧なままにしておくこと\n\n所有権を曖昧にすると、品質の維持や利用可否の判断が滞ります。",
+        "references": [
+          {
+            "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
+            "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
+          }
+        ],
+        "questionType": "single",
+        "choices": [
+          {
+            "key": "A",
+            "text": "どのデータを誰がどの条件で利用できるかを明確にし、活用を進めながらリスクを管理できる。",
+            "explanation": "誰がどの条件で利用できるかを明確にし、活用とリスク管理を両立できる点が意義であるため正解。"
+          },
+          {
+            "key": "B",
+            "text": "すべてのデータを無条件に全社に開放すること。",
+            "explanation": "無条件の開放は、機密情報の保護や規制対応を損なうため不正解。"
+          },
+          {
+            "key": "C",
+            "text": "データの利用を全面的に禁止すること。",
+            "explanation": "全面禁止は、AI 活用の前提となるデータ利用を不可能にするため不正解。"
+          },
+          {
+            "key": "D",
+            "text": "データの所有権を曖昧なままにしておくこと。",
+            "explanation": "所有権を曖昧にすると、品質維持や利用可否の判断が滞るため不正解。"
+          }
+        ],
+        "correctAnswers": ["A"]
+      }
+    },
+    {
+      "verdict": "rewritable",
+      "reasons": ["judge:choices-weak", "judge:type-mismatch"],
+      "question": {
+        "questionId": "AIB-0184",
+        "examCode": "AWS-AIB-C01",
+        "domain": "domain4",
+        "difficulty": "medium",
+        "questionText": "全社の AI トランスフォーメーションを進めるアプローチとして、反復的な進め方が推奨される理由はどれですか。",
+        "explanation": "この問題は、AI トランスフォーメーションで反復的な進め方が推奨される理由を問うものです。\n\n正解がCである理由は、AI トランスフォーメーションが、技術、業務、組織の前提が変化し続ける取り組みだからです。構想を立てて実験し、成果と課題を確認して計画を見直し、起動と拡大の段階へ進むという反復的な進め方をとることで、環境変化や学びを反映しながら前進できます。\n\n前提知識\n\n反復的なアプローチ\n\n構想、実験、起動、スケーリングの段階を繰り返しながら進めます。各段階で学びを得て次の計画に反映できるため、不確実性の高い取り組みでも軌道修正が可能になります。\n\n他の選択肢が誤りである理由：\n\n計画を最初に固定できるため、変更が不要になる\n\n前提が変化し続けるため、当初の計画を固定することは現実的ではありません。\n\n短期的な成果を出さずに、長期の構想だけを追えるため\n\n反復的な進め方は、短期的な成果を確認しながら長期の構想につなげる手法です。\n\n関係者の合意が不要になるため\n\n反復的な進め方でも、各段階での合意と確認は必要です。",
+        "references": [
+          {
+            "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
+            "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
+          },
+          {
+            "title": "人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク - 人工知能、機械学習、および生成 AI の AWS クラウド 導入フレームワーク",
+            "url": "https://docs.aws.amazon.com/ja_jp/whitepapers/latest/aws-caf-for-ai/aws-caf-for-ai.html"
+          }
+        ],
+        "questionType": "single",
+        "choices": [
+          {
+            "key": "A",
+            "text": "計画を最初に固定できるため、変更が不要になる。",
+            "explanation": "前提が変化し続けるため、当初の計画を固定することは現実的でないため不正解。"
+          },
+          {
+            "key": "B",
+            "text": "短期的な成果を出さずに、長期の構想だけを追えるため。",
+            "explanation": "反復的な進め方は、短期的な成果を確認しながら長期の構想につなげる手法であるため不正解。"
+          },
+          {
+            "key": "C",
+            "text": "各段階で学びを得て次の計画に反映できるため、不確実性の高い取り組みでも軌道修正しながら進められる。",
+            "explanation": "各段階で学びを得て次の計画に反映でき、軌道修正しながら進められる点が理由であるため正解。"
+          },
+          {
+            "key": "D",
+            "text": "関係者の合意が不要になるため。",
+            "explanation": "反復的な進め方でも、各段階での合意と確認は必要であるため不正解。"
+          }
+        ],
+        "correctAnswers": ["C"]
+      }
+    },
+    {
+      "verdict": "rewritable",
+      "reasons": ["judge:choices-weak", "judge:situation-unnatural", "judge:type-mismatch"],
+      "question": {
+        "questionId": "AIB-0185",
+        "examCode": "AWS-AIB-C01",
+        "domain": "domain4",
+        "difficulty": "medium",
+        "questionText": "反復的なアプローチで進める際、各段階を評価するために必要となるものはどれですか。",
+        "explanation": "この問題は、反復的な進め方を機能させるために必要な評価の設計を問うものです。\n\n正解がDである理由は、各段階で何を達成すべきか、どの指標で確認するか、次の段階に進むか見直すかをどう判断するかをあらかじめ定めておく必要があるためです。これにより、進捗の確認と資源配分の見直しが継続的に行えます。\n\n前提知識\n\n段階ごとの評価基準\n\n達成基準と、次の段階へ進むか見直すかの判断基準を定めます。評価を最後に一度だけ行う運用では、問題の発見が遅れ、成果につながらなくなります。\n\n他の選択肢が誤りである理由：\n\n段階を評価せず、期間が来たら次に進む運用\n\n評価を行わずに進めると、課題を抱えたまま次の段階に進むことになります。\n\n最初に決めた計画を変更しないという原則\n\n計画の変更を禁じると、学びを反映できません。\n\n評価は最後に一度だけ行う方針\n\n最後の一度だけでは、途中の問題に気づけず、軌道修正ができません。",
+        "references": [
+          {
+            "title": "コンテンツ分野 4: ビジネス準備状況、リーダーシップ、AI トランスフォーメーション - AWS Certified AI Business Strategist",
+            "url": "https://docs.aws.amazon.com/ja_jp/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
+          }
+        ],
+        "questionType": "single",
+        "choices": [
+          {
+            "key": "A",
+            "text": "段階を評価せず、期間が来たら次に進む運用。",
+            "explanation": "評価を行わずに進めると、課題を抱えたまま次の段階に進むことになるため不正解。"
+          },
+          {
+            "key": "B",
+            "text": "最初に決めた計画を変更しないという原則。",
+            "explanation": "計画の変更を禁じると、学びを反映できないため不正解。"
+          },
+          {
+            "key": "C",
+            "text": "評価は最後に一度だけ行う方針。",
+            "explanation": "最後の一度だけでは、途中の問題に気づけず軌道修正できないため不正解。"
+          },
+          {
+            "key": "D",
+            "text": "段階ごとの達成基準と、次の段階へ進むか見直すかを判断する基準。",
+            "explanation": "段階ごとの達成基準と、次に進むか見直すかの判断基準を定めることが必要であるため正解。"
+          }
+        ],
+        "correctAnswers": ["D"]
       }
     }
   ]
