@@ -1,0 +1,386 @@
+{
+  "examCode": "DBX-DEA-2605",
+  "sources": [
+    {
+      "url": "https://www.databricks.com/learn/certification/data-engineer-associate",
+      "kind": "exam-guide"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/lakehouse/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/getting-started/concepts",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/compute/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/compute/serverless/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/compute/configure",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/compute/sql-warehouse/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/delta/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/delta/tutorial",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/delta/history",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/delta/vacuum",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/delta/optimize",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/delta/clustering",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/delta/update-schema",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/delta/merge",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/delta/selective-overwrite",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/delta/delta-change-data-feed",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/delta/best-practices",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/delta/table-properties",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/delta/generated-columns",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/delta/deletion-vectors",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/ingestion/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/schema",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/options",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/file-detection-modes",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/copy-into/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/ingestion/file-upload/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/ingestion/lakeflow-connect/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/structured-streaming/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/structured-streaming/concepts",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/structured-streaming/triggers",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/structured-streaming/checkpoints",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/structured-streaming/watermarks",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/structured-streaming/delta-lake",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/dlt/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/dlt/expectations",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/dlt/streaming-tables",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/dlt/materialized-views",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/dlt/flows",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/dlt/cdc",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/dlt/pipeline-mode",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/dlt/updates",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/dlt/unity-catalog",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/lakehouse/medallion",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/data-engineering/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/jobs/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/jobs/configure-task",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/jobs/run-if",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/jobs/conditional-tasks",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/jobs/for-each",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/jobs/repair-job-failures",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/jobs/schedule-jobs",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/jobs/file-arrival-triggers",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/jobs/continuous",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/jobs/parameters",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/jobs/task-values",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/jobs/monitor",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/jobs/notifications",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/settings",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/deployment-modes",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/work-tasks",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/dev-tools/cli/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/repos/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/repos/git-operations-with-repos",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/dev-tools/ci-cd/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/notebooks/testing",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/spark/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/optimizations/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/optimizations/predictive-optimization",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/optimizations/disk-cache",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/optimizations/spark-ui-guide/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/optimizations/aqe",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/sql/language-manual/functions/explode",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/get-started",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/manage-privileges/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/manage-privileges/privileges",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/create-tables",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/best-practices",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/tables/managed",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/tables/external",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/volumes/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/connect/unity-catalog/cloud-storage/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/row-and-column-filters",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/filters-and-masks/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/data-lineage",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/delta-sharing/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/query-federation/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/views/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/security/secrets/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/audit",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.databricks.com/aws/en/admin/system-tables/",
+      "kind": "official-doc"
+    }
+  ],
+  "scope": {
+    "prefixes": ["https://www.databricks.com/learn/certification/", "https://docs.databricks.com/aws/en/"],
+    "maxDepth": 0
+  },
+  "exclude": []
+}
