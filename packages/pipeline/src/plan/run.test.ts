@@ -10,12 +10,15 @@ import { emptyFacts, factsPath, writeFacts } from "../facts/schema.ts";
 import { DOC_HASH, DOC_URL } from "../facts/test-helpers.ts";
 import { main } from "../main.ts";
 import { readAgentStamp } from "../shared/agents.ts";
-import { installAgentDefinitions } from "../shared/test-helpers.ts";
+import { installAgentDefinitions, withoutExamSettings } from "../shared/test-helpers.ts";
 import { planPath, readPlan } from "./schema.ts";
 
 const repoRoot = resolve(import.meta.dirname, "../../../..");
-const config = JSON.parse(readFileSync(resolve(import.meta.dirname, "../../pipeline.config.json"), "utf8"));
 const CODE = "AWS-AIB-C01";
+const config = withoutExamSettings(
+  JSON.parse(readFileSync(resolve(import.meta.dirname, "../../pipeline.config.json"), "utf8")),
+  CODE,
+);
 
 function setupRoot(questions?: unknown) {
   const root = mkdtempSync(join(tmpdir(), "pipeline-planrun-"));

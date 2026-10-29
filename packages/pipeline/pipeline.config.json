@@ -44,7 +44,7 @@
     "highRiskScore": 2,
     "maxRejectRate": 0.2,
     "minDecisions": 5,
-    "autoApprove": ["AWS-DVA-C02"]
+    "autoApprove": ["AWS-AIB-C01", "AWS-DVA-C02"]
   },
   "eval": {
     "seed": 1,
@@ -76,6 +76,7 @@
     "difficultyMix": { "easy": 0.3, "medium": 0.5, "hard": 0.2 },
     "typeMix": { "single": 0.75, "multiple": 0.2, "free-text": 0.05 },
     "overrides": {
+      "AWS-AIB-C01": { "targetTotal": 340, "typeMix": { "single": 1, "multiple": 0, "free-text": 0 } },
       "AWS-CLF-C02": { "targetTotal": 200 },
       "AWS-DVA-C02": {
         "targetTotal": 457,
