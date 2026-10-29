@@ -1,4 +1,4 @@
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readdirSync, writeFileSync } from "node:fs";
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
@@ -119,5 +119,18 @@ describe("本文のキャッシュ", () => {
   it("置き場がまだない_掃除は何もしない", () => {
     const { cache } = setup();
     expect(cache.sweep()).toBe(0);
+  });
+
+  it("付属のテキスト_書いて読め、本文が残るあいだは掃除で残り、本文がなくなると掃除で消える", () => {
+    const { dir, cache } = setup();
+    const hash = cache.write(Buffer.from("%PDF-synthetic"));
+    expect(cache.readText(hash)).toBeNull();
+    cache.writeText(hash, "読めるようにした本文");
+    expect(cache.readText(hash)).toBe("読めるようにした本文");
+    expect(cache.sweep()).toBe(0);
+    expect(readdirSync(dir)).toContain(`${hash}.txt`);
+    rmSync(join(dir, `${hash}.body`));
+    expect(cache.sweep()).toBe(1);
+    expect(readdirSync(dir)).not.toContain(`${hash}.txt`);
   });
 });

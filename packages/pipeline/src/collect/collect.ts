@@ -39,6 +39,7 @@ import {
   type SourceKind,
   writeLedger,
 } from "./ledger.ts";
+import { isPdf, pdfToText } from "./pdf.ts";
 import { inScope, loadPlan, type Plan, planPath } from "./plan.ts";
 import { titleField } from "./title.ts";
 
@@ -100,7 +101,7 @@ export async function runCollect(options: CollectOptions): Promise<ExitCode> {
     return EXIT.checkFailed;
   }
   return options.importGuide
-    ? importGuideStep(options, paths, ledger, master.domains, master.examValues)
+    ? await importGuideStep(options, paths, ledger, master.domains, master.examValues)
     : collectStep(options, paths, ledger, master.exam);
 }
 
@@ -299,7 +300,7 @@ async function collectStep(
     sources: ledger.sources.map((s) => ({ url: s.url, status: s.status, checks: s.checks })),
   });
 
-  writeGuideRequest(plan, ledger, cache, paths, rootDir, output, stamp);
+  await writeGuideRequest(plan, ledger, cache, paths, rootDir, output, stamp);
   cache.sweep();
 
   report(output, "情報", `取得 ${fetchedCount} 件、再開で飛ばした ${resumedCount} 件、止めた出典 ${blocked.length} 件`);
@@ -312,7 +313,7 @@ async function collectStep(
 }
 
 /** 試験ガイドが使える状態なら、エージェントへの抽出の依頼を、作業用の置き場に書く */
-function writeGuideRequest(
+async function writeGuideRequest(
   plan: Plan,
   ledger: LedgerFile,
   cache: BodyCache,
@@ -320,14 +321,13 @@ function writeGuideRequest(
   rootDir: string,
   output: Output,
   stamp: AgentStamp,
-): void {
+): Promise<void> {
   const ready = (url: string | undefined) => {
     const s = ledger.sources.find((e) => e.url === url);
     return s?.status === "active" && s.contentHash !== null && cache.has(s.contentHash)
       ? { url: s.url, contentHash: s.contentHash }
       : null;
   };
-  const bodyPath = (hash: string) => relative(rootDir, join(paths.cacheDir, `${hash}.body`));
   const source = ready(plan.sources.find((s) => s.kind === "exam-guide")?.url);
   if (source === null) return;
   const pages = (plan.guidePages ?? []).map(ready);
@@ -345,13 +345,19 @@ function writeGuideRequest(
   ) {
     return;
   }
+  // PDF の本文は、読めるようにしたテキストの置き場を渡す
+  const bodyPath = async (hash: string) =>
+    relative(
+      rootDir,
+      (await readableText(cache, hash)) === null ? join(paths.cacheDir, `${hash}.body`) : cache.textPath(hash),
+    );
   const code = ledger.examCode.toLowerCase();
   const request: GuideRequest = {
     examCode: ledger.examCode,
     sourceUrl: source.url,
     contentHash: source.contentHash,
-    bodyPath: bodyPath(source.contentHash),
-    pages: readyPages.map((p) => ({ ...p, bodyPath: bodyPath(p.contentHash) })),
+    bodyPath: await bodyPath(source.contentHash),
+    pages: await Promise.all(readyPages.map(async (p) => ({ ...p, bodyPath: await bodyPath(p.contentHash) }))),
     outputPath: relative(rootDir, join(paths.guideDir, `${code}.extract.json`)),
     agent: stamp,
   };
@@ -360,13 +366,13 @@ function writeGuideRequest(
   report(output, "試験ガイドの抽出の依頼", relative(rootDir, requestPath));
 }
 
-function importGuideStep(
+async function importGuideStep(
   options: CollectOptions,
   paths: Paths,
   ledger: LedgerFile,
   masterDomains: { code: string; weight: number }[],
   masterExam: MasterExamValues,
-): ExitCode {
+): Promise<ExitCode> {
   const { config, rootDir, examCode, output, deps, dryRun } = options;
   const stamp = readAgentStampOrReport(output, rootDir, "guide-extractor");
   if (stamp === null) return EXIT.checkFailed;
@@ -402,7 +408,15 @@ function importGuideStep(
     return EXIT.checkFailed;
   }
   const cache = new BodyCache(paths.cacheDir, config.cache, deps.now);
-  const readBody = (hash: string) => cache.read(hash)?.toString("utf8") ?? null;
+  // PDF の本文は、読めるようにしたテキストと比べる(言い換えが本文の写しでないかの検査)
+  const hashes = [
+    (raw as { contentHash?: unknown })?.contentHash,
+    ...((raw as { pages?: { contentHash?: unknown }[] })?.pages ?? []).map((p) => p?.contentHash),
+  ];
+  const texts = new Map<string, string | null>();
+  for (const hash of hashes)
+    if (typeof hash === "string" && /^[0-9a-f]{64}$/.test(hash)) texts.set(hash, await readableText(cache, hash));
+  const readBody = (hash: string) => texts.get(hash) ?? cache.read(hash)?.toString("utf8") ?? null;
   const result = importGuide(raw, ledger, plan.guidePages ?? [], readBody, deps.today(), stamp);
   if (!result.ok) {
     report(output, "試験ガイドの取り込みの停止", result.reason);
@@ -441,4 +455,15 @@ function importGuideStep(
     diff.examMissingInMaster.length;
   report(output, "情報", `試験ガイドを台帳に取り込んだ(マスタとの差分 ${total} 件。マスタは書き換えない)`);
   return EXIT.ok;
+}
+
+/** 本文が PDF なら、読めるようにしたテキストを返す(なければ作って、キャッシュの付属のファイルに置く)。PDF でなければ null */
+async function readableText(cache: BodyCache, hash: string): Promise<string | null> {
+  const body = cache.peek(hash);
+  if (body === null || !isPdf(body)) return null;
+  const cached = cache.readText(hash);
+  if (cached !== null) return cached;
+  const text = await pdfToText(body);
+  cache.writeText(hash, text);
+  return text;
 }

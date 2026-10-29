@@ -10,7 +10,7 @@ const repoRoot = resolve(import.meta.dirname, "../../../..");
 const read = (path: string) => readFileSync(resolve(repoRoot, path), "utf8");
 
 describe("判定の基準の文書", () => {
-  it.each(["AWS-CLF-C02", "AWS-DVA-C02", "AWS-AIB-C01"])(
+  it.each(["AWS-CLF-C02", "AWS-DVA-C02", "AWS-AIB-C01", "DBX-DEA-2605"])(
     "%s_判定の基準の節に_機械の観点と LLM の観点があり_観点 J1〜J5 の行がそろい_合格点が実装と同じ",
     (code) => {
       const criteria = readCriteria(repoRoot, code);
@@ -24,7 +24,7 @@ describe("判定の基準の文書", () => {
     },
   );
 
-  it.each(["AWS-CLF-C02", "AWS-DVA-C02", "AWS-AIB-C01"])(
+  it.each(["AWS-CLF-C02", "AWS-DVA-C02", "AWS-AIB-C01", "DBX-DEA-2605"])(
     "%s_機械の観点の節に帯の値を重ねて書かない(値の食い違いを防ぐ)",
     (code) => {
       const text = readCriteria(repoRoot, code)?.text ?? "";

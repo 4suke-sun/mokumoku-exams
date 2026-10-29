@@ -58,6 +58,7 @@ function setupRoot(plan: unknown) {
   cpSync(join(repoRoot, "data/questions.ex-smp-xx.json"), join(root, "data/questions.ex-smp-xx.json"));
   cpSync(join(repoRoot, "data/questions.aws-clf-c02.json"), join(root, "data/questions.aws-clf-c02.json"));
   cpSync(join(repoRoot, "data/questions.aws-dva-c02.json"), join(root, "data/questions.aws-dva-c02.json"));
+  cpSync(join(repoRoot, "data/questions.dbx-dea-2605.json"), join(root, "data/questions.dbx-dea-2605.json"));
   writeFileSync(
     join(root, "data/questions.aws-aib-c01.json"),
     JSON.stringify({ examCode: CODE, questions: published(90) }),

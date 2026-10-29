@@ -187,6 +187,59 @@
         "guideUrl": "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/developer-associate-02.html"
       },
       "idPrefix": "DVA"
+    },
+    {
+      "examCode": "DBX-DEA-2605",
+      "status": "published",
+      "vendor": "Databricks",
+      "edition": "2605",
+      "name": "Databricks Certified Data Engineer Associate",
+      "shortName": "Data Engineer Associate",
+      "level": "Associate",
+      "abbr": "DEA",
+      "category": "Data Engineering",
+      "passingScore": 70,
+      "totalScore": 100,
+      "domains": [
+        {
+          "code": "domain1",
+          "name": "Databricks Intelligence Platform",
+          "weight": 0.06
+        },
+        {
+          "code": "domain2",
+          "name": "データの取り込みとロード",
+          "weight": 0.21
+        },
+        {
+          "code": "domain3",
+          "name": "データの変換とモデリング",
+          "weight": 0.22
+        },
+        {
+          "code": "domain4",
+          "name": "Lakeflow Jobs の運用",
+          "weight": 0.16
+        },
+        {
+          "code": "domain5",
+          "name": "CI/CD の実装",
+          "weight": 0.1
+        },
+        {
+          "code": "domain6",
+          "name": "トラブルシューティング・監視・最適化",
+          "weight": 0.1
+        },
+        {
+          "code": "domain7",
+          "name": "ガバナンスとセキュリティ",
+          "weight": 0.15
+        }
+      ],
+      "officialQuestionCount": 45,
+      "officialTimeMinutes": 90,
+      "idPrefix": "DEA"
     }
   ]
 }

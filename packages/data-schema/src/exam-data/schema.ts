@@ -229,7 +229,13 @@ const ChoiceSchema = z.strictObject({
  * 出典に使えるホスト名(完全一致)。公式ドキュメントだけを許す。
  * 資格を足すときは、そのベンダーの公式ドキュメントのホスト名を、ここに足す(docs/adding-an-exam.md)。
  */
-export const ALLOWED_REFERENCE_HOSTS: readonly string[] = ["docs.aws.amazon.com", "aws.amazon.com", "www.nist.gov"];
+export const ALLOWED_REFERENCE_HOSTS: readonly string[] = [
+  "docs.aws.amazon.com",
+  "aws.amazon.com",
+  "www.nist.gov",
+  "docs.databricks.com",
+  "www.databricks.com",
+];
 
 /** 出典の題・URL の長さと、1 か所あたりの出典の数の上限 */
 export const REFERENCE_TITLE_MAX = 200;
@@ -245,6 +251,8 @@ export const REFERENCE_HOST_VENDORS: Readonly<Record<string, readonly string[]>>
   "docs.aws.amazon.com": ["AWS"],
   "aws.amazon.com": ["AWS"],
   "www.nist.gov": ["AWS"],
+  "docs.databricks.com": ["Databricks"],
+  "www.databricks.com": ["Databricks"],
 };
 
 /** 出典の URL を落とす理由のコード。値は含めない */

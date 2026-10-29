@@ -45,4 +45,17 @@ describe("節への分割", () => {
     const sections = parseSections('<h2><a id="inner-id"></a>Title</h2><p>body</p>');
     expect(sections[0]?.id).toBe("inner-id");
   });
+
+  it("引用符のない ID と見出しの中のリンクの ID_どちらの ID でも節が見つかる", () => {
+    const html =
+      "<h2 class=anchor id=own-id><a id=inner-id></a>Title<a href=#own-id class=hash-link>\u200b</a></h2><p>body</p>";
+    expect(parseSections(html)[0]?.ids).toEqual(["own-id", "inner-id"]);
+    expect(findSection(html, "own-id")?.text).toBe("body");
+    expect(findSection(html, "inner-id")?.text).toBe("body");
+  });
+
+  it("見出しの末尾に幅のない文字がある_見出しの文で節が見つかる", () => {
+    const html = "<h2>Synthetic title<a href=#x>\u200b</a></h2><p>body</p>";
+    expect(findSection(html, "Synthetic title")?.text).toBe("body");
+  });
 });
