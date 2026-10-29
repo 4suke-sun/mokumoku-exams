@@ -16,6 +16,7 @@ import { contentHashOf, rawSha256 } from "./content-hash.ts";
  * 取得した本文の作業用キャッシュ。作業用の置き場(gitignore 済み)の中にだけ置き、本文のハッシュ(content-hash.ts)をキーにする。
  * 見える本文が同じ 2 つの HTML は、同じキーになり、あとから書いた本文が残る。旧い定義(生のバイト列の sha256)の名前のファイルも、読める。
  * 書き込みは一時ファイルから置き換えるので、途中で止まっても壊れたファイルを残さない。
+ * PDF の本文には、読めるようにしたテキストを、同じキーの付属のファイル(`.txt`)に置く。本文のなくなった付属のファイルは、掃除で消す。
  */
 
 const HASH = /^[0-9a-f]{64}$/;
@@ -68,6 +69,24 @@ export class BodyCache {
     return contentHashOf(body) === hash || rawSha256(body) === hash ? body : null;
   }
 
+  /** 本文の付属のテキスト(PDF の本文を読めるようにしたもの)の置き場 */
+  textPath(hash: string): string {
+    if (!HASH.test(hash)) throw new Error("ハッシュの形ではない");
+    return join(this.dir, `${hash}.txt`);
+  }
+
+  /** 付属のテキストを読み出す。なければ null */
+  readText(hash: string): string | null {
+    const path = this.textPath(hash);
+    return existsSync(path) ? readFileSync(path, "utf8") : null;
+  }
+
+  /** 付属のテキストを書き込む */
+  writeText(hash: string, text: string): void {
+    mkdirSync(this.dir, { recursive: true });
+    writeFileSync(this.textPath(hash), text);
+  }
+
   /** 書き込み、ハッシュを返す */
   write(body: Buffer): string {
     const hash = contentHashOf(body);
@@ -96,7 +115,8 @@ export class BodyCache {
       const path = join(this.dir, name);
       const stat = statSync(path);
       if (!stat.isFile()) continue;
-      if (name.endsWith(".tmp") || !name.endsWith(".body") || stat.mtimeMs < limit) {
+      const isText = name.endsWith(".txt") && existsSync(join(this.dir, name.replace(/\.txt$/, ".body")));
+      if (name.endsWith(".tmp") || (!name.endsWith(".body") && !isText) || stat.mtimeMs < limit) {
         rmSync(path, { force: true });
         removed++;
         continue;

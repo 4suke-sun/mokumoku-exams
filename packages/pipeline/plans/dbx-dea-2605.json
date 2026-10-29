@@ -2,7 +2,7 @@
   "examCode": "DBX-DEA-2605",
   "sources": [
     {
-      "url": "https://www.databricks.com/learn/certification/data-engineer-associate",
+      "url": "https://www.databricks.com/sites/default/files/2026-10/Databricks-Certified-Data-Engineer-Associate-Exam-Guide-August-2026.pdf",
       "kind": "exam-guide"
     },
     {
@@ -379,7 +379,10 @@
     }
   ],
   "scope": {
-    "prefixes": ["https://www.databricks.com/learn/certification/", "https://docs.databricks.com/aws/en/"],
+    "prefixes": [
+      "https://www.databricks.com/sites/default/files/2026-10/Databricks-Certified-Data-Engineer-Associate-Exam-Guide",
+      "https://docs.databricks.com/aws/en/"
+    ],
     "maxDepth": 0
   },
   "exclude": []

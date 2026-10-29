@@ -11,7 +11,15 @@ import { installAgentDefinitions } from "../shared/test-helpers.ts";
 import { contentHashOf } from "./content-hash.ts";
 import { Fetcher } from "./fetcher.ts";
 import { emptyLedger, readLedger, serializeLedger } from "./ledger.ts";
-import { entry, type FakeResponse, fakeNet, fixture, ROBOTS_OK, testFetchConfig } from "./test-helpers.ts";
+import {
+  entry,
+  type FakeResponse,
+  fakeNet,
+  fixture,
+  ROBOTS_OK,
+  syntheticPdf,
+  testFetchConfig,
+} from "./test-helpers.ts";
 
 const CODE = "AWS-AIB-C01";
 const BASE = "https://docs.aws.amazon.com/guide/";
@@ -320,6 +328,39 @@ describe("collect", () => {
   it("資格マスタにない資格_入力の誤り", async () => {
     const root = setupRoot();
     expect((await run(root, ["collect", "AWS-ZZZ-C01"])).code).toBe(EXIT.inputError);
+  });
+});
+
+describe("collect の試験ガイドが PDF", () => {
+  const PDF = `${BASE}guide.pdf`;
+  const pdfPlan = { ...plan, sources: [{ url: PDF, kind: "exam-guide" }], scope: { prefixes: [BASE], maxDepth: 0 } };
+  const pdfRoutes = { ...routes, [PDF]: { body: syntheticPdf("Section 1: Synthetic topics (100%)") } };
+
+  it("PDF の試験ガイド_読めるようにしたテキストを付属のファイルに置き、依頼はそのテキストを指す", async () => {
+    const root = setupRoot(pdfPlan);
+    const r = await run(root, ["collect", CODE], pdfRoutes);
+    expect(r.out).toContain("試験ガイドの抽出の依頼: pipeline-work/guide/aws-aib-c01.request.json");
+    const request = JSON.parse(readFileSync(join(root, config.workDir, "guide/aws-aib-c01.request.json"), "utf8"));
+    expect(request.bodyPath).toMatch(/^pipeline-work\/cache\/[0-9a-f]{64}\.txt$/);
+    expect(readFileSync(join(root, request.bodyPath), "utf8")).toContain("Section 1: Synthetic topics");
+  });
+
+  it("PDF の試験ガイドの抽出_テキストと比べて取り込む", async () => {
+    const root = setupRoot(pdfPlan);
+    await run(root, ["collect", CODE], pdfRoutes);
+    const request = JSON.parse(readFileSync(join(root, config.workDir, "guide/aws-aib-c01.request.json"), "utf8"));
+    writeFileSync(
+      join(root, config.workDir, "guide/aws-aib-c01.extract.json"),
+      JSON.stringify({
+        examCode: CODE,
+        sourceUrl: PDF,
+        contentHash: request.contentHash,
+        domains: [{ number: 1, name: "分野 1", weightPercent: 100, scope: ["範囲の言い換え"] }],
+      }),
+    );
+    const r = await run(root, ["collect", CODE, "--import-guide"], pdfRoutes);
+    expect(r.code).toBe(EXIT.ok);
+    expect(r.ledger().guide?.domains.map((d) => d.code)).toEqual(["domain1"]);
   });
 });
 
