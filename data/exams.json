@@ -190,14 +190,16 @@
     },
     {
       "examCode": "DBX-DEA-2605",
-      "status": "coming-soon",
+      "status": "published",
       "vendor": "Databricks",
       "edition": "2605",
       "name": "Databricks Certified Data Engineer Associate",
       "shortName": "Data Engineer Associate",
       "level": "Associate",
       "abbr": "DEA",
-      "note": "近日公開予定です。",
+      "category": "Data Engineering",
+      "passingScore": 70,
+      "totalScore": 100,
       "domains": [
         {
           "code": "domain1",
@@ -236,6 +238,7 @@
         }
       ],
       "officialQuestionCount": 45,
+      "officialTimeMinutes": 90,
       "idPrefix": "DEA"
     }
   ]
