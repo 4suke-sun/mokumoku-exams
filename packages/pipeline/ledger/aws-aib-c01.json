@@ -653,41 +653,6 @@
         }
       ],
       "claims": [],
-      "contentHash": "e6b75b235b2d5b2755b9feb5dc8106775dc4b5bb9550177f454900bcec08c19f",
-      "fetchedAt": "2026-10-29",
-      "kind": "exam-guide",
-      "status": "active",
-      "target": {
-        "edition": "C01",
-        "examCode": "AWS-AIB-C01"
-      },
-      "updatedAt": "2026-10-28",
-      "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-in-scope-services.md"
-    },
-    {
-      "checks": [
-        {
-          "name": "official",
-          "result": "pass"
-        },
-        {
-          "name": "target",
-          "result": "pass"
-        },
-        {
-          "name": "deprecation",
-          "result": "pass"
-        },
-        {
-          "name": "freshness",
-          "result": "pass"
-        },
-        {
-          "name": "liveness",
-          "result": "pass"
-        }
-      ],
-      "claims": [],
       "contentHash": "fc4d7a2576195efdebb640f231d9675b0ed8c7dd14743159bc3134070479da35",
       "fetchedAt": "2026-10-29",
       "kind": "exam-guide",
@@ -724,41 +689,6 @@
         }
       ],
       "claims": [],
-      "contentHash": "53bac564a3ed414aadb2ae1c1970fe0f4bd7f2c878a6e26823a6f2e6c44f7e56",
-      "fetchedAt": "2026-10-29",
-      "kind": "exam-guide",
-      "status": "active",
-      "target": {
-        "edition": "C01",
-        "examCode": "AWS-AIB-C01"
-      },
-      "updatedAt": "2026-10-28",
-      "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-out-of-scope-services.md"
-    },
-    {
-      "checks": [
-        {
-          "name": "official",
-          "result": "pass"
-        },
-        {
-          "name": "target",
-          "result": "pass"
-        },
-        {
-          "name": "deprecation",
-          "result": "pass"
-        },
-        {
-          "name": "freshness",
-          "result": "pass"
-        },
-        {
-          "name": "liveness",
-          "result": "pass"
-        }
-      ],
-      "claims": [],
       "contentHash": "40d8feb86e5263af28e1358c3489ea4a4e842e2d4b25036c4df3b24fa7c13000",
       "fetchedAt": "2026-10-29",
       "kind": "exam-guide",
@@ -770,41 +700,6 @@
       "title": "Technologies and concepts that might appear on the exam - AWS Certified AI Business Strategist",
       "updatedAt": "2026-10-28",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-technologies-concepts.html"
-    },
-    {
-      "checks": [
-        {
-          "name": "official",
-          "result": "pass"
-        },
-        {
-          "name": "target",
-          "result": "pass"
-        },
-        {
-          "name": "deprecation",
-          "result": "pass"
-        },
-        {
-          "name": "freshness",
-          "result": "pass"
-        },
-        {
-          "name": "liveness",
-          "result": "pass"
-        }
-      ],
-      "claims": [],
-      "contentHash": "83666c090c6b3d39da36cf4f1b87e193bdbfbf58653f417ec7ebf469349b7e27",
-      "fetchedAt": "2026-10-29",
-      "kind": "exam-guide",
-      "status": "active",
-      "target": {
-        "edition": "C01",
-        "examCode": "AWS-AIB-C01"
-      },
-      "updatedAt": "2026-10-28",
-      "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-technologies-concepts.md"
     },
     {
       "checks": [

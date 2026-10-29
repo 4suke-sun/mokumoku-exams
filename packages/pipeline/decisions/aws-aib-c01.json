@@ -1,0 +1,353 @@
+{
+  "examCode": "AWS-AIB-C01",
+  "decisions": [
+    {
+      "target": "draft",
+      "id": "d-005074ba1850",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-087ce791c4d2",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-0b5769b35199",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-0b974ae0a6e6",
+      "decision": "reject",
+      "reason": "legacy-not-reviewable"
+    },
+    {
+      "target": "draft",
+      "id": "d-0d12ed3da7b1",
+      "decision": "reject",
+      "reason": "legacy-not-reviewable"
+    },
+    {
+      "target": "draft",
+      "id": "d-11337a01cfbc",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-13c341da183c",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-1659e386d446",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-1a56384e023f",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-1b18e795cadd",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-1ea65d8d9436",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-1ee7675764ae",
+      "decision": "reject",
+      "reason": "legacy-not-reviewable"
+    },
+    {
+      "target": "draft",
+      "id": "d-1f7d43cfd603",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-247520b27cf6",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-2898ec998fb1",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-2c17d04cc3ca",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-2dd393407c4a",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-331d9d07b2f6",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-37e87955f125",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-392f512fee5f",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-4094a6c055f0",
+      "decision": "reject",
+      "reason": "legacy-not-reviewable"
+    },
+    {
+      "target": "draft",
+      "id": "d-449faa2ce811",
+      "decision": "reject",
+      "reason": "legacy-not-reviewable"
+    },
+    {
+      "target": "draft",
+      "id": "d-5020b4a43ff0",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-55007ab7b219",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-577ee8d85bec",
+      "decision": "reject",
+      "reason": "legacy-not-reviewable"
+    },
+    {
+      "target": "draft",
+      "id": "d-60641eca9649",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-60f8de82fc2e",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-66c42b138a93",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-6a9c082c3ff6",
+      "decision": "reject",
+      "reason": "legacy-not-reviewable"
+    },
+    {
+      "target": "draft",
+      "id": "d-6b9fcfadd6c1",
+      "decision": "reject",
+      "reason": "legacy-not-reviewable"
+    },
+    {
+      "target": "draft",
+      "id": "d-6d1afc912734",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-767a87515f7e",
+      "decision": "reject",
+      "reason": "legacy-not-reviewable"
+    },
+    {
+      "target": "draft",
+      "id": "d-78291362a4ea",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-78fea5e9aa27",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-83d747181269",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-86b3fd4b13eb",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-8a15bb63ad84",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-943418863d71",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-9febc9d8326b",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-9ff913f083a5",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-a254bbcedf3c",
+      "decision": "reject",
+      "reason": "legacy-not-reviewable"
+    },
+    {
+      "target": "draft",
+      "id": "d-a562b71cbf07",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-a9f294f78e23",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-afdc56a3b21b",
+      "decision": "reject",
+      "reason": "legacy-not-reviewable"
+    },
+    {
+      "target": "draft",
+      "id": "d-ba6e2dfface7",
+      "decision": "reject",
+      "reason": "legacy-not-reviewable"
+    },
+    {
+      "target": "draft",
+      "id": "d-bc0b36d0eb16",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-be494062fde0",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-ca7f45d7ea3d",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-cff8ab70f869",
+      "decision": "reject",
+      "reason": "legacy-not-reviewable"
+    },
+    {
+      "target": "draft",
+      "id": "d-d13485a42d97",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-d26f998cc6e9",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-d3a08026a235",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-dabb8007751d",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-dbfcc6e8ec30",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-dddfa2dcd420",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-df820503bb05",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-e5f40eb23693",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    },
+    {
+      "target": "draft",
+      "id": "d-e8ccd226e122",
+      "decision": "approve",
+      "reason": "auto-approved-accepted"
+    }
+  ]
+}
