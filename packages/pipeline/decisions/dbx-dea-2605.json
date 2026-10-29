@@ -1,0 +1,143 @@
+{
+  "examCode": "DBX-DEA-2605",
+  "decisions": [
+    {
+      "target": "draft",
+      "id": "d-0417bb142cf8",
+      "decision": "reject",
+      "reason": "evidence-insufficient"
+    },
+    {
+      "target": "draft",
+      "id": "d-0935361bff23",
+      "decision": "approve",
+      "reason": "overlap-acceptable"
+    },
+    {
+      "target": "draft",
+      "id": "d-0d69f038605d",
+      "decision": "approve",
+      "reason": "overlap-acceptable"
+    },
+    {
+      "target": "draft",
+      "id": "d-2bdd60e9cda1",
+      "decision": "approve",
+      "reason": "overlap-acceptable"
+    },
+    {
+      "target": "draft",
+      "id": "d-36ead762dccf",
+      "decision": "reject",
+      "reason": "evidence-insufficient"
+    },
+    {
+      "target": "draft",
+      "id": "d-415b6d3bbd76",
+      "decision": "reject",
+      "reason": "evidence-insufficient"
+    },
+    {
+      "target": "draft",
+      "id": "d-474b39a99f3b",
+      "decision": "reject",
+      "reason": "evidence-insufficient"
+    },
+    {
+      "target": "draft",
+      "id": "d-4814b0e45167",
+      "decision": "reject",
+      "reason": "evidence-insufficient"
+    },
+    {
+      "target": "draft",
+      "id": "d-565749c80ce1",
+      "decision": "approve",
+      "reason": "overlap-acceptable"
+    },
+    {
+      "target": "draft",
+      "id": "d-5767b25a6847",
+      "decision": "approve",
+      "reason": "overlap-acceptable"
+    },
+    {
+      "target": "draft",
+      "id": "d-585d83089dd5",
+      "decision": "approve",
+      "reason": "overlap-acceptable"
+    },
+    {
+      "target": "draft",
+      "id": "d-61ef3e3d8b64",
+      "decision": "reject",
+      "reason": "duplicate-topic"
+    },
+    {
+      "target": "draft",
+      "id": "d-6bb301ca31c8",
+      "decision": "reject",
+      "reason": "evidence-insufficient"
+    },
+    {
+      "target": "draft",
+      "id": "d-a14a64366e2f",
+      "decision": "approve",
+      "reason": "overlap-acceptable"
+    },
+    {
+      "target": "draft",
+      "id": "d-a27befdcd2e7",
+      "decision": "approve",
+      "reason": "overlap-acceptable"
+    },
+    {
+      "target": "draft",
+      "id": "d-a6b37dc8597b",
+      "decision": "approve",
+      "reason": "overlap-acceptable"
+    },
+    {
+      "target": "draft",
+      "id": "d-a6d7a9856d62",
+      "decision": "reject",
+      "reason": "overlap-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-ab3fa5beb6b3",
+      "decision": "approve",
+      "reason": "overlap-acceptable"
+    },
+    {
+      "target": "draft",
+      "id": "d-ad44534a682a",
+      "decision": "approve",
+      "reason": "overlap-acceptable"
+    },
+    {
+      "target": "draft",
+      "id": "d-d586cd8aff2d",
+      "decision": "reject",
+      "reason": "evidence-insufficient"
+    },
+    {
+      "target": "draft",
+      "id": "d-e1188c6219d6",
+      "decision": "reject",
+      "reason": "evidence-insufficient"
+    },
+    {
+      "target": "draft",
+      "id": "d-f836c86871e3",
+      "decision": "approve",
+      "reason": "overlap-acceptable"
+    },
+    {
+      "target": "draft",
+      "id": "d-fcd010228e11",
+      "decision": "approve",
+      "reason": "overlap-acceptable"
+    }
+  ]
+}
