@@ -2,6 +2,68 @@
   "examCode": "AWS-AIB-C01",
   "entries": [
     {
+      "draftId": "d-005074ba1850",
+      "questionId": "AIB-0201",
+      "factIds": [
+        "f-00830094f60c",
+        "f-0baa032b6a09",
+        "f-44ccd30ad75d",
+        "f-9acdaf90b71e"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-087ce791c4d2",
+      "questionId": "AIB-0202",
+      "factIds": [
+        "f-33ba4ee28af0",
+        "f-3e082936e26f",
+        "f-4857f4be4fdf"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0b5769b35199",
+      "questionId": "AIB-0203",
+      "factIds": [
+        "f-20c02d8a15c4"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        }
+      ]
+    },
+    {
       "draftId": "d-0b974ae0a6e6",
       "factIds": [
         "f-0edc6383d72a",
@@ -29,6 +91,146 @@
       ]
     },
     {
+      "draftId": "d-11337a01cfbc",
+      "questionId": "AIB-0204",
+      "factIds": [
+        "f-373bc49cecbd",
+        "f-45727c856c48",
+        "f-6dabb6d2551f",
+        "f-9f4f45aca842",
+        "f-aab602ac1a43"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-13c341da183c",
+      "questionId": "AIB-0205",
+      "factIds": [
+        "f-00830094f60c",
+        "f-0baa032b6a09",
+        "f-a0a924806eca",
+        "f-d08e1173f919",
+        "f-f3e2d741206a"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-1659e386d446",
+      "questionId": "AIB-0206",
+      "factIds": [
+        "f-1402e20e2dcb",
+        "f-83193c7589c6",
+        "f-f894e1339e1d"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-1a56384e023f",
+      "questionId": "AIB-0207",
+      "factIds": [
+        "f-3e082936e26f",
+        "f-5ed2a712ff71",
+        "f-851530a9b776"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-1b18e795cadd",
+      "questionId": "AIB-0208",
+      "factIds": [
+        "f-2067e3d8d96a",
+        "f-24882aff8762",
+        "f-4e3ac15d128a",
+        "f-5ed2a712ff71"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44"
+        }
+      ]
+    },
+    {
+      "draftId": "d-1ea65d8d9436",
+      "questionId": "AIB-0209",
+      "factIds": [
+        "f-007bfe0460a1",
+        "f-3847a10bf7fb"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        }
+      ]
+    },
+    {
       "draftId": "d-1ee7675764ae",
       "factIds": [
         "f-0e193ebfb5d8"
@@ -38,6 +240,177 @@
           "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
           "fetchedAt": "2026-10-15",
           "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-1f7d43cfd603",
+      "questionId": "AIB-0210",
+      "factIds": [
+        "f-31b23d2dbaf9",
+        "f-851530a9b776"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-247520b27cf6",
+      "questionId": "AIB-0211",
+      "factIds": [
+        "f-31b23d2dbaf9",
+        "f-5ed2a712ff71"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-2898ec998fb1",
+      "questionId": "AIB-0212",
+      "factIds": [
+        "f-1402e20e2dcb",
+        "f-9f4f45aca842",
+        "f-bf462f8f918d"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-2c17d04cc3ca",
+      "questionId": "AIB-0213",
+      "factIds": [
+        "f-0cc55de7e1a9",
+        "f-9acdaf90b71e"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-2dd393407c4a",
+      "questionId": "AIB-0214",
+      "factIds": [
+        "f-007bfe0460a1",
+        "f-1ff31ce18e57",
+        "f-24882aff8762",
+        "f-4e3ac15d128a"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44"
+        }
+      ]
+    },
+    {
+      "draftId": "d-331d9d07b2f6",
+      "questionId": "AIB-0215",
+      "factIds": [
+        "f-2daa3ad1af2b",
+        "f-44ccd30ad75d"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-37e87955f125",
+      "questionId": "AIB-0216",
+      "factIds": [
+        "f-373bc49cecbd",
+        "f-9f4f45aca842",
+        "f-aab602ac1a43",
+        "f-bf462f8f918d"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-392f512fee5f",
+      "questionId": "AIB-0217",
+      "factIds": [
+        "f-6dabb6d2551f",
+        "f-83193c7589c6",
+        "f-f894e1339e1d"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
         }
       ]
     },
@@ -71,6 +444,40 @@
       ]
     },
     {
+      "draftId": "d-5020b4a43ff0",
+      "questionId": "AIB-0218",
+      "factIds": [
+        "f-0cc55de7e1a9",
+        "f-6fe10b00ff34"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-55007ab7b219",
+      "questionId": "AIB-0219",
+      "factIds": [
+        "f-3507fef8c65c"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44"
+        }
+      ]
+    },
+    {
       "draftId": "d-577ee8d85bec",
       "factIds": [
         "f-10458e104869",
@@ -97,6 +504,80 @@
       ]
     },
     {
+      "draftId": "d-60641eca9649",
+      "questionId": "AIB-0220",
+      "factIds": [
+        "f-2daa3ad1af2b",
+        "f-44ccd30ad75d",
+        "f-9acdaf90b71e"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-60f8de82fc2e",
+      "questionId": "AIB-0221",
+      "factIds": [
+        "f-0833bd50b672",
+        "f-24e9e2827b7b",
+        "f-3a764b995da3",
+        "f-6dabb6d2551f"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-66c42b138a93",
+      "questionId": "AIB-0222",
+      "factIds": [
+        "f-1640403a3745",
+        "f-390b7bd409d9",
+        "f-3e082936e26f"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        }
+      ]
+    },
+    {
       "draftId": "d-6a9c082c3ff6",
       "factIds": [
         "f-147e7b89ea3d",
@@ -107,6 +588,19 @@
           "url": "https://aws.amazon.com/what-is/prompt-engineering/",
           "fetchedAt": "2026-10-15",
           "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-6abdd73a0c28",
+      "factIds": [
+        "f-20c02d8a15c4"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
         }
       ]
     },
@@ -143,6 +637,27 @@
       ]
     },
     {
+      "draftId": "d-6d1afc912734",
+      "questionId": "AIB-0223",
+      "factIds": [
+        "f-36023436d65b",
+        "f-45727c856c48",
+        "f-bf462f8f918d"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
       "draftId": "d-767a87515f7e",
       "factIds": [
         "f-07e3a1f9d25e",
@@ -162,6 +677,253 @@
       ]
     },
     {
+      "draftId": "d-78291362a4ea",
+      "questionId": "AIB-0224",
+      "factIds": [
+        "f-0833bd50b672",
+        "f-6dabb6d2551f"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-78fea5e9aa27",
+      "questionId": "AIB-0225",
+      "factIds": [
+        "f-20c02d8a15c4",
+        "f-f1e5f7891440"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-83d747181269",
+      "questionId": "AIB-0226",
+      "factIds": [
+        "f-00830094f60c",
+        "f-24ef6227ff90",
+        "f-89002e5bf8bf",
+        "f-9acdaf90b71e",
+        "f-d08e1173f919"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-8481bdb697f7",
+      "factIds": [
+        "f-20c02d8a15c4",
+        "f-f1e5f7891440"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-86b3fd4b13eb",
+      "questionId": "AIB-0227",
+      "factIds": [
+        "f-3847a10bf7fb",
+        "f-390b7bd409d9",
+        "f-3e082936e26f",
+        "f-851530a9b776"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-8a15bb63ad84",
+      "questionId": "AIB-0228",
+      "factIds": [
+        "f-21b493132e3d",
+        "f-33ba4ee28af0",
+        "f-3e082936e26f"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-943418863d71",
+      "questionId": "AIB-0229",
+      "factIds": [
+        "f-31b23d2dbaf9",
+        "f-851530a9b776",
+        "f-aa84e2e6aead"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-9febc9d8326b",
+      "questionId": "AIB-0230",
+      "factIds": [
+        "f-0cc55de7e1a9",
+        "f-a0a924806eca",
+        "f-f3e2d741206a"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-9ff913f083a5",
+      "questionId": "AIB-0231",
+      "factIds": [
+        "f-0baa032b6a09",
+        "f-44ccd30ad75d",
+        "f-a0a924806eca",
+        "f-a404b4b420f2"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a0d06446329a",
+      "factIds": [
+        "f-1402e20e2dcb",
+        "f-83193c7589c6",
+        "f-f894e1339e1d"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a2063030b84c",
+      "factIds": [
+        "f-f1e5f7891440"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
       "draftId": "d-a254bbcedf3c",
       "factIds": [
         "f-0017e176b638",
@@ -173,6 +935,78 @@
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/",
           "fetchedAt": "2026-10-15",
           "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a4b885f56531",
+      "factIds": [
+        "f-f1e5f7891440"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a562b71cbf07",
+      "questionId": "AIB-0232",
+      "factIds": [
+        "f-1640403a3745",
+        "f-1ff31ce18e57",
+        "f-33ba4ee28af0",
+        "f-4857f4be4fdf",
+        "f-851530a9b776"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a9f294f78e23",
+      "questionId": "AIB-0233",
+      "factIds": [
+        "f-24ef6227ff90",
+        "f-44ccd30ad75d",
+        "f-f3e2d741206a"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
         }
       ]
     },
@@ -211,6 +1045,80 @@
       ]
     },
     {
+      "draftId": "d-bc0b36d0eb16",
+      "questionId": "AIB-0234",
+      "factIds": [
+        "f-00830094f60c",
+        "f-44ccd30ad75d",
+        "f-7d014d3e38ae",
+        "f-9acdaf90b71e"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44"
+        }
+      ]
+    },
+    {
+      "draftId": "d-be494062fde0",
+      "questionId": "AIB-0235",
+      "factIds": [
+        "f-d08e1173f919"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-c7d215dee270",
+      "factIds": [
+        "f-f1e5f7891440"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ca7f45d7ea3d",
+      "questionId": "AIB-0236",
+      "factIds": [
+        "f-4e3ac15d128a",
+        "f-5ed2a712ff71"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
       "draftId": "d-cff8ab70f869",
       "factIds": [
         "f-0569348864e9"
@@ -220,6 +1128,213 @@
           "url": "https://aws.amazon.com/what-is/generative-ai/",
           "fetchedAt": "2026-10-15",
           "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d13485a42d97",
+      "questionId": "AIB-0237",
+      "factIds": [
+        "f-36023436d65b",
+        "f-c67c1617a75f"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d26f998cc6e9",
+      "questionId": "AIB-0238",
+      "factIds": [
+        "f-6fe10b00ff34",
+        "f-7d014d3e38ae",
+        "f-89002e5bf8bf"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d3a08026a235",
+      "questionId": "AIB-0239",
+      "factIds": [
+        "f-1402e20e2dcb"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-dabb8007751d",
+      "questionId": "AIB-0240",
+      "factIds": [
+        "f-9f4f45aca842"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-dbfcc6e8ec30",
+      "questionId": "AIB-0241",
+      "factIds": [
+        "f-0833bd50b672",
+        "f-3a764b995da3"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-dddfa2dcd420",
+      "questionId": "AIB-0242",
+      "factIds": [
+        "f-44ccd30ad75d",
+        "f-9acdaf90b71e",
+        "f-a0a924806eca",
+        "f-a404b4b420f2"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-df820503bb05",
+      "questionId": "AIB-0243",
+      "factIds": [
+        "f-31b23d2dbaf9",
+        "f-390b7bd409d9",
+        "f-3b46667a6c99",
+        "f-3e082936e26f",
+        "f-851530a9b776"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-e5f40eb23693",
+      "questionId": "AIB-0244",
+      "factIds": [
+        "f-24e9e2827b7b",
+        "f-36023436d65b"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-e8ccd226e122",
+      "questionId": "AIB-0245",
+      "factIds": [
+        "f-1402e20e2dcb",
+        "f-3a764b995da3",
+        "f-6dabb6d2551f",
+        "f-aab602ac1a43"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-efc595b9d5b5",
+      "factIds": [
+        "f-00830094f60c",
+        "f-0baa032b6a09",
+        "f-a404b4b420f2",
+        "f-d08e1173f919"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-29",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
         }
       ]
     }
