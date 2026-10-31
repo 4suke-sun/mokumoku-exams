@@ -39,6 +39,15 @@ export function groupByVendor(exams: readonly Exam[], colorCount = 6): VendorGro
   return groups;
 }
 
+/**
+ * 絞り込みのベンダー(`?vendor=`)で、表示するグループを選ぶ。一覧にあるベンダーと一致したときだけ、そのグループに絞り、
+ * 指定がない・一覧にない・複数指定のときは、すべてを返す。色の番号は、絞り込む前のままにする(絞り込んでも色が変わらないように)。
+ */
+export function filterByVendor(groups: readonly VendorGroup[], vendor: string | string[] | undefined): VendorGroup[] {
+  const picked = typeof vendor === "string" ? groups.find((g) => g.vendor === vendor) : undefined;
+  return picked ? [picked] : [...groups];
+}
+
 /** タイルに出す短い表記。`abbr` がなければ、資格コード(`<ベンダー>-<試験>-<版>`)の試験略称の部分(4 文字まで) */
 export function tileText(exam: Pick<Exam, "abbr" | "examCode">): string {
   return exam.abbr ?? (exam.examCode.split("-")[1] ?? exam.examCode).slice(0, 4);

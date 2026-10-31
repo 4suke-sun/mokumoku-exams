@@ -34,10 +34,26 @@ export function sectionPassLine(total: number): number {
 export type SectionStatus = "perfect" | "passed" | "failed" | "untried";
 
 /** セクションの状態。満点・合格・未達・未挑戦 */
-export function sectionStatus(record: Pick<SectionRecord, "correct" | "total"> | undefined): SectionStatus {
+export function sectionStatus(record: Pick<SectionRecord, "correct" | "total" | "retry"> | undefined): SectionStatus {
   if (!record) return "untried";
-  if (record.correct >= record.total) return "perfect";
+  // 満点は、通しで 1 回で全問正解したときだけ(解き直しで合格にした記録は、合格まで)
+  if (record.correct >= record.total && !record.retry) return "perfect";
   return record.correct >= sectionPassLine(record.total) ? "passed" : "failed";
+}
+
+/**
+ * 解き直しの採点から、セクションを合格に上げる記録を作る。解き直した問題をすべて正解し、
+ * いまの記録が未達のときだけ返す(未挑戦・合格・満点のときは、変えないので null)。
+ * 正答数は合格に要る数にして、記録の比べ方(正答数の多いほうを残す)のまま、未達の記録より上に来るようにする。
+ */
+export function retryPassRecord(
+  before: SectionRecord | undefined,
+  attempt: { correct: number; total: number },
+  finishedAt: string,
+): SectionRecord | null {
+  if (!before || attempt.total === 0 || attempt.correct < attempt.total) return null;
+  if (sectionStatus(before) !== "failed") return null;
+  return { correct: sectionPassLine(before.total), total: before.total, finishedAt, retry: true };
 }
 
 /** 合格(満点を含む)したセクションの数 */

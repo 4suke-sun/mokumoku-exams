@@ -5,6 +5,7 @@ import { ledgerPath, readLedger, writeLedger } from "../collect/ledger.ts";
 import { CRITERION_NAME_MAX, KEYWORD_MAX } from "../contract.ts";
 import { EXIT } from "../exit-codes.ts";
 import { card, DOC_HASH, DOC_URL } from "../facts/test-helpers.ts";
+import { focusItemId } from "../plan/plan.ts";
 import { planPath, readPlan } from "../plan/schema.ts";
 import { readAgentStamp } from "../shared/agents.ts";
 import { DraftRequestSchema } from "./request.ts";
@@ -49,6 +50,61 @@ describe("draft の依頼", () => {
       expect(request.styleGuides).toEqual(["docs/exam-style/aws-common.md", "docs/exam-style/aws-aib.md"]);
     }
     expect(r.out).toContain("下書きの依頼:");
+  });
+
+  const focusOverrides = (prefix: string) => ({
+    plan: {
+      ...baseConfig.plan,
+      overrides: {
+        [EXAM]: {
+          focus: [
+            {
+              id: "maturity-level",
+              domain: "domain4",
+              difficulty: "medium",
+              kind: "single",
+              count: 2,
+              sourcePrefixes: [prefix],
+              instruction: "企業の現状から、いまのレベルを選ばせる",
+            },
+          ],
+        },
+      },
+    },
+  });
+
+  it("論点の枠がある_枠の出典の範囲のカードを分野を問わず載せ_問いの形の一言を依頼に添える", async () => {
+    const root = setupDraftRoot();
+    const r = await prepare(root, focusOverrides("https://docs.aws.amazon.com/guide/"));
+    expect(r.code).toBe(EXIT.ok);
+    const requests = readRequests(root);
+    const focused = requests.filter((q) => q.planItemId === focusItemId(EXAM, "maturity-level"));
+    expect(focused).toHaveLength(1);
+    expect(focused[0]?.focus).toEqual({ instruction: "企業の現状から、いまのレベルを選ばせる" });
+    expect(focused[0]?.domain.code).toBe("domain4");
+    expect(focused[0]?.count).toBe(2);
+    expect(focused[0]?.facts.map((f) => f.claim).sort()).toEqual([
+      "架空の主張 1",
+      "架空の主張 2",
+      "架空の主張 3",
+      "架空の主張 4",
+    ]);
+    // 論点の枠の依頼では、カードごとに先頭の出典のページと節を添える(枠のない依頼には付けない)
+    expect(focused[0]?.facts.every((f) => f.source?.url.startsWith("https://docs.aws.amazon.com/guide/"))).toBe(true);
+    expect(
+      requests.filter((q) => q.focus === undefined).every((q) => q.facts.every((f) => f.source === undefined)),
+    ).toBe(true);
+    expect(requests.filter((q) => q.planItemId !== focused[0]?.planItemId).every((q) => q.focus === undefined)).toBe(
+      true,
+    );
+  });
+
+  it("論点の枠の出典の範囲にカードがない_枠の項目は依頼せず_no-facts で失敗する", async () => {
+    const root = setupDraftRoot();
+    const r = await prepare(root, focusOverrides("https://docs.aws.amazon.com/other/"));
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain("下書きの誤り: no-facts focus:maturity-level");
+    expect(readRequests(root).some((q) => q.planItemId === focusItemId(EXAM, "maturity-level"))).toBe(false);
   });
 
   it("事実カードのない分野_下書きの依頼を作らず失敗する", async () => {

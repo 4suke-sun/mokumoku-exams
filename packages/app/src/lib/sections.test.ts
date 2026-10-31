@@ -1,5 +1,12 @@
 import { describe, expect, it } from "vitest";
-import { passedSectionCount, sectionPassLine, sectionStatus, sectionsOf, sectionTargets } from "./sections.ts";
+import {
+  passedSectionCount,
+  retryPassRecord,
+  sectionPassLine,
+  sectionStatus,
+  sectionsOf,
+  sectionTargets,
+} from "./sections.ts";
 
 describe("sectionsOf", () => {
   it("5 問ずつに分ける", () => {
@@ -62,6 +69,11 @@ describe("sectionStatus", () => {
     expect(sectionStatus(undefined)).toBe("untried");
   });
 
+  it("解き直しで合格にした記録_全問正解の数でも満点にせず合格", () => {
+    expect(sectionStatus({ correct: 4, total: 5, retry: true })).toBe("passed");
+    expect(sectionStatus({ correct: 2, total: 2, retry: true })).toBe("passed");
+  });
+
   it("合格したセクションの数_満点を含め_範囲の外は数えない", () => {
     const at = "2026-10-12T00:00:00.000Z";
     const best = {
@@ -71,5 +83,29 @@ describe("sectionStatus", () => {
       "9": { correct: 5, total: 5, finishedAt: at },
     };
     expect(passedSectionCount(best, 3)).toBe(2);
+  });
+});
+
+describe("retryPassRecord", () => {
+  const at = "2026-10-31T00:00:00.000Z";
+  const failed = { correct: 2, total: 5, finishedAt: "2026-10-30T00:00:00.000Z" };
+
+  it("未達のセクションで解き直しを全問正解_合格に要る正答数の解き直しの記録を返す", () => {
+    expect(retryPassRecord(failed, { correct: 3, total: 3 }, at)).toEqual({
+      correct: 4,
+      total: 5,
+      finishedAt: at,
+      retry: true,
+    });
+  });
+
+  it("解き直しに間違いが残る_合格に上げない", () => {
+    expect(retryPassRecord(failed, { correct: 2, total: 3 }, at)).toBeNull();
+  });
+
+  it("合格か満点か未挑戦のセクション_記録を変えない", () => {
+    expect(retryPassRecord({ ...failed, correct: 4 }, { correct: 1, total: 1 }, at)).toBeNull();
+    expect(retryPassRecord({ ...failed, correct: 5 }, { correct: 1, total: 1 }, at)).toBeNull();
+    expect(retryPassRecord(undefined, { correct: 1, total: 1 }, at)).toBeNull();
   });
 });

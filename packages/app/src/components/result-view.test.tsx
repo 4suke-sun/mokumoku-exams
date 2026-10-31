@@ -11,6 +11,7 @@ import {
   type StageCheck,
   saveResult,
   saveSectionCheck,
+  saveSectionRetry,
   saveStageCheck,
   setStorageOwner,
 } from "@/lib/storage.ts";
@@ -415,6 +416,24 @@ describe("ResultView の過去の結果とセクション", () => {
     const session = loadSession(browserStore(), "TEST");
     expect(session?.section).toBe(1);
     expect(session?.questionIds).toEqual(["TEST-0006"]);
+  });
+
+  it("直近がセクションの出題で間違いがある_解き直しにそのセクションの解き直しの印を付ける", async () => {
+    saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["B"], "TEST-0003": ["A"] });
+    saveSectionCheck(browserStore(), "TEST", 0, { correct: 1, total: 3, finishedAt: "2026-10-10T00:00:00.000Z" });
+    renderView(questions);
+    const user = userEvent.setup();
+    await user.click(await screen.findByRole("button", { name: "間違えた問題だけで解き直す(2 問)" }));
+    expect(loadSession(browserStore(), "TEST")?.retryOf).toBe(0);
+  });
+
+  it("直近がセクションの解き直しで全問正解_合格を伝え_満点とは言わない", async () => {
+    saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["A"], "TEST-0003": ["B"] });
+    const at = "2026-10-10T00:00:00.000Z";
+    saveSectionRetry(browserStore(), "TEST", 0, { correct: 3, total: 3, finishedAt: at }, null);
+    renderView(questions);
+    expect(await screen.findByText(/解き直しの 3 問をすべて正解しました。セクション 1 は合格です/)).toBeTruthy();
+    expect(screen.queryByText(/満点で合格しました/)).toBeNull();
   });
 });
 

@@ -1,11 +1,14 @@
 import { type GradableQuestion, score } from "./quiz.ts";
+import { retryPassRecord } from "./sections.ts";
 import {
   type KeyValueStore,
+  loadSectionProgress,
   type Result,
   type SectionProgress,
   type Session,
   saveResult,
   saveSectionCheck,
+  saveSectionRetry,
   saveStageCheck,
 } from "./storage.ts";
 import { isStagePassed } from "./study-stages.ts";
@@ -64,7 +67,7 @@ export function recordSessionChecks(
   finishedAt: string,
   putSections: (progress: SectionProgress) => Promise<unknown>,
 ): void {
-  if (!session.stage && session.section === undefined) return;
+  if (!session.stage && session.section === undefined && session.retryOf === undefined) return;
   const { correct, total, percent } = score(asked, session.answers, session.textAnswers);
   if (session.stage) {
     saveStageCheck(store, session.examCode, { ...session.stage, percent, passed: isStagePassed(percent), finishedAt });
@@ -77,5 +80,20 @@ export function recordSessionChecks(
       best: { [String(session.section)]: record },
       last: { ...record, section: session.section },
     });
+  }
+  // セクションの解き直し: 解き直した問題をすべて正解したら、未達のセクションを合格に上げる(満点にはしない)
+  if (session.retryOf !== undefined && total > 0) {
+    const key = String(session.retryOf);
+    const progress = loadSectionProgress(store, session.examCode);
+    const before = Object.hasOwn(progress.best, key) ? progress.best[key] : undefined;
+    const upgraded = retryPassRecord(before, { correct, total }, finishedAt);
+    saveSectionRetry(store, session.examCode, session.retryOf, { correct, total, finishedAt }, upgraded);
+    if (upgraded) {
+      void putSections({
+        examCode: session.examCode,
+        best: { [key]: upgraded },
+        last: { ...upgraded, section: session.retryOf },
+      });
+    }
   }
 }

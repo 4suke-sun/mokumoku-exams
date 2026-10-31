@@ -37,14 +37,15 @@ export default async function HomePage() {
       <p className="leading-relaxed text-muted">
         クラウド資格の学習用に、問題を解き、間違いを見直せます。資格を選んで、はじめましょう。
       </p>
-      <ResumeCards exams={exams} />
-      <HomePredictions entries={entries} />
+      {/* 資格を選ぶ導線を、続きのカードと合格予測より先に出す(資格が増えても、最初に目に入るように) */}
       <Link
         href="/exams"
         className="inline-block rounded-md bg-primary px-5 py-3 font-bold text-on-primary hover:opacity-90"
       >
         資格を選ぶ
       </Link>
+      <ResumeCards exams={exams} />
+      <HomePredictions entries={entries} />
     </section>
   );
 }

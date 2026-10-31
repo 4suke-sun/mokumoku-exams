@@ -12,6 +12,7 @@ import { ScoreRing } from "@/components/score-ring.tsx";
 import { type AnswerTimer, createTimer, elapsedTimes, setVisible, showQuestion } from "@/lib/answer-timer.ts";
 import { saveFinishedResult } from "@/lib/finish-session.ts";
 import { postServerResult } from "@/lib/history/client.ts";
+import { showFromTop } from "@/lib/page-top.ts";
 import { displayLabels, isCorrect, labelKeys, orderChoices, resultDetailHref, score, sortKeys } from "@/lib/quiz.ts";
 import { browserStore, type Result } from "@/lib/storage.ts";
 import type { NextStep } from "@/lib/study-nav.ts";
@@ -70,10 +71,10 @@ export function UnitPractice({ exam, questions, next }: Props) {
     return () => document.removeEventListener("visibilitychange", onVisibility);
   }, [playing]);
 
-  // 回答したら正誤の表示へ、次の問題へ進んだら問題へ、フォーカスを移す(キーボードや読み上げで、続けて操作できるように)
+  // 回答したら正誤の表示へ、次の問題へ進んだらページの先頭へ戻して問題へ、フォーカスを移す(キーボードや読み上げで、続けて操作できるように)
   useEffect(() => {
     if (focusTarget === "verdict") verdictRef.current?.focus();
-    if (focusTarget === "question") questionRef.current?.focus();
+    if (focusTarget === "question") showFromTop(questionRef.current);
     setFocusTarget(null);
   }, [focusTarget]);
 

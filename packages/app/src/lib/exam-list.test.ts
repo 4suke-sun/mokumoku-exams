@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { groupByVendor, levelRank, tileText } from "./exam-list.ts";
+import { filterByVendor, groupByVendor, levelRank, tileText } from "./exam-list.ts";
 import type { Exam } from "./types.ts";
 
 const exam = (examCode: string, vendor: string, over: Record<string, unknown> = {}): Exam =>
@@ -67,5 +67,22 @@ describe("tileText", () => {
     expect(tileText({ examCode: "EX-SMP-XX" })).toBe("SMP");
     expect(tileText({ examCode: "AWS-LONGNAME-C01" })).toBe("LONG");
     expect(tileText({ examCode: "AB" })).toBe("AB");
+  });
+});
+
+describe("filterByVendor", () => {
+  const groups = [
+    { vendor: "AWS", colorIndex: 0, exams: [] },
+    { vendor: "Databricks", colorIndex: 1, exams: [] },
+  ];
+
+  it("一覧にあるベンダー_そのグループだけを色の番号のまま返す", () => {
+    expect(filterByVendor(groups, "Databricks")).toEqual([{ vendor: "Databricks", colorIndex: 1, exams: [] }]);
+  });
+
+  it("指定がないか一覧にないか複数指定_すべてを返す", () => {
+    expect(filterByVendor(groups, undefined)).toEqual(groups);
+    expect(filterByVendor(groups, "Nope")).toEqual(groups);
+    expect(filterByVendor(groups, ["AWS", "Databricks"])).toEqual(groups);
   });
 });

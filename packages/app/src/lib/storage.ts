@@ -238,6 +238,8 @@ export const SessionSchema = z
     stage: StageRefSchema.optional(),
     /** セクション(5 問ずつの区切り)の番号(0 始まり)。セクションの出題のときだけ。採点すると、その記録を更新する */
     section: z.int().min(0).max(999).optional(),
+    /** セクションの結果から始めた、間違えた問題の解き直しのときだけ。そのセクションの番号(0 始まり) */
+    retryOf: z.int().min(0).max(999).optional(),
     /** 本番モードの締め切り(ISO 8601)。再読み込みしても残り時間を保つ。通常の出題では持たない */
     deadline: STAMP.optional(),
     /** 解答の表示のしかた。持たないときは、まとめて最後に */
@@ -409,6 +411,8 @@ const SectionRecordSchema = z.strictObject({
   correct: z.int().min(0).max(1000),
   total: z.int().min(1).max(1000),
   finishedAt: STAMP,
+  /** 間違えた問題の解き直しの記録(通しで解いた記録は、持たない)。解き直しで合格にしたセクションは、満点にしない */
+  retry: z.literal(true).optional(),
 });
 export type SectionRecord = z.infer<typeof SectionRecordSchema>;
 
@@ -442,6 +446,23 @@ export function saveSectionCheck(
   const before = Object.hasOwn(progress.best, key) ? progress.best[key] : undefined;
   const best = before && before.correct >= record.correct ? before : record;
   const next: SectionProgress = { examCode, best: { ...progress.best, [key]: best }, last: { ...record, section } };
+  return writeJson(store, sectionsKey(examCode), next);
+}
+
+/**
+ * セクションの解き直しを記録する。直近の記録は、解き直しの記録で上書きし、
+ * 合格に上げる記録(`upgraded`)があるときだけ、いちばん良い記録を差し替える。
+ */
+export function saveSectionRetry(
+  store: KeyValueStore,
+  examCode: string,
+  section: number,
+  attempt: SectionRecord,
+  upgraded: SectionRecord | null,
+): boolean {
+  const progress = loadSectionProgress(store, examCode);
+  const best = upgraded ? { ...progress.best, [String(section)]: upgraded } : progress.best;
+  const next: SectionProgress = { examCode, best, last: { ...attempt, retry: true, section } };
   return writeJson(store, sectionsKey(examCode), next);
 }
 

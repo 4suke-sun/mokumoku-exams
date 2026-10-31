@@ -36,6 +36,306 @@
     {
       "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
       "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/introduction.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-aspects.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/level-1.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/level-2.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/level-3.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/level-4.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/continuing.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/next-steps.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/outcomes.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/best-practices.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/readiness.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/use-cases.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/regulations-and-compliance.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/data-strategy.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/translate.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/dev-architecting.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/dev-advancing.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/preprod-advancing.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-value.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-enterprise-ready-gen-ai-platform/model.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-enterprise-ready-gen-ai-platform/security.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-enterprise-ready-gen-ai-platform/best-practices.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/differences.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/security.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/journey.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/govern-architect-agentic-ai/what-needs-to-be-governed.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/govern-architect-agentic-ai/governance-models.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/navigating-security-landscape-genai/regulatory-and-standards-evolution.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/navigating-security-landscape-genai/generative-ais-impact-on-organization-structures.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/navigating-security-landscape-genai/scoping-generative-ai-use-cases.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/navigating-security-landscape-genai/optimizing-generative-ai-security-and-responsible-ai.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/navigating-security-landscape-genai/shadow-generative-ai.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/design-principles.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raiuc05.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raibr03.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raibr04.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raimon01.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/your-ai-transformation-journey.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/business-perspective-the-ai-strategy-in-the-age-of-aiml.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/people-perspective-culture-and-change-towards-aiml-first.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/governance-perspective-managing-an-aiml-driven-organization.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/genops05-bp01.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/mlcost02-bp02.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/key-definitions.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/design-a-prompt.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/what-is/large-language-model/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/what-is/foundation-models/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/ai/responsible-ai/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://aws.amazon.com/compliance/iso-42001-faqs/",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://www.nist.gov/itl/ai-risk-management-framework",
+      "kind": "standard"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-advanced-operations.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-drift.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-feedback.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-insights.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-maintenance.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-performance.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-security.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/lifecycle.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raibr03-bp01.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raibr03-bp02.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raibr03-bp03.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raibr03-bp04.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raibr04-bp01.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raibr04-bp02.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raibr04-bp03.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raimon01-bp01.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raimon01-bp02.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raimon01-bp03.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raimon01-bp04.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raimon01-bp05.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raiuc05-bp01.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/security-perspective-compliance-and-assurance-of-aiml-systems.html",
+      "kind": "official-doc"
     }
   ],
   "guidePages": [
@@ -57,9 +357,27 @@
       "https://aws.amazon.com/what-is/ai-agents/",
       "https://aws.amazon.com/what-is/prompt-engineering/",
       "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
-      "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
+      "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
+      "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/",
+      "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/",
+      "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/",
+      "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-enterprise-ready-gen-ai-platform/",
+      "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/",
+      "https://docs.aws.amazon.com/prescriptive-guidance/latest/govern-architect-agentic-ai/",
+      "https://docs.aws.amazon.com/whitepapers/latest/navigating-security-landscape-genai/",
+      "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/",
+      "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/",
+      "https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/genops05-bp01.html",
+      "https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/mlcost02-bp02.html",
+      "https://docs.aws.amazon.com/bedrock/latest/userguide/key-definitions.html",
+      "https://docs.aws.amazon.com/bedrock/latest/userguide/design-a-prompt.html",
+      "https://aws.amazon.com/what-is/large-language-model/",
+      "https://aws.amazon.com/what-is/foundation-models/",
+      "https://aws.amazon.com/ai/responsible-ai/",
+      "https://aws.amazon.com/compliance/iso-42001-faqs/",
+      "https://www.nist.gov/itl/ai-risk-management-framework"
     ],
-    "maxDepth": 1
+    "maxDepth": 0
   },
   "exclude": [
     "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01.md",
@@ -69,6 +387,87 @@
     "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.md",
     "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-in-scope-services.md",
     "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-out-of-scope-services.md",
-    "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-technologies-concepts.md"
+    "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-technologies-concepts.md",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/contributors.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/doc-history.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/document-history.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/document-revisions.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/resources.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/notices.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/glossary.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/further-reading.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/toc-contents.json",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/contributors.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/doc-history.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/document-history.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/document-revisions.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/resources.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/notices.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/glossary.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/further-reading.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/toc-contents.json",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/contributors.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/doc-history.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/document-history.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/document-revisions.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/resources.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/notices.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/glossary.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/further-reading.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/toc-contents.json",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-enterprise-ready-gen-ai-platform/contributors.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-enterprise-ready-gen-ai-platform/doc-history.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-enterprise-ready-gen-ai-platform/document-history.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-enterprise-ready-gen-ai-platform/document-revisions.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-enterprise-ready-gen-ai-platform/resources.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-enterprise-ready-gen-ai-platform/notices.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-enterprise-ready-gen-ai-platform/glossary.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-enterprise-ready-gen-ai-platform/further-reading.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-enterprise-ready-gen-ai-platform/toc-contents.json",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/contributors.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/doc-history.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/document-history.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/document-revisions.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/resources.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/notices.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/glossary.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/further-reading.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/toc-contents.json",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/govern-architect-agentic-ai/contributors.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/govern-architect-agentic-ai/doc-history.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/govern-architect-agentic-ai/document-history.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/govern-architect-agentic-ai/document-revisions.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/govern-architect-agentic-ai/resources.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/govern-architect-agentic-ai/notices.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/govern-architect-agentic-ai/glossary.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/govern-architect-agentic-ai/further-reading.html",
+    "https://docs.aws.amazon.com/prescriptive-guidance/latest/govern-architect-agentic-ai/toc-contents.json",
+    "https://docs.aws.amazon.com/whitepapers/latest/navigating-security-landscape-genai/contributors.html",
+    "https://docs.aws.amazon.com/whitepapers/latest/navigating-security-landscape-genai/doc-history.html",
+    "https://docs.aws.amazon.com/whitepapers/latest/navigating-security-landscape-genai/document-history.html",
+    "https://docs.aws.amazon.com/whitepapers/latest/navigating-security-landscape-genai/document-revisions.html",
+    "https://docs.aws.amazon.com/whitepapers/latest/navigating-security-landscape-genai/resources.html",
+    "https://docs.aws.amazon.com/whitepapers/latest/navigating-security-landscape-genai/notices.html",
+    "https://docs.aws.amazon.com/whitepapers/latest/navigating-security-landscape-genai/glossary.html",
+    "https://docs.aws.amazon.com/whitepapers/latest/navigating-security-landscape-genai/further-reading.html",
+    "https://docs.aws.amazon.com/whitepapers/latest/navigating-security-landscape-genai/toc-contents.json",
+    "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/contributors.html",
+    "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/doc-history.html",
+    "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/document-history.html",
+    "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/document-revisions.html",
+    "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/resources.html",
+    "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/notices.html",
+    "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/glossary.html",
+    "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/further-reading.html",
+    "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/toc-contents.json",
+    "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/contributors.html",
+    "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/doc-history.html",
+    "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/document-history.html",
+    "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/document-revisions.html",
+    "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/resources.html",
+    "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/notices.html",
+    "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/glossary.html",
+    "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/further-reading.html",
+    "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/toc-contents.json"
   ]
 }

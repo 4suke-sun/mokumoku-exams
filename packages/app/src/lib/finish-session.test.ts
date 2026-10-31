@@ -101,6 +101,34 @@ describe("段階とセクションの記録", () => {
     });
   });
 
+  it("セクションの解き直しで全問正解_未達のセクションを合格に上げ_サーバーにも送る", () => {
+    const store = memoryStore();
+    const put = vi.fn(async () => null);
+    recordSessionChecks(store, answered({ section: 1 }), questions, "2026-10-14T00:00:00.000Z", put);
+    put.mockClear();
+    const allRight = { ...answered({ retryOf: 1 }), answers: { "SAMPLE-0001": ["A"], "SAMPLE-0002": ["B"] } };
+    recordSessionChecks(store, allRight, questions, NOW.toISOString(), put);
+    const upgraded = { correct: 2, total: 2, finishedAt: NOW.toISOString(), retry: true };
+    expect(loadSectionProgress(store, "EX-SMP-XX").best["1"]).toEqual(upgraded);
+    expect(put).toHaveBeenCalledWith({
+      examCode: "EX-SMP-XX",
+      best: { "1": upgraded },
+      last: { ...upgraded, section: 1 },
+    });
+  });
+
+  it("セクションの解き直しに間違いが残る_記録を上げず_直近に解き直しの結果を残す", () => {
+    const store = memoryStore();
+    const put = vi.fn(async () => null);
+    recordSessionChecks(store, answered({ section: 1 }), questions, "2026-10-14T00:00:00.000Z", put);
+    put.mockClear();
+    recordSessionChecks(store, answered({ retryOf: 1 }), questions, NOW.toISOString(), put);
+    const progress = loadSectionProgress(store, "EX-SMP-XX");
+    expect(progress.best["1"]).toMatchObject({ correct: 1, total: 2 });
+    expect(progress.last).toEqual({ correct: 1, total: 2, finishedAt: NOW.toISOString(), retry: true, section: 1 });
+    expect(put).not.toHaveBeenCalled();
+  });
+
   it("通常の出題_何も残さない", () => {
     const store = memoryStore();
     const put = vi.fn(async () => null);

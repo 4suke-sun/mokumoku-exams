@@ -951,23 +951,23 @@ body {
  * 遷移中のバーとスピナーは、待っていることを伝えるので動かす(光の筋は流さない)。フォーカスの見た目は止めない。
  */
 :root[data-style="simple"]
-:is(
-  .motion-page,
-  .motion-stagger > *,
-  .motion-slide-next,
-  .motion-slide-prev,
-  .motion-select,
-  .motion-correct,
-  .motion-wrong,
-  .motion-stamp,
-  .motion-star,
-  .section-perfect,
-  .motion-float,
-  .skeleton,
-  .confetti-piece,
-  .loading-badge,
-  .sheet-panel
-),
+  :is(
+    .motion-page,
+    .motion-stagger > *,
+    .motion-slide-next,
+    .motion-slide-prev,
+    .motion-select,
+    .motion-correct,
+    .motion-wrong,
+    .motion-stamp,
+    .motion-star,
+    .section-perfect,
+    .motion-float,
+    .skeleton,
+    .confetti-piece,
+    .loading-badge,
+    .sheet-panel
+  ),
 :root[data-style="simple"] .motion-shine::after {
   animation: none;
 }
