@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { DomainMenu } from "@/components/domain-menu.tsx";
 import { listExams } from "@/lib/exam-data.ts";
-import { groupByVendor, tileText } from "@/lib/exam-list.ts";
+import { filterByVendor, groupByVendor, tileText } from "@/lib/exam-list.ts";
 import type { Exam } from "@/lib/types.ts";
 
 export const metadata: Metadata = { title: "資格を選ぶ" };
@@ -30,8 +30,37 @@ function ExamTile({ exam, tone }: { exam: Exam; tone: string }) {
   );
 }
 
-export default function ExamsPage() {
-  const groups = groupByVendor(listExams(), VENDOR_TONES.length);
+/** ベンダーの絞り込みの切り替え。選んだ項目は `aria-current` で示す(選択は URL の `?vendor=` だけに持ち、保存しない) */
+function VendorFilter({ vendors, current }: { vendors: readonly string[]; current: string | null }) {
+  const items = [{ label: "すべて", href: "/exams", selected: current === null }].concat(
+    vendors.map((vendor) => ({
+      label: vendor,
+      href: `/exams?vendor=${encodeURIComponent(vendor)}`,
+      selected: current === vendor,
+    })),
+  );
+  return (
+    <nav aria-label="ベンダーで絞り込む" className="flex flex-wrap gap-2">
+      {items.map((item) => (
+        <Link
+          key={item.href}
+          href={item.href}
+          aria-current={item.selected ? "page" : undefined}
+          className={`chip ${item.selected ? "tone-primary font-bold" : "tone-muted"}`}
+        >
+          <span aria-hidden="true">{item.selected ? "✓ " : ""}</span>
+          {item.label}
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
+export default async function ExamsPage({ searchParams }: { searchParams: Promise<{ vendor?: string | string[] }> }) {
+  const all = groupByVendor(listExams(), VENDOR_TONES.length);
+  const { vendor } = await searchParams;
+  const groups = filterByVendor(all, vendor);
+  const current = groups.length === 1 && all.length > 1 ? (groups[0]?.vendor ?? null) : null;
 
   return (
     <section className="space-y-8">
@@ -39,6 +68,8 @@ export default function ExamsPage() {
         <h1 className="h1">資格を選ぶ</h1>
         <p className="text-muted">学習する資格を選んでください。ベンダーごとに、レベルの順に並べています。</p>
       </div>
+
+      {all.length > 1 ? <VendorFilter vendors={all.map((g) => g.vendor)} current={current} /> : null}
 
       {groups.map((group) => {
         const tone = VENDOR_TONES[group.colorIndex] ?? "tone-domain-1";

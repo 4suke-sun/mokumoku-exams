@@ -70,15 +70,20 @@ vi.mock("@/lib/exam-data.ts", () => ({ listExams: () => exams }));
 
 const { default: ExamsPage } = await import("./page.tsx");
 
+/** サーバーの画面を、URL の検索条件を渡して組み立てる */
+async function renderPage(query: { vendor?: string | string[] } = {}) {
+  return render(await ExamsPage({ searchParams: Promise.resolve(query) }));
+}
+
 describe("資格の一覧", () => {
-  it("ベンダーごとに分けて見出しを付ける", () => {
-    render(<ExamsPage />);
+  it("ベンダーごとに分けて見出しを付ける", async () => {
+    await renderPage();
     expect(screen.getByRole("heading", { level: 2, name: "AWS" })).toBeTruthy();
     expect(screen.getByRole("heading", { level: 2, name: "Other" })).toBeTruthy();
   });
 
-  it("ベンダーの中_レベルの順に並べ_レベルを持たない資格も出す", () => {
-    render(<ExamsPage />);
+  it("ベンダーの中_レベルの順に並べ_レベルを持たない資格も出す", async () => {
+    await renderPage();
     const group = screen.getByRole("heading", { name: "AWS" }).closest("section") as HTMLElement;
     const names = within(group)
       .getAllByRole("listitem")
@@ -91,8 +96,8 @@ describe("資格の一覧", () => {
     ]);
   });
 
-  it("資格_正式名と資格コードとレベルを出し_タイルは読み上げない", () => {
-    render(<ExamsPage />);
+  it("資格_正式名と資格コードとレベルを出し_タイルは読み上げない", async () => {
+    await renderPage();
     const link = screen.getByRole("link", { name: /基礎の資格/ });
     expect(link.getAttribute("href")).toBe("/exams/FND1");
     expect(link.textContent).toContain("FND1(F01)");
@@ -101,14 +106,14 @@ describe("資格の一覧", () => {
     expect(tile.getAttribute("aria-hidden")).toBe("true");
   });
 
-  it("公開中の資格_試験の情報と分野のメニューへ行ける", () => {
-    render(<ExamsPage />);
+  it("公開中の資格_試験の情報と分野のメニューへ行ける", async () => {
+    await renderPage();
     expect(screen.getByRole("link", { name: "基礎の試験の情報" }).getAttribute("href")).toBe("/exams/FND1/info");
     expect(screen.getByRole("navigation", { name: "基礎の分野" })).toBeTruthy();
   });
 
-  it("近日公開の資格_バッジと注記を出し_リンクにしない", () => {
-    render(<ExamsPage />);
+  it("近日公開の資格_バッジと注記を出し_リンクにしない", async () => {
+    await renderPage();
     expect(screen.getByText("近日公開")).toBeTruthy();
     expect(screen.getByText("来春に公開します。")).toBeTruthy();
     expect(screen.queryByRole("link", { name: /近日の資格/ })).toBeNull();
@@ -116,16 +121,44 @@ describe("資格の一覧", () => {
     expect(card?.className).toContain("bg-surface/60");
   });
 
-  it("分野・版・出題数・接頭辞を持つ近日公開の資格_それらを一覧に出さない", () => {
-    render(<ExamsPage />);
+  it("分野・版・出題数・接頭辞を持つ近日公開の資格_それらを一覧に出さない", async () => {
+    await renderPage();
     const card = screen.getByText("近日の資格").closest("li");
     expect(card?.textContent).not.toContain("架空の分野名");
     expect(card?.textContent).not.toContain("S01");
     expect(card?.textContent).not.toContain("65");
   });
 
-  it("略称のない資格_資格コードの先頭の 4 文字をタイルに出す", () => {
-    render(<ExamsPage />);
+  it("略称のない資格_資格コードの先頭の 4 文字をタイルに出す", async () => {
+    await renderPage();
     expect(screen.getByText("NOLV").getAttribute("aria-hidden")).toBe("true");
+  });
+
+  it("ベンダーを指定_そのベンダーの資格だけを出し_切り替えで選んだ項目を示す", async () => {
+    await renderPage({ vendor: "Other" });
+    expect(screen.queryByRole("heading", { name: "AWS" })).toBeNull();
+    expect(screen.getByRole("heading", { name: "Other" })).toBeTruthy();
+    const filter = screen.getByRole("navigation", { name: "ベンダーで絞り込む" });
+    expect(within(filter).getByRole("link", { name: /Other/ }).getAttribute("aria-current")).toBe("page");
+    expect(within(filter).getByRole("link", { name: "すべて" }).getAttribute("href")).toBe("/exams");
+  });
+
+  it("ベンダーの指定がない_すべてのベンダーを出し_すべてを選んだ状態にする", async () => {
+    await renderPage();
+    expect(screen.getByRole("heading", { name: "AWS" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Other" })).toBeTruthy();
+    const filter = screen.getByRole("navigation", { name: "ベンダーで絞り込む" });
+    expect(
+      within(filter)
+        .getByRole("link", { name: /すべて/ })
+        .getAttribute("aria-current"),
+    ).toBe("page");
+    expect(within(filter).getByRole("link", { name: "AWS" }).getAttribute("href")).toBe("/exams?vendor=AWS");
+  });
+
+  it("一覧にないベンダーを指定_すべてのベンダーを出す", async () => {
+    await renderPage({ vendor: "Nope" });
+    expect(screen.getByRole("heading", { name: "AWS" })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "Other" })).toBeTruthy();
   });
 });
