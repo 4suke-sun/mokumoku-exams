@@ -96,6 +96,9 @@ describe("pageWidth", () => {
     ["/exams/EX-SMP-XX/info", "wide"],
     ["/exams/EX-SMP-XX/study/basics", "study"],
     ["/bookmarks", "study"],
+    ["/exams/DBX-DEA-2605/notebook", "wide"],
+    ["/exams/DBX-DEA-2605/notebook/domain7-1", "wide"],
+    ["/admin/preview/DBX-DEA-2605/notebook/domain7-1", "wide"],
   ])("%s_%s", (path, width) => {
     expect(pageWidth(path)).toBe(width);
   });

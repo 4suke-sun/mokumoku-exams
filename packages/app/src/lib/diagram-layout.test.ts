@@ -418,3 +418,38 @@ describe("layoutAny", () => {
     expect(layoutAny({ type: "hierarchy", title: "h", root: { label: "r" } }).kind).toBe("hierarchy");
   });
 });
+
+describe("比較の図を上下に積む配置", () => {
+  const compare: CompareDiagram = {
+    type: "compare",
+    title: "比較",
+    left: { heading: "左", items: [{ label: "項目 1", state: "removed" }, { label: "項目 2" }] },
+    right: { heading: "右", items: [{ label: "あ".repeat(20), note: "い".repeat(40), state: "kept" }] },
+  };
+
+  it("左の側を上に_右の側を下に_1 列で並べ_重ならず範囲に収まる", () => {
+    const layout = layoutCompare(compare, { stacked: true });
+    expect(layout.boxes.map((b) => b.tone)).toEqual(["heading-left", "item", "item", "heading-right", "item"]);
+    expect(new Set(layout.boxes.map((b) => b.x)).size).toBe(1);
+    layout.boxes.forEach((a, i) => {
+      for (const b of layout.boxes.slice(i + 1)) expect(overlaps(a, b), `${i}`).toBe(false);
+    });
+    expect(diagramProblems(layout)).toEqual([]);
+    expect(layout.width).toBeLessThan(layoutCompare(compare).width);
+  });
+
+  it("「vs」の位置_左の側と右の側の間", () => {
+    const layout = layoutCompare(compare, { stacked: true });
+    const lastLeft = layout.boxes[2];
+    const rightHeading = layout.boxes[3];
+    expect(layout.versus?.y).toBeGreaterThan((lastLeft?.y ?? 0) + (lastLeft?.height ?? 0));
+    expect(layout.versus?.y).toBeLessThan(rightHeading?.y ?? 0);
+  });
+
+  it("項目の状態_左右に並べても積んでも、箱に写す", () => {
+    for (const stacked of [false, true]) {
+      const states = layoutCompare(compare, { stacked }).boxes.map((b) => b.state);
+      expect(states.filter(Boolean).sort()).toEqual(["kept", "removed"]);
+    }
+  });
+});

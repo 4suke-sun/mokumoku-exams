@@ -898,6 +898,61 @@ body {
   animation: sheet-up 0.24s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
 }
 
+/* 体系ノート(components/notebook-*.tsx)の本文。狭い画面で横にはみ出さないよう、コードと表の文字を折り返す */
+.notebook-prose pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.notebook-prose code {
+  overflow-wrap: anywhere;
+}
+
+/* 体系ノートの要点のマーカー。面は注意の色を薄く混ぜた色にし、文字は本文の色のまま */
+.notebook-marker {
+  color: inherit;
+  background-color: transparent;
+  background-image: linear-gradient(transparent 58%, color-mix(in srgb, var(--warn) 30%, transparent) 58%);
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+
+/* 要点のマーカーが、左から引かれる(1 回だけ) */
+@keyframes marker-draw {
+  from {
+    background-size: 0% 100%;
+  }
+}
+
+.motion-marker {
+  animation: marker-draw 0.6s ease-out 0.3s backwards;
+}
+
+/* 図の消える項目の斜線が、引かれる(線の長さを 1 とみなす。components/diagram.tsx の pathLength) */
+@keyframes strike-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+.motion-strike {
+  stroke-dasharray: 1;
+  animation: strike-draw 0.45s ease-out 0.3s backwards;
+}
+
+/* 体系ノートの目次が、左から出る(狭い画面) */
+@keyframes drawer-in {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+}
+
+.drawer-panel {
+  animation: drawer-in 0.24s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
 /*
  * 止める一覧(1): 動きを減らす設定のとき。スタイルにかかわらず、上の動きをすべて止め、終わりの状態だけを見せる。
  * レイヤーの外に書くので、ユーティリティと共通の部品のクラスより優先される(!important は使わない)。
@@ -923,6 +978,9 @@ body {
   .nav-progress-fill,
   .loading-badge,
   .sheet-panel,
+  .drawer-panel,
+  .motion-marker,
+  .motion-strike,
   .spinner::before,
   .spinner::after {
     animation: none;
@@ -966,7 +1024,10 @@ body {
   .skeleton,
   .confetti-piece,
   .loading-badge,
-  .sheet-panel
+  .sheet-panel,
+  .drawer-panel,
+  .motion-marker,
+  .motion-strike
 ),
 :root[data-style="simple"] .motion-shine::after {
   animation: none;

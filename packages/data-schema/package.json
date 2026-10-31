@@ -11,6 +11,8 @@
     "./exam-data/bias": "./src/exam-data/bias.ts",
     "./curriculum-data/schema": "./src/curriculum-data/schema.ts",
     "./curriculum-data/validate": "./src/curriculum-data/validate.ts",
+    "./notebook-data/schema": "./src/notebook-data/schema.ts",
+    "./notebook-data/validate": "./src/notebook-data/validate.ts",
     "./summary-data/schema": "./src/summary-data/schema.ts",
     "./summary-data/validate": "./src/summary-data/validate.ts",
     "./help-data/schema": "./src/help-data/schema.ts",

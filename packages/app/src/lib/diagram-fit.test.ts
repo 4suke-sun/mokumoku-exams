@@ -1,10 +1,12 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { CurriculumFileSchema } from "@mokumoku-exams/data-schema/curriculum-data/schema";
+import { NotebookFileSchema } from "@mokumoku-exams/data-schema/notebook-data/schema";
 import { describe, expect, it } from "vitest";
 import { type Diagram, diagramProblems, layoutAny } from "./diagram-layout.ts";
 
-// 実際のカリキュラム(data/curriculum.*.json)のすべての図で、文字が箱に収まることを検査する。
+// 実際のカリキュラム(data/curriculum.*.json)と体系ノート(data/notebook.*.json)のすべての図で、文字が箱に収まることを検査する。
+// 体系ノートの比較の図は、狭い画面で上下に積むので、積んだ形でも検査する。
 // 図を増やしたり、文字を長くしたりして収まらなくなったら、ここが失敗する。報告は、資格・単元・節・図の題で場所が分かる形にする。
 
 const DATA_DIR = join(import.meta.dirname, "../../../../data");
@@ -28,6 +30,23 @@ function realDiagrams(): Located[] {
   return found;
 }
 
+/** 体系ノートの中分類の図。比較の図は、上下に積んだ形も並べる */
+function notebookDiagrams(): (Located & { stacked: boolean })[] {
+  const found: (Located & { stacked: boolean })[] = [];
+  for (const name of readdirSync(DATA_DIR).filter((n) => /^notebook\..+\.json$/.test(n))) {
+    const file = NotebookFileSchema.parse(JSON.parse(readFileSync(join(DATA_DIR, name), "utf8")));
+    for (const unit of file.units) {
+      if (!unit.diagram) continue;
+      const where = `${file.examCode} / 中分類 ${unit.id} / 図「${unit.diagram.title}」(${unit.diagram.type})`;
+      found.push({ where, diagram: unit.diagram, stacked: false });
+      if (unit.diagram.type === "compare") {
+        found.push({ where: `${where}(上下に積む)`, diagram: unit.diagram, stacked: true });
+      }
+    }
+  }
+  return found;
+}
+
 /** 収まっていない図の報告(収まっていれば空) */
 function violations(diagrams: Located[]): string[] {
   return diagrams.flatMap(({ where, diagram }) => diagramProblems(layoutAny(diagram)).map((p) => `${where}: ${p}`));
@@ -43,6 +62,13 @@ describe("実データの図の文字の収まり", () => {
 
   it("すべての図_文字が箱に収まる(折り返しと縮小のあと)", () => {
     expect(violations(diagrams)).toEqual([]);
+  });
+
+  it("体系ノートのすべての図_上下に積んだ形を含めて、文字が箱に収まる", () => {
+    const problems = notebookDiagrams().flatMap(({ where, diagram, stacked }) =>
+      diagramProblems(layoutAny(diagram, { stacked })).map((p) => `${where}: ${p}`),
+    );
+    expect(problems).toEqual([]);
   });
 
   it("文字を長くした図_収まらないと報告し_場所が分かる", () => {

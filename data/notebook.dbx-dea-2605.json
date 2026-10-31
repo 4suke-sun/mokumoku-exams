@@ -1,0 +1,415 @@
+{
+  "examCode": "DBX-DEA-2605",
+  "units": [
+    {
+      "id": "domain1-1",
+      "domain": "domain1",
+      "order": 1,
+      "title": "基盤の構成要素"
+    },
+    {
+      "id": "domain1-2",
+      "domain": "domain1",
+      "order": 2,
+      "title": "コンピュートの種類と選び方"
+    },
+    {
+      "id": "domain2-1",
+      "domain": "domain2",
+      "order": 1,
+      "title": "ロードの方式(バッチ・ストリーミング・増分)"
+    },
+    {
+      "id": "domain2-2",
+      "domain": "domain2",
+      "order": 2,
+      "title": "COPY INTO"
+    },
+    {
+      "id": "domain2-3",
+      "domain": "domain2",
+      "order": 3,
+      "title": "Auto Loader"
+    },
+    {
+      "id": "domain2-4",
+      "domain": "domain2",
+      "order": 4,
+      "title": "Lakeflow Connect"
+    },
+    {
+      "id": "domain2-5",
+      "domain": "domain2",
+      "order": 5,
+      "title": "JDBC/ODBC・REST からの取り込み"
+    },
+    {
+      "id": "domain2-6",
+      "domain": "domain2",
+      "order": 6,
+      "title": "取り込み方法の選び方"
+    },
+    {
+      "id": "domain2-7",
+      "domain": "domain2",
+      "order": 7,
+      "title": "半構造化データの取り込み"
+    },
+    {
+      "id": "domain3-1",
+      "domain": "domain3",
+      "order": 1,
+      "title": "ブロンズからシルバーへ"
+    },
+    {
+      "id": "domain3-2",
+      "domain": "domain3",
+      "order": 2,
+      "title": "結合"
+    },
+    {
+      "id": "domain3-3",
+      "domain": "domain3",
+      "order": 3,
+      "title": "列・行・表の操作"
+    },
+    {
+      "id": "domain3-4",
+      "domain": "domain3",
+      "order": 4,
+      "title": "重複の除去と集計"
+    },
+    {
+      "id": "domain3-5",
+      "domain": "domain3",
+      "order": 5,
+      "title": "チューニングの基本"
+    },
+    {
+      "id": "domain3-6",
+      "domain": "domain3",
+      "order": 6,
+      "title": "ゴールド層のオブジェクト"
+    },
+    {
+      "id": "domain3-7",
+      "domain": "domain3",
+      "order": 7,
+      "title": "データ品質の検査"
+    },
+    {
+      "id": "domain4-1",
+      "domain": "domain4",
+      "order": 1,
+      "title": "制御フロー(再試行・分岐・繰り返し)"
+    },
+    {
+      "id": "domain4-2",
+      "domain": "domain4",
+      "order": 2,
+      "title": "タスクと DAG"
+    },
+    {
+      "id": "domain4-3",
+      "domain": "domain4",
+      "order": 3,
+      "title": "トリガーの種類"
+    },
+    {
+      "id": "domain4-4",
+      "domain": "domain4",
+      "order": 4,
+      "title": "トリガーの選び方"
+    },
+    {
+      "id": "domain5-1",
+      "domain": "domain5",
+      "order": 1,
+      "title": "Git フォルダー"
+    },
+    {
+      "id": "domain5-2",
+      "domain": "domain5",
+      "order": 2,
+      "title": "バンドルの変数と上書き"
+    },
+    {
+      "id": "domain5-3",
+      "domain": "domain5",
+      "order": 3,
+      "title": "バンドルでの配布と昇格"
+    },
+    {
+      "id": "domain5-4",
+      "domain": "domain5",
+      "order": 4,
+      "title": "Databricks CLI"
+    },
+    {
+      "id": "domain6-1",
+      "domain": "domain6",
+      "order": 1,
+      "title": "実行時間の傾向"
+    },
+    {
+      "id": "domain6-2",
+      "domain": "domain6",
+      "order": 2,
+      "title": "ジョブの監視"
+    },
+    {
+      "id": "domain6-3",
+      "domain": "domain6",
+      "order": 3,
+      "title": "Spark UI で見る性能の阻害要因"
+    },
+    {
+      "id": "domain6-4",
+      "domain": "domain6",
+      "order": 4,
+      "title": "Liquid Clustering と予測的最適化"
+    },
+    {
+      "id": "domain6-5",
+      "domain": "domain6",
+      "order": 5,
+      "title": "障害の切り分け"
+    },
+    {
+      "id": "domain7-1",
+      "domain": "domain7",
+      "order": 1,
+      "title": "マネージドテーブルと外部テーブル",
+      "intro": "Unity Catalog のテーブルには、データファイルの置き場所と管理を Unity Catalog に任せるマネージドテーブルと、利用者が指定した場所のファイルを登録する外部テーブルがあります。この中分類では、2 つの違いと、作成、削除、復元、変換の操作を扱います。",
+      "diagram": {
+        "type": "compare",
+        "title": "DROP TABLE のあとに残るもの",
+        "left": {
+          "heading": "マネージドテーブル",
+          "items": [
+            {
+              "label": "メタデータ",
+              "note": "Unity Catalog から消える",
+              "state": "removed"
+            },
+            {
+              "label": "データファイル",
+              "note": "復元の期間(既定で 7 日)のあとに消える",
+              "state": "removed"
+            }
+          ]
+        },
+        "right": {
+          "heading": "外部テーブル",
+          "items": [
+            {
+              "label": "メタデータ",
+              "note": "Unity Catalog から消える",
+              "state": "removed"
+            },
+            {
+              "label": "データファイル",
+              "note": "クラウドストレージに残る",
+              "state": "kept"
+            }
+          ]
+        }
+      },
+      "comparison": {
+        "columns": ["マネージドテーブル", "外部テーブル"],
+        "rows": [
+          {
+            "aspect": "作り方",
+            "cells": ["LOCATION を書かずに CREATE TABLE で作る", "LOCATION で、外部ロケーションの下のパスを指定する"]
+          },
+          {
+            "aspect": "データファイルの置き場所",
+            "cells": [
+              "管理ストレージの場所(スキーマ、カタログ、メタストアの順に、設定のあるもの)",
+              "指定したパス(利用者のクラウドストレージ)"
+            ]
+          },
+          {
+            "aspect": "ファイルの管理と最適化",
+            "cells": ["Unity Catalog が受け持つ", "利用者が受け持つ(Unity Catalog はメタデータと権限を管理する)"]
+          },
+          {
+            "aspect": "形式",
+            "cells": ["Delta Lake(既定)と Apache Iceberg", "Delta、CSV、JSON、Avro、Parquet、ORC、テキスト"]
+          },
+          {
+            "aspect": "作るのに要る権限",
+            "cells": ["USE CATALOG、USE SCHEMA、CREATE TABLE", "左の 3 つと、外部ロケーションの CREATE EXTERNAL TABLE"]
+          },
+          {
+            "aspect": "DROP TABLE",
+            "cells": [
+              "メタデータが消え、復元の期間のあとにデータファイルも消える",
+              "メタデータだけが消え、データファイルは残る"
+            ],
+            "highlight": true
+          },
+          {
+            "aspect": "UNDROP TABLE",
+            "cells": [
+              "復元の期間(既定で 7 日)のうちは戻せる",
+              "復元の期間のうちは戻せる。外部ロケーションの CREATE EXTERNAL TABLE の権限が要る"
+            ]
+          },
+          {
+            "aspect": "相手の種類への変換",
+            "cells": [
+              "SET MANAGED で変えたものに限り、14 日のうちなら UNSET MANAGED で外部テーブルに戻せる",
+              "ALTER TABLE … SET MANAGED でマネージドテーブルに変える(Delta Lake だけ)"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "domain7-2",
+      "domain": "domain7",
+      "order": 2,
+      "title": "権限(GRANT・REVOKE・DENY)"
+    },
+    {
+      "id": "domain7-3",
+      "domain": "domain7",
+      "order": 3,
+      "title": "列マスキングと行セキュリティ"
+    },
+    {
+      "id": "domain7-4",
+      "domain": "domain7",
+      "order": 4,
+      "title": "ABAC ポリシー"
+    }
+  ],
+  "entries": [
+    {
+      "id": "managed-table",
+      "unit": "domain7-1",
+      "order": 1,
+      "term": "マネージドテーブル",
+      "oneLine": "マネージドテーブルは、データファイルの置き場所と管理を Unity Catalog に任せるテーブルで、Databricks で既定の種類です。",
+      "keyPhrase": "データファイルの置き場所と管理を Unity Catalog に任せる",
+      "body": "`CREATE TABLE` で `LOCATION` を書かずに作ると、マネージドテーブルになります。\n\n```sql\nCREATE TABLE main.sales.orders (id BIGINT, amount DECIMAL(10, 2));\n```\n\nデータファイルは、Unity Catalog の管理ストレージの場所に置かれます。どの場所を使うかは、最も細かい設定で決まります。スキーマに設定があればスキーマの場所、なければカタログの場所、どちらにもなければメタストアの場所です。\n\n形式は、既定で Delta Lake です。`USING iceberg` を付けると、Apache Iceberg のテーブルになります。読み書き、置き場所、最適化(予測的最適化など)は Unity Catalog が受け持ちます。Databricks は、外部テーブルを使う理由がなければ、マネージドテーブルを使うよう勧めています。\n\n`DROP TABLE` を実行すると、メタデータはすぐに消えます。データファイルは、復元の期間(既定で 7 日)が過ぎてからクラウドストレージから消されます。期間のうちは `UNDROP TABLE` で戻せます。",
+      "examAngle": "「テーブルを DROP したあと、基になるデータファイルはどうなるか」という問いで、テーブルの種類による違いを確かめる形で出ます。",
+      "checks": [
+        {
+          "question": "`LOCATION` を指定せずに `CREATE TABLE` で作ったテーブルを、`DROP TABLE` で削除しました。復元の期間は既定のままです。8 日後に `UNDROP TABLE` で戻せますか。",
+          "answer": "戻せません。",
+          "reason": "`LOCATION` を書かずに作ったテーブルは、マネージドテーブルです。既定の復元の期間は 7 日で、それを過ぎるとデータファイルは削除の対象になり、`UNDROP TABLE` で戻せなくなります。"
+        }
+      ],
+      "related": ["external-table", "undrop-table"],
+      "references": [
+        {
+          "title": "Unity Catalog managed tables for Delta Lake and Apache Iceberg | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/tables/managed"
+        },
+        {
+          "title": "Specify a managed storage location in Unity Catalog | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/connect/unity-catalog/cloud-storage/managed-storage"
+        },
+        {
+          "title": "DROP TABLE | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-syntax-ddl-drop-table"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "external-table",
+      "unit": "domain7-1",
+      "order": 2,
+      "term": "外部テーブル",
+      "oneLine": "外部テーブルは、データファイルを利用者のクラウドストレージに置き、Unity Catalog にはメタデータと権限の管理だけを任せるテーブルです。",
+      "keyPhrase": "メタデータと権限の管理だけを任せる",
+      "body": "外部テーブルを作るときは、`LOCATION` でパスを指定します。パスは、Unity Catalog に登録した外部ロケーションの下でなければなりません。作る人には、親のカタログとスキーマの権限(`USE CATALOG`、`USE SCHEMA`、`CREATE TABLE`)に加えて、その外部ロケーションの `CREATE EXTERNAL TABLE` の権限が要ります。\n\n```sql\nCREATE TABLE main.sales.raw_events (id BIGINT, payload STRING)\nLOCATION 's3://example-bucket/raw_events';\n```\n\n形式は、Delta のほかに CSV、JSON、Avro、Parquet、ORC、テキストを使えます。データファイルの最適化と、いつ消すかは、利用者が決めます。\n\n`DROP TABLE` で消えるのは、Unity Catalog のメタデータだけです。データファイルはクラウドストレージに残ります。要らなければ、利用者がストレージから直接消します。\n\n外部テーブルを選ぶのは、マネージドテーブルで扱えない形式の既存のデータを登録するときと、Databricks 以外のツールがファイルを直接読み書きするときです。ファイルを直接読み書きする経路には、Unity Catalog の権限がかかりません。",
+      "examAngle": "「テーブルを削除してもデータファイルを残したい」「既存の JSON ファイルをそのままテーブルとして使いたい」といった要件から、テーブルの種類を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "外部テーブルを `DROP TABLE` で削除しました。クラウドストレージにあるデータファイルはどうなりますか。",
+          "answer": "残ります。",
+          "reason": "外部テーブルの削除で消えるのは、Unity Catalog のメタデータだけです。ファイルを消すには、利用者がストレージから直接消します。"
+        },
+        {
+          "question": "JSON ファイルのまま置かれている既存のデータを、Unity Catalog のテーブルとして登録したいとき、どちらの種類のテーブルを使いますか。",
+          "answer": "外部テーブルです。",
+          "reason": "マネージドテーブルの形式は Delta Lake と Apache Iceberg です。JSON のままのデータは、外部テーブルとして登録します。"
+        }
+      ],
+      "related": ["managed-table", "set-managed"],
+      "references": [
+        {
+          "title": "Work with external tables | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/tables/external"
+        },
+        {
+          "title": "DROP TABLE | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-syntax-ddl-drop-table"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "undrop-table",
+      "unit": "domain7-1",
+      "order": 3,
+      "term": "UNDROP TABLE",
+      "oneLine": "UNDROP TABLE は、削除したテーブルを、復元の期間(既定で 7 日)のうちに戻すコマンドです。",
+      "keyPhrase": "復元の期間(既定で 7 日)のうちに戻す",
+      "body": "`UNDROP TABLE` は、Unity Catalog のマネージドテーブルにも外部テーブルにも使えます。外部テーブルを戻すときは、外部ロケーションが残っていて、実行する人がその `CREATE EXTERNAL TABLE` の権限を持っている必要があります。一時テーブルは戻せません。\n\n復元の期間は、カタログ(`ALTER CATALOG`)かスキーマ(`ALTER SCHEMA`)の単位で変えられます。両方に設定があると、スキーマの設定が使われます。設定できるのは、0 時間(戻せない)か、7〜30 日です。変えた設定は、そのあとに削除したテーブルにだけ効きます。\n\n名前だけを指定すると、その名前で最後に削除した、自分が所有するテーブルが戻ります。同じ名前のテーブルを何度か削除したときは、`SHOW TABLES DROPPED` で ID を調べ、`WITH ID` で指定します。\n\n```sql\nSHOW TABLES DROPPED IN main.sales;\nUNDROP TABLE WITH ID '<テーブルの ID>';\n```\n\n戻したテーブルには、権限や列の定義などのメタデータも戻ります。主キーと外部キーの制約は戻らないので、`ALTER TABLE ADD CONSTRAINT` で付け直します。同じ名前のテーブルがすでにあるときは、先にそちらの名前を変えてから戻します。",
+      "examAngle": "誤って削除したテーブルを戻す方法と、戻せる期間を問う形で出ます。",
+      "checks": [
+        {
+          "question": "誤って `DROP TABLE` で削除したマネージドテーブルを、3 日後に戻したいとします。復元の期間は既定のままです。何を実行しますか。",
+          "answer": "`UNDROP TABLE <テーブル名>` を実行します。",
+          "reason": "既定の復元の期間は 7 日です。3 日後なら期間のうちなので、`UNDROP TABLE` で戻せます。"
+        }
+      ],
+      "related": ["managed-table", "external-table"],
+      "references": [
+        {
+          "title": "UNDROP | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-syntax-ddl-undrop-table"
+        },
+        {
+          "title": "SHOW TABLES DROPPED | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-syntax-aux-show-tables-dropped"
+        },
+        {
+          "title": "Unity Catalog managed tables for Delta Lake and Apache Iceberg | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/tables/managed"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "set-managed",
+      "unit": "domain7-1",
+      "order": 4,
+      "term": "ALTER TABLE SET MANAGED",
+      "oneLine": "ALTER TABLE SET MANAGED は、外部テーブルを、名前と権限を保ったままマネージドテーブルに変える文です。",
+      "keyPhrase": "名前と権限を保ったまま",
+      "body": "`ALTER TABLE … SET MANAGED` を実行すると、外部ロケーションにあるデータファイルと Delta のトランザクションログが、管理ストレージの場所へコピーされます。テーブルの名前、設定、権限、ビュー、履歴は引き継がれます。\n\n```sql\nALTER TABLE main.sales.raw_events SET MANAGED;\n```\n\n変えられるのは、Delta Lake のテーブルだけです。外部テーブルを変えるには、Databricks Runtime 17.3 LTS 以上かサーバーレスのコンピュートと、テーブルの所有者であることが要ります。コピーの間もテーブルは使えます。最後の切り替えの間だけ、外部ロケーションへの書き込みが短く止まります。変えたあとは、動いていたストリーミングのジョブを再起動します。\n\n`CREATE TABLE … AS SELECT` や `DEEP CLONE` で作り直す方法より、Databricks は `SET MANAGED` を勧めています。設定や権限、履歴を引き継げて、止まる時間も短いためです。\n\n変えてから 14 日のうちは、`ALTER TABLE … UNSET MANAGED` で、元の外部ロケーションを指す形に戻せます。元のデータファイルは、その 14 日のあいだ残ります。そのあと、予測的最適化が有効なら自動で消え、有効でなければ利用者が `VACUUM` で消します。",
+      "examAngle": "外部テーブルを、権限や履歴を保ったままマネージドテーブルに移す方法を問う形で出ます。",
+      "checks": [
+        {
+          "question": "Delta Lake の外部テーブルを、テーブル名と権限を変えずにマネージドテーブルにしたいとき、どの文を使いますか。",
+          "answer": "`ALTER TABLE <テーブル名> SET MANAGED` を使います。",
+          "reason": "`SET MANAGED` は、データを管理ストレージの場所へコピーし、名前、設定、権限、ビュー、履歴を引き継ぎます。"
+        }
+      ],
+      "related": ["external-table", "managed-table"],
+      "references": [
+        {
+          "title": "Convert external or foreign Delta Lake tables to Unity Catalog managed tables | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/tables/convert-to-managed"
+        }
+      ],
+      "status": "verified"
+    }
+  ]
+}
