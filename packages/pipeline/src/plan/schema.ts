@@ -7,7 +7,7 @@ import { writeFileAtomic } from "../shared/fs.ts";
 
 /**
  * 出題計画(ADR 0007)。分野の配点から目標の問題数を出し、既存の問題との差分(足りない分)を、
- * 分野・難易度・種別ごとに持つ。作業用の置き場に書き、コミットしない。
+ * 分野・難易度・種別ごとに持つ。論点の枠(設定の focus)があれば、枠ごとの項目も持つ。作業用の置き場に書き、コミットしない。
  */
 
 export const DIFFICULTIES = ["easy", "medium", "hard"] as const;
@@ -21,13 +21,24 @@ const DOMAIN_CODE = z.string().regex(/^domain[1-9][0-9]?$/);
 const COUNT = z.number().int().min(0).max(100000);
 
 export const PlanItemSchema = z.strictObject({
-  /** 分野・難易度・種別から決まる。同じ計画なら同じ ID */
+  /** 分野・難易度・種別から決まる(論点の枠の項目は、枠の名前から決まる)。同じ計画なら同じ ID */
   id: z.string().regex(/^p-[0-9a-f]{12}$/),
   domain: DOMAIN_CODE,
   difficulty: z.enum(DIFFICULTIES),
   kind: z.enum(KINDS),
   /** 足りない問題の数 */
   count: z.number().int().min(1).max(100000),
+  /**
+   * 論点の枠(設定 plan.overrides の focus)から作った項目だけが持つ。分野の不足の数には数えない。
+   * 依頼に載せる事実カードを出典の URL の接頭辞で絞り、問いの形の一言を依頼に添える
+   */
+  focus: z
+    .strictObject({
+      id: z.string().min(1).max(40),
+      sourcePrefixes: z.array(z.string().min(1).max(2000)).min(1).max(10),
+      instruction: z.string().min(1).max(300),
+    })
+    .optional(),
 });
 
 export const PlanFileSchema = z
@@ -68,7 +79,9 @@ export const PlanFileSchema = z
           message: "不足の数が目標と既存の差ではありません",
         });
       }
-      const total = plan.items.filter((item) => item.domain === d.domain).reduce((a, item) => a + item.count, 0);
+      const total = plan.items
+        .filter((item) => item.domain === d.domain && item.focus === undefined)
+        .reduce((a, item) => a + item.count, 0);
       if (total !== d.missing) {
         ctx.addIssue({ code: "custom", path: ["items"], message: "項目の数の合計が不足の数と一致しません" });
       }

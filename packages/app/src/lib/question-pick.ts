@@ -9,7 +9,7 @@ type Difficulty = NonNullable<Question["difficulty"]>;
 /** 出題の対象。復習プールとブックマークは、アカウントに保存したもの。 */
 export type Target = "all" | "review" | "bookmarks";
 
-/** 選ぶと、出題の設定が出るモード */
+/** 選ぶと、そのモードの設定(問題数など)が出るモード */
 export type SettingsMode = "normal" | "review" | "free-text";
 
 export type PickItem = {

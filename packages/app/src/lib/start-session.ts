@@ -16,13 +16,13 @@ type Item = { questionId: string; choiceKeys: readonly string[] };
 
 /**
  * 端末の設定(選択肢のシャッフルと解答の表示のしかた)で出題を組み立てて保存し、出題の画面の場所を返す。
- * セクションや段階の出題は、その印(`section`・`stage`)を付ける。保存できなければ null。
+ * セクションや段階の出題、セクションの解き直しは、その印(`section`・`stage`・`retryOf`)を付ける。保存できなければ null。
  */
 export function startSession(
   store: KeyValueStore,
   examCode: string,
   items: readonly Item[],
-  marks: Pick<Session, "section" | "stage"> = {},
+  marks: Pick<Session, "section" | "stage" | "retryOf"> = {},
   random: () => number = Math.random,
   now: Date = new Date(),
 ): string | null {

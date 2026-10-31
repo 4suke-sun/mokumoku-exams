@@ -27,6 +27,13 @@ export const DraftRequestSchema = z.strictObject({
         claim: z.string().min(1),
         confidence: z.enum(["high", "medium", "low"]),
         scope: z.strictObject({ edition: z.string().optional(), region: z.string().optional() }),
+        /**
+         * 論点の枠の依頼だけが持つ。カードの先頭の出典のページと節(URL、人が読む節の名前、見出し)。
+         * 主張が「この段階」のようにページの主題を名前で書いていないとき、どのページの話かを作問役が読めるようにする
+         */
+        source: z
+          .strictObject({ url: z.string().min(1), section: z.string().min(1), heading: z.string().min(1) })
+          .optional(),
       }),
     )
     .min(1),
@@ -44,6 +51,10 @@ export const DraftRequestSchema = z.strictObject({
     .min(1)
     .optional(),
   styleRules: z.array(z.strictObject({ name: z.string(), severity: z.enum(["block", "warn"]), summary: z.string() })),
+  /**
+   * 論点の枠(計画の項目の focus)の依頼だけが持つ。問いの形の一言。facts は枠の出典の範囲のカードだけになる
+   */
+  focus: z.strictObject({ instruction: z.string().min(1).max(300) }).optional(),
   /** 結果を書く場所。リポジトリ直下からの相対パス */
   outputPath: z.string().min(1),
   /** 依頼を出した時点の、エージェントの定義(役・モデルの ID・定義のハッシュ) */
@@ -122,7 +133,7 @@ export function styleRuleSummaries(kind: DraftRequest["kind"]): DraftRequest["st
 
 /**
  * 依頼の鍵。入力(計画の項目、書かせる数、出し直しの回数、事実カードの ID と主張、規則と依頼の版、エージェントの定義のハッシュ、
- * 人が却下した下書きの数)から決まる。同じ入力では同じ鍵になり、取り込み済みの鍵は、再び依頼しない。
+ * 人が却下した下書きの数、論点の枠の依頼では問いの形の一言)から決まる。同じ入力では同じ鍵になり、取り込み済みの鍵は、再び依頼しない。
  * 人が却下した数は、1 件以上のときだけ鍵に入れる(却下のない項目の鍵は、これを足す前と変わらない)。
  * 却下が増えると鍵が変わるので、却下で足りなくなった分の依頼が、取り込み済みの依頼と同じ鍵で飛ばされない。
  * 直しの依頼は、直す下書きの ID を鍵に入れる(補充の依頼と同じ鍵にならない)。書き直しの依頼は、問題の ID と現行の本文のハッシュと、その問題の書き直しの下書きを人が却下した数を鍵に入れる。
@@ -141,6 +152,8 @@ export function requestKey(input: {
   reviseOf?: string;
   /** 書き直しの依頼のとき、書き直す問題の ID と、その問題の書き直しの下書きを人が却下した数(数が増えると鍵が変わる) */
   rewriteOf?: { questionId: string; contentHash: string; round: number };
+  /** 論点の枠の依頼のとき、問いの形の一言(変えると鍵が変わる) */
+  focusInstruction?: string;
 }): string {
   const canonical = JSON.stringify({
     examCode: input.examCode,
@@ -154,6 +167,7 @@ export function requestKey(input: {
     ...(input.humanRejected ? { humanRejected: input.humanRejected } : {}),
     ...(input.reviseOf !== undefined ? { reviseOf: input.reviseOf } : {}),
     ...(input.rewriteOf !== undefined ? { rewriteOf: input.rewriteOf } : {}),
+    ...(input.focusInstruction !== undefined ? { focus: sha256(Buffer.from(input.focusInstruction)) } : {}),
   });
   return sha256(Buffer.from(canonical)).slice(0, 16);
 }

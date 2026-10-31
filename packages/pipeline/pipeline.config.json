@@ -76,7 +76,23 @@
     "difficultyMix": { "easy": 0.3, "medium": 0.5, "hard": 0.2 },
     "typeMix": { "single": 0.75, "multiple": 0.2, "free-text": 0.05 },
     "overrides": {
-      "AWS-AIB-C01": { "targetTotal": 340, "typeMix": { "single": 1, "multiple": 0, "free-text": 0 } },
+      "AWS-AIB-C01": {
+        "targetTotal": 340,
+        "typeMix": { "single": 1, "multiple": 0, "free-text": 0 },
+        "focus": [
+          {
+            "id": "maturity-level-by-state",
+            "domain": "domain4",
+            "difficulty": "medium",
+            "kind": "single",
+            "count": 8,
+            "sourcePrefixes": [
+              "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html"
+            ],
+            "instruction": "状況の文に企業の生成 AI の取り組みの事実(予算や正式なプロジェクトの有無、PoC の状況、本番のアプリの数、体制、全社への広がり)だけを書き、成熟度モデルのどのレベルかを選ばせる。レベル名やその説明をなぞる語は書かない。選択肢は「構想(Envision)」「実験(Experiment)」「起動(Launch)」「拡張(Scale)」の 4 語をこの順に置く。各レベルの意味は解説で説明する。"
+          }
+        ]
+      },
       "AWS-CLF-C02": { "targetTotal": 200 },
       "AWS-DVA-C02": {
         "targetTotal": 457,

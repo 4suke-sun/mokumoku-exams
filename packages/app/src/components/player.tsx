@@ -18,6 +18,7 @@ import { type AnswerTimer, createTimer, elapsedTimes, setVisible, showQuestion }
 import { recordSessionChecks, resultOf, saveFinishedResult } from "@/lib/finish-session.ts";
 import { postServerResult, putSectionProgress } from "@/lib/history/client.ts";
 import { type QuizKeyAction, type QuizKeyPhase, quizKeyAction } from "@/lib/keyboard.ts";
+import { showFromTop } from "@/lib/page-top.ts";
 import {
   answerFor,
   displayLabels,
@@ -156,8 +157,8 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
   useEffect(() => {
     if (currentIndex === null) return;
     timer.current = showQuestion(timer.current, currentIndex, isVisible(), clock().getTime());
-    // 最初の表示では動かさず、問題が切り替わったときだけ、設問へフォーカスを移す(キーボードや読み上げで追えるように)
-    if (shownIndex.current !== null && shownIndex.current !== currentIndex) questionRef.current?.focus();
+    // 最初の表示では動かさず、問題が切り替わったときだけ、ページの先頭へ戻して設問へフォーカスを移す(キーボードや読み上げで追えるように)
+    if (shownIndex.current !== null && shownIndex.current !== currentIndex) showFromTop(questionRef.current);
     shownIndex.current = currentIndex;
   }, [currentIndex, clock]);
 

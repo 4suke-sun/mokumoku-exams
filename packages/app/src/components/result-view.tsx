@@ -47,6 +47,7 @@ import {
   loadStageProgress,
   type Result,
   type SectionProgress,
+  type SectionRecord,
   type StageCheck,
 } from "@/lib/storage.ts";
 import { STAGE_PASS_PERCENT } from "@/lib/study-stages.ts";
@@ -98,6 +99,11 @@ function RecentOutcomeMarks({ outcomes }: { outcomes: readonly boolean[] }) {
   );
 }
 
+/** セクションの合否の文字の色。解き直しは、すべて正解したときだけ正解の色 */
+function sectionTone(section: SectionRecord): string {
+  if (section.retry) return section.correct >= section.total ? "text-correct" : "text-warn";
+  return sectionStatus(section) === "failed" ? "text-warn" : "text-correct";
+}
 export function ResultView({ exam, outline }: Props) {
   const router = useRouter();
   const [state, setState] = useState<State>({ status: "loading" });
@@ -238,13 +244,16 @@ export function ResultView({ exam, outline }: Props) {
   // 解き直しの対象: 間違えた問題と、自信なしの印を付けた問題(出題した順)
   const retryRows = allRows.filter((row) => !row.correct || row.unsure);
 
-  /** 間違えた問題(と自信なし)だけで、新しい出題を始める。結果は、通常の結果として保存される */
+  /**
+   * 間違えた問題(と自信なし)だけで、新しい出題を始める。結果は、通常の結果として保存される。
+   * セクション(とその解き直し)の結果からのときは、そのセクションの解き直しの印を付ける(すべて正解すると、未達のセクションが合格になる)
+   */
   function retry() {
     const items = retryRows.map(({ question }) => ({
       questionId: question.questionId,
       choiceKeys: question.questionType === "free-text" ? [] : question.choices.map((c) => c.key),
     }));
-    const href = startSession(browserStore(), exam.examCode, items);
+    const href = startSession(browserStore(), exam.examCode, items, section ? { retryOf: section.section } : {});
     if (!href) {
       setRetryError(SESSION_SAVE_FAILED);
       return;
@@ -342,12 +351,16 @@ export function ResultView({ exam, outline }: Props) {
       ) : null}
       {section ? (
         <div role="status" className="card space-y-3 p-4">
-          <p className={`font-bold ${sectionStatus(section) === "failed" ? "text-warn" : "text-correct"}`}>
-            {sectionStatus(section) === "perfect"
-              ? `セクション ${section.section + 1} を満点で合格しました(${section.correct} / ${section.total} 問)。`
-              : sectionStatus(section) === "passed"
-                ? `セクション ${section.section + 1} に合格しました(${section.correct} / ${section.total} 問)。`
-                : `セクション ${section.section + 1} は、${sectionPassLine(section.total)} 問以上の正解で合格です(今回は ${section.correct} / ${section.total} 問)。`}
+          <p className={`font-bold ${sectionTone(section)}`}>
+            {section.retry
+              ? section.correct >= section.total
+                ? `解き直しの ${section.total} 問をすべて正解しました。セクション ${section.section + 1} は合格です(満点は、セクションを通して全問正解したときに付きます)。`
+                : `解き直しは ${section.correct} / ${section.total} 問の正解でした。間違えた問題をすべて正解すると、未達のセクションは合格になります。`
+              : sectionStatus(section) === "perfect"
+                ? `セクション ${section.section + 1} を満点で合格しました(${section.correct} / ${section.total} 問)。`
+                : sectionStatus(section) === "passed"
+                  ? `セクション ${section.section + 1} に合格しました(${section.correct} / ${section.total} 問)。`
+                  : `セクション ${section.section + 1} は、${sectionPassLine(section.total)} 問以上の正解で合格です(今回は ${section.correct} / ${section.total} 問)。`}
           </p>
           <div className="flex flex-wrap gap-3">
             {nextSection !== null ? (
