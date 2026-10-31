@@ -29,6 +29,73 @@
       ]
     },
     {
+      "draftId": "d-013d55722080",
+      "questionId": "AIB-0253",
+      "factIds": [
+        "f-f1e5f7891440"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-019cd2ccb4c9",
+      "factIds": [
+        "f-1402e20e2dcb",
+        "f-3a764b995da3"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-052fc4a6c8c4",
+      "questionId": "AIB-0305",
+      "factIds": [
+        "f-24df81e9fb43",
+        "f-3dc486669085"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/dev-architecting.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "9ee5bb91b8086f618994b6731741817b82e65c404566afe65d7617d5b29a71f4"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-value.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "92ce359e12e5c690169d682ebf6f9301ee91325b3fb75647872237744a546967"
+        }
+      ]
+    },
+    {
+      "draftId": "d-056bac07f11f",
+      "questionId": "AIB-0254",
+      "factIds": [
+        "f-1640403a3745"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        }
+      ]
+    },
+    {
       "draftId": "d-087ce791c4d2",
       "questionId": "AIB-0202",
       "factIds": [
@@ -50,6 +117,34 @@
       ]
     },
     {
+      "draftId": "d-091f39e549c8",
+      "questionId": "AIB-0257",
+      "factIds": [
+        "f-f1e5f7891440"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-097ecf1a74b7",
+      "questionId": "AIB-0306",
+      "factIds": [
+        "f-2803a5205054"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/dev-advancing.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "fea7cbc05cccd100a798d04236b7dda0c56bb36ec74e59c6f8c1006ad849c018"
+        }
+      ]
+    },
+    {
       "draftId": "d-0b5769b35199",
       "questionId": "AIB-0203",
       "factIds": [
@@ -60,6 +155,33 @@
           "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
           "fetchedAt": "2026-10-29",
           "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0b6c818bae74",
+      "questionId": "AIB-0258",
+      "factIds": [
+        "f-44ccd30ad75d",
+        "f-6fe10b00ff34",
+        "f-9acdaf90b71e",
+        "f-d08e1173f919"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
         }
       ]
     },
@@ -78,6 +200,80 @@
       ]
     },
     {
+      "draftId": "d-0b998e6800c0",
+      "questionId": "AIB-0307",
+      "factIds": [
+        "f-08aae1c7bb65",
+        "f-1bb7e1296b65"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/best-practices.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "755d42f403e3b9d4f62e1d76139a645cf040ec1485ff412fa9a4ff9dac6ef4a5"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/business-perspective-the-ai-strategy-in-the-age-of-aiml.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "8bebd99fddd4b1dc014d5c3d50dbe74bd1f46845c85ac9f3264013d2430e7e8f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0bc46e163efb",
+      "factIds": [
+        "f-3f33c56b531c",
+        "f-7a5d480275ef",
+        "f-7c6f58ba08b7",
+        "f-9d0d3e2dbfdf",
+        "f-b5cd1d36d610",
+        "f-d7263d268510"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "027921be56132a90e7840f92ec096fd1fe8566eba0963f4c5bdb7d29daa480bc"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0c27bced32ef",
+      "questionId": "AIB-0259",
+      "factIds": [
+        "f-36669add7c2e",
+        "f-3847a10bf7fb"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0c53331bd49e",
+      "factIds": [
+        "f-24e9e2827b7b",
+        "f-45727c856c48",
+        "f-9f4f45aca842",
+        "f-aab602ac1a43"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
       "draftId": "d-0d12ed3da7b1",
       "factIds": [
         "f-179342ec64c0"
@@ -87,6 +283,47 @@
           "url": "https://aws.amazon.com/what-is/machine-learning/",
           "fetchedAt": "2026-10-15",
           "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0da829ce527a",
+      "questionId": "AIB-0260",
+      "factIds": [
+        "f-24ef6227ff90",
+        "f-2daa3ad1af2b",
+        "f-6fe10b00ff34",
+        "f-d08e1173f919"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0f91b4509b75",
+      "questionId": "AIB-0261",
+      "factIds": [
+        "f-24882aff8762"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44"
         }
       ]
     },
@@ -142,6 +379,68 @@
       ]
     },
     {
+      "draftId": "d-14c4bcc0ef09",
+      "factIds": [
+        "f-055357330df4",
+        "f-153fbcb35a40",
+        "f-23cfc2b82ec5",
+        "f-28267f68e1c0",
+        "f-2b51c4267282",
+        "f-340e5b749563",
+        "f-5126900a4405",
+        "f-68e21c53de8d",
+        "f-8b661567b467",
+        "f-a51a69d49a6b"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/level-1.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "54f4aa51ffc010d64bd31bd8429cb21f648d89cf71f8813c2ad28aa273de5fff"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/level-2.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "7aac0daee3b18e0362cb7d4a3e7e1496b90d654dd406f26531d17804776c22f6"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/level-3.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "ba59f8275f9bba65f79e761b06ec73feb6697359e9953297402735b368312d36"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/level-4.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "bc5144bdb60ca985fba1239426504d153f5d52519ac351ce31784d644d51edc9"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "027921be56132a90e7840f92ec096fd1fe8566eba0963f4c5bdb7d29daa480bc"
+        }
+      ]
+    },
+    {
+      "draftId": "d-165596949604",
+      "questionId": "AIB-0308",
+      "factIds": [
+        "f-8d02c116f3bd",
+        "f-cebd9131f9d6"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raibr04-bp01.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4a2abb77da5a3be14c1a39d714baffe5f08c6da3f6ada95801ec039b5b0a1c55"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/people-perspective-culture-and-change-towards-aiml-first.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "ad8cfd3183c3eb98f7bed83c2fdd5140d006b4a2ba23be3db0e24d5879e64d11"
+        }
+      ]
+    },
+    {
       "draftId": "d-1659e386d446",
       "questionId": "AIB-0206",
       "factIds": [
@@ -163,6 +462,94 @@
       ]
     },
     {
+      "draftId": "d-169f38a0b229",
+      "questionId": "AIB-0309",
+      "factIds": [
+        "f-0544f5dc1c06"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-maintenance.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "b94e3a591559b58041f584aeccd7cb87627c68653df6679bd6f0bafed37f98d0"
+        }
+      ]
+    },
+    {
+      "draftId": "d-171ff7b325af",
+      "questionId": "AIB-0262",
+      "factIds": [
+        "f-44ccd30ad75d",
+        "f-9acdaf90b71e",
+        "f-a0a924806eca",
+        "f-a404b4b420f2"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-18e48fb665ce",
+      "questionId": "AIB-0286",
+      "factIds": [
+        "f-0cc55de7e1a9",
+        "f-24ef6227ff90",
+        "f-6fe10b00ff34",
+        "f-9acdaf90b71e"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-19fb405c96e1",
+      "questionId": "AIB-0310",
+      "factIds": [
+        "f-3dc486669085",
+        "f-73c380e9fa6d"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-value.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "92ce359e12e5c690169d682ebf6f9301ee91325b3fb75647872237744a546967"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-enterprise-ready-gen-ai-platform/best-practices.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "525d16953a8f5d9ec415821f53e705898b6bbc71dc01e0841271a0b18b04a2d5"
+        }
+      ]
+    },
+    {
       "draftId": "d-1a56384e023f",
       "questionId": "AIB-0207",
       "factIds": [
@@ -179,6 +566,38 @@
         {
           "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
           "fetchedAt": "2026-10-29",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-1b14e8754d2c",
+      "questionId": "AIB-0264",
+      "factIds": [
+        "f-00830094f60c",
+        "f-6fe10b00ff34",
+        "f-a0a924806eca",
+        "f-a404b4b420f2"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-31",
           "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
         }
       ]
@@ -207,6 +626,46 @@
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
           "fetchedAt": "2026-10-29",
           "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44"
+        }
+      ]
+    },
+    {
+      "draftId": "d-1c7ca1efaf10",
+      "questionId": "AIB-0263",
+      "factIds": [
+        "f-1402e20e2dcb",
+        "f-3a764b995da3"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-1dd962705292",
+      "questionId": "AIB-0311",
+      "factIds": [
+        "f-046b02a7931a",
+        "f-1060eb534d7c"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-enterprise-ready-gen-ai-platform/best-practices.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "525d16953a8f5d9ec415821f53e705898b6bbc71dc01e0841271a0b18b04a2d5"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/level-3.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "ba59f8275f9bba65f79e761b06ec73feb6697359e9953297402735b368312d36"
         }
       ]
     },
@@ -264,6 +723,129 @@
       ]
     },
     {
+      "draftId": "d-2220ef69c33d",
+      "questionId": "AIB-0266",
+      "factIds": [
+        "f-24ef6227ff90",
+        "f-6fe10b00ff34",
+        "f-a0a924806eca",
+        "f-a404b4b420f2",
+        "f-d08e1173f919"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-2294a28e5de4",
+      "questionId": "AIB-0267",
+      "factIds": [
+        "f-20c02d8a15c4",
+        "f-f1e5f7891440"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-232d6fff25a9",
+      "questionId": "AIB-0268",
+      "factIds": [
+        "f-20c02d8a15c4"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-235a7b0f4828",
+      "questionId": "AIB-0269",
+      "factIds": [
+        "f-1402e20e2dcb",
+        "f-83193c7589c6",
+        "f-f894e1339e1d"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-235afea68610",
+      "questionId": "AIB-0312",
+      "factIds": [
+        "f-3318dec47cd6",
+        "f-3f33c56b531c",
+        "f-5dd48fb20725",
+        "f-7a5d480275ef",
+        "f-7c6f58ba08b7",
+        "f-9d0d3e2dbfdf",
+        "f-b5cd1d36d610",
+        "f-d7263d268510"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "027921be56132a90e7840f92ec096fd1fe8566eba0963f4c5bdb7d29daa480bc"
+        }
+      ]
+    },
+    {
+      "draftId": "d-245cc653a41e",
+      "questionId": "AIB-0275",
+      "factIds": [
+        "f-4e3ac15d128a"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
       "draftId": "d-247520b27cf6",
       "questionId": "AIB-0211",
       "factIds": [
@@ -280,6 +862,21 @@
           "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
           "fetchedAt": "2026-10-29",
           "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-2526f2abe400",
+      "questionId": "AIB-0284",
+      "factIds": [
+        "f-3a764b995da3",
+        "f-6dabb6d2551f"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
         }
       ]
     },
@@ -301,6 +898,117 @@
           "url": "https://aws.amazon.com/what-is/machine-learning/",
           "fetchedAt": "2026-10-29",
           "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-2a08c92d55d1",
+      "factIds": [
+        "f-055357330df4",
+        "f-0eb55e001387",
+        "f-153fbcb35a40",
+        "f-23cfc2b82ec5",
+        "f-2b51c4267282",
+        "f-340e5b749563",
+        "f-5126900a4405",
+        "f-68e21c53de8d",
+        "f-8b661567b467",
+        "f-a51a69d49a6b"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/level-2.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "7aac0daee3b18e0362cb7d4a3e7e1496b90d654dd406f26531d17804776c22f6"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/level-3.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "ba59f8275f9bba65f79e761b06ec73feb6697359e9953297402735b368312d36"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/level-4.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "bc5144bdb60ca985fba1239426504d153f5d52519ac351ce31784d644d51edc9"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "027921be56132a90e7840f92ec096fd1fe8566eba0963f4c5bdb7d29daa480bc"
+        }
+      ]
+    },
+    {
+      "draftId": "d-2a18d48dc858",
+      "questionId": "AIB-0313",
+      "factIds": [
+        "f-06ddd12ebc1a",
+        "f-b6f45ff1dbc3"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/foundation-models/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "dc46715e82db7a47bf76f326c353da9a90be52e9fd9cea1637edb1c287bc2c82"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/navigating-security-landscape-genai/scoping-generative-ai-use-cases.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "48eb9f2ba117e3145520d3588d7bc6200642bb42efafaca2195faef5ba923b9e"
+        }
+      ]
+    },
+    {
+      "draftId": "d-2a1a8affb544",
+      "questionId": "AIB-0314",
+      "factIds": [
+        "f-03e9a0962d7c",
+        "f-04595189e74a"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/ai/responsible-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "76b43dd6c4880168a8bebeb0ec5274f9b0e780ba5f70664e958c1a8f8a06b85d"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-performance.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "99466c024a677fe047d77d016f9504dc71c768e8e0bcdfe2b6a994b13615d2bc"
+        }
+      ]
+    },
+    {
+      "draftId": "d-2b9c31839e2d",
+      "questionId": "AIB-0315",
+      "factIds": [
+        "f-3f1c11bcb235",
+        "f-ee99513ae656"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-feedback.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "2788e17a00a19e0381596cf52039bddf802450eda3ac40c74289049c75c29af9"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4426d4e658379b8230d901c75f39d9ed58777ea52445b9230e3cad1459410586"
+        }
+      ]
+    },
+    {
+      "draftId": "d-2bcc6ec3b479",
+      "questionId": "AIB-0316",
+      "factIds": [
+        "f-24df81e9fb43"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/dev-architecting.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "9ee5bb91b8086f618994b6731741817b82e65c404566afe65d7617d5b29a71f4"
         }
       ]
     },
@@ -357,6 +1065,26 @@
       ]
     },
     {
+      "draftId": "d-2fe9e80429e8",
+      "questionId": "AIB-0317",
+      "factIds": [
+        "f-024d902b6eb5",
+        "f-0252945b68dc"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/security-perspective-compliance-and-assurance-of-aiml-systems.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "0cb7d9612a440cb8ff4267e4446927f545fc7e675ca46f568b2900430a08fbcc"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/your-ai-transformation-journey.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "820732dcc5caad7def1ac16b11bd8603aa6b1fb3cd4165421cbd47084e5923ee"
+        }
+      ]
+    },
+    {
       "draftId": "d-331d9d07b2f6",
       "questionId": "AIB-0215",
       "factIds": [
@@ -394,6 +1122,27 @@
       ]
     },
     {
+      "draftId": "d-3808474faffb",
+      "questionId": "AIB-0291",
+      "factIds": [
+        "f-1402e20e2dcb",
+        "f-83193c7589c6",
+        "f-f894e1339e1d"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        }
+      ]
+    },
+    {
       "draftId": "d-392f512fee5f",
       "questionId": "AIB-0217",
       "factIds": [
@@ -415,6 +1164,51 @@
       ]
     },
     {
+      "draftId": "d-3bfd15ab95d3",
+      "factIds": [
+        "f-0cc55de7e1a9",
+        "f-6fe10b00ff34",
+        "f-9acdaf90b71e"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-3d6329dc7562",
+      "questionId": "AIB-0318",
+      "factIds": [
+        "f-1431f3533e2c",
+        "f-781ec2e26473"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/genops05-bp01.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "41b6d7b49c12db5deceff65c2e19648dba400a0c33623b9f6642f5da059fb638"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/governance-perspective-managing-an-aiml-driven-organization.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "247fd861d0ee62d48880b043d1be1f21b4c13e017a38b0bcbb9a9d123f5fb2c1"
+        }
+      ]
+    },
+    {
       "draftId": "d-4094a6c055f0",
       "factIds": [
         "f-0017e176b638",
@@ -425,6 +1219,99 @@
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/",
           "fetchedAt": "2026-10-15",
           "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2"
+        }
+      ]
+    },
+    {
+      "draftId": "d-40a107905e54",
+      "questionId": "AIB-0319",
+      "factIds": [
+        "f-04edd5e83000"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/use-cases.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "0b9eb9584465ffc9faa435780df13e69672191d6a7f1e2d108953ad2d49ff774"
+        }
+      ]
+    },
+    {
+      "draftId": "d-40e559c7afef",
+      "questionId": "AIB-0273",
+      "factIds": [
+        "f-3a764b995da3",
+        "f-45727c856c48",
+        "f-9f4f45aca842"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-4268e47ead0f",
+      "questionId": "AIB-0255",
+      "factIds": [
+        "f-373bc49cecbd",
+        "f-6dabb6d2551f",
+        "f-9f4f45aca842",
+        "f-bf462f8f918d"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-432db82aac74",
+      "questionId": "AIB-0320",
+      "factIds": [
+        "f-058f0a15d7ab",
+        "f-c137b9e39d48"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/differences.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "afbd54525b5ecfd46814516d24ccfa841d5de27c897015aa4ac1f873812777cb"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/level-1.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "54f4aa51ffc010d64bd31bd8429cb21f648d89cf71f8813c2ad28aa273de5fff"
+        }
+      ]
+    },
+    {
+      "draftId": "d-4469d5b77b9f",
+      "questionId": "AIB-0321",
+      "factIds": [
+        "f-007458d9b87a",
+        "f-033933606651",
+        "f-13fdceaea073"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raimon01-bp02.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "9aee2c975e4a1fe2d09eca34435121d63cd5c6de504e86c0aacb60a7679973d6"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raimon01-bp03.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "08a57e322153619c779f1c2bdbc7bb94b19c9ad15d15808a24871fe51481e1c7"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raimon01-bp04.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "032c510faec0dd56b0545154f38a0e937da62b3773c65ff913eb0d948333e58b"
         }
       ]
     },
@@ -440,6 +1327,84 @@
           "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/",
           "fetchedAt": "2026-10-15",
           "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2"
+        }
+      ]
+    },
+    {
+      "draftId": "d-464a282c824f",
+      "questionId": "AIB-0322",
+      "factIds": [
+        "f-172748b3c76a"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/level-4.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "bc5144bdb60ca985fba1239426504d153f5d52519ac351ce31784d644d51edc9"
+        }
+      ]
+    },
+    {
+      "draftId": "d-47fe3aee35dc",
+      "questionId": "AIB-0270",
+      "factIds": [
+        "f-24882aff8762",
+        "f-3507fef8c65c"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44"
+        }
+      ]
+    },
+    {
+      "draftId": "d-49ed29b976b6",
+      "questionId": "AIB-0323",
+      "factIds": [
+        "f-3d967e600f10"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/preprod-advancing.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "c94d5cdf35f1b6f35693d1ebd54a07b74be0fb4443f79b6e8a87dd81699e7d2e"
+        }
+      ]
+    },
+    {
+      "draftId": "d-4e8d8b673acf",
+      "factIds": [
+        "f-3f33c56b531c",
+        "f-5dd48fb20725",
+        "f-7a5d480275ef",
+        "f-7c6f58ba08b7",
+        "f-9d0d3e2dbfdf",
+        "f-ec48573989f2"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "027921be56132a90e7840f92ec096fd1fe8566eba0963f4c5bdb7d29daa480bc"
+        }
+      ]
+    },
+    {
+      "draftId": "d-500d1bf2f220",
+      "factIds": [
+        "f-3f33c56b531c",
+        "f-7a5d480275ef",
+        "f-7c6f58ba08b7",
+        "f-9d0d3e2dbfdf",
+        "f-d7263d268510"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "027921be56132a90e7840f92ec096fd1fe8566eba0963f4c5bdb7d29daa480bc"
         }
       ]
     },
@@ -464,6 +1429,27 @@
       ]
     },
     {
+      "draftId": "d-5396bef5640d",
+      "questionId": "AIB-0274",
+      "factIds": [
+        "f-0833bd50b672",
+        "f-24e9e2827b7b",
+        "f-36023436d65b"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
       "draftId": "d-55007ab7b219",
       "questionId": "AIB-0219",
       "factIds": [
@@ -474,6 +1460,33 @@
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
           "fetchedAt": "2026-10-29",
           "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44"
+        }
+      ]
+    },
+    {
+      "draftId": "d-55e0e61126e3",
+      "questionId": "AIB-0280",
+      "factIds": [
+        "f-0baa032b6a09",
+        "f-89002e5bf8bf",
+        "f-9acdaf90b71e",
+        "f-d08e1173f919"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
         }
       ]
     },
@@ -500,6 +1513,40 @@
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
           "fetchedAt": "2026-10-15",
           "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44"
+        }
+      ]
+    },
+    {
+      "draftId": "d-59a9593b9573",
+      "questionId": "AIB-0256",
+      "factIds": [
+        "f-33ba4ee28af0",
+        "f-36669add7c2e"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-60621ddabef8",
+      "questionId": "AIB-0276",
+      "factIds": [
+        "f-f1e5f7891440"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
         }
       ]
     },
@@ -552,6 +1599,53 @@
       ]
     },
     {
+      "draftId": "d-62e1cd2a3c58",
+      "questionId": "AIB-0324",
+      "factIds": [
+        "f-207a18ac24af"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-enterprise-ready-gen-ai-platform/best-practices.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "525d16953a8f5d9ec415821f53e705898b6bbc71dc01e0841271a0b18b04a2d5"
+        }
+      ]
+    },
+    {
+      "draftId": "d-639f408cf31b",
+      "questionId": "AIB-0277",
+      "factIds": [
+        "f-1402e20e2dcb",
+        "f-f894e1339e1d"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-64c3eb4dc474",
+      "factIds": [
+        "f-3f33c56b531c",
+        "f-7a5d480275ef",
+        "f-7c6f58ba08b7",
+        "f-9d0d3e2dbfdf",
+        "f-b5cd1d36d610",
+        "f-cde20e486f96"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "027921be56132a90e7840f92ec096fd1fe8566eba0963f4c5bdb7d29daa480bc"
+        }
+      ]
+    },
+    {
       "draftId": "d-66c42b138a93",
       "questionId": "AIB-0222",
       "factIds": [
@@ -574,6 +1668,78 @@
           "url": "https://aws.amazon.com/what-is/machine-learning/",
           "fetchedAt": "2026-10-29",
           "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-679aeef2ce21",
+      "questionId": "AIB-0278",
+      "factIds": [
+        "f-00830094f60c",
+        "f-24ef6227ff90",
+        "f-9acdaf90b71e",
+        "f-a0a924806eca"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-694174d2fdbb",
+      "questionId": "AIB-0279",
+      "factIds": [
+        "f-21b493132e3d"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-696da5d26754",
+      "questionId": "AIB-0325",
+      "factIds": [
+        "f-010c9667ca76",
+        "f-19a1a3fc4268",
+        "f-1b060c0fe6ed"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-drift.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "f2f27031c9bf8ab9cd3c42d2a5c1c2dbbcb7d01da36acf8d41f2b3f608c66ba0"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-performance.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "99466c024a677fe047d77d016f9504dc71c768e8e0bcdfe2b6a994b13615d2bc"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/lifecycle.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "73698122f5a52bc4648b54ac24c437c260daedc1c36151ce08b671def28f7563"
         }
       ]
     },
@@ -638,6 +1804,32 @@
       ]
     },
     {
+      "draftId": "d-6c5a6fefcec0",
+      "questionId": "AIB-0265",
+      "factIds": [
+        "f-3226a0952cc4",
+        "f-33ba4ee28af0",
+        "f-37428769a7ae"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/compare/the-difference-between-structured-data-and-unstructured-data/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        }
+      ]
+    },
+    {
       "draftId": "d-6d1afc912734",
       "questionId": "AIB-0223",
       "factIds": [
@@ -659,6 +1851,84 @@
       ]
     },
     {
+      "draftId": "d-7116617d6d04",
+      "questionId": "AIB-0326",
+      "factIds": [
+        "f-014a60f32c6c"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/design-principles.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "b2238e3a942c505bc3dcfcee6cbe07f360c7ff6fa82eb052d0466a944e08f4f7"
+        }
+      ]
+    },
+    {
+      "draftId": "d-7120417d56ec",
+      "factIds": [
+        "f-1a74c37f1fd5",
+        "f-5f6753beeedb",
+        "f-67d2264715bc"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/level-1.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "54f4aa51ffc010d64bd31bd8429cb21f648d89cf71f8813c2ad28aa273de5fff"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "027921be56132a90e7840f92ec096fd1fe8566eba0963f4c5bdb7d29daa480bc"
+        }
+      ]
+    },
+    {
+      "draftId": "d-714c0cffdb58",
+      "questionId": "AIB-0281",
+      "factIds": [
+        "f-9f4f45aca842"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-7277f869b76f",
+      "factIds": [
+        "f-3f33c56b531c",
+        "f-7a5d480275ef",
+        "f-7c6f58ba08b7",
+        "f-9d0d3e2dbfdf",
+        "f-b5cd1d36d610"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "027921be56132a90e7840f92ec096fd1fe8566eba0963f4c5bdb7d29daa480bc"
+        }
+      ]
+    },
+    {
+      "draftId": "d-72e414e236cf",
+      "factIds": [
+        "f-20c02d8a15c4"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        }
+      ]
+    },
+    {
       "draftId": "d-767a87515f7e",
       "factIds": [
         "f-07e3a1f9d25e",
@@ -674,6 +1944,45 @@
           "url": "https://aws.amazon.com/what-is/ai-agents/",
           "fetchedAt": "2026-10-15",
           "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        }
+      ]
+    },
+    {
+      "draftId": "d-769fa4e63280",
+      "questionId": "AIB-0327",
+      "factIds": [
+        "f-3318dec47cd6",
+        "f-3f33c56b531c",
+        "f-5dd48fb20725",
+        "f-7a5d480275ef",
+        "f-7c6f58ba08b7",
+        "f-9d0d3e2dbfdf",
+        "f-b5cd1d36d610",
+        "f-ec48573989f2"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "027921be56132a90e7840f92ec096fd1fe8566eba0963f4c5bdb7d29daa480bc"
+        }
+      ]
+    },
+    {
+      "draftId": "d-77d6f37771c4",
+      "factIds": [
+        "f-3318dec47cd6",
+        "f-3f33c56b531c",
+        "f-7a5d480275ef",
+        "f-7c6f58ba08b7",
+        "f-9d0d3e2dbfdf",
+        "f-cde20e486f96"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "027921be56132a90e7840f92ec096fd1fe8566eba0963f4c5bdb7d29daa480bc"
         }
       ]
     },
@@ -714,6 +2023,92 @@
           "url": "https://aws.amazon.com/what-is/generative-ai/",
           "fetchedAt": "2026-10-29",
           "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-7b2c7cadb57d",
+      "questionId": "AIB-0282",
+      "factIds": [
+        "f-20c02d8a15c4"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-7bca1ca5dcc8",
+      "questionId": "AIB-0283",
+      "factIds": [
+        "f-00830094f60c",
+        "f-6fe10b00ff34"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-7caaaaae9a3b",
+      "factIds": [
+        "f-21b493132e3d"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-81ad5402773f",
+      "factIds": [
+        "f-20c02d8a15c4"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        }
+      ]
+    },
+    {
+      "draftId": "d-81ce892ade8d",
+      "questionId": "AIB-0285",
+      "factIds": [
+        "f-21b493132e3d",
+        "f-3e698a76a092",
+        "f-5ed2a712ff71"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
         }
       ]
     },
@@ -771,6 +2166,25 @@
       ]
     },
     {
+      "draftId": "d-8501c6e91656",
+      "factIds": [
+        "f-1a74c37f1fd5",
+        "f-67d2264715bc"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/level-1.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "54f4aa51ffc010d64bd31bd8429cb21f648d89cf71f8813c2ad28aa273de5fff"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "027921be56132a90e7840f92ec096fd1fe8566eba0963f4c5bdb7d29daa480bc"
+        }
+      ]
+    },
+    {
       "draftId": "d-86b3fd4b13eb",
       "questionId": "AIB-0227",
       "factIds": [
@@ -798,6 +2212,20 @@
       ]
     },
     {
+      "draftId": "d-86ed0f8ad93d",
+      "questionId": "AIB-0328",
+      "factIds": [
+        "f-0d629fdc4380"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/people-perspective-culture-and-change-towards-aiml-first.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "ad8cfd3183c3eb98f7bed83c2fdd5140d006b4a2ba23be3db0e24d5879e64d11"
+        }
+      ]
+    },
+    {
       "draftId": "d-8a15bb63ad84",
       "questionId": "AIB-0228",
       "factIds": [
@@ -819,6 +2247,77 @@
       ]
     },
     {
+      "draftId": "d-8ddb551916cb",
+      "questionId": "AIB-0329",
+      "factIds": [
+        "f-3318dec47cd6",
+        "f-3f33c56b531c",
+        "f-5dd48fb20725",
+        "f-7a5d480275ef",
+        "f-7c6f58ba08b7",
+        "f-9d0d3e2dbfdf",
+        "f-b5cd1d36d610",
+        "f-cde20e486f96"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "027921be56132a90e7840f92ec096fd1fe8566eba0963f4c5bdb7d29daa480bc"
+        }
+      ]
+    },
+    {
+      "draftId": "d-8e2bd499c993",
+      "questionId": "AIB-0330",
+      "factIds": [
+        "f-02e4fd41b37e"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/level-2.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "7aac0daee3b18e0362cb7d4a3e7e1496b90d654dd406f26531d17804776c22f6"
+        }
+      ]
+    },
+    {
+      "draftId": "d-925e8b336d80",
+      "questionId": "AIB-0331",
+      "factIds": [
+        "f-3318dec47cd6",
+        "f-3f33c56b531c",
+        "f-5dd48fb20725",
+        "f-7a5d480275ef",
+        "f-7c6f58ba08b7",
+        "f-9d0d3e2dbfdf",
+        "f-b5cd1d36d610",
+        "f-cde20e486f96",
+        "f-d7263d268510"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "027921be56132a90e7840f92ec096fd1fe8566eba0963f4c5bdb7d29daa480bc"
+        }
+      ]
+    },
+    {
+      "draftId": "d-93ed5c053b5a",
+      "questionId": "AIB-0287",
+      "factIds": [
+        "f-31b23d2dbaf9"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f"
+        }
+      ]
+    },
+    {
       "draftId": "d-943418863d71",
       "questionId": "AIB-0229",
       "factIds": [
@@ -836,6 +2335,123 @@
           "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
           "fetchedAt": "2026-10-29",
           "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-96b912d18a39",
+      "factIds": [
+        "f-24882aff8762"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44"
+        }
+      ]
+    },
+    {
+      "draftId": "d-983f5579f426",
+      "questionId": "AIB-0296",
+      "factIds": [
+        "f-3a764b995da3",
+        "f-45727c856c48",
+        "f-aab602ac1a43",
+        "f-f894e1339e1d"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-994be08c908c",
+      "questionId": "AIB-0332",
+      "factIds": [
+        "f-09150406bb75"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-insights.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "e75a09304f31d2817421027b5deb92fbc92724a816b06e251dca31d4feaec08f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-9aeb86c4df53",
+      "factIds": [
+        "f-1f9107c4ba55",
+        "f-3c698eff7e3d"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-aspects.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "3ec4e0699dde6da4c5e1db4721564f44495cc4a5fec35bef7c4a404f69bdcde9"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "027921be56132a90e7840f92ec096fd1fe8566eba0963f4c5bdb7d29daa480bc"
+        }
+      ]
+    },
+    {
+      "draftId": "d-9b0c59ab521a",
+      "questionId": "AIB-0333",
+      "factIds": [
+        "f-05ca0ed0f480"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/security.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "f4634ab88368f9792c5a48a2a235ae54001958da0c22692b025fc72d52a1d8b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-9dc5fb6cae29",
+      "questionId": "AIB-0288",
+      "factIds": [
+        "f-4e3ac15d128a",
+        "f-5ed2a712ff71"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-9f7fd3693bb1",
+      "questionId": "AIB-0334",
+      "factIds": [
+        "f-0544f5dc1c06",
+        "f-05ca0ed0f480"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-maintenance.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "b94e3a591559b58041f584aeccd7cb87627c68653df6679bd6f0bafed37f98d0"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/security.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "f4634ab88368f9792c5a48a2a235ae54001958da0c22692b025fc72d52a1d8b8"
         }
       ]
     },
@@ -943,6 +2559,42 @@
       ]
     },
     {
+      "draftId": "d-a25bce0312d3",
+      "factIds": [
+        "f-20c02d8a15c4",
+        "f-f1e5f7891440"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a340c7354085",
+      "factIds": [
+        "f-3f33c56b531c",
+        "f-7a5d480275ef",
+        "f-7c6f58ba08b7",
+        "f-9d0d3e2dbfdf",
+        "f-ec48573989f2"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "027921be56132a90e7840f92ec096fd1fe8566eba0963f4c5bdb7d29daa480bc"
+        }
+      ]
+    },
+    {
       "draftId": "d-a4b885f56531",
       "questionId": "AIB-0250",
       "factIds": [
@@ -995,6 +2647,44 @@
       ]
     },
     {
+      "draftId": "d-a60ed3608e74",
+      "questionId": "AIB-0335",
+      "factIds": [
+        "f-1b4e9dacf1ac",
+        "f-99a876965b1d"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-security.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "7f0c067775093be8b10b44c49012ea60f45c1abc8dc4053743d0e9e12d345cfb"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-enterprise-ready-gen-ai-platform/model.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "2946ec39fdbf602e13fddb12065c43967c4b6badc6d190b53340e580a96de9a1"
+        }
+      ]
+    },
+    {
+      "draftId": "d-a7eac546227f",
+      "factIds": [
+        "f-3318dec47cd6",
+        "f-3f33c56b531c",
+        "f-5dd48fb20725",
+        "f-7a5d480275ef",
+        "f-7c6f58ba08b7",
+        "f-9d0d3e2dbfdf"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "027921be56132a90e7840f92ec096fd1fe8566eba0963f4c5bdb7d29daa480bc"
+        }
+      ]
+    },
+    {
       "draftId": "d-a9f294f78e23",
       "questionId": "AIB-0233",
       "factIds": [
@@ -1012,6 +2702,79 @@
           "url": "https://aws.amazon.com/what-is/machine-learning/",
           "fetchedAt": "2026-10-29",
           "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-aa9ba6eb123e",
+      "questionId": "AIB-0289",
+      "factIds": [
+        "f-0cc55de7e1a9",
+        "f-2daa3ad1af2b",
+        "f-44ccd30ad75d",
+        "f-9acdaf90b71e",
+        "f-a404b4b420f2"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ad295517675b",
+      "questionId": "AIB-0290",
+      "factIds": [
+        "f-f1e5f7891440"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-afcd9e48e98b",
+      "questionId": "AIB-0336",
+      "factIds": [
+        "f-03e9a0962d7c",
+        "f-05ca0ed0f480",
+        "f-0d1d112659b1"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-performance.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "99466c024a677fe047d77d016f9504dc71c768e8e0bcdfe2b6a994b13615d2bc"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/security.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "f4634ab88368f9792c5a48a2a235ae54001958da0c22692b025fc72d52a1d8b8"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-enterprise-ready-gen-ai-platform/security.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "72d3d80a468a15b56b6ba8d80c9f9f5a72fb3137dc40742bccc4ab3731224e87"
         }
       ]
     },
@@ -1036,6 +2799,33 @@
       ]
     },
     {
+      "draftId": "d-b266adbe782c",
+      "factIds": [
+        "f-2067e3d8d96a"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        }
+      ]
+    },
+    {
+      "draftId": "d-b93f6567810e",
+      "questionId": "AIB-0337",
+      "factIds": [
+        "f-05d6b5e3df13"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/dev-advancing.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "fea7cbc05cccd100a798d04236b7dda0c56bb36ec74e59c6f8c1006ad849c018"
+        }
+      ]
+    },
+    {
       "draftId": "d-ba6e2dfface7",
       "factIds": [
         "f-1a5c1937de98",
@@ -1046,6 +2836,69 @@
           "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
           "fetchedAt": "2026-10-15",
           "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ba89c44cc040",
+      "questionId": "AIB-0338",
+      "factIds": [
+        "f-3318dec47cd6",
+        "f-3f33c56b531c",
+        "f-5dd48fb20725",
+        "f-7a5d480275ef",
+        "f-7c6f58ba08b7",
+        "f-9d0d3e2dbfdf",
+        "f-b5cd1d36d610",
+        "f-cde20e486f96"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "027921be56132a90e7840f92ec096fd1fe8566eba0963f4c5bdb7d29daa480bc"
+        }
+      ]
+    },
+    {
+      "draftId": "d-bb1924ac534c",
+      "questionId": "AIB-0339",
+      "factIds": [
+        "f-3318dec47cd6",
+        "f-3f33c56b531c",
+        "f-5dd48fb20725",
+        "f-7a5d480275ef",
+        "f-7c6f58ba08b7",
+        "f-9d0d3e2dbfdf",
+        "f-b5cd1d36d610",
+        "f-cde20e486f96"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "027921be56132a90e7840f92ec096fd1fe8566eba0963f4c5bdb7d29daa480bc"
+        }
+      ]
+    },
+    {
+      "draftId": "d-bbfbd404aea9",
+      "questionId": "AIB-0340",
+      "factIds": [
+        "f-3318dec47cd6",
+        "f-3f33c56b531c",
+        "f-5dd48fb20725",
+        "f-7a5d480275ef",
+        "f-7c6f58ba08b7",
+        "f-9d0d3e2dbfdf",
+        "f-b5cd1d36d610",
+        "f-cde20e486f96"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "027921be56132a90e7840f92ec096fd1fe8566eba0963f4c5bdb7d29daa480bc"
         }
       ]
     },
@@ -1082,6 +2935,73 @@
       ]
     },
     {
+      "draftId": "d-bc142765a52d",
+      "questionId": "AIB-0341",
+      "factIds": [
+        "f-0bf10cd68ad8"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/govern-architect-agentic-ai/governance-models.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "b9c4579f2126bbb7392f941d0e4240f2f2cdf9aed1dab7b5d50442cd47ea1d4a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-bcc2759e82e9",
+      "questionId": "AIB-0293",
+      "factIds": [
+        "f-00830094f60c",
+        "f-0cc55de7e1a9",
+        "f-24ef6227ff90",
+        "f-6fe10b00ff34",
+        "f-74290a1fd114"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-bcfe354f88ad",
+      "questionId": "AIB-0294",
+      "factIds": [
+        "f-20c02d8a15c4",
+        "f-f1e5f7891440"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
       "draftId": "d-be494062fde0",
       "questionId": "AIB-0235",
       "factIds": [
@@ -1096,6 +3016,154 @@
       ]
     },
     {
+      "draftId": "d-bf10e88a6afc",
+      "questionId": "AIB-0292",
+      "factIds": [
+        "f-0baa032b6a09",
+        "f-0cc55de7e1a9",
+        "f-9acdaf90b71e",
+        "f-a0a924806eca",
+        "f-d08e1173f919"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-c0e7994e27f4",
+      "questionId": "AIB-0342",
+      "factIds": [
+        "f-03e9a0962d7c",
+        "f-0c5fac4388d2"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-performance.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "99466c024a677fe047d77d016f9504dc71c768e8e0bcdfe2b6a994b13615d2bc"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/journey.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "20b11019b51bede85a4f32de32336a3efc58fb4ade42f06e19cac91c2c193536"
+        }
+      ]
+    },
+    {
+      "draftId": "d-c123f8d3520c",
+      "questionId": "AIB-0343",
+      "factIds": [
+        "f-01d5e94d1d66"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/mlcost02-bp02.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "0e7a6f578bdf454dcc680b79bd421324dadc6a34d8fb6e3bd92707ad4e7c20e9"
+        }
+      ]
+    },
+    {
+      "draftId": "d-c1717ec87741",
+      "questionId": "AIB-0344",
+      "factIds": [
+        "f-2f718d9cfbcf"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-advanced-operations.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "6e4700055b5717a983b5140c792a6afe10d842c27839c7630c7bd89b8c6a77d0"
+        }
+      ]
+    },
+    {
+      "draftId": "d-c32b25a2796c",
+      "factIds": [
+        "f-1a74c37f1fd5",
+        "f-5f6753beeedb",
+        "f-67d2264715bc"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/level-1.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "54f4aa51ffc010d64bd31bd8429cb21f648d89cf71f8813c2ad28aa273de5fff"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "027921be56132a90e7840f92ec096fd1fe8566eba0963f4c5bdb7d29daa480bc"
+        }
+      ]
+    },
+    {
+      "draftId": "d-c452a8aa9025",
+      "questionId": "AIB-0345",
+      "factIds": [
+        "f-337abb120545",
+        "f-3bbc29bc5c83"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/outcomes.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "26819e84e786ca6a1e9df0c57cd10cbdb331ae322e23251e2359e5a347b5c197"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/translate.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "3bd7dd663f3e268e75ddeb3cc88a2f5ed7cf4b92884f8c178679294d0e16712f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-c57058fc1152",
+      "questionId": "AIB-0272",
+      "factIds": [
+        "f-37428769a7ae",
+        "f-3847a10bf7fb",
+        "f-390b7bd409d9",
+        "f-3e082936e26f"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        }
+      ]
+    },
+    {
       "draftId": "d-c7d215dee270",
       "questionId": "AIB-0251",
       "factIds": [
@@ -1105,6 +3173,23 @@
         {
           "url": "https://aws.amazon.com/what-is/generative-ai/",
           "fetchedAt": "2026-10-29",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ca3fa415f60e",
+      "questionId": "AIB-0297",
+      "factIds": [
+        "f-24e9e2827b7b",
+        "f-45727c856c48",
+        "f-9f4f45aca842",
+        "f-aab602ac1a43"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
           "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
         }
       ]
@@ -1179,6 +3264,56 @@
       ]
     },
     {
+      "draftId": "d-d276a6c3448d",
+      "questionId": "AIB-0295",
+      "factIds": [
+        "f-3a764b995da3",
+        "f-6dabb6d2551f",
+        "f-9f4f45aca842",
+        "f-aab602ac1a43"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d32c07c09ff9",
+      "questionId": "AIB-0298",
+      "factIds": [
+        "f-00830094f60c",
+        "f-0cc55de7e1a9",
+        "f-74290a1fd114",
+        "f-9acdaf90b71e",
+        "f-d08e1173f919"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
       "draftId": "d-d3a08026a235",
       "questionId": "AIB-0239",
       "factIds": [
@@ -1189,6 +3324,106 @@
           "url": "https://aws.amazon.com/what-is/machine-learning/",
           "fetchedAt": "2026-10-29",
           "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d40478fb3a89",
+      "questionId": "AIB-0346",
+      "factIds": [
+        "f-010c9667ca76",
+        "f-03bfe791e822"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/lifecycle.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "73698122f5a52bc4648b54ac24c437c260daedc1c36151ce08b671def28f7563"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/business-perspective-the-ai-strategy-in-the-age-of-aiml.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "8bebd99fddd4b1dc014d5c3d50dbe74bd1f46845c85ac9f3264013d2430e7e8f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d4767ff22e85",
+      "questionId": "AIB-0271",
+      "factIds": [
+        "f-83193c7589c6",
+        "f-f894e1339e1d"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/machine-learning/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d606a2a465f9",
+      "questionId": "AIB-0299",
+      "factIds": [
+        "f-3507fef8c65c",
+        "f-3a8af33449d1"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d76a4ff73340",
+      "questionId": "AIB-0300",
+      "factIds": [
+        "f-2067e3d8d96a"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/ai-agents/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d779b69798ad",
+      "questionId": "AIB-0302",
+      "factIds": [
+        "f-24e9e2827b7b",
+        "f-3a764b995da3",
+        "f-45727c856c48",
+        "f-6dabb6d2551f"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-d9adcd0d6020",
+      "questionId": "AIB-0347",
+      "factIds": [
+        "f-08c0f2d4bf13"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-value.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "92ce359e12e5c690169d682ebf6f9301ee91325b3fb75647872237744a546967"
         }
       ]
     },
@@ -1249,6 +3484,32 @@
       ]
     },
     {
+      "draftId": "d-df71926aeb64",
+      "questionId": "AIB-0348",
+      "factIds": [
+        "f-273214dea161",
+        "f-8d02c116f3bd",
+        "f-cebd9131f9d6"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/level-1.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "54f4aa51ffc010d64bd31bd8429cb21f648d89cf71f8813c2ad28aa273de5fff"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raibr04-bp01.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4a2abb77da5a3be14c1a39d714baffe5f08c6da3f6ada95801ec039b5b0a1c55"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/people-perspective-culture-and-change-towards-aiml-first.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "ad8cfd3183c3eb98f7bed83c2fdd5140d006b4a2ba23be3db0e24d5879e64d11"
+        }
+      ]
+    },
+    {
       "draftId": "d-df820503bb05",
       "questionId": "AIB-0243",
       "factIds": [
@@ -1282,6 +3543,19 @@
       ]
     },
     {
+      "draftId": "d-e42faf3fbf58",
+      "factIds": [
+        "f-20c02d8a15c4"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/artificial-intelligence/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b"
+        }
+      ]
+    },
+    {
       "draftId": "d-e5f40eb23693",
       "questionId": "AIB-0244",
       "factIds": [
@@ -1298,6 +3572,46 @@
           "url": "https://aws.amazon.com/what-is/generative-ai/",
           "fetchedAt": "2026-10-29",
           "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-e69945da8673",
+      "questionId": "AIB-0349",
+      "factIds": [
+        "f-01d5e94d1d66",
+        "f-024d902b6eb5",
+        "f-19a1a3fc4268"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-performance.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "99466c024a677fe047d77d016f9504dc71c768e8e0bcdfe2b6a994b13615d2bc"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/mlcost02-bp02.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "0e7a6f578bdf454dcc680b79bd421324dadc6a34d8fb6e3bd92707ad4e7c20e9"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/your-ai-transformation-journey.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "820732dcc5caad7def1ac16b11bd8603aa6b1fb3cd4165421cbd47084e5923ee"
+        }
+      ]
+    },
+    {
+      "draftId": "d-e7ffbb52e6a7",
+      "questionId": "AIB-0350",
+      "factIds": [
+        "f-2803a5205054"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/dev-advancing.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "fea7cbc05cccd100a798d04236b7dda0c56bb36ec74e59c6f8c1006ad849c018"
         }
       ]
     },
@@ -1324,6 +3638,53 @@
       ]
     },
     {
+      "draftId": "d-ed5e0e551c01",
+      "questionId": "AIB-0351",
+      "factIds": [
+        "f-183ea976b650",
+        "f-337abb120545"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/outcomes.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "26819e84e786ca6a1e9df0c57cd10cbdb331ae322e23251e2359e5a347b5c197"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/govern-architect-agentic-ai/governance-models.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "b9c4579f2126bbb7392f941d0e4240f2f2cdf9aed1dab7b5d50442cd47ea1d4a"
+        }
+      ]
+    },
+    {
+      "draftId": "d-ed91cec797f9",
+      "questionId": "AIB-0303",
+      "factIds": [
+        "f-2daa3ad1af2b",
+        "f-7d014d3e38ae",
+        "f-a404b4b420f2",
+        "f-d08e1173f919"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        },
+        {
+          "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44"
+        }
+      ]
+    },
+    {
       "draftId": "d-efc595b9d5b5",
       "questionId": "AIB-0252",
       "factIds": [
@@ -1342,6 +3703,71 @@
           "url": "https://aws.amazon.com/what-is/retrieval-augmented-generation/",
           "fetchedAt": "2026-10-29",
           "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f06f75c60b68",
+      "questionId": "AIB-0301",
+      "factIds": [
+        "f-31b23d2dbaf9"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/prompt-engineering/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f3b302f663f6",
+      "questionId": "AIB-0352",
+      "factIds": [
+        "f-3318dec47cd6",
+        "f-3f33c56b531c",
+        "f-5dd48fb20725",
+        "f-7a5d480275ef",
+        "f-7c6f58ba08b7",
+        "f-9d0d3e2dbfdf",
+        "f-b5cd1d36d610",
+        "f-cde20e486f96",
+        "f-d7263d268510",
+        "f-ec48573989f2"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "027921be56132a90e7840f92ec096fd1fe8566eba0963f4c5bdb7d29daa480bc"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f9365b55fe4f",
+      "questionId": "AIB-0304",
+      "factIds": [
+        "f-373bc49cecbd",
+        "f-6dabb6d2551f"
+      ],
+      "sources": [
+        {
+          "url": "https://aws.amazon.com/what-is/generative-ai/",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8"
+        }
+      ]
+    },
+    {
+      "draftId": "d-fcd6db631ddb",
+      "factIds": [
+        "f-6eac6ec97381"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/outcomes.html",
+          "fetchedAt": "2026-10-31",
+          "contentHash": "26819e84e786ca6a1e9df0c57cd10cbdb331ae322e23251e2359e5a347b5c197"
         }
       ]
     }

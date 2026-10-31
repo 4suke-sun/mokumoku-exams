@@ -185,8 +185,44 @@
         }
       ],
       "claims": [],
+      "contentHash": "76b43dd6c4880168a8bebeb0ec5274f9b0e780ba5f70664e958c1a8f8a06b85d",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Responsible AI – Building AI Responsibly – AWS",
+      "updatedAt": "2026-10-27",
+      "url": "https://aws.amazon.com/ai/responsible-ai/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
       "contentHash": "f50e9931722054eeafd6efc4fb275b0d20e045a65223f12f5bec169b357421a2",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-10-31",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -221,8 +257,44 @@
         }
       ],
       "claims": [],
+      "contentHash": "b2ad4b73f6c3b13de2bf6d989be651089f2cda3655661e6647202622ce779b18",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "ISO 42001 Artificial Intelligence Management System - Amazon Web Services (AWS)",
+      "updatedAt": "2026-10-27",
+      "url": "https://aws.amazon.com/compliance/iso-42001-faqs/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
       "contentHash": "ab7a0c116a3a73b214225edc0559598c21d74f60dbf390bee049b126289bfda1",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-10-31",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -258,7 +330,7 @@
       ],
       "claims": [],
       "contentHash": "e78c800453f01b49620cd2dfa1ca30f8398e82e68a21ad230c0d7235b087849b",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-10-31",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -293,8 +365,44 @@
         }
       ],
       "claims": [],
+      "contentHash": "dc46715e82db7a47bf76f326c353da9a90be52e9fd9cea1637edb1c287bc2c82",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "What are Foundation Models? - Foundation Models in Generative AI Explained - AWS",
+      "updatedAt": "2026-10-27",
+      "url": "https://aws.amazon.com/what-is/foundation-models/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
       "contentHash": "4dc724ad5739ae42809b6cf29ad3e6e4a8ea2d5d2c712dd2a70aa7a5c14ac5b8",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-10-31",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -329,8 +437,44 @@
         }
       ],
       "claims": [],
+      "contentHash": "3672d04fe042c5086207f9b8dcbf4d053174b16d0e741f5cea86f4a9eddaf7a8",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "What is LLM? - Large Language Models Explained - AWS",
+      "updatedAt": "2026-10-27",
+      "url": "https://aws.amazon.com/what-is/large-language-model/"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
       "contentHash": "c1e3f599a4504ceebed2cf141b08d45c0b92bd2fe9849ed85a52d61f41b2763d",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-10-31",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -366,7 +510,7 @@
       ],
       "claims": [],
       "contentHash": "a36c28693fcebd10ca93dbc13287063f0e679fb2563d7e77cacfbfe8aad51a7f",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-10-31",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -402,7 +546,7 @@
       ],
       "claims": [],
       "contentHash": "3586826c3690c43254d28d87ea98917fb9a8ec254404c322b805b8cae9b06408",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-10-31",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -438,7 +582,7 @@
       ],
       "claims": [],
       "contentHash": "4cd5ef2b2a300a1ac414e25dfa5b9d960386ebbef4073140d8f3f060132003f6",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-10-31",
       "kind": "exam-guide",
       "status": "active",
       "target": {
@@ -446,7 +590,7 @@
         "examCode": "AWS-AIB-C01"
       },
       "title": "Content Domain 1: AI Fundamentals and Literacy - AWS Certified AI Business Strategist",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain1.html"
     },
     {
@@ -474,7 +618,7 @@
       ],
       "claims": [],
       "contentHash": "f580cfe2a443562d10fd7124b0f213de8bfe1b14901036d187bdf8fd95da1143",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-10-31",
       "kind": "exam-guide",
       "status": "active",
       "target": {
@@ -482,7 +626,7 @@
         "examCode": "AWS-AIB-C01"
       },
       "title": "Content Domain 2: AI Strategy and Business Value Creation - AWS Certified AI Business Strategist",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain2.html"
     },
     {
@@ -510,7 +654,7 @@
       ],
       "claims": [],
       "contentHash": "037a234a8683af8e85cda75553efce285f995926a5fbff21e949f7c780a98f66",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-10-31",
       "kind": "exam-guide",
       "status": "active",
       "target": {
@@ -518,7 +662,7 @@
         "examCode": "AWS-AIB-C01"
       },
       "title": "Content Domain 3: AI Governance and Responsible AI Leadership - AWS Certified AI Business Strategist",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain3.html"
     },
     {
@@ -546,7 +690,7 @@
       ],
       "claims": [],
       "contentHash": "d77b91b2a2f65383904ec6cd3ce8e256c46da75609e8cb79df9f8589f0f5ad08",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-10-31",
       "kind": "exam-guide",
       "status": "active",
       "target": {
@@ -554,7 +698,7 @@
         "examCode": "AWS-AIB-C01"
       },
       "title": "Content Domain 4: Business Readiness, Leadership, and AI Transformation - AWS Certified AI Business Strategist",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01-domain4.html"
     },
     {
@@ -582,7 +726,7 @@
       ],
       "claims": [],
       "contentHash": "c6c5fd1de34018697e41cbe3e9840d50f9668e28937ae6000ae23dbc19edf330",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-10-31",
       "kind": "exam-guide",
       "status": "active",
       "target": {
@@ -590,7 +734,7 @@
         "examCode": "AWS-AIB-C01"
       },
       "title": "AWS Certified AI Business Strategist (AIB-C01) - AWS Certified AI Business Strategist",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/ai-business-strategist-01.html"
     },
     {
@@ -618,7 +762,7 @@
       ],
       "claims": [],
       "contentHash": "e7943b2a0c9917dee5fcf00d70f7fa170a837408575dec7a38896cf957cefb97",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-10-31",
       "kind": "exam-guide",
       "status": "active",
       "target": {
@@ -626,7 +770,7 @@
         "examCode": "AWS-AIB-C01"
       },
       "title": "In-scope AWS services and features - AWS Certified AI Business Strategist",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-in-scope-services.html"
     },
     {
@@ -654,7 +798,7 @@
       ],
       "claims": [],
       "contentHash": "fc4d7a2576195efdebb640f231d9675b0ed8c7dd14743159bc3134070479da35",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-10-31",
       "kind": "exam-guide",
       "status": "active",
       "target": {
@@ -662,7 +806,7 @@
         "examCode": "AWS-AIB-C01"
       },
       "title": "Out-of-scope AWS services and features - AWS Certified AI Business Strategist",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-out-of-scope-services.html"
     },
     {
@@ -690,7 +834,7 @@
       ],
       "claims": [],
       "contentHash": "40d8feb86e5263af28e1358c3489ea4a4e842e2d4b25036c4df3b24fa7c13000",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-10-31",
       "kind": "exam-guide",
       "status": "active",
       "target": {
@@ -698,7 +842,7 @@
         "examCode": "AWS-AIB-C01"
       },
       "title": "Technologies and concepts that might appear on the exam - AWS Certified AI Business Strategist",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.aws.amazon.com/aws-certification/latest/ai-business-strategist-01/aib-01-technologies-concepts.html"
     },
     {
@@ -725,8 +869,1412 @@
         }
       ],
       "claims": [],
+      "contentHash": "a43384e344b3e6dba91c4207ebe8e43a992a6c6d057283223b78e2880ccbedc0",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Design a prompt - Amazon Bedrock",
+      "updatedAt": "2026-10-31",
+      "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/design-a-prompt.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "bef02e8af321cc6e1cda4ebbbf25abb6091b0d1fd5d66155cd1b7a2ee8438342",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Key terminology - Amazon Bedrock",
+      "updatedAt": "2026-10-31",
+      "url": "https://docs.aws.amazon.com/bedrock/latest/userguide/key-definitions.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "fea7cbc05cccd100a798d04236b7dda0c56bb36ec74e59c6f8c1006ad849c018",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Advancing a generative AI PoC to preproduction - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/dev-advancing.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "9ee5bb91b8086f618994b6731741817b82e65c404566afe65d7617d5b29a71f4",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Architecting a successful generative AI proof of concept - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/dev-architecting.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "c94d5cdf35f1b6f35693d1ebd54a07b74be0fb4443f79b6e8a87dd81699e7d2e",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Advancing your generative AI application to production - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/preprod-advancing.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "6e4700055b5717a983b5140c792a6afe10d842c27839c7630c7bd89b8c6a77d0",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Advanced operations for generative AI applications in production - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-advanced-operations.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "f2f27031c9bf8ab9cd3c42d2a5c1c2dbbcb7d01da36acf8d41f2b3f608c66ba0",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Detecting drift in production applications - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-drift.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "2788e17a00a19e0381596cf52039bddf802450eda3ac40c74289049c75c29af9",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Architecting the production feedback loops - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-feedback.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "e75a09304f31d2817421027b5deb92fbc92724a816b06e251dca31d4feaec08f",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Turning insights into improvements in generative AI applications - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-insights.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "b94e3a591559b58041f584aeccd7cb87627c68653df6679bd6f0bafed37f98d0",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Scalable maintenance and user support for generative AI applications - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-maintenance.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "99466c024a677fe047d77d016f9504dc71c768e8e0bcdfe2b6a994b13615d2bc",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Pillars of monitoring generative AI application performance in production - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-performance.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "7f0c067775093be8b10b44c49012ea60f45c1abc8dc4053743d0e9e12d345cfb",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Enterprise-grade security and governance for generative AI applications - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring-security.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "4426d4e658379b8230d901c75f39d9ed58777ea52445b9230e3cad1459410586",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Performance monitoring and continuous improvement for generative AI applications - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-monitoring.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "92ce359e12e5c690169d682ebf6f9301ee91325b3fb75647872237744a546967",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Delivering and sustaining the value of a generative AI application - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-lifecycle-operational-excellence/prod-value.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "755d42f403e3b9d4f62e1d76139a645cf040ec1485ff412fa9a4ff9dac6ef4a5",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Assessment considerations and prerequisites - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/best-practices.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "3f28c9ee1a333e8441ee15595a8d3acb6bd0228efa2b9a02b4a795c63e9db759",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Data strategy - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/data-strategy.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "26819e84e786ca6a1e9df0c57cd10cbdb331ae322e23251e2359e5a347b5c197",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Targeted business outcomes - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/outcomes.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "eb819803ab42ab03eae2e20d30d1d902253f9391e2cd4e15e0c16baea377f4c2",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Readiness - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/readiness.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "7e218be7ab722eec2d69c7cff1ef8f187c363e9b19f922118baa889ef44b43bc",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Regulations and compliance - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/regulations-and-compliance.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "3bd7dd663f3e268e75ddeb3cc88a2f5ed7cf4b92884f8c178679294d0e16712f",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Translating assessment insights into actionable outcomes - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/translate.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "0b9eb9584465ffc9faa435780df13e69672191d6a7f1e2d108953ad2d49ff774",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Use cases - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/gen-ai-workload-assessment/use-cases.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "b9c4579f2126bbb7392f941d0e4240f2f2cdf9aed1dab7b5d50442cd47ea1d4a",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Governance models - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/govern-architect-agentic-ai/governance-models.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "34f8cc5e4340f4bc5a3f50d38b82e1b3bf3f487f22638bfb913e16989d7e10c6",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Governance scope - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/govern-architect-agentic-ai/what-needs-to-be-governed.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "afbd54525b5ecfd46814516d24ccfa841d5de27c897015aa4ac1f873812777cb",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Data differences between generative AI and traditional ML - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/differences.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "20b11019b51bede85a4f32de32336a3efc58fb4ade42f06e19cac91c2c193536",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Data strategy - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/journey.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "73698122f5a52bc4648b54ac24c437c260daedc1c36151ce08b671def28f7563",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Data lifecycle in generative AI - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/lifecycle.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "f4634ab88368f9792c5a48a2a235ae54001958da0c22692b025fc72d52a1d8b8",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Security considerations for data in generative AI - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-data-considerations-gen-ai/security.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "525d16953a8f5d9ec415821f53e705898b6bbc71dc01e0841271a0b18b04a2d5",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Best practices for enterprise generative AI adoption and scaling - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-enterprise-ready-gen-ai-platform/best-practices.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "2946ec39fdbf602e13fddb12065c43967c4b6badc6d190b53340e580a96de9a1",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Layer 2: Approved set of foundation models and tools - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-enterprise-ready-gen-ai-platform/model.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "72d3d80a468a15b56b6ba8d80c9f9f5a72fb3137dc40742bccc4ab3731224e87",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Layer 3: Security and governance for generative AI platforms on AWS - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-enterprise-ready-gen-ai-platform/security.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "f1debfc1b22f46af3dd845c05dca5e4186f7be92734bdf2e674e1a04702dcf5b",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Continuing the maturity journey - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/continuing.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "1f50c60f0767d1b763fb28bc189c152d57c649a78a275366a3eca5fa82d74598",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Maturity model for adopting generative AI on AWS - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/introduction.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "54f4aa51ffc010d64bd31bd8429cb21f648d89cf71f8813c2ad28aa273de5fff",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Generative AI maturity model level 1: Envision - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/level-1.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "7aac0daee3b18e0362cb7d4a3e7e1496b90d654dd406f26531d17804776c22f6",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Generative AI maturity model level 2: Experiment - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/level-2.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "ba59f8275f9bba65f79e761b06ec73feb6697359e9953297402735b368312d36",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Generative AI maturity model level 3: Launch - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/level-3.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "bc5144bdb60ca985fba1239426504d153f5d52519ac351ce31784d644d51edc9",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Generative AI maturity model level 4: Scale - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/level-4.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "3eb3c0ccd2b56069d11e9c0f0457942b3b7e2bcf4191cc0bba4e45c50ce9b68e",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Next steps - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/next-steps.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "3ec4e0699dde6da4c5e1db4721564f44495cc4a5fec35bef7c4a404f69bdcde9",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Aspects of generative AI maturity - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-aspects.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "027921be56132a90e7840f92ec096fd1fe8566eba0963f4c5bdb7d29daa480bc",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Levels in the generative AI maturity model - AWS Prescriptive Guidance",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-gen-ai-maturity-model/overview-levels.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
       "contentHash": "99bec048a9df2281850e5f17ee16bdf580c74ef4e7293be9ee6bd502e39afb44",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-10-31",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -734,8 +2282,1160 @@
         "examCode": "AWS-AIB-C01"
       },
       "title": "Data and model quality monitoring with Amazon SageMaker Model Monitor - Amazon SageMaker AI",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-31",
       "url": "https://docs.aws.amazon.com/sagemaker/latest/dg/model-monitor.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "41b6d7b49c12db5deceff65c2e19648dba400a0c33623b9f6642f5da059fb638",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "GENOPS05-BP01 Learn when to customize models - Generative AI Lens",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/generative-ai-lens/genops05-bp01.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "0e7a6f578bdf454dcc680b79bd421324dadc6a34d8fb6e3bd92707ad4e7c20e9",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "MLCOST02-BP02 Perform a tradeoff analysis between custom and pre-trained models - Machine Learning Lens",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/machine-learning-lens/mlcost02-bp02.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "b2238e3a942c505bc3dcfcee6cbe07f360c7ff6fa82eb052d0466a944e08f4f7",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Design principles - Responsible AI Lens",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/design-principles.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "5b18915024fd1f0b52cee2d70bcdf613384704492d586d1dd7c5cca75a465275",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "RAIBR03-BP01 Identify the likelihood of each potential harm - Responsible AI Lens",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raibr03-bp01.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "caebb409da578ca51e9147a0756d3b76b38d666267d3f67dfb3be1ce433d70e0",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "RAIBR03-BP02 Identify the severity of each potential harm - Responsible AI Lens",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raibr03-bp02.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "ee3be9844ed076afc5189fe1859914f95c33d92b389407d26ea66839de84749d",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "RAIBR03-BP03 Assign an overall risk level to each potential harm - Responsible AI Lens",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raibr03-bp03.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "d5afb11bee02083d3fbefaf14ab0f2c4d3e6f73ad20eb8c378e3b37be172a7d2",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "RAIBR03-BP04 Use a risk registry to track and calibrate potential harms and risks - Responsible AI Lens",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raibr03-bp04.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "49bbd939bc5950c637e01b4386731765b5ea77033ad0c3d91967079ee820c55c",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Assess risks - Responsible AI Lens",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raibr03.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "4a2abb77da5a3be14c1a39d714baffe5f08c6da3f6ada95801ec039b5b0a1c55",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "RAIBR04-BP01 Narrow the use case - Responsible AI Lens",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raibr04-bp01.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "0436519b670f999ddf07041fc70f142e4a07f083e3c51eb0049195eb2d19bc0c",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "RAIBR04-BP02 Weigh trade-offs across competing use case objectives - Responsible AI Lens",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raibr04-bp02.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "d780f689baa30bd9fd70942d9630bb134efe3937cff7a427718d36d11452b076",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "RAIBR04-BP03 Assign your potential harm mitigations to implementation strategies - Responsible AI Lens",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raibr04-bp03.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "9c09e474e693649e3674628bff7d1c260ea3d58530bd1e0013374f620cdec6d0",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Mitigate risks - Responsible AI Lens",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raibr04.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "fba376d5bd08dd9a4163fe09b155ab11153f1f5ba51ab7763e33d16f85ece399",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "RAIMON01-BP01 Obtain consent for monitoring production data - Responsible AI Lens",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raimon01-bp01.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "9aee2c975e4a1fe2d09eca34435121d63cd5c6de504e86c0aacb60a7679973d6",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "RAIMON01-BP02 Set operational performance baselines and apply methods for drift detection - Responsible AI Lens",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raimon01-bp02.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "08a57e322153619c779f1c2bdbc7bb94b19c9ad15d15808a24871fe51481e1c7",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "RAIMON01-BP03 Preserve data privacy and set access controls on monitored data - Responsible AI Lens",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raimon01-bp03.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "032c510faec0dd56b0545154f38a0e937da62b3773c65ff913eb0d948333e58b",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "RAIMON01-BP04 Create monitoring dashboards for operational visibility - Responsible AI Lens",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raimon01-bp04.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "82b6c80c5ebfc847c4981c758b24afcba090086cefcaf8a370e483d373cabe26",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "RAIMON01-BP05 Design protocols that trigger human oversight of automated monitoring alerts - Responsible AI Lens",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raimon01-bp05.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "d5e0cc45a2d26dd176ba9447f8bce0e6d22f529aefe11b8069cf0a2fe681c894",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Monitoring for deviations - Responsible AI Lens",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raimon01.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "9f9312ab13fc64acf83871004ad6066862d78f3d5cd0cb2c832af7432d906e59",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "RAIUC05-BP01 Engage your organization in approving your use case - Responsible AI Lens",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raiuc05-bp01.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "a42712b37b1a5a51266eed4f8f9eea38666209cea5748a3608170e0fe47181f5",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Identify requirements and approvals - Responsible AI Lens",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/raiuc05.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "c58a30da15466c10e57128f752ad209aefc867fccb1cb9791a2ccd6e61f7b8db",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Responsible AI Lens - AWS Well-Architected Framework - Responsible AI Lens",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/wellarchitected/latest/responsible-ai-lens/responsible-ai-lens.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "8bebd99fddd4b1dc014d5c3d50dbe74bd1f46845c85ac9f3264013d2430e7e8f",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Business perspective: The AI strategy in the age of AI - AWS Cloud Adoption Framework for Artificial Intelligence, Machine Learning, and Generative AI",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/business-perspective-the-ai-strategy-in-the-age-of-aiml.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "247fd861d0ee62d48880b043d1be1f21b4c13e017a38b0bcbb9a9d123f5fb2c1",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Governance perspective: Managing an AI-driven organization - AWS Cloud Adoption Framework for Artificial Intelligence, Machine Learning, and Generative AI",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/governance-perspective-managing-an-aiml-driven-organization.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "ad8cfd3183c3eb98f7bed83c2fdd5140d006b4a2ba23be3db0e24d5879e64d11",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "People perspective: Culture and change towards AI-first - AWS Cloud Adoption Framework for Artificial Intelligence, Machine Learning, and Generative AI",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/people-perspective-culture-and-change-towards-aiml-first.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "0cb7d9612a440cb8ff4267e4446927f545fc7e675ca46f568b2900430a08fbcc",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Security perspective: Compliance and assurance of AI systems - AWS Cloud Adoption Framework for Artificial Intelligence, Machine Learning, and Generative AI",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/security-perspective-compliance-and-assurance-of-aiml-systems.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "820732dcc5caad7def1ac16b11bd8603aa6b1fb3cd4165421cbd47084e5923ee",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Your AI transformation journey - AWS Cloud Adoption Framework for Artificial Intelligence, Machine Learning, and Generative AI",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/aws-caf-for-ai/your-ai-transformation-journey.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "51cad0847abb90052148b5f61a1adb293b498aa8829bdf7ef89c00b010b73953",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Generative AI's impact on organization structures - Navigating the security landscape of generative AI",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/navigating-security-landscape-genai/generative-ais-impact-on-organization-structures.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "d6be09af1c4e2fcd0cd461bf45dbb9c17115b1467e6371635c8afdf55f1f69cb",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Optimizing generative AI security and responsible AI - Navigating the security landscape of generative AI",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/navigating-security-landscape-genai/optimizing-generative-ai-security-and-responsible-ai.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "9406909a17d1801890a5a7db596e282a30b94c048b22942ef8def349c0ad594e",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Regulatory and standards evolution - Navigating the security landscape of generative AI",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/navigating-security-landscape-genai/regulatory-and-standards-evolution.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "48eb9f2ba117e3145520d3588d7bc6200642bb42efafaca2195faef5ba923b9e",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Scoping generative AI use cases - Navigating the security landscape of generative AI",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/navigating-security-landscape-genai/scoping-generative-ai-use-cases.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "358916689e5c6d2b2f4c83a34caf380999349fe71417e9b8d6326d8d631aa132",
+      "fetchedAt": "2026-10-31",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "Shadow generative AI - Navigating the security landscape of generative AI",
+      "updatedAt": "2026-10-30",
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/navigating-security-landscape-genai/shadow-generative-ai.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "810bb874817c502676c09038a0d5d60b2c41a56df1603516e1b0b081dbeab150",
+      "fetchedAt": "2026-10-31",
+      "kind": "standard",
+      "status": "active",
+      "target": {
+        "edition": "C01",
+        "examCode": "AWS-AIB-C01"
+      },
+      "title": "AI Risk Management Framework | NIST",
+      "updatedAt": "2026-08-13",
+      "url": "https://www.nist.gov/itl/ai-risk-management-framework"
     }
   ]
 }
