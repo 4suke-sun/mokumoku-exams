@@ -148,6 +148,17 @@ describe("checkEntries", () => {
     for (const text of ok) expect(checkEntries(entry(text)).blocks, text).toHaveLength(0);
   });
 
+  it("JSON の文字列で改行の直後にデコレーターがある_メールアドレスとして止めない", () => {
+    const body = String.raw`"body": "from x import y\n\n@dp.table(comment=\"a\")\n@dp.expect_all(rules)\ndef t():"`;
+    expect(checkEntries(entry(body)).blocks).toHaveLength(0);
+  });
+
+  it("JSON の文字列で改行の直後にメールアドレスがある_止める", () => {
+    const personal = ["someone", "gmail.com"].join("@");
+    const body = `${String.raw`"body": "連絡先\n`}${personal}"`;
+    expect(checkEntries(entry(body)).blocks).toHaveLength(1);
+  });
+
   it("プロファイル名はプレースホルダーなら通す", () => {
     expect(checkEntries(entry("AWS_PROFILE=<プロファイル名>")).blocks).toHaveLength(0);
     expect(checkEntries(entry(fakeProfileAssignment)).blocks).toHaveLength(1);

@@ -111,13 +111,16 @@ const ALLOWED_EMAIL =
 const EMAIL = /[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)*\.[A-Za-z]{2,}/g;
 // user@host や user:pass@host の形の URL は、メールアドレスではない。
 const URL_CREDENTIALS = /[a-z][a-z0-9+.-]*:\/\/[^\s/@]*@/gi;
+// JSON の文字列の中の改行・タブの書き方(\n など)。その直後に置いた Python のデコレーターを、
+// 書き方の末尾の文字と合わせてメールアドレスに読まないよう、探す前に空白へ置き換える。
+const JSON_ESCAPED_SPACE = /\\[nrt]/g;
 // 署名の行(Co-Authored-By: 名前 <noreply@…>)の宛先は、定型として通す。文書やテストが例として引用する場合もある。
 const SIGNATURE_LINE = /Co-Authored-By:[^<]*<noreply@[a-z0-9.-]+>/i;
 
 /** 行にある、許可されていないメールアドレス(署名の行は除く)。追加行の検査と、出力を伏せる処理(output-mask.ts)が使う。 */
 export function disallowedEmails(text: string): string[] {
   if (SIGNATURE_LINE.test(text)) return [];
-  const found = text.replace(URL_CREDENTIALS, "").match(EMAIL) ?? [];
+  const found = text.replace(JSON_ESCAPED_SPACE, " ").replace(URL_CREDENTIALS, "").match(EMAIL) ?? [];
   return found.filter((address) => !ALLOWED_EMAIL.test(address));
 }
 

@@ -59,43 +59,330 @@
       "id": "domain3-1",
       "domain": "domain3",
       "order": 1,
-      "title": "ブロンズからシルバーへ"
+      "title": "ブロンズからシルバーへ",
+      "intro": "ブロンズからシルバーへの移行では、取り込んだ生のデータを置くブロンズ層から、検証して整えたシルバー層へ、データを移します。この中分類では、2 つの層の役割と、移すときの型の変換、欠けた値の除去、時刻のそろえ方を扱います。",
+      "diagram": {
+        "type": "flow",
+        "title": "メダリオンアーキテクチャのデータの流れ",
+        "nodes": [
+          {
+            "id": "source",
+            "label": "ソース",
+            "note": "ストレージ、メッセージバスなど"
+          },
+          {
+            "id": "bronze",
+            "label": "ブロンズ層",
+            "note": "生のデータを元の形のまま追記で残す"
+          },
+          {
+            "id": "silver",
+            "label": "シルバー層",
+            "note": "検証、型の変換、重複の除去、結合"
+          },
+          {
+            "id": "gold",
+            "label": "ゴールド層",
+            "note": "集計の多くはここに置く"
+          }
+        ],
+        "edges": [
+          {
+            "from": "source",
+            "to": "bronze",
+            "label": "取り込み"
+          },
+          {
+            "from": "bronze",
+            "to": "silver",
+            "label": "多くはストリーミング"
+          },
+          {
+            "from": "silver",
+            "to": "gold"
+          }
+        ]
+      }
     },
     {
       "id": "domain3-2",
       "domain": "domain3",
       "order": 2,
-      "title": "結合"
+      "title": "結合",
+      "intro": "結合は、2 つの表の行を、キーの一致で横につなぐ操作です。この中分類では、結合の種類ごとに残る行の違いと、小さい表を配って結合するブロードキャスト結合、行を縦につなぐ UNION を扱います。",
+      "comparison": {
+        "columns": ["一致した行", "左の表だけにある行", "右の表だけにある行", "結果の列"],
+        "rows": [
+          {
+            "aspect": "INNER JOIN",
+            "cells": ["残る", "残らない", "残らない", "左と右"]
+          },
+          {
+            "aspect": "LEFT JOIN",
+            "cells": ["残る", "残る(右の列は NULL)", "残らない", "左と右"]
+          },
+          {
+            "aspect": "RIGHT JOIN",
+            "cells": ["残る", "残らない", "残る(左の列は NULL)", "左と右"]
+          },
+          {
+            "aspect": "FULL JOIN",
+            "cells": ["残る", "残る(右の列は NULL)", "残る(左の列は NULL)", "左と右"]
+          },
+          {
+            "aspect": "LEFT SEMI JOIN",
+            "cells": ["左の行が残る", "残らない", "残らない", "左だけ"],
+            "highlight": true
+          },
+          {
+            "aspect": "LEFT ANTI JOIN",
+            "cells": ["残らない", "残る", "残らない", "左だけ"],
+            "highlight": true
+          }
+        ]
+      }
     },
     {
       "id": "domain3-3",
       "domain": "domain3",
       "order": 3,
-      "title": "列・行・表の操作"
+      "title": "列・行・表の操作",
+      "intro": "列・行・表の操作では、テーブルを作る文、行を足したり書き換えたり消したりする文、列を分けたり名前を変えたりする操作を扱います。配列や STRUCT の中身を取り出す書き方と、クエリに実行時の値を渡すパラメータマーカーも、ここで扱います。",
+      "comparison": {
+        "columns": ["何をするか", "取り違えやすい点"],
+        "rows": [
+          {
+            "aspect": "INSERT INTO",
+            "cells": ["既存のテーブルに行を足す", "既存の行は残る。同じ行を入れると重複する"]
+          },
+          {
+            "aspect": "INSERT OVERWRITE",
+            "cells": [
+              "既存の行を消してから行を入れる",
+              "パーティションを指定したときは、そのパーティションの行だけを消す"
+            ]
+          },
+          {
+            "aspect": "UPDATE",
+            "cells": ["条件に合う行の列の値を書き換える", "WHERE を省くと、すべての行が対象になる"],
+            "highlight": true
+          },
+          {
+            "aspect": "DELETE FROM",
+            "cells": ["条件に合う行を消す", "WHERE を省くと、すべての行が消える"],
+            "highlight": true
+          },
+          {
+            "aspect": "MERGE INTO",
+            "cells": [
+              "キーで突き合わせ、更新、挿入、削除を分ける",
+              "別の表との結合で書き換えるときは、UPDATE ではなくこれを使う"
+            ]
+          },
+          {
+            "aspect": "CTAS",
+            "cells": [
+              "問い合わせの結果からテーブルを作り、データを入れる",
+              "列の定義は書かず、スキーマは結果から決まる"
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "domain3-4",
       "domain": "domain3",
       "order": 4,
-      "title": "重複の除去と集計"
+      "title": "重複の除去と集計",
+      "intro": "重複の除去と集計では、同じレコードを 1 つにまとめる方法と、グループごとに値を集計する方法を扱います。重複の除去は、DataFrame の中で除く方法と、テーブルに書き込むときに MERGE INTO で入れない方法に分かれます。",
+      "comparison": {
+        "columns": ["dropDuplicates", "distinct", "MERGE INTO(WHEN NOT MATCHED)"],
+        "rows": [
+          {
+            "aspect": "重複を判定する列",
+            "cells": ["指定できる(既定はすべての列)", "すべての列", "ON の条件に書いたキー"]
+          },
+          {
+            "aspect": "除く重複",
+            "cells": ["DataFrame の中の重複", "DataFrame の中の重複", "目的のテーブルに既にある行との重複"]
+          },
+          {
+            "aspect": "ソースの中の重複",
+            "cells": ["除く", "除く", "除かない(先に除いておく)"],
+            "highlight": true
+          }
+        ]
+      }
     },
     {
       "id": "domain3-5",
       "domain": "domain3",
       "order": 5,
-      "title": "チューニングの基本"
+      "title": "チューニングの基本",
+      "intro": "この中分類では、Delta のテーブルのファイルを並べ直す OPTIMIZE と、Spark の実行計画を調整する AQE、ブロードキャスト結合のしきい値を扱います。違いの軸は、効く時点(ファイルの配置か、クエリの実行中か、計画を立てるときか)です。",
+      "comparison": {
+        "columns": ["OPTIMIZE", "AQE", "spark.sql.autoBroadcastJoinThreshold"],
+        "rows": [
+          {
+            "aspect": "効く時点",
+            "cells": [
+              "実行したときに、テーブルのデータファイルを書き直す",
+              "クエリの実行中に、実際のデータの大きさを見て計画を直す",
+              "結合の計画を立てるときに、ブロードキャストするかを決める"
+            ],
+            "highlight": true
+          },
+          {
+            "aspect": "対象",
+            "cells": [
+              "Delta Lake と Apache Iceberg のテーブル",
+              "シャッフルとブロードキャストを含むクエリ",
+              "結合の片側の表"
+            ]
+          },
+          {
+            "aspect": "既定",
+            "cells": [
+              "予測的最適化が有効なマネージドテーブルでは、自動で実行される",
+              "有効",
+              "10 MB(-1 でブロードキャストしない)"
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "domain3-6",
       "domain": "domain3",
       "order": 6,
-      "title": "ゴールド層のオブジェクト"
+      "title": "ゴールド層のオブジェクト",
+      "intro": "ゴールド層には、業務の用途に合わせて集計したデータを置きます。この中分類では、ゴールド層で使うビュー、一時ビュー、マテリアライズドビュー、ストリーミングテーブルの違いと、それらを宣言型パイプラインで作る方法(Python のデコレーター、AUTO CDC、パイプラインのモード)を扱います。",
+      "diagram": {
+        "type": "flow",
+        "title": "メダリオンアーキテクチャの層と、ゴールド層の利用者",
+        "nodes": [
+          {
+            "id": "bronze",
+            "label": "ブロンズ",
+            "note": "取り込んだままのデータ"
+          },
+          {
+            "id": "silver",
+            "label": "シルバー",
+            "note": "検証、整形、重複の除去、結合"
+          },
+          {
+            "id": "gold",
+            "label": "ゴールド",
+            "note": "業務の用途に合わせた集計"
+          },
+          {
+            "id": "bi",
+            "label": "ダッシュボードと BI"
+          },
+          {
+            "id": "ml",
+            "label": "機械学習"
+          }
+        ],
+        "edges": [
+          {
+            "from": "bronze",
+            "to": "silver"
+          },
+          {
+            "from": "silver",
+            "to": "gold"
+          },
+          {
+            "from": "gold",
+            "to": "bi"
+          },
+          {
+            "from": "gold",
+            "to": "ml"
+          }
+        ]
+      },
+      "comparison": {
+        "columns": ["ビュー", "一時ビュー", "マテリアライズドビュー", "ストリーミングテーブル"],
+        "rows": [
+          {
+            "aspect": "データを持つか",
+            "cells": [
+              "持たない(クエリの文だけを持つ)",
+              "持たない",
+              "結果を Delta のテーブルとして持つ",
+              "Delta のテーブルとして持つ"
+            ],
+            "highlight": true
+          },
+          {
+            "aspect": "結果の更新",
+            "cells": [
+              "読むたびにクエリを実行する",
+              "読むたびにクエリを実行する",
+              "更新のたびに、変わった分を反映する(全体の再計算もある)",
+              "更新のたびに、新しく届いた行だけを追記する"
+            ]
+          },
+          {
+            "aspect": "Unity Catalog への登録",
+            "cells": ["カタログ.スキーマ.ビュー で登録する", "登録しない", "登録する", "登録する"]
+          },
+          {
+            "aspect": "向く用途",
+            "cells": [
+              "クエリを名前で登録し、権限のある利用者が読む",
+              "ノートブックやパイプラインの中だけの中間の結果",
+              "集計や結合の結果を、いつも正しく保つ",
+              "追記型のデータの取り込みと、低い遅延の変換"
+            ]
+          },
+          {
+            "aspect": "パイプラインでの書き方",
+            "cells": [
+              "CREATE VIEW",
+              "CREATE TEMPORARY VIEW か @dp.temporary_view",
+              "CREATE MATERIALIZED VIEW か @dp.materialized_view",
+              "CREATE STREAMING TABLE か @dp.table"
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "domain3-7",
       "domain": "domain3",
       "order": 7,
-      "title": "データ品質の検査"
+      "title": "データ品質の検査",
+      "intro": "宣言型パイプラインでは、expectation で、表を通る各行に品質の条件を当てます。この中分類では、条件に合わない行の扱い(残す、捨てる、更新を失敗させる)の違いと、Python でまとめて当てる書き方、Delta のテーブルそのものに付ける CHECK 制約を扱います。",
+      "comparison": {
+        "columns": ["EXPECT だけ(warn)", "ON VIOLATION DROP ROW", "ON VIOLATION FAIL UPDATE"],
+        "rows": [
+          {
+            "aspect": "条件に合わない行",
+            "cells": ["表に書き込む", "書き込む前に捨てる", "更新を失敗させる"],
+            "highlight": true
+          },
+          {
+            "aspect": "品質の指標",
+            "cells": [
+              "条件に合う行と合わない行の件数を記録する",
+              "捨てた行の件数を記録する",
+              "更新が失敗するので記録しない"
+            ]
+          },
+          {
+            "aspect": "Python の関数(1 件)",
+            "cells": ["expect", "expect_or_drop", "expect_or_fail"]
+          },
+          {
+            "aspect": "Python の関数(まとめて)",
+            "cells": ["expect_all", "expect_all_or_drop", "expect_all_or_fail"]
+          }
+        ]
+      }
     },
     {
       "id": "domain4-1",
@@ -407,6 +694,1227 @@
         {
           "title": "Convert external or foreign Delta Lake tables to Unity Catalog managed tables | Databricks on AWS",
           "url": "https://docs.databricks.com/aws/en/tables/convert-to-managed"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "bronze-layer",
+      "unit": "domain3-1",
+      "order": 1,
+      "term": "ブロンズ層",
+      "oneLine": "ブロンズ層は、メダリオンアーキテクチャで、取り込んだ生のデータを元の形のまま追記で残しておく層です。",
+      "keyPhrase": "取り込んだ生のデータを元の形のまま追記で残しておく",
+      "body": "ブロンズ層のソースは、クラウドのオブジェクトストレージ、メッセージバス、フェデレーションしたシステムなどです。データは追記で増やし、過去の分も消さずに残します。あとで処理し直したり、監査したりするためです。\n\nブロンズ層での検証は、最小限にとどめます。予期しないスキーマの変化で取り込みが止まらないよう、多くの列を STRING、VARIANT、バイナリのまま持ちます。来歴などのメタデータの列を足すことはあります。\n\n取り込みは、ストリーミングでもバッチでも構いません。ブロンズのテーブルを使うのは、主にデータエンジニアや監査の担当者です。ブロンズのテーブルは、アナリストやデータサイエンティストが直接使うためのものではありません。シルバーのテーブルを作る処理が、ブロンズのテーブルを読みます。",
+      "examAngle": "「生のデータを、あとで処理し直せるように元の形で残したい」という要件から、メダリオンアーキテクチャのどの層に置くかを選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "ソースから取り込んだ JSON を、型の変換や重複の除去をせずに、元の形のまま溜めておく層は、メダリオンアーキテクチャのどれですか。",
+          "answer": "ブロンズ層です。",
+          "reason": "ブロンズ層は、取り込んだ生のデータを元の形で残し、検証を最小限にとどめます。型の変換や重複の除去は、シルバー層で行います。"
+        }
+      ],
+      "related": ["silver-layer"],
+      "references": [
+        {
+          "title": "What is the medallion lakehouse architecture? | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/lakehouse/medallion"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "silver-layer",
+      "unit": "domain3-1",
+      "order": 2,
+      "term": "シルバー層",
+      "oneLine": "シルバー層は、ブロンズのデータを検証し、整えて、ほかのデータと結び付けた層です。",
+      "keyPhrase": "検証し、整えて、ほかのデータと結び付けた",
+      "body": "シルバー層には、レコードごとに、検証済みで集計していない形を少なくとも 1 つ置きます。集計したデータをシルバー層に置くこともありますが、多くはゴールド層に置きます。\n\nブロンズからシルバーへ移すときに行う処理には、次のものがあります。\n\n- スキーマの強制とスキーマの進化\n- NULL と欠けた値の扱い\n- 重複の除去\n- 順序の乱れたデータや遅れて届くデータの扱い\n- データ品質の検査\n- 型の変換\n- 結合\n- 正規化と誤りの修正\n\nシルバーのテーブルは、ブロンズかシルバーのテーブルを読んで作ります。Databricks は、取り込みから直接シルバーのテーブルに書くことを勧めていません。ブロンズからの読み込みは、多くをストリーミングにします。バッチで読むのは、小さなディメンションのテーブルのような、小さいデータのときです。\n\nシルバー層は、データエンジニアのほか、細部を残した整ったデータが要るアナリストやデータサイエンティストも使います。",
+      "examAngle": "「重複を除き、型をそろえ、マスタと結合したテーブル」をどの層に置くかや、ブロンズからシルバーへの読み込みの方式を問う形で出ます。",
+      "checks": [
+        {
+          "question": "ブロンズのテーブルからシルバーのテーブルを作るとき、Databricks が多くの場合に勧める読み込みの方式は何ですか。",
+          "answer": "ストリーミングの読み込みです。",
+          "reason": "Databricks は、ブロンズからの読み込みの多くをストリーミングにするよう勧めています。バッチで読むのは、小さなディメンションのテーブルのような小さいデータのときです。"
+        },
+        {
+          "question": "メダリオンアーキテクチャで、検証済みで集計していないレコードを置く層はどれですか。",
+          "answer": "シルバー層です。",
+          "reason": "シルバー層には、レコードごとに、検証済みで集計していない形を少なくとも 1 つ置きます。集計の多くはゴールド層に置きます。"
+        }
+      ],
+      "related": ["bronze-layer", "try-cast", "dropna", "drop-duplicates"],
+      "references": [
+        {
+          "title": "What is the medallion lakehouse architecture? | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/lakehouse/medallion"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "try-cast",
+      "unit": "domain3-1",
+      "order": 3,
+      "term": "CAST と TRY_CAST",
+      "oneLine": "TRY_CAST は、CAST と同じく値の型を変換する関数で、値を変換できないときにエラーではなく NULL を返します。",
+      "keyPhrase": "値を変換できないときにエラーではなく NULL を返します",
+      "body": "ANSI モードが有効なとき、`CAST` は、数字でない文字列を数値に変換しようとすると、エラー(`CAST_INVALID_INPUT`)で止まります。値が変換先の型の範囲に収まらないときも、エラーです。`TRY_CAST` は、このような値に NULL を返し、処理を続けます。\n\n```sql\nSELECT CAST('a' AS INT);       -- ANSI モードではエラー\nSELECT TRY_CAST('a' AS INT);   -- NULL\nSELECT TRY_CAST('10' AS INT);  -- 10\n```\n\nANSI モードは、Databricks Runtime 17.0 以上で既定で有効です。Databricks SQL では、2022 年 10 月 19 日以降に作ったアカウントで、既定が `TRUE` です。ANSI モードが無効なときは、`CAST` も、変換できない値に NULL を返します。\n\n`TRY_CAST` でも、型の組み合わせそのものが変換の規則にないときは、エラー(`DATATYPE_MISMATCH`)になります。NULL になるのは、型の組み合わせは正しく、値が合わないときです。",
+      "examAngle": "「文字列の列を数値に変換したいが、変換できない値があってもクエリを失敗させたくない」という要件から、使う関数を選ばせる形で出ます。ANSI モードが有効かどうかで、CAST の結果が変わります。",
+      "checks": [
+        {
+          "question": "ANSI モードが有効な環境で、`TRY_CAST('abc' AS INT)` は何を返しますか。",
+          "answer": "NULL を返します。",
+          "reason": "`TRY_CAST` は、値が不正で変換できないとき、エラーではなく NULL を返します。"
+        },
+        {
+          "question": "同じ環境で、`CAST('abc' AS INT)` を実行するとどうなりますか。",
+          "answer": "エラーになります。",
+          "reason": "ANSI モードでは、文字列から数値への変換で値が不正なとき、`CAST` は実行時エラーになります。"
+        }
+      ],
+      "related": ["silver-layer"],
+      "references": [
+        {
+          "title": "try_cast function | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/functions/try_cast"
+        },
+        {
+          "title": "ANSI compliance in Databricks Runtime | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-ansi-compliance"
+        },
+        {
+          "title": "ANSI_MODE | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/parameters/ansi_mode"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "dropna",
+      "unit": "domain3-1",
+      "order": 4,
+      "term": "dropna(na.drop)",
+      "oneLine": "dropna は、NULL や NaN を含む行を除いた新しい DataFrame を返す PySpark のメソッドで、na.drop と同じ働きをします。",
+      "keyPhrase": "NULL や NaN を含む行を除いた新しい DataFrame を返す",
+      "body": "どの行を除くかは、引数で決めます。\n\n- `how`: `'any'`(既定)は、値が 1 つでも NULL か NaN の行を除きます。`'all'` は、すべての値が NULL か NaN の行だけを除きます。\n- `thresh`: NULL でも NaN でもない値が、指定した数より少ない行を除きます。指定すると、`how` より優先されます。\n- `subset`: 調べる列を絞ります。\n\n```python\ndf.dropna()                       # 欠けた値が 1 つでもある行を除く\ndf.na.drop(how=\"all\")             # すべての値が欠けた行だけを除く\ndf.dropna(subset=[\"id\", \"name\"])  # id か name が欠けた行を除く\n```\n\n`dropna` は新しい DataFrame を返し、元の DataFrame は変わりません。",
+      "examAngle": "「すべての列が NULL の行だけを除きたい」のような要件から、how や subset の指定を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "一部の列だけが NULL の行は残し、すべての列が NULL の行だけを除きたいとき、どう書きますか。",
+          "answer": "`df.na.drop(how=\"all\")`(または `df.dropna(how=\"all\")`)と書きます。",
+          "reason": "`how` の既定は `'any'` で、1 つでも NULL があると行を除きます。`'all'` にすると、すべての値が NULL か NaN の行だけを除きます。"
+        },
+        {
+          "question": "`df.dropna(thresh=2)` は、どの行を除きますか。",
+          "answer": "NULL でも NaN でもない値が 2 つより少ない行を除きます。",
+          "reason": "`thresh` は、行を残すのに要る、欠けていない値の数です。指定すると `how` より優先されます。"
+        }
+      ],
+      "related": ["silver-layer"],
+      "references": [
+        {
+          "title": "pyspark.sql.DataFrame.dropna — PySpark 4.3.0 documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.DataFrame.dropna.html"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "to-utc-timestamp",
+      "unit": "domain3-1",
+      "order": 5,
+      "term": "to_utc_timestamp",
+      "oneLine": "to_utc_timestamp は、あるタイムゾーンの時刻として書かれたタイムスタンプを、UTC の時刻に直す関数です。",
+      "keyPhrase": "UTC の時刻に直す",
+      "body": "1 つめの引数にタイムスタンプを、2 つめの引数にタイムゾーンを渡します。タイムゾーンは、`'Asia/Seoul'` のような名前か、`'GMT+1'` のような書き方で指定します。\n\n```sql\nSELECT to_utc_timestamp('2016-08-31', 'Asia/Seoul');\n-- 2016-08-30 15:00:00\n```\n\n逆に、UTC の時刻を、あるタイムゾーンの時刻に直すときは、`from_utc_timestamp` を使います。",
+      "examAngle": "「地域ごとのローカル時刻で記録された時刻を、UTC にそろえて保存したい」という要件から、使う関数を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "ソウルの時刻として記録された `2016-08-31 00:00:00` を UTC の時刻に直すには、どう書きますか。",
+          "answer": "`to_utc_timestamp('2016-08-31', 'Asia/Seoul')` と書きます。結果は `2016-08-30 15:00:00` です。",
+          "reason": "`to_utc_timestamp` は、2 つめの引数のタイムゾーンの時刻として値を読み、UTC の時刻を返します。"
+        }
+      ],
+      "related": ["try-cast"],
+      "references": [
+        {
+          "title": "to_utc_timestamp function | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/functions/to_utc_timestamp"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "join-inner-outer",
+      "unit": "domain3-2",
+      "order": 1,
+      "term": "INNER JOIN と外部結合",
+      "oneLine": "INNER JOIN は両方の表で一致した行だけを返し、外部結合(LEFT、RIGHT、FULL)は一致しない行も残して、相手側の列を NULL で埋めます。",
+      "keyPhrase": "一致しない行も残して、相手側の列を NULL で埋めます",
+      "body": "結合の種類を書かずに `JOIN` と書くと、INNER JOIN になります。外部結合には、次の種類があります。\n\n- `LEFT [OUTER] JOIN`: 左の表の行をすべて残します。右の表に一致する行がなければ、右の列は NULL です。\n- `RIGHT [OUTER] JOIN`: 右の表の行をすべて残します。左の表に一致する行がなければ、左の列は NULL です。\n- `FULL [OUTER] JOIN`: 両方の表の行をすべて残し、一致しない側の列を NULL で埋めます。\n\n```sql\nSELECT o.id, o.amount, c.name\nFROM orders AS o\nLEFT JOIN customers AS c ON o.customer_id = c.id;\n```\n\nこの例では、顧客の表に一致する行がない注文も結果に残り、`c.name` は NULL になります。\n\n結合の条件は、`ON` に式で書くか、`USING (列名)` で両方の表にある同じ名前の列を指定します。結合の条件を書かないと、どの種類でも `CROSS JOIN`(すべての行の組み合わせ)と同じ結果になります。\n\nPySpark では、`df.join(other, on, how)` の `how` に、`\"inner\"`(既定)、`\"left\"`、`\"right\"`、`\"full\"` などを渡します。",
+      "examAngle": "「マスタに一致しない行も落とさずに残したい」「両方の表にある行だけがほしい」といった要件から、結合の種類を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "注文の表のすべての行を残し、顧客の表に一致する行があれば顧客名を付けたいとき、注文の表を左に置いて、どの結合を使いますか。",
+          "answer": "LEFT JOIN(LEFT OUTER JOIN)を使います。",
+          "reason": "LEFT JOIN は、左の表の行をすべて残し、右の表に一致する行がなければ、右の列を NULL で埋めます。"
+        },
+        {
+          "question": "`JOIN` の前に結合の種類を書かないと、どの結合になりますか。",
+          "answer": "INNER JOIN になります。",
+          "reason": "INNER は既定の結合の種類で、両方の表で一致した行だけを返します。"
+        }
+      ],
+      "related": ["semi-anti-join", "broadcast-join"],
+      "references": [
+        {
+          "title": "JOIN | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-syntax-qry-select-join"
+        },
+        {
+          "title": "pyspark.sql.DataFrame.join — PySpark 4.3.0 documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.DataFrame.join.html"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "semi-anti-join",
+      "unit": "domain3-2",
+      "order": 2,
+      "term": "LEFT SEMI JOIN と LEFT ANTI JOIN",
+      "oneLine": "LEFT ANTI JOIN は、右の表に一致する行がない左の表の行だけを返し、LEFT SEMI JOIN は、一致する行がある左の表の行だけを返します。",
+      "keyPhrase": "右の表に一致する行がない左の表の行だけを返し",
+      "body": "どちらも、結果に入るのは左の表の列だけです。右の表は、一致する行があるかを調べるためだけに使います。`LEFT` は省いて、`SEMI JOIN`、`ANTI JOIN` とも書けます。\n\n```sql\n-- 部署の表にない部署番号を持つ社員\nSELECT * FROM employees AS e\nLEFT ANTI JOIN departments AS d ON e.dept_id = d.dept_id;\n```\n\nPySpark では、`how` に `\"left_anti\"`(別名 `\"anti\"`、`\"leftanti\"`)や `\"left_semi\"`(別名 `\"semi\"`、`\"leftsemi\"`)を渡します。",
+      "examAngle": "「新しく届いたレコードのうち、既存のテーブルにまだないものだけを取り出したい」という要件から、left_anti を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "表 A の行のうち、表 B にキーが一致する行がないものだけを、A の列だけで取り出したいとき、どの結合を使いますか。",
+          "answer": "LEFT ANTI JOIN を使います(PySpark では `how=\"left_anti\"`)。",
+          "reason": "ANTI JOIN は、右の表に一致する行がない左の表の行だけを返し、結果には左の表の列だけが入ります。"
+        },
+        {
+          "question": "LEFT SEMI JOIN の結果に、右の表の列は含まれますか。",
+          "answer": "含まれません。",
+          "reason": "SEMI JOIN は、右の表に一致する行がある左の表の行を返します。右の表は、一致を調べるためだけに使います。"
+        }
+      ],
+      "related": ["join-inner-outer"],
+      "references": [
+        {
+          "title": "JOIN | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-syntax-qry-select-join"
+        },
+        {
+          "title": "pyspark.sql.DataFrame.join — PySpark 4.3.0 documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.DataFrame.join.html"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "broadcast-join",
+      "unit": "domain3-2",
+      "order": 3,
+      "term": "ブロードキャスト結合(broadcast)",
+      "oneLine": "ブロードキャスト結合は、結合する一方の小さい表を、すべてのワーカーノードに配ってから結合する方式です。",
+      "keyPhrase": "小さい表を、すべてのワーカーノードに配ってから結合する",
+      "body": "PySpark では、`broadcast` 関数で、小さい DataFrame に、ブロードキャスト結合に使える大きさだという印を付けます。SQL では、`BROADCAST` のヒントで、配る側の表を指定します。`BROADCASTJOIN` と `MAPJOIN` は、`BROADCAST` の別名です。\n\n```python\nfrom pyspark.sql.functions import broadcast\nresult = orders.join(broadcast(countries), \"country_code\")\n```\n\n```sql\nSELECT /*+ BROADCAST(c) */ *\nFROM orders AS o JOIN countries AS c ON o.country_code = c.code;\n```\n\nヒントを付けた表は、自動でブロードキャストする大きさの上限(`spark.sql.autoBroadcastJoinThreshold`。Spark の既定は 10 MB)を超えていても、ブロードキャストの対象になります。ただし、結合の種類によっては使えない方式があるため、ヒントどおりの方式になるとは限りません。\n\nヒントがなくても、Databricks の適応型クエリ実行(AQE)は、実行中に集めた統計をもとに、ソートマージ結合をブロードキャストハッシュ結合に切り替えます。切り替えの上限(`spark.databricks.adaptive.autoBroadcastJoinThreshold`)の既定は 30MB です。",
+      "examAngle": "「大きな表と小さなマスタの表の結合が遅い」といった状況から、小さい側を broadcast で包む書き方を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "PySpark で、大きな DataFrame `orders` と小さな DataFrame `countries` を結合するとき、`countries` をブロードキャストするには、どう書きますか。",
+          "answer": "`orders.join(broadcast(countries), \"country_code\")` のように、小さい側を `broadcast()` で包みます。",
+          "reason": "`broadcast` 関数は、DataFrame に、ブロードキャスト結合に使える大きさだという印を付けます。"
+        },
+        {
+          "question": "SQL で `BROADCAST` のヒントを付けた表が、`spark.sql.autoBroadcastJoinThreshold` を超える大きさのとき、ブロードキャストの対象になりますか。",
+          "answer": "対象になります。",
+          "reason": "ヒントを付けた側は、上限の設定に関係なくブロードキャストの対象になります。ただし、結合の種類が対応していないときは、ヒントどおりにならないことがあります。"
+        }
+      ],
+      "related": ["join-inner-outer"],
+      "references": [
+        {
+          "title": "pyspark.sql.functions.broadcast — PySpark 4.3.0 documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.functions.broadcast.html"
+        },
+        {
+          "title": "Hints | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-syntax-qry-select-hints"
+        },
+        {
+          "title": "Performance Tuning - Spark 4.3.0 Documentation",
+          "url": "https://spark.apache.org/docs/latest/sql-performance-tuning.html"
+        },
+        {
+          "title": "Adaptive query execution | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/optimizations/aqe"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "union-set-operators",
+      "unit": "domain3-2",
+      "order": 4,
+      "term": "UNION と UNION ALL",
+      "oneLine": "UNION は、2 つの問い合わせの結果を縦につなぐ集合演算子で、既定では重複した行を除き、ALL を付けると重複した行も残します。",
+      "keyPhrase": "既定では重複した行を除き、ALL を付けると重複した行も残します",
+      "body": "`UNION` は `UNION DISTINCT` と同じです。重複した行も残したいときは、`UNION ALL` を使います。\n\n```sql\nSELECT id FROM sales_2025\nUNION ALL\nSELECT id FROM sales_2026;\n```\n\nつなぐ 2 つの問い合わせは、列の数が同じで、対応する列どうしに共通の型がなければなりません。列の数が違うと、エラー(`NUM_COLUMNS_MISMATCH`)になります。\n\n集合演算子には、ほかに、両方にある行を返す `INTERSECT` と、1 つめにあって 2 つめにない行を返す `EXCEPT`(別名 `MINUS`)があります。どちらも、既定では重複した行を除きます。",
+      "examAngle": "「2 つの表の行を 1 つにまとめたい。重複は残す(または除く)」という要件から、UNION と UNION ALL を選び分けさせる形で出ます。",
+      "checks": [
+        {
+          "question": "値が 1、2、2 の 3 行の表と、値が 2、3 の 2 行の表を `UNION` でつなぐと、結果は何行になりますか。",
+          "answer": "3 行(1、2、3)です。",
+          "reason": "`UNION` は既定で `DISTINCT` なので、重複した行を除きます。"
+        },
+        {
+          "question": "同じ 2 つの表を `UNION ALL` でつなぐと、結果は何行になりますか。",
+          "answer": "5 行です。",
+          "reason": "`ALL` を付けると、重複した行も残ります。"
+        }
+      ],
+      "related": ["drop-duplicates"],
+      "references": [
+        {
+          "title": "Set operators | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-syntax-qry-select-setops"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "ctas",
+      "unit": "domain3-3",
+      "order": 1,
+      "term": "CTAS(CREATE TABLE AS SELECT)",
+      "oneLine": "CTAS は、問い合わせの結果からテーブルを作って、そのデータを入れる文で、テーブルのスキーマは問い合わせの結果から決まります。",
+      "keyPhrase": "テーブルのスキーマは問い合わせの結果から決まります",
+      "body": "`CREATE TABLE … AS` の後ろに、問い合わせを書きます。`AS` で問い合わせを指定するときは、列の定義(列名と型の一覧)を書きません。\n\n```sql\nCREATE TABLE main.sales.orders_2026\nCOMMENT '2026 年の注文'\nAS SELECT * FROM main.sales.orders WHERE order_year = 2026;\n```\n\n`COMMENT` や `TBLPROPERTIES` などのテーブルの句は、CTAS でも付けられます。`USING` を書かないと、形式は Delta になります。\n\n既にあるテーブルを作り直すときは、`CREATE OR REPLACE TABLE … AS SELECT` を使えます。Databricks は、テーブルを削除して作り直すより、`REPLACE` を使うよう強く勧めています。`REPLACE` は、テーブルの履歴と、付与した権限を保ちます。",
+      "examAngle": "「既存のテーブルの一部を、新しいテーブルとして保存したい」という要件から CTAS を選ばせる形や、CTAS でテーブルのスキーマがどう決まるかを問う形で出ます。",
+      "checks": [
+        {
+          "question": "CTAS で作ったテーブルの列の名前と型は、どこから決まりますか。",
+          "answer": "問い合わせの結果から決まります。",
+          "reason": "`AS` で問い合わせを指定すると、テーブルのスキーマは問い合わせの結果から導かれます。このとき、列の定義は書きません。"
+        },
+        {
+          "question": "既存のテーブルを `DROP TABLE` で消してから CTAS で作り直す代わりに、Databricks が勧める書き方は何ですか。",
+          "answer": "`CREATE OR REPLACE TABLE … AS SELECT` です。",
+          "reason": "`REPLACE` は、テーブルの履歴と付与した権限を保ったまま、中身を置き換えます。"
+        }
+      ],
+      "related": ["create-table-using", "insert-into"],
+      "references": [
+        {
+          "title": "CREATE TABLE [USING] | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-syntax-ddl-create-table-using"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "create-table-using",
+      "unit": "domain3-3",
+      "order": 2,
+      "term": "CREATE TABLE の USING と COMMENT",
+      "oneLine": "CREATE TABLE の USING 句は、テーブルのデータの形式(CSV、JSON、Parquet など)を指定する句で、省くと形式は Delta になります。",
+      "keyPhrase": "テーブルのデータの形式(CSV、JSON、Parquet など)を指定する",
+      "body": "`USING` には、`CSV`、`JSON`、`PARQUET`、`ORC`、`AVRO`、`TEXT`、`BINARYFILE`、`DELTA`、`ICEBERG` などのファイル形式を書きます。`LOCATION` と組み合わせると、既にあるファイルを、置き場所を変えずにテーブルとして読めます。テーブルのオプションは、`OPTIONS` 句で設定します。\n\n```sql\nCREATE TABLE main.raw.students\nUSING CSV\nLOCATION 's3://example-bucket/students/';\n```\n\n`LOCATION` を指定したテーブルは、外部テーブルです。Unity Catalog では、パスが外部ロケーションの下になければなりません(有効なストレージ資格情報を指定したときを除く)。DELTA と ICEBERG 以外の形式で、`LOCATION` も `AS` の問い合わせも書かないと、データのない空のマネージドテーブルができます。\n\nテーブルの説明は `COMMENT` 句で、列の説明は列の定義の `COMMENT` で残せます。\n\n```sql\nCREATE TABLE main.sales.customers (\n  id BIGINT COMMENT '顧客の ID',\n  name STRING\n) COMMENT '顧客のマスタ';\n```",
+      "examAngle": "「既存の CSV ファイルを、移さずにテーブルとして登録したい」という要件から、USING と LOCATION の組み合わせを選ばせる形で出ます。テーブルに説明を残す方法として、COMMENT 句を問う形もあります。",
+      "checks": [
+        {
+          "question": "外部ストレージにある CSV ファイルを、置き場所を変えずにテーブルとして登録するには、`CREATE TABLE` にどの句を付けますか。",
+          "answer": "`USING CSV` と `LOCATION '<パス>'` を付けます。",
+          "reason": "`USING` でファイルの形式を、`LOCATION` でファイルの場所を指定します。`LOCATION` を指定したテーブルは外部テーブルです。"
+        },
+        {
+          "question": "`CREATE TABLE` で `USING` を省くと、テーブルの形式は何になりますか。",
+          "answer": "Delta になります。",
+          "reason": "`USING` を省いたときの既定の形式は、DELTA です。"
+        }
+      ],
+      "related": ["ctas", "external-table"],
+      "references": [
+        {
+          "title": "CREATE TABLE [USING] | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-syntax-ddl-create-table-using"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "insert-into",
+      "unit": "domain3-3",
+      "order": 3,
+      "term": "INSERT INTO",
+      "oneLine": "INSERT INTO は、値や問い合わせの結果を、既にあるテーブルに行として足す文です。",
+      "keyPhrase": "既にあるテーブルに行として足す",
+      "body": "`INSERT INTO` で入れた行は、既存の行に加わります。`INSERT OVERWRITE` は、入れる前にテーブルの行を消します。パーティションを指定したときは、そのパーティションの行だけを消します。\n\n```sql\nINSERT INTO main.sales.orders VALUES (1, 100.00), (2, 250.00);\nINSERT INTO main.sales.orders SELECT id, amount FROM main.raw.new_orders;\n```\n\n列の一覧を書かないと、テーブルの定義の順に、すべての列へ値を入れます。Databricks SQL と Databricks Runtime 12.2 LTS 以上では、列の一覧で省いた列に、既定値が入ります。既定値の定義がなければ NULL が入り、NULL を許さない列ではエラーになります。\n\n`BY NAME` を付けると、問い合わせの列名で、テーブルの列に対応させます(Databricks SQL と Databricks Runtime 13.3 LTS 以上)。\n\nDelta のテーブルに入れるときは、スキーマの強制がかかります。列のデータ型を安全に変換できないときは、実行時にエラーになります。",
+      "examAngle": "「既存のテーブルに新しい行を足したい」「テーブルの中身を置き換えたい」といった要件から、INSERT INTO と INSERT OVERWRITE を選び分けさせる形で出ます。",
+      "checks": [
+        {
+          "question": "テーブルの既存の行を残したまま、問い合わせの結果を足したいとき、`INSERT INTO` と `INSERT OVERWRITE` のどちらを使いますか。",
+          "answer": "`INSERT INTO` を使います。",
+          "reason": "`INSERT INTO` で入れた行は、既存の行に加わります。`INSERT OVERWRITE` は、入れる前に既存の行を消します。"
+        }
+      ],
+      "related": ["update-delete", "merge-into-dedup", "ctas"],
+      "references": [
+        {
+          "title": "INSERT | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-syntax-dml-insert-into"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "update-delete",
+      "unit": "domain3-3",
+      "order": 4,
+      "term": "UPDATE と DELETE",
+      "oneLine": "UPDATE は条件に合う行の列の値を書き換える文、DELETE は条件に合う行を消す文で、どちらも Delta Lake のテーブルだけで使えます。",
+      "keyPhrase": "どちらも Delta Lake のテーブルだけで使えます",
+      "body": "どちらの文も、`WHERE` で対象の行を絞ります。`WHERE` を省くと、すべての行が対象になります。\n\n```sql\nUPDATE main.web.events SET event_type = 'click' WHERE event_type = 'clk';\nDELETE FROM main.web.events WHERE event_date < '2025-01-01';\n```\n\n`WHERE` には、`IN` や `EXISTS` などのサブクエリを書けます。`NOT IN` のサブクエリは遅くなることがあるため、Databricks は、できるだけ `NOT EXISTS` に書き換えるよう勧めています。\n\nDatabricks SQL は、ほかの SQL の方言にある `UPDATE … FROM … JOIN` の構文に対応していません。別のテーブルとの結合をもとに値を書き換えるときは、`MERGE INTO` の `WHEN MATCHED THEN UPDATE` を使います。",
+      "examAngle": "「別のテーブルの値をもとに、既存の行を書き換えたい」という要件から MERGE INTO を選ばせる形や、WHERE を省いたときの影響を問う形で出ます。",
+      "checks": [
+        {
+          "question": "`DELETE FROM main.web.events` を、`WHERE` を付けずに実行すると、どうなりますか。",
+          "answer": "すべての行が消えます。",
+          "reason": "`DELETE` は、条件を省くと、テーブルのすべての行を消します。"
+        },
+        {
+          "question": "別のテーブルとの結合の結果で列の値を書き換えたいとき、Databricks SQL では何を使いますか。",
+          "answer": "`MERGE INTO` を使います。",
+          "reason": "Databricks SQL は `UPDATE … FROM … JOIN` の構文に対応していないため、`MERGE INTO` の `WHEN MATCHED THEN UPDATE` で書き換えます。"
+        }
+      ],
+      "related": ["insert-into", "merge-into-dedup"],
+      "references": [
+        {
+          "title": "UPDATE | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/delta-update"
+        },
+        {
+          "title": "DELETE FROM | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/delta-delete-from"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "sql-udf",
+      "unit": "domain3-3",
+      "order": 5,
+      "term": "SQL の UDF(CREATE FUNCTION)",
+      "oneLine": "SQL の UDF は、CREATE FUNCTION で引数と戻り値の型と本体の式を定義し、組み込みの関数と同じようにクエリから呼べる関数です。",
+      "keyPhrase": "組み込みの関数と同じようにクエリから呼べる",
+      "body": "本体は、`RETURN` の後ろに式か問い合わせで書きます。SQL の UDF では、`RETURNS` の戻り値の型を省くと、型は本体から決まります。\n\n```sql\nCREATE FUNCTION main.default.area(x DOUBLE, y DOUBLE)\nRETURNS DOUBLE\nRETURN x * y;\n\nSELECT area(width, height) AS area FROM main.default.shapes;\n```\n\n作った関数は、`SELECT` の列の式にも、`WHERE` の条件にも使えます。ほかの UDF の本体からも呼べます。\n\n`TEMPORARY` を付けた関数は、作ったセッションの中だけで使え、カタログには登録されません。\n\nUnity Catalog に関数を作るには、カタログの `USE CATALOG`、スキーマの `USE SCHEMA` と `CREATE FUNCTION` の権限が要ります。本体で参照するテーブルには、`SELECT` の権限も要ります。\n\n本体の式には、集計関数、ウィンドウ関数、順位の関数と、`explode` のように行を生む関数を書けません。",
+      "examAngle": "「同じ計算の式を、多くのクエリで使い回したい」という要件から、SQL の UDF の定義の書き方を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "2 つの DOUBLE の積を返す SQL の関数 `area` を定義するには、どう書きますか。",
+          "answer": "`CREATE FUNCTION area(x DOUBLE, y DOUBLE) RETURNS DOUBLE RETURN x * y;` と書きます。",
+          "reason": "SQL の UDF は、引数の一覧、`RETURNS` の戻り値の型、`RETURN` の本体で定義します。"
+        },
+        {
+          "question": "`TEMPORARY` を付けて作った関数は、別のセッションから呼べますか。",
+          "answer": "呼べません。",
+          "reason": "一時関数は、作ったセッションの中だけで有効で、カタログには登録されません。"
+        }
+      ],
+      "related": ["higher-order-functions"],
+      "references": [
+        {
+          "title": "CREATE FUNCTION (SQL, Python, Scala, and Java) | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-syntax-ddl-create-sql-function"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "higher-order-functions",
+      "unit": "domain3-3",
+      "order": 6,
+      "term": "高階関数(transform と filter)",
+      "oneLine": "transform と filter は、配列の要素ごとにラムダ式をかける関数で、transform は各要素を変換した配列を、filter は条件に合う要素だけの配列を返します。",
+      "keyPhrase": "transform は各要素を変換した配列を、filter は条件に合う要素だけの配列を返します",
+      "body": "ラムダ式は、`x -> 式` の形で書きます。引数を 2 つにすると、2 つめの引数に要素の位置(添字)が入ります。\n\n```sql\nSELECT transform(array(1, 2, 3), x -> x * 10);         -- [10,20,30]\nSELECT filter(array(1, 2, 3, 4), x -> x % 2 == 0);      -- [2,4]\nSELECT filter(array(5, NULL, 7), x -> x IS NOT NULL);   -- [5,7]\n```\n\n`filter` の結果は、元の配列と同じ型です。`transform` の結果は、ラムダ式が返す値の型の配列です。",
+      "examAngle": "「配列の列の各要素に計算をかけたい」「配列から条件に合う要素だけを残したい」という要件から、transform と filter を選び分けさせる形で出ます。",
+      "checks": [
+        {
+          "question": "`SELECT transform(array(1, 2, 3), x -> x + 1)` の結果は何ですか。",
+          "answer": "`[2,3,4]` です。",
+          "reason": "`transform` は、配列の各要素にラムダ式をかけた結果の配列を返します。"
+        },
+        {
+          "question": "配列の列 `scores` から、60 以上の要素だけを残すには、どう書きますか。",
+          "answer": "`filter(scores, x -> x >= 60)` と書きます。",
+          "reason": "`filter` は、ラムダ式が真になる要素だけを残した配列を返します。"
+        }
+      ],
+      "related": ["struct-field", "split-column"],
+      "references": [
+        {
+          "title": "transform function | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/functions/transform"
+        },
+        {
+          "title": "filter function | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/functions/filter"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "pivot",
+      "unit": "domain3-3",
+      "order": 7,
+      "term": "PIVOT",
+      "oneLine": "PIVOT は、指定した列の値ごとに新しい列を作り、縦に並んだ行を横に並べ替える句です。",
+      "keyPhrase": "指定した列の値ごとに新しい列を作り",
+      "body": "`PIVOT` の中には、集計の式と、`FOR 列 IN (値の一覧)` を書きます。`IN` の値ごとに 1 つの列ができ、各セルには、その値に当たる行を集計した結果が入ります。\n\n```sql\nSELECT *\nFROM quarterly_sales\nPIVOT (sum(amount) FOR quarter IN (1 AS q1, 2 AS q2, 3 AS q3, 4 AS q4));\n```\n\n集計の式にも `FOR` にも使っていない列が、グループ分けの列になります。`quarterly_sales` が `year`、`quarter`、`amount` の 3 列なら、結果は `year` ごとに 1 行で、`q1` から `q4` の 4 列が並びます。\n\n`IN` の値は、リテラルで書きます。リテラルでないと、エラー(`NON_LITERAL_PIVOT_VALUES`)になります。同じ結果は、`GROUP BY` と、集計関数の `FILTER (WHERE …)` を組み合わせても書けます。",
+      "examAngle": "「四半期ごとの売上を、四半期を列にした横長の表にしたい」という要件から、PIVOT を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "行ごとに `quarter`(1〜4)と `amount` を持つ表から、四半期を列にした横長の表を作るには、どの句を使いますか。",
+          "answer": "`PIVOT` を使います(例: `PIVOT (sum(amount) FOR quarter IN (1 AS q1, 2 AS q2, 3 AS q3, 4 AS q4))`)。",
+          "reason": "`PIVOT` は、`FOR` の列の値ごとに列を作り、各セルに集計の結果を入れます。"
+        }
+      ],
+      "related": ["groupby-agg"],
+      "references": [
+        {
+          "title": "PIVOT clause | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-syntax-qry-select-pivot"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "struct-field",
+      "unit": "domain3-3",
+      "order": 8,
+      "term": "STRUCT の項目の参照(ドットの記法)",
+      "oneLine": "STRUCT の列の中の項目は、列名.項目名 のようにドットでつないで取り出し、入れ子の項目も同じ書き方でたどります。",
+      "keyPhrase": "列名.項目名 のようにドットでつないで取り出し",
+      "body": "```sql\nSELECT customer.address.city FROM main.sales.orders;\n```\n\nこの例では、STRUCT の列 `customer` の中の `address` の、さらに中の `city` を取り出します。\n\nドットでつないだ名前は、まずスキーマ、テーブル、列の名前として、できるだけ長く解釈されます。残った部分が、STRUCT の項目として解釈されます。STRUCT の項目に使うとき、Databricks は、文をコンパイルするときに、その項目があるかを確かめます。",
+      "examAngle": "「入れ子の JSON を読み込んだ STRUCT の列から、内側の値を取り出したい」という要件から、ドットの記法を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "STRUCT の列 `device` の中にある STRUCT `location` の項目 `country` を取り出すには、どう書きますか。",
+          "answer": "`device.location.country` と書きます。",
+          "reason": "STRUCT の項目はドットでつないで取り出し、入れ子の項目も同じ書き方でたどれます。"
+        }
+      ],
+      "related": ["higher-order-functions"],
+      "references": [
+        {
+          "title": ". (dot sign) operator | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/functions/dotsign"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "split-column",
+      "unit": "domain3-3",
+      "order": 9,
+      "term": "split で列を分ける",
+      "oneLine": "split は、文字列を正規表現に合う箇所で区切り、文字列の配列を返す関数です。",
+      "keyPhrase": "文字列の配列を返す",
+      "body": "2 つめの引数は、正規表現として扱われます。3 つめの引数 `limit` が正のとき、配列の長さは `limit` 以下になり、最後の要素に残りの文字列がすべて入ります。`limit` を省くと、区切れるだけ区切ります。\n\n```sql\nSELECT split('a,b,c', ',');     -- [a,b,c]\nSELECT split('a,b,c', ',', 2);  -- 要素は a と b,c の 2 つ\n```\n\n1 つの列を複数の列に分けるときは、`split` で配列にしてから、添字で要素を取り出し、それぞれを新しい列にします。SQL の `[ ]` の添字と、PySpark の `getItem` の添字は、0 から始まります。\n\n```python\nfrom pyspark.sql import functions as F\nparts = F.split(F.col(\"full_name\"), \" \")\ndf = (df.withColumn(\"first_name\", parts.getItem(0))\n        .withColumn(\"last_name\", parts.getItem(1))\n        .drop(\"full_name\"))\n```\n\n`withColumn` は列を足した(同じ名前の列があれば置き換えた)新しい DataFrame を、`drop` は指定した列を除いた新しい DataFrame を返します。",
+      "examAngle": "「姓と名がつながった列を 2 つの列に分け、元の列は除きたい」という要件から、split と列の追加、削除の組み合わせを選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "`split('a,b,c', ',', 2)` の結果は何ですか。",
+          "answer": "`a` と `b,c` の 2 つの要素の配列です。",
+          "reason": "`limit` が正のとき、配列の長さは `limit` 以下になり、最後の要素に残りの文字列がすべて入ります。"
+        },
+        {
+          "question": "PySpark で、`split` で作った配列の 1 つめの要素を取り出すとき、`getItem` に渡す添字は何ですか。",
+          "answer": "0 です。",
+          "reason": "配列の添字は 0 から始まります。"
+        }
+      ],
+      "related": ["withcolumnrenamed-alias", "higher-order-functions"],
+      "references": [
+        {
+          "title": "split function | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/functions/split"
+        },
+        {
+          "title": "pyspark.sql.functions.split — PySpark 4.3.0 documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.functions.split.html"
+        },
+        {
+          "title": "[ ] (bracket sign) operator | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/functions/bracketsign"
+        },
+        {
+          "title": "pyspark.sql.Column.getItem — PySpark 4.3.0 documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.Column.getItem.html"
+        },
+        {
+          "title": "pyspark.sql.DataFrame.withColumn — PySpark 4.3.0 documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.DataFrame.withColumn.html"
+        },
+        {
+          "title": "pyspark.sql.DataFrame.drop — PySpark 4.3.0 documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.DataFrame.drop.html"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "withcolumnrenamed-alias",
+      "unit": "domain3-3",
+      "order": 10,
+      "term": "withColumnRenamed と alias",
+      "oneLine": "withColumnRenamed は列の名前を変えた新しい DataFrame を返すメソッドで、alias は select などの中で列に別名を付けるメソッドです。",
+      "keyPhrase": "列の名前を変えた新しい DataFrame を返す",
+      "body": "`withColumnRenamed` は、元の DataFrame を変えずに、新しい DataFrame を返します。名前を変えた結果を使うには、戻り値を変数に入れ直します。\n\n```python\ndf = df.withColumnRenamed(\"cust_id\", \"customer_id\")\n```\n\nスキーマにない列の名前を渡しても、エラーにはならず、何も変わりません。複数の列の名前を変えるときは、`withColumnRenamed` をつなげて書けます。\n\n`alias` は、列(Column)に付けるメソッドです。`select` の中で使うと、出力の列にだけ別名が付きます。\n\n```python\ndf.select(df.amount.alias(\"total_amount\"))\n```",
+      "examAngle": "「列名を変えたはずなのに、次の処理で古い列名のままになっている」といったコードの誤りを見つけさせる形で出ます。",
+      "checks": [
+        {
+          "question": "`df.withColumnRenamed(\"a\", \"b\")` を実行し、戻り値をどこにも代入しなかったとき、`df` の列名は変わっていますか。",
+          "answer": "変わっていません。",
+          "reason": "`withColumnRenamed` は新しい DataFrame を返します。結果を使うには、`df = df.withColumnRenamed(\"a\", \"b\")` のように代入し直します。"
+        },
+        {
+          "question": "`df.withColumnRenamed(\"no_such_col\", \"x\")` は、エラーになりますか。",
+          "answer": "なりません。",
+          "reason": "スキーマにない列の名前を渡したときは、何もしません。"
+        }
+      ],
+      "related": ["split-column"],
+      "references": [
+        {
+          "title": "pyspark.sql.DataFrame.withColumnRenamed — PySpark 4.3.0 documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.DataFrame.withColumnRenamed.html"
+        },
+        {
+          "title": "pyspark.sql.Column.alias — PySpark 4.3.0 documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.Column.alias.html"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "named-parameter-marker",
+      "unit": "domain3-3",
+      "order": 11,
+      "term": "名前付きのパラメータマーカー",
+      "oneLine": "名前付きのパラメータマーカーは、SQL の文の中に :名前 の形で置く、型を持つ値の差し込み口で、値は文を実行する API から渡します。",
+      "keyPhrase": ":名前 の形で置く",
+      "body": "```python\nspark.sql(\n    \"SELECT * FROM main.sales.orders WHERE amount > :min_amount\",\n    args={\"min_amount\": 1000},\n)\n```\n\nパラメータマーカーを使うと、値が文の構造と分けて渡されるため、SQL インジェクションを防げます。\n\n同じマーカーは、1 つの文の中で何度でも参照できます。値を渡していないマーカーがあると、エラー(`UNBOUND_SQL_PARAMETER`)になります。渡した値を、すべて使う必要はありません。\n\n名前のないマーカー `?` もあります。`?` は、渡した値の配列を、出てくる順に 1 つずつ使います。1 つの文の中で、名前付きと名前なしのマーカーを混ぜられません。\n\n値を渡せるのは、Databricks SQL の Statement Execution API と、PySpark、Scala、Java の `SparkSession.sql()` です。SQL の中では、`EXECUTE IMMEDIATE … USING` でも渡せます。\n\nDatabricks Runtime 17.3 LTS 以前では、マーカーは式の中でだけ使えます。生成列や `DEFAULT` の定義、ビュー、SQL の関数などの DDL には、マーカーを書けません(`IDENTIFIER` 句の中は例外)。Databricks Runtime 18.0 以上では、その型のリテラルを書ける場所なら、どこにでも書けます。",
+      "examAngle": "「クエリに実行時の値を安全に渡したい」という要件から、:名前 の書き方と、値の渡し方を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "`spark.sql(\"SELECT * FROM t WHERE id = :id\", args={\"id\": 5})` の `:id` は何ですか。",
+          "answer": "名前付きのパラメータマーカーです。",
+          "reason": "コロンに続く名前で値の差し込み口を置き、値は `args` の辞書で、名前と組にして渡します。"
+        },
+        {
+          "question": "文の中に `:id` があるのに、`id` の値を渡さずに実行すると、どうなりますか。",
+          "answer": "エラー(`UNBOUND_SQL_PARAMETER`)になります。",
+          "reason": "値を渡していないパラメータマーカーがあると、文は実行できません。"
+        }
+      ],
+      "references": [
+        {
+          "title": "Parameter markers | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-parameter-marker"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "drop-duplicates",
+      "unit": "domain3-4",
+      "order": 1,
+      "term": "dropDuplicates と distinct",
+      "oneLine": "dropDuplicates は、重複した行を除いた新しい DataFrame を返すメソッドで、比べる列を指定すると、その列の値が同じ行を 1 つにします。",
+      "keyPhrase": "比べる列を指定すると、その列の値が同じ行を 1 つにします",
+      "body": "```python\ndf.dropDuplicates()               # すべての列の値が同じ行を 1 つにする\ndf.dropDuplicates([\"order_id\"])   # order_id が同じ行を 1 つにする\n```\n\n列を指定しないと、すべての列で比べます。`distinct()` も重複した行を除きますが、列は指定できず、すべての列で比べます。`drop_duplicates()` は、`dropDuplicates()` の別名です。\n\nストリーミングの DataFrame で `dropDuplicates` を使うと、重複を見分けるため、Spark はトリガーをまたいでデータを状態として持ち続けます。`withWatermark()` で、どこまで遅れて届く重複を見るかを限ると、持つ状態も限られます。ウォーターマークより古いデータは捨てられます。",
+      "examAngle": "「同じ注文 ID のレコードが重複して届く。注文 ID ごとに 1 行にしたい」という要件から、dropDuplicates の列の指定を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "3 列の DataFrame で、`order_id` が同じ行を 1 つにしたいとき、どう書きますか。",
+          "answer": "`df.dropDuplicates([\"order_id\"])` と書きます。",
+          "reason": "`dropDuplicates` に列名のリストを渡すと、その列だけで重複を判定します。"
+        },
+        {
+          "question": "`df.distinct()` と、引数なしの `df.dropDuplicates()` は、同じ行を残しますか。",
+          "answer": "同じ行を残します。",
+          "reason": "どちらも、すべての列の値が同じ行を 1 つにします。"
+        }
+      ],
+      "related": ["merge-into-dedup", "groupby-agg", "union-set-operators"],
+      "references": [
+        {
+          "title": "pyspark.sql.DataFrame.dropDuplicates — PySpark 4.3.0 documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.DataFrame.dropDuplicates.html"
+        },
+        {
+          "title": "pyspark.sql.DataFrame.distinct — PySpark 4.3.0 documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.DataFrame.distinct.html"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "groupby-agg",
+      "unit": "domain3-4",
+      "order": 2,
+      "term": "groupBy と agg",
+      "oneLine": "groupBy は行を列の値でグループに分け、agg はグループごとに 1 つ以上の集計を求めて、結果を DataFrame で返します。",
+      "keyPhrase": "グループごとに 1 つ以上の集計を求めて",
+      "body": "`agg` には、集計の式(Column)を並べて渡すか、列名と集計関数の名前を組にした辞書を渡します。\n\n```python\nfrom pyspark.sql import functions as F\n(df.groupBy(\"region\")\n   .agg(F.sum(\"amount\").alias(\"total\"),\n        F.avg(\"amount\").alias(\"average\"),\n        F.count(\"*\").alias(\"orders\")))\n```\n\n辞書で渡すときは、キーが列名、値が集計関数の名前です。辞書のキーは重複できないため、1 つの列に対して集計を 1 つしか書けません。同じ列に 2 種類以上の集計をかけるときは、式で渡します。\n\n```python\ndf.groupBy(\"region\").agg({\"amount\": \"sum\", \"quantity\": \"max\"})\n```\n\nSQL では、`GROUP BY` で同じ集計を書きます。Databricks SQL と Databricks Runtime 12.2 LTS 以上では、`GROUP BY ALL` と書くと、`SELECT` の中で集計関数を含まない式が、すべてグループ分けの列になります。\n\n```sql\nSELECT region, sum(amount) AS total\nFROM main.sales.orders\nGROUP BY region;\n```\n\n集計関数に `FILTER (WHERE …)` を付けると、条件に合う行だけが、その集計に渡されます。",
+      "examAngle": "「地域ごとに、売上の合計と平均と件数を一度に求めたい」という要件から、groupBy と agg の書き方を選ばせる形や、agg に辞書を渡したときの制約を問う形で出ます。",
+      "checks": [
+        {
+          "question": "`df.groupBy(\"region\").agg({\"amount\": \"sum\", \"amount\": \"avg\"})` と書くと、`amount` の合計と平均の両方が求まりますか。",
+          "answer": "求まりません。",
+          "reason": "辞書のキーは重複できないため、同じ列のキーは 1 つにまとまります(Python では、あとに書いた値が残ります)。両方を求めるには、`agg(F.sum(\"amount\"), F.avg(\"amount\"))` のように式で渡します。"
+        },
+        {
+          "question": "SQL で、`SELECT` の中の集計していない列をすべてグループ分けの列にしたいとき、列を書き並べる代わりに使える書き方は何ですか。",
+          "answer": "`GROUP BY ALL` です。",
+          "reason": "`GROUP BY ALL` は、`SELECT` の中で集計関数を含まない式を、すべてグループ分けの式として足します。"
+        }
+      ],
+      "related": ["drop-duplicates", "pivot", "describe-summary"],
+      "references": [
+        {
+          "title": "pyspark.sql.GroupedData.agg — PySpark 4.3.0 documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.GroupedData.agg.html"
+        },
+        {
+          "title": "GROUP BY clause | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-syntax-qry-select-groupby"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "merge-into-dedup",
+      "unit": "domain3-4",
+      "order": 3,
+      "term": "MERGE INTO で重複を入れない",
+      "oneLine": "MERGE INTO は、ソースの行を条件で目的の Delta のテーブルと突き合わせ、一致したかどうかで更新、挿入、削除を分けて書き込む文です。",
+      "keyPhrase": "一致したかどうかで更新、挿入、削除を分けて書き込む",
+      "body": "```sql\nMERGE INTO main.logs.events AS t\nUSING new_events AS s\nON t.event_id = s.event_id\nWHEN NOT MATCHED THEN INSERT *;\n```\n\nこの例は、`event_id` が目的のテーブルにまだない行だけを挿入します。同じレコードが何度か届くソースでも、目的のテーブルに既にある行と重複する行は入りません。\n\nただし、ソースの中に重複があると、その重複は挿入されます。MERGE INTO の前に、ソースの重複を除いておきます。\n\n一致した行は `WHEN MATCHED THEN UPDATE` で書き換えられます。Databricks SQL と Databricks Runtime 12.2 LTS 以上では、`WHEN NOT MATCHED BY SOURCE` で、ソースに対応する行がない目的のテーブルの行を、更新したり削除したりできます。\n\n目的のテーブルの 1 行に、ソースの複数の行が一致して更新しようとすると、どの行で更新するかが決まらないため、エラー(`DELTA_MULTIPLE_SOURCE_ROW_MATCHING_TARGET_ROW_IN_MERGE`)になります。この場合も、先にソースを整えて、1 つのキーに 1 行にします。",
+      "examAngle": "「同じログが何度か届くことがある。テーブルに重複を入れずに書き込みたい」という要件から、WHEN NOT MATCHED THEN INSERT だけの MERGE INTO を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "目的のテーブルにまだない `event_id` の行だけを入れたいとき、MERGE INTO にどの句を書きますか。",
+          "answer": "`WHEN NOT MATCHED THEN INSERT *` を書きます。",
+          "reason": "`WHEN NOT MATCHED` は、`ON` の条件で目的のテーブルに一致する行がないソースの行にだけかかります。"
+        },
+        {
+          "question": "ソースの中に同じ `event_id` の行が 2 行あり、目的のテーブルにはその `event_id` がないとき、`WHEN NOT MATCHED THEN INSERT *` で 2 行とも入りますか。",
+          "answer": "2 行とも入ります。",
+          "reason": "MERGE はソースと目的のテーブルを突き合わせるだけで、ソースの中の重複は除きません。先にソースの重複を除いておきます。"
+        }
+      ],
+      "related": ["drop-duplicates", "insert-into", "update-delete"],
+      "references": [
+        {
+          "title": "MERGE INTO | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/delta-merge-into"
+        },
+        {
+          "title": "Upsert into a Delta Lake table using merge | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/delta/merge"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "describe-summary",
+      "unit": "domain3-4",
+      "order": 4,
+      "term": "describe と summary",
+      "oneLine": "describe と summary は、DataFrame の数値と文字列の列の統計を求めるメソッドで、summary は describe の統計に近似の四分位数を加えます。",
+      "keyPhrase": "summary は describe の統計に近似の四分位数を加えます",
+      "body": "`describe` は、件数(count)、平均(mean)、標準偏差(stddev)、最小(min)、最大(max)を返します。列を指定しないと、数値と文字列のすべての列が対象です。\n\n`summary` は、統計を指定しないと、`describe` の 5 つに加えて、25%、50%、75% の近似のパーセンタイル(四分位数)を返します。引数で、求める統計を選べます。\n\n```python\ndf.describe(\"amount\").show()\ndf.summary(\"count\", \"min\", \"25%\", \"75%\", \"max\").show()\n```\n\nどちらも、データを調べるためのメソッドです。結果の DataFrame のスキーマは、版をまたいで同じになる保証がありません。",
+      "examAngle": "「列ごとの四分位数まで含めた統計を、手早く確かめたい」という要件から、describe と summary を選び分けさせる形で出ます。",
+      "checks": [
+        {
+          "question": "引数なしの `summary()` が返し、引数なしの `describe()` が返さない統計は何ですか。",
+          "answer": "25%、50%、75% の近似のパーセンタイル(四分位数)です。",
+          "reason": "`describe` は count、mean、stddev、min、max を返します。`summary` は、これに近似の四分位数を加えます。"
+        }
+      ],
+      "related": ["groupby-agg"],
+      "references": [
+        {
+          "title": "pyspark.sql.DataFrame.summary — PySpark 4.3.0 documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.DataFrame.summary.html"
+        },
+        {
+          "title": "pyspark.sql.DataFrame.describe — PySpark 4.3.0 documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.DataFrame.describe.html"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "delta-optimize",
+      "unit": "domain3-5",
+      "order": 1,
+      "term": "OPTIMIZE",
+      "oneLine": "OPTIMIZE は、テーブルのデータファイルを書き直して、読み取りに向いた配置にするコマンドです。",
+      "keyPhrase": "データファイルを書き直して",
+      "body": "書き込みを重ねたテーブルには、小さなファイルがたまります。`OPTIMIZE` を実行すると、Databricks はファイルを書き直してまとめます。パーティションのあるテーブルでは、パーティションごとにまとめます。Liquid Clustering を使うテーブルでは、クラスタリングのキーでデータを寄せます。\n\n```sql\nOPTIMIZE main.sales.orders;\nOPTIMIZE main.sales.events WHERE event_date >= '2026-01-01';\n```\n\n`WHERE` にパーティションの条件を書くと、その範囲だけを対象にできます。Liquid Clustering を使わない Delta のテーブルでは、`ZORDER BY` を付けて、指定した列で近い値を同じファイルに寄せられます。Databricks は、`ZORDER` よりも Liquid Clustering を勧めています。\n\nファイルをまとめる処理(bin-packing)は冪等です。同じデータに 2 回目を実行しても、何も変わりません。`OPTIMIZE` はデータの中身を変えないので、実行中も読み手は止まらず、前後で同じ結果を読めます。\n\nUnity Catalog のマネージドテーブルでは、予測的最適化が `OPTIMIZE` を自動で実行します。Databricks は、マネージドテーブルで予測的最適化を有効にするよう勧めています。",
+      "examAngle": "「小さなファイルが多く、クエリが遅い」という状況から、実行するコマンドを選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "小さなファイルが大量にたまった Delta のテーブルで、読み取りを速くするために実行するコマンドは何ですか。",
+          "answer": "`OPTIMIZE` です。",
+          "reason": "`OPTIMIZE` は、データファイルを書き直してまとめます。データの中身は変わりません。"
+        },
+        {
+          "question": "`OPTIMIZE` の実行中に、同じテーブルを読むクエリは止まりますか。",
+          "answer": "止まりません。",
+          "reason": "Delta の読み手はスナップショットを読みます。`OPTIMIZE` はデータの中身を変えないので、前後で同じ結果を読めます。"
+        }
+      ],
+      "related": ["adaptive-query-execution"],
+      "references": [
+        {
+          "title": "Optimize data file layout | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/delta/optimize"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "adaptive-query-execution",
+      "unit": "domain3-5",
+      "order": 2,
+      "term": "AQE(アダプティブクエリ実行)",
+      "oneLine": "AQE は、クエリの実行中に、終わった段階の実際のデータの大きさを見て、残りの実行計画を立て直す仕組みです。",
+      "keyPhrase": "実際のデータの大きさを見て",
+      "body": "AQE は、Databricks では既定で有効です。シャッフルやブロードキャストの段階が終わるたびに、その結果の大きさを使って、次の 4 つの調整をします。\n\n- ソートマージ結合を、ブロードキャストハッシュ結合に変える\n- シャッフルのあとの小さなパーティションをまとめる\n- ソートマージ結合とシャッフルハッシュ結合で、偏ったパーティションのタスクを分ける\n- 空の結果を見つけて、その先の処理を省く\n\n偏りの扱いは、`spark.sql.adaptive.skewJoin.enabled`(既定で `true`)で決まります。パーティションが偏っているとみなされるのは、大きさが中央値の 5 倍(`skewedPartitionFactor`)を超え、しかも 256 MB(`skewedPartitionThresholdInBytes`)を超えるときです。ブロードキャスト結合には、この偏りの扱いはかかりません。\n\n実行中にブロードキャスト結合へ変えるしきい値は、`spark.databricks.adaptive.autoBroadcastJoinThreshold` で、既定は 30 MB です。AQE そのものは `spark.databricks.optimizer.adaptive.enabled` で切り替えます。",
+      "examAngle": "「一部のタスクだけが長く、パーティションの大きさに偏りがある」といった状況で、偏りを自動で扱う機能の名前を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "結合の一部のパーティションだけが大きく、そのタスクが遅れています。実行時の統計から偏ったパーティションを分けて処理する機能は何ですか。",
+          "answer": "AQE(アダプティブクエリ実行)の偏りの扱い(skew join)です。",
+          "reason": "AQE は、ソートマージ結合とシャッフルハッシュ結合で、偏ったパーティションのタスクを分けます。Databricks では既定で有効です。"
+        }
+      ],
+      "related": ["auto-broadcast-join-threshold", "delta-optimize"],
+      "references": [
+        {
+          "title": "Adaptive query execution | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/optimizations/aqe"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "auto-broadcast-join-threshold",
+      "unit": "domain3-5",
+      "order": 3,
+      "term": "spark.sql.autoBroadcastJoinThreshold",
+      "oneLine": "spark.sql.autoBroadcastJoinThreshold は、結合のときに全てのワーカーへ配る(ブロードキャストする)表の大きさの上限を、バイト数で決める設定です。",
+      "keyPhrase": "表の大きさの上限を、バイト数で決める",
+      "body": "結合の片側の表がこの値より小さいと、Spark はその表を全てのワーカーノードへ配って結合します。既定は 10 MB(10485760 バイト)です。`-1` にすると、自動のブロードキャストを止めます。\n\n```python\nspark.conf.set(\"spark.sql.autoBroadcastJoinThreshold\", 50 * 1024 * 1024)\n```\n\nしきい値を超える表でもブロードキャストしたいときは、`BROADCAST` のヒントを書きます。ヒントがあると、Spark は統計上の大きさがしきい値を超えていても、その表をブロードキャストする結合を優先します。ただし、結合の種類によっては、ヒントの方式が使えないこともあります。\n\n```sql\nSELECT /*+ BROADCAST(d) */ * FROM sales s JOIN dim_store d ON s.store_id = d.store_id;\n```\n\nこの設定は、計画を立てるときに使われます。AQE が実行中にブロードキャストへ切り替えるときは、別の設定(Databricks では `spark.databricks.adaptive.autoBroadcastJoinThreshold`、既定は 30 MB)を使います。",
+      "examAngle": "設定の名前と役割を対応させる形や、「小さな次元表との結合でシャッフルを避けたい」という要件から、設定やヒントを選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "`spark.sql.autoBroadcastJoinThreshold` を `-1` にすると、どうなりますか。",
+          "answer": "大きさによる自動のブロードキャスト結合が使われなくなります。",
+          "reason": "Spark の文書では、この値を `-1` にするとブロードキャストを止められるとしています。"
+        },
+        {
+          "question": "Apache Spark での `spark.sql.autoBroadcastJoinThreshold` の既定値はいくつですか。",
+          "answer": "10 MB(10485760 バイト)です。",
+          "reason": "Spark の性能の調整の文書に、既定値として 10485760 が書かれています。"
+        }
+      ],
+      "related": ["adaptive-query-execution"],
+      "references": [
+        {
+          "title": "Performance Tuning - Spark Documentation",
+          "url": "https://spark.apache.org/docs/latest/sql-performance-tuning.html"
+        },
+        {
+          "title": "Adaptive query execution | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/optimizations/aqe"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "gold-layer",
+      "unit": "domain3-6",
+      "order": 1,
+      "term": "ゴールド層",
+      "oneLine": "ゴールド層は、メダリオンアーキテクチャの最後の層で、業務の用途に合わせて集計し、分析やダッシュボードがすぐ使える形にしたデータを置く層です。",
+      "keyPhrase": "業務の用途に合わせて集計し",
+      "body": "ゴールド層のデータは、シルバー層で検証し整えたデータから作ります。平均、件数、最大、最小などの集計や、期間や地域で絞った結果を置きます。報告のためには、指標と関係を定めた次元モデルで形を作ります。\n\n```sql\nCREATE OR REPLACE MATERIALIZED VIEW main.gold.weekly_sales AS\nSELECT date_trunc('week', order_date) AS week, SUM(amount) AS total\nFROM main.silver.orders\nGROUP BY 1;\n```\n\nゴールド層のデータを使うのは、業務の分析担当や BI の開発者、データサイエンティストと機械学習のエンジニア、経営層などです。業務の領域ごとにゴールド層を分ける組織もあります(人事、財務など)。\n\nシルバー層には、集計していない、検証済みのレコードを少なくとも 1 つの形で残します。大量の過去のデータを読むときは、ゴールド層に実体化せず、シルバー層を読むのが普通です。ゴールド層のデータセットの数は、ブロンズ層やシルバー層より少なくなります。",
+      "examAngle": "「ダッシュボードが使う、集計済みの表をどの層に置くか」のように、データの用途から層を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "経営層向けのダッシュボードが読む、週ごとの売上の集計結果は、メダリオンアーキテクチャのどの層に置きますか。",
+          "answer": "ゴールド層です。",
+          "reason": "ゴールド層は、業務の用途に合わせて集計し、分析やダッシュボードが使う形にしたデータを置く層です。"
+        },
+        {
+          "question": "検証と重複の除去を済ませた、集計していない顧客のレコードは、どの層に置きますか。",
+          "answer": "シルバー層です。",
+          "reason": "シルバー層は、検証、整形、重複の除去を済ませたデータを、集計せずに持つ層です。"
+        }
+      ],
+      "related": ["materialized-view", "streaming-table"],
+      "references": [
+        {
+          "title": "What is the medallion lakehouse architecture? | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/lakehouse/medallion"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "temporary-view",
+      "unit": "domain3-6",
+      "order": 2,
+      "term": "一時ビュー",
+      "oneLine": "一時ビューは、カタログにもスキーマにも登録せず、作った場所の中だけで使えるビューです。",
+      "keyPhrase": "作った場所の中だけで使える",
+      "body": "ビューは、クエリの文だけを持ち、データを複製しません。Unity Catalog のビューは `カタログ.スキーマ.ビュー` の名前で登録され、権限があればどこからでも読めます。一時ビューは登録されないので、残りません。\n\n```sql\nCREATE TEMPORARY VIEW recent_orders AS\nSELECT * FROM main.silver.orders WHERE order_date >= current_date() - 7;\n```\n\n一時ビューを使える範囲は、どこで作ったかで決まります。ノートブックやジョブで作ると、そのノートブックかスクリプトの中だけで使え、クラスターから切り離すと消えます。Databricks SQL では 1 つのクエリの中だけで使え、同じダッシュボードのほかのクエリからも使えません。\n\n宣言型パイプラインでは、`CREATE TEMPORARY VIEW` か Python の `@dp.temporary_view` で、パイプラインの中の中間の結果を定義します。expectation は一時ビューにも付けられます。",
+      "examAngle": "「データを複製せず、このセッションの中だけで使える仮の表を作りたい」といった要件から、オブジェクトの種類を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "ノートブックで作った一時ビューは、そのノートブックをクラスターから切り離したあとも使えますか。",
+          "answer": "使えません。",
+          "reason": "ノートブックで作った一時ビューは、そのノートブックの中だけで使え、クラスターから切り離すと消えます。"
+        },
+        {
+          "question": "一時ビューを作ると、基のテーブルのデータは複製されますか。",
+          "answer": "複製されません。",
+          "reason": "ビューが持つのはクエリの文だけです。データを持つのは、ビューの種類の中ではマテリアライズドビューだけです。"
+        }
+      ],
+      "related": ["materialized-view"],
+      "references": [
+        {
+          "title": "What is a view? | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/views/"
+        },
+        {
+          "title": "Pipeline SQL language reference | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/ldp/developer/sql-ref"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "materialized-view",
+      "unit": "domain3-6",
+      "order": 3,
+      "term": "マテリアライズドビュー",
+      "oneLine": "マテリアライズドビューは、クエリの結果を前もって計算して保存し、更新のたびに上流の変更を反映するビューです。",
+      "keyPhrase": "クエリの結果を前もって計算して保存し",
+      "body": "通常のビューは、読むたびにクエリを実行します。マテリアライズドビューは、結果を Delta のテーブルとして持ち、読むときは保存した結果を返します。メタデータは Unity Catalog に、データはクラウドストレージに置かれます。\n\n```sql\nCREATE OR REPLACE MATERIALIZED VIEW main.gold.regional_sales AS\nSELECT p.region, SUM(s.amount) AS total\nFROM main.silver.sales s JOIN main.silver.partners p USING (partner_id)\nGROUP BY p.region;\n```\n\n更新のたびに、Databricks は上流の変わったデータを処理し、遅れて届いたデータも含めて結果を正しく保ちます。多くの場合は変わった分だけを反映し(増分の更新)、入力の変わり方によっては全体を計算し直します。結合の相手の表が変わったときも結果を計算し直すので、次元の表が変わっても正しい結果が必要なときに向きます。\n\nパイプラインの中では、SQL の `CREATE MATERIALIZED VIEW` か、Python の `@dp.materialized_view` で定義します。パイプラインの外で SQL で作ると、Databricks は更新用のパイプライン(種類は `MV/ST`)を自動で作ります。マテリアライズドビューを更新できるのは、それを定義したパイプラインだけです。\n\n遅延は数秒から数分なので、低い遅延が要る処理には向きません。",
+      "examAngle": "「集計や結合の結果を前もって計算し、ダッシュボードを速く表示したい」「次元の表が変わっても結果を正しく保ちたい」といった要件から、オブジェクトの種類を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "ストリーミングテーブルとマテリアライズドビューのうち、結合の相手の次元の表が変わったとき、結合の結果を計算し直すのはどちらですか。",
+          "answer": "マテリアライズドビューです。",
+          "reason": "マテリアライズドビューは、更新のたびに結合を計算し直します。ストリーミングテーブルは、追記済みの行を計算し直しません。"
+        }
+      ],
+      "related": ["streaming-table", "gold-layer", "temporary-view"],
+      "references": [
+        {
+          "title": "Materialized views | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/ldp/materialized-views"
+        },
+        {
+          "title": "What is a view? | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/views/"
+        },
+        {
+          "title": "Streaming tables | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/ldp/streaming-tables"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "streaming-table",
+      "unit": "domain3-6",
+      "order": 4,
+      "term": "ストリーミングテーブル",
+      "oneLine": "ストリーミングテーブルは、追記型のソースから届いた新しい行だけを、更新のたびに追記していく Delta のテーブルです。",
+      "keyPhrase": "新しい行だけを、更新のたびに追記していく",
+      "body": "ストリーミングテーブルは、入力の各行を 1 回だけ処理します。Auto Loader でクラウドストレージから読む取り込みや、Kafka などのメッセージバスからの取り込みに向きます。ストリーミングテーブルを更新するのは、それを持つ 1 つのパイプラインだけです。\n\nSQL では、`AS` のあとのクエリをストリーミングの読み取りにします。ほかのテーブルを読むときは `STREAM(…)` で囲み、ファイルを読むときは `STREAM read_files(…)` と書きます。\n\n```sql\nCREATE OR REFRESH STREAMING TABLE customers_silver\nAS SELECT * FROM STREAM(customers_bronze);\n```\n\nソースは、追記だけか、変わらないものにします。既存の行の更新や削除がソースにあると、エラーになります。更新や削除を含む変更を反映するときは、AUTO CDC を使います。\n\n追記済みの行は、あとで計算し直されません。クエリを変えても、変えたあとに届く行にだけ効きます。既存の行に反映するには、完全な更新(full refresh)をします。結合の相手の表が変わっても結合の結果は計算し直されないので、いつも正しい結合の結果が必要なときは、マテリアライズドビューを使います。",
+      "examAngle": "「パイプラインの中の別の表を増分で読む」書き方を穴埋めで問う形や、追記型のデータを増分で処理する要件から、オブジェクトの種類を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "パイプラインで、`customers_bronze` を増分で読んで `customers_silver` のストリーミングテーブルを作ります。`FROM` のあとに何と書きますか。",
+          "answer": "`STREAM(customers_bronze)` と書きます。",
+          "reason": "ストリーミングテーブルのクエリは、ストリーミングの読み取りでなければなりません。ほかのテーブルをストリーミングで読むときは、`STREAM` で囲みます。"
+        },
+        {
+          "question": "ストリーミングテーブルの定義のクエリを変えました。すでに追記済みの行にも新しいクエリを当てるには、何が要りますか。",
+          "answer": "完全な更新(full refresh)です。",
+          "reason": "ストリーミングテーブルは追記済みの行を計算し直さず、クエリの変更は変えたあとに届く行にだけ効きます。"
+        }
+      ],
+      "related": ["materialized-view", "auto-cdc", "pipeline-python-decorators"],
+      "references": [
+        {
+          "title": "Streaming tables | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/ldp/streaming-tables"
+        },
+        {
+          "title": "CREATE STREAMING TABLE (pipelines) | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/ldp/developer/ldp-sql-ref-create-streaming-table"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "pipeline-python-decorators",
+      "unit": "domain3-6",
+      "order": 5,
+      "term": "パイプラインの Python のデコレーター",
+      "oneLine": "パイプラインの Python のデコレーターは、DataFrame を返す関数に付けて、その結果をストリーミングテーブルやマテリアライズドビューとして定義する書き方です。",
+      "keyPhrase": "DataFrame を返す関数に付けて",
+      "body": "パイプラインの Python のコードは、`from pyspark import pipelines as dp` で読み込んだモジュールを使います。デコレーターの種類で、作るものが決まります。\n\n- `@dp.table`: ストリーミングテーブル。関数はストリーミングの DataFrame を返す\n- `@dp.materialized_view`: マテリアライズドビュー\n- `@dp.temporary_view`: パイプラインの中だけで使う一時ビュー\n\n```python\nfrom pyspark import pipelines as dp\n\n@dp.table(comment=\"取り込んだ注文\")\ndef orders_bronze():\n    return spark.readStream.table(\"main.raw.orders\")\n```\n\n`@dp.table` の `name` を省くと、関数の名前がテーブルの名前になります。expectation のデコレーター(`@dp.expect` など)は、`@dp.table` などの下、関数の定義の上に重ねます。\n\n古い `dlt` のモジュールの `@dlt.table` は、ストリーミングの DataFrame を返せばストリーミングテーブルを、バッチの DataFrame を返せばマテリアライズドビューを作りました。`dlt` はいまも使えますが、Databricks は `pyspark.pipelines` を勧めています。",
+      "examAngle": "デコレーターを付けた関数のコードを示し、作られる表の種類や名前を問う形で出ます。",
+      "checks": [
+        {
+          "question": "`@dp.table` を付けた関数 `orders_bronze` が `spark.readStream` の DataFrame を返します。`name` は指定していません。作られるものの種類と名前は何ですか。",
+          "answer": "`orders_bronze` という名前のストリーミングテーブルです。",
+          "reason": "`@dp.table` はストリーミングテーブルを定義し、`name` を省くと関数の名前が使われます。"
+        }
+      ],
+      "related": ["streaming-table", "materialized-view"],
+      "references": [
+        {
+          "title": "Lakeflow pipelines Python language reference | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/ldp/developer/python-ref"
+        },
+        {
+          "title": "table | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/ldp/developer/ldp-python-ref-table"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "auto-cdc",
+      "unit": "domain3-6",
+      "order": 6,
+      "term": "AUTO CDC(APPLY CHANGES)",
+      "oneLine": "AUTO CDC は、挿入、更新、削除を含む変更のフィードを、順序の列に従ってストリーミングテーブルに反映する、パイプラインの API です。",
+      "keyPhrase": "順序の列に従ってストリーミングテーブルに反映する",
+      "body": "AUTO CDC は、以前の APPLY CHANGES の API を置き換えたもので、構文は同じです。反映先は、先に作っておいたストリーミングテーブルです(SQL では `CREATE OR REFRESH STREAMING TABLE`、Python では `dp.create_streaming_table()`)。\n\n```sql\nCREATE OR REFRESH STREAMING TABLE customers_current;\n\nCREATE FLOW customers_cdc AS AUTO CDC INTO customers_current\nFROM stream(main.raw.customers_changes)\nKEYS (customer_id)\nAPPLY AS DELETE WHEN operation = 'DELETE'\nSEQUENCE BY seq\nCOLUMNS * EXCEPT (operation, seq)\nSTORED AS SCD TYPE 1;\n```\n\n`KEYS` は行を見分けるキー、`SEQUENCE BY` は変更の順序を決める列です。順序の列は並べ替えられる型にし、NULL は使えません。順序の遅い変更が先に届いていれば、あとから届いた古い変更は捨てられます。`APPLY AS DELETE WHEN` には、削除を表す条件を書きます。\n\n`STORED AS SCD TYPE 1` は最新の値だけを持ち、履歴を残しません。`SCD TYPE 2` は、`__START_AT` と `__END_AT` の列で履歴を残します。\n\nAUTO CDC を使うには、サーバーレスのパイプラインか、Pro か Advanced のエディションが要ります。",
+      "examAngle": "「変更の種類と順序の列を持つ CDC のフィードを、対象の表に反映したい」という要件から、構文を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "AUTO CDC で、変更が届く順序が入れ替わっても正しく反映するために指定する句は何ですか。",
+          "answer": "`SEQUENCE BY` です。",
+          "reason": "`SEQUENCE BY` の列で変更の順序を決めます。順序の古い変更があとから届いても、新しい変更を上書きしません。"
+        },
+        {
+          "question": "顧客の住所の変更の履歴を残したいとき、AUTO CDC で指定する保存の形は何ですか。",
+          "answer": "`STORED AS SCD TYPE 2` です。",
+          "reason": "SCD TYPE 2 は、`__START_AT` と `__END_AT` の列で履歴を残します。SCD TYPE 1 は最新の値だけを持ちます。"
+        }
+      ],
+      "related": ["streaming-table"],
+      "references": [
+        {
+          "title": "The AUTO CDC APIs: Simplify change data capture with pipelines | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/ldp/cdc"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "pipeline-trigger-mode",
+      "unit": "domain3-6",
+      "order": 7,
+      "term": "パイプラインのモード(トリガーと継続)",
+      "oneLine": "パイプラインのモードは、更新を 1 回ずつ実行して止めるトリガーのモードと、止めるまで処理を続ける継続のモードのどちらで、パイプラインを動かすかの設定です。",
+      "keyPhrase": "1 回ずつ実行して止める",
+      "body": "既定は、トリガーのモードです。トリガーのモードでは、更新を始めた時点にあったデータで全ての表を更新し、終わると止まります。そのあとに届いたデータは、次の更新まで処理されません。クラスターは更新の間だけ動くので、費用を抑えられます。更新の間隔が 10 分、1 時間、1 日といった処理に向きます。\n\n継続のモードでは、データが届くたびに処理し、手で止めるまで動き続けます。クラスターが動き続けるので費用は増えますが、遅延は短くなります。間隔が 10 秒から数分の処理に向きます。Databricks は、継続で動かしたいときは、パイプラインの設定ではなく、継続のジョブからパイプラインを動かすことを勧めています。\n\n更新の動き方は、起動のしかたでも変わります。\n\n- UI の「Run now」などで、手でトリガーのパイプラインを動かしたとき: クラスターを使い回して起動の時間を省き、再試行をしないので、エラーにすぐ気づけます。\n- ジョブや API から動かしたときと、継続のパイプライン: 回復できるエラーでクラスターを再起動します。特定のエラーで再試行します。実行が終わるとすぐクラスターを止めます。",
+      "examAngle": "「新しいデータが届くたびに処理し、止めるまで動き続ける」などの要件から、パイプラインのモードを選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "更新を始めた時点のデータで全ての表を更新し、終わったら止まるのは、トリガーと継続のどちらのモードですか。",
+          "answer": "トリガーのモードです。",
+          "reason": "トリガーのモードは、更新の開始時点にあったデータで表を更新して止まります。継続のモードは、手で止めるまで動き続けます。"
+        },
+        {
+          "question": "トリガーのパイプラインを UI から手で動かしたとき、失敗した処理は自動で再試行されますか。",
+          "answer": "再試行されません。",
+          "reason": "UI から手で動かしたときは、エラーにすぐ気づけるように、パイプラインの再試行をしません。"
+        }
+      ],
+      "related": ["streaming-table", "materialized-view"],
+      "references": [
+        {
+          "title": "Triggered vs. continuous pipeline mode | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/ldp/pipeline-mode"
+        },
+        {
+          "title": "Run a pipeline update | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/ldp/updates"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "pipeline-expectation",
+      "unit": "domain3-7",
+      "order": 1,
+      "term": "expectation(EXPECT)",
+      "oneLine": "expectation は、宣言型パイプラインの表やビューを通る各行に、真か偽になる SQL の条件を当てて、データの品質を確かめる仕組みです。",
+      "keyPhrase": "真か偽になる SQL の条件を当てて",
+      "body": "expectation は、名前、条件、条件に合わない行の扱い(アクション)の 3 つからなります。名前は、同じデータセットの中で重ならないようにします。条件は SQL の真偽の式で、Python の独自の関数や、ほかの表を参照する副問い合わせは使えません。\n\n```sql\nCREATE OR REFRESH STREAMING TABLE orders_silver (\n  CONSTRAINT valid_amount EXPECT (amount >= 0)\n)\nAS SELECT * FROM STREAM(orders_bronze);\n```\n\n`ON VIOLATION` を書かないと、アクションは既定の warn になります。条件に合わない行も、そのまま表に書き込まれます。パイプラインは、条件に合う行と合わない行の件数を記録します。件数は、パイプラインの UI の「Data quality」タブや、イベントログで確かめられます。\n\nexpectation を付けられるのは、ストリーミングテーブル、マテリアライズドビュー、一時ビューです。1 つのデータセットに、複数の expectation を付けられます。",
+      "examAngle": "`ON VIOLATION` を書かない expectation を示し、条件に合わない行がどうなるかを問う形で出ます。",
+      "checks": [
+        {
+          "question": "`CONSTRAINT valid_id EXPECT (id IS NOT NULL)` だけを書いたストリーミングテーブルに、`id` が NULL の行が届きました。その行はどうなりますか。",
+          "answer": "表に書き込まれ、条件に合わない行として件数が記録されます。",
+          "reason": "`ON VIOLATION` を書かないときのアクションは warn で、条件に合わない行も表に残します。"
+        }
+      ],
+      "related": ["expect-drop-row", "expect-fail-update", "expect-all"],
+      "references": [
+        {
+          "title": "Manage data quality with pipeline expectations | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/ldp/expectations"
+        },
+        {
+          "title": "CREATE STREAMING TABLE (pipelines) | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/ldp/developer/ldp-sql-ref-create-streaming-table"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "expect-drop-row",
+      "unit": "domain3-7",
+      "order": 2,
+      "term": "ON VIOLATION DROP ROW",
+      "oneLine": "ON VIOLATION DROP ROW は、expectation の条件に合わない行を、表に書き込む前に捨てるアクションです。",
+      "keyPhrase": "表に書き込む前に捨てる",
+      "body": "条件に合わない行は捨てられ、更新そのものは続きます。捨てた行の件数は、データセットの品質の指標として記録されます。\n\n```sql\nCONSTRAINT valid_email EXPECT (email IS NOT NULL) ON VIOLATION DROP ROW\n```\n\nPython では `@dp.expect_or_drop(\"valid_email\", \"email IS NOT NULL\")` と書きます。\n\nシルバー層やゴールド層に、条件に合わない行を入れたくないが、パイプラインは止めたくないときに使います。",
+      "examAngle": "「不正な行を除き、処理は続けたい」という要件から、`ON VIOLATION` のあとに書く句を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "条件に合わない行を表から除き、パイプラインの更新は続けたいとき、`ON VIOLATION` のあとに何を書きますか。",
+          "answer": "`DROP ROW` です。",
+          "reason": "`DROP ROW` は、条件に合わない行を書き込む前に捨て、件数を記録します。更新は失敗しません。"
+        }
+      ],
+      "related": ["pipeline-expectation", "expect-fail-update"],
+      "references": [
+        {
+          "title": "Manage data quality with pipeline expectations | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/ldp/expectations"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "expect-fail-update",
+      "unit": "domain3-7",
+      "order": 3,
+      "term": "ON VIOLATION FAIL UPDATE",
+      "oneLine": "ON VIOLATION FAIL UPDATE は、expectation の条件に合わない行が 1 行でもあれば、その更新を失敗させるアクションです。",
+      "keyPhrase": "その更新を失敗させる",
+      "body": "表の更新の途中で条件に合わない行があると、パイプラインはその更新のトランザクションを不可分に取り消します。エラーの文には、どの expectation に反したかが書かれます。\n\n```sql\nCONSTRAINT valid_amount EXPECT (amount >= 0) ON VIOLATION FAIL UPDATE\n```\n\nPython では `@dp.expect_or_fail(\"valid_amount\", \"amount >= 0\")` と書きます。\n\n失敗したあとは、条件に合わないデータを扱えるようにパイプラインのコードを直してから、処理し直します。トリガーのパイプラインでは、失敗したフローのほかに並行して動くフローは失敗しません。継続のパイプラインでは、失敗したフローと、それに依存するフローが止まります。更新が失敗するので、品質の指標は記録されません。",
+      "examAngle": "「不正なデータが 1 行でもあれば処理を止めたい」という要件から、`ON VIOLATION` のあとに書く句を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "条件に合わない行が 1 行でもあれば、表を更新せずに止めたいとき、`ON VIOLATION` のあとに何を書きますか。",
+          "answer": "`FAIL UPDATE` です。",
+          "reason": "`FAIL UPDATE` は、条件に合わない行があると更新を失敗させ、表の更新のトランザクションを取り消します。"
+        }
+      ],
+      "related": ["pipeline-expectation", "expect-drop-row"],
+      "references": [
+        {
+          "title": "Manage data quality with pipeline expectations | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/ldp/expectations"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "expect-all",
+      "unit": "domain3-7",
+      "order": 4,
+      "term": "expect_all",
+      "oneLine": "expect_all は、Python のパイプラインで、名前と条件の組を辞書で渡して、複数の expectation をまとめて当てるデコレーターです。",
+      "keyPhrase": "辞書で渡して、複数の expectation をまとめて当てる",
+      "body": "`@dp.expect_all` に渡した各条件は、`@dp.expect` と同じく warn として動きます。条件に合わない行も表に残り、件数は条件ごとに記録されます。\n\n```python\nfrom pyspark import pipelines as dp\n\nrules = {\"valid_id\": \"id IS NOT NULL\", \"valid_amount\": \"amount >= 0\"}\n\n@dp.table()\n@dp.expect_all(rules)\ndef orders_silver():\n    return spark.readStream.table(\"orders_bronze\")\n```\n\n行を捨てたいときは `expect_all_or_drop`、更新を失敗させたいときは `expect_all_or_fail` を使います。Python の expectation の関数は 6 つです。まとめて当てる 3 つは `expect_all`、`expect_all_or_drop`、`expect_all_or_fail` です。1 件ずつ当てる 3 つは `expect`、`expect_or_drop`、`expect_or_fail` です。\n\n辞書でまとめる書き方は Python だけにあります。SQL では、`CONSTRAINT … EXPECT` をカンマで区切って並べます。",
+      "examAngle": "複数の品質の条件を 1 つのデコレーターで当てるコードを示し、条件に合わない行の扱いや、関数の名前を問う形で出ます。",
+      "checks": [
+        {
+          "question": "`@dp.expect_all` に 2 つの条件を渡しました。片方の条件に合わない行は、表に残りますか。",
+          "answer": "残ります。",
+          "reason": "`expect_all` の各条件は、`expect` と同じ warn のアクションで当たります。行を捨てるには `expect_all_or_drop` を使います。"
+        },
+        {
+          "question": "複数の条件をまとめて当て、どれかに合わない行があれば更新を失敗させる Python の関数は何ですか。",
+          "answer": "`expect_all_or_fail` です。",
+          "reason": "まとめて当てる関数には、warn の `expect_all`、捨てる `expect_all_or_drop`、失敗させる `expect_all_or_fail` があります。"
+        }
+      ],
+      "related": ["pipeline-expectation", "expect-drop-row", "expect-fail-update"],
+      "references": [
+        {
+          "title": "Expectations | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/ldp/developer/ldp-python-ref-expectations"
+        },
+        {
+          "title": "Manage data quality with pipeline expectations | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/ldp/expectations"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "delta-check-constraint",
+      "unit": "domain3-7",
+      "order": 5,
+      "term": "CHECK 制約",
+      "oneLine": "CHECK 制約は、Delta のテーブルに付けて、条件に合わない値の書き込みをエラーにする制約です。",
+      "keyPhrase": "条件に合わない値の書き込みをエラーにする",
+      "body": "既存のテーブルには、`ALTER TABLE … ADD CONSTRAINT` で付けます。\n\n```sql\nALTER TABLE main.silver.orders ADD CONSTRAINT valid_amount CHECK (amount >= 0);\n```\n\n付けるとき、Databricks は既存の全ての行が条件に合うかを確かめます。合わない行があると、制約を付けられません。付けたあとは、条件に合わない書き込みがあると、トランザクションがエラーで失敗します。\n\n条件の式は、決定的なものにします。ユーザー定義の関数、集計の関数、ウィンドウの関数は使えません。付いている制約は、`DESCRIBE DETAIL` か `SHOW TBLPROPERTIES` で確かめ、`ALTER TABLE … DROP CONSTRAINT` で外します。\n\n制約は、Delta Lake のテーブルでだけ使えます。主キー、外部キー、一意の制約は情報として持つだけで、強制されません。強制されるのは、CHECK 制約と NOT NULL 制約です。",
+      "examAngle": "「既存の Delta のテーブルに、値の範囲の条件を足し、反する書き込みを拒みたい」という要件から、文を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "条件に合わない行がすでにある Delta のテーブルに、`ALTER TABLE … ADD CONSTRAINT … CHECK` で制約を付けようとしました。どうなりますか。",
+          "answer": "制約を付けられません。",
+          "reason": "制約を付けるとき、既存の全ての行が条件に合うかが確かめられます。合わない行があると、付けられません。"
+        },
+        {
+          "question": "CHECK 制約に反する行を含む `INSERT` を実行すると、どうなりますか。",
+          "answer": "トランザクションがエラーで失敗します。",
+          "reason": "Delta のテーブルの制約に反する書き込みは、トランザクションごと失敗します。expectation の warn のように行を残す扱いはありません。"
+        }
+      ],
+      "related": ["pipeline-expectation", "expect-fail-update"],
+      "references": [
+        {
+          "title": "Constraints on Databricks | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/tables/constraints"
         }
       ],
       "status": "verified"

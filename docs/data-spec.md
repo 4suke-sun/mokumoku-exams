@@ -206,6 +206,7 @@
 | `www.nist.gov` | NIST の公式サイト | AWS |
 | `docs.databricks.com` | Databricks の公式ドキュメント | Databricks |
 | `www.databricks.com` | Databricks の公式サイト | Databricks |
+| `spark.apache.org` | Apache Spark の公式ドキュメント(PySpark の API など) | Databricks |
 
 ホストごとに、そのホストを出典にしてよい資格のベンダーを、同じファイルの `REFERENCE_HOST_VENDORS` で定めます。
 作問パイプラインは、出典が公式かどうかを、この対応で判定します。ベンダーの名前は `data/vendors.json` にあるものだけで、
