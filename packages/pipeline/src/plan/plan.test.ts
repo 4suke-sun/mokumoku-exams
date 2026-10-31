@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildPlan, type ExistingQuestion, planItemId, resolveSettings } from "./plan.ts";
+import { buildPlan, type ExistingQuestion, focusItemId, planItemId, resolveSettings } from "./plan.ts";
 import { parsePlan } from "./schema.ts";
 
 const settings = {
@@ -92,6 +92,63 @@ describe("buildPlan", () => {
   });
 });
 
+describe("buildPlan の論点の枠", () => {
+  const focus = {
+    id: "maturity-level",
+    domain: "domain2",
+    difficulty: "medium" as const,
+    kind: "single" as const,
+    count: 5,
+    sourcePrefixes: ["https://docs.example.com/maturity/"],
+    instruction: "企業の現状から、いまのレベルを選ばせる",
+  };
+
+  it("論点の枠がある_枠の数のまま項目が足され_分野の不足の数は変わらない", () => {
+    const plain = buildPlan({ examCode: "EX-SMP-XX", domains, existing: [], settings });
+    const plan = buildPlan({ examCode: "EX-SMP-XX", domains, existing: [], settings: { ...settings, focus: [focus] } });
+    expect(plan.domains).toEqual(plain.domains);
+    const item = plan.items.find((i) => i.focus !== undefined);
+    expect(item).toEqual({
+      id: focusItemId("EX-SMP-XX", "maturity-level"),
+      domain: "domain2",
+      difficulty: "medium",
+      kind: "single",
+      count: 5,
+      focus: {
+        id: "maturity-level",
+        sourcePrefixes: ["https://docs.example.com/maturity/"],
+        instruction: focus.instruction,
+      },
+    });
+    expect(() => parsePlan(plan)).not.toThrow();
+  });
+
+  it("分野の目標を満たしている_論点の枠の項目は出る", () => {
+    const plan = buildPlan({
+      examCode: "EX-SMP-XX",
+      domains,
+      existing: [...existing("domain1", 12), ...existing("domain2", 8)],
+      settings: { ...settings, focus: [focus] },
+    });
+    expect(plan.items.map((i) => i.focus?.id)).toEqual(["maturity-level"]);
+  });
+
+  it("論点の枠の分野がマスタにない_出題計画の誤りになる", () => {
+    expect(() =>
+      buildPlan({
+        examCode: "EX-SMP-XX",
+        domains,
+        existing: [],
+        settings: { ...settings, focus: [{ ...focus, domain: "domain9" }] },
+      }),
+    ).toThrow("出題計画の誤り");
+  });
+
+  it("論点の枠の項目の ID_分野・難易度・種別の項目の ID と重ならない", () => {
+    expect(focusItemId("EX-SMP-XX", "maturity-level")).not.toBe(planItemId("EX-SMP-XX", "domain2", "medium", "single"));
+  });
+});
+
 describe("resolveSettings", () => {
   const plan = {
     targetMultiplier: 3,
@@ -111,5 +168,9 @@ describe("resolveSettings", () => {
     expect(s.targetTotal).toBe(40);
     expect(s.difficultyMix.hard).toBe(0);
     expect(s.typeMix.single).toBe(0.75);
+  });
+
+  it("論点の枠の上書きがない_論点の枠は空になる", () => {
+    expect(resolveSettings(plan, "EX-SMP-XX", 5).focus).toEqual([]);
   });
 });

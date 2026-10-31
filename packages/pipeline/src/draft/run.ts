@@ -346,6 +346,12 @@ function servicePriorityOf(
   return (card) => servicePriority(card, services, status);
 }
 
+/** 論点の枠の依頼で、カードに添える先頭の出典のページと節 */
+function focusSource(card: FactsFile["cards"][number]): { url: string; section: string; heading: string } {
+  const source = card.sources[0];
+  return { url: source?.url ?? "", section: source?.section ?? "", heading: source?.anchor.heading ?? "" };
+}
+
 function requestStep(
   options: DraftOptions,
   paths: Paths,
@@ -422,10 +428,19 @@ function requestStep(
       continue;
     }
     // 再検証の印がある事実カードと、根拠の出典が active でないか本文が変わった事実カードは、根拠の候補にしない
-    const cards = facts.cards.filter((c) => c.domain === item.domain && usableFact(c, ledger));
+    // 論点の枠の項目は、枠の出典の範囲のカードだけを候補にする(分野は問わない)
+    const focus = item.focus;
+    const cards = facts.cards.filter(
+      (c) =>
+        usableFact(c, ledger) &&
+        (focus === undefined
+          ? c.domain === item.domain
+          : c.sources.some((s) => focus.sourcePrefixes.some((p) => s.url.startsWith(p)))),
+    );
     if (cards.length === 0) {
-      if (!noFacts.has(item.domain)) report(output, "下書きの誤り", `no-facts ${item.domain}`);
-      noFacts.add(item.domain);
+      const scope = focus === undefined ? item.domain : `focus:${focus.id}`;
+      if (!noFacts.has(scope)) report(output, "下書きの誤り", `no-facts ${scope}`);
+      noFacts.add(scope);
       unmet[item.id] = ["no-facts"];
       continue;
     }
@@ -450,6 +465,7 @@ function requestStep(
       facts: selected,
       definitionHash: stamp.definitionHash,
       humanRejected,
+      ...(focus !== undefined ? { focusInstruction: focus.instruction } : {}),
     });
     if (state.done.includes(key)) {
       cached++;
@@ -482,7 +498,13 @@ function requestStep(
       difficulty: item.difficulty,
       kind: item.kind,
       count,
-      facts: selected.map((c) => ({ id: c.id, claim: c.claim, confidence: c.confidence, scope: c.scope })),
+      facts: selected.map((c) => ({
+        id: c.id,
+        claim: c.claim,
+        confidence: c.confidence,
+        scope: c.scope,
+        ...(focus !== undefined ? { source: focusSource(c) } : {}),
+      })),
       ...(item.kind === "free-text"
         ? {}
         : { answerPositions: assignAnswerPositions(item.kind, count, positionCounts[item.kind]) }),
@@ -490,6 +512,7 @@ function requestStep(
       styleVersion: STYLE_VERSION,
       ...(styleGuides !== null ? { styleGuides } : {}),
       styleRules: styleRuleSummaries(item.kind),
+      ...(focus !== undefined ? { focus: { instruction: focus.instruction } } : {}),
       outputPath: relative(rootDir, join(paths.outDir, `${key}.json`)),
       agent: stamp,
     };

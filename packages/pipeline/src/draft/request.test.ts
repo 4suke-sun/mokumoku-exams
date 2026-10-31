@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import type { FactCard } from "../facts/schema.ts";
 import { card } from "../facts/test-helpers.ts";
-import { assignAnswerPositions, factSource, positionKey, selectFacts } from "./request.ts";
+import { assignAnswerPositions, factSource, positionKey, requestKey, selectFacts } from "./request.ts";
 
 const URL_A = "https://docs.aws.amazon.com/guide/a.html";
 const URL_B = "https://docs.aws.amazon.com/guide/b.html";
@@ -76,5 +76,24 @@ describe("正答の位置の割り当て", () => {
     const counts = new Map<string, number>();
     assignAnswerPositions("single", 4, counts);
     expect([...counts.values()]).toEqual([1, 1, 1, 1]);
+  });
+});
+
+describe("requestKey の論点の枠", () => {
+  const base = {
+    examCode: "AWS-AIB-C01",
+    planItemId: "p-000000000001",
+    count: 2,
+    round: 0,
+    facts: [{ id: "f-000000000001", claim: "架空の主張" }],
+    definitionHash: "0".repeat(64),
+  };
+
+  it("問いの形の一言がない_鍵は論点の枠を足す前と変わらず_一言があると変わる", () => {
+    expect(requestKey({ ...base, focusInstruction: undefined })).toBe(requestKey(base));
+    expect(requestKey({ ...base, focusInstruction: "いまのレベルを選ばせる" })).not.toBe(requestKey(base));
+    expect(requestKey({ ...base, focusInstruction: "いまのレベルを選ばせる" })).not.toBe(
+      requestKey({ ...base, focusInstruction: "次の段階の取り組みを選ばせる" }),
+    );
   });
 });

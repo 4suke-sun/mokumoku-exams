@@ -171,6 +171,28 @@ export const ConfigSchema = z.strictObject({
             minMultiServiceShare: z.number().min(0).max(1).optional(),
           })
           .optional(),
+        /**
+         * 論点の枠。分野の不足とは別に、決まった論点の問題を、決まった数だけ作る(plan の項目に足す)。
+         * 依頼に載せる事実カードを、出典の URL の接頭辞で絞り(分野は問わない)、問いの形の一言を依頼に添える
+         */
+        focus: z
+          .array(
+            z.strictObject({
+              /** 枠の名前。計画の項目の ID のもとになる(変えると、別の項目として数え直す) */
+              id: z.string().regex(/^[a-z0-9][a-z0-9-]{0,39}$/),
+              domain: z.string().regex(/^domain[1-9][0-9]?$/),
+              difficulty: z.enum(["easy", "medium", "hard"]),
+              kind: z.enum(["single", "multiple"]),
+              /** 作る問題の数(不採用でない下書きの数で数える) */
+              count: z.number().int().min(1).max(50),
+              /** 根拠にする事実カードの出典の URL の接頭辞。どれかで始まる出典を持つカードだけを載せる */
+              sourcePrefixes: z.array(z.string().startsWith("https://").max(2000)).min(1).max(10),
+              /** 問いの形の一言。依頼にそのまま載る */
+              instruction: z.string().min(1).max(300),
+            }),
+          )
+          .max(20)
+          .optional(),
       }),
     ),
   }),
