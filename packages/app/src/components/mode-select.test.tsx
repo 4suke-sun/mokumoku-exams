@@ -2,7 +2,7 @@
 import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { browserStore, loadSession, saveConditions } from "@/lib/storage.ts";
+import { browserStore, loadSession, loadSettings, saveConditions } from "@/lib/storage.ts";
 import type { PublishedExam } from "@/lib/types.ts";
 import { ModeSelect } from "./mode-select.tsx";
 
@@ -33,7 +33,7 @@ beforeEach(() => {
   push.mockClear();
 });
 
-/** モードのカードを選ぶ(出題の設定は、選んだあとに出る) */
+/** モードのカードを選ぶ(問題数などのモードの設定は、選んだあとに出る) */
 async function chooseMode(user: ReturnType<typeof userEvent.setup>, name: string | RegExp = "通常出題") {
   await user.click(await screen.findByRole("button", { name }));
 }
@@ -277,7 +277,7 @@ describe("ModeSelect のモードのカード", () => {
     vi.unstubAllGlobals();
   });
 
-  it("開いたとき_全モードのカードを並べ_出題の設定はまだ出さない", async () => {
+  it("開いたとき_全モードのカードを並べ_モードの設定はまだ出さない", async () => {
     vi.stubGlobal(
       "fetch",
       vi.fn(async () => ({ ok: true, status: 200, json: async () => ({ questionIds: [] }) })),
@@ -355,6 +355,23 @@ describe("ModeSelect のモードのカード", () => {
 });
 
 describe("ModeSelect のシャッフルの設定", () => {
+  it("モードを選んでいない_シャッフルと解答の表示を変えられ_全体の設定に保存する", async () => {
+    localStorage.clear();
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({ ok: true, status: 200, json: async () => ({}) })),
+    );
+    render(<ModeSelect exam={exam} pool={pool} />);
+    const user = userEvent.setup();
+    expect(screen.queryByRole("button", { name: "出題を始める" })).toBeNull();
+    const shuffle = await screen.findByRole("checkbox", { name: /選択肢の並びをシャッフルする/ });
+    await user.click(shuffle);
+    expect((shuffle as HTMLInputElement).checked).toBe(true);
+    await user.click(screen.getByRole("radio", { name: /1 問ごと/ }));
+    expect(loadSettings(browserStore()).reveal).toBe("each");
+    vi.unstubAllGlobals();
+  });
+
   it("シャッフルを切り替える_端末に保存し_アカウントにも送る", async () => {
     const fetchMock = vi.fn(async (_url: string, _init?: { method?: string; body?: string }) => ({
       ok: true,

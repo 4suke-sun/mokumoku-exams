@@ -108,6 +108,7 @@ const MODE_NAMES: Record<SettingsMode, string> = { normal: "通常出題", revie
 export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null }: Props) {
   const router = useRouter();
   const countId = useId();
+  const settingsId = useId();
   const [domains, setDomains] = useState<string[]>([]);
   const [count, setCount] = useState<number>(Math.min(5, pool.length));
   const [error, setError] = useState<string | null>(null);
@@ -133,9 +134,10 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
     const store = browserStore();
     const settings = loadSettings(store);
     setShuffleChoices(settings.shuffleChoices);
-    // 前回この資格で選んだ条件を、初期値にする(なければ、解答の表示だけ、全体の設定から)
+    // 解答の表示は、どのモードにも効く全体の設定から(セクションなど、ほかのモードの出題も同じ設定を使うため)
+    setReveal(settings.reveal ?? "end");
+    // ほかの条件は、前回この資格で選んだものを、初期値にする
     const conditions = loadConditions(store, exam.examCode);
-    setReveal(conditions?.reveal ?? settings.reveal ?? "end");
     if (conditions) {
       setTarget(conditions.target);
       // 前に条件を選んでいたときは、そのモードの設定を開いたままにする
@@ -398,6 +400,46 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
         </div>
       ) : null}
 
+      <section aria-labelledby={settingsId} className="space-y-3">
+        <h2 id={settingsId} className="h2">
+          出題の設定
+        </h2>
+        <p className="text-sm text-muted">
+          どのモードにも効きます。本番モードは、本番と同じく、まとめて最後に採点します。
+        </p>
+        <label className="flex items-center gap-3 rounded-md border border-line bg-surface p-3">
+          <input
+            type="checkbox"
+            className="size-5"
+            checked={shuffleChoices}
+            onChange={(event) => changeShuffle(event.target.checked)}
+          />
+          <span>
+            選択肢の並びをシャッフルする
+            <span className="block text-sm text-muted">位置で答えを覚えてしまうのを防ぎます。採点は変わりません。</span>
+          </span>
+        </label>
+
+        <fieldset className="space-y-2">
+          <legend className="font-bold">解答の表示</legend>
+          {REVEALS.map((item) => (
+            <label key={item.id} className="flex items-start gap-3 rounded-md border border-line bg-surface p-3">
+              <input
+                type="radio"
+                name="reveal"
+                className="mt-1 size-5"
+                checked={reveal === item.id}
+                onChange={() => changeReveal(item.id)}
+              />
+              <span>
+                {item.name}
+                <span className="block text-sm text-muted">{item.description}</span>
+              </span>
+            </label>
+          ))}
+        </fieldset>
+      </section>
+
       <div className="space-y-3">
         <h2 className="h2">モード</h2>
         <ul className="motion-stagger grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -456,7 +498,7 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
 
       {mode === null ? (
         <>
-          <p className="text-sm text-muted">「通常出題」「復習」「自由記述」を選ぶと、出題の設定が出ます。</p>
+          <p className="text-sm text-muted">「通常出題」「復習」「自由記述」を選ぶと、問題数などの設定が出ます。</p>
           {error ? <Notice kind="error">{error}</Notice> : null}
         </>
       ) : (
@@ -578,41 +620,6 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
               </span>
             </span>
           </label>
-
-          <label className="flex items-center gap-3 rounded-md border border-line bg-surface p-3">
-            <input
-              type="checkbox"
-              className="size-5"
-              checked={shuffleChoices}
-              onChange={(event) => changeShuffle(event.target.checked)}
-            />
-            <span>
-              選択肢の並びをシャッフルする
-              <span className="block text-sm text-muted">
-                位置で答えを覚えてしまうのを防ぎます。採点は変わりません。
-              </span>
-            </span>
-          </label>
-
-          <fieldset className="space-y-2">
-            <legend className="text-lg font-bold">解答の表示</legend>
-            {REVEALS.map((item) => (
-              <label key={item.id} className="flex items-start gap-3 rounded-md border border-line bg-surface p-3">
-                <input
-                  type="radio"
-                  name="reveal"
-                  className="mt-1 size-5"
-                  checked={reveal === item.id}
-                  onChange={() => changeReveal(item.id)}
-                />
-                <span>
-                  {item.name}
-                  <span className="block text-sm text-muted">{item.description}</span>
-                </span>
-              </label>
-            ))}
-            <p className="text-sm text-muted">本番モードは、本番と同じく、まとめて最後に採点します。</p>
-          </fieldset>
 
           <div className="space-y-2">
             <label htmlFor={countId} className="block text-lg font-bold">
