@@ -36,7 +36,7 @@
 | 日ごとの学習量に足す | `PutItem`(`ReturnValues=ALL_OLD`)→ `UpdateItem`(`ADD`) | 結果の保存で、結果の項目が新しく作られたとき(上書きした項目が返らないとき)だけ、`SK=DAY#{資格}#{日付}` の `answered` と `correct` に足す。項目がなければ 0 から足す |
 | 資格の日ごとの学習量を取る | `Query` | `PK=USER#{sub}` かつ `begins_with(SK, "DAY#{資格}#")`。日付の順 |
 | 目標日を決める・消す・取る | `PutItem` / `DeleteItem` / `GetItem` | `SK=GOAL#{資格}`。資格ごとに 1 項目 |
-| セクションの進捗を取り込む・取る | `GetItem` → `PutItem` | `SK=SECTIONS#{資格}`。資格ごとに 1 項目。項目は `type`(`sections`)・`examCode`・`best`(セクションの番号ごとの、いちばん良い記録 `{ correct, total, finishedAt }`)・`last`(直近に採点したセクションの記録と番号。なければ省く)だけ。取り込むたびに、保存済みの項目と 1 つにして書く(セクションごとに正答数の多いほうを残し、直近は完了時刻の新しいほうを残す)。読み出した値は検査し、壊れた値は、保存していないものとして扱う |
+| セクションの進捗を取り込む・取る | `GetItem` → `PutItem` | `SK=SECTIONS#{資格}`。資格ごとに 1 項目。項目は `type`(`sections`)・`examCode`・`best`(セクションの番号ごとの、いちばん良い記録 `{ correct, total, finishedAt }`。解き直しで合格にした記録は、`retry: true` を持ち、正答数を合格に要る数にする)・`last`(直近に採点したセクションの記録と番号。なければ省く)だけ。取り込むたびに、保存済みの項目と 1 つにして書く(セクションごとに正答数の多いほうを残し、直近は完了時刻の新しいほうを残す)。読み出した値は検査し、壊れた値は、保存していないものとして扱う |
 | 表示の設定を保存する・取る | `PutItem` / `GetItem` | `SK=PREFS`。利用者ごとに 1 項目。項目は `type`(`prefs`)・`theme`(`system` / `light` / `dark`)・`style`(`rich` / `simple`)・`shuffleChoices`(真偽値)だけ。上書きする。読み出した値は検査し、壊れた値は、保存していないものとして扱う |
 | 管理者の操作を記録する | `PutItem` | `PK=ADMIN`、`SK=AUDIT#{時刻}#{対象のユーザー名}`。無効化のあとに 1 件。項目は `at`(時刻)・`actor`(操作した管理者の `sub`)・`target`(対象の Cognito のユーザー名)・`action`(`disable-user`)だけで、メールアドレスは入れない |
 | 通知を購読する・やめる | `PutItem` / `DeleteItem` | `SK=PUSH#{endpoint の SHA-256}`。同じ端末(endpoint)は上書き |
