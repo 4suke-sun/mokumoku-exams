@@ -982,7 +982,10 @@ function importStep(
       }
       // 重複の検出: 公開済みの問題や下書きとほぼ同じなら落とし、近ければ保留にして確かめる
       // 直した下書きは、直す前の下書きとは比べない(同じ問いを直したものなので、似ているのが当然)
-      const others = reviseOf === undefined ? pool : pool.filter((c) => c.ref !== reviseOf);
+      // 書き直した下書きも、書き直す元の問題の下書き(来歴でつながる下書き)とは比べない
+      const rewriteOriginDraftId =
+        rewriteId === undefined ? undefined : provenance.entries.find((e) => e.questionId === rewriteId)?.draftId;
+      const others = pool.filter((c) => c.ref !== reviseOf && c.ref !== rewriteOriginDraftId);
       const dups =
         reasons.length === 0 ? findDuplicates(candidateOf(id, "draft", draft), others, config.draft.similarity) : [];
       for (const f of dups.filter((d) => d.level === "duplicate")) {

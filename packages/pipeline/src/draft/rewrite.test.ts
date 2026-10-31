@@ -154,6 +154,37 @@ describe("draft --rewrite と取り込み", () => {
     expect(provenance.entries.find((e) => e.questionId === REWRITE_ID)?.draftId).toBe("d-0000000000aa");
   });
 
+  it("元の問題の下書きが残っている_その下書きとは重複を比べず、書き直しを通す", async () => {
+    const root = setupRewriteRoot();
+    await runMain(root, ["draft", EXAM, "--rewrite"]);
+    const request = rewriteRequests(root)[0] as DraftRequest;
+    const rewritten = draftFor(request, { questionText: REWRITTEN_TEXT });
+    writeOutput(root, request, [rewritten]);
+    // 元の問題を書き出した下書き(来歴の draftId)が、同じ本文で残っている
+    const path = workPath(root, "drafts.json");
+    const file = readDrafts(path, EXAM);
+    writeDrafts(path, {
+      ...file,
+      drafts: [
+        ...file.drafts,
+        {
+          id: "d-0000000000aa",
+          planItemId: "p-0000000000aa",
+          domain: "domain1",
+          difficulty: "easy",
+          status: "passed",
+          reasons: [],
+          warnings: [],
+          draft: rewritten,
+        },
+      ],
+    });
+    await runMain(root, ["draft", EXAM, "--import"]);
+    const draft = records(root).find((d) => d.rewriteOf === REWRITE_ID) as DraftRecord;
+    expect(draft.status).toBe("passed");
+    expect(draft.reasons).toEqual([]);
+  });
+
   it("出典が元と違う根拠で書き直した_不採用(rewrite:references-changed)", async () => {
     const root = setupRewriteRoot();
     const draft = await rewriteAndImport(root, (request) =>
