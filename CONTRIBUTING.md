@@ -24,7 +24,7 @@ npm install   # 依存を入れ、検査フック(.githooks)を有効にしま�
 | `npm test` | テスト(Vitest) |
 | `npm run test:e2e` | 主要な画面の通し確認(Playwright)。開発サーバーを代替の認証で起動して通す。初回は `npx playwright install chromium` が必要 |
 | `npm run check:release-notes` | リリースノートとタグの対応の検査 |
-| `npm run validate:data` | 資格マスタ・問題データ・カリキュラム・体系ノート・要約カード・使い方ページのデータの検査(仕様: `docs/data-spec.md`) |
+| `npm run validate:data` | 資格マスタ・問題データ・非公開の問題・カリキュラム・体系ノート・要約カード・使い方ページのデータの検査(仕様: `docs/data-spec.md`) |
 | `npm run lessons -- <add\|list\|repeats\|draft\|close>` | 引っかかりの受け箱(`.git` の共有領域)の記録と集計。手順は `docs/lessons-workflow.md` |
 | `npm run metrics` | 手元の計測の集計(`verify` の段階ごとの時間、サブエージェントの時間とトークン、検査の台帳の内訳)。`-- agent <役> <ミリ秒> <トークン>` で記録を足す |
 | `npm run -s mask` | 標準入力の出力から値を伏せて出す(コミット・push・PR の検査と同じ正規表現と許可されていないメールアドレス、数字だけの 12 桁、`.env` の 4 文字以上の値、拒否リストの語。伏せきれない行は出さない)。合成と差分の出力を読むときに通す。伏せない形と注意は `docs/app/lessons/0004-mask-diff-output.md` |
