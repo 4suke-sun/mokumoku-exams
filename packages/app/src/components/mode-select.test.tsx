@@ -347,6 +347,19 @@ describe("ModeSelect のモードのカード", () => {
     expect(screen.getByRole("link", { name: "直前チェック(ブックマーク)" })).toBeTruthy();
   });
 
+  it("体系ノートがある_入口と見出しの数を出す", async () => {
+    render(<ModeSelect exam={exam} pool={pool} notebookCount={3} />);
+    const link = await screen.findByRole("link", { name: "体系ノート" });
+    expect(link.getAttribute("href")).toBe("/exams/TEST/notebook");
+    expect(screen.getByText("見出し 3 件")).toBeTruthy();
+  });
+
+  it("体系ノートがない資格_入口を出さない", async () => {
+    render(<ModeSelect exam={exam} pool={pool} />);
+    await screen.findByRole("button", { name: "通常出題" });
+    expect(screen.queryByText("体系ノート")).toBeNull();
+  });
+
   it("カリキュラムがない_学習モードは準備中", async () => {
     render(<ModeSelect exam={exam} pool={pool} />);
     expect(await screen.findByText(/単元ごとに読んでから解きます。\(準備中です\)/)).toBeTruthy();

@@ -66,6 +66,8 @@ type Props = {
   studyUnits?: number | null;
   /** 要約カードの枚数。要約カードがない資格では null(入口を出さない) */
   summaryCount?: number | null;
+  /** 体系ノートの見出しの数(検証済みだけ)。体系ノートがない資格では null(入口を出さない) */
+  notebookCount?: number | null;
 };
 
 const COUNT_CHOICES = [5, 10, 20, 50];
@@ -105,7 +107,7 @@ type ModeCard = {
 
 const MODE_NAMES: Record<SettingsMode, string> = { normal: "通常出題", review: "復習", "free-text": "自由記述" };
 
-export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null }: Props) {
+export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null, notebookCount = null }: Props) {
   const router = useRouter();
   const countId = useId();
   const settingsId = useId();
@@ -311,6 +313,20 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null 
       kind: "link",
       href: `/exams/${exam.examCode}/study`,
     },
+    ...(notebookCount === null
+      ? []
+      : [
+          {
+            id: "notebook",
+            name: "体系ノート",
+            emoji: "📓",
+            tone: "tone-domain-5",
+            description: "試験の分野と出題範囲の項目ごとに、用語の解説を読みます。",
+            meta: `見出し ${notebookCount} 件`,
+            kind: "link" as const,
+            href: `/exams/${exam.examCode}/notebook`,
+          },
+        ]),
     {
       id: "sections",
       name: "セクションで解く",

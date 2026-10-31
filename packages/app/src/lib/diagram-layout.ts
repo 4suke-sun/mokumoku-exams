@@ -1,5 +1,6 @@
 import type {
   CompareDiagram,
+  CompareItemState,
   Diagram,
   FlowDiagram,
   HierarchyDiagram,
@@ -12,6 +13,7 @@ import type {
 // - 矢印のラベルは、段と段の間の帯に、行を分けて置く。帯の行の数を、その帯に置くラベルの数以上にするので、
 //   ラベルどうし、ラベルと箱は、必ず重ならない。ほかの矢印の線にかからない行があれば、そこを選ぶ。
 // 比較の図(compare): 左右に、見出しの箱と項目の箱を並べる。左右の項目は、同じ行どうしを対応させる。
+//   上下に積む形(`stacked`)では、左の側を上に、右の側を下に、1 列で並べる(狭い画面で、文字を小さくしないため)。
 // 階層の図(hierarchy): 根の箱の中に、子の箱を入れ子にして、上から順に並べる。
 // 箱の文字は、折り返し、それでも収まらなければ小さくする(`fitText`)。収まらない図は、`diagramProblems` が報告する。
 // 文字の幅は、全角を 1 文字分、半角を 0.6 文字分として見積もる(描画の前に文字の大きさを測れないため)。
@@ -53,10 +55,11 @@ export type DiagramLayout = {
   edges: PlacedEdge[];
 };
 
-/** 比較・階層の図の箱。`tone` は、色の役割(画面側で、色に対応させる) */
+/** 比較・階層の図の箱。`tone` は、色の役割(画面側で、色に対応させる)。`state` は、比較の項目の状態(消える・残る) */
 export type PlacedBox = Box & {
   tone: "heading-left" | "heading-right" | "item" | "depth-0" | "depth-1" | "depth-2" | "depth-3";
   texts: PlacedText[];
+  state?: CompareItemState;
 };
 export type BoxLayout = {
   kind: "compare" | "hierarchy";
@@ -392,10 +395,17 @@ function placeTexts(texts: Omit<PlacedText, "x">[], box: Box): PlacedText[] {
   return texts.map((t) => ({ ...t, x: box.x + box.width / 2, y: box.y + t.y }));
 }
 
-/** 比較の図: 左右の列に、見出しと項目を並べる。同じ行の左右は、高いほうに高さをそろえる。 */
-export function layoutCompare(diagram: CompareDiagram): BoxLayout {
+/** 項目の状態を、箱に写す(状態のない項目には、項目を足さない) */
+const withState = (state: CompareItemState | undefined) => (state ? { state } : {});
+
+/**
+ * 比較の図: 左右の列に、見出しと項目を並べる。同じ行の左右は、高いほうに高さをそろえる。
+ * `stacked` では、左の側を上に、右の側を下に、1 列で積む(列の幅は、左右に並べるときと同じ)。
+ */
+export function layoutCompare(diagram: CompareDiagram, { stacked = false }: { stacked?: boolean } = {}): BoxLayout {
   const column = (WIDE_WIDTH - COMPARE_GAP) / 2;
   const inner = column - NODE_PADDING_X * 2;
+  if (stacked) return layoutCompareStacked(diagram, column, inner);
   const leftX = MARGIN;
   const rightX = MARGIN + column + COMPARE_GAP;
   const boxes: PlacedBox[] = [];
@@ -413,14 +423,13 @@ export function layoutCompare(diagram: CompareDiagram): BoxLayout {
   let y = MARGIN + headingHeight + ROW_GAP;
   const rowCount = Math.max(diagram.left.items.length, diagram.right.items.length);
   for (let i = 0; i < rowCount; i += 1) {
-    const fits = [diagram.left.items[i], diagram.right.items[i]].map((item) =>
-      item ? fitBoxText(item.label, item.note, inner, "label") : null,
-    );
+    const items = [diagram.left.items[i], diagram.right.items[i]];
+    const fits = items.map((item) => (item ? fitBoxText(item.label, item.note, inner, "label") : null));
     const height = Math.max(NODE_MIN_HEIGHT, ...fits.map((fit) => fit?.height ?? 0));
     fits.forEach((fit, side) => {
       if (!fit) return;
       const box = { x: side === 0 ? leftX : rightX, y, width: column, height };
-      boxes.push({ ...box, tone: "item", texts: placeTexts(fit.texts, box) });
+      boxes.push({ ...box, tone: "item", texts: placeTexts(fit.texts, box), ...withState(items[side]?.state) });
     });
     y += height + ROW_GAP;
   }
@@ -430,6 +439,38 @@ export function layoutCompare(diagram: CompareDiagram): BoxLayout {
     height: y - ROW_GAP + MARGIN,
     boxes,
     versus: { x: MARGIN + column + COMPARE_GAP / 2, y: MARGIN + headingHeight / 2 },
+  };
+}
+
+/** 比較の図を上下に積む: 左の側(見出しと項目)、「vs」、右の側の順に、1 列で並べる */
+function layoutCompareStacked(diagram: CompareDiagram, column: number, inner: number): BoxLayout {
+  const boxes: PlacedBox[] = [];
+  let y = MARGIN;
+  let versus: Point | undefined;
+  for (const side of ["left", "right"] as const) {
+    if (side === "right") {
+      // 左の側の最後の箱の下端から、COMPARE_GAP だけ空けて、その中央に「vs」を置く
+      const end = y - ROW_GAP;
+      versus = { x: MARGIN + column / 2, y: end + COMPARE_GAP / 2 };
+      y = end + COMPARE_GAP;
+    }
+    const heading = fitBoxText(diagram[side].heading, undefined, inner, "heading");
+    const headingBox = { x: MARGIN, y, width: column, height: heading.height };
+    boxes.push({ ...headingBox, tone: `heading-${side}`, texts: placeTexts(heading.texts, headingBox) });
+    y += heading.height + ROW_GAP;
+    for (const item of diagram[side].items) {
+      const fit = fitBoxText(item.label, item.note, inner, "label");
+      const box = { x: MARGIN, y, width: column, height: Math.max(NODE_MIN_HEIGHT, fit.height) };
+      boxes.push({ ...box, tone: "item", texts: placeTexts(fit.texts, box), ...withState(item.state) });
+      y += box.height + ROW_GAP;
+    }
+  }
+  return {
+    kind: "compare",
+    width: column + MARGIN * 2,
+    height: y - ROW_GAP + MARGIN,
+    boxes,
+    ...(versus ? { versus } : {}),
   };
 }
 
@@ -468,13 +509,13 @@ export function layoutHierarchy(diagram: HierarchyDiagram): BoxLayout {
   return { kind: "hierarchy", width: WIDE_WIDTH + MARGIN * 2, height: rootHeight + MARGIN * 2, boxes };
 }
 
-/** 図の種類に応じて配置する */
-export function layoutAny(diagram: Diagram): AnyLayout {
+/** 図の種類に応じて配置する。`stacked` は、比較の図を上下に積む(ほかの種類には効かない) */
+export function layoutAny(diagram: Diagram, { stacked = false }: { stacked?: boolean } = {}): AnyLayout {
   switch (diagram.type) {
     case "flow":
       return layoutDiagram(diagram);
     case "compare":
-      return layoutCompare(diagram);
+      return layoutCompare(diagram, { stacked });
     case "hierarchy":
       return layoutHierarchy(diagram);
   }

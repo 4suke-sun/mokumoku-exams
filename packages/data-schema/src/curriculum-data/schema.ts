@@ -86,8 +86,18 @@ const FlowDiagramSchema = z
     }
   });
 
+/**
+ * 比較の図の項目の状態(任意)。操作のあとに、その項目が消えるか(`removed`)、残るか(`kept`)。
+ * 画面は、消える項目に斜線を引き、残る項目を強調する。状態のない項目は、ふだんの箱にする。
+ */
+export const COMPARE_ITEM_STATES = ["removed", "kept"] as const;
+
 /** 比較の図の 1 項目(左右どちらかの側の箱) */
-const CompareItemSchema = z.strictObject({ label: BOX_LABEL, note: BOX_NOTE.optional() });
+const CompareItemSchema = z.strictObject({
+  label: BOX_LABEL,
+  note: BOX_NOTE.optional(),
+  state: z.enum(COMPARE_ITEM_STATES).optional(),
+});
 
 /** 比較の図の片側: 見出しと、上から順に並べる項目 */
 const CompareSideSchema = z.strictObject({
@@ -301,6 +311,7 @@ export type Diagram = z.infer<typeof DiagramSchema>;
 export type FlowDiagram = Extract<Diagram, { type: "flow" }>;
 export type CompareDiagram = Extract<Diagram, { type: "compare" }>;
 export type HierarchyDiagram = Extract<Diagram, { type: "hierarchy" }>;
+export type CompareItemState = (typeof COMPARE_ITEM_STATES)[number];
 export type CurriculumDomain = z.infer<typeof CurriculumDomainSchema>;
 export type CurriculumSection = z.infer<typeof CurriculumSectionSchema>;
 export type CurriculumStage = z.infer<typeof CurriculumStageSchema>;

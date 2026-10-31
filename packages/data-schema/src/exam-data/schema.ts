@@ -235,6 +235,7 @@ export const ALLOWED_REFERENCE_HOSTS: readonly string[] = [
   "www.nist.gov",
   "docs.databricks.com",
   "www.databricks.com",
+  "spark.apache.org",
 ];
 
 /** 出典の題・URL の長さと、1 か所あたりの出典の数の上限 */
@@ -253,6 +254,7 @@ export const REFERENCE_HOST_VENDORS: Readonly<Record<string, readonly string[]>>
   "www.nist.gov": ["AWS"],
   "docs.databricks.com": ["Databricks"],
   "www.databricks.com": ["Databricks"],
+  "spark.apache.org": ["Databricks"],
 };
 
 /** 出典の URL を落とす理由のコード。値は含めない */
