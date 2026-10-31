@@ -5,13 +5,102 @@
       "id": "domain1-1",
       "domain": "domain1",
       "order": 1,
-      "title": "基盤の構成要素"
+      "title": "基盤の構成要素",
+      "intro": "Databricks の基盤は、Databricks が運用するコントロールプレーンと、処理を動かすコンピュートプレーンに分かれます。この中分類では、その構成と、データを管理する Unity Catalog、表の形式の Delta Lake(スキーマの強制、履歴、タイムトラベル、VACUUM)を扱います。",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "Unity Catalog のオブジェクトの階層",
+        "root": {
+          "label": "メタストア",
+          "note": "最上位の入れ物",
+          "children": [
+            {
+              "label": "カタログ",
+              "note": "名前の 1 段目",
+              "children": [
+                {
+                  "label": "スキーマ",
+                  "note": "名前の 2 段目",
+                  "children": [
+                    {
+                      "label": "テーブル"
+                    },
+                    {
+                      "label": "ビュー"
+                    },
+                    {
+                      "label": "ボリューム"
+                    },
+                    {
+                      "label": "関数"
+                    },
+                    {
+                      "label": "モデル"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "label": "外部ロケーション",
+              "note": "メタストアの直下"
+            },
+            {
+              "label": "ストレージの資格情報",
+              "note": "メタストアの直下"
+            }
+          ]
+        }
+      }
     },
     {
       "id": "domain1-2",
       "domain": "domain1",
       "order": 2,
-      "title": "コンピュートの種類と選び方"
+      "title": "コンピュートの種類と選び方",
+      "intro": "Databricks のコンピュートには、サーバーレス、ジョブコンピュート、汎用コンピュート、SQL ウェアハウスがあります。この中分類では、誰がコンピュートを管理するか、起動の速さ、使える言語と機能の制約で、ワークロードに合う種類を選ぶ方法と、インスタンスの種類、スポット、オートスケーリングの設定を扱います。",
+      "comparison": {
+        "columns": ["サーバーレス(ジョブ)", "ジョブコンピュート(クラシック)", "汎用コンピュート", "SQL ウェアハウス"],
+        "rows": [
+          {
+            "aspect": "動く場所",
+            "cells": [
+              "Databricks のアカウント",
+              "利用者のクラウドアカウント",
+              "利用者のクラウドアカウント",
+              "サーバーレスは Databricks のアカウント、Pro とクラシックは利用者のアカウント"
+            ]
+          },
+          {
+            "aspect": "主な用途",
+            "cells": [
+              "ノートブック、Python、wheel のタスク(推奨の既定)",
+              "JAR と Spark Submit のタスク",
+              "対話的な開発と分析",
+              "SQL と dbt のタスク、BI、ダッシュボード"
+            ],
+            "highlight": true
+          },
+          {
+            "aspect": "止まるとき",
+            "cells": [
+              "Databricks が管理する",
+              "そのコンピュートを使う最後のタスクが終わったとき",
+              "自動終了の時間が過ぎたとき",
+              "自動停止の時間が過ぎたとき"
+            ]
+          },
+          {
+            "aspect": "主な制約",
+            "cells": [
+              "R と RDD API は使えない。Spark UI はない",
+              "設定を利用者が受け持つ",
+              "本番のジョブには勧められない",
+              "SQL だけを実行する"
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "domain2-1",
@@ -882,55 +971,345 @@
       "id": "domain5-1",
       "domain": "domain5",
       "order": 1,
-      "title": "Git フォルダー"
+      "title": "Git フォルダー",
+      "intro": "Git フォルダーは、ワークスペースの中で Git のリポジトリを扱うための機能です。この中分類では、ブランチの作成と切り替え、Commit & Push と Pull、プルリクエストのように Git のプロバイダー側で行う操作を扱います。",
+      "diagram": {
+        "type": "flow",
+        "title": "Git フォルダーでの変更の流れ",
+        "nodes": [
+          {
+            "id": "branch",
+            "label": "ブランチを作る",
+            "note": "Git フォルダーで、元のブランチを選ぶ"
+          },
+          {
+            "id": "edit",
+            "label": "ノートブックを編集",
+            "note": "Git フォルダーの中で作業する"
+          },
+          {
+            "id": "push",
+            "label": "Commit & Push",
+            "note": "Git フォルダーで、コミットとリモートへの送信"
+          },
+          {
+            "id": "pr",
+            "label": "プルリクエスト",
+            "note": "Git のプロバイダーで作り、マージする"
+          },
+          {
+            "id": "pull",
+            "label": "Pull",
+            "note": "Git フォルダーで、リモートの変更を取り込む"
+          }
+        ],
+        "edges": [
+          {
+            "from": "branch",
+            "to": "edit"
+          },
+          {
+            "from": "edit",
+            "to": "push"
+          },
+          {
+            "from": "push",
+            "to": "pr"
+          },
+          {
+            "from": "pr",
+            "to": "pull"
+          }
+        ]
+      }
     },
     {
       "id": "domain5-2",
       "domain": "domain5",
       "order": 2,
-      "title": "バンドルの変数と上書き"
+      "title": "バンドルの変数と上書き",
+      "intro": "バンドルは、1 つの設定から開発、検証、本番などの環境へ配布します。この中分類では、環境を定義する targets、環境ごとに値を変える変数、環境の性格を決めるデプロイのモードを扱います。",
+      "comparison": {
+        "columns": ["development モード", "production モード"],
+        "rows": [
+          {
+            "aspect": "リソースの名前",
+            "cells": ["`[dev <ユーザー名>]` の接頭辞が付く", "接頭辞は付かない"]
+          },
+          {
+            "aspect": "ジョブのスケジュールとトリガー",
+            "cells": ["一時停止の状態で配布される", "定義のとおりに動く"],
+            "highlight": true
+          },
+          {
+            "aspect": "既存のクラスターへの差し替え",
+            "cells": ["`--cluster-id` などで差し替えられる", "差し替えられない"]
+          },
+          {
+            "aspect": "そのほかの挙動",
+            "cells": [
+              "配布のロックを外し、繰り返しの配布を速くする",
+              "Git のブランチ、パイプラインの開発用の印、実行の ID などを確かめる"
+            ]
+          },
+          {
+            "aspect": "向く環境",
+            "cells": ["開発者ごとの開発の環境", "本番の環境(サービスプリンシパルでの実行を勧める)"]
+          }
+        ]
+      }
     },
     {
       "id": "domain5-3",
       "domain": "domain5",
       "order": 3,
-      "title": "バンドルでの配布と昇格"
+      "title": "バンドルでの配布と昇格",
+      "intro": "Declarative Automation Bundles(旧称 Databricks Asset Bundles)は、ジョブやパイプラインをソースのファイルとして定義し、環境の間で同じ形のまま配布する仕組みです。この中分類では、設定の入口の databricks.yml、配布する対象の resources、環境の間での昇格の流れを扱います。",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "databricks.yml の主な項目",
+        "root": {
+          "label": "databricks.yml",
+          "children": [
+            {
+              "label": "bundle",
+              "note": "バンドルの名前(必須)"
+            },
+            {
+              "label": "include",
+              "note": "リソースの設定のファイルを取り込む"
+            },
+            {
+              "label": "variables",
+              "note": "変数の宣言と既定値"
+            },
+            {
+              "label": "resources",
+              "note": "配布する対象",
+              "children": [
+                {
+                  "label": "jobs"
+                },
+                {
+                  "label": "pipelines"
+                }
+              ]
+            },
+            {
+              "label": "targets",
+              "note": "配布先の環境",
+              "children": [
+                {
+                  "label": "dev"
+                },
+                {
+                  "label": "prod"
+                }
+              ]
+            }
+          ]
+        }
+      }
     },
     {
       "id": "domain5-4",
       "domain": "domain5",
       "order": 4,
-      "title": "Databricks CLI"
+      "title": "Databricks CLI",
+      "intro": "Databricks CLI の bundle コマンドで、バンドルを検証し、配布し、実行します。この中分類では、CI/CD の流れで使う validate、deploy、run と、既存のジョブを取り込む generate と bind、CLI の認証を扱います。",
+      "diagram": {
+        "type": "flow",
+        "title": "CI/CD の流れで使う bundle コマンド",
+        "nodes": [
+          {
+            "id": "validate",
+            "label": "bundle validate",
+            "note": "設定の誤りを、配布せずに確かめる"
+          },
+          {
+            "id": "deploy",
+            "label": "bundle deploy",
+            "note": "ターゲットのワークスペースへ配布する"
+          },
+          {
+            "id": "run",
+            "label": "bundle run",
+            "note": "配布したジョブなどをキーで実行する"
+          },
+          {
+            "id": "destroy",
+            "label": "bundle destroy",
+            "note": "配布したリソースを消す"
+          }
+        ],
+        "edges": [
+          {
+            "from": "validate",
+            "to": "deploy"
+          },
+          {
+            "from": "deploy",
+            "to": "run"
+          },
+          {
+            "from": "run",
+            "to": "destroy",
+            "label": "不要になったら"
+          }
+        ]
+      }
     },
     {
       "id": "domain6-1",
       "domain": "domain6",
       "order": 1,
-      "title": "実行時間の傾向"
+      "title": "実行時間の傾向",
+      "intro": "ジョブが遅くなったかどうかは、過去の実行と比べて判断します。この中分類では、ジョブの実行の履歴の画面、実行時間のしきい値、実行の記録を持つシステムテーブルを扱います。"
     },
     {
       "id": "domain6-2",
       "domain": "domain6",
       "order": 2,
-      "title": "ジョブの監視"
+      "title": "ジョブの監視",
+      "intro": "ジョブの健全性は、実行の状態と、タスクの依存関係(DAG)のどこで止まったかで見ます。この中分類では、実行の詳細の画面、通知、同時実行の上限とキューを扱います。"
     },
     {
       "id": "domain6-3",
       "domain": "domain6",
       "order": 3,
-      "title": "Spark UI で見る性能の阻害要因"
+      "title": "Spark UI で見る性能の阻害要因",
+      "intro": "Spark UI では、時間のかかるステージを見つけ、その原因を偏り、あふれ出し、I/O、並列のなさに分けて調べます。この中分類では、ステージのメトリクスの読み方と、シャッフル、ディスクへのあふれ出し、データの偏り、タスクが 1 つのステージを扱います。",
+      "diagram": {
+        "type": "flow",
+        "title": "Spark UI で遅いジョブの原因を探す順",
+        "nodes": [
+          {
+            "id": "timeline",
+            "label": "ジョブのタイムライン",
+            "note": "全体の形を見る"
+          },
+          {
+            "id": "longest",
+            "label": "最も長いステージ",
+            "note": "所要時間で並べ替える"
+          },
+          {
+            "id": "one-task",
+            "label": "タスクが 1 つ",
+            "note": "並列にならない原因を除く"
+          },
+          {
+            "id": "skew-spill",
+            "label": "偏りとあふれ出し",
+            "note": "サマリーメトリクスを見る"
+          },
+          {
+            "id": "io",
+            "label": "I/O の多さ",
+            "note": "入出力とシャッフルの量"
+          },
+          {
+            "id": "other",
+            "label": "そのほかの原因",
+            "note": "I/O が少ないのに遅い"
+          }
+        ],
+        "edges": [
+          {
+            "from": "timeline",
+            "to": "longest"
+          },
+          {
+            "from": "longest",
+            "to": "one-task",
+            "label": "タスクが 1 つ"
+          },
+          {
+            "from": "longest",
+            "to": "skew-spill",
+            "label": "タスクが複数"
+          },
+          {
+            "from": "skew-spill",
+            "to": "io",
+            "label": "どちらもない"
+          },
+          {
+            "from": "io",
+            "to": "other",
+            "label": "I/O が少ない"
+          }
+        ]
+      }
     },
     {
       "id": "domain6-4",
       "domain": "domain6",
       "order": 4,
-      "title": "Liquid Clustering と予測的最適化"
+      "title": "Liquid Clustering と予測的最適化",
+      "intro": "表のデータの配置を整えると、クエリが読むファイルを減らせます。この中分類では、配置を整える Liquid Clustering と、キーを自動で選ぶ CLUSTER BY AUTO、保守の操作を自動で行う予測的最適化を扱います。",
+      "comparison": {
+        "columns": ["キーを指定する Liquid Clustering", "自動の Liquid Clustering"],
+        "rows": [
+          {
+            "aspect": "キーを決める主",
+            "cells": ["利用者が CLUSTER BY (列) で決める", "Databricks が過去のクエリの傾向から選ぶ"],
+            "highlight": true
+          },
+          {
+            "aspect": "書き方",
+            "cells": ["CLUSTER BY (col1, col2)", "CLUSTER BY AUTO"]
+          },
+          {
+            "aspect": "キーの変更",
+            "cells": [
+              "ALTER TABLE … CLUSTER BY で変える。既存のデータは書き直さない",
+              "節約が費用を上回るときに Databricks が変える"
+            ]
+          },
+          {
+            "aspect": "対象のテーブル",
+            "cells": [
+              "Delta Lake のテーブルと、マネージドの Iceberg のテーブル",
+              "Unity Catalog のマネージドテーブル(予測的最適化を使う)"
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "domain6-5",
       "domain": "domain6",
       "order": 5,
-      "title": "障害の切り分け"
+      "title": "障害の切り分け",
+      "intro": "コンピュートの障害は、起動の段階、ライブラリの読み込み、実行中のメモリの、どこで起きたかで切り分けます。この中分類では、クラスターの起動失敗、ライブラリの競合、ドライバーとエグゼキューターのメモリ不足を扱います。",
+      "comparison": {
+        "columns": ["ドライバーのメモリ不足", "エグゼキューターのメモリ不足"],
+        "rows": [
+          {
+            "aspect": "よくある原因",
+            "cells": [
+              "collect や toPandas で、全データをドライバーに集める",
+              "シャッフルのパーティションが少ない、偏り、大きなブロードキャスト、UDF"
+            ],
+            "highlight": true
+          },
+          {
+            "aspect": "見え方",
+            "cells": [
+              "集めた結果が spark.driver.maxResultSize を超えるとジョブが中止される。上限が大きすぎるとドライバーがメモリ不足になる",
+              "ExecutorLostFailure などの一般的なエラーで、タスクの再試行のあとにステージが失敗する"
+            ]
+          },
+          {
+            "aspect": "主な対処",
+            "cells": [
+              "結果が小さいときだけ集める。メモリの大きいドライバーの種類を選ぶ",
+              "spark.sql.shuffle.partitions を auto にする。偏りを直す。コアあたりのメモリを増やす"
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "domain7-1",
@@ -1027,19 +1406,134 @@
       "id": "domain7-2",
       "domain": "domain7",
       "order": 2,
-      "title": "権限(GRANT・REVOKE・DENY)"
+      "title": "権限(GRANT・REVOKE・DENY)",
+      "intro": "Unity Catalog では、カタログ、スキーマ、テーブルの階層ごとに、ユーザー、グループ、サービスプリンシパルへ権限を与えます。この中分類では、GRANT と REVOKE、Unity Catalog では使えない DENY、読み書きに要る権限の組み合わせ、継承と所有者を扱います。",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "テーブルを読むのに要る権限",
+        "root": {
+          "label": "カタログ",
+          "note": "USE CATALOG",
+          "children": [
+            {
+              "label": "スキーマ",
+              "note": "USE SCHEMA",
+              "children": [
+                {
+                  "label": "テーブル",
+                  "note": "SELECT"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "comparison": {
+        "columns": ["GRANT", "REVOKE", "DENY"],
+        "rows": [
+          {
+            "aspect": "働き",
+            "cells": ["権限を与える", "与えた権限を取り消す", "権限を拒否し、どの付与よりも優先させる"]
+          },
+          {
+            "aspect": "Unity Catalog で使えるか",
+            "cells": ["使える", "使える", "使えない(`hive_metastore` のカタログだけ)"],
+            "highlight": true
+          },
+          {
+            "aspect": "構文",
+            "cells": [
+              "`GRANT 権限 ON オブジェクト TO 相手`",
+              "`REVOKE 権限 ON オブジェクト FROM 相手`",
+              "`DENY 権限 ON オブジェクト TO 相手`"
+            ]
+          },
+          {
+            "aspect": "画面での操作",
+            "cells": [
+              "Catalog Explorer の Permissions のタブで Grant",
+              "Catalog Explorer の Permissions のタブで Revoke",
+              "なし"
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "domain7-3",
       "domain": "domain7",
       "order": 3,
-      "title": "列マスキングと行セキュリティ"
+      "title": "列マスキングと行セキュリティ",
+      "intro": "列マスクと行フィルターは、クエリを実行した利用者に応じて、見える値と行を変える仕組みです。この中分類では、テーブルに直接かける行フィルターと列マスク、グループの所属を調べる関数、ビューで同じことをする動的ビューを扱います。",
+      "comparison": {
+        "columns": ["行フィルター", "列マスク", "動的ビュー"],
+        "rows": [
+          {
+            "aspect": "かける先",
+            "cells": ["テーブル", "テーブルの列", "ビューを新しく作る"]
+          },
+          {
+            "aspect": "書き方",
+            "cells": [
+              "`ALTER TABLE … SET ROW FILTER 関数 ON (列)`",
+              "`ALTER TABLE … ALTER COLUMN 列 SET MASK 関数`",
+              "`CREATE VIEW` の中で `CASE` と `WHERE` を書く"
+            ]
+          },
+          {
+            "aspect": "関数が返すもの",
+            "cells": [
+              "真偽値(偽の行は結果から外れる)",
+              "元の値か、隠した値(列の型に合わせる)",
+              "UDF は要らない(ビューの定義に条件を書く)"
+            ],
+            "highlight": true
+          },
+          {
+            "aspect": "向く用途",
+            "cells": [
+              "元のテーブルを、利用者ごとに行で絞る",
+              "元のテーブルの機微な列を隠す",
+              "結合や加工をした結果を、元のテーブルの権限なしで見せる"
+            ]
+          }
+        ]
+      }
     },
     {
       "id": "domain7-4",
       "domain": "domain7",
       "order": 4,
-      "title": "ABAC ポリシー"
+      "title": "ABAC ポリシー",
+      "intro": "ABAC ポリシーは、ガバナンスタグを手がかりに、行フィルターと列マスクをカタログやスキーマの単位でまとめてかける仕組みです。この中分類では、ポリシー、ガバナンスタグ、タグで列を選ぶ MATCH COLUMNS を扱います。",
+      "comparison": {
+        "columns": ["ABAC ポリシー", "テーブルごとの行フィルターと列マスク"],
+        "rows": [
+          {
+            "aspect": "かける範囲",
+            "cells": [
+              "カタログ、スキーマ、テーブル。配下の今あるテーブルと、あとで作るテーブル",
+              "1 つのテーブル。テーブルごとに設定する"
+            ]
+          },
+          {
+            "aspect": "対象の選び方",
+            "cells": ["ガバナンスタグ(`has_tag`、`has_tag_value`)", "テーブルと列を名前で指定する"]
+          },
+          {
+            "aspect": "テーブルの所有者の操作",
+            "cells": ["上の階層のポリシーを外せない、変えられない", "自分のテーブルのフィルターとマスクを変えられる"],
+            "highlight": true
+          },
+          {
+            "aspect": "向く場面",
+            "cells": [
+              "多くのテーブルに同じ規則をかけるとき",
+              "テーブルごとに固有の規則で、テーブルの数が少なく変化も少ないとき"
+            ]
+          }
+        ]
+      }
     }
   ],
   "entries": [
@@ -3838,6 +4332,2040 @@
         {
           "title": "Automate jobs with schedules and triggers | Databricks on AWS",
           "url": "https://docs.databricks.com/aws/en/jobs/triggers"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "control-and-compute-plane",
+      "unit": "domain1-1",
+      "order": 1,
+      "term": "コントロールプレーンとコンピュートプレーン",
+      "oneLine": "コントロールプレーンは Databricks が自分のアカウントで運用する管理の部分で、コンピュートプレーンはデータを処理するコンピュートが動く部分です。",
+      "keyPhrase": "Databricks が自分のアカウントで運用する管理の部分",
+      "body": "コントロールプレーンには、Web アプリケーションと、Databricks が管理するバックエンドのサービスがあります。これらは利用者の AWS アカウントではなく、Databricks のアカウントにあります。\n\nコンピュートプレーンは 2 種類です。\n\n- **クラシックのコンピュートプレーン**: コンピュートは利用者の AWS アカウントの中で、ワークスペースごとの仮想ネットワークに置かれます。\n- **サーバーレスのコンピュートプレーン**: コンピュートは Databricks のアカウントの中で動きます。ワークスペースと同じリージョンに作られ、ワークスペースごとにネットワークの境界があります。\n\nクラシックのワークスペースでは、ジョブの結果やクラスターのログなどのシステムのデータを、利用者の AWS アカウントにあるワークスペースのストレージのバケットに置きます。Unity Catalog のテーブルやボリュームのデータは、ノートブックなどのワークスペースのファイルとは分けて保管します。",
+      "examAngle": "「クラスターの VM と顧客のデータはどちらのアカウントにあるか」という問いで、コントロールプレーンとクラシックのコンピュートプレーンの境界を確かめる形で出ます。",
+      "checks": [
+        {
+          "question": "クラシックのコンピュートで動くクラスターの VM は、どちらのアカウントにありますか。",
+          "answer": "利用者の AWS アカウントです。",
+          "reason": "クラシックのコンピュートプレーンは、利用者の AWS アカウントの中で、ワークスペースの仮想ネットワークに置かれます。"
+        },
+        {
+          "question": "ワークスペースの Web アプリケーションは、コントロールプレーンとコンピュートプレーンのどちらにありますか。",
+          "answer": "コントロールプレーンです。",
+          "reason": "コントロールプレーンは Databricks のアカウントにあり、Web アプリケーションとバックエンドのサービスを持ちます。"
+        }
+      ],
+      "related": ["serverless-compute", "unity-catalog"],
+      "references": [
+        {
+          "title": "High-level architecture | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/getting-started/overview"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "unity-catalog",
+      "unit": "domain1-1",
+      "order": 2,
+      "term": "Unity Catalog",
+      "oneLine": "Unity Catalog は、データと AI の資産の権限、監査、リネージ、検索を一か所で管理する仕組みです。",
+      "keyPhrase": "権限、監査、リネージ、検索を一か所で管理する",
+      "body": "テーブル、ビュー、ボリューム、関数、モデルは、`カタログ.スキーマ.オブジェクト` の 3 層の名前で指します。\n\n```sql\nSELECT * FROM main.sales.orders;\n```\n\n権限を付けられる対象を、セキュリティ保護可能なオブジェクトと呼びます。ストレージの資格情報、外部ロケーション、接続、共有は、カタログの下ではなく、メタストアの直下に置きます。\n\nUnity Catalog の主な機能は次のとおりです。\n\n- **アクセス制御**: 権限、属性に基づくポリシー、行と列のフィルター、ワークスペースへのバインド\n- **リネージ**: ソースのデータからモデルやダッシュボードまでのつながりを、自動で記録します\n- **監査**: データへのアクセスとシステムの操作を、監査ログのシステムテーブルに残します\n- **検索**: Catalog Explorer、SQL、CLI、REST API で資産を探せます\n\nテーブルとボリュームには、保管も Unity Catalog に任せるマネージドと、管理だけを任せる外部の 2 種類があります。2023 年 11 月 8 日より後に作ったワークスペースでは、Unity Catalog が自動で有効です。",
+      "examAngle": "「ワークスペースをまたいで権限とリネージを一元管理したい」という要件から、Unity Catalog を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "Unity Catalog で、テーブルを指す 3 層の名前の並びは何ですか。",
+          "answer": "カタログ、スキーマ、テーブルの順です。",
+          "reason": "Unity Catalog は、テーブル、ビュー、ボリュームなどを `カタログ.スキーマ.オブジェクト` の 3 層の名前で指します。"
+        }
+      ],
+      "related": ["create-schema-describe-schema", "managed-table", "external-table"],
+      "references": [
+        {
+          "title": "What is Unity Catalog? | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "create-schema-describe-schema",
+      "unit": "domain1-1",
+      "order": 3,
+      "term": "CREATE SCHEMA と DESCRIBE SCHEMA",
+      "oneLine": "CREATE SCHEMA はスキーマ(データベース)を作るコマンドで、DESCRIBE SCHEMA はスキーマの名前、コメント、格納場所を表示するコマンドです。",
+      "keyPhrase": "スキーマ(データベース)を作るコマンド",
+      "body": "`CREATE SCHEMA` に `IF NOT EXISTS` を付けると、同じ名前のスキーマがあるときは何もしません。付けないと、同じ名前があればエラーになります。\n\n```sql\nCREATE SCHEMA IF NOT EXISTS main.sales\n  COMMENT '販売のデータ'\n  MANAGED LOCATION 's3://example-bucket/sales';\n```\n\n`MANAGED LOCATION` は、スキーマのマネージドテーブルを置く場所を、カタログやメタストアの場所と別にするときに書きます。Unity Catalog が必要で、パスは外部ロケーションの中になければなりません。その外部ロケーションの `CREATE MANAGED STORAGE` の権限も要ります。`LOCATION` は Unity Catalog では使えず、Hive メタストアのスキーマで使います。\n\n`DESCRIBE SCHEMA` は、スキーマの名前、コメント、格納場所を返します。`EXTENDED` を付けると、スキーマのプロパティも返します。`SCHEMA` と `DATABASE` はどちらの語でも書けますが、公式の文書は `SCHEMA` を勧めています。\n\n```sql\nDESCRIBE SCHEMA EXTENDED main.sales;\n```",
+      "examAngle": "「スキーマの格納場所を確かめるコマンド」を選ばせる形や、`IF NOT EXISTS` の有無で、既にあるときの動作を問う形で出ます。",
+      "checks": [
+        {
+          "question": "既にある名前で、`IF NOT EXISTS` を付けずに `CREATE SCHEMA` を実行すると、どうなりますか。",
+          "answer": "エラーになります。",
+          "reason": "`IF NOT EXISTS` を付けたときだけ、同じ名前のスキーマがあっても何もせずに終わります。"
+        },
+        {
+          "question": "スキーマのプロパティまで表示したいとき、`DESCRIBE SCHEMA` に何を付けますか。",
+          "answer": "`EXTENDED` です。",
+          "reason": "`DESCRIBE SCHEMA` は名前、コメント、格納場所を返し、`EXTENDED` を付けるとプロパティも返します。"
+        }
+      ],
+      "related": ["unity-catalog", "managed-table"],
+      "references": [
+        {
+          "title": "CREATE SCHEMA | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-syntax-ddl-create-schema"
+        },
+        {
+          "title": "DESCRIBE SCHEMA | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-syntax-aux-describe-schema"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "delta-lake",
+      "unit": "domain1-1",
+      "order": 4,
+      "term": "Delta Lake",
+      "oneLine": "Delta Lake は、Parquet のデータファイルにファイルのトランザクションログを加えた、Databricks のテーブルの既定のストレージ形式です。",
+      "keyPhrase": "Parquet のデータファイルにファイルのトランザクションログを加えた",
+      "body": "Databricks では、形式を指定せずに作ったテーブルは、Delta Lake のテーブルになります。Delta Lake はオープンソースで、Apache Spark の API で読み書きできます。\n\nトランザクションログがあるので、Delta Lake のテーブルは ACID のトランザクションを持ちます。書き込みのたびに、テーブルの新しいバージョンができます。ログを見ると変更の履歴が分かり、前のバージョンを読むこともできます(タイムトラベル)。\n\n書き込むデータは、テーブルのスキーマと照らして検査されます。Delta Lake は Structured Streaming とも組み合わせられるので、同じデータのコピー 1 つを、バッチとストリーミングの両方で使えます。",
+      "examAngle": "「Databricks の表の既定の形式」や「Delta の表はどんなファイルでできているか」を問う形で出ます。",
+      "checks": [
+        {
+          "question": "Databricks で、`USING` を書かずに作ったテーブルの形式は何ですか。",
+          "answer": "Delta Lake です。",
+          "reason": "Databricks では、指定がなければすべてのテーブルが Delta Lake のテーブルになります。"
+        },
+        {
+          "question": "Delta Lake のテーブルのデータファイルの形式は何ですか。",
+          "answer": "Parquet です。",
+          "reason": "Delta Lake は、Parquet のデータファイルに、ファイルのトランザクションログを加えた形式です。"
+        }
+      ],
+      "related": ["delta-schema-enforcement", "describe-history", "delta-time-travel"],
+      "references": [
+        {
+          "title": "What is Delta Lake in Databricks? | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/delta/"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "delta-schema-enforcement",
+      "unit": "domain1-1",
+      "order": 5,
+      "term": "スキーマの強制(Delta Lake)",
+      "oneLine": "スキーマの強制は、Delta Lake のテーブルへの書き込みを、テーブルのスキーマと照らして検査し、合わない書き込みを止める仕組みです。",
+      "keyPhrase": "合わない書き込みを止める",
+      "body": "スキーマの強制は、Delta Lake のテーブルにかかります。CSV や JSON のファイルにはかかりません。\n\n`INSERT` で、テーブルにない列に値を入れようとすると、エラー(`UNRESOLVED_COLUMN.WITH_SUGGESTION`)になります。型が違うときは、Databricks が安全に変換できる範囲で変換します。たとえば、整数を `BIGINT` の列に入れる書き込みは成功します。\n\n列を足したいときは、次のどちらかでスキーマを広げます(スキーマの進化)。\n\n- `ALTER TABLE … ADD COLUMN` で、明示的に列を足す\n- DataFrame の書き込みに `mergeSchema` を `true` で渡し、書き込みと同時に列を足す\n\n```python\ndf.write.option(\"mergeSchema\", \"true\").mode(\"append\").saveAsTable(\"main.sales.orders\")\n```\n\n列の型や名前の変更は、`overwriteSchema` でテーブルを書き直すか、列のマッピングを有効にして行います。",
+      "examAngle": "「新しい列を含むデータを追記したら失敗した。列を自動で足すにはどうするか」という問いで、`mergeSchema` を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "Delta Lake のテーブルに、テーブルにない列を含む DataFrame を追記したところ、失敗しました。書き込みのときに列を足すオプションは何ですか。",
+          "answer": "`mergeSchema` です。",
+          "reason": "`mergeSchema` を `true` にすると、書き込みと同時にスキーマが広がります。指定がないと、スキーマの強制で書き込みが止まります。"
+        }
+      ],
+      "related": ["delta-lake", "copy-into-schema", "schema-evolution-add-new-columns"],
+      "references": [
+        {
+          "title": "Schema enforcement | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/tables/schema-enforcement"
+        },
+        {
+          "title": "Update table schemas with schema evolution | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/delta/update-schema"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "describe-history",
+      "unit": "domain1-1",
+      "order": 6,
+      "term": "DESCRIBE HISTORY",
+      "oneLine": "DESCRIBE HISTORY は、Delta Lake のテーブルへの書き込みごとに、操作、実行した利用者、時刻を新しい順に返すコマンドです。",
+      "keyPhrase": "操作、実行した利用者、時刻を新しい順に返す",
+      "body": "```sql\nDESCRIBE HISTORY main.sales.orders;\nDESCRIBE HISTORY main.sales.orders LIMIT 1;  -- 最後の操作だけ\n```\n\n結果の 1 行が、テーブルの 1 つのバージョンに当たります。`operationParameters` と `operationMetrics` の列からは、操作の中身が分かります。たとえば `OPTIMIZE` が自動のコンパクション、Liquid Clustering、Z-order、手動のどれで実行されたかを確かめられます。\n\n履歴は、既定で 30 日分を持ちます。この長さは、テーブルのプロパティ `logRetentionDuration` で決まります。公式の文書は、履歴を長期の保管やバックアップに使わないよう勧めています。",
+      "examAngle": "「誰がいつテーブルを変更したかを確かめるコマンド」を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "Delta Lake のテーブルを最後に変更した操作と利用者を確かめるコマンドは何ですか。",
+          "answer": "`DESCRIBE HISTORY`(`LIMIT 1` を付ける)です。",
+          "reason": "`DESCRIBE HISTORY` は、書き込みごとの操作、利用者、時刻を新しい順に返します。`LIMIT 1` で最後の操作だけになります。"
+        }
+      ],
+      "related": ["delta-time-travel", "delta-lake"],
+      "references": [
+        {
+          "title": "Work with table history | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/delta/history"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "delta-time-travel",
+      "unit": "domain1-1",
+      "order": 7,
+      "term": "タイムトラベル(Delta Lake)",
+      "oneLine": "タイムトラベルは、Delta Lake のテーブルの過去のバージョンを、バージョンの番号か時刻を指定して読む機能です。",
+      "keyPhrase": "バージョンの番号か時刻を指定して読む",
+      "body": "```sql\nSELECT * FROM main.sales.orders VERSION AS OF 5;\nSELECT * FROM main.sales.orders TIMESTAMP AS OF '2026-10-01';\nSELECT * FROM main.sales.orders@v5;\n```\n\nPySpark では、`versionAsOf` か `timestampAsOf` のオプションを使います。\n\n戻れる範囲は、既定で 7 日です。データファイルを残す期間 `deletedFileRetentionDuration` の既定が 7 日だからです。`VACUUM` で古いデータファイルが消えると、そのファイルを使うバージョンは読めなくなります。範囲を延ばすには、データファイルの期間と、ログを残す期間 `logRetentionDuration`(既定 30 日)の両方を延ばします。延ばした分だけ、ストレージの費用が増えます。\n\nテーブルを過去のバージョンに戻すときは、`RESTORE TABLE` を使います。実行には `MODIFY` の権限が要ります。\n\n```sql\nRESTORE TABLE main.sales.orders TO VERSION AS OF 5;\n```",
+      "examAngle": "「誤って更新した表を前の状態に戻したい」という状況で、`RESTORE TABLE` やタイムトラベルの構文を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "Delta Lake のテーブルを、バージョン 5 の状態に戻すコマンドは何ですか。",
+          "answer": "`RESTORE TABLE … TO VERSION AS OF 5` です。",
+          "reason": "`RESTORE TABLE` は、テーブルを指定したバージョンか時刻の状態に戻します。`MODIFY` の権限が要ります。"
+        },
+        {
+          "question": "既定の設定のままで `VACUUM` を実行したあと、10 日前のバージョンをタイムトラベルで読めますか。",
+          "answer": "読めません。",
+          "reason": "データファイルを残す期間の既定は 7 日です。`VACUUM` が期間を過ぎたファイルを消すため、そのファイルを使うバージョンは読めなくなります。"
+        }
+      ],
+      "related": ["describe-history", "delta-vacuum"],
+      "references": [
+        {
+          "title": "Work with table history | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/delta/history"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "delta-vacuum",
+      "unit": "domain1-1",
+      "order": 8,
+      "term": "VACUUM",
+      "oneLine": "VACUUM は、Delta Lake のテーブルが参照しなくなったデータファイルのうち、保持の期間を過ぎたものを消すコマンドです。",
+      "keyPhrase": "保持の期間を過ぎたものを消す",
+      "body": "保持の期間の既定は 7 日です。期間のうちのファイルは、参照されていなくても残ります。\n\n```sql\nVACUUM main.sales.orders DRY RUN;  -- 消す対象を一覧にするだけ\nVACUUM main.sales.orders;\n```\n\n`VACUUM` で消えたファイルを使う過去のバージョンには、タイムトラベルで戻れなくなります。保持の期間を短くした `VACUUM` は、安全のための検査で止められます。`spark.databricks.delta.retentionDurationCheck.enabled` を `false` にすると止まりませんが、保持の期間より長く動く操作がテーブルにないときに限ります。公式の文書は、期間を 7 日以上にするよう強く勧めています。\n\nトランザクションログのファイルは `VACUUM` の対象ではありません。ログはチェックポイントのあとに自動で消え、既定で 30 日残ります。\n\nUnity Catalog のマネージドテーブルでは、予測的最適化が `VACUUM` を自動で実行します。",
+      "examAngle": "「VACUUM を実行したのに古いファイルが残っている」理由や、「VACUUM のあとに戻れなくなる操作」を問う形で出ます。",
+      "checks": [
+        {
+          "question": "既定の設定で `VACUUM` を実行しました。3 日前に参照されなくなったデータファイルは消えますか。",
+          "answer": "消えません。",
+          "reason": "`VACUUM` が消すのは、保持の期間(既定 7 日)を過ぎたファイルだけです。"
+        },
+        {
+          "question": "`VACUUM` で実際に消さずに、消す対象のファイルだけを確かめたいとき、何を付けますか。",
+          "answer": "`DRY RUN` です。",
+          "reason": "`DRY RUN` を付けると、消す対象のファイルを一覧にするだけで、何も消しません。"
+        }
+      ],
+      "related": ["delta-time-travel", "predictive-optimization", "delta-optimize"],
+      "references": [
+        {
+          "title": "Remove unused data files with vacuum | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/delta/vacuum"
+        },
+        {
+          "title": "Work with table history | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/delta/history"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "serverless-compute",
+      "unit": "domain1-2",
+      "order": 1,
+      "term": "サーバーレスのコンピュート",
+      "oneLine": "サーバーレスのコンピュートは、ノートブック、ジョブ、Lakeflow のパイプラインのためのコンピュートを、Databricks が割り当てて管理する方式です。",
+      "keyPhrase": "Databricks が割り当てて管理する",
+      "body": "利用者は、自分のクラウドアカウントにコンピュートを用意しません。起動と拡縮が速く、アイドルの時間が少なくなります。ランタイムは Databricks が自動で上げるので、ワークロードはいつも最新の版で動きます。ジョブのタスクでは、サーバーレスに対応したタスクの既定がサーバーレスです。\n\nサーバーレスには、次の制約があります。\n\n- R は使えません。Scala はノートブックでは使えません(ジョブの JAR のタスクは使えます)\n- RDD API は使えません。Spark Connect の API だけを使えます\n- Spark UI はありません。代わりにクエリのプロファイルを使います\n- コンピュートの単位の init スクリプトとライブラリは使えません。環境(environment)やノートブックの単位のライブラリを使います\n- Spark の設定は、一部だけを変えられます\n\n費用は、システムテーブル `system.billing.usage` で確かめます。",
+      "examAngle": "「起動の待ち時間とアイドルの費用を減らしたい定期のジョブ」に合うコンピュートを選ばせる形や、「サーバーレスで使えない言語」を問う形で出ます。",
+      "checks": [
+        {
+          "question": "サーバーレスのノートブックで使えない言語はどれですか。Python、SQL、R から選んでください。",
+          "answer": "R です。",
+          "reason": "サーバーレスのコンピュートは R に対応していません。Scala もノートブックでは使えません。"
+        },
+        {
+          "question": "サーバーレスのジョブで、ステージごとの性能を確かめたいとき、Spark UI の代わりに何を使いますか。",
+          "answer": "クエリのプロファイルです。",
+          "reason": "サーバーレスでは Spark UI を使えないため、クエリのプロファイルで確かめます。"
+        }
+      ],
+      "related": ["jobs-compute", "control-and-compute-plane", "sql-warehouse"],
+      "references": [
+        {
+          "title": "Connect to serverless compute | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/compute/serverless/"
+        },
+        {
+          "title": "Serverless compute limitations | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/compute/serverless/limitations"
+        },
+        {
+          "title": "Configure compute for jobs | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/jobs/compute"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "jobs-compute",
+      "unit": "domain1-2",
+      "order": 2,
+      "term": "ジョブコンピュートと汎用コンピュート",
+      "oneLine": "ジョブコンピュートはジョブの定義の中で設定し、ジョブの実行に合わせて起動と終了をするコンピュートで、汎用コンピュートは対話的な作業に使うコンピュートです。",
+      "keyPhrase": "ジョブの実行に合わせて起動と終了をする",
+      "body": "クラシックのジョブコンピュートは、Lakeflow Jobs の画面で、ジョブの定義の一部として設定します。設定の項目は、汎用コンピュートと同じです。\n\nジョブコンピュートは、1 つのタスクだけが使うときは、タスクの開始で起動し、タスクのあとに終わります。複数のタスクで共有するときは、最初のタスクで起動し、最後のタスクのあとに終わります。共有すると起動の待ち時間が減ります。共有したジョブコンピュートは、その 1 回の実行の中だけで使え、ほかのジョブや実行からは使えません。\n\n汎用コンピュートもタスクに指定できますが、Databricks は本番のジョブには勧めていません。\n\nタスクの種類ごとの推奨は次のとおりです。\n\n- ノートブック、Python のスクリプト、Python の wheel: サーバーレスのジョブ\n- SQL と dbt: サーバーレスの SQL ウェアハウス\n- JAR と Spark Submit: クラシックのジョブコンピュート",
+      "examAngle": "「本番の定期ジョブを汎用コンピュートで動かしている。どう変えるか」という問いで、ジョブ向けのコンピュートを選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "3 つのタスクが 1 つのジョブコンピュートを共有しています。コンピュートはいつ終わりますか。",
+          "answer": "そのコンピュートを使う最後のタスクが終わったあとです。",
+          "reason": "共有したジョブコンピュートは、最初のタスクで起動し、最後のタスクのあとに終わります。"
+        },
+        {
+          "question": "JAR のタスクに勧められるコンピュートは何ですか。",
+          "answer": "クラシックのジョブコンピュートです。",
+          "reason": "公式の文書は、JAR と Spark Submit のタスクにクラシックのジョブコンピュートを勧めています。"
+        }
+      ],
+      "related": ["serverless-compute", "autoscaling", "lakeflow-jobs"],
+      "references": [
+        {
+          "title": "Configure compute for jobs | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/jobs/compute"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "sql-warehouse",
+      "unit": "domain1-2",
+      "order": 3,
+      "term": "SQL ウェアハウス",
+      "oneLine": "SQL ウェアハウスは、Databricks SQL でデータを問い合わせるためのコンピュートで、サーバーレス、Pro、クラシックの 3 種類があります。",
+      "keyPhrase": "サーバーレス、Pro、クラシックの 3 種類",
+      "body": "SQL ウェアハウスは、クエリエディター、Catalog Explorer、ダッシュボードのコンピュートとして選べます。Power BI や Tableau などの BI ツールからも接続できます。止まっているウェアハウスは、クエリの実行や JDBC/ODBC の接続などで自動で起動します。\n\n3 つの種類の違いは次のとおりです。\n\n- **サーバーレス**: Databricks のアカウントで動きます。起動は 2〜6 秒ほどです。Intelligent Workload Management と Predictive IO を持ちます\n- **Pro**: 利用者の AWS アカウントで動き、起動に 4 分ほどかかります。Predictive IO を持ちます\n- **クラシック**: 利用者の AWS アカウントで動き、起動に 4 分ほどかかります。Photon だけを持ちます\n\nDatabricks は、使えるならサーバーレスを勧めています。リージョンでサーバーレスを使えないときや、利用者のクラウドやオンプレミスのデータベースへ独自のネットワークでつなぐときは、Pro を選びます。",
+      "examAngle": "「オンプレミスのデータベースへ独自のネットワークでつなぐ必要がある」といった要件から、ウェアハウスの種類を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "起動を最も速くしたいとき、選ぶ SQL ウェアハウスの種類は何ですか。",
+          "answer": "サーバーレスです。",
+          "reason": "サーバーレスの起動は 2〜6 秒ほどで、Pro とクラシックは 4 分ほどかかります。"
+        },
+        {
+          "question": "利用者のネットワークの中のデータベースへ独自のネットワークでつなぐとき、公式の文書が勧める種類は何ですか。",
+          "answer": "Pro です。",
+          "reason": "Pro は利用者の AWS アカウントで動き、独自のネットワークが要るときに勧められています。"
+        }
+      ],
+      "related": ["sql-warehouse-auto-stop", "sql-warehouse-sizing", "serverless-compute"],
+      "references": [
+        {
+          "title": "Connect to a SQL warehouse | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/compute/sql-warehouse/"
+        },
+        {
+          "title": "SQL warehouse types | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/compute/sql-warehouse/warehouse-types"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "sql-warehouse-auto-stop",
+      "unit": "domain1-2",
+      "order": 4,
+      "term": "SQL ウェアハウスの自動停止(Auto Stop)",
+      "oneLine": "自動停止は、SQL ウェアハウスがアイドルのまま指定の分数を過ぎたときに、ウェアハウスを止める設定です。",
+      "keyPhrase": "アイドルのまま指定の分数を過ぎたときに、ウェアハウスを止める",
+      "body": "アイドルのウェアハウスも、止まるまでは DBU とクラウドのインスタンスの料金がかかります。自動停止の時間を短くすると、アイドルの費用が減ります。\n\n既定と最小の値は、種類で違います。\n\n- **Pro とクラシック**: 既定 45 分、最小 10 分\n- **サーバーレス**: 既定 10 分、画面での最小 5 分(SQL ウェアハウスの API では 1 分まで)\n\n止まったウェアハウスは、クエリを実行したときや、ダッシュボードを開いたときに、自動で起動します。",
+      "examAngle": "「業務時間外にアイドルのウェアハウスの費用がかかっている」という状況から、自動停止の設定を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "Pro の SQL ウェアハウスの自動停止の既定は何分ですか。",
+          "answer": "45 分です。",
+          "reason": "Pro とクラシックの既定は 45 分で、最小は 10 分です。サーバーレスの既定は 10 分です。"
+        }
+      ],
+      "related": ["sql-warehouse", "sql-warehouse-sizing"],
+      "references": [
+        {
+          "title": "Create a SQL warehouse | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/compute/sql-warehouse/create"
+        },
+        {
+          "title": "Connect to a SQL warehouse | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/compute/sql-warehouse/"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "sql-warehouse-sizing",
+      "unit": "domain1-2",
+      "order": 5,
+      "term": "SQL ウェアハウスのサイズとスケーリング",
+      "oneLine": "SQL ウェアハウスのサイズは 1 つのクラスターのドライバーの大きさとワーカーの数を決め、スケーリングはクラスターの数の最小と最大を決める設定です。",
+      "keyPhrase": "クラスターの数の最小と最大を決める",
+      "body": "2 つの設定は、効く場面が違います。\n\nサイズ(Cluster Size)を上げると、1 つのクエリの待ち時間が短くなります。既定は X-Large です。\n\nスケーリングの最大を上げると、同時に動かせるクエリの数が増えます。既定は最小 1、最大 1 です。Databricks は、同時に動くクエリ 10 個につき 1 つのクラスターを目安にしています。\n\n24 時間を超えて動いたクラスターは入れ替えられます。24 時間を超えるクエリは止められることがあるので、長い処理はその時間のうちに終わるよう分けます。",
+      "examAngle": "「1 つのクエリが遅い」と「同時に使う人が増えて待たされる」を区別し、サイズとスケーリングのどちらを変えるかを選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "利用者が増え、クエリがキューで待たされるようになりました。SQL ウェアハウスのどの設定を変えますか。",
+          "answer": "スケーリングの最大のクラスター数を増やします。",
+          "reason": "クラスターの数を増やすと、同時に動かせるクエリが増えます。サイズは 1 つのクエリの待ち時間に効きます。"
+        },
+        {
+          "question": "1 つの重いクエリの待ち時間を短くしたいとき、SQL ウェアハウスのどの設定を変えますか。",
+          "answer": "サイズ(Cluster Size)を上げます。",
+          "reason": "サイズは、クラスターのドライバーの大きさとワーカーの数を決めます。公式の文書は、待ち時間を減らすにはサイズを上げるとしています。"
+        }
+      ],
+      "related": ["sql-warehouse", "sql-warehouse-auto-stop"],
+      "references": [
+        {
+          "title": "Create a SQL warehouse | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/compute/sql-warehouse/create"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "instance-types",
+      "unit": "domain1-2",
+      "order": 6,
+      "term": "インスタンスの種類",
+      "oneLine": "インスタンスの種類は、クラシックのコンピュートのワーカーとドライバーに使う VM の系統で、CPU、メモリ、ローカルのストレージの比率がワークロードへの向き不向きを決めます。",
+      "keyPhrase": "CPU、メモリ、ローカルのストレージの比率",
+      "body": "公式の文書が挙げる選び方は、次のとおりです。\n\n- **コンピュート最適化**: `OPTIMIZE` の実行に勧められています。`OPTIMIZE` は、接続した SSD からも利点を得ます\n- **ストレージ最適化(ローカルの SSD を持つ種類)**: 同じデータを繰り返し読む分析や機械学習の学習に向きます。SSD を持つワーカーでは、ディスクキャッシュが自動で有効になります\n- **メモリを増やす**: 複雑な ETL で、ディスクへのあふれ出しやメモリ不足が多いときに選びます\n- **GPU**: 深層学習のような計算の重い処理に使います\n\nドライバーの種類は、既定でワーカーと同じです。大量のデータをドライバーに集める予定があるときは、メモリの大きいドライバーを選べます。\n\nディスクキャッシュは、クラウドのストレージから読んだ Parquet のファイルの写しを、ワーカーのローカルに置きます。2 回目からはローカルから読むので、読み取りが速くなります。",
+      "examAngle": "「OPTIMIZE を速く回したい」「同じデータを何度も読む対話的な分析」などの状況から、インスタンスの種類を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "`OPTIMIZE` を実行するクラスターに、公式の文書が勧めるインスタンスの種類は何ですか。",
+          "answer": "コンピュート最適化です。",
+          "reason": "公式の文書は、`OPTIMIZE` にコンピュート最適化の種類を勧めています。"
+        },
+        {
+          "question": "同じテーブルを繰り返し読む分析で、ディスクキャッシュを生かしたいとき、どんなワーカーを選びますか。",
+          "answer": "ローカルの SSD を持つ種類(ストレージ最適化)です。",
+          "reason": "ディスクキャッシュは SSD を持つワーカーで自動で有効になり、読んだファイルの写しをローカルに置きます。"
+        }
+      ],
+      "related": ["delta-optimize", "disk-spill", "driver-out-of-memory"],
+      "references": [
+        {
+          "title": "Optimize data file layout | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/delta/optimize"
+        },
+        {
+          "title": "Classic compute configuration best practices | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/compute/cluster-config-best-practices"
+        },
+        {
+          "title": "Optimize performance with caching on Databricks | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/optimizations/disk-cache"
+        },
+        {
+          "title": "Compute configuration reference | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/compute/configure"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "spot-instances",
+      "unit": "domain1-2",
+      "order": 7,
+      "term": "スポットインスタンス",
+      "oneLine": "スポットインスタンスは、クラウドの余った容量を安く使うインスタンスで、クラウド事業者に回収されることがあります。",
+      "keyPhrase": "クラウド事業者に回収されることがあります",
+      "body": "クラシックのコンピュートの設定で、スポットインスタンスを有効にできます。最初のインスタンスはいつもオンデマンドで、ドライバーもオンデマンドです。2 台目からがスポットになります。\n\n公式の文書は、費用を下げるためにスポットを使うのは、遅延の要件が緩いワークロードに限るよう勧めています。ドライバーが回収されるとコンピュート全体が止まるので、ドライバーにはオンデマンドの種類を使います。",
+      "examAngle": "「費用を下げたいが、時間に余裕のあるバッチ」と「締め切りの厳しい処理」を比べ、スポットを使ってよい方を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "スポットインスタンスを有効にしたクラシックのコンピュートで、ドライバーはスポットとオンデマンドのどちらになりますか。",
+          "answer": "オンデマンドです。",
+          "reason": "最初のインスタンスはいつもオンデマンドで、ドライバーもオンデマンドになります。"
+        }
+      ],
+      "related": ["instance-types", "autoscaling"],
+      "references": [
+        {
+          "title": "Compute configuration reference | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/compute/configure"
+        },
+        {
+          "title": "Classic compute configuration best practices | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/compute/cluster-config-best-practices"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "autoscaling",
+      "unit": "domain1-2",
+      "order": 8,
+      "term": "オートスケーリング",
+      "oneLine": "オートスケーリングは、ワーカーの数の最小と最大を指定し、その範囲でワークロードに必要な数を Databricks が選ぶ設定です。",
+      "keyPhrase": "その範囲でワークロードに必要な数を Databricks が選ぶ",
+      "body": "Premium 以上のプランでは、最適化されたオートスケーリングが使えます。最小から最大まで、最大 2 回の拡大で広がります。縮小は、使われていない状態が続いたときに起こります。ジョブコンピュートでは 40 秒、汎用コンピュートでは 150 秒です。`spark-submit` のジョブでは、オートスケーリングを使えません。\n\n汎用コンピュートには、自動終了も設定します。コマンドが実行されない時間が指定の分数を過ぎると、Databricks がコンピュートを終了します。公式の文書は、分析や機械学習のコンピュートで自動終了を有効にするよう勧めています。",
+      "examAngle": "「負荷の変わるジョブで、ワーカーの数を自動で増減させたい」という要件から、最小と最大のワーカー数の設定を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "オートスケーリングを使えないジョブの種類は何ですか。",
+          "answer": "`spark-submit` のジョブです。",
+          "reason": "公式の文書は、`spark-submit` のジョブではオートスケーリングを使えないとしています。"
+        },
+        {
+          "question": "最適化されたオートスケーリングで、ジョブコンピュートが縮小を始めるまでの、使われていない時間は何秒ですか。",
+          "answer": "40 秒です。",
+          "reason": "ジョブコンピュートは 40 秒、汎用コンピュートは 150 秒、使われていない状態が続くと縮小します。"
+        }
+      ],
+      "related": ["jobs-compute", "spot-instances"],
+      "references": [
+        {
+          "title": "Compute configuration reference | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/compute/configure"
+        },
+        {
+          "title": "Classic compute configuration best practices | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/compute/cluster-config-best-practices"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "job-run-history",
+      "unit": "domain6-1",
+      "order": 1,
+      "term": "ジョブの実行の履歴(行列の表示)",
+      "oneLine": "ジョブの実行の履歴は、ジョブの Runs の画面で、過去の実行を並べて、実行時間と各タスクの状態を比べる表示です。",
+      "keyPhrase": "過去の実行を並べて、実行時間と各タスクの状態を比べる",
+      "body": "1 つのジョブの Runs には、2 つの表示があります。\n\n行列の表示(matrix view)では、実行ごとに、全体の実行時間の行と、タスクごとのセルの行が並びます。棒の高さが実行時間を表し、セルの色がタスクの状態を表します。過去の実行より棒が高くなった回を見つければ、遅くなった実行と、遅れたタスクが分かります。\n\n一覧の表示(list view)では、開始時刻、実行の ID、トリガー、実行時間、状態、エラーのコード、パラメーターが並びます。\n\n実行の履歴は 60 日残ります。それより前の結果が要るときは、期限の前に書き出します。期待する完了の時間を設定しておくと、その時間を超えた実行に、一覧と行列の表示で警告が付きます。",
+      "examAngle": "「このジョブがいつから遅くなったかを確かめたい」という状況で、ジョブの実行の履歴の画面を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "Lakeflow Jobs の画面で、ジョブの実行の履歴は何日残りますか。",
+          "answer": "60 日です。",
+          "reason": "実行の履歴は 60 日残ります。それより長く残すには、期限の前に書き出します。"
+        },
+        {
+          "question": "行列の表示で、各実行の全体の実行時間は何で表されますか。",
+          "answer": "棒の高さです。",
+          "reason": "行列の表示では、実行ごとの全体の実行時間を棒の高さで表し、タスクのセルの色で状態を表します。"
+        }
+      ],
+      "related": ["job-duration-threshold", "lakeflow-system-tables", "job-run-details"],
+      "references": [
+        {
+          "title": "Monitor Lakeflow Jobs | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/jobs/monitor"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "job-duration-threshold",
+      "unit": "domain6-1",
+      "order": 2,
+      "term": "実行時間のしきい値(警告とタイムアウト)",
+      "oneLine": "実行時間のしきい値は、ジョブやタスクに、期待する完了の時間(警告)と最大の実行時間(タイムアウト)を決めておく設定です。",
+      "keyPhrase": "期待する完了の時間(警告)と最大の実行時間(タイムアウト)",
+      "body": "ジョブの詳細の Duration and streaming backlog thresholds で、指標に Run duration を選んで設定します。タスクの単位でも設定できます。\n\n- **Warning**: 期待する完了の時間です。超えるとイベントが起き、遅いジョブの通知に使えます\n- **Timeout**: 最大の実行時間です。その時間で終わらないと、実行の状態が Timed Out になります\n\n通知の Duration warning は、先に期待する時間を設定しておかないと使えません。",
+      "examAngle": "「ジョブがいつもより長くかかったら知らせてほしい」という要件で、実行時間の警告のしきい値と通知の組み合わせを選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "ジョブが設定した最大の実行時間を超えて終わらないとき、実行の状態は何になりますか。",
+          "answer": "Timed Out です。",
+          "reason": "Timeout に設定した時間で終わらない実行は、状態が Timed Out になります。"
+        },
+        {
+          "question": "実行がいつもより長くかかったときに通知を受けたいとき、通知の Duration warning の前に何を設定しますか。",
+          "answer": "実行時間の Warning のしきい値(期待する完了の時間)です。",
+          "reason": "Duration warning の通知は、期待する完了の時間を超えたときに送られるため、先にそのしきい値が要ります。"
+        }
+      ],
+      "related": ["job-notifications", "job-run-history"],
+      "references": [
+        {
+          "title": "Configure and edit Lakeflow Jobs | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/jobs/advanced"
+        },
+        {
+          "title": "Add notifications on a job | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/jobs/notifications"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "lakeflow-system-tables",
+      "unit": "domain6-1",
+      "order": 3,
+      "term": "ジョブのシステムテーブル(system.lakeflow)",
+      "oneLine": "ジョブのシステムテーブルは、アカウントの中のジョブとタスクの定義と実行の記録を、system.lakeflow のスキーマのテーブルとして SQL で問い合わせる仕組みです。",
+      "keyPhrase": "system.lakeflow のスキーマのテーブル",
+      "body": "主なテーブルは次の 4 つです。\n\n- `jobs`: ジョブの定義\n- `job_tasks`: ジョブのタスクの定義\n- `job_run_timeline`: ジョブの実行の記録\n- `job_task_run_timeline`: タスクの実行の記録\n\n`job_run_timeline` は、1 時間を超える実行を複数の行に分けて記録します。結果の状態(`result_state`)は、最後の行にだけ入ります。実行時間は、`period_end_time` から `period_start_time` を引いた値を、実行ごとに足して求めます。`run_duration_seconds` の列が値を持つのは、古い Jobs API で作った単一タスクのジョブだけです。\n\n```sql\nSELECT job_id, run_id,\n  SUM(unix_timestamp(period_end_time) - unix_timestamp(period_start_time)) AS seconds\nFROM system.lakeflow.job_run_timeline\nGROUP BY job_id, run_id;\n```\n\n記録は 365 日残ります。テーブルはリージョンごとで、同じクラウドのリージョンにあるすべてのワークスペースの記録を持ちます。ジョブの画面の履歴(60 日)より長い期間の傾向を見るときに使います。",
+      "examAngle": "「60 日より前からの実行時間の傾向を、ワークスペースをまたいで調べたい」という要件から、システムテーブルを選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "`system.lakeflow` のジョブのシステムテーブルの記録は、何日残りますか。",
+          "answer": "365 日です。",
+          "reason": "ジョブのシステムテーブルは 365 日分の記録を持ちます。ジョブの画面の実行の履歴は 60 日です。"
+        }
+      ],
+      "related": ["job-run-history"],
+      "references": [
+        {
+          "title": "Jobs system table reference | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/admin/system-tables/jobs"
+        },
+        {
+          "title": "Monitor Lakeflow Jobs | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/jobs/monitor"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "job-run-details",
+      "unit": "domain6-2",
+      "order": 1,
+      "term": "ジョブの実行の詳細(グラフとタイムライン)",
+      "oneLine": "ジョブの実行の詳細は、1 回の実行について、タスクの DAG と各タスクの状態、所要時間を表示する画面です。",
+      "keyPhrase": "タスクの DAG と各タスクの状態、所要時間を表示する",
+      "body": "実行の詳細には 3 つの表示があります。\n\n- **グラフの表示**: タスクの DAG を描きます。タスクを選ぶと、実行した利用者、時間、状態、コード、クラスター、ログへのリンクが見られます\n- **タイムラインの表示**: タスクの所要時間、依存関係、重なりを並べます。遅いタスクを見つけるのに使います\n- **一覧の表示**: 状態、名前、種類、所要時間、依存関係を表にします\n\n実行全体の状態は、葉のタスク(下流に依存するタスクがないタスク)の結果で決まります。状態には Succeeded、Failed、Skipped、Timed Out、Canceled などがあります。\n\nタスクの実行の詳細の画面では、そのタスクの過去の実行も選べます。",
+      "examAngle": "「どのタスクで失敗し、どの下流が実行されなかったかを確かめたい」という状況で、実行の詳細のグラフの表示を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "1 回の実行の中で、どのタスクが長くかかり、どのタスクと並行していたかを見るには、実行の詳細のどの表示を使いますか。",
+          "answer": "タイムラインの表示です。",
+          "reason": "タイムラインの表示は、タスクの所要時間、依存関係、重なりを並べます。"
+        },
+        {
+          "question": "ジョブの実行全体の状態は、どのタスクの結果で決まりますか。",
+          "answer": "葉のタスク(下流に依存するタスクがないタスク)です。",
+          "reason": "公式の文書は、実行の状態を葉のタスクの結果で決めるとしています。"
+        }
+      ],
+      "related": ["task-depends-on", "repair-run", "job-run-history"],
+      "references": [
+        {
+          "title": "Monitor Lakeflow Jobs | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/jobs/monitor"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "job-notifications",
+      "unit": "domain6-2",
+      "order": 2,
+      "term": "ジョブの通知",
+      "oneLine": "ジョブの通知は、ジョブやタスクの開始、成功、失敗、実行時間の超過などのときに、メールや外部のサービスへ知らせる設定です。",
+      "keyPhrase": "メールや外部のサービスへ知らせる",
+      "body": "通知を送れるときは、次のとおりです。\n\n- 開始(Start)\n- 成功(Success)\n- 失敗(Failure)\n- 実行時間の警告(Duration warning)\n- ストリーミングのバックログ(Streaming backlog)\n\n送り先は、メールのアドレスと、システムの送り先(Slack、Microsoft Teams、PagerDuty、HTTP の webhook)です。システムの送り先は、管理者が管理の設定で用意します。1 つのイベントの種類に、システムの送り先を 3 つまで指定できます。\n\nジョブの単位の通知は、失敗したタスクを再試行している間は送られません。失敗の試行ごとに知りたいときは、タスクの単位で通知を設定します。タスクの通知の Mute notifications until the last retry を選ぶと、最後の再試行まで通知を止められます。スキップした実行と、取り消した実行の通知も、それぞれ止められます。\n\n通知を設定するには、ジョブの `CAN MANAGE` か `IS OWNER` の権限が要ります。",
+      "examAngle": "「失敗したときだけ担当者にメールを送りたい」「再試行の途中では知らせたくない」という要件から、通知の設定を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "再試行の途中の失敗では知らせず、最後の再試行でも失敗したときだけ通知したいとき、何を設定しますか。",
+          "answer": "タスクの通知の Mute notifications until the last retry です。",
+          "reason": "この設定は、タスクの通知を最後の再試行まで止めます。"
+        },
+        {
+          "question": "Slack を通知の送り先にするには、まず誰が何を用意しますか。",
+          "answer": "管理者が、管理の設定でシステムの送り先を用意します。",
+          "reason": "Slack などのシステムの送り先は、管理者が設定してから、ジョブの通知で選べるようになります。"
+        }
+      ],
+      "related": ["job-duration-threshold", "task-retries"],
+      "references": [
+        {
+          "title": "Add notifications on a job | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/jobs/notifications"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "job-queueing",
+      "unit": "domain6-2",
+      "order": 3,
+      "term": "キューと同時実行の上限",
+      "oneLine": "同時実行の上限は 1 つのジョブを同時に何回まで動かすかを決める設定で、キューは上限に達したときに新しい実行を待たせる仕組みです。",
+      "keyPhrase": "上限に達したときに新しい実行を待たせる",
+      "body": "新しいジョブの同時実行の上限(Maximum concurrent runs)は、既定で 1 です。1 より大きくすると、同じジョブの実行が重なって動けます。\n\nキューは、2024 年 4 月 15 日より後に画面で作ったジョブでは、既定で有効です。キューが有効なら、上限に達したときの新しい実行は、最大 48 時間待ってから動きます。待っている実行は、ジョブの実行の一覧に表示されます。キューが無効なら、上限に達したときの新しい実行はスキップされます。\n\n実行がキューに入るのは、次のどれかの上限に達したときです。\n\n- ワークスペースの、同時に動く実行の数の上限\n- ワークスペースの、同時に動く Run Job のタスクの数の上限\n- そのジョブの同時実行の上限",
+      "examAngle": "「前の実行が終わらないうちに次のスケジュールが来た。実行はどうなるか」という問いで、同時実行の上限とキューの有無による違いを確かめる形で出ます。",
+      "checks": [
+        {
+          "question": "同時実行の上限が 1 でキューが有効なジョブで、前の実行が動いている間に次の実行が始まろうとしました。次の実行はどうなりますか。",
+          "answer": "キューで待ち、前の実行が終わってから動きます。",
+          "reason": "キューが有効なら、上限に達したときの新しい実行は、最大 48 時間待ってから動きます。"
+        },
+        {
+          "question": "キューが無効で、同時実行の上限に達しているときに始まった実行はどうなりますか。",
+          "answer": "スキップされます。",
+          "reason": "キューが無効なときは、上限に達していると新しい実行はスキップされます。"
+        }
+      ],
+      "related": ["scheduled-trigger", "job-run-history"],
+      "references": [
+        {
+          "title": "Configure and edit Lakeflow Jobs | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/jobs/advanced"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "spark-ui-stage-metrics",
+      "unit": "domain6-3",
+      "order": 1,
+      "term": "ステージのサマリーメトリクス(Spark UI)",
+      "oneLine": "ステージのサマリーメトリクスは、Spark UI のステージの画面で、そのステージの全タスクの所要時間や読み書きの量の分布を表にしたものです。",
+      "keyPhrase": "全タスクの所要時間や読み書きの量の分布",
+      "body": "遅いジョブを調べるときは、ジョブのページの下にあるステージの一覧を所要時間で並べ替え、最も長いステージを開きます。一覧の Input、Output、Shuffle Read、Shuffle Write の列で、そのステージの I/O の量も控えておきます。\n\nステージの画面の Summary Metrics には、タスクの所要時間、GC の時間、シャッフルの読み書きの量、Peak Execution Memory などの指標が並びます。所要時間の Max が 75 パーセンタイルより 50% 以上長ければ、偏りがあるかもしれません。あふれ出しの統計は、ステージの画面の上部に出ます。表示がなければ、そのステージにあふれ出しはありません。\n\nサーバーレスのコンピュートには Spark UI がありません。代わりにクエリのプロファイルを使います。",
+      "examAngle": "「ステージの一部のタスクだけが長い」状況で、サマリーメトリクスの Max と中位の値の差から偏りを見抜かせる形で出ます。",
+      "checks": [
+        {
+          "question": "Summary Metrics で、タスクの所要時間の Max が 75 パーセンタイルの 3 倍でした。何を疑いますか。",
+          "answer": "データの偏り(スキュー)です。",
+          "reason": "公式の文書は、Max が 75 パーセンタイルより 50% 以上長いときに、偏りがあるかもしれないとしています。"
+        }
+      ],
+      "related": ["data-skew", "disk-spill", "shuffle"],
+      "references": [
+        {
+          "title": "Diagnosing a long job in Spark | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/optimizations/spark-ui-guide/long-spark-stage"
+        },
+        {
+          "title": "Skew and spill | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/optimizations/spark-ui-guide/long-spark-stage-page"
+        },
+        {
+          "title": "Web UI - Spark Documentation",
+          "url": "https://spark.apache.org/docs/latest/web-ui.html"
+        },
+        {
+          "title": "Diagnose cost and performance issues using the Spark UI | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/optimizations/spark-ui-guide/"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "data-skew",
+      "unit": "domain6-3",
+      "order": 2,
+      "term": "データの偏り(スキュー)",
+      "oneLine": "データの偏りは、パーティションの大きさがそろわず、一部のタスクだけに多くのデータが集まる状態です。",
+      "keyPhrase": "一部のタスクだけに多くのデータが集まる",
+      "body": "偏りがあると、ステージの多くのタスクが終わったあとも、少数のタスクが動き続けます。ステージの所要時間は、最も遅いタスクで決まります。\n\n対処は、原因で選びます。\n\n- **結合の偏り**: AQE が、ソートマージ結合とシャッフルハッシュ結合で、偏ったパーティションを自動で分けます。分ける対象は、大きさのしきい値を 2 つとも超えたパーティションです。しきい値より小さい偏りは、`spark.sql.adaptive.skewJoin.skewedPartitionFactor` と `spark.sql.adaptive.skewJoin.skewedPartitionThresholdInBytes` で調整します。ブロードキャスト結合には、この扱いはかかりません\n- **集計の偏り**: 偏ったキーにランダムな値を付けて分け(ソルティング)、2 段階で集計します\n- **表の配置の偏り**: Liquid Clustering を使います\n- **出力の表への書き込み**: `REBALANCE` のヒントを使います(AQE が要ります)",
+      "examAngle": "「一部のタスクだけが長い」状況から、偏りを見抜き、AQE の偏りの扱いやソルティングなどの対処を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "偏ったキーで集計するステージが遅いとき、キーにランダムな値を付けて分け、2 段階で集計する方法を何と呼びますか。",
+          "answer": "ソルティング(salting)です。",
+          "reason": "公式の文書は、偏ったキーにランダムな値を付けて分け、2 段階で集計する方法を対処の 1 つに挙げています。"
+        },
+        {
+          "question": "AQE の偏りの扱いがかからない結合の方式は何ですか。",
+          "answer": "ブロードキャスト結合です。",
+          "reason": "AQE の偏りの扱いは、ソートマージ結合とシャッフルハッシュ結合にかかり、ブロードキャスト結合にはかかりません。"
+        }
+      ],
+      "related": ["adaptive-query-execution", "spark-ui-stage-metrics", "liquid-clustering"],
+      "references": [
+        {
+          "title": "Skew and spill | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/optimizations/spark-ui-guide/long-spark-stage-page"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "shuffle",
+      "unit": "domain6-3",
+      "order": 3,
+      "term": "シャッフル",
+      "oneLine": "シャッフルは、Spark がデータをパーティションをまたいで配り直し、別のまとまり方にする処理です。",
+      "keyPhrase": "パーティションをまたいで配り直し",
+      "body": "1 つのタスクは 1 つのパーティションだけを処理します。キーごとの集計や結合では、同じキーの値を 1 か所に集める必要があります。そのため Spark は、すべてのパーティションからデータを読み、エグゼキューターやマシンをまたいでコピーします。\n\nシャッフルを起こす操作には、`repartition`、キーごとの集計(`groupByKey`、`reduceByKey` など)、結合があります。シャッフルには、ディスクの I/O、データのシリアライズ、ネットワークの I/O がかかります。\n\nSpark UI では、ステージの Shuffle Read と Shuffle Write の列で量を確かめます。最も大きな I/O の値を、ワーカーの全コア数とステージの秒数で割って、1 コアあたり毎秒 3 MB 程度になるなら、そのステージは I/O で律速しているかもしれません。\n\nシャッフルの多いステージには、`spark.sql.shuffle.partitions` を `auto` にして、パーティションの数を AQE に選ばせます。処理の能力が足りないときは、クラスターを大きくするか、サーバーレスに移します。",
+      "examAngle": "Spark UI の Shuffle Read と Shuffle Write の大きいステージを示し、原因になった操作や対処を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "Spark UI で、ステージがシャッフルで読んだデータの量を示す列は何ですか。",
+          "answer": "Shuffle Read です。",
+          "reason": "Shuffle Read は、ステージがシャッフルで読んだデータの量です。書いた量は Shuffle Write です。"
+        },
+        {
+          "question": "シャッフルのパーティションの数を、クエリの計画とデータの大きさから Spark に選ばせる設定は何ですか。",
+          "answer": "`spark.sql.shuffle.partitions` を `auto` にします。",
+          "reason": "公式の文書は、シャッフルの多いステージで `auto` を使い、AQE にパーティションの数を選ばせるよう勧めています。"
+        }
+      ],
+      "related": ["disk-spill", "broadcast-join", "adaptive-query-execution"],
+      "references": [
+        {
+          "title": "RDD Programming Guide - Spark Documentation",
+          "url": "https://spark.apache.org/docs/latest/rdd-programming-guide.html"
+        },
+        {
+          "title": "Diagnosing a long job in Spark | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/optimizations/spark-ui-guide/long-spark-stage"
+        },
+        {
+          "title": "Spark stage high I/O | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/optimizations/spark-ui-guide/long-spark-stage-io"
+        },
+        {
+          "title": "Web UI - Spark Documentation",
+          "url": "https://spark.apache.org/docs/latest/web-ui.html"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "disk-spill",
+      "unit": "domain6-3",
+      "order": 4,
+      "term": "ディスクへのあふれ出し(スピル)",
+      "oneLine": "ディスクへのあふれ出しは、シャッフルや集計の途中のデータがメモリに収まらず、Spark がそれをディスクに書き出すことです。",
+      "keyPhrase": "メモリに収まらず、Spark がそれをディスクに書き出す",
+      "body": "あふれ出すと、ディスクの I/O とガベージコレクションの負担が増え、ステージが遅くなります。Spark UI のステージの画面では、Shuffle spill (memory) と Shuffle spill (disk) で量を確かめます。前者はメモリ上の展開した形の大きさ、後者はディスク上のシリアライズした形の大きさです。\n\n公式の文書が挙げる対処は次のとおりです。\n\n- エグゼキューターのメモリの大きいインスタンスを使います。複雑なバッチの ETL では、少数の大きなワーカーにします\n- `spark.sql.shuffle.partitions` を `auto` にして、パーティションの数を Spark に選ばせます\n- メモリに載せる行や列を減らし、大きな文字列、配列、マップ、構造体を小さくします\n- Structured Streaming では、入力の量を制限して、マイクロバッチを小さくします",
+      "examAngle": "Spark UI の spill の値が大きいステージを示し、メモリを増やすか、パーティションを増やすかなどの対処を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "Spark UI で、ディスクへのあふれ出しの量を示す指標は何ですか。",
+          "answer": "Shuffle spill (disk) です。",
+          "reason": "Shuffle spill (disk) はディスク上のシリアライズした形の大きさで、Shuffle spill (memory) はメモリ上の展開した形の大きさです。"
+        }
+      ],
+      "related": ["shuffle", "instance-types", "executor-out-of-memory"],
+      "references": [
+        {
+          "title": "Skew and spill | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/optimizations/spark-ui-guide/long-spark-stage-page"
+        },
+        {
+          "title": "Web UI - Spark Documentation",
+          "url": "https://spark.apache.org/docs/latest/web-ui.html"
+        },
+        {
+          "title": "RDD Programming Guide - Spark Documentation",
+          "url": "https://spark.apache.org/docs/latest/rdd-programming-guide.html"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "single-task-stage",
+      "unit": "domain6-3",
+      "order": 5,
+      "term": "タスクが 1 つのステージ",
+      "oneLine": "タスクが 1 つのステージは、全データを 1 つのタスクが処理するため、クラスターのほかのコアが遊び、並列にならないステージです。",
+      "keyPhrase": "クラスターのほかのコアが遊び、並列にならない",
+      "body": "このステージは、ワーカーを増やしても速くなりません。よくある原因と対処は次のとおりです。\n\n- **`PARTITION BY` のないウィンドウ関数**: ウィンドウが全データにまたがります。ロジックが許すなら `PARTITION BY` を足します\n- **gzip のような分割できないファイル**: 1 つのファイルを 1 つのタスクが読みます。繰り返し読むなら、一度 Delta のテーブルに取り込みます\n- **JSON や CSV の `multiLine`**: レコードが複数行にまたがるときだけ使います\n- **大きなファイルのスキーマの推測**: スキーマを指定します\n- **`repartition(1)` や `coalesce(1)`**: 出力を 1 つのファイルにする必要がなければ外します\n- **小さなデータへの重い UDF**: 組み込みの関数で書き直すか、UDF の前に `repartition` します",
+      "examAngle": "「ステージのタスクが 1 つしかなく、ワーカーを増やしても速くならない」状況から、原因の書き方を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "`PARTITION BY` のないウィンドウ関数を含むステージで、タスクがいくつになりますか。",
+          "answer": "1 つです。",
+          "reason": "`PARTITION BY` がないと、ウィンドウが全データにまたがるため、1 つのタスクが全行を処理します。"
+        },
+        {
+          "question": "タスクが 1 つのステージで、ワーカーを増やすと速くなりますか。",
+          "answer": "速くなりません。",
+          "reason": "1 つのタスクは 1 つのコアで動くため、ほかのコアが増えても使われません。"
+        }
+      ],
+      "related": ["spark-ui-stage-metrics", "data-skew"],
+      "references": [
+        {
+          "title": "Long Spark stage with one task | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/optimizations/spark-ui-guide/one-spark-task"
+        },
+        {
+          "title": "Diagnosing a long job in Spark | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/optimizations/spark-ui-guide/long-spark-stage"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "liquid-clustering",
+      "unit": "domain6-4",
+      "order": 1,
+      "term": "Liquid Clustering",
+      "oneLine": "Liquid Clustering は、クラスタリングのキーに沿ってテーブルのデータの配置を整え、パーティション分割と ZORDER に代わる配置の最適化です。",
+      "keyPhrase": "パーティション分割と ZORDER に代わる",
+      "body": "テーブルを作るときに `CLUSTER BY` でキーを指定します。既存のパーティションのないテーブルにも、あとから付けられます。\n\n```sql\nCREATE TABLE main.sales.events (event_date DATE, user_id BIGINT) CLUSTER BY (event_date);\nALTER TABLE main.sales.events CLUSTER BY (user_id, event_date);  -- キーを変える\nALTER TABLE main.sales.events CLUSTER BY NONE;                 -- キーを外す\n```\n\nキーは 4 つまでです。キーを変えても、既存のデータは書き直されません。Liquid Clustering は、パーティション分割や `ZORDER` と併用できません。\n\nクラスタリングは `OPTIMIZE` で進みます。`OPTIMIZE` は増分で、整える必要のあるデータだけを書き直します。キーを変えたあとに既存のデータもすべて整えるには、`OPTIMIZE … FULL` を使います。`INSERT INTO` や CTAS などの書き込みでも、データが一定の量を超えるとその場で整えますが、すべての操作が対象ではありません。そのため、`OPTIMIZE` を定期的に実行します。\n\n公式の文書は、すべての新しいテーブルに Liquid Clustering を勧めています。とくに、カーディナリティの高い列で絞り込むテーブル、偏りの大きいテーブル、アクセスの傾向が変わるテーブルに向きます。",
+      "examAngle": "「絞り込みに使う列が時間とともに変わる」「パーティションが細かくなりすぎた」などの状況で、Liquid Clustering を選ばせる形や、キーの変更が既存のデータに及ぼす影響を問う形で出ます。",
+      "checks": [
+        {
+          "question": "Liquid Clustering のキーを `ALTER TABLE … CLUSTER BY` で変えました。既存のデータはすぐに書き直されますか。",
+          "answer": "書き直されません。",
+          "reason": "キーの変更は、以後の書き込みと `OPTIMIZE` にだけ効きます。既存のデータも整えるには `OPTIMIZE … FULL` を実行します。"
+        },
+        {
+          "question": "Liquid Clustering で指定できるクラスタリングのキーは、いくつまでですか。",
+          "answer": "4 つまでです。",
+          "reason": "公式の文書は、クラスタリングのキーを 4 つまでとしています。"
+        }
+      ],
+      "related": ["cluster-by-auto", "predictive-optimization", "delta-optimize"],
+      "references": [
+        {
+          "title": "Use liquid clustering for tables | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/delta/clustering"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "cluster-by-auto",
+      "unit": "domain6-4",
+      "order": 2,
+      "term": "自動の Liquid Clustering(CLUSTER BY AUTO)",
+      "oneLine": "自動の Liquid Clustering は、テーブルへの過去のクエリの傾向から、Databricks がクラスタリングのキーを選ぶ機能です。",
+      "keyPhrase": "Databricks がクラスタリングのキーを選ぶ",
+      "body": "```sql\nCREATE TABLE main.sales.orders (id BIGINT, region STRING) CLUSTER BY AUTO;\nALTER TABLE main.sales.orders CLUSTER BY AUTO;\n```\n\n自動の Liquid Clustering は、キーの選択に予測的最適化を使います。対象は Unity Catalog のマネージドテーブルです。キーは時間とともに変わりますが、Databricks がキーを変えるのは、データのスキップで見込める節約がクラスタリングの費用を上回るときだけです。\n\n小さなテーブル、問い合わせの少ないテーブル、すでに十分に整っているテーブルでは、キーが選ばれないことがあります。最初のキーの候補を示したいときは、`CLUSTER BY (c1, c2)` を指定したあとに `CLUSTER BY AUTO` にします。",
+      "examAngle": "「どの列で絞り込まれるか前もって分からない」「絞り込みの列が変わりやすい」マネージドテーブルに合う設定を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "CLUSTER BY AUTO で、Databricks がキーを選ぶときに使う機能は何ですか。",
+          "answer": "予測的最適化です。",
+          "reason": "自動の Liquid Clustering は、予測的最適化を使い、テーブルへの過去のクエリの傾向からキーを選びます。"
+        }
+      ],
+      "related": ["liquid-clustering", "predictive-optimization", "managed-table"],
+      "references": [
+        {
+          "title": "Use liquid clustering for tables | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/delta/clustering"
+        },
+        {
+          "title": "Predictive optimization for Unity Catalog managed tables | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/optimizations/predictive-optimization"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "predictive-optimization",
+      "unit": "domain6-4",
+      "order": 3,
+      "term": "予測的最適化",
+      "oneLine": "予測的最適化は、Unity Catalog のマネージドテーブルに要る保守の操作を Databricks が見つけ、自動で実行する機能です。",
+      "keyPhrase": "保守の操作を Databricks が見つけ、自動で実行する",
+      "body": "予測的最適化が実行する操作は、次のとおりです。\n\n- `OPTIMIZE`: ファイルの大きさを整え、Liquid Clustering のテーブルでは増分のクラスタリングを行います\n- `VACUUM`: テーブルが参照しなくなったデータファイルを消します\n- `ANALYZE`: クエリの性能のために統計を集めます\n\n予測的最適化は `ZORDER` を実行しません。Z-order で並べたファイルは、予測的最適化の対象から外れます。対象は Unity Catalog のマネージドテーブルだけで、外部テーブルは対象になりません。\n\n2024 年 11 月 11 日以降に作ったアカウントでは、既定で有効です。カタログ、スキーマ、テーブルの単位で、有効、無効、親の設定を継ぐ(`INHERIT`)を選べます。\n\n```sql\nALTER CATALOG main ENABLE PREDICTIVE OPTIMIZATION;\nALTER SCHEMA main.staging DISABLE PREDICTIVE OPTIMIZATION;\n```\n\n操作はサーバーレスのジョブのコンピュートで動き、サーバーレスのジョブの SKU で課金されます。実行の記録は、システムテーブル `system.storage.predictive_optimization_operations_history` で確かめます。",
+      "examAngle": "「OPTIMIZE と VACUUM を手で計画せずに保守したい」という要件から予測的最適化を選ばせる形や、対象のテーブルと実行しない操作(ZORDER、外部テーブル)を問う形で出ます。",
+      "checks": [
+        {
+          "question": "予測的最適化が実行しない操作はどれですか。OPTIMIZE、VACUUM、ZORDER、ANALYZE から選んでください。",
+          "answer": "ZORDER です。",
+          "reason": "予測的最適化は OPTIMIZE、VACUUM、ANALYZE を実行し、ZORDER は実行しません。"
+        },
+        {
+          "question": "外部テーブルは、予測的最適化の対象になりますか。",
+          "answer": "なりません。",
+          "reason": "予測的最適化の対象は、Unity Catalog のマネージドテーブルだけです。"
+        }
+      ],
+      "related": ["cluster-by-auto", "delta-optimize", "delta-vacuum", "managed-table"],
+      "references": [
+        {
+          "title": "Predictive optimization for Unity Catalog managed tables | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/optimizations/predictive-optimization"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "cluster-launch-failure",
+      "unit": "domain6-5",
+      "order": 1,
+      "term": "クラスターの起動失敗",
+      "oneLine": "クラスターの起動失敗は、クラシックのコンピュートが起動の途中で止まる障害で、init スクリプトのエラーやネットワークの設定の誤りが主な原因です。",
+      "keyPhrase": "init スクリプトのエラーやネットワークの設定の誤り",
+      "body": "まず、コンピュートの詳細の Event log のタブで、起動の流れを確かめます。イベントは 60 日残ります。\n\n**init スクリプト**: クラスター単位の init スクリプトが 0 以外の終了コードを返すと、クラスターの起動は失敗します。スクリプトが設定した場所にないときや、64 KB を超えるときも失敗します。イベントログには `INIT_SCRIPTS_STARTED` と `INIT_SCRIPTS_FINISHED` が記録され、後者でどのスクリプトが成功したかが分かります。スクリプトの出力は、クラスターのログの配信を設定していれば `<ログの場所>/<クラスターの ID>/init_scripts` に書かれます。\n\n**ネットワーク**: 新しいコンピュートが応答せず、イベントログに `Node daemon ping timeout` が出るときは、ネットワークの設定の誤りが多い原因です。`failed to launch Spark container` のエラーは、インスタンスが AWS STS に届かず、ルートの S3 バケットにアクセスできないときによく出ます。\n\n公式の文書は、init スクリプトの前にコンピュートのポリシーなどの組み込みの機能を使い、ライブラリを init スクリプトで入れないよう勧めています。サーバーレスでは init スクリプトを使えません。",
+      "examAngle": "「init スクリプトを追加したらクラスターが起動しなくなった」状況で、原因の確かめ方(イベントログ、init スクリプトのログ)を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "クラスター単位の init スクリプトが 0 以外の終了コードを返すと、クラスターはどうなりますか。",
+          "answer": "起動に失敗します。",
+          "reason": "公式の文書は、クラスター単位の init スクリプトが 0 以外を返すと、クラスターの起動が失敗するとしています。"
+        },
+        {
+          "question": "クラスターの起動の流れと init スクリプトの開始、終了を確かめる画面はどこですか。",
+          "answer": "コンピュートの詳細の Event log のタブです。",
+          "reason": "イベントログには、起動などのイベントと、`INIT_SCRIPTS_STARTED`、`INIT_SCRIPTS_FINISHED` が記録されます。"
+        }
+      ],
+      "related": ["library-conflict", "serverless-compute"],
+      "references": [
+        {
+          "title": "Cluster-scoped init scripts | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/init-scripts/cluster-scoped"
+        },
+        {
+          "title": "Init script logging | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/init-scripts/logs"
+        },
+        {
+          "title": "Manage classic compute | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/compute/clusters-manage"
+        },
+        {
+          "title": "Troubleshoot compute issues | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/compute/troubleshooting/"
+        },
+        {
+          "title": "What are init scripts? | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/init-scripts/"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "library-conflict",
+      "unit": "domain6-5",
+      "order": 2,
+      "term": "ライブラリの競合",
+      "oneLine": "ライブラリの競合は、同じ名前のライブラリが複数の場所に入り、意図しない版が読み込まれる状態で、Databricks では読み込みの優先順位で決まる版が使われます。",
+      "keyPhrase": "読み込みの優先順位で決まる版が使われます",
+      "body": "同じ名前のライブラリがあるとき、Python は優先順位の高いものを読み込みます。主な順位は、高い順に次のとおりです。\n\n1. ノートブックの単位のライブラリ(`%pip install`)\n2. コンピュートの単位のライブラリ\n3. Databricks Runtime に組み込まれたライブラリ\n\nGit フォルダーでは、作業ディレクトリと Git フォルダーの最上位が、ノートブックの単位より上に来ます。init スクリプトで入れたライブラリは、入れ方によって、組み込みのライブラリより前にも後にもなります。\n\nノートブックの単位のライブラリは、そのノートブックだけに効き、同じコンピュートのほかのノートブックに影響しません。組み込みのライブラリの版を変えたいときにも使えます。\n\n```python\n%pip install example-package==1.2.0\ndbutils.library.restartPython()\n```\n\n`%pip` は Python のプロセスを自動では再起動しないので、入れた版を読み込むには `dbutils.library.restartPython()` が要ることがあります。コンピュートの単位で入れたライブラリは、`%pip` では消せません。組み込みのライブラリの別の版を入れたときは、`%pip uninstall` で Runtime の既定の版に戻せます。",
+      "examAngle": "「ノートブックで入れた版と、クラスターに入れた版のどちらが使われるか」を問う形や、ほかのノートブックに影響せずに版を変える方法を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "同じライブラリを、コンピュートの単位と `%pip` のノートブックの単位で別の版で入れました。ノートブックで読み込まれるのはどちらですか。",
+          "answer": "ノートブックの単位(`%pip`)の版です。",
+          "reason": "ノートブックの単位のライブラリは、コンピュートの単位のライブラリより優先されます。"
+        },
+        {
+          "question": "同じコンピュートのほかのノートブックに影響せずに、ライブラリの版を変える方法は何ですか。",
+          "answer": "`%pip install` でノートブックの単位のライブラリとして入れます。",
+          "reason": "ノートブックの単位のライブラリは、入れたノートブックだけに効きます。"
+        }
+      ],
+      "related": ["cluster-launch-failure"],
+      "references": [
+        {
+          "title": "Install libraries | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/libraries/"
+        },
+        {
+          "title": "Notebook-scoped Python libraries | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/libraries/notebooks-python-libraries"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "driver-out-of-memory",
+      "unit": "domain6-5",
+      "order": 3,
+      "term": "ドライバーのメモリ不足(collect と toPandas)",
+      "oneLine": "ドライバーのメモリ不足は、collect や toPandas などで大量の結果をドライバーに集め、ドライバーのメモリが足りなくなる障害です。",
+      "keyPhrase": "大量の結果をドライバーに集め",
+      "body": "`collect()` と `toPandas()` は、全データをドライバーのメモリに読み込みます。PySpark の文書は、どちらも結果が小さいと分かっているときだけ使うよう書いています。\n\n```python\nrows = df.collect()     # 全行がドライバーに集まる\npdf = df.toPandas()     # 全行が pandas の DataFrame としてドライバーに集まる\npreview = df.limit(100).toPandas()\n```\n\nApache Spark の `spark.driver.maxResultSize` は、1 回のアクションでドライバーに返す結果の大きさの合計の上限で、Spark の既定は `1g` です。超えるとジョブは中止されます。上限を大きくしすぎると、ドライバーがメモリ不足になることがあります。\n\nドライバーの種類は、既定でワーカーと同じです。大量のデータをドライバーに集める予定があるときは、メモリの大きいドライバーの種類を選べます。",
+      "examAngle": "「大きな DataFrame を toPandas で変換したらドライバーが落ちた」状況で、原因がドライバーへの集約にあることを見抜かせる形で出ます。",
+      "checks": [
+        {
+          "question": "数億行の DataFrame に `toPandas()` を実行したところ、ドライバーのメモリが足りなくなりました。なぜですか。",
+          "answer": "`toPandas()` が全データをドライバーのメモリに読み込むからです。",
+          "reason": "PySpark の文書は、`toPandas()` が全データをドライバーのメモリに読み込むため、結果が小さいときだけ使うよう書いています。"
+        }
+      ],
+      "related": ["executor-out-of-memory", "instance-types"],
+      "references": [
+        {
+          "title": "pyspark.sql.DataFrame.toPandas — PySpark documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.DataFrame.toPandas.html"
+        },
+        {
+          "title": "pyspark.sql.DataFrame.collect — PySpark documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.DataFrame.collect.html"
+        },
+        {
+          "title": "Configuration - Spark Documentation",
+          "url": "https://spark.apache.org/docs/latest/configuration.html"
+        },
+        {
+          "title": "Compute configuration reference | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/compute/configure"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "executor-out-of-memory",
+      "unit": "domain6-5",
+      "order": 4,
+      "term": "エグゼキューターのメモリ不足(ExecutorLostFailure)",
+      "oneLine": "エグゼキューターのメモリ不足は、タスクの処理中にエグゼキューターのメモリが足りなくなり、Spark がエグゼキューターを外してタスクを再試行する障害です。",
+      "keyPhrase": "Spark がエグゼキューターを外してタスクを再試行する",
+      "body": "再試行でも失敗が続くと、ステージとジョブが失敗します。エラーは一般的な文言になりやすく、`ExecutorLostFailure` に「containers exceeding thresholds, or network issues」のような説明が付くことがあります。\n\nメモリが原因かを確かめるには、コアの数を変えずに、コアあたりのメモリを 2 倍にします(4 コア 16 GB から 4 コア 32 GB など)。失敗が遅くなるか起きなくなれば、メモリが原因です。効くのは、全体のメモリではなく、コアあたりのメモリの比率です。\n\n公式の文書が挙げる主な原因と対処は次のとおりです。\n\n- シャッフルのパーティションが少ない: `spark.sql.shuffle.partitions` を `auto` にします\n- 大きなテーブルのブロードキャスト: ブロードキャストのヒントと、実行時のしきい値を見直します\n- UDF がパーティション全体をメモリに載せる: 組み込みの関数で書き直すか、先に `repartition` します\n- `PARTITION BY` のないウィンドウ関数: ロジックが許すなら `PARTITION BY` を足します\n- データの偏り: ステージの Summary Metrics で確かめます\n- ストリーミングの状態: RocksDB の状態ストアを使い、メモリに上限を付けます\n\n大きなワーカーの種類で直るなら、そのまま使ってかまいません。",
+      "examAngle": "「シャッフルを伴う処理で ExecutorLostFailure が出る」状況から、パーティションの数やメモリの比率など、対処を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "エグゼキューターのメモリ不足かを確かめるために、公式の文書が勧める方法は何ですか。",
+          "answer": "コアの数を変えずに、コアあたりのメモリを 2 倍にして、失敗が遅くなるか消えるかを見ます。",
+          "reason": "メモリの問題では、全体の量ではなく、コアあたりのメモリの比率が効きます。"
+        },
+        {
+          "question": "シャッフルのパーティションが少なくてエグゼキューターのメモリが足りないとき、どの設定を変えますか。",
+          "answer": "`spark.sql.shuffle.partitions` を `auto` にします。",
+          "reason": "公式の文書は、パーティションの数を Spark に選ばせる `auto` を勧めています。"
+        }
+      ],
+      "related": ["driver-out-of-memory", "disk-spill", "data-skew"],
+      "references": [
+        {
+          "title": "Spark memory issues | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/optimizations/spark-ui-guide/spark-memory-issues"
+        },
+        {
+          "title": "Long Spark stage with one task | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/optimizations/spark-ui-guide/one-spark-task"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "git-folder",
+      "unit": "domain5-1",
+      "order": 1,
+      "term": "Git フォルダー",
+      "oneLine": "Git フォルダーは、Git のリポジトリをワークスペースに複製し、ノートブックやファイルを Git で版の管理をするための、画面と API の Git のクライアントです。",
+      "keyPhrase": "Git のリポジトリをワークスペースに複製し",
+      "body": "Git フォルダーは、以前は Repos と呼ばれていた機能です。リモートのリポジトリを複製(クローン)して作り、その中のノートブックやファイルを編集します。\n\nGit フォルダーの Git のダイアログでは、ブランチの作成と切り替え、コミットと push、Pull、マージ、リベース、競合の解消ができます。プルリクエストの作成とマージ、リモートのブランチの削除は、Git のプロバイダー(GitHub など)の画面で行います。\n\nGit フォルダーを使うと、ブランチを分けて開発し、変更をリモートのリポジトリに記録できます。記録した変更は、チームで共有したり CI/CD の流れにつないだりできます。\n\n作業中のブランチの大きさは 1 GB まで、ワークスペースの資産とファイルの数は 20,000 未満が推奨です。",
+      "examAngle": "「チームでノートブックの変更をブランチで分けて開発し、Git のリポジトリと同期したい」という要件から、Git フォルダーを選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "ノートブックの変更を、ブランチを分けて開発し、リモートの Git のリポジトリに記録したいとき、ワークスペースのどの機能を使いますか。",
+          "answer": "Git フォルダーです。",
+          "reason": "Git フォルダーは、リポジトリをワークスペースに複製し、ブランチの作成と切り替え、コミットと push を画面から行えます。"
+        }
+      ],
+      "related": ["git-folder-branch", "git-folder-commit-push", "git-provider-operations"],
+      "references": [
+        {
+          "title": "Databricks Git folders | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/repos/"
+        },
+        {
+          "title": "Create and manage Git folders | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/repos/git-operations-with-repos"
+        },
+        {
+          "title": "Databricks Git folder limits and reference | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/repos/limits"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "git-folder-branch",
+      "unit": "domain5-1",
+      "order": 2,
+      "term": "ブランチの作成と切り替え(Git フォルダー)",
+      "oneLine": "Git フォルダーでは、Git のダイアログの Create Branch で元のブランチを選んで新しいブランチを作り、Git のダイアログのブランチのドロップダウンで切り替えます。",
+      "keyPhrase": "元のブランチを選んで新しいブランチを作り",
+      "body": "新しいブランチは、名前を入れ、元にするブランチを選んで作ります。ブランチを切り替えたとき、コミットしていない変更は、切り替え先のコードとぶつからなければ、切り替え先のブランチでもコミットしていない変更として残ります。\n\n切り替え先のブランチにないノートブックやファイルは、ワークスペースから消えます。元のブランチに戻すと作り直されますが、ID は新しくなります。この挙動は取り消せません。",
+      "examAngle": "「新しい機能を開発するため、既定のブランチから作業用のブランチを作りたい」という場面で、Git フォルダーのどの操作を使うかを問う形で出ます。",
+      "checks": [
+        {
+          "question": "Git フォルダーで、コミットしていない変更があるままブランチを切り替えました。切り替え先のコードと変更がぶつからないとき、その変更はどうなりますか。",
+          "answer": "切り替え先のブランチで、コミットしていない変更として残ります。",
+          "reason": "Git フォルダーは、ぶつからないコミット前の変更を、切り替え先のブランチへ持ち越します。"
+        }
+      ],
+      "related": ["git-folder", "git-folder-commit-push"],
+      "references": [
+        {
+          "title": "Create and manage Git folders | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/repos/git-operations-with-repos"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "git-folder-commit-push",
+      "unit": "domain5-1",
+      "order": 3,
+      "term": "Commit & Push と Pull",
+      "oneLine": "Commit & Push は、Git フォルダーの変更を 1 回の操作でコミットしてリモートのリポジトリへ送るボタンで、Pull はリモートの変更を Git フォルダーへ取り込むボタンです。",
+      "keyPhrase": "1 回の操作でコミットしてリモートのリポジトリへ送る",
+      "body": "利用者は、Git のダイアログで、変更したファイルを選び、コミットのメッセージ(必須)を入れて **Commit & Push** を押します。コミットと push が続けて行われます。\n\n**Pull** を押すと、ノートブックやファイルが、リモートのリポジトリの最新の版に更新されます。手元の変更とぶつかったときは、競合を解消します。\n\n競合は、ファイルを手で直すか、Keep all current changes(手元の変更を残す)か Take all incoming changes(取り込む側の変更を採る)を選んで解消します。\n\n**Reset** は、`git reset --hard` と `git push --force` に当たる操作です。手元とリモートの両方で、そのブランチのコミット済みの変更とコミット前の変更が消えます。",
+      "examAngle": "「ほかの開発者がリモートに push した最新の変更を、自分の Git フォルダーに反映したい」「変更をリモートに送りたい」という場面で、Pull と Commit & Push のどちらを使うかを問う形で出ます。",
+      "checks": [
+        {
+          "question": "同僚がリモートのリポジトリに push した変更を、自分の Git フォルダーに取り込みたいとき、どの操作を使いますか。",
+          "answer": "Pull です。",
+          "reason": "Pull は、Git フォルダーのノートブックやファイルを、リモートのリポジトリの最新の版に更新します。"
+        },
+        {
+          "question": "Git フォルダーで編集したノートブックの変更を、リモートのリポジトリに送るとき、どのボタンを押しますか。",
+          "answer": "Commit & Push です。",
+          "reason": "Commit & Push は、コミットのメッセージを付けてコミットし、続けてリモートへ push します。"
+        }
+      ],
+      "related": ["git-folder", "git-folder-branch", "git-provider-operations"],
+      "references": [
+        {
+          "title": "Create and manage Git folders | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/repos/git-operations-with-repos"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "git-provider-operations",
+      "unit": "domain5-1",
+      "order": 4,
+      "term": "Git のプロバイダーで行う操作(プルリクエスト)",
+      "oneLine": "プルリクエストの作成とマージ、リモートのブランチの削除は、Git フォルダーではなく、GitHub などの Git のプロバイダーの画面で行います。",
+      "keyPhrase": "Git のプロバイダーの画面で行います",
+      "body": "Git フォルダーの Git のダイアログには、プルリクエストを作る操作がありません。既定のブランチに直接コミットできないリポジトリでは、作業用のブランチを push します。そのあと、Git のプロバイダーでプルリクエストを作り、レビューを経てマージします。\n\nブランチの削除も、Git のプロバイダーで行います。リモートのブランチを消しても、Git フォルダーの手元のブランチは最大 30 日残ることがあります。\n\nマージそのものは、Git フォルダーでもできます。競合がなければ、Git フォルダーはマージの結果をリモートへ push します。",
+      "examAngle": "「Git フォルダーで開発したブランチの変更を、レビューを経て main に取り込みたい」という場面で、プルリクエストをどこで作るかを問う形で出ます。",
+      "checks": [
+        {
+          "question": "Git フォルダーで開発したブランチを push しました。チームのレビューを受けるため、プルリクエストを作るにはどこで操作しますか。",
+          "answer": "GitHub などの Git のプロバイダーの画面です。",
+          "reason": "Git フォルダーには、プルリクエストを作る操作がありません。プルリクエストの作成とマージは、Git のプロバイダーで行います。"
+        }
+      ],
+      "related": ["git-folder-commit-push", "git-folder"],
+      "references": [
+        {
+          "title": "Create and manage Git folders | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/repos/git-operations-with-repos"
+        },
+        {
+          "title": "Databricks Git folder limits and reference | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/repos/limits"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "bundle-targets",
+      "unit": "domain5-2",
+      "order": 1,
+      "term": "targets(ターゲット)",
+      "oneLine": "targets は、databricks.yml で、開発や本番などの配布先の環境を並べ、環境ごとにワークスペースや設定の上書きを書く項目です。",
+      "keyPhrase": "配布先の環境を並べ、環境ごとにワークスペースや設定の上書きを書く",
+      "body": "各ターゲットには、使うワークスペース、デプロイのモード、変数の値、リソースの設定の上書きなどを書きます。トップレベルの設定が既定値になり、ターゲットに書いた設定がそれを上書きします。ターゲットに書いていない項目は、トップレベルの設定がそのまま使われます。\n\n```yaml\ntargets:\n  dev:\n    mode: development\n    default: true\n    variables:\n      catalog: dev_catalog\n  prod:\n    mode: production\n    variables:\n      catalog: prod_catalog\n```\n\n`default: true` を付けられるターゲットは 1 つだけです。`bundle deploy` などのコマンドは、`-t` を付けないと既定のターゲットを使い、ほかのターゲットには `-t prod` のように指定します。",
+      "examAngle": "「開発、検証、本番の環境ごとに、配布先のワークスペースや設定を変えたい」という要件から、databricks.yml のどの項目に書くかを問う形で出ます。",
+      "checks": [
+        {
+          "question": "databricks.yml で、開発と本番の環境ごとに配布先のワークスペースを変えたいとき、どの項目に書きますか。",
+          "answer": "targets です。",
+          "reason": "targets には配布先の環境を並べ、環境ごとにワークスペースや設定の上書きを書きます。"
+        },
+        {
+          "question": "ターゲットの 1 つに `default: true` を付けています。`databricks bundle deploy` を `-t` なしで実行すると、どのターゲットに配布されますか。",
+          "answer": "`default: true` を付けたターゲットです。",
+          "reason": "コマンドで指定しなければ、既定のターゲットが使われます。"
+        }
+      ],
+      "related": ["bundle-variables", "bundle-deployment-modes", "databricks-yml"],
+      "references": [
+        {
+          "title": "Declarative Automation Bundles configuration | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/settings"
+        },
+        {
+          "title": "Declarative Automation Bundles deployment modes | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/deployment-modes"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "bundle-variables",
+      "unit": "domain5-2",
+      "order": 2,
+      "term": "バンドルの変数(variables)",
+      "oneLine": "バンドルの変数は、トップレベルの variables で宣言し、`${var.<名前>}` で参照する値で、ターゲットごとに別の値を与えられます。",
+      "keyPhrase": "ターゲットごとに別の値を与えられます",
+      "body": "変数は、トップレベルの `variables` で、説明と既定値を付けて宣言します。環境ごとに値を変えるときは、ターゲットの下の `variables` に値を書きます。\n\n```yaml\nvariables:\n  catalog:\n    description: 書き込み先のカタログ\n    default: dev_catalog\n\ntargets:\n  prod:\n    variables:\n      catalog: prod_catalog\n```\n\n設定の中では `${var.catalog}` で参照します。値は、次の順に強く効きます。\n\n- コマンドの `--var` の指定\n- `BUNDLE_VAR_` で始まる環境変数\n- `.databricks/bundle/<ターゲット>/variable-overrides.json` のファイル\n- ターゲットの下の `variables` の値\n- トップレベルの `default`\n\n既定値のない変数には、上のどれかで値を与えます。`type: complex` を付けると、クラスターの設定のような構造のある値も持てます。\n\n宣言しなくても使える置換もあります。`${bundle.target}` は配布中のターゲットの名前、`${workspace.current_user.userName}` は配布した利用者の名前になります。",
+      "examAngle": "「本番の環境だけ書き込み先のカタログを変えたい」という要件で、変数の宣言の場所と、ターゲットごとの値の書き方を問う形で出ます。",
+      "checks": [
+        {
+          "question": "トップレベルで `default: dev_catalog` と宣言した変数 `catalog` に、ターゲット `prod` の下で `prod_catalog` を与えました。`-t prod` で配布すると、`${var.catalog}` は何になりますか。",
+          "answer": "`prod_catalog` です。",
+          "reason": "ターゲットの下の値は、トップレベルの既定値より強く効きます。"
+        },
+        {
+          "question": "ターゲットの下で値を与えた変数に、コマンドの `--var` でも値を指定しました。どちらが使われますか。",
+          "answer": "`--var` で指定した値です。",
+          "reason": "変数の値の優先の順では、`--var` の指定が最も強く効きます。"
+        }
+      ],
+      "related": ["bundle-targets", "databricks-yml"],
+      "references": [
+        {
+          "title": "Substitutions and variables in Declarative Automation Bundles | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/variables"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "bundle-deployment-modes",
+      "unit": "domain5-2",
+      "order": 3,
+      "term": "デプロイのモード(development と production)",
+      "oneLine": "デプロイのモードは、ターゲットの `mode` に development か production を書き、開発用と本番用で配布の挙動を切り替える設定です。",
+      "keyPhrase": "開発用と本番用で配布の挙動を切り替える",
+      "body": "`mode: development` のターゲットでは、Databricks は配布するジョブやパイプラインの名前に `[dev <ユーザー名>]` の接頭辞を付けます。ジョブのスケジュールとトリガーは一時停止の状態で配布され、同時実行も許されます。開発者どうしが同じワークスペースに配布しても、名前がぶつからず、本番のように定期実行もされません。\n\n`mode: production` のターゲットでは、Databricks は配布の前に設定を確かめます。たとえば、ターゲットに Git のブランチを書いていれば、今のブランチと一致するかを確かめます。パイプラインが開発用の印(`development: true`)になっていないことも確かめます。既存のクラスターへの差し替えはできません。\n\n本番の配布では、ジョブを利用者でなくサービスプリンシパルで動かすことを Databricks は勧めています。`run_as` にサービスプリンシパルを指定すると、そのように動きます。\n\nモードの既定の挙動は、`presets` で個別に変えられます。`mode` と `presets` の両方があるときは、`presets` が優先され、リソースごとの設定はさらに `presets` より優先されます。",
+      "examAngle": "「開発者ごとに配布したジョブの名前がぶつからないようにしたい」「開発の環境で定期実行させたくない」という要件から、ターゲットのモードを選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "開発者がそれぞれ同じワークスペースにバンドルを配布しても、ジョブの名前がぶつからず、スケジュールも動かないようにしたいとき、ターゲットの `mode` に何を書きますか。",
+          "answer": "`development` です。",
+          "reason": "development モードでは、リソースの名前に `[dev <ユーザー名>]` が付き、ジョブのスケジュールとトリガーが一時停止の状態で配布されます。"
+        }
+      ],
+      "related": ["bundle-targets", "bundle-promotion"],
+      "references": [
+        {
+          "title": "Declarative Automation Bundles deployment modes | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/deployment-modes"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "declarative-automation-bundles",
+      "unit": "domain5-3",
+      "order": 1,
+      "term": "Declarative Automation Bundles(バンドル)",
+      "oneLine": "Declarative Automation Bundles は、ジョブやパイプラインなどの Databricks のリソースを YAML のソースのファイルで定義し、Git で管理して、環境ごとに同じ形で配布する仕組みです。",
+      "keyPhrase": "YAML のソースのファイルで定義し、Git で管理して",
+      "body": "Declarative Automation Bundles は、以前は Databricks Asset Bundles と呼ばれていました。公式の文書は今の名前を使い、旧称を併記しています。試験の問題や古い記事で Databricks Asset Bundles とあれば、同じ仕組みを指します。\n\nバンドルには、ノートブックや Python のファイルなどのソースのファイルと、リソースの定義と設定、テストを入れます。設定は YAML で書き、入口のファイルは `databricks.yml` です。\n\n作業は、次の順に進めます。\n\n```bash\ndatabricks bundle init        # ひな形からプロジェクトを作る\ndatabricks bundle validate    # 設定を確かめる\ndatabricks bundle deploy -t dev\ndatabricks bundle run -t dev my_job\n```\n\n配布できるリソースには、Lakeflow Jobs のジョブ、パイプライン、ダッシュボード、モデルサービングのエンドポイント、MLflow の実験などがあります。Databricks は、CI/CD の方法としてバンドルを勧めています。\n\nバンドルを使うには、Databricks CLI の v0.218.0 以降が要ります。",
+      "examAngle": "「ジョブやパイプラインの定義をコードとして Git で管理し、開発から本番へ同じ形で配布したい」という要件から、バンドルを選ばせる形で出ます。旧称の Databricks Asset Bundles で書かれることもあります。",
+      "checks": [
+        {
+          "question": "Databricks Asset Bundles と Declarative Automation Bundles は、別の仕組みですか。",
+          "answer": "同じ仕組みです。",
+          "reason": "Databricks Asset Bundles は旧称で、今の名前が Declarative Automation Bundles です。"
+        },
+        {
+          "question": "バンドルの設定を書く入口のファイルの名前は何ですか。",
+          "answer": "`databricks.yml` です。",
+          "reason": "バンドルの設定とリソースは、`databricks.yml` と、そこから取り込むリソースの設定のファイルに書きます。"
+        }
+      ],
+      "related": ["databricks-yml", "bundle-resources", "bundle-promotion", "lakeflow-jobs"],
+      "references": [
+        {
+          "title": "What are Declarative Automation Bundles? | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/"
+        },
+        {
+          "title": "CI/CD on Databricks | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/ci-cd"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "databricks-yml",
+      "unit": "domain5-3",
+      "order": 2,
+      "term": "databricks.yml",
+      "oneLine": "databricks.yml は、バンドルの名前、変数、リソース、ターゲットなどを書く、バンドルの設定の入口のファイルです。",
+      "keyPhrase": "バンドルの設定の入口のファイル",
+      "body": "`databricks.yml` のトップレベルに書く主な項目は、次のとおりです。\n\n- `bundle`: バンドルの名前(必須)など\n- `include`: リソースの設定を書いた別のファイルを取り込む\n- `variables`: 変数の宣言\n- `workspace`: ワークスペースの接続先とパス\n- `permissions`: リソースにかける権限\n- `resources`: 配布するジョブやパイプラインなど\n- `targets`: 配布先の環境\n\n```yaml\nbundle:\n  name: sales_pipeline\n\ninclude:\n  - resources/*.yml\n\ntargets:\n  dev:\n    default: true\n```\n\nリソースが多いときは、`include` でファイルを分けます。トップレベルに書いた設定は既定値になり、`targets` の中の設定で環境ごとに上書きされます。",
+      "examAngle": "「バンドルの名前、配布先の環境、配布するジョブを定義するファイルはどれか」という形で出ます。",
+      "checks": [
+        {
+          "question": "`databricks.yml` のトップレベルの項目のうち、必ず書く必要があるのはどれですか。",
+          "answer": "`bundle` の中の名前です。",
+          "reason": "最も簡単な `databricks.yml` も、トップレベルの `bundle` にバンドルの名前を書きます。名前は必須です。"
+        }
+      ],
+      "related": ["declarative-automation-bundles", "bundle-resources", "bundle-targets", "bundle-variables"],
+      "references": [
+        {
+          "title": "Declarative Automation Bundles configuration | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/settings"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "bundle-resources",
+      "unit": "domain5-3",
+      "order": 3,
+      "term": "resources(リソース)",
+      "oneLine": "resources は、バンドルが配布するジョブやパイプラインなどを、種類ごとにキーを付けて定義する項目です。",
+      "keyPhrase": "種類ごとにキーを付けて定義する",
+      "body": "`resources` の下に、`jobs` や `pipelines` のようなリソースの種類を書き、その下に各リソースのキーと設定を書きます。設定の項目は、各リソースの REST API の形に沿います。\n\n```yaml\nresources:\n  jobs:\n    daily_sales:\n      name: daily_sales\n      tasks:\n        - task_key: load\n          notebook_task:\n            notebook_path: ../src/load.ipynb\n```\n\nキー(上の例では `daily_sales`)は、バンドルの中でリソースを指す名前です。`databricks bundle run daily_sales` のようにコマンドで実行するときや、`${resources.jobs.daily_sales.id}` のように設定の中で参照するときに使います。\n\nジョブとパイプラインのほか、ダッシュボード、スキーマ、ボリューム、アプリ、SQL ウェアハウスなども定義できます。",
+      "examAngle": "「バンドルで配布するジョブの定義を、databricks.yml のどこに書くか」という形で出ます。",
+      "checks": [
+        {
+          "question": "バンドルで配布するジョブの定義は、databricks.yml のどの項目の下に書きますか。",
+          "answer": "`resources` の下の `jobs` です。",
+          "reason": "配布するリソースは、`resources` の下に種類ごとに書きます。ジョブの種類は `jobs` です。"
+        }
+      ],
+      "related": ["databricks-yml", "bundle-run", "lakeflow-jobs"],
+      "references": [
+        {
+          "title": "Declarative Automation Bundles resources | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/resources"
+        },
+        {
+          "title": "bundle command group | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/dev-tools/cli/bundle-commands"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "bundle-promotion",
+      "unit": "domain5-3",
+      "order": 4,
+      "term": "バンドルでの環境の昇格(CI/CD)",
+      "oneLine": "バンドルでの昇格は、同じバンドルのソースを、CI/CD の道具から開発、検証、本番のターゲットへ順に配布して、変更を本番まで進める流れです。",
+      "keyPhrase": "同じバンドルのソースを、CI/CD の道具から開発、検証、本番のターゲットへ順に配布して",
+      "body": "利用者は、バンドルのファイルを Git で管理し、GitHub Actions などの CI/CD の道具から Databricks CLI を呼びます。環境ごとの違いはターゲットと変数に書くので、どの環境にも同じソースを配布できます。\n\n```bash\ndatabricks bundle validate -t staging\ndatabricks bundle deploy -t staging\ndatabricks bundle run -t staging integration_test\ndatabricks bundle deploy -t prod\n```\n\n本番のターゲットは `mode: production` にします。CI/CD の流れでは、利用者のアカウントでなくサービスプリンシパルで認証することを Databricks は勧めています。保存した秘密情報を持たずに済む、ワークロードの ID のフェデレーションが最も安全な方法です。\n\n既存のジョブを本番に置いたままバンドルの管理に移すときは、`bundle generate` と `bundle deployment bind` を使います。",
+      "examAngle": "「開発の環境で確かめたジョブを、同じ定義のまま本番の環境に配布したい」という要件で、ターゲットを分けた配布の流れを問う形で出ます。",
+      "checks": [
+        {
+          "question": "同じバンドルを、検証の環境と本番の環境に配布し分けるとき、コマンドでは何を変えますか。",
+          "answer": "`-t` で指定するターゲットです。",
+          "reason": "環境ごとの違いはターゲットに書くので、同じソースのまま、`-t staging` と `-t prod` のようにターゲットだけを変えて配布します。"
+        }
+      ],
+      "related": ["bundle-targets", "bundle-deployment-modes", "bundle-deploy", "cli-authentication"],
+      "references": [
+        {
+          "title": "CI/CD on Databricks | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/ci-cd"
+        },
+        {
+          "title": "Declarative Automation Bundles deployment modes | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/deployment-modes"
+        },
+        {
+          "title": "bundle command group | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/dev-tools/cli/bundle-commands"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "bundle-validate",
+      "unit": "domain5-4",
+      "order": 1,
+      "term": "databricks bundle validate",
+      "oneLine": "`databricks bundle validate` は、バンドルの設定のファイルに構文の誤りがないかを、配布せずに確かめるコマンドです。",
+      "keyPhrase": "配布せずに確かめる",
+      "body": "`bundle validate` は、設定のファイルの構文を確かめ、バンドルの名前、ターゲット、配布先のワークスペースなどの要約を表示します。リソースの設定に知らない項目があれば、警告を出します。\n\n```bash\ndatabricks bundle validate -t prod\n```\n\nCI/CD の流れでは、配布の前に `validate` を置き、設定の誤りを早く見つけます。配布で何が変わるかを確かめたいときは、`databricks bundle plan` で、変更を加えずに配布の操作の一覧を見られます。",
+      "examAngle": "「CI/CD の流れで、配布の前にバンドルの設定の誤りを見つけたい」という要件から、コマンドを選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "ワークスペースに何も配布せずに、バンドルの設定のファイルの構文が正しいかを確かめるコマンドは何ですか。",
+          "answer": "`databricks bundle validate` です。",
+          "reason": "`bundle validate` は、設定のファイルの構文を確かめ、要約を表示するだけで、配布はしません。"
+        }
+      ],
+      "related": ["bundle-deploy", "bundle-promotion"],
+      "references": [
+        {
+          "title": "bundle command group | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/dev-tools/cli/bundle-commands"
+        },
+        {
+          "title": "What are Declarative Automation Bundles? | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "bundle-deploy",
+      "unit": "domain5-4",
+      "order": 2,
+      "term": "databricks bundle deploy",
+      "oneLine": "`databricks bundle deploy` は、バンドルのファイルとリソースを、指定したターゲットのワークスペースへ配布するコマンドです。",
+      "keyPhrase": "指定したターゲットのワークスペースへ配布する",
+      "body": "`bundle deploy` では、`-t`(`--target`)でターゲットを指定します。指定しなければ、`default: true` を付けたターゲットに配布します。\n\n```bash\ndatabricks bundle deploy -t prod\n```\n\n配布すると、ジョブやパイプラインが作られるか、前の配布から更新されます。配布するだけで、ジョブは実行されません。実行は `bundle run` で行います。\n\n配布したリソースとファイルを消すときは `databricks bundle destroy` を使います。消したものは戻せません。",
+      "examAngle": "「バンドルを本番のワークスペースに配布するコマンドはどれか」という形で、`validate` や `run` と区別させる問いで出ます。",
+      "checks": [
+        {
+          "question": "`databricks bundle deploy -t prod` を実行しました。バンドルに定義したジョブは、このコマンドで実行されますか。",
+          "answer": "実行されません。",
+          "reason": "`bundle deploy` はリソースを配布するだけです。ジョブの実行は `bundle run` で行います。"
+        }
+      ],
+      "related": ["bundle-validate", "bundle-run", "bundle-targets"],
+      "references": [
+        {
+          "title": "bundle command group | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/dev-tools/cli/bundle-commands"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "bundle-run",
+      "unit": "domain5-4",
+      "order": 3,
+      "term": "databricks bundle run",
+      "oneLine": "`databricks bundle run` は、配布済みのバンドルにあるジョブやパイプラインを、リソースのキーで指定して実行するコマンドです。",
+      "keyPhrase": "リソースのキーで指定して実行する",
+      "body": "引数には、`resources` の下で付けたジョブやパイプラインのキーを指定します。ジョブの名前やジョブの ID ではありません。\n\n```bash\ndatabricks bundle run -t dev daily_sales\n```\n\nジョブにパラメータを渡すときは `--params`、パイプラインの表を指定してリセットし、計算し直すときは `--full-refresh` を付けます。`--no-wait` を付けると、実行の完了を待たずにコマンドが終わります。\n\n設定を変えたときは、先に `bundle deploy` で配布してから実行します。",
+      "examAngle": "「配布したジョブを、CLI から実行したい」という場面で、コマンドと引数(リソースのキー)を問う形で出ます。",
+      "checks": [
+        {
+          "question": "`resources.jobs.daily_sales` として定義したジョブを、CLI から実行するコマンドは何ですか。",
+          "answer": "`databricks bundle run daily_sales` です。",
+          "reason": "`bundle run` には、バンドルの設定で付けたリソースのキーを指定します。"
+        }
+      ],
+      "related": ["bundle-deploy", "bundle-resources"],
+      "references": [
+        {
+          "title": "bundle command group | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/dev-tools/cli/bundle-commands"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "bundle-generate-bind",
+      "unit": "domain5-4",
+      "order": 4,
+      "term": "bundle generate と bundle deployment bind",
+      "oneLine": "`bundle generate` は既存のジョブなどからバンドルの設定のファイルを作るコマンドで、`bundle deployment bind` はバンドルのリソースを既存のジョブなどに結び付けるコマンドです。",
+      "keyPhrase": "バンドルのリソースを既存のジョブなどに結び付ける",
+      "body": "ワークスペースで作ったジョブをバンドルの管理に移すときは、まず `generate` で設定を作ります。\n\n```bash\ndatabricks bundle generate job --existing-job-id 1234\n```\n\nこのコマンドは、`resources` のフォルダーにジョブの設定のファイルを書き、ジョブが参照するノートブックや Python のファイルを `src` のフォルダーに取り込みます。\n\n次に `bind` で、バンドルのリソースのキーと既存のジョブの ID を結び付けます。\n\n```bash\ndatabricks bundle deployment bind daily_sales 1234\n```\n\n結び付けたあとの配布では、既存のジョブがバンドルの設定で更新されます。結び付けずに配布すると、新しいジョブが別に作られ、同じジョブが 2 つになることがあります。結び付けを外すときは `bundle deployment unbind` を使います。",
+      "examAngle": "「既存のジョブをバンドルで管理したい。配布で新しいジョブを作らず、元のジョブを更新したい」という要件から、generate と bind の組み合わせを選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "既存のジョブから `bundle generate` で設定を作り、そのまま `bundle deploy` しました。`bind` はしていません。ワークスペースのジョブはどうなりますか。",
+          "answer": "既存のジョブとは別に、新しいジョブが作られることがあります。",
+          "reason": "結び付けていないリソースは、配布で新しく作られます。既存のジョブを更新するには、先に `bundle deployment bind` で結び付けます。"
+        }
+      ],
+      "related": ["bundle-deploy", "bundle-resources", "bundle-promotion"],
+      "references": [
+        {
+          "title": "Migrate existing resources to a bundle | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/migrate-resources"
+        },
+        {
+          "title": "bundle command group | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/dev-tools/cli/bundle-commands"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "cli-authentication",
+      "unit": "domain5-4",
+      "order": 5,
+      "term": "Databricks CLI の認証(統合認証)",
+      "oneLine": "Databricks CLI は、統合認証の環境変数か、`.databrickscfg` の構成プロファイルから、接続先のワークスペースと認証情報を読みます。",
+      "keyPhrase": "統合認証の環境変数か、`.databrickscfg` の構成プロファイルから",
+      "body": "接続先は `DATABRICKS_HOST` に書きます。認証の情報は、方式ごとに環境変数が違います。\n\n- 個人用アクセストークン(PAT): `DATABRICKS_TOKEN`\n- サービスプリンシパルの OAuth(マシン間): `DATABRICKS_CLIENT_ID` と `DATABRICKS_CLIENT_SECRET`\n\n同じ値は、`.databrickscfg` のプロファイルにも書けます。`databricks configure` は、ホストとトークンを尋ねてプロファイルを作ります。名前を指定しなければ `DEFAULT` のプロファイルを上書きします。\n\nPAT は、公式の文書で旧来(legacy)の方式とされています。Databricks は、利用者の認証には PAT より OAuth を勧めています。CI/CD のような無人の処理では、サービスプリンシパルの OAuth か、秘密情報を保存せずに済むトークンのフェデレーションを使います。",
+      "examAngle": "「CI/CD の環境から、PAT で Databricks CLI を認証したい。どの環境変数を設定するか」という形で出ます。",
+      "checks": [
+        {
+          "question": "PAT で Databricks CLI を認証するとき、環境変数に設定する 2 つの値は何ですか。",
+          "answer": "`DATABRICKS_HOST` と `DATABRICKS_TOKEN` です。",
+          "reason": "`DATABRICKS_HOST` にワークスペースの URL、`DATABRICKS_TOKEN` に PAT を設定します。"
+        },
+        {
+          "question": "CI/CD の流れで CLI を認証するとき、Databricks は利用者のアカウントとサービスプリンシパルのどちらを勧めていますか。",
+          "answer": "サービスプリンシパルです。",
+          "reason": "CI/CD では、Databricks は利用者のアカウントでなくサービスプリンシパルを使うよう勧めています。"
+        }
+      ],
+      "related": ["bundle-promotion"],
+      "references": [
+        {
+          "title": "Authorize access to Databricks resources | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/dev-tools/auth/"
+        },
+        {
+          "title": "Authenticate with Databricks personal access tokens (legacy) | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/dev-tools/auth/pat"
+        },
+        {
+          "title": "CI/CD on Databricks | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/ci-cd"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "grant-revoke",
+      "unit": "domain7-2",
+      "order": 1,
+      "term": "GRANT と REVOKE",
+      "oneLine": "GRANT は、Unity Catalog のオブジェクトの権限を、ユーザー、グループ、サービスプリンシパルに与える SQL の文で、REVOKE はその権限を取り消す文です。",
+      "keyPhrase": "ユーザー、グループ、サービスプリンシパルに与える",
+      "body": "構文は、権限、オブジェクトの種類と名前、相手の順に書きます。\n\n```sql\nGRANT SELECT ON TABLE main.sales.orders TO `analysts`;\nREVOKE SELECT ON TABLE main.sales.orders FROM `analysts`;\n```\n\n相手には、ユーザー(メールアドレス)、グループの名前、サービスプリンシパル(アプリケーション ID)を書きます。特殊な文字を含む名前は、バッククォートで囲みます。権限は、カンマで区切って複数を一度に書けます。\n\n画面で操作するときは、Catalog Explorer でオブジェクトを開き、Permissions のタブで Grant を押して相手と権限を選びます。取り消しは、同じタブで権限を選んで Revoke を押します。\n\n権限を与えられるのは、オブジェクトの所有者、親のカタログやスキーマの所有者、オブジェクトの `MANAGE` を持つ利用者、メタストアの管理者です。`REVOKE` は、与えていない権限を指定しても成功します。\n\n今の付与は `SHOW GRANTS ON TABLE main.sales.orders` で確かめます。",
+      "examAngle": "「アナリストのグループに表の読み取りを許したい」という要件で、GRANT の文の形や、UI(Catalog Explorer)での操作を問う形で出ます。",
+      "checks": [
+        {
+          "question": "グループ `analysts` に、表 `main.sales.orders` を読む権限を与える文を書いてください(親のカタログとスキーマの権限は、すでにあるものとします)。",
+          "answer": "`GRANT SELECT ON TABLE main.sales.orders TO analysts` です。",
+          "reason": "表を読む権限は `SELECT` で、`GRANT 権限 ON オブジェクト TO 相手` の形で与えます。"
+        },
+        {
+          "question": "与えていない権限を `REVOKE` で取り消そうとしました。文はエラーになりますか。",
+          "answer": "なりません。成功します。",
+          "reason": "`REVOKE` は、指定した権限がもともと与えられていなくても成功します。"
+        }
+      ],
+      "related": ["use-catalog-use-schema", "deny-privilege", "privilege-inheritance", "object-owner"],
+      "references": [
+        {
+          "title": "Manage privileges in Unity Catalog | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/manage-privileges/"
+        },
+        {
+          "title": "GRANT | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/security-grant"
+        },
+        {
+          "title": "REVOKE | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/security-revoke"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "deny-privilege",
+      "unit": "domain7-2",
+      "order": 2,
+      "term": "DENY",
+      "oneLine": "DENY は、権限を明示的に拒否して、どの付与よりも優先させる SQL の文で、`hive_metastore` のカタログだけで使え、Unity Catalog では使えません。",
+      "keyPhrase": "`hive_metastore` のカタログだけで使え、Unity Catalog では使えません",
+      "body": "DENY は、旧来のテーブルのアクセス制御(`hive_metastore`)の文です。拒否した権限は、明示の付与にも暗黙の付与にも優先します。スキーマで拒否すれば、その中のすべてのオブジェクトでも拒否されます。\n\n```sql\nDENY SELECT ON TABLE t TO `user@example.com`;\nREVOKE SELECT ON TABLE t FROM `user@example.com`;  -- DENY を取り消す\n```\n\nDENY を取り消すときは、同じ権限を同じ相手から `REVOKE` します。\n\nUnity Catalog には、権限を拒否する文がありません。利用者に権限を持たせたくないときは、与えた権限を `REVOKE` で取り消し、どの階層で与えているか(継承)も確かめます。\n\nUnity Catalog には、ABAC の DENY ポリシー(ベータ)があります。拒否できる権限は `MANAGE ACCESS CONTROL`(権限を管理する権限)だけで、`SELECT` や `MODIFY` は拒否できません。",
+      "examAngle": "試験ガイドの範囲には「GRANT、REVOKE、DENY」と並んでいます。「Unity Catalog の表で、特定の利用者の読み取りを止めるにはどうするか」のような問いで、DENY が Unity Catalog で使えるかを区別させる形が考えられます。",
+      "checks": [
+        {
+          "question": "Unity Catalog の表に対して `DENY SELECT ON TABLE … TO …` を実行できますか。",
+          "answer": "できません。",
+          "reason": "DENY は `hive_metastore` のカタログとその中のオブジェクトだけに使える文で、Unity Catalog では使えません。"
+        },
+        {
+          "question": "`hive_metastore` の表で、ある利用者に `DENY SELECT` を実行しました。この拒否を取り消すにはどの文を使いますか。",
+          "answer": "同じ権限を同じ相手から取り消す `REVOKE SELECT ON TABLE … FROM …` です。",
+          "reason": "DENY は、同じ権限の REVOKE で取り消します。"
+        }
+      ],
+      "related": ["grant-revoke", "abac-policy"],
+      "references": [
+        {
+          "title": "DENY | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/security-deny"
+        },
+        {
+          "title": "ABAC DENY policies (Beta) | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/abac/deny-policies"
+        },
+        {
+          "title": "Unity Catalog privileges reference | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/manage-privileges/privileges"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "use-catalog-use-schema",
+      "unit": "domain7-2",
+      "order": 3,
+      "term": "USE CATALOG と USE SCHEMA",
+      "oneLine": "USE CATALOG と USE SCHEMA は、カタログとスキーマの中のオブジェクトを使うための前提の権限で、それだけではデータを読めません。",
+      "keyPhrase": "それだけではデータを読めません",
+      "body": "表を読むには、次の 3 つの権限がそろっている必要があります。\n\n- 親のカタログの `USE CATALOG`\n- 親のスキーマの `USE SCHEMA`\n- 表の `SELECT`\n\n```sql\nGRANT USE CATALOG ON CATALOG main TO `analysts`;\nGRANT USE SCHEMA ON SCHEMA main.sales TO `analysts`;\nGRANT SELECT ON TABLE main.sales.orders TO `analysts`;\n```\n\n`USE CATALOG` と `USE SCHEMA` だけを持つ利用者は、中の表のデータを読めません。逆に、表の `SELECT` だけがあっても、親の `USE CATALOG` と `USE SCHEMA` がなければ読めません。\n\nオブジェクトがあることとメタデータだけを見せたいときは、`BROWSE` を使います。`BROWSE` は、`USE CATALOG` と `USE SCHEMA` がなくても、オブジェクトを見つけてメタデータを見られる権限です。",
+      "examAngle": "「アナリストに 1 つの表だけを読ませたい。最小の権限の組み合わせはどれか」という形で出ます。",
+      "checks": [
+        {
+          "question": "表 `main.sales.orders` の `SELECT` だけを与えられた利用者が、この表を読もうとしました。読めますか。",
+          "answer": "読めません。",
+          "reason": "表を読むには、`SELECT` に加えて、親のスキーマの `USE SCHEMA` と親のカタログの `USE CATALOG` が要ります。"
+        },
+        {
+          "question": "スキーマの `USE SCHEMA` と、カタログの `USE CATALOG` だけを持つ利用者は、スキーマの中の表のデータを読めますか。",
+          "answer": "読めません。",
+          "reason": "`USE CATALOG` と `USE SCHEMA` は前提の権限で、それだけではデータへのアクセスを許しません。"
+        }
+      ],
+      "related": ["grant-revoke", "select-modify", "privilege-inheritance"],
+      "references": [
+        {
+          "title": "Unity Catalog privileges reference | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/manage-privileges/privileges"
+        },
+        {
+          "title": "Manage privileges in Unity Catalog | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/manage-privileges/"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "select-modify",
+      "unit": "domain7-2",
+      "order": 4,
+      "term": "SELECT と MODIFY",
+      "oneLine": "SELECT は表やビューを読む権限で、MODIFY は表にデータを追加、更新、削除する権限です。",
+      "keyPhrase": "表にデータを追加、更新、削除する権限",
+      "body": "`MODIFY` は、`INSERT`、`UPDATE`、`DELETE` のようにデータを変える操作に要ります。`MODIFY` を使うときも、表の `SELECT` と、親の `USE SCHEMA` と `USE CATALOG` が要ります。\n\n```sql\nGRANT SELECT, MODIFY ON TABLE main.sales.orders TO `etl_team`;\n```\n\n新しい表を作るのは別の権限です。スキーマの `CREATE TABLE` が要り、Databricks はスキーマの単位で与えることを勧めています。関数を呼ぶには、関数の `EXECUTE` が要ります。",
+      "examAngle": "「ETL のグループに、既存の表へデータを書き込ませたい」という要件で、付与する権限を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "グループに、既存の表の行を更新し、削除させたいとき、表の `SELECT` に加えて何の権限を与えますか(親のカタログとスキーマの権限はあるものとします)。",
+          "answer": "`MODIFY` です。",
+          "reason": "表のデータを追加、更新、削除する権限は `MODIFY` です。"
+        }
+      ],
+      "related": ["use-catalog-use-schema", "all-privileges", "grant-revoke"],
+      "references": [
+        {
+          "title": "Unity Catalog privileges reference | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/manage-privileges/privileges"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "all-privileges",
+      "unit": "domain7-2",
+      "order": 5,
+      "term": "ALL PRIVILEGES",
+      "oneLine": "ALL PRIVILEGES は、オブジェクトとその子のオブジェクトで使える権限をまとめて与える指定で、`MANAGE` などの一部の権限は含みません。",
+      "keyPhrase": "`MANAGE` などの一部の権限は含みません",
+      "body": "`ALL PRIVILEGES` は、権限を確かめる時点で、使えるすべての権限に展開されます。あとで Databricks が新しい権限を足したときも、既存の `ALL PRIVILEGES` の付与に含まれます。\n\n```sql\nGRANT ALL PRIVILEGES ON SCHEMA main.sales TO `data_engineers`;\n```\n\n含まれない権限は、`MANAGE`、`READ METADATA`、`EXTERNAL USE SCHEMA`、`EXTERNAL USE LOCATION` です。\n\n`REVOKE ALL PRIVILEGES` で取り消すと、`ALL PRIVILEGES` に含まれる個別の権限もまとめて取り消されます。含まれない上の権限は、そのまま残ります。",
+      "examAngle": "「グループに、スキーマのすべての操作を許したい」という要件で、ALL PRIVILEGES を選ばせる形や、含まれない権限を問う形で出ます。",
+      "checks": [
+        {
+          "question": "`ALL PRIVILEGES` を与えた利用者は、そのオブジェクトの `MANAGE` の権限も持ちますか。",
+          "answer": "持ちません。",
+          "reason": "`ALL PRIVILEGES` には `MANAGE`、`READ METADATA`、`EXTERNAL USE SCHEMA`、`EXTERNAL USE LOCATION` が含まれません。"
+        }
+      ],
+      "related": ["select-modify", "object-owner", "grant-revoke"],
+      "references": [
+        {
+          "title": "Unity Catalog privileges reference | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/manage-privileges/privileges"
+        },
+        {
+          "title": "GRANT | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/security-grant"
+        },
+        {
+          "title": "REVOKE | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/security-revoke"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "privilege-inheritance",
+      "unit": "domain7-2",
+      "order": 6,
+      "term": "権限の継承",
+      "oneLine": "カタログやスキーマに与えた権限は、その中の今あるオブジェクトと、これから作るオブジェクトに引き継がれます。",
+      "keyPhrase": "今あるオブジェクトと、これから作るオブジェクトに引き継がれます",
+      "body": "Unity Catalog のオブジェクトは、メタストア、カタログ、スキーマ、表(ビュー、ボリューム、関数)の階層になっています。カタログとスキーマは、オブジェクトを入れる容器です。\n\nスキーマに `SELECT` を与えると、そのスキーマの今ある表とビュー、あとで作る表とビューのすべてで `SELECT` が効きます。表ごとに与え直す必要はありません。\n\n```sql\nGRANT SELECT ON SCHEMA main.sales TO `analysts`;\n```\n\nメタストアに与えた権限は、子のオブジェクトに引き継がれません。\n\n継承は、権限を与える階層を選ぶ手がかりになります。スキーマの表すべてを読ませたいならスキーマに、1 つの表だけなら表に与えます。",
+      "examAngle": "「スキーマの表を、今後追加される表も含めて読ませたい」という要件で、どの階層に権限を与えるかを問う形で出ます。",
+      "checks": [
+        {
+          "question": "スキーマに `SELECT` を与えたあとで、そのスキーマに新しい表を作りました。新しい表にも `SELECT` は効きますか。",
+          "answer": "効きます。",
+          "reason": "カタログやスキーマに与えた権限は、中の今あるオブジェクトと、これから作るオブジェクトに引き継がれます。"
+        }
+      ],
+      "related": ["grant-revoke", "use-catalog-use-schema"],
+      "references": [
+        {
+          "title": "Unity Catalog permissions model concepts | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/access-control/permissions-concepts"
+        },
+        {
+          "title": "Unity Catalog privileges reference | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/manage-privileges/privileges"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "object-owner",
+      "unit": "domain7-2",
+      "order": 7,
+      "term": "所有者と MANAGE",
+      "oneLine": "所有者は、オブジェクトのすべての操作と権限の付与ができる主体で、MANAGE は所有者でなくても権限の管理、所有者の変更、削除をさせる権限です。",
+      "keyPhrase": "所有者でなくても権限の管理、所有者の変更、削除をさせる権限",
+      "body": "Unity Catalog のオブジェクトには、必ず所有者が 1 つあります。所有者は、ユーザー、サービスプリンシパル、グループのどれでもかまいません。所有者は、自分のオブジェクトの操作をすべて行え、ほかの主体に権限を与えられます。所有権は、子のオブジェクトには引き継がれません。\n\n所有者は、SQL か Catalog Explorer で変えます。\n\n```sql\nALTER TABLE main.sales.orders OWNER TO `data_engineers`;\n```\n\nCatalog Explorer では、オブジェクトのページの Owner の横の編集のアイコンから、新しい所有者を選びます。\n\n`MANAGE` を持つ利用者は、所有者でなくても、権限の管理、所有者の変更、オブジェクトの削除ができます。ほかの権限が自動で付くわけではありませんが、自分に与えることはできます。",
+      "examAngle": "「表の所有者を、個人からグループに変えたい」という場面で、ALTER … OWNER TO や Catalog Explorer の操作を問う形で出ます。",
+      "checks": [
+        {
+          "question": "表 `main.sales.orders` の所有者を、グループ `data_engineers` に変える SQL の文を書いてください。",
+          "answer": "`ALTER TABLE main.sales.orders OWNER TO data_engineers` です。",
+          "reason": "所有者は `ALTER <オブジェクトの種類> <名前> OWNER TO <主体>` で変えます。"
+        }
+      ],
+      "related": ["grant-revoke", "all-privileges"],
+      "references": [
+        {
+          "title": "Manage privileges in Unity Catalog | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/manage-privileges/"
+        },
+        {
+          "title": "Unity Catalog privileges reference | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/manage-privileges/privileges"
+        },
+        {
+          "title": "Unity Catalog permissions model concepts | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/access-control/permissions-concepts"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "row-filter",
+      "unit": "domain7-3",
+      "order": 1,
+      "term": "行フィルター(SET ROW FILTER)",
+      "oneLine": "行フィルターは、真偽値を返す SQL の関数をテーブルにかけ、関数が偽を返した行をクエリの結果から外す仕組みです。",
+      "keyPhrase": "関数が偽を返した行をクエリの結果から外す",
+      "body": "まず、真偽値を返す関数を作り、`ALTER TABLE … SET ROW FILTER` でテーブルにかけます。`ON` の括弧には、関数に渡す列を書きます。\n\n```sql\nCREATE FUNCTION us_filter(region STRING)\nRETURN IF(IS_ACCOUNT_GROUP_MEMBER('admin'), true, region = 'US');\n\nALTER TABLE sales SET ROW FILTER us_filter ON (region);\n```\n\nこの例では、`admin` のグループの利用者はすべての行を見ます。それ以外の利用者には、`region` が `US` の行だけが返ります。\n\n表を作るときにも、`WITH ROW FILTER us_filter ON (region)` でかけられます。外すときは `ALTER TABLE sales DROP ROW FILTER` を使います。関数を消す前に、フィルターを外します。先に関数を消すと、テーブルを読めなくなります。\n\n既存のテーブルにかけるには、テーブルの所有者であるか、`MANAGE` と `SELECT` の両方が要ります。関数の `EXECUTE` も要ります。ビューには行フィルターをかけられません。",
+      "examAngle": "「利用者のグループによって、見える行を絞りたい」という要件で、関数の作り方と、SET ROW FILTER の文の形を問う形で出ます。",
+      "checks": [
+        {
+          "question": "行フィルターの関数が `false` を返した行は、クエリの結果でどうなりますか。",
+          "answer": "結果から外れます。",
+          "reason": "行フィルターでは、関数が偽を返した行がクエリの結果に入りません。"
+        },
+        {
+          "question": "テーブルに行フィルターをかけたまま、その関数を `DROP FUNCTION` で消そうとしています。先に何をしますか。",
+          "answer": "`ALTER TABLE … DROP ROW FILTER` でフィルターを外します。",
+          "reason": "フィルターを外さずに関数を消すと、テーブルを読めなくなります。"
+        }
+      ],
+      "related": ["column-mask", "is-account-group-member", "dynamic-view", "abac-policy"],
+      "references": [
+        {
+          "title": "Manually apply row filters and column masks | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/filters-and-masks/manually-apply"
+        },
+        {
+          "title": "Row filters and column masks | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/filters-and-masks"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "column-mask",
+      "unit": "domain7-3",
+      "order": 2,
+      "term": "列マスク(SET MASK)",
+      "oneLine": "列マスクは、列の値を受け取って元の値か隠した値を返す SQL の関数を列にかけ、利用者に応じて見える値を変える仕組みです。",
+      "keyPhrase": "列の値を受け取って元の値か隠した値を返す",
+      "body": "関数の最初の引数がマスクする列の値で、戻り値は列の型と同じか、列の型に変換できる型にします。`ALTER TABLE … ALTER COLUMN … SET MASK` で列にかけます。\n\n```sql\nCREATE FUNCTION ssn_mask(ssn STRING)\nRETURN CASE WHEN IS_ACCOUNT_GROUP_MEMBER('HumanResourceDept')\n  THEN ssn ELSE '***-**-****' END;\n\nALTER TABLE users ALTER COLUMN ssn SET MASK ssn_mask;\n```\n\nこの例では、`HumanResourceDept` のグループの利用者だけが元の値を見ます。それ以外の利用者には、隠した文字列が返ります。\n\n`USING COLUMNS` を付けると、ほかの列の値も関数に渡せます。1 つの列にかけられるマスクは 1 つです。外すときは `ALTER TABLE users ALTER COLUMN ssn DROP MASK` を使います。表を作るときにも、列の定義に `MASK ssn_mask` と書いてかけられます。",
+      "examAngle": "「人事のグループ以外には、社会保障番号の列を隠したい」という要件で、関数と SET MASK の文の形を問う形で出ます。",
+      "checks": [
+        {
+          "question": "列マスクの関数の戻り値の型は、どう決めますか。",
+          "answer": "マスクする列の型と同じか、列の型に変換できる型にします。",
+          "reason": "列マスクの関数は、元の値か隠した値を返し、その値が列の値として結果に入るためです。"
+        }
+      ],
+      "related": ["row-filter", "is-account-group-member", "abac-policy"],
+      "references": [
+        {
+          "title": "Manually apply row filters and column masks | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/filters-and-masks/manually-apply"
+        },
+        {
+          "title": "Row filters and column masks | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/filters-and-masks"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "is-account-group-member",
+      "unit": "domain7-3",
+      "order": 3,
+      "term": "is_account_group_member",
+      "oneLine": "`is_account_group_member` は、クエリを実行した利用者が、アカウントの単位のグループに直接か間接に属するかを、真偽値で返す関数です。",
+      "keyPhrase": "アカウントの単位のグループに直接か間接に属するか",
+      "body": "この関数は、行フィルターや列マスクの関数、動的ビューの中で、グループの所属で結果を変えるために使います。\n\n```sql\nSELECT is_account_group_member('auditors');  -- true か false\n```\n\n似た関数に `is_member` があります。`is_member` はワークスペースの単位のグループを調べる関数で、Hive メタストアとの互換のために残っています。Unity Catalog のデータでは、アカウントの単位のグループを調べない `is_member` を避け、`is_account_group_member` を使うよう、Databricks は勧めています。\n\n利用者の名前そのものは `session_user()` で得られます。",
+      "examAngle": "「行フィルターや動的ビューで、特定のグループの利用者だけに全件を見せたい」という要件で、使う関数を選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "Unity Catalog のデータにかける動的ビューで、利用者のグループの所属を調べるとき、`is_member` と `is_account_group_member` のどちらを使いますか。",
+          "answer": "`is_account_group_member` です。",
+          "reason": "`is_member` はワークスペースの単位のグループしか調べません。Unity Catalog のデータでは、アカウントの単位のグループを調べる `is_account_group_member` が勧められています。"
+        }
+      ],
+      "related": ["row-filter", "column-mask", "dynamic-view"],
+      "references": [
+        {
+          "title": "is_account_group_member function | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/functions/is_account_group_member"
+        },
+        {
+          "title": "Create a dynamic view | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/views/dynamic"
+        },
+        {
+          "title": "Manually apply row filters and column masks | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/filters-and-masks/manually-apply"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "dynamic-view",
+      "unit": "domain7-3",
+      "order": 4,
+      "term": "動的ビュー",
+      "oneLine": "動的ビューは、ビューの定義の中でグループの所属などを調べ、利用者に応じて見える列の値と行を変えるビューです。",
+      "keyPhrase": "利用者に応じて見える列の値と行を変えるビュー",
+      "body": "列を隠すときは `CASE` で、行を絞るときは `WHERE` で、`is_account_group_member` の結果を使います。\n\n```sql\nCREATE VIEW main.sales.orders_v AS\nSELECT\n  id,\n  CASE WHEN is_account_group_member('auditors') THEN email\n       ELSE 'REDACTED' END AS email,\n  total\nFROM main.sales.orders\nWHERE is_account_group_member('managers') OR total <= 1000000;\n```\n\n利用者にはビューの権限を与え、元のテーブルを読む権限は与えません。\n\n動的ビューは、結合や加工をした結果を見せたいときに向きます。元のテーブルそのものを守るときは、テーブルにかける行フィルターと列マスクを使います。多くのテーブルに同じ規則をかけるときは、Databricks は ABAC ポリシーを勧めています。\n\n動的ビューは、SQL ウェアハウスと、標準のアクセスモードのコンピュートで読めます。専用のアクセスモードでは、Databricks Runtime 15.4 LTS 以降が要ります。",
+      "examAngle": "「監査のグループ以外には email の列を隠し、管理者以外には一定額以下の行だけを見せるビューを作りたい」という形で、CASE と WHERE の組み立てを問う形で出ます。",
+      "checks": [
+        {
+          "question": "動的ビューで行を絞るとき、利用者に元のテーブルの `SELECT` も与えるべきですか。",
+          "answer": "与えません。",
+          "reason": "利用者が元のテーブルを直接読めると、ビューの条件を通らずにデータを見られます。Databricks は、ビューが参照する表やビューを読む権限を、利用者に与えないよう勧めています。"
+        }
+      ],
+      "related": ["row-filter", "column-mask", "is-account-group-member"],
+      "references": [
+        {
+          "title": "Create a dynamic view | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/views/dynamic"
+        },
+        {
+          "title": "Row filters and column masks | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/filters-and-masks"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "abac-policy",
+      "unit": "domain7-4",
+      "order": 1,
+      "term": "ABAC ポリシー",
+      "oneLine": "ABAC ポリシーは、ガバナンスタグを条件に、行フィルターや列マスクをカタログ、スキーマ、テーブルに付けて、配下の条件に合う表にまとめてかける Unity Catalog の仕組みです。",
+      "keyPhrase": "配下の条件に合う表にまとめてかける",
+      "body": "ABAC は、属性に基づくアクセス制御です。属性には、オブジェクトに付けたガバナンスタグを使います。ポリシーを付けたカタログやスキーマの配下で、タグの条件に合う表には、ポリシーが自動でかかります。あとで作った表も、範囲の中でタグが付けば対象になります。\n\n```sql\nCREATE POLICY ssn_mask\nON CATALOG employees\nCOLUMN MASK ssn_to_last_nr\nTO 'analysts' EXCEPT 'hr_admins'\nFOR TABLES\nMATCH COLUMNS has_tag('ssn') AS ssn\nON COLUMN ssn\nUSING COLUMNS (4);\n```\n\n`TO` で対象の利用者、`EXCEPT` で外す利用者を指定します。ポリシーの関数自体は、テーブルごとの行フィルターや列マスクと同じ SQL の関数です。\n\nポリシーを作るには、付ける先のオブジェクトの `MANAGE` を持つか、その所有者であることが要ります。関数の `EXECUTE` も要ります。画面では、Catalog Explorer の Policies のタブで作ります。行フィルターと列マスクのポリシーには、Databricks Runtime 16.4 以降か、サーバーレスのコンピュートが要ります。\n\n上の階層に付けたポリシーは、テーブルの所有者が外したり変えたりできません。テーブルごとの行フィルターや列マスクと同じ表で重なり、利用者ごとに違う関数がかかると、Databricks はアクセスを止めてエラーを返します。",
+      "examAngle": "「機微なタグの付いた列を、カタログの全表で一元的にマスクしたい。今後追加される表にも自動でかけたい」という要件から、ABAC ポリシーを選ばせる形で出ます。",
+      "checks": [
+        {
+          "question": "カタログに付けた列マスクのポリシーがあります。そのカタログに、条件のタグの付いた列を持つ表を新しく作りました。ポリシーをかけ直す必要はありますか。",
+          "answer": "ありません。",
+          "reason": "ABAC ポリシーは、付けた先の配下のオブジェクトに対して評価されます。範囲の中で作られ、タグが付いた表には、追加の設定なしでかかります。"
+        },
+        {
+          "question": "スキーマに付けた ABAC ポリシーを、そのスキーマの中のテーブルの所有者が外せますか。",
+          "answer": "外せません。",
+          "reason": "上の階層に付けたポリシーは、テーブルの所有者が外したり、変えたり、避けたりできません。"
+        }
+      ],
+      "related": ["governed-tag", "match-columns", "row-filter", "column-mask"],
+      "references": [
+        {
+          "title": "Attribute-based access control in Unity Catalog | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/abac/"
+        },
+        {
+          "title": "Core concepts for attribute-based access control (ABAC) | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/abac/core-concepts"
+        },
+        {
+          "title": "Create and manage row filter and column mask policies | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/abac/policies"
+        },
+        {
+          "title": "When to use ABAC vs table-level row filters and column masks | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/abac/abac-vs-rls-cm"
+        },
+        {
+          "title": "CREATE POLICY | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-syntax-ddl-create-policy"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "governed-tag",
+      "unit": "domain7-4",
+      "order": 2,
+      "term": "ガバナンスタグ",
+      "oneLine": "ガバナンスタグは、アカウントの単位でキーと許す値を定義し、Unity Catalog のオブジェクトに付けて、ABAC ポリシーの条件に使うタグです。",
+      "keyPhrase": "ABAC ポリシーの条件に使うタグ",
+      "body": "ガバナンスタグのキーと値の一覧は、アカウントの管理者などが、ポリシーを書く前に定義します。タグを付けるには、タグの `ASSIGN` と、付ける先のオブジェクトの `APPLY TAG` が要ります。\n\n```sql\nALTER TABLE main.hr.employees ALTER COLUMN ssn SET TAGS ('pii' = 'ssn');\n```\n\n表は、親のカタログとスキーマのタグを既定で引き継ぎます。列は、表のタグを引き継ぎません。列のタグは、列に直接付けます。\n\nポリシーを書く人とタグを付ける人を分けられるのが、タグで対象を選ぶ利点です。データの管理者が新しい表の列にタグを付ければ、ポリシーを書き換えずに保護がかかります。",
+      "examAngle": "「ポリシーの対象の列を、名前でなくタグで選ぶ」という前提で、タグの付け方や引き継ぎを問う形で出ます。",
+      "checks": [
+        {
+          "question": "スキーマに付けたタグは、その中の表の列に引き継がれますか。",
+          "answer": "引き継がれません。",
+          "reason": "表はカタログとスキーマのタグを引き継ぎますが、列のタグは引き継がれず、列に直接付ける必要があります。"
+        }
+      ],
+      "related": ["abac-policy", "match-columns"],
+      "references": [
+        {
+          "title": "Core concepts for attribute-based access control (ABAC) | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/abac/core-concepts"
+        },
+        {
+          "title": "Create and manage row filter and column mask policies | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/abac/policies"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "match-columns",
+      "unit": "domain7-4",
+      "order": 3,
+      "term": "MATCH COLUMNS と has_tag_value",
+      "oneLine": "MATCH COLUMNS は、ABAC ポリシーの中で、タグの条件(`has_tag`、`has_tag_value`)に合う列を選び、別名を付ける句です。",
+      "keyPhrase": "タグの条件(`has_tag`、`has_tag_value`)に合う列を選び",
+      "body": "`has_tag('キー')` はタグのキーがあるか、`has_tag_value('キー', '値')` はキーと値の組があるかを調べます。`MATCH COLUMNS` で選んだ列に `AS` で別名を付け、列マスクでは `ON COLUMN` で、マスクする列にその別名を指定します。\n\n```sql\nCREATE POLICY mask_ssn\nON SCHEMA main.hr\nCOLUMN MASK mask_value\nTO 'analysts'\nFOR TABLES\nMATCH COLUMNS has_tag_value('pii', 'ssn') AS c\nON COLUMN c;\n```\n\n`WHEN` の句は、どの表にポリシーをかけるかを決めます。`WHEN` の中のタグの関数は、表のタグと、親のカタログやスキーマから引き継いだタグを調べます。`MATCH COLUMNS` の中のタグの関数は、列に直接付けたタグだけを調べます。\n\n古い書き方の `hasTag` と `hasTagValue` も、互換のために使えます。",
+      "examAngle": "「pii のタグの値が ssn の列だけをマスクしたい」という要件で、ポリシーのどの句にタグの条件を書くかを問う形で出ます。",
+      "checks": [
+        {
+          "question": "ABAC の列マスクのポリシーで、タグ `pii` の値が `ssn` の列を対象にするとき、どの句にどの関数を書きますか。",
+          "answer": "`MATCH COLUMNS` に `has_tag_value('pii', 'ssn')` を書きます。",
+          "reason": "ポリシーの対象の列は、`MATCH COLUMNS` の中のタグの条件で選びます。キーと値の組を調べる関数は `has_tag_value` です。"
+        }
+      ],
+      "related": ["abac-policy", "governed-tag"],
+      "references": [
+        {
+          "title": "CREATE POLICY | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-syntax-ddl-create-policy"
+        },
+        {
+          "title": "Create and manage row filter and column mask policies | Databricks on AWS",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/abac/policies"
         }
       ],
       "status": "verified"
