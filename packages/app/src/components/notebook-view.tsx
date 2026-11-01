@@ -104,7 +104,7 @@ function StatusChip({ status }: { status: NotebookEntry["status"] }) {
   );
 }
 
-/** 見出しのブロック: 一言 → 解説 → こう聞かれる → 確認 → 検証の状態 → 関連 */
+/** 見出しのブロック: 一言 → 解説 → ここを押さえる → 確認 → 検証の状態 → 関連 */
 export function NotebookEntryBlock({
   entry,
   related,
@@ -128,7 +128,7 @@ export function NotebookEntryBlock({
       </div>
       {entry.examAngle ? (
         <div className="space-y-1 rounded-r-md border-l-4 border-warn bg-warn-bg px-4 py-3">
-          <p className="font-bold text-warn">こう聞かれる</p>
+          <p className="font-bold text-warn">ここを押さえる</p>
           <RichText text={entry.examAngle} className="notebook-prose" />
         </div>
       ) : null}

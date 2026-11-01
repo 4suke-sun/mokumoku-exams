@@ -44,7 +44,7 @@ const entry = (over: Partial<NotebookEntry>): NotebookEntry => ({
   oneLine: "外部の場所にデータを置くテーブル。DROP してもファイルは残る。",
   keyPhrase: "DROP してもファイルは残る",
   body: "解説です。\n\n```\nDROP TABLE sales;\n```",
-  examAngle: "ファイルが残った理由を聞かれる。",
+  examAngle: "ファイルが残る理由を、テーブルの種類と結びつけて覚える。",
   checks: [{ question: "何が残る?", answer: "データファイル。", reason: "持ち主がストレージだから。" }],
   related: ["managed-table"],
   references: [{ title: "公式の文書", url: "https://docs.databricks.com/" }],
@@ -89,12 +89,12 @@ describe("NotebookUnitView", () => {
     expect(within(pager).getByRole("link").getAttribute("href")).toBe("/exams/TEST/notebook/domain1-2");
   });
 
-  it("見出し_一言の要点にマーカー_こう聞かれる_確認は折りたたみで答えと理由", () => {
+  it("見出し_一言の要点にマーカー_ここを押さえるの囲み_確認は折りたたみで答えと理由", () => {
     const { container } = renderUnit("domain1-1", false);
     const section = container.querySelector("#external-table");
     expect(section?.querySelector("mark")?.textContent).toBe("DROP してもファイルは残る");
     expect(section?.querySelector("mark")?.getAttribute("class")).toContain("motion-marker");
-    expect(section?.textContent).toContain("こう聞かれる");
+    expect(section?.textContent).toContain("ここを押さえる");
     const details = section?.querySelector("details");
     expect(details?.hasAttribute("open")).toBe(false);
     expect(details?.querySelector("summary")?.textContent).toBe("何が残る?");

@@ -87,7 +87,7 @@ export const NotebookEntrySchema = z
     keyPhrase: text.max(200).optional(),
     /** 解説 */
     body: text.max(10000),
-    /** こう聞かれる */
+    /** ここを押さえる(取り違えやすい点と、区別して覚える点。表示の名前は「ここを押さえる」) */
     examAngle: text.max(1000).optional(),
     checks: z.array(NotebookCheckSchema).min(1).max(10),
     /** 関連する見出しの ID */

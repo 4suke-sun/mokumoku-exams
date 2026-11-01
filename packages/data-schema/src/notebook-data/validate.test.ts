@@ -37,7 +37,7 @@ describe("validateNotebookData", () => {
       [unit(), unit({ id: "domain1-2", order: 2, intro: "導入です。" }), unit({ id: "domain2-1", domain: "domain2" })],
       [
         entry({ related: ["term-two"] }),
-        entry({ id: "term-two", order: 2, keyPhrase: undefined, status: "unverified", examAngle: "聞かれ方です。" }),
+        entry({ id: "term-two", order: 2, keyPhrase: undefined, status: "unverified", examAngle: "押さえる点です。" }),
       ],
     );
     expect(run(data)).toEqual([]);
