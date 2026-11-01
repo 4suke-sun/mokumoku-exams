@@ -1545,7 +1545,7 @@
       "oneLine": "マネージドテーブルは、データファイルの置き場所と管理を Unity Catalog に任せるテーブルで、Databricks で既定の種類です。",
       "keyPhrase": "データファイルの置き場所と管理を Unity Catalog に任せる",
       "body": "`CREATE TABLE` で `LOCATION` を書かずに作ると、マネージドテーブルになります。\n\n```sql\nCREATE TABLE main.sales.orders (id BIGINT, amount DECIMAL(10, 2));\n```\n\nデータファイルは、Unity Catalog の管理ストレージの場所に置かれます。どの場所を使うかは、最も細かい設定で決まります。スキーマに設定があればスキーマの場所、なければカタログの場所、どちらにもなければメタストアの場所です。\n\n形式は、既定で Delta Lake です。`USING iceberg` を付けると、Apache Iceberg のテーブルになります。読み書き、置き場所、最適化(予測的最適化など)は Unity Catalog が受け持ちます。Databricks は、外部テーブルを使う理由がなければ、マネージドテーブルを使うよう勧めています。\n\n`DROP TABLE` を実行すると、メタデータはすぐに消えます。データファイルは、復元の期間(既定で 7 日)が過ぎてからクラウドストレージから消されます。期間のうちは `UNDROP TABLE` で戻せます。",
-      "examAngle": "「テーブルを DROP したあと、基になるデータファイルはどうなるか」という問いで、テーブルの種類による違いを確かめる形で出ます。",
+      "examAngle": "`LOCATION` を書かずに作ったテーブルは、マネージドテーブルです。マネージドテーブルを `DROP TABLE` で消すと、データファイルは復元の期間(既定で 7 日)が過ぎてから消されます。期間を過ぎたテーブルは、`UNDROP TABLE` で戻せません。",
       "checks": [
         {
           "question": "`LOCATION` を指定せずに `CREATE TABLE` で作ったテーブルを、`DROP TABLE` で削除しました。復元の期間は既定のままです。8 日後に `UNDROP TABLE` で戻せますか。",
@@ -1578,7 +1578,7 @@
       "oneLine": "外部テーブルは、データファイルを利用者のクラウドストレージに置き、Unity Catalog にはメタデータと権限の管理だけを任せるテーブルです。",
       "keyPhrase": "メタデータと権限の管理だけを任せる",
       "body": "外部テーブルを作るときは、`LOCATION` でパスを指定します。パスは、Unity Catalog に登録した外部ロケーションの下でなければなりません。作る人には、親のカタログとスキーマの権限(`USE CATALOG`、`USE SCHEMA`、`CREATE TABLE`)に加えて、その外部ロケーションの `CREATE EXTERNAL TABLE` の権限が要ります。\n\n```sql\nCREATE TABLE main.sales.raw_events (id BIGINT, payload STRING)\nLOCATION 's3://example-bucket/raw_events';\n```\n\n形式は、Delta のほかに CSV、JSON、Avro、Parquet、ORC、テキストを使えます。データファイルの最適化と、いつ消すかは、利用者が決めます。\n\n`DROP TABLE` で消えるのは、Unity Catalog のメタデータだけです。データファイルはクラウドストレージに残ります。要らなければ、利用者がストレージから直接消します。\n\n外部テーブルを選ぶのは、マネージドテーブルで扱えない形式の既存のデータを登録するときと、Databricks 以外のツールがファイルを直接読み書きするときです。ファイルを直接読み書きする経路には、Unity Catalog の権限がかかりません。",
-      "examAngle": "「テーブルを削除してもデータファイルを残したい」「既存の JSON ファイルをそのままテーブルとして使いたい」といった要件から、テーブルの種類を選ばせる形で出ます。",
+      "examAngle": "外部テーブルを `DROP TABLE` で消しても、データファイルはクラウドストレージに残ります。消えるのは、Unity Catalog のメタデータだけです。JSON のままの既存のデータは、マネージドテーブルの形式(Delta Lake と Apache Iceberg)に当たらないので、外部テーブルとして登録します。",
       "checks": [
         {
           "question": "外部テーブルを `DROP TABLE` で削除しました。クラウドストレージにあるデータファイルはどうなりますか。",
@@ -1612,7 +1612,7 @@
       "oneLine": "UNDROP TABLE は、削除したテーブルを、復元の期間(既定で 7 日)のうちに戻すコマンドです。",
       "keyPhrase": "復元の期間(既定で 7 日)のうちに戻す",
       "body": "`UNDROP TABLE` は、Unity Catalog のマネージドテーブルにも外部テーブルにも使えます。外部テーブルを戻すときは、外部ロケーションが残っていて、実行する人がその `CREATE EXTERNAL TABLE` の権限を持っている必要があります。一時テーブルは戻せません。\n\n復元の期間は、カタログ(`ALTER CATALOG`)かスキーマ(`ALTER SCHEMA`)の単位で変えられます。両方に設定があると、スキーマの設定が使われます。設定できるのは、0 時間(戻せない)か、7〜30 日です。変えた設定は、そのあとに削除したテーブルにだけ効きます。\n\n名前だけを指定すると、その名前で最後に削除した、自分が所有するテーブルが戻ります。同じ名前のテーブルを何度か削除したときは、`SHOW TABLES DROPPED` で ID を調べ、`WITH ID` で指定します。\n\n```sql\nSHOW TABLES DROPPED IN main.sales;\nUNDROP TABLE WITH ID '<テーブルの ID>';\n```\n\n戻したテーブルには、権限や列の定義などのメタデータも戻ります。主キーと外部キーの制約は戻らないので、`ALTER TABLE ADD CONSTRAINT` で付け直します。同じ名前のテーブルがすでにあるときは、先にそちらの名前を変えてから戻します。",
-      "examAngle": "誤って削除したテーブルを戻す方法と、戻せる期間を問う形で出ます。",
+      "examAngle": "削除したテーブルを `UNDROP TABLE` で戻せるのは、復元の期間(既定で 7 日)のうちだけです。期間は、カタログかスキーマの単位で変えられます。両方に設定があると、スキーマの設定が使われます。",
       "checks": [
         {
           "question": "誤って `DROP TABLE` で削除したマネージドテーブルを、3 日後に戻したいとします。復元の期間は既定のままです。何を実行しますか。",
@@ -1645,7 +1645,7 @@
       "oneLine": "ALTER TABLE SET MANAGED は、外部テーブルを、名前と権限を保ったままマネージドテーブルに変える文です。",
       "keyPhrase": "名前と権限を保ったまま",
       "body": "`ALTER TABLE … SET MANAGED` を実行すると、外部ロケーションにあるデータファイルと Delta のトランザクションログが、管理ストレージの場所へコピーされます。テーブルの名前、設定、権限、ビュー、履歴は引き継がれます。\n\n```sql\nALTER TABLE main.sales.raw_events SET MANAGED;\n```\n\n変えられるのは、Delta Lake のテーブルだけです。外部テーブルを変えるには、Databricks Runtime 17.3 LTS 以上かサーバーレスのコンピュートと、テーブルの所有者であることが要ります。コピーの間もテーブルは使えます。最後の切り替えの間だけ、外部ロケーションへの書き込みが短く止まります。変えたあとは、動いていたストリーミングのジョブを再起動します。\n\n`CREATE TABLE … AS SELECT` や `DEEP CLONE` で作り直す方法より、Databricks は `SET MANAGED` を勧めています。設定や権限、履歴を引き継げて、止まる時間も短いためです。\n\n変えてから 14 日のうちは、`ALTER TABLE … UNSET MANAGED` で、元の外部ロケーションを指す形に戻せます。元のデータファイルは、その 14 日のあいだ残ります。そのあと、予測的最適化が有効なら自動で消え、有効でなければ利用者が `VACUUM` で消します。",
-      "examAngle": "外部テーブルを、権限や履歴を保ったままマネージドテーブルに移す方法を問う形で出ます。",
+      "examAngle": "`ALTER TABLE … SET MANAGED` は、外部テーブルを、名前、設定、権限、ビュー、履歴を引き継いだままマネージドテーブルに変えます。Databricks は、`CREATE TABLE … AS SELECT` や `DEEP CLONE` で作り直す方法より、`SET MANAGED` を勧めています。変えられるのは、Delta Lake のテーブルだけです。",
       "checks": [
         {
           "question": "Delta Lake の外部テーブルを、テーブル名と権限を変えずにマネージドテーブルにしたいとき、どの文を使いますか。",
@@ -1670,7 +1670,7 @@
       "oneLine": "ブロンズ層は、メダリオンアーキテクチャで、取り込んだ生のデータを元の形のまま追記で残しておく層です。",
       "keyPhrase": "取り込んだ生のデータを元の形のまま追記で残しておく",
       "body": "ブロンズ層のソースは、クラウドのオブジェクトストレージ、メッセージバス、フェデレーションしたシステムなどです。データは追記で増やし、過去の分も消さずに残します。あとで処理し直したり、監査したりするためです。\n\nブロンズ層での検証は、最小限にとどめます。予期しないスキーマの変化で取り込みが止まらないよう、多くの列を STRING、VARIANT、バイナリのまま持ちます。来歴などのメタデータの列を足すことはあります。\n\n取り込みは、ストリーミングでもバッチでも構いません。ブロンズのテーブルを使うのは、主にデータエンジニアや監査の担当者です。ブロンズのテーブルは、アナリストやデータサイエンティストが直接使うためのものではありません。シルバーのテーブルを作る処理が、ブロンズのテーブルを読みます。",
-      "examAngle": "「生のデータを、あとで処理し直せるように元の形で残したい」という要件から、メダリオンアーキテクチャのどの層に置くかを選ばせる形で出ます。",
+      "examAngle": "取り込んだ生のデータを元の形のまま追記で残すのは、ブロンズ層です。ブロンズ層は、あとで処理し直したり監査したりするために、過去の分も消さずに残します。型の変換や重複の除去は、シルバー層で行います。",
       "checks": [
         {
           "question": "ソースから取り込んだ JSON を、型の変換や重複の除去をせずに、元の形のまま溜めておく層は、メダリオンアーキテクチャのどれですか。",
@@ -1695,7 +1695,7 @@
       "oneLine": "シルバー層は、ブロンズのデータを検証し、整えて、ほかのデータと結び付けた層です。",
       "keyPhrase": "検証し、整えて、ほかのデータと結び付けた",
       "body": "シルバー層には、レコードごとに、検証済みで集計していない形を少なくとも 1 つ置きます。集計したデータをシルバー層に置くこともありますが、多くはゴールド層に置きます。\n\nブロンズからシルバーへ移すときに行う処理には、次のものがあります。\n\n- スキーマの強制とスキーマの進化\n- NULL と欠けた値の扱い\n- 重複の除去\n- 順序の乱れたデータや遅れて届くデータの扱い\n- データ品質の検査\n- 型の変換\n- 結合\n- 正規化と誤りの修正\n\nシルバーのテーブルは、ブロンズかシルバーのテーブルを読んで作ります。Databricks は、取り込みから直接シルバーのテーブルに書くことを勧めていません。ブロンズからの読み込みは、多くをストリーミングにします。バッチで読むのは、小さなディメンションのテーブルのような、小さいデータのときです。\n\nシルバー層は、データエンジニアのほか、細部を残した整ったデータが要るアナリストやデータサイエンティストも使います。",
-      "examAngle": "「重複を除き、型をそろえ、マスタと結合したテーブル」をどの層に置くかや、ブロンズからシルバーへの読み込みの方式を問う形で出ます。",
+      "examAngle": "重複の除去、型の変換、結合を済ませ、集計していないレコードは、シルバー層に置きます。集計したデータの多くは、ゴールド層に置きます。Databricks は、ブロンズからの読み込みの多くをストリーミングにするよう勧めています。",
       "checks": [
         {
           "question": "ブロンズのテーブルからシルバーのテーブルを作るとき、Databricks が多くの場合に勧める読み込みの方式は何ですか。",
@@ -1725,7 +1725,7 @@
       "oneLine": "TRY_CAST は、CAST と同じく値の型を変換する関数で、値を変換できないときにエラーではなく NULL を返します。",
       "keyPhrase": "値を変換できないときにエラーではなく NULL を返します",
       "body": "ANSI モードが有効なとき、`CAST` は、数字でない文字列を数値に変換しようとすると、エラー(`CAST_INVALID_INPUT`)で止まります。値が変換先の型の範囲に収まらないときも、エラーです。`TRY_CAST` は、このような値に NULL を返し、処理を続けます。\n\n```sql\nSELECT CAST('a' AS INT);       -- ANSI モードではエラー\nSELECT TRY_CAST('a' AS INT);   -- NULL\nSELECT TRY_CAST('10' AS INT);  -- 10\n```\n\nANSI モードは、Databricks Runtime 17.0 以上で既定で有効です。Databricks SQL では、2022 年 10 月 19 日以降に作ったアカウントで、既定が `TRUE` です。ANSI モードが無効なときは、`CAST` も、変換できない値に NULL を返します。\n\n`TRY_CAST` でも、型の組み合わせそのものが変換の規則にないときは、エラー(`DATATYPE_MISMATCH`)になります。NULL になるのは、型の組み合わせは正しく、値が合わないときです。",
-      "examAngle": "「文字列の列を数値に変換したいが、変換できない値があってもクエリを失敗させたくない」という要件から、使う関数を選ばせる形で出ます。ANSI モードが有効かどうかで、CAST の結果が変わります。",
+      "examAngle": "ANSI モードが有効なとき、`CAST` は変換できない値でエラーになり、`TRY_CAST` は NULL を返します。ANSI モードが無効なときは、`CAST` も NULL を返します。`TRY_CAST` でも、型の組み合わせが変換の規則にないときは、エラー(`DATATYPE_MISMATCH`)になります。",
       "checks": [
         {
           "question": "ANSI モードが有効な環境で、`TRY_CAST('abc' AS INT)` は何を返しますか。",
@@ -1763,7 +1763,7 @@
       "oneLine": "dropna は、NULL や NaN を含む行を除いた新しい DataFrame を返す PySpark のメソッドで、na.drop と同じ働きをします。",
       "keyPhrase": "NULL や NaN を含む行を除いた新しい DataFrame を返す",
       "body": "どの行を除くかは、引数で決めます。\n\n- `how`: `'any'`(既定)は、値が 1 つでも NULL か NaN の行を除きます。`'all'` は、すべての値が NULL か NaN の行だけを除きます。\n- `thresh`: NULL でも NaN でもない値が、指定した数より少ない行を除きます。指定すると、`how` より優先されます。\n- `subset`: 調べる列を絞ります。\n\n```python\ndf.dropna()                       # 欠けた値が 1 つでもある行を除く\ndf.na.drop(how=\"all\")             # すべての値が欠けた行だけを除く\ndf.dropna(subset=[\"id\", \"name\"])  # id か name が欠けた行を除く\n```\n\n`dropna` は新しい DataFrame を返し、元の DataFrame は変わりません。",
-      "examAngle": "「すべての列が NULL の行だけを除きたい」のような要件から、how や subset の指定を選ばせる形で出ます。",
+      "examAngle": "`how` の既定は `'any'` で、値が 1 つでも NULL か NaN の行を除きます。すべての値が NULL か NaN の行だけを除くときは、`how=\"all\"` を指定します。調べる列を絞るときは、`subset` を使います。",
       "checks": [
         {
           "question": "一部の列だけが NULL の行は残し、すべての列が NULL の行だけを除きたいとき、どう書きますか。",
@@ -1793,7 +1793,7 @@
       "oneLine": "to_utc_timestamp は、あるタイムゾーンの時刻として書かれたタイムスタンプを、UTC の時刻に直す関数です。",
       "keyPhrase": "UTC の時刻に直す",
       "body": "1 つめの引数にタイムスタンプを、2 つめの引数にタイムゾーンを渡します。タイムゾーンは、`'Asia/Seoul'` のような名前か、`'GMT+1'` のような書き方で指定します。\n\n```sql\nSELECT to_utc_timestamp('2016-08-31', 'Asia/Seoul');\n-- 2016-08-30 15:00:00\n```\n\n逆に、UTC の時刻を、あるタイムゾーンの時刻に直すときは、`from_utc_timestamp` を使います。",
-      "examAngle": "「地域ごとのローカル時刻で記録された時刻を、UTC にそろえて保存したい」という要件から、使う関数を選ばせる形で出ます。",
+      "examAngle": "`to_utc_timestamp` は、2 つめの引数のタイムゾーンの時刻として値を読み、UTC の時刻を返します。逆に、UTC の時刻をあるタイムゾーンの時刻に直すときは、`from_utc_timestamp` を使います。",
       "checks": [
         {
           "question": "ソウルの時刻として記録された `2016-08-31 00:00:00` を UTC の時刻に直すには、どう書きますか。",
@@ -1818,7 +1818,7 @@
       "oneLine": "INNER JOIN は両方の表で一致した行だけを返し、外部結合(LEFT、RIGHT、FULL)は一致しない行も残して、相手側の列を NULL で埋めます。",
       "keyPhrase": "一致しない行も残して、相手側の列を NULL で埋めます",
       "body": "結合の種類を書かずに `JOIN` と書くと、INNER JOIN になります。外部結合には、次の種類があります。\n\n- `LEFT [OUTER] JOIN`: 左の表の行をすべて残します。右の表に一致する行がなければ、右の列は NULL です。\n- `RIGHT [OUTER] JOIN`: 右の表の行をすべて残します。左の表に一致する行がなければ、左の列は NULL です。\n- `FULL [OUTER] JOIN`: 両方の表の行をすべて残し、一致しない側の列を NULL で埋めます。\n\n```sql\nSELECT o.id, o.amount, c.name\nFROM orders AS o\nLEFT JOIN customers AS c ON o.customer_id = c.id;\n```\n\nこの例では、顧客の表に一致する行がない注文も結果に残り、`c.name` は NULL になります。\n\n結合の条件は、`ON` に式で書くか、`USING (列名)` で両方の表にある同じ名前の列を指定します。結合の条件を書かないと、どの種類でも `CROSS JOIN`(すべての行の組み合わせ)と同じ結果になります。\n\nPySpark では、`df.join(other, on, how)` の `how` に、`\"inner\"`(既定)、`\"left\"`、`\"right\"`、`\"full\"` などを渡します。",
-      "examAngle": "「マスタに一致しない行も落とさずに残したい」「両方の表にある行だけがほしい」といった要件から、結合の種類を選ばせる形で出ます。",
+      "examAngle": "結合の種類を書かずに `JOIN` と書くと、INNER JOIN になり、両方の表で一致した行だけが残ります。一致しない行も残すときは外部結合を使い、LEFT JOIN なら左の表の行がすべて残ります。相手側に一致する行がなければ、その列は NULL です。",
       "checks": [
         {
           "question": "注文の表のすべての行を残し、顧客の表に一致する行があれば顧客名を付けたいとき、注文の表を左に置いて、どの結合を使いますか。",
@@ -1852,7 +1852,7 @@
       "oneLine": "LEFT ANTI JOIN は、右の表に一致する行がない左の表の行だけを返し、LEFT SEMI JOIN は、一致する行がある左の表の行だけを返します。",
       "keyPhrase": "右の表に一致する行がない左の表の行だけを返し",
       "body": "どちらも、結果に入るのは左の表の列だけです。右の表は、一致する行があるかを調べるためだけに使います。`LEFT` は省いて、`SEMI JOIN`、`ANTI JOIN` とも書けます。\n\n```sql\n-- 部署の表にない部署番号を持つ社員\nSELECT * FROM employees AS e\nLEFT ANTI JOIN departments AS d ON e.dept_id = d.dept_id;\n```\n\nPySpark では、`how` に `\"left_anti\"`(別名 `\"anti\"`、`\"leftanti\"`)や `\"left_semi\"`(別名 `\"semi\"`、`\"leftsemi\"`)を渡します。",
-      "examAngle": "「新しく届いたレコードのうち、既存のテーブルにまだないものだけを取り出したい」という要件から、left_anti を選ばせる形で出ます。",
+      "examAngle": "LEFT ANTI JOIN は、右の表に一致する行がない左の表の行を返します。LEFT SEMI JOIN は、一致する行がある左の表の行を返します。どちらも、結果に入るのは左の表の列だけです。",
       "checks": [
         {
           "question": "表 A の行のうち、表 B にキーが一致する行がないものだけを、A の列だけで取り出したいとき、どの結合を使いますか。",
@@ -1886,7 +1886,7 @@
       "oneLine": "ブロードキャスト結合は、結合する一方の小さい表を、すべてのワーカーノードに配ってから結合する方式です。",
       "keyPhrase": "小さい表を、すべてのワーカーノードに配ってから結合する",
       "body": "PySpark では、`broadcast` 関数で、小さい DataFrame に、ブロードキャスト結合に使える大きさだという印を付けます。SQL では、`BROADCAST` のヒントで、配る側の表を指定します。`BROADCASTJOIN` と `MAPJOIN` は、`BROADCAST` の別名です。\n\n```python\nfrom pyspark.sql.functions import broadcast\nresult = orders.join(broadcast(countries), \"country_code\")\n```\n\n```sql\nSELECT /*+ BROADCAST(c) */ *\nFROM orders AS o JOIN countries AS c ON o.country_code = c.code;\n```\n\nヒントを付けた表は、自動でブロードキャストする大きさの上限(`spark.sql.autoBroadcastJoinThreshold`。Spark の既定は 10 MB)を超えていても、ブロードキャストの対象になります。ただし、結合の種類によっては使えない方式があるため、ヒントどおりの方式になるとは限りません。\n\nヒントがなくても、Databricks の適応型クエリ実行(AQE)は、実行中に集めた統計をもとに、ソートマージ結合をブロードキャストハッシュ結合に切り替えます。切り替えの上限(`spark.databricks.adaptive.autoBroadcastJoinThreshold`)の既定は 30MB です。",
-      "examAngle": "「大きな表と小さなマスタの表の結合が遅い」といった状況から、小さい側を broadcast で包む書き方を選ばせる形で出ます。",
+      "examAngle": "大きい表と小さい表の結合では、小さい側を `broadcast()` で包むと、その表に、ブロードキャスト結合に使える大きさだという印が付きます。`BROADCAST` のヒントを付けた表は、`spark.sql.autoBroadcastJoinThreshold` を超えていてもブロードキャストの対象になります。ただし、結合の種類によっては、ヒントどおりの方式にならないことがあります。",
       "checks": [
         {
           "question": "PySpark で、大きな DataFrame `orders` と小さな DataFrame `countries` を結合するとき、`countries` をブロードキャストするには、どう書きますか。",
@@ -1928,7 +1928,7 @@
       "oneLine": "UNION は、2 つの問い合わせの結果を縦につなぐ集合演算子で、既定では重複した行を除き、ALL を付けると重複した行も残します。",
       "keyPhrase": "既定では重複した行を除き、ALL を付けると重複した行も残します",
       "body": "`UNION` は `UNION DISTINCT` と同じです。重複した行も残したいときは、`UNION ALL` を使います。\n\n```sql\nSELECT id FROM sales_2025\nUNION ALL\nSELECT id FROM sales_2026;\n```\n\nつなぐ 2 つの問い合わせは、列の数が同じで、対応する列どうしに共通の型がなければなりません。列の数が違うと、エラー(`NUM_COLUMNS_MISMATCH`)になります。\n\n集合演算子には、ほかに、両方にある行を返す `INTERSECT` と、1 つめにあって 2 つめにない行を返す `EXCEPT`(別名 `MINUS`)があります。どちらも、既定では重複した行を除きます。",
-      "examAngle": "「2 つの表の行を 1 つにまとめたい。重複は残す(または除く)」という要件から、UNION と UNION ALL を選び分けさせる形で出ます。",
+      "examAngle": "`UNION` は `UNION DISTINCT` と同じで、重複した行を除きます。重複した行も残すときは、`UNION ALL` を使います。つなぐ 2 つの問い合わせは、列の数が同じでなければなりません。",
       "checks": [
         {
           "question": "値が 1、2、2 の 3 行の表と、値が 2、3 の 2 行の表を `UNION` でつなぐと、結果は何行になりますか。",
@@ -1958,7 +1958,7 @@
       "oneLine": "CTAS は、問い合わせの結果からテーブルを作って、そのデータを入れる文で、テーブルのスキーマは問い合わせの結果から決まります。",
       "keyPhrase": "テーブルのスキーマは問い合わせの結果から決まります",
       "body": "`CREATE TABLE … AS` の後ろに、問い合わせを書きます。`AS` で問い合わせを指定するときは、列の定義(列名と型の一覧)を書きません。\n\n```sql\nCREATE TABLE main.sales.orders_2026\nCOMMENT '2026 年の注文'\nAS SELECT * FROM main.sales.orders WHERE order_year = 2026;\n```\n\n`COMMENT` や `TBLPROPERTIES` などのテーブルの句は、CTAS でも付けられます。`USING` を書かないと、形式は Delta になります。\n\n既にあるテーブルを作り直すときは、`CREATE OR REPLACE TABLE … AS SELECT` を使えます。Databricks は、テーブルを削除して作り直すより、`REPLACE` を使うよう強く勧めています。`REPLACE` は、テーブルの履歴と、付与した権限を保ちます。",
-      "examAngle": "「既存のテーブルの一部を、新しいテーブルとして保存したい」という要件から CTAS を選ばせる形や、CTAS でテーブルのスキーマがどう決まるかを問う形で出ます。",
+      "examAngle": "CTAS で作ったテーブルの列の名前と型は、問い合わせの結果から決まります。既存のテーブルを作り直すとき、Databricks は `CREATE OR REPLACE TABLE … AS SELECT` を勧めています。`REPLACE` は、テーブルの履歴と付与した権限を保ちます。",
       "checks": [
         {
           "question": "CTAS で作ったテーブルの列の名前と型は、どこから決まりますか。",
@@ -1988,7 +1988,7 @@
       "oneLine": "CREATE TABLE の USING 句は、テーブルのデータの形式(CSV、JSON、Parquet など)を指定する句で、省くと形式は Delta になります。",
       "keyPhrase": "テーブルのデータの形式(CSV、JSON、Parquet など)を指定する",
       "body": "`USING` には、`CSV`、`JSON`、`PARQUET`、`ORC`、`AVRO`、`TEXT`、`BINARYFILE`、`DELTA`、`ICEBERG` などのファイル形式を書きます。`LOCATION` と組み合わせると、既にあるファイルを、置き場所を変えずにテーブルとして読めます。テーブルのオプションは、`OPTIONS` 句で設定します。\n\n```sql\nCREATE TABLE main.raw.students\nUSING CSV\nLOCATION 's3://example-bucket/students/';\n```\n\n`LOCATION` を指定したテーブルは、外部テーブルです。Unity Catalog では、パスが外部ロケーションの下になければなりません(有効なストレージ資格情報を指定したときを除く)。DELTA と ICEBERG 以外の形式で、`LOCATION` も `AS` の問い合わせも書かないと、データのない空のマネージドテーブルができます。\n\nテーブルの説明は `COMMENT` 句で、列の説明は列の定義の `COMMENT` で残せます。\n\n```sql\nCREATE TABLE main.sales.customers (\n  id BIGINT COMMENT '顧客の ID',\n  name STRING\n) COMMENT '顧客のマスタ';\n```",
-      "examAngle": "「既存の CSV ファイルを、移さずにテーブルとして登録したい」という要件から、USING と LOCATION の組み合わせを選ばせる形で出ます。テーブルに説明を残す方法として、COMMENT 句を問う形もあります。",
+      "examAngle": "既にあるファイルを置き場所を変えずにテーブルとして読むときは、`USING` で形式を、`LOCATION` で場所を指定します。`USING` を省くと、形式は Delta になります。テーブルの説明は `COMMENT` 句で、列の説明は列の定義の `COMMENT` で残せます。",
       "checks": [
         {
           "question": "外部ストレージにある CSV ファイルを、置き場所を変えずにテーブルとして登録するには、`CREATE TABLE` にどの句を付けますか。",
@@ -2018,7 +2018,7 @@
       "oneLine": "INSERT INTO は、値や問い合わせの結果を、既にあるテーブルに行として足す文です。",
       "keyPhrase": "既にあるテーブルに行として足す",
       "body": "`INSERT INTO` で入れた行は、既存の行に加わります。`INSERT OVERWRITE` は、入れる前にテーブルの行を消します。パーティションを指定したときは、そのパーティションの行だけを消します。\n\n```sql\nINSERT INTO main.sales.orders VALUES (1, 100.00), (2, 250.00);\nINSERT INTO main.sales.orders SELECT id, amount FROM main.raw.new_orders;\n```\n\n列の一覧を書かないと、テーブルの定義の順に、すべての列へ値を入れます。Databricks SQL と Databricks Runtime 12.2 LTS 以上では、列の一覧で省いた列に、既定値が入ります。既定値の定義がなければ NULL が入り、NULL を許さない列ではエラーになります。\n\n`BY NAME` を付けると、問い合わせの列名で、テーブルの列に対応させます(Databricks SQL と Databricks Runtime 13.3 LTS 以上)。\n\nDelta のテーブルに入れるときは、スキーマの強制がかかります。列のデータ型を安全に変換できないときは、実行時にエラーになります。",
-      "examAngle": "「既存のテーブルに新しい行を足したい」「テーブルの中身を置き換えたい」といった要件から、INSERT INTO と INSERT OVERWRITE を選び分けさせる形で出ます。",
+      "examAngle": "`INSERT INTO` で入れた行は、既存の行に加わります。`INSERT OVERWRITE` は、入れる前にテーブルの行を消します。パーティションを指定したときは、そのパーティションの行だけを消します。",
       "checks": [
         {
           "question": "テーブルの既存の行を残したまま、問い合わせの結果を足したいとき、`INSERT INTO` と `INSERT OVERWRITE` のどちらを使いますか。",
@@ -2043,7 +2043,7 @@
       "oneLine": "UPDATE は条件に合う行の列の値を書き換える文、DELETE は条件に合う行を消す文で、どちらも Delta Lake のテーブルだけで使えます。",
       "keyPhrase": "どちらも Delta Lake のテーブルだけで使えます",
       "body": "どちらの文も、`WHERE` で対象の行を絞ります。`WHERE` を省くと、すべての行が対象になります。\n\n```sql\nUPDATE main.web.events SET event_type = 'click' WHERE event_type = 'clk';\nDELETE FROM main.web.events WHERE event_date < '2025-01-01';\n```\n\n`WHERE` には、`IN` や `EXISTS` などのサブクエリを書けます。`NOT IN` のサブクエリは遅くなることがあるため、Databricks は、できるだけ `NOT EXISTS` に書き換えるよう勧めています。\n\nDatabricks SQL は、ほかの SQL の方言にある `UPDATE … FROM … JOIN` の構文に対応していません。別のテーブルとの結合をもとに値を書き換えるときは、`MERGE INTO` の `WHEN MATCHED THEN UPDATE` を使います。",
-      "examAngle": "「別のテーブルの値をもとに、既存の行を書き換えたい」という要件から MERGE INTO を選ばせる形や、WHERE を省いたときの影響を問う形で出ます。",
+      "examAngle": "`UPDATE` と `DELETE` で `WHERE` を省くと、すべての行が対象になります。Databricks SQL は、`UPDATE … FROM … JOIN` の構文に対応していません。別のテーブルとの結合をもとに値を書き換えるときは、`MERGE INTO` の `WHEN MATCHED THEN UPDATE` を使います。",
       "checks": [
         {
           "question": "`DELETE FROM main.web.events` を、`WHERE` を付けずに実行すると、どうなりますか。",
@@ -2077,7 +2077,7 @@
       "oneLine": "SQL の UDF は、CREATE FUNCTION で引数と戻り値の型と本体の式を定義し、組み込みの関数と同じようにクエリから呼べる関数です。",
       "keyPhrase": "組み込みの関数と同じようにクエリから呼べる",
       "body": "本体は、`RETURN` の後ろに式か問い合わせで書きます。SQL の UDF では、`RETURNS` の戻り値の型を省くと、型は本体から決まります。\n\n```sql\nCREATE FUNCTION main.default.area(x DOUBLE, y DOUBLE)\nRETURNS DOUBLE\nRETURN x * y;\n\nSELECT area(width, height) AS area FROM main.default.shapes;\n```\n\n作った関数は、`SELECT` の列の式にも、`WHERE` の条件にも使えます。ほかの UDF の本体からも呼べます。\n\n`TEMPORARY` を付けた関数は、作ったセッションの中だけで使え、カタログには登録されません。\n\nUnity Catalog に関数を作るには、カタログの `USE CATALOG`、スキーマの `USE SCHEMA` と `CREATE FUNCTION` の権限が要ります。本体で参照するテーブルには、`SELECT` の権限も要ります。\n\n本体の式には、集計関数、ウィンドウ関数、順位の関数と、`explode` のように行を生む関数を書けません。",
-      "examAngle": "「同じ計算の式を、多くのクエリで使い回したい」という要件から、SQL の UDF の定義の書き方を選ばせる形で出ます。",
+      "examAngle": "SQL の UDF は、引数の一覧、`RETURNS` の戻り値の型、`RETURN` の本体で定義します。`TEMPORARY` を付けた関数は、作ったセッションの中だけで使え、カタログには登録されません。本体の式には、集計関数やウィンドウ関数を書けません。",
       "checks": [
         {
           "question": "2 つの DOUBLE の積を返す SQL の関数 `area` を定義するには、どう書きますか。",
@@ -2107,7 +2107,7 @@
       "oneLine": "transform と filter は、配列の要素ごとにラムダ式をかける関数で、transform は各要素を変換した配列を、filter は条件に合う要素だけの配列を返します。",
       "keyPhrase": "transform は各要素を変換した配列を、filter は条件に合う要素だけの配列を返します",
       "body": "ラムダ式は、`x -> 式` の形で書きます。引数を 2 つにすると、2 つめの引数に要素の位置(添字)が入ります。\n\n```sql\nSELECT transform(array(1, 2, 3), x -> x * 10);         -- [10,20,30]\nSELECT filter(array(1, 2, 3, 4), x -> x % 2 == 0);      -- [2,4]\nSELECT filter(array(5, NULL, 7), x -> x IS NOT NULL);   -- [5,7]\n```\n\n`filter` の結果は、元の配列と同じ型です。`transform` の結果は、ラムダ式が返す値の型の配列です。",
-      "examAngle": "「配列の列の各要素に計算をかけたい」「配列から条件に合う要素だけを残したい」という要件から、transform と filter を選び分けさせる形で出ます。",
+      "examAngle": "`transform` は、配列の各要素にラムダ式をかけた結果の配列を返します。`filter` は、ラムダ式が真になる要素だけを残した配列を返します。`filter` の結果は、元の配列と同じ型です。",
       "checks": [
         {
           "question": "`SELECT transform(array(1, 2, 3), x -> x + 1)` の結果は何ですか。",
@@ -2141,7 +2141,7 @@
       "oneLine": "PIVOT は、指定した列の値ごとに新しい列を作り、縦に並んだ行を横に並べ替える句です。",
       "keyPhrase": "指定した列の値ごとに新しい列を作り",
       "body": "`PIVOT` の中には、集計の式と、`FOR 列 IN (値の一覧)` を書きます。`IN` の値ごとに 1 つの列ができ、各セルには、その値に当たる行を集計した結果が入ります。\n\n```sql\nSELECT *\nFROM quarterly_sales\nPIVOT (sum(amount) FOR quarter IN (1 AS q1, 2 AS q2, 3 AS q3, 4 AS q4));\n```\n\n集計の式にも `FOR` にも使っていない列が、グループ分けの列になります。`quarterly_sales` が `year`、`quarter`、`amount` の 3 列なら、結果は `year` ごとに 1 行で、`q1` から `q4` の 4 列が並びます。\n\n`IN` の値は、リテラルで書きます。リテラルでないと、エラー(`NON_LITERAL_PIVOT_VALUES`)になります。同じ結果は、`GROUP BY` と、集計関数の `FILTER (WHERE …)` を組み合わせても書けます。",
-      "examAngle": "「四半期ごとの売上を、四半期を列にした横長の表にしたい」という要件から、PIVOT を選ばせる形で出ます。",
+      "examAngle": "`PIVOT` は、`FOR` の列の値ごとに列を作り、各セルに集計の結果を入れます。集計の式にも `FOR` にも使っていない列が、グループ分けの列になります。`IN` の値はリテラルで書き、リテラルでないとエラー(`NON_LITERAL_PIVOT_VALUES`)になります。",
       "checks": [
         {
           "question": "行ごとに `quarter`(1〜4)と `amount` を持つ表から、四半期を列にした横長の表を作るには、どの句を使いますか。",
@@ -2166,7 +2166,7 @@
       "oneLine": "STRUCT の列の中の項目は、列名.項目名 のようにドットでつないで取り出し、入れ子の項目も同じ書き方でたどります。",
       "keyPhrase": "列名.項目名 のようにドットでつないで取り出し",
       "body": "```sql\nSELECT customer.address.city FROM main.sales.orders;\n```\n\nこの例では、STRUCT の列 `customer` の中の `address` の、さらに中の `city` を取り出します。\n\nドットでつないだ名前は、まずスキーマ、テーブル、列の名前として、できるだけ長く解釈されます。残った部分が、STRUCT の項目として解釈されます。STRUCT の項目に使うとき、Databricks は、文をコンパイルするときに、その項目があるかを確かめます。",
-      "examAngle": "「入れ子の JSON を読み込んだ STRUCT の列から、内側の値を取り出したい」という要件から、ドットの記法を選ばせる形で出ます。",
+      "examAngle": "STRUCT の列の中の項目は、列名.項目名 のようにドットでつないで取り出します。入れ子の項目も、`customer.address.city` のように同じ書き方でたどります。",
       "checks": [
         {
           "question": "STRUCT の列 `device` の中にある STRUCT `location` の項目 `country` を取り出すには、どう書きますか。",
@@ -2191,7 +2191,7 @@
       "oneLine": "split は、文字列を正規表現に合う箇所で区切り、文字列の配列を返す関数です。",
       "keyPhrase": "文字列の配列を返す",
       "body": "2 つめの引数は、正規表現として扱われます。3 つめの引数 `limit` が正のとき、配列の長さは `limit` 以下になり、最後の要素に残りの文字列がすべて入ります。`limit` を省くと、区切れるだけ区切ります。\n\n```sql\nSELECT split('a,b,c', ',');     -- [a,b,c]\nSELECT split('a,b,c', ',', 2);  -- 要素は a と b,c の 2 つ\n```\n\n1 つの列を複数の列に分けるときは、`split` で配列にしてから、添字で要素を取り出し、それぞれを新しい列にします。SQL の `[ ]` の添字と、PySpark の `getItem` の添字は、0 から始まります。\n\n```python\nfrom pyspark.sql import functions as F\nparts = F.split(F.col(\"full_name\"), \" \")\ndf = (df.withColumn(\"first_name\", parts.getItem(0))\n        .withColumn(\"last_name\", parts.getItem(1))\n        .drop(\"full_name\"))\n```\n\n`withColumn` は列を足した(同じ名前の列があれば置き換えた)新しい DataFrame を、`drop` は指定した列を除いた新しい DataFrame を返します。",
-      "examAngle": "「姓と名がつながった列を 2 つの列に分け、元の列は除きたい」という要件から、split と列の追加、削除の組み合わせを選ばせる形で出ます。",
+      "examAngle": "1 つの列を複数の列に分けるときは、`split` で配列にしてから、添字で要素を取り出し、それぞれを新しい列にします。SQL の `[ ]` と PySpark の `getItem` の添字は、0 から始まります。元の列は、`drop` で除きます。",
       "checks": [
         {
           "question": "`split('a,b,c', ',', 2)` の結果は何ですか。",
@@ -2241,7 +2241,7 @@
       "oneLine": "withColumnRenamed は列の名前を変えた新しい DataFrame を返すメソッドで、alias は select などの中で列に別名を付けるメソッドです。",
       "keyPhrase": "列の名前を変えた新しい DataFrame を返す",
       "body": "`withColumnRenamed` は、元の DataFrame を変えずに、新しい DataFrame を返します。名前を変えた結果を使うには、戻り値を変数に入れ直します。\n\n```python\ndf = df.withColumnRenamed(\"cust_id\", \"customer_id\")\n```\n\nスキーマにない列の名前を渡しても、エラーにはならず、何も変わりません。複数の列の名前を変えるときは、`withColumnRenamed` をつなげて書けます。\n\n`alias` は、列(Column)に付けるメソッドです。`select` の中で使うと、出力の列にだけ別名が付きます。\n\n```python\ndf.select(df.amount.alias(\"total_amount\"))\n```",
-      "examAngle": "「列名を変えたはずなのに、次の処理で古い列名のままになっている」といったコードの誤りを見つけさせる形で出ます。",
+      "examAngle": "`withColumnRenamed` は、元の DataFrame を変えずに、新しい DataFrame を返します。結果を使うには、`df = df.withColumnRenamed(\"a\", \"b\")` のように戻り値を代入し直します。スキーマにない列の名前を渡しても、エラーにはならず、何も変わりません。",
       "checks": [
         {
           "question": "`df.withColumnRenamed(\"a\", \"b\")` を実行し、戻り値をどこにも代入しなかったとき、`df` の列名は変わっていますか。",
@@ -2275,7 +2275,7 @@
       "oneLine": "名前付きのパラメータマーカーは、SQL の文の中に :名前 の形で置く、型を持つ値の差し込み口で、値は文を実行する API から渡します。",
       "keyPhrase": ":名前 の形で置く",
       "body": "```python\nspark.sql(\n    \"SELECT * FROM main.sales.orders WHERE amount > :min_amount\",\n    args={\"min_amount\": 1000},\n)\n```\n\nパラメータマーカーを使うと、値が文の構造と分けて渡されるため、SQL インジェクションを防げます。\n\n同じマーカーは、1 つの文の中で何度でも参照できます。値を渡していないマーカーがあると、エラー(`UNBOUND_SQL_PARAMETER`)になります。渡した値を、すべて使う必要はありません。\n\n名前のないマーカー `?` もあります。`?` は、渡した値の配列を、出てくる順に 1 つずつ使います。1 つの文の中で、名前付きと名前なしのマーカーを混ぜられません。\n\n値を渡せるのは、Databricks SQL の Statement Execution API と、PySpark、Scala、Java の `SparkSession.sql()` です。SQL の中では、`EXECUTE IMMEDIATE … USING` でも渡せます。\n\nDatabricks Runtime 17.3 LTS 以前では、マーカーは式の中でだけ使えます。生成列や `DEFAULT` の定義、ビュー、SQL の関数などの DDL には、マーカーを書けません(`IDENTIFIER` 句の中は例外)。Databricks Runtime 18.0 以上では、その型のリテラルを書ける場所なら、どこにでも書けます。",
-      "examAngle": "「クエリに実行時の値を安全に渡したい」という要件から、:名前 の書き方と、値の渡し方を選ばせる形で出ます。",
+      "examAngle": "名前付きのパラメータマーカーは、文の中に :名前 の形で置き、値は `args` の辞書で名前と組にして渡します。値を渡していないマーカーがあると、エラー(`UNBOUND_SQL_PARAMETER`)になります。1 つの文の中で、名前付きのマーカーと名前のないマーカー `?` は混ぜられません。",
       "checks": [
         {
           "question": "`spark.sql(\"SELECT * FROM t WHERE id = :id\", args={\"id\": 5})` の `:id` は何ですか。",
@@ -2304,7 +2304,7 @@
       "oneLine": "dropDuplicates は、重複した行を除いた新しい DataFrame を返すメソッドで、比べる列を指定すると、その列の値が同じ行を 1 つにします。",
       "keyPhrase": "比べる列を指定すると、その列の値が同じ行を 1 つにします",
       "body": "```python\ndf.dropDuplicates()               # すべての列の値が同じ行を 1 つにする\ndf.dropDuplicates([\"order_id\"])   # order_id が同じ行を 1 つにする\n```\n\n列を指定しないと、すべての列で比べます。`distinct()` も重複した行を除きますが、列は指定できず、すべての列で比べます。`drop_duplicates()` は、`dropDuplicates()` の別名です。\n\nストリーミングの DataFrame で `dropDuplicates` を使うと、重複を見分けるため、Spark はトリガーをまたいでデータを状態として持ち続けます。`withWatermark()` で、どこまで遅れて届く重複を見るかを限ると、持つ状態も限られます。ウォーターマークより古いデータは捨てられます。",
-      "examAngle": "「同じ注文 ID のレコードが重複して届く。注文 ID ごとに 1 行にしたい」という要件から、dropDuplicates の列の指定を選ばせる形で出ます。",
+      "examAngle": "`dropDuplicates` に列名のリストを渡すと、その列だけで重複を判定します。列を指定しないと、すべての列で比べ、`distinct()` と同じ行が残ります。`distinct()` には、列を指定できません。",
       "checks": [
         {
           "question": "3 列の DataFrame で、`order_id` が同じ行を 1 つにしたいとき、どう書きますか。",
@@ -2338,7 +2338,7 @@
       "oneLine": "groupBy は行を列の値でグループに分け、agg はグループごとに 1 つ以上の集計を求めて、結果を DataFrame で返します。",
       "keyPhrase": "グループごとに 1 つ以上の集計を求めて",
       "body": "`agg` には、集計の式(Column)を並べて渡すか、列名と集計関数の名前を組にした辞書を渡します。\n\n```python\nfrom pyspark.sql import functions as F\n(df.groupBy(\"region\")\n   .agg(F.sum(\"amount\").alias(\"total\"),\n        F.avg(\"amount\").alias(\"average\"),\n        F.count(\"*\").alias(\"orders\")))\n```\n\n辞書で渡すときは、キーが列名、値が集計関数の名前です。辞書のキーは重複できないため、1 つの列に対して集計を 1 つしか書けません。同じ列に 2 種類以上の集計をかけるときは、式で渡します。\n\n```python\ndf.groupBy(\"region\").agg({\"amount\": \"sum\", \"quantity\": \"max\"})\n```\n\nSQL では、`GROUP BY` で同じ集計を書きます。Databricks SQL と Databricks Runtime 12.2 LTS 以上では、`GROUP BY ALL` と書くと、`SELECT` の中で集計関数を含まない式が、すべてグループ分けの列になります。\n\n```sql\nSELECT region, sum(amount) AS total\nFROM main.sales.orders\nGROUP BY region;\n```\n\n集計関数に `FILTER (WHERE …)` を付けると、条件に合う行だけが、その集計に渡されます。",
-      "examAngle": "「地域ごとに、売上の合計と平均と件数を一度に求めたい」という要件から、groupBy と agg の書き方を選ばせる形や、agg に辞書を渡したときの制約を問う形で出ます。",
+      "examAngle": "`agg` に辞書を渡すと、辞書のキーは重複できないため、1 つの列に集計を 1 つしか書けません。同じ列に 2 種類以上の集計をかけるときは、`F.sum(\"amount\")` のような式で渡します。",
       "checks": [
         {
           "question": "`df.groupBy(\"region\").agg({\"amount\": \"sum\", \"amount\": \"avg\"})` と書くと、`amount` の合計と平均の両方が求まりますか。",
@@ -2372,7 +2372,7 @@
       "oneLine": "MERGE INTO は、ソースの行を条件で目的の Delta のテーブルと突き合わせ、一致したかどうかで更新、挿入、削除を分けて書き込む文です。",
       "keyPhrase": "一致したかどうかで更新、挿入、削除を分けて書き込む",
       "body": "```sql\nMERGE INTO main.logs.events AS t\nUSING new_events AS s\nON t.event_id = s.event_id\nWHEN NOT MATCHED THEN INSERT *;\n```\n\nこの例は、`event_id` が目的のテーブルにまだない行だけを挿入します。同じレコードが何度か届くソースでも、目的のテーブルに既にある行と重複する行は入りません。\n\nただし、ソースの中に重複があると、その重複は挿入されます。MERGE INTO の前に、ソースの重複を除いておきます。\n\n一致した行は `WHEN MATCHED THEN UPDATE` で書き換えられます。Databricks SQL と Databricks Runtime 12.2 LTS 以上では、`WHEN NOT MATCHED BY SOURCE` で、ソースに対応する行がない目的のテーブルの行を、更新したり削除したりできます。\n\n目的のテーブルの 1 行に、ソースの複数の行が一致して更新しようとすると、どの行で更新するかが決まらないため、エラー(`DELTA_MULTIPLE_SOURCE_ROW_MATCHING_TARGET_ROW_IN_MERGE`)になります。この場合も、先にソースを整えて、1 つのキーに 1 行にします。",
-      "examAngle": "「同じログが何度か届くことがある。テーブルに重複を入れずに書き込みたい」という要件から、WHEN NOT MATCHED THEN INSERT だけの MERGE INTO を選ばせる形で出ます。",
+      "examAngle": "`WHEN NOT MATCHED THEN INSERT *` だけの MERGE INTO は、目的のテーブルにまだないキーの行だけを挿入します。ただし、ソースの中の重複は除かれず、そのまま挿入されます。MERGE INTO の前に、ソースの重複を除いておきます。",
       "checks": [
         {
           "question": "目的のテーブルにまだない `event_id` の行だけを入れたいとき、MERGE INTO にどの句を書きますか。",
@@ -2406,7 +2406,7 @@
       "oneLine": "describe と summary は、DataFrame の数値と文字列の列の統計を求めるメソッドで、summary は describe の統計に近似の四分位数を加えます。",
       "keyPhrase": "summary は describe の統計に近似の四分位数を加えます",
       "body": "`describe` は、件数(count)、平均(mean)、標準偏差(stddev)、最小(min)、最大(max)を返します。列を指定しないと、数値と文字列のすべての列が対象です。\n\n`summary` は、統計を指定しないと、`describe` の 5 つに加えて、25%、50%、75% の近似のパーセンタイル(四分位数)を返します。引数で、求める統計を選べます。\n\n```python\ndf.describe(\"amount\").show()\ndf.summary(\"count\", \"min\", \"25%\", \"75%\", \"max\").show()\n```\n\nどちらも、データを調べるためのメソッドです。結果の DataFrame のスキーマは、版をまたいで同じになる保証がありません。",
-      "examAngle": "「列ごとの四分位数まで含めた統計を、手早く確かめたい」という要件から、describe と summary を選び分けさせる形で出ます。",
+      "examAngle": "`describe` は、count、mean、stddev、min、max を返します。引数なしの `summary` は、これに 25%、50%、75% の近似のパーセンタイル(四分位数)を加えます。`summary` は、引数で求める統計を選べます。",
       "checks": [
         {
           "question": "引数なしの `summary()` が返し、引数なしの `describe()` が返さない統計は何ですか。",
@@ -2435,7 +2435,7 @@
       "oneLine": "OPTIMIZE は、テーブルのデータファイルを書き直して、読み取りに向いた配置にするコマンドです。",
       "keyPhrase": "データファイルを書き直して",
       "body": "書き込みを重ねたテーブルには、小さなファイルがたまります。`OPTIMIZE` を実行すると、Databricks はファイルを書き直してまとめます。パーティションのあるテーブルでは、パーティションごとにまとめます。Liquid Clustering を使うテーブルでは、クラスタリングのキーでデータを寄せます。\n\n```sql\nOPTIMIZE main.sales.orders;\nOPTIMIZE main.sales.events WHERE event_date >= '2026-01-01';\n```\n\n`WHERE` にパーティションの条件を書くと、その範囲だけを対象にできます。Liquid Clustering を使わない Delta のテーブルでは、`ZORDER BY` を付けて、指定した列で近い値を同じファイルに寄せられます。Databricks は、`ZORDER` よりも Liquid Clustering を勧めています。\n\nファイルをまとめる処理(bin-packing)は冪等です。同じデータに 2 回目を実行しても、何も変わりません。`OPTIMIZE` はデータの中身を変えないので、実行中も読み手は止まらず、前後で同じ結果を読めます。\n\nUnity Catalog のマネージドテーブルでは、予測的最適化が `OPTIMIZE` を自動で実行します。Databricks は、マネージドテーブルで予測的最適化を有効にするよう勧めています。",
-      "examAngle": "「小さなファイルが多く、クエリが遅い」という状況から、実行するコマンドを選ばせる形で出ます。",
+      "examAngle": "小さなファイルがたまったテーブルでは、`OPTIMIZE` がデータファイルを書き直してまとめます。`OPTIMIZE` はデータの中身を変えないので、実行中も読み手は止まりません。Unity Catalog のマネージドテーブルでは、予測的最適化が `OPTIMIZE` を自動で実行します。",
       "checks": [
         {
           "question": "小さなファイルが大量にたまった Delta のテーブルで、読み取りを速くするために実行するコマンドは何ですか。",
@@ -2465,7 +2465,7 @@
       "oneLine": "AQE は、クエリの実行中に、終わった段階の実際のデータの大きさを見て、残りの実行計画を立て直す仕組みです。",
       "keyPhrase": "実際のデータの大きさを見て",
       "body": "AQE は、Databricks では既定で有効です。シャッフルやブロードキャストの段階が終わるたびに、その結果の大きさを使って、次の 4 つの調整をします。\n\n- ソートマージ結合を、ブロードキャストハッシュ結合に変える\n- シャッフルのあとの小さなパーティションをまとめる\n- ソートマージ結合とシャッフルハッシュ結合で、偏ったパーティションのタスクを分ける\n- 空の結果を見つけて、その先の処理を省く\n\n偏りの扱いは、`spark.sql.adaptive.skewJoin.enabled`(既定で `true`)で決まります。パーティションが偏っているとみなされるのは、大きさが中央値の 5 倍(`skewedPartitionFactor`)を超え、しかも 256 MB(`skewedPartitionThresholdInBytes`)を超えるときです。ブロードキャスト結合には、この偏りの扱いはかかりません。\n\n実行中にブロードキャスト結合へ変えるしきい値は、`spark.databricks.adaptive.autoBroadcastJoinThreshold` で、既定は 30 MB です。AQE そのものは `spark.databricks.optimizer.adaptive.enabled` で切り替えます。",
-      "examAngle": "「一部のタスクだけが長く、パーティションの大きさに偏りがある」といった状況で、偏りを自動で扱う機能の名前を選ばせる形で出ます。",
+      "examAngle": "AQE は、実行中に、偏ったパーティションのタスクを分けます。偏りの扱いがかかるのはソートマージ結合とシャッフルハッシュ結合で、ブロードキャスト結合にはかかりません。AQE は、Databricks では既定で有効です。",
       "checks": [
         {
           "question": "結合の一部のパーティションだけが大きく、そのタスクが遅れています。実行時の統計から偏ったパーティションを分けて処理する機能は何ですか。",
@@ -2490,7 +2490,7 @@
       "oneLine": "spark.sql.autoBroadcastJoinThreshold は、結合のときに全てのワーカーへ配る(ブロードキャストする)表の大きさの上限を、バイト数で決める設定です。",
       "keyPhrase": "表の大きさの上限を、バイト数で決める",
       "body": "結合の片側の表がこの値より小さいと、Spark はその表を全てのワーカーノードへ配って結合します。既定は 10 MB(10485760 バイト)です。`-1` にすると、自動のブロードキャストを止めます。\n\n```python\nspark.conf.set(\"spark.sql.autoBroadcastJoinThreshold\", 50 * 1024 * 1024)\n```\n\nしきい値を超える表でもブロードキャストしたいときは、`BROADCAST` のヒントを書きます。ヒントがあると、Spark は統計上の大きさがしきい値を超えていても、その表をブロードキャストする結合を優先します。ただし、結合の種類によっては、ヒントの方式が使えないこともあります。\n\n```sql\nSELECT /*+ BROADCAST(d) */ * FROM sales s JOIN dim_store d ON s.store_id = d.store_id;\n```\n\nこの設定は、計画を立てるときに使われます。AQE が実行中にブロードキャストへ切り替えるときは、別の設定(Databricks では `spark.databricks.adaptive.autoBroadcastJoinThreshold`、既定は 30 MB)を使います。",
-      "examAngle": "設定の名前と役割を対応させる形や、「小さな次元表との結合でシャッフルを避けたい」という要件から、設定やヒントを選ばせる形で出ます。",
+      "examAngle": "`spark.sql.autoBroadcastJoinThreshold` は、自動でブロードキャストする表の大きさの上限で、Spark の既定は 10 MB です。`-1` にすると、自動のブロードキャストを止めます。AQE が実行中にブロードキャストへ切り替えるときは、別の設定 `spark.databricks.adaptive.autoBroadcastJoinThreshold`(既定は 30 MB)を使います。",
       "checks": [
         {
           "question": "`spark.sql.autoBroadcastJoinThreshold` を `-1` にすると、どうなりますか。",
@@ -2524,7 +2524,7 @@
       "oneLine": "ゴールド層は、メダリオンアーキテクチャの最後の層で、業務の用途に合わせて集計し、分析やダッシュボードがすぐ使える形にしたデータを置く層です。",
       "keyPhrase": "業務の用途に合わせて集計し",
       "body": "ゴールド層のデータは、シルバー層で検証し整えたデータから作ります。平均、件数、最大、最小などの集計や、期間や地域で絞った結果を置きます。報告のためには、指標と関係を定めた次元モデルで形を作ります。\n\n```sql\nCREATE OR REPLACE MATERIALIZED VIEW main.gold.weekly_sales AS\nSELECT date_trunc('week', order_date) AS week, SUM(amount) AS total\nFROM main.silver.orders\nGROUP BY 1;\n```\n\nゴールド層のデータを使うのは、業務の分析担当や BI の開発者、データサイエンティストと機械学習のエンジニア、経営層などです。業務の領域ごとにゴールド層を分ける組織もあります(人事、財務など)。\n\nシルバー層には、集計していない、検証済みのレコードを少なくとも 1 つの形で残します。大量の過去のデータを読むときは、ゴールド層に実体化せず、シルバー層を読むのが普通です。ゴールド層のデータセットの数は、ブロンズ層やシルバー層より少なくなります。",
-      "examAngle": "「ダッシュボードが使う、集計済みの表をどの層に置くか」のように、データの用途から層を選ばせる形で出ます。",
+      "examAngle": "業務の用途に合わせて集計し、ダッシュボードが読むデータは、ゴールド層に置きます。検証と重複の除去を済ませ、集計していないレコードは、シルバー層に置きます。",
       "checks": [
         {
           "question": "経営層向けのダッシュボードが読む、週ごとの売上の集計結果は、メダリオンアーキテクチャのどの層に置きますか。",
@@ -2554,7 +2554,7 @@
       "oneLine": "一時ビューは、カタログにもスキーマにも登録せず、作った場所の中だけで使えるビューです。",
       "keyPhrase": "作った場所の中だけで使える",
       "body": "ビューは、クエリの文だけを持ち、データを複製しません。Unity Catalog のビューは `カタログ.スキーマ.ビュー` の名前で登録され、権限があればどこからでも読めます。一時ビューは登録されないので、残りません。\n\n```sql\nCREATE TEMPORARY VIEW recent_orders AS\nSELECT * FROM main.silver.orders WHERE order_date >= current_date() - 7;\n```\n\n一時ビューを使える範囲は、どこで作ったかで決まります。ノートブックやジョブで作ると、そのノートブックかスクリプトの中だけで使え、クラスターから切り離すと消えます。Databricks SQL では 1 つのクエリの中だけで使え、同じダッシュボードのほかのクエリからも使えません。\n\n宣言型パイプラインでは、`CREATE TEMPORARY VIEW` か Python の `@dp.temporary_view` で、パイプラインの中の中間の結果を定義します。expectation は一時ビューにも付けられます。",
-      "examAngle": "「データを複製せず、このセッションの中だけで使える仮の表を作りたい」といった要件から、オブジェクトの種類を選ばせる形で出ます。",
+      "examAngle": "一時ビューは、カタログにもスキーマにも登録されず、作った場所の中だけで使えます。ビューはクエリの文だけを持ち、データを複製しません。ノートブックで作った一時ビューは、クラスターから切り離すと消えます。",
       "checks": [
         {
           "question": "ノートブックで作った一時ビューは、そのノートブックをクラスターから切り離したあとも使えますか。",
@@ -2588,7 +2588,7 @@
       "oneLine": "マテリアライズドビューは、クエリの結果を前もって計算して保存し、更新のたびに上流の変更を反映するビューです。",
       "keyPhrase": "クエリの結果を前もって計算して保存し",
       "body": "通常のビューは、読むたびにクエリを実行します。マテリアライズドビューは、結果を Delta のテーブルとして持ち、読むときは保存した結果を返します。メタデータは Unity Catalog に、データはクラウドストレージに置かれます。\n\n```sql\nCREATE OR REPLACE MATERIALIZED VIEW main.gold.regional_sales AS\nSELECT p.region, SUM(s.amount) AS total\nFROM main.silver.sales s JOIN main.silver.partners p USING (partner_id)\nGROUP BY p.region;\n```\n\n更新のたびに、Databricks は上流の変わったデータを処理し、遅れて届いたデータも含めて結果を正しく保ちます。多くの場合は変わった分だけを反映し(増分の更新)、入力の変わり方によっては全体を計算し直します。結合の相手の表が変わったときも結果を計算し直すので、次元の表が変わっても正しい結果が必要なときに向きます。\n\nパイプラインの中では、SQL の `CREATE MATERIALIZED VIEW` か、Python の `@dp.materialized_view` で定義します。パイプラインの外で SQL で作ると、Databricks は更新用のパイプライン(種類は `MV/ST`)を自動で作ります。マテリアライズドビューを更新できるのは、それを定義したパイプラインだけです。\n\n遅延は数秒から数分なので、低い遅延が要る処理には向きません。",
-      "examAngle": "「集計や結合の結果を前もって計算し、ダッシュボードを速く表示したい」「次元の表が変わっても結果を正しく保ちたい」といった要件から、オブジェクトの種類を選ばせる形で出ます。",
+      "examAngle": "マテリアライズドビューは、結果を Delta のテーブルとして持ち、読むときは保存した結果を返します。結合の相手の表が変わると、マテリアライズドビューは結果を計算し直します。ストリーミングテーブルは、追記済みの行を計算し直しません。",
       "checks": [
         {
           "question": "ストリーミングテーブルとマテリアライズドビューのうち、結合の相手の次元の表が変わったとき、結合の結果を計算し直すのはどちらですか。",
@@ -2621,7 +2621,7 @@
       "oneLine": "ストリーミングテーブルは、追記型のソースから届いた新しい行だけを、更新のたびに追記していく Delta のテーブルです。",
       "keyPhrase": "新しい行だけを、更新のたびに追記していく",
       "body": "ストリーミングテーブルは、入力の各行を 1 回だけ処理します。Auto Loader でクラウドストレージから読む取り込みや、Kafka などのメッセージバスからの取り込みに向きます。ストリーミングテーブルを更新するのは、それを持つ 1 つのパイプラインだけです。\n\nSQL では、`AS` のあとのクエリをストリーミングの読み取りにします。ほかのテーブルを読むときは `STREAM(…)` で囲み、ファイルを読むときは `STREAM read_files(…)` と書きます。\n\n```sql\nCREATE OR REFRESH STREAMING TABLE customers_silver\nAS SELECT * FROM STREAM(customers_bronze);\n```\n\nソースは、追記だけか、変わらないものにします。既存の行の更新や削除がソースにあると、エラーになります。更新や削除を含む変更を反映するときは、AUTO CDC を使います。\n\n追記済みの行は、あとで計算し直されません。クエリを変えても、変えたあとに届く行にだけ効きます。既存の行に反映するには、完全な更新(full refresh)をします。結合の相手の表が変わっても結合の結果は計算し直されないので、いつも正しい結合の結果が必要なときは、マテリアライズドビューを使います。",
-      "examAngle": "「パイプラインの中の別の表を増分で読む」書き方を穴埋めで問う形や、追記型のデータを増分で処理する要件から、オブジェクトの種類を選ばせる形で出ます。",
+      "examAngle": "ストリーミングテーブルのクエリで、ほかのテーブルを読むときは `STREAM(…)` で囲みます。ストリーミングテーブルは追記済みの行を計算し直さず、クエリの変更は変えたあとに届く行にだけ効きます。既存の行に反映するには、完全な更新(full refresh)をします。",
       "checks": [
         {
           "question": "パイプラインで、`customers_bronze` を増分で読んで `customers_silver` のストリーミングテーブルを作ります。`FROM` のあとに何と書きますか。",
@@ -2655,7 +2655,7 @@
       "oneLine": "パイプラインの Python のデコレーターは、DataFrame を返す関数に付けて、その結果をストリーミングテーブルやマテリアライズドビューとして定義する書き方です。",
       "keyPhrase": "DataFrame を返す関数に付けて",
       "body": "パイプラインの Python のコードは、`from pyspark import pipelines as dp` で読み込んだモジュールを使います。デコレーターの種類で、作るものが決まります。\n\n- `@dp.table`: ストリーミングテーブル。関数はストリーミングの DataFrame を返す\n- `@dp.materialized_view`: マテリアライズドビュー\n- `@dp.temporary_view`: パイプラインの中だけで使う一時ビュー\n\n```python\nfrom pyspark import pipelines as dp\n\n@dp.table(comment=\"取り込んだ注文\")\ndef orders_bronze():\n    return spark.readStream.table(\"main.raw.orders\")\n```\n\n`@dp.table` の `name` を省くと、関数の名前がテーブルの名前になります。expectation のデコレーター(`@dp.expect` など)は、`@dp.table` などの下、関数の定義の上に重ねます。\n\n古い `dlt` のモジュールの `@dlt.table` は、ストリーミングの DataFrame を返せばストリーミングテーブルを、バッチの DataFrame を返せばマテリアライズドビューを作りました。`dlt` はいまも使えますが、Databricks は `pyspark.pipelines` を勧めています。",
-      "examAngle": "デコレーターを付けた関数のコードを示し、作られる表の種類や名前を問う形で出ます。",
+      "examAngle": "`@dp.table` はストリーミングテーブルを、`@dp.materialized_view` はマテリアライズドビューを、`@dp.temporary_view` は一時ビューを定義します。`@dp.table` の `name` を省くと、関数の名前がテーブルの名前になります。古い `@dlt.table` は、返す DataFrame がストリーミングかバッチかで、作るものが変わりました。",
       "checks": [
         {
           "question": "`@dp.table` を付けた関数 `orders_bronze` が `spark.readStream` の DataFrame を返します。`name` は指定していません。作られるものの種類と名前は何ですか。",
@@ -2684,7 +2684,7 @@
       "oneLine": "AUTO CDC は、挿入、更新、削除を含む変更のフィードを、順序の列に従ってストリーミングテーブルに反映する、パイプラインの API です。",
       "keyPhrase": "順序の列に従ってストリーミングテーブルに反映する",
       "body": "AUTO CDC は、以前の APPLY CHANGES の API を置き換えたもので、構文は同じです。反映先は、先に作っておいたストリーミングテーブルです(SQL では `CREATE OR REFRESH STREAMING TABLE`、Python では `dp.create_streaming_table()`)。\n\n```sql\nCREATE OR REFRESH STREAMING TABLE customers_current;\n\nCREATE FLOW customers_cdc AS AUTO CDC INTO customers_current\nFROM stream(main.raw.customers_changes)\nKEYS (customer_id)\nAPPLY AS DELETE WHEN operation = 'DELETE'\nSEQUENCE BY seq\nCOLUMNS * EXCEPT (operation, seq)\nSTORED AS SCD TYPE 1;\n```\n\n`KEYS` は行を見分けるキー、`SEQUENCE BY` は変更の順序を決める列です。順序の列は並べ替えられる型にし、NULL は使えません。順序の遅い変更が先に届いていれば、あとから届いた古い変更は捨てられます。`APPLY AS DELETE WHEN` には、削除を表す条件を書きます。\n\n`STORED AS SCD TYPE 1` は最新の値だけを持ち、履歴を残しません。`SCD TYPE 2` は、`__START_AT` と `__END_AT` の列で履歴を残します。\n\nAUTO CDC を使うには、サーバーレスのパイプラインか、Pro か Advanced のエディションが要ります。",
-      "examAngle": "「変更の種類と順序の列を持つ CDC のフィードを、対象の表に反映したい」という要件から、構文を選ばせる形で出ます。",
+      "examAngle": "AUTO CDC では、`KEYS` で行を見分けるキーを、`SEQUENCE BY` で変更の順序を決める列を指定します。順序の古い変更があとから届いても、新しい変更は上書きされません。履歴を残すときは `STORED AS SCD TYPE 2`、最新の値だけを持つときは `STORED AS SCD TYPE 1` にします。",
       "checks": [
         {
           "question": "AUTO CDC で、変更が届く順序が入れ替わっても正しく反映するために指定する句は何ですか。",
@@ -2714,7 +2714,7 @@
       "oneLine": "パイプラインのモードは、更新を 1 回ずつ実行して止めるトリガーのモードと、止めるまで処理を続ける継続のモードのどちらで、パイプラインを動かすかの設定です。",
       "keyPhrase": "1 回ずつ実行して止める",
       "body": "既定は、トリガーのモードです。トリガーのモードでは、更新を始めた時点にあったデータで全ての表を更新し、終わると止まります。そのあとに届いたデータは、次の更新まで処理されません。クラスターは更新の間だけ動くので、費用を抑えられます。更新の間隔が 10 分、1 時間、1 日といった処理に向きます。\n\n継続のモードでは、データが届くたびに処理し、手で止めるまで動き続けます。クラスターが動き続けるので費用は増えますが、遅延は短くなります。間隔が 10 秒から数分の処理に向きます。Databricks は、継続で動かしたいときは、パイプラインの設定ではなく、継続のジョブからパイプラインを動かすことを勧めています。\n\n更新の動き方は、起動のしかたでも変わります。\n\n- UI の「Run now」などで、手でトリガーのパイプラインを動かしたとき: クラスターを使い回して起動の時間を省き、再試行をしないので、エラーにすぐ気づけます。\n- ジョブや API から動かしたときと、継続のパイプライン: 回復できるエラーでクラスターを再起動します。特定のエラーで再試行します。実行が終わるとすぐクラスターを止めます。",
-      "examAngle": "「新しいデータが届くたびに処理し、止めるまで動き続ける」などの要件から、パイプラインのモードを選ばせる形で出ます。",
+      "examAngle": "トリガーのモードは、更新を始めた時点にあったデータで全ての表を更新し、終わると止まります。継続のモードは、データが届くたびに処理し、手で止めるまで動き続けます。既定は、トリガーのモードです。",
       "checks": [
         {
           "question": "更新を始めた時点のデータで全ての表を更新し、終わったら止まるのは、トリガーと継続のどちらのモードですか。",
@@ -2748,7 +2748,7 @@
       "oneLine": "expectation は、宣言型パイプラインの表やビューを通る各行に、真か偽になる SQL の条件を当てて、データの品質を確かめる仕組みです。",
       "keyPhrase": "真か偽になる SQL の条件を当てて",
       "body": "expectation は、名前、条件、条件に合わない行の扱い(アクション)の 3 つからなります。名前は、同じデータセットの中で重ならないようにします。条件は SQL の真偽の式で、Python の独自の関数や、ほかの表を参照する副問い合わせは使えません。\n\n```sql\nCREATE OR REFRESH STREAMING TABLE orders_silver (\n  CONSTRAINT valid_amount EXPECT (amount >= 0)\n)\nAS SELECT * FROM STREAM(orders_bronze);\n```\n\n`ON VIOLATION` を書かないと、アクションは既定の warn になります。条件に合わない行も、そのまま表に書き込まれます。パイプラインは、条件に合う行と合わない行の件数を記録します。件数は、パイプラインの UI の「Data quality」タブや、イベントログで確かめられます。\n\nexpectation を付けられるのは、ストリーミングテーブル、マテリアライズドビュー、一時ビューです。1 つのデータセットに、複数の expectation を付けられます。",
-      "examAngle": "`ON VIOLATION` を書かない expectation を示し、条件に合わない行がどうなるかを問う形で出ます。",
+      "examAngle": "`ON VIOLATION` を書かない expectation のアクションは、既定の warn です。warn では、条件に合わない行も表に書き込まれ、その件数が記録されます。",
       "checks": [
         {
           "question": "`CONSTRAINT valid_id EXPECT (id IS NOT NULL)` だけを書いたストリーミングテーブルに、`id` が NULL の行が届きました。その行はどうなりますか。",
@@ -2777,7 +2777,7 @@
       "oneLine": "ON VIOLATION DROP ROW は、expectation の条件に合わない行を、表に書き込む前に捨てるアクションです。",
       "keyPhrase": "表に書き込む前に捨てる",
       "body": "条件に合わない行は捨てられ、更新そのものは続きます。捨てた行の件数は、データセットの品質の指標として記録されます。\n\n```sql\nCONSTRAINT valid_email EXPECT (email IS NOT NULL) ON VIOLATION DROP ROW\n```\n\nPython では `@dp.expect_or_drop(\"valid_email\", \"email IS NOT NULL\")` と書きます。\n\nシルバー層やゴールド層に、条件に合わない行を入れたくないが、パイプラインは止めたくないときに使います。",
-      "examAngle": "「不正な行を除き、処理は続けたい」という要件から、`ON VIOLATION` のあとに書く句を選ばせる形で出ます。",
+      "examAngle": "`DROP ROW` では、条件に合わない行だけが、表に書き込む前に捨てられます。パイプラインの更新は失敗せず、捨てた行の件数が品質の指標として記録されます。",
       "checks": [
         {
           "question": "条件に合わない行を表から除き、パイプラインの更新は続けたいとき、`ON VIOLATION` のあとに何を書きますか。",
@@ -2802,7 +2802,7 @@
       "oneLine": "ON VIOLATION FAIL UPDATE は、expectation の条件に合わない行が 1 行でもあれば、その更新を失敗させるアクションです。",
       "keyPhrase": "その更新を失敗させる",
       "body": "表の更新の途中で条件に合わない行があると、パイプラインはその更新のトランザクションを不可分に取り消します。エラーの文には、どの expectation に反したかが書かれます。\n\n```sql\nCONSTRAINT valid_amount EXPECT (amount >= 0) ON VIOLATION FAIL UPDATE\n```\n\nPython では `@dp.expect_or_fail(\"valid_amount\", \"amount >= 0\")` と書きます。\n\n失敗したあとは、条件に合わないデータを扱えるようにパイプラインのコードを直してから、処理し直します。トリガーのパイプラインでは、失敗したフローのほかに並行して動くフローは失敗しません。継続のパイプラインでは、失敗したフローと、それに依存するフローが止まります。更新が失敗するので、品質の指標は記録されません。",
-      "examAngle": "「不正なデータが 1 行でもあれば処理を止めたい」という要件から、`ON VIOLATION` のあとに書く句を選ばせる形で出ます。",
+      "examAngle": "`FAIL UPDATE` では、条件に合わない行が 1 行でもあると、更新そのものが失敗し、パイプラインは表の更新のトランザクションを取り消します。更新が失敗するので、品質の指標は記録されません。",
       "checks": [
         {
           "question": "条件に合わない行が 1 行でもあれば、表を更新せずに止めたいとき、`ON VIOLATION` のあとに何を書きますか。",
@@ -2827,7 +2827,7 @@
       "oneLine": "expect_all は、Python のパイプラインで、名前と条件の組を辞書で渡して、複数の expectation をまとめて当てるデコレーターです。",
       "keyPhrase": "辞書で渡して、複数の expectation をまとめて当てる",
       "body": "`@dp.expect_all` に渡した各条件は、`@dp.expect` と同じく warn として動きます。条件に合わない行も表に残り、件数は条件ごとに記録されます。\n\n```python\nfrom pyspark import pipelines as dp\n\nrules = {\"valid_id\": \"id IS NOT NULL\", \"valid_amount\": \"amount >= 0\"}\n\n@dp.table()\n@dp.expect_all(rules)\ndef orders_silver():\n    return spark.readStream.table(\"orders_bronze\")\n```\n\n行を捨てたいときは `expect_all_or_drop`、更新を失敗させたいときは `expect_all_or_fail` を使います。Python の expectation の関数は 6 つです。まとめて当てる 3 つは `expect_all`、`expect_all_or_drop`、`expect_all_or_fail` です。1 件ずつ当てる 3 つは `expect`、`expect_or_drop`、`expect_or_fail` です。\n\n辞書でまとめる書き方は Python だけにあります。SQL では、`CONSTRAINT … EXPECT` をカンマで区切って並べます。",
-      "examAngle": "複数の品質の条件を 1 つのデコレーターで当てるコードを示し、条件に合わない行の扱いや、関数の名前を問う形で出ます。",
+      "examAngle": "`@dp.expect_all` に渡した各条件は、`@dp.expect` と同じ warn で当たり、条件に合わない行も表に残ります。行を捨てるときは `expect_all_or_drop` を、更新を失敗させるときは `expect_all_or_fail` を使います。",
       "checks": [
         {
           "question": "`@dp.expect_all` に 2 つの条件を渡しました。片方の条件に合わない行は、表に残りますか。",
@@ -2861,7 +2861,7 @@
       "oneLine": "CHECK 制約は、Delta のテーブルに付けて、条件に合わない値の書き込みをエラーにする制約です。",
       "keyPhrase": "条件に合わない値の書き込みをエラーにする",
       "body": "既存のテーブルには、`ALTER TABLE … ADD CONSTRAINT` で付けます。\n\n```sql\nALTER TABLE main.silver.orders ADD CONSTRAINT valid_amount CHECK (amount >= 0);\n```\n\n付けるとき、Databricks は既存の全ての行が条件に合うかを確かめます。合わない行があると、制約を付けられません。付けたあとは、条件に合わない書き込みがあると、トランザクションがエラーで失敗します。\n\n条件の式は、決定的なものにします。ユーザー定義の関数、集計の関数、ウィンドウの関数は使えません。付いている制約は、`DESCRIBE DETAIL` か `SHOW TBLPROPERTIES` で確かめ、`ALTER TABLE … DROP CONSTRAINT` で外します。\n\n制約は、Delta Lake のテーブルでだけ使えます。主キー、外部キー、一意の制約は情報として持つだけで、強制されません。強制されるのは、CHECK 制約と NOT NULL 制約です。",
-      "examAngle": "「既存の Delta のテーブルに、値の範囲の条件を足し、反する書き込みを拒みたい」という要件から、文を選ばせる形で出ます。",
+      "examAngle": "既存の Delta のテーブルに CHECK 制約を付けるときは、`ALTER TABLE … ADD CONSTRAINT` を使います。既存の行に条件に合わないものがあると、制約は付けられません。付けたあとに条件に反する書き込みは、expectation の warn と違って行を残さず、トランザクションごと失敗します。",
       "checks": [
         {
           "question": "条件に合わない行がすでにある Delta のテーブルに、`ALTER TABLE … ADD CONSTRAINT … CHECK` で制約を付けようとしました。どうなりますか。",
@@ -2891,7 +2891,7 @@
       "oneLine": "バッチ処理は実行のたびにソースのデータ全体を処理し、ストリーミング処理は処理済みのデータを記録して、次の実行で新しいデータだけを処理します。",
       "keyPhrase": "処理済みのデータを記録して、次の実行で新しいデータだけを処理します",
       "body": "バッチ処理では、エンジンはどのデータを処理したかを記録しません。実行のたびにソースにあるデータをすべて読み、前の結果を上書きします。読み直す量を抑えるために、日付や地域でデータを区切る使い方がよくあります。バッチ処理は、書き方が単純な一方で、効率が低く、処理に時間がかかります。\n\nストリーミング処理では、エンジンが処理済みの範囲を記録します。次の実行では新しく届いたデータだけを処理し、結果を前の結果に追記します。Databricks では、Kafka のようなメッセージバスのほかに、クラウドオブジェクトストレージのファイルや Delta Lake のテーブルも、ストリーミングのソースとして増分で読めます。\n\nストリーミング処理は、動かし続けるだけでなく、トリガーで起動し、届いた分だけを処理して止める形でも動かせます。定期的な増分のロードには、この形(`availableNow` のトリガー)を使います。\n\nメダリオンアーキテクチャでは、Databricks はブロンズ層の取り込みにストリーミング処理を勧めています。シルバー層とゴールド層には、増分で更新するマテリアライズドビューを勧めています。",
-      "examAngle": "「毎晩、前回の実行のあとに届いたファイルだけを読み込みたい」のような要件から、全体を読み直すバッチ処理と、増分で読む処理のどちらを選ぶかを問う形で出ます。",
+      "examAngle": "バッチ処理は、処理済みのデータを記録せず、実行のたびにソースのデータをすべて読み直します。ストリーミング処理は、処理済みの範囲を記録し、次の実行では新しく届いたデータだけを読みます。定期的な増分のロードでは、ストリーミング処理を `availableNow` のトリガーで起動し、届いた分だけを処理して止めます。",
       "checks": [
         {
           "question": "実行のたびにソースの全データを読み直し、前回の結果を上書きする処理は、バッチ処理とストリーミング処理のどちらですか。",
@@ -2925,7 +2925,7 @@
       "oneLine": "トリガーは、Structured Streaming のクエリが、いつ新しいデータを確かめて処理するかを決める設定です。",
       "keyPhrase": "いつ新しいデータを確かめて処理するかを決める",
       "body": "トリガーは、`writeStream` の `trigger` で指定します。\n\n```python\n(df.writeStream\n  .option(\"checkpointLocation\", checkpoint_path)\n  .trigger(availableNow=True)\n  .toTable(\"main.bronze.events\"))\n```\n\nトリガーを指定しないと、間隔 0 ms の `processingTime` と同じ動きになります。クエリは、前のマイクロバッチが終わるとすぐに次のマイクロバッチを始めます。遅延は 3〜5 秒ほどです。ただし、新しいデータを数ミリ秒ごとに確かめるため、クラウドストレージの API の呼び出しが増えます。その結果、思わぬ費用がかかることがあります。\n\n`processingTime` に `'10 seconds'` のような間隔を書くと、クエリはその間隔ごとにマイクロバッチを始めます。\n\n`availableNow=True` を指定すると、クエリは起動の時点で読めるデータを、いくつかのマイクロバッチに分けてすべて処理し、止まります。ジョブで定期的に起動すれば、増分のバッチになります。1 回のマイクロバッチの量は、`maxBytesPerTrigger` などのソースのオプションで抑えられます。\n\n`Trigger.Once` は、Databricks Runtime 11.3 LTS 以降で非推奨です。増分のバッチには `availableNow` を使います。Spark の `continuous` のトリガーは、Databricks では使えません。1 秒未満の遅延が要る処理には、リアルタイムモード(`realTime`)を使います。",
-      "examAngle": "「数時間おきに起動して、届いた分だけを処理し、クラスターを止めたい」のような要件から、トリガーの種類を選ばせる形で出ます。トリガーを指定しないときの動きも問われます。",
+      "examAngle": "トリガーを指定しないクエリは、間隔 0 ms の `processingTime` と同じく、前のマイクロバッチが終わるとすぐに次を始めます。`availableNow=True` のクエリは、起動の時点で読めるデータをすべて処理してから止まります。増分のバッチには、非推奨の `Trigger.Once` ではなく `availableNow` を使います。",
       "checks": [
         {
           "question": "トリガーを指定せずに始めたストリーミングのクエリは、どの間隔でマイクロバッチを始めますか。",
@@ -2955,7 +2955,7 @@
       "oneLine": "`spark.readStream.table` は、Delta テーブルをストリーミングのソースとして読み、テーブルに追記された行を増分で処理する方法です。",
       "keyPhrase": "テーブルに追記された行を増分で処理する",
       "body": "Delta テーブルをストリームとして読むと、クエリは新しいバージョンがコミットされるたびに、追記された行を処理します。書き込み先を Delta テーブルにするときは、`toTable` とチェックポイントの場所を指定します。\n\n```python\n(spark.readStream.table(\"main.bronze.events\")\n  .writeStream\n  .option(\"checkpointLocation\", checkpoint_path)\n  .toTable(\"main.silver.events\"))\n```\n\nクエリを初めて起動すると、クエリはその時点の最新のバージョンのテーブル全体を読み、そのあとの追記を続けて読みます。`startingVersion` か `startingTimestamp` を指定すると、そのバージョンか時刻からあとの変更だけを読みます。2 つは同時に指定できません。チェックポイントに進み具合が記録されたあとは、どちらも無視されます。\n\nStructured Streaming が受け付ける入力は、追記だけです。ソースのテーブルで既存の行を更新したり削除したりすると、既定ではストリームが例外で止まります。`skipChangeCommits` を `true` にすると、クエリは既存の行を変えたコミットを読み飛ばし、追記だけを処理します。読み飛ばした変更は、別の処理で反映します。",
-      "examAngle": "「シルバー層のテーブルを、ブロンズ層のテーブルから増分で作る」場面で、ソースの更新や削除があるとストリームがどうなるかを問う形で出ます。",
+      "examAngle": "Structured Streaming が入力として受け付けるのは、追記だけです。ソースの Delta テーブルで既存の行を更新や削除すると、既定ではストリームが例外で止まります。`skipChangeCommits` を `true` にすると、クエリは既存の行を変えたコミットを読み飛ばし、追記だけを処理します。",
       "checks": [
         {
           "question": "ストリームとして読んでいる Delta テーブルで、既存の行を UPDATE しました。オプションを指定していないとき、ストリームはどうなりますか。",
@@ -2985,7 +2985,7 @@
       "oneLine": "Structured Streaming は、`format(\"kafka\")` のソースで Apache Kafka のトピックを読み、メッセージのキーと値をバイナリの列として受け取ります。",
       "keyPhrase": "メッセージのキーと値をバイナリの列として受け取ります",
       "body": "Kafka を読むときは、`kafka.bootstrap.servers` にブローカーの `ホスト:ポート` を書きます。読むトピックは、`subscribe`、`subscribePattern`、`assign` のどれか 1 つで指定します。`subscribe` にはトピックの名前をカンマで区切って並べ、`subscribePattern` には Java の正規表現を書きます。`assign` では、読むトピックのパーティションを JSON の文字列で指定します。\n\n```python\nraw = (spark.readStream\n  .format(\"kafka\")\n  .option(\"kafka.bootstrap.servers\", \"broker1.example.com:9092\")\n  .option(\"subscribe\", \"orders\")\n  .load())\n\norders = raw.selectExpr(\"CAST(value AS STRING) AS json\")\n```\n\n読んだ DataFrame の列は、`key`、`value`、`topic`、`partition`、`offset`、`timestamp`、`timestampType` です。`key` と `value` はバイト列のまま届くため、`cast(\"string\")` や `from_avro` などで変換してから使います。\n\n`startingOffsets` の既定は、ストリーミングのクエリでは `latest`、バッチのクエリでは `earliest` です。ストリーミングのクエリでこの値が効くのは、新しいクエリを始めるときだけです。再開したクエリは、前回に処理を終えた位置から続けて読みます。",
-      "examAngle": "「Kafka から読んだ value 列をどう扱うか」や、トピックを指定するオプションの名前を問う形で出ます。",
+      "examAngle": "Kafka のソースは、`key` と `value` をバイト列のまま返します。文字列として扱うには、先に `cast(\"string\")` などで変換します。読むトピックは、`subscribe`、`subscribePattern`、`assign` のどれか 1 つで指定します。",
       "checks": [
         {
           "question": "Kafka から readStream で読んだ DataFrame の value 列を、JSON の文字列として扱いたいです。そのまま文字列の関数にかけられますか。",
@@ -3019,7 +3019,7 @@
       "oneLine": "COPY INTO は、指定した場所のファイルを Delta テーブルに読み込む SQL のコマンドで、読み込み済みのファイルを次の実行で飛ばします。",
       "keyPhrase": "読み込み済みのファイルを次の実行で飛ばします",
       "body": "```sql\nCOPY INTO main.bronze.orders\nFROM 's3://example-bucket/landing/orders/'\nFILEFORMAT = JSON\nPATTERN = '2026-*/*.json';\n```\n\n`FROM` には読み込むファイルの場所を、`FILEFORMAT` にはファイルの形式を書きます。形式は `CSV`、`JSON`、`AVRO`、`ORC`、`PARQUET`、`TEXT`、`BINARYFILE` から選びます。読み込み先は、既にある Delta テーブルです。\n\nCOPY INTO は、読み込み済みのファイルを飛ばします。同じ文を何度実行しても、読み込むのは新しいファイルだけです。そのため、失敗したときはそのまま再実行でき、定期的に実行する増分の読み込みにも使えます。読み込んだあとに中身が変わったファイルも、飛ばす対象です。\n\n読み込み済みのファイルも含めて読み込み直すときは、`COPY_OPTIONS` で `force` を `true` にします。`force` の既定は `false` です。\n\n読み込むファイルを絞るには、`FILES` でファイルの名前を並べるか、`PATTERN` で glob の形を書きます。`FILES` に並べられるのは 1000 件までで、`FILES` と `PATTERN` は同時に使えません。`VALIDATE` を付けると、COPY INTO はデータを書き込みません。確かめるのは、解析できるか、スキーマが合うか、制約を満たすかだけです。\n\nファイルの数がとても多いディレクトリを取り込むときは、Databricks は Auto Loader を勧めています。",
-      "examAngle": "「同じ COPY INTO を再実行したとき、読み込み済みのファイルはどうなるか」や、FILES と PATTERN の使い分けを問う形で出ます。",
+      "examAngle": "COPY INTO は読み込み済みのファイルを飛ばすため、同じ文を再実行しても、新しいファイルだけを読み込みます。`FILES` はファイルの名前を並べて絞り、`PATTERN` は glob の形で絞ります。`FILES` と `PATTERN` は、同時に使えません。",
       "checks": [
         {
           "question": "COPY INTO で 100 個のファイルを読み込んだあと、同じ場所に 5 個のファイルが届きました。同じ COPY INTO 文をもう一度実行すると、何個のファイルを読み込みますか。",
@@ -3053,7 +3053,7 @@
       "oneLine": "COPY INTO では、FORMAT_OPTIONS の inferSchema でファイルの列の型を推測し、COPY_OPTIONS の mergeSchema で読み込み先のテーブルのスキーマを届いたデータに合わせて変えます。",
       "keyPhrase": "COPY_OPTIONS の mergeSchema で読み込み先のテーブルのスキーマを届いたデータに合わせて変えます",
       "body": "Databricks Runtime 11.3 LTS 以降では、列を定義しない空の Delta テーブルを作り、COPY INTO で最初に読み込むときにスキーマを決められます。このとき、`COPY_OPTIONS` で `mergeSchema` を `true` にします。\n\n```sql\nCREATE TABLE IF NOT EXISTS main.bronze.raw_orders;\n\nCOPY INTO main.bronze.raw_orders\nFROM '/Volumes/main/landing/orders/'\nFILEFORMAT = CSV\nFORMAT_OPTIONS ('header' = 'true', 'inferSchema' = 'true', 'mergeSchema' = 'true')\nCOPY_OPTIONS ('mergeSchema' = 'true');\n```\n\n`mergeSchema` は、置く欄で意味が変わります。`FORMAT_OPTIONS` の `mergeSchema` は、複数のソースのファイルからスキーマを推測してまとめます。`COPY_OPTIONS` の `mergeSchema` は、読み込み先の Delta テーブルのスキーマを、届いたデータに合わせて変えます。どちらも既定は `false` です。ソースのファイルがすべて同じスキーマなら、公式の文書は `FORMAT_OPTIONS` の `mergeSchema` を既定のままにするよう勧めています。\n\n`FORMAT_OPTIONS` の `inferSchema` は、解析した値の型を推測するかどうかを決めます。推測しないときは、すべての列を文字列(`StringType`)として読みます。\n\n列を定義していないテーブルには、COPY INTO でデータを読み込むまで、`INSERT INTO` や `MERGE INTO` で書き込めません。",
-      "examAngle": "「ソースのファイルに列が増えたので、テーブルにも列を足して読み込みたい」のような要件で、mergeSchema を置く欄を選ばせる形で出ます。",
+      "examAngle": "`mergeSchema` は、置く欄で意味が変わります。`COPY_OPTIONS` の `mergeSchema` は、読み込み先のテーブルのスキーマを届いたデータに合わせて変えます。`FORMAT_OPTIONS` の `mergeSchema` は、ソースのファイルどうしのスキーマをまとめる設定で、テーブルに列を足すのは `COPY_OPTIONS` の側です。",
       "checks": [
         {
           "question": "COPY INTO で読み込むファイルに、読み込み先のテーブルにない列が増えました。テーブルにその列を足して読み込むには、どの欄で mergeSchema を true にしますか。",
@@ -3091,7 +3091,7 @@
       "oneLine": "modifiedAfter と modifiedBefore は、ファイルの更新時刻で、読み込むファイルを絞る読み取りのオプションです。",
       "keyPhrase": "ファイルの更新時刻で、読み込むファイルを絞る",
       "body": "`modifiedAfter` に時刻を書くと、更新時刻がその時刻よりあとのファイルだけを読み込みます。`modifiedBefore` では、その時刻より前のファイルだけを読み込みます。2 つを組み合わせると、期間を区切れます。\n\nこれらは、すべてのファイルの形式に共通する読み取りのオプションです。Databricks では、`DataFrameReader` のオプション、`read_files`、COPY INTO の `FORMAT_OPTIONS` で使えます。\n\n```sql\nCOPY INTO main.bronze.orders\nFROM '/Volumes/main/landing/orders/'\nFILEFORMAT = JSON\nFORMAT_OPTIONS ('modifiedAfter' = '2026-10-01T00:00:00');\n```\n\nSpark の文書では、時刻を `YYYY-MM-DDTHH:mm:ss` の形で書きます。タイムゾーンを指定しないときは、Spark のセッションのタイムゾーン(`spark.sql.session.timeZone`)で解釈します。\n\nファイルの名前で絞るときは、COPY INTO では `PATTERN` を、DataFrameReader と Auto Loader では `pathGlobFilter` を使います。",
-      "examAngle": "「ある日時よりあとに更新されたファイルだけを取り込む」要件で、オプションの名前を選ばせる形で出ます。",
+      "examAngle": "`modifiedAfter` と `modifiedBefore` は、ファイルの更新時刻で読み込むファイルを絞ります。ファイルの名前で絞るときは、COPY INTO では `PATTERN` を、DataFrameReader と Auto Loader では `pathGlobFilter` を使います。",
       "checks": [
         {
           "question": "COPY INTO で、2026 年 10 月 1 日 0 時よりあとに更新されたファイルだけを読み込みたいです。FORMAT_OPTIONS に何を指定しますか。",
@@ -3129,7 +3129,7 @@
       "oneLine": "Auto Loader は、クラウドストレージに届いた新しいファイルを増分で取り込む、cloudFiles という名前の Structured Streaming のソースです。",
       "keyPhrase": "届いた新しいファイルを増分で取り込む",
       "body": "Auto Loader は、`format(\"cloudFiles\")` で使います。ファイルの形式は `cloudFiles.format` で指定し、`json`、`csv`、`xml`、`parquet`、`avro`、`orc`、`text`、`binaryFile` から選びます。\n\n```python\n(spark.readStream\n  .format(\"cloudFiles\")\n  .option(\"cloudFiles.format\", \"json\")\n  .option(\"cloudFiles.schemaLocation\", schema_path)\n  .load(\"/Volumes/main/landing/events/\")\n  .writeStream\n  .option(\"checkpointLocation\", checkpoint_path)\n  .trigger(availableNow=True)\n  .toTable(\"main.bronze.events\"))\n```\n\nAuto Loader は、見つけたファイルをチェックポイントに記録し、それぞれのファイルを 1 回だけ処理します。既定では、最初の起動のときに、場所に既にあるファイルも取り込みます(`cloudFiles.includeExistingFiles` の既定は `true`)。\n\nAuto Loader のクエリは、動かし続けるほかに、`availableNow` のトリガーで定期的に起動し、届いた分だけを取り込んで止めることもできます。1 時間に数百万個のファイルを取り込む処理や、数十億個のファイルでテーブルを移行したり埋め戻したりする処理にも使えます。\n\nDatabricks は、増分の取り込みには、Lakeflow のパイプラインで Auto Loader を使うことを勧めています。パイプラインでは、スキーマとチェックポイントの場所をパイプラインが管理するため、利用者が指定する必要はありません。",
-      "examAngle": "「新しく届いたファイルだけを、重複なく取り込み続けたい」要件から Auto Loader を選ばせる形や、cloudFiles のオプションの名前を問う形で出ます。",
+      "examAngle": "Auto Loader を使うときは、readStream の format に `cloudFiles` を指定します。ファイルの形式は、`cloudFiles.format` で別に指定します。Auto Loader は見つけたファイルをチェックポイントに記録し、それぞれのファイルを 1 回だけ処理します。",
       "checks": [
         {
           "question": "Auto Loader を使うとき、readStream の format に何を指定しますか。",
@@ -3173,7 +3173,7 @@
       "oneLine": "Auto Loader のチェックポイントは、取り込んだファイルの情報と処理の進み具合を記録する場所で、障害のあとの再開と、ファイルを 1 回だけ処理することに使われます。",
       "keyPhrase": "取り込んだファイルの情報と処理の進み具合を記録する場所",
       "body": "チェックポイントの場所は、書き込み側の `checkpointLocation` で指定します。Auto Loader は、見つけたファイルの情報を、チェックポイントの場所にあるキーと値の保存先(RocksDB)に記録します。利用者がこの状態を管理する必要はありません。\n\nクエリが障害で止まったときは、同じチェックポイントの場所で再起動します。Auto Loader は記録した位置から再開し、Delta Lake に書き込むときは、障害のあとも各ファイルを 1 回だけ処理します。\n\nチェックポイントの場所を変えると、前のストリームを捨てて、新しいストリームを始めることになります。",
-      "examAngle": "「障害のあとに再起動しても、重複なく取り込みを続けられる理由」として、チェックポイントの役割を問う形で出ます。",
+      "examAngle": "Auto Loader は、見つけたファイルの情報をチェックポイントの場所に記録します。同じチェックポイントの場所で再起動すると、Auto Loader は記録した位置から再開し、Delta Lake に書き込むときは、障害のあとも各ファイルを 1 回だけ処理します。チェックポイントの場所を変えると、新しいストリームを始めることになります。",
       "checks": [
         {
           "question": "Auto Loader のクエリが障害で止まりました。同じチェックポイントの場所で再起動すると、取り込み済みのファイルをもう一度取り込みますか。",
@@ -3207,7 +3207,7 @@
       "oneLine": "ファイル通知モードは、クラウドの通知とキューのサービスで新しいファイルを知る、Auto Loader のファイルの検出の方式です。",
       "keyPhrase": "クラウドの通知とキューのサービスで新しいファイルを知る",
       "body": "Auto Loader が新しいファイルを見つける方式は 2 つあります。既定はディレクトリの一覧のモードで、Auto Loader は入力の場所のファイルを一覧して、新しいファイルを探します。このモードは、ストレージのデータを読める権限があれば、追加の設定なしで始められます。\n\nファイル通知モードでは、Auto Loader が、入力の場所のファイルのイベントを受け取る通知のサービスとキューのサービスを、利用者のクラウドのアカウントに設定できます。公式の文書では、ディレクトリの一覧より性能が高く、規模を大きくしやすい方式とされています。\n\nUnity Catalog の外部ロケーションでファイルイベントを有効にすると、ファイル通知モードはそのイベントを使います。利用者は通知の仕組みを設定する必要がなく、ストリームを作るときに追加の権限も要りません。Databricks は、多くの処理で、ファイルイベントを使うファイル通知モードを勧めています。\n\nどちらのモードでも、Auto Loader はファイルを見つける順や処理する順を保証しません。",
-      "examAngle": "「ファイルの数が多く、ディレクトリの一覧に時間がかかる」状況から、ファイル通知モードを選ばせる形で出ます。",
+      "examAngle": "Auto Loader の既定の検出の方式は、入力の場所のファイルを一覧する、ディレクトリの一覧のモードです。ファイル通知モードは、通知とキューのサービスでファイルのイベントを受け取る方式です。公式の文書では、ファイル通知モードのほうが性能が高く、規模を大きくしやすいとされています。",
       "checks": [
         {
           "question": "Auto Loader で検出の方式を何も設定しないとき、新しいファイルはどの方式で見つけますか。",
@@ -3237,7 +3237,7 @@
       "oneLine": "Auto Loader は、cloudFiles.schemaLocation を指定すると、最初に見つけたファイルからスキーマを推測し、その場所にスキーマとその後の変化を保存します。",
       "keyPhrase": "最初に見つけたファイルからスキーマを推測し",
       "body": "`cloudFiles.schemaLocation` に場所を指定すると、スキーマの推測と進化が使えるようになります。Auto Loader は、その場所の `_schemas` ディレクトリにスキーマの情報を保存します。\n\n推測には、最初に見つけたファイルのうち、50 GB か 1000 個のどちらか先に達した分を使います。JSON、CSV、XML のように型の情報を持たない形式では、Auto Loader はすべての列を文字列として推測します。サンプルのデータから型を推測させるには、`cloudFiles.inferColumnTypes` を `true` にします。Parquet と Avro では、ファイルのスキーマに書かれた型を使います。\n\n特定の列の型を決めておきたいときは、`cloudFiles.schemaHints` に SQL のスキーマの形で書きます。\n\n```python\n.option(\"cloudFiles.schemaHints\", \"amount DECIMAL(10,2), order_date DATE\")\n```\n\nスキーマのヒントが使われるのは、スキーマを指定しないときだけです。",
-      "examAngle": "「JSON を読んだら、すべての列が文字列になった」のような状況から、原因や、型を推測させるオプションを問う形で出ます。",
+      "examAngle": "JSON、CSV、XML は型の情報を持たないため、Auto Loader は既定ですべての列を文字列として推測します。型を推測させるには、`cloudFiles.inferColumnTypes` を `true` にします。Parquet と Avro では、Auto Loader はファイルのスキーマに書かれた型を使います。",
       "checks": [
         {
           "question": "JSON のファイルを Auto Loader で読み、オプションを足さずにスキーマを推測させました。数値の列は、どの型になりますか。",
@@ -3267,7 +3267,7 @@
       "oneLine": "addNewColumns は、新しい列が届くとスキーマの末尾に列を足してストリームを止め、再起動のあとに新しいスキーマで続ける、Auto Loader のスキーマ進化モードです。",
       "keyPhrase": "スキーマの末尾に列を足してストリームを止め",
       "body": "スキーマ進化モードは、`cloudFiles.schemaEvolutionMode` で指定します。スキーマを指定しないときの既定は `addNewColumns` です。スキーマを指定したときの既定は `none` です。\n\n`addNewColumns` では、Auto Loader が新しい列を見つけると、最新のマイクロバッチのデータでスキーマを推測し直します。Auto Loader は、新しい列をスキーマの末尾に足して、スキーマの場所を更新します。そのあと、ストリームは `UnknownFieldException` で止まります。既存の列の型は変えません。ストリームを再起動すると、足した列を含むスキーマで取り込みを続けます。\n\nDatabricks は、スキーマが変わって止まったあとに自動で再起動するよう、Auto Loader のストリームを Lakeflow Jobs で設定することを勧めています。\n\n型の拡張(int から long など)も行う `addNewColumnsWithTypeWidening` もあります。これは、Databricks Runtime 16.4 以降のパブリックプレビューです。",
-      "examAngle": "「新しい列をテーブルに足しながら取り込みを続けたい」のような要件から、モードを選ばせる形や、既定のモードで新しい列が届いたときの動きを問う形で出ます。",
+      "examAngle": "`cloudFiles.schemaEvolutionMode` の既定は、スキーマを指定しないときは `addNewColumns`、指定したときは `none` です。`addNewColumns` では、Auto Loader が新しい列をスキーマの末尾に足してから、ストリームが `UnknownFieldException` で止まります。再起動すると、足した列を含むスキーマで取り込みを続けます。",
       "checks": [
         {
           "question": "スキーマも schemaEvolutionMode も指定していない Auto Loader のストリームに、新しい列を含むファイルが届きました。ストリームはどうなりますか。",
@@ -3297,7 +3297,7 @@
       "oneLine": "rescue は、スキーマを変えずにストリームを続け、スキーマにない列の値を救済データの列(_rescued_data)に入れる、Auto Loader のスキーマ進化モードです。",
       "keyPhrase": "スキーマにない列の値を救済データの列(_rescued_data)に入れる",
       "body": "`rescue` では、新しい列が届いても、スキーマは変わらず、ストリームも止まりません。スキーマにない列の値は、救済データの列に JSON の形でまとめて入ります。\n\n```python\n.option(\"cloudFiles.schemaEvolutionMode\", \"rescue\")\n```\n\nAuto Loader は、救済データの列を既定で `_rescued_data` という名前で足します。名前は `rescuedDataColumn` のオプションで変えられます。この列には、スキーマにない列のほか、型が合わない値や、列の名前の大文字と小文字が合わない値も入ります。値と一緒に、そのレコードの元のファイルのパスも記録されます。\n\n`none` も、ストリームを止めずにスキーマを変えないモードです。`none` では、新しい列の値は捨てられます。救済データの列に残るのは、`rescuedDataColumn` を設定したときだけです。",
-      "examAngle": "「スキーマに合わないデータを、捨てずに残しておきたい」要件から、rescue や救済データの列を選ばせる形で出ます。",
+      "examAngle": "`rescue` と `none` は、どちらもスキーマを変えず、ストリームを止めません。`rescue` では、スキーマにない列の値が救済データの列(既定は `_rescued_data`)に残ります。`none` では、`rescuedDataColumn` を設定しない限り、新しい列の値は捨てられます。",
       "checks": [
         {
           "question": "新しい列が届いてもストリームを止めず、その列の値も失わずに残したいです。どのスキーマ進化モードを使いますか。",
@@ -3331,7 +3331,7 @@
       "oneLine": "failOnNewColumns は、新しい列が届くとストリームを止め、スキーマを自動では更新しない、Auto Loader のスキーマ進化モードです。",
       "keyPhrase": "スキーマを自動では更新しない",
       "body": "`failOnNewColumns` では、Auto Loader が新しい列を見つけると、ストリームが止まります。`addNewColumns` と違い、Auto Loader はスキーマを自動では更新しません。\n\nストリームを再開するには、利用者が指定したスキーマを直すか、新しい列を含むファイルを取り除きます。どちらかをするまで、ストリームは再開しません。\n\n```python\n.option(\"cloudFiles.schemaEvolutionMode\", \"failOnNewColumns\")\n```",
-      "examAngle": "addNewColumns との違いとして、「再起動だけで取り込みを続けられるか」を問う形で出ます。",
+      "examAngle": "`failOnNewColumns` と `addNewColumns` は、どちらも新しい列が届くとストリームを止めます。`addNewColumns` はスキーマを自動で更新するため、再起動するだけで続けられます。`failOnNewColumns` は自動で更新しないため、利用者がスキーマを直すか、新しい列を含むファイルを取り除くまで再開しません。",
       "checks": [
         {
           "question": "failOnNewColumns のモードで止まったストリームを、スキーマもファイルも変えずに再起動しました。取り込みを続けられますか。",
@@ -3361,7 +3361,7 @@
       "oneLine": "pathGlobFilter は、ファイルの名前を glob の形で指定し、名前が合うファイルだけを読み込むオプションです。",
       "keyPhrase": "名前が合うファイルだけを読み込む",
       "body": "`pathGlobFilter` は、すべてのファイルの形式に共通する読み取りのオプションで、Auto Loader でも使えます。たとえば、同じ場所に CSV と JSON が混ざっているとき、JSON のファイルだけを読み込めます。\n\n```python\n(spark.readStream\n  .format(\"cloudFiles\")\n  .option(\"cloudFiles.format\", \"json\")\n  .option(\"pathGlobFilter\", \"*.json\")\n  .load(\"/Volumes/main/landing/events/\"))\n```\n\nSpark の文書では、`pathGlobFilter` はファイルの名前に合わせる設定で、パーティションの検出の動きは変えません。\n\n同じ役目のオプションは、COPY INTO では `PATTERN`、`read_files` では `fileNamePattern` です。",
-      "examAngle": "「特定の拡張子のファイルだけを取り込みたい」要件で、オプションの名前を選ばせる形で出ます。",
+      "examAngle": "`pathGlobFilter` は、ファイルの名前を glob の形で指定して、読み込むファイルを絞るオプションです。同じ役目のオプションは、COPY INTO では `PATTERN`、`read_files` では `fileNamePattern` です。",
       "checks": [
         {
           "question": "Auto Loader で、ある場所のファイルのうち、名前が .json で終わるものだけを取り込みたいです。どのオプションを使いますか。",
@@ -3395,7 +3395,7 @@
       "oneLine": "cloudFiles.allowOverwrites は、取り込み済みのファイルが変わったときに、Auto Loader がそのファイルを取り込み直すかを決めるオプションで、既定は false です。",
       "keyPhrase": "Auto Loader がそのファイルを取り込み直すかを決める",
       "body": "既定(`false`)では、Auto Loader はそれぞれのファイルを 1 回だけ処理します。取り込んだあとにファイルが上書きされたり追記されたりしても、取り込み直しません。\n\n`true` にすると、Auto Loader は変わったファイルを取り込み直します。一部だけ追記されたファイルでも、ファイル全体を読み直します。Auto Loader が取り込むことを保証するのはファイルの最新の版で、途中のどの版を取り込むかは保証しません。\n\nファイル全体を読み直すため、同じレコードがテーブルに重複して入ることがあります。`true` にするときは、利用者が重複を扱う処理を組み込みます。",
-      "examAngle": "「取り込み済みのファイルが更新された」状況で、Auto Loader の動きや、取り込み直す設定を問う形で出ます。",
+      "examAngle": "`cloudFiles.allowOverwrites` の既定は `false` で、取り込み済みのファイルが上書きされても、Auto Loader は取り込み直しません。`true` にすると、Auto Loader は変わったファイルを全体から読み直すため、同じレコードが重複して入ることがあります。重複は、利用者の処理で扱います。",
       "checks": [
         {
           "question": "既定の設定の Auto Loader で、取り込み済みのファイルが上書きされました。Auto Loader はそのファイルを取り込み直しますか。",
@@ -3429,7 +3429,7 @@
       "oneLine": "マネージドコネクタは、Lakeflow Connect の組み込みのコネクタで、ソースごとの取り込みのパイプラインを作り、Unity Catalog の管理の下で増分に読み書きします。",
       "keyPhrase": "ソースごとの取り込みのパイプラインを作り",
       "body": "マネージドコネクタは、ソースの種類ごとに用意されています。公式の文書は、次の種類に分けています。\n\n- データベース(CDC): MySQL、PostgreSQL、SQL Server など\n- クエリベース: CDC の設定をせず、データベースに直接問い合わせる\n- ファイルのソース: Google Drive、SharePoint など\n- SaaS: Salesforce、HubSpot、Jira、Workday など\n- ストリーミング: RabbitMQ などのメッセージバス\n\nコネクタを設定すると、Unity Catalog の接続(connection)、取り込みのパイプライン、格納先のテーブルができます。接続は、ソースの認証の情報を持つ、Unity Catalog のセキュリティ保護可能なオブジェクトです。パイプラインのスケジュールごとに、ジョブが 1 つ作られます。\n\nコネクタは、最初の実行では、選んだデータをすべて取り込みます。2 回目以降は、ソースが対応していれば、変わったデータだけを取り込みます。増分の方法はソースで違い、SQL Server は変更の追跡か CDC を、Salesforce はカーソル列を使います。増分に対応していないソースやテーブルもあります。\n\nマネージドコネクタがないソースには、利用者がコミュニティのコネクタ、自作のカスタムコネクタ、SQL と Spark の API を使います。SQL と Spark の API は、扱えるソースが広い代わりに、自動化される範囲が狭くなります。",
-      "examAngle": "「SaaS やデータベースから、少ない手間で増分に取り込み、Unity Catalog で管理したい」という要件から、Lakeflow Connect のマネージドコネクタを選ばせる形で出ます。",
+      "examAngle": "マネージドコネクタは、最初の実行では選んだデータをすべて取り込みます。2 回目以降は、ソースが対応していれば、変わったデータだけを取り込みます。マネージドコネクタがないソースには、利用者がコミュニティのコネクタ、カスタムコネクタ、SQL と Spark の API を使います。",
       "checks": [
         {
           "question": "Salesforce のデータを、コードをほとんど書かずに、Unity Catalog の管理の下で増分に取り込みたいとき、何を使いますか。",
@@ -3467,7 +3467,7 @@
       "oneLine": "インジェスチョンゲートウェイは、データベースのマネージドコネクタで、ソースのスナップショットと変更のログを取り出し、ステージングのボリュームに置く部品です。",
       "keyPhrase": "スナップショットと変更のログを取り出し",
       "body": "データベースのコネクタは、インジェスチョンゲートウェイと取り込みのパイプラインの 2 段で動きます。ゲートウェイは、クラシックのコンピュートで常時動きます。ソースが変更のログを切り詰める前に、変更を捉えるためです。取り込みのパイプラインが動いていない間も、ゲートウェイのコンピュートの料金はかかります。\n\nゲートウェイが取り出したデータは、ステージングのボリューム(Unity Catalog のボリューム)に一時的に置かれます。このボリュームは、ゲートウェイを配置したときに自動で作られ、置き場所のカタログとスキーマは変えられます。ステージングのデータは、30 日後に自動で消えます。\n\n取り込みのパイプラインは、サーバーレスのコンピュートで、ステージングのデータを格納先のストリーミングテーブルに反映します。パイプラインは、ゲートウェイとは別に、好きなスケジュールで動かせます。ゲートウェイは、専用のジョブの中で、継続のタスクとして動きます。\n\n公式の文書が挙げる対象のデータベースは、MySQL、PostgreSQL、SQL Server、Oracle です。",
-      "examAngle": "データベースのコネクタの部品のうち、常時動いて変更を捉えるもの、取り込みのパイプラインが止まっていても課金が続くものを問う形が考えられます。",
+      "examAngle": "データベースのコネクタでは、インジェスチョンゲートウェイがクラシックのコンピュートで常時動き、変更を捉えます。取り込みのパイプラインは、サーバーレスのコンピュートで、ゲートウェイとは別のスケジュールで動きます。パイプラインが動いていない間も、ゲートウェイのコンピュートの料金はかかります。",
       "checks": [
         {
           "question": "データベースのコネクタで、常時動いてソースの変更のログを読むのは、ゲートウェイと取り込みのパイプラインのどちらですか。",
@@ -3500,7 +3500,7 @@
       "term": "クエリベースのコネクタ",
       "oneLine": "クエリベースのコネクタは、CDC やバイナリログの設定をせずに、ソースのデータベースへ直接問い合わせて取り込む、Lakeflow Connect のコネクタです。",
       "body": "クエリベースのコネクタは、カーソル列(単調に増えるタイムスタンプか整数の列)で、変わった行を探します。実行のたびに、前回の実行で保存した最大値(high-water mark)より大きいカーソル列の行を読みます。\n\nクエリベースのコネクタは、インジェスチョンゲートウェイとステージングのボリュームを使いません。ソースへの問い合わせの結果を、格納先のストリーミングテーブルへ直接書きます。パイプラインは、利用者が決めたスケジュールで動きます。\n\nCDC のコネクタと比べると、次の違いがあります。\n\n- CDC やバイナリログを使えないソースでも使え、ゲートウェイの準備が要らない\n- 実行と実行の間に変わった行は、最新の状態だけを捉え、途中の状態は捉えない\n- ソースのテーブルに直接問い合わせるため、ソースの負荷が増え、バイナリログを使う CDC より遅くなることがある\n\n対象のソースは、Oracle、Teradata、SQL Server、MySQL、MariaDB、PostgreSQL などです。",
-      "examAngle": "「ソースのデータベースで CDC を有効にできない」という条件から、クエリベースのコネクタを選ばせる形が考えられます。",
+      "examAngle": "クエリベースのコネクタは、CDC やバイナリログの設定ができないソースでも使えます。CDC のコネクタと違い、クエリベースのコネクタはゲートウェイを使わず、カーソル列で変わった行を探します。実行と実行の間に変わった行は、最新の状態だけを取り込みます。",
       "checks": [
         {
           "question": "ある行が、1 日のうちに 3 回更新されました。クエリベースのコネクタで 1 日 1 回取り込むと、途中の 2 回の状態も取り込めますか。",
@@ -3530,7 +3530,7 @@
       "oneLine": "Spark の JDBC での読み取りは、spark.read.format(\"jdbc\") で、外部のデータベースのテーブルや問い合わせの結果を DataFrame としてバッチで読む方法です。",
       "keyPhrase": "DataFrame としてバッチで読む",
       "body": "接続先は url で、読むテーブルは dbtable で指定します。dbtable には、括弧で囲んで別名を付けた副問い合わせも書けます。この副問い合わせは、データベースの側で実行されます。\n\n```python\ndf = (spark.read.format(\"jdbc\")\n  .option(\"url\", jdbc_url)\n  .option(\"dbtable\", \"sales.orders\")\n  .option(\"user\", user)\n  .option(\"password\", password)\n  .load())\n```\n\n既定では、JDBC のドライバーは 1 本のスレッドでソースに問い合わせます。並列に読むには、partitionColumn、lowerBound、upperBound で分割する範囲を指定します。並列の問い合わせの数は、numPartitions で指定します。partitionColumn には索引のある列を選びます。公式の文書は、numPartitions を 50 より大きくしないよう注意しています。\n\nfetchSize は、1 回の往復で取る行の数です。小さすぎると遅延が増え、大きすぎるとメモリ不足になることがあります。\n\n利用者名とパスワードは JDBC の URL に書かず、シークレットに置いて dbutils.secrets.get で読みます。\n\nJDBC は、Structured Streaming の組み込みの入力のソースに含まれません。データベースの変更を続けて増分に取り込むときは、Lakeflow Connect のデータベースのコネクタを使います。外部のデータベースを問い合わせるだけなら、対応するデータベースについて、公式の文書は Lakehouse Federation を勧めています。",
-      "examAngle": "「ノートブックから外部のデータベースのテーブルを読み、Unity Catalog の表へ書く」コードの穴埋めや、読み取りが遅いときに並列にする設定(numPartitions など)を選ばせる形で出ます。",
+      "examAngle": "Spark の JDBC での読み取りは、既定では 1 本のスレッドで問い合わせます。並列に読むには、partitionColumn、lowerBound、upperBound で範囲を決め、numPartitions で問い合わせの数を決めます。JDBC は Structured Streaming の組み込みの入力のソースに含まれないため、データベースの変更を続けて増分に取り込むときは Lakeflow Connect のデータベースのコネクタを使います。",
       "checks": [
         {
           "question": "JDBC の読み取りが 1 本のスレッドで遅いとき、並列に読むために指定するオプションを挙げてください。",
@@ -3567,7 +3567,7 @@
       "term": "REST API からの取り込み",
       "oneLine": "REST API からの取り込みは、組み込みの汎用の REST のソースがないため、認証とページ送りと呼び出しの制限を利用者のコードで扱い、API の応答をテーブルに入れる方法です。",
       "body": "まず、ソースに Lakeflow Connect のマネージドコネクタがあるかを確かめます。コネクタがあれば、認証やページ送りはコネクタが扱います。ないときは、公式の文書が示す 3 つの型から選びます。\n\n1 つ目は、Python の関数が requests で API を呼んで DataFrame を返し、それをマテリアライズドビューにする型です。更新のたびに応答をすべて読み直すため、量に上限のあるデータに向きます。\n\n2 つ目は、Python のデータソース API で DataSource と DataSourceStreamReader を実装し、spark.readStream で読む型です。読んだ位置(オフセット)を記録するので、再起動しても続きから読めます。量の多い API から増分に取るときに向きます。\n\n3 つ目は、Lakeflow Jobs で定期実行するノートブックが API の生の JSON の応答を Unity Catalog のボリュームに書き、パイプラインがそのファイルを Auto Loader でストリーミングテーブルに取り込む型です。API の扱いと変換を分けられ、ファイルごとに 1 回だけ処理されます。\n\nどの型でも、API のトークンはコードに書かず、シークレットに置きます。一時的な失敗で更新全体が落ちないよう、再試行と、待ち時間を伸ばしながらのやり直し(バックオフ)を入れます。",
-      "examAngle": "「REST API の応答をノートブックで取得し、ボリュームに保存して定期実行する」のように取得、保存、定期実行の組み合わせを選ばせる形で出ます。",
+      "examAngle": "汎用の REST のソースは組み込みにないため、まずソースに Lakeflow Connect のマネージドコネクタがあるかを確かめます。応答をボリュームに書いて Auto Loader で取り込む型では、ノートブックの定期実行を Lakeflow Jobs が受け持ちます。量の多い API から増分に取り、再起動しても続きから読むときは、Python のデータソース API の型を使います。",
       "checks": [
         {
           "question": "API の応答を Unity Catalog のボリュームに JSON で書き、Auto Loader で取り込む型で、ノートブックを定期実行するのは何ですか。",
@@ -3596,7 +3596,7 @@
       "term": "シークレット(dbutils.secrets.get)",
       "oneLine": "シークレットは、パスワードや API キー、トークンなどの資格情報をノートブックや平文に書かずに保管し、ノートブックとジョブから名前で読むための仕組みです。",
       "body": "シークレットは、シークレットのスコープ(名前の付いたシークレットの集まり)の中に、キーと値の組で置きます。スコープの名前はワークスペースの中で一意で、ワークスペースのすべての利用者から見えます。公式の文書は、スコープを個人の単位ではなく、役割やアプリケーションの単位で作るよう勧めています。\n\nノートブックとジョブでは、dbutils.secrets.get で値を読みます。\n\n```python\npassword = dbutils.secrets.get(scope=\"jdbc\", key=\"password\")\n```\n\ndbutils.secrets.get で読んだ値を表示すると、[REDACTED] に置き換わります。この置き換えは値そのものだけにかかり、加工した値にはかかりません。ワークスペースの管理者や、読む権限を持つ利用者は値を読めるため、権限は絞って渡します。\n\nスコープを作った利用者には、既定で MANAGE の権限が付きます。MANAGE を持つ利用者は、シークレットの読み書きと、権限の付与ができます。",
-      "examAngle": "「JDBC のパスワードをノートブックに書かずに渡す」方法として、dbutils.secrets.get を選ばせる形で出ます。",
+      "examAngle": "JDBC のパスワードなどの資格情報は、ノートブックに書かず、シークレットに置いて dbutils.secrets.get で読みます。dbutils.secrets.get で読んだ値を表示すると、[REDACTED] に置き換わります。この置き換えは値そのものだけにかかり、加工した値にはかかりません。",
       "checks": [
         {
           "question": "シークレットに置いた JDBC のパスワードを、ノートブックで読む関数は何ですか。",
@@ -3626,7 +3626,7 @@
       "oneLine": "取り込みの 3 つの層は、Structured Streaming、Lakeflow のパイプライン、マネージドコネクタの順に、Databricks が受け持つ範囲が広がる、取り込みの方法の分け方です。",
       "keyPhrase": "Databricks が受け持つ範囲が広がる",
       "body": "Structured Streaming は Spark のストリーミングの処理系で、障害からの回復と、1 回だけの処理を受け持ちます。Lakeflow のパイプラインは、Structured Streaming の上に作られた宣言型の仕組みです。この仕組みは、実行の順序、監視、データ品質、エラーの扱いを受け持ちます。マネージドコネクタは、さらに、ソースごとの認証、CDC、スキーマの変化への対応、自動の再試行を受け持ちます。\n\n公式の文書は、最も管理された層から始め、要件を満たさないとき(ソースに対応していないときなど)だけ下の層へ下りるよう勧めています。\n\n利用者は、クラウドのオブジェクトストレージのファイルには Auto Loader を、Kafka や Kinesis のイベントにはそれぞれのソースを使います。これらは、Structured Streaming、パイプライン、Databricks SQL のどれからでも使えます。",
-      "examAngle": "「コードを最小にし、運用の手間を減らしたい」のような要件から、最も管理された層(マネージドコネクタ)を選ばせる形で出ます。",
+      "examAngle": "取り込みの層は、Structured Streaming、Lakeflow のパイプライン、マネージドコネクタの順に、Databricks が受け持つ範囲が広がります。公式の文書は、最も管理された層から始め、要件を満たさないときだけ下の層へ下りるよう勧めています。",
       "checks": [
         {
           "question": "対応するマネージドコネクタがあるソースで、運用の手間を最小にしたいとき、どの層から検討しますか。",
@@ -3655,7 +3655,7 @@
       "term": "Partner Connect",
       "oneLine": "Partner Connect は、選ばれた技術パートナーの試用のアカウントを作り、ワークスペースとパートナーの製品をつなぐ、Databricks の画面の機能です。",
       "body": "Partner Connect でつなぐと、Databricks は、パートナーの製品が使う資源(SQL ウェアハウス、サービスプリンシパル、個人用アクセストークン)を用意します。Databricks は、その情報をパートナーに渡します。データの取り込み(Data Ingestion)の分類には Fivetran などがあり、パートナーの製品がワークスペースにデータベースとテーブルを作ります。作られたデータベースとテーブルは、パートナーのサービスプリンシパルが所有します。\n\n利用者がすでにパートナーのアカウントを持っているときは、Partner Connect を使わず、パートナーの接続の手順に沿って手でつなぎます。Partner Connect を使うには Premium 以上のプランが要り、新しい接続を作るのはワークスペースの管理者です。",
-      "examAngle": "「Fivetran などのパートナーの製品を試し、少ない手順でワークスペースとつなぐ」要件から、Partner Connect を選ばせる形で出ます。",
+      "examAngle": "Partner Connect は、パートナーの試用のアカウントを作り、ワークスペースとパートナーの製品をつなぐ機能です。利用者がすでにパートナーのアカウントを持っているときは、Partner Connect を使わず、パートナーの接続の手順に沿って手でつなぎます。",
       "checks": [
         {
           "question": "Partner Connect でパートナーの製品とつなぐと、Databricks の側で用意される資源を挙げてください。",
@@ -3685,7 +3685,7 @@
       "oneLine": "Lakehouse Federation は、外部のデータベースやカタログのデータを移さずに、Unity Catalog の管理の下で、読み取り専用で問い合わせる仕組みです。",
       "keyPhrase": "データを移さずに",
       "body": "Lakehouse Federation には 2 つの形があります。クエリのフェデレーションは、JDBC で外部のデータベースへ問い合わせを押し下げ、Databricks と外部の両方のコンピュートで実行します。カタログのフェデレーションは、外部のカタログのテーブルを Unity Catalog がオブジェクトストレージから直接読み、Databricks のコンピュートだけで実行します。\n\n使うときは、接続(connection)に資格情報と接続先を置き、接続から外部カタログ(foreign catalog)を作ります。利用者への権限は、外部カタログのテーブルの単位で付けます。\n\nクエリのフェデレーションの対象には、MySQL、PostgreSQL、Oracle、Snowflake、SQL Server、Amazon Redshift、Google BigQuery などがあります。どちらの形も、書き込みはできません。書き込みが要るときは、Spark のデータソースを使います。\n\nLakehouse Federation は、データを移さずにその場で使うための仕組みで、その場の報告、BI、検証に向きます。同じソースに Lakeflow Connect も対応していて、量が多く遅延を小さくしたいときは、公式の文書は Lakeflow Connect を勧めています。",
-      "examAngle": "「データを複製せずに、外部のデータベースを Databricks から問い合わせたい」要件から Lakehouse Federation を選ばせる形や、取り込み(Lakeflow Connect)との使い分けを問う形で出ます。",
+      "examAngle": "Lakehouse Federation は、外部のデータを移さずに、読み取り専用で問い合わせる仕組みです。どちらの形でも、書き込みはできません。同じソースで量が多く遅延を小さくしたいときは、公式の文書は Lakeflow Connect での取り込みを勧めています。",
       "checks": [
         {
           "question": "Snowflake のテーブルを、Databricks に複製せずに、Unity Catalog の権限で問い合わせたいとき、何を使いますか。",
@@ -3715,7 +3715,7 @@
       "oneLine": "コロンの記法は、JSON を入れた文字列の列から、列名:パス の形で項目の値を取り出す SQL の書き方です。",
       "keyPhrase": "列名:パス の形で項目の値を取り出す",
       "body": "入れ子の項目は、ドット(raw:store.bicycle)か括弧(raw:store['bicycle'])でたどります。配列の要素は 0 から数える添字で指定し、[*] で全要素の項目をまとめて取り出せます。括弧なしの名前は大文字と小文字を区別せず、括弧の中の名前は区別します。空白や記号を含む名前は、バッククォートで囲みます。\n\n```sql\nSELECT raw:owner,\n       raw:store.bicycle.price::double,\n       from_json(raw:store.bicycle, 'price double, color string')\nFROM store_data;\n```\n\n取り出した値は文字列です。数値などの基本の型には :: で変換し、配列や構造体には from_json を使います。JSON の null の値は、SQL の NULL になります(文字列の \"null\" にはなりません)。",
-      "examAngle": "JSON を入れた文字列の列から、入れ子の項目を取り出す SELECT の穴埋めや、取り出した値の型を問う形で出ます。",
+      "examAngle": "コロンの記法で取り出した値は、文字列です。数値などの基本の型には :: で、配列や構造体には from_json で変換します。括弧なしの名前は大文字と小文字を区別せず、括弧の中の名前は区別します。",
       "checks": [
         {
           "question": "raw:price で取り出した値の型は何ですか。",
@@ -3745,7 +3745,7 @@
       "oneLine": "VARIANT 型は、JSON などの半構造化データを、決まったスキーマなしで 1 つの列に持つためのデータ型です。",
       "keyPhrase": "決まったスキーマなしで 1 つの列に持つ",
       "body": "文字列の JSON は、parse_json で VARIANT に変えます。\n\n```sql\nSELECT parse_json(json_str) AS v FROM raw_events;\n```\n\nVARIANT の列からは、JSON の文字列と同じコロンの記法か、variant_get で値を取り出します。VARIANT の項目の名前は、大文字と小文字を区別します。型は :: か cast で変え、変換に失敗しうるときは try_variant_get を使います。値の構造は schema_of_variant で、複数の行をまとめた構造は schema_of_variant_agg で確かめます。\n\nVARIANT の列は、クラスタリングのキー、パーティションのキー、Z-order のキーに使えません。比較、グループ化、並べ替え、集合演算にも使えません。\n\nVARIANT 型は、Databricks Runtime 15.4 以降で使えます。公式の文書は、半構造化データに、JSON の文字列より VARIANT を使うよう勧めています。",
-      "examAngle": "「スキーマが頻繁に変わる JSON を、柔軟に格納して問い合わせたい」要件から VARIANT 型を選ばせる形や、VARIANT の列でできない操作を問う形で出ます。",
+      "examAngle": "文字列の JSON を VARIANT 型に変えるには、parse_json を使います。VARIANT の列は、クラスタリング、パーティション、Z-order のキーに使えません。比較、グループ化、並べ替え、集合演算にも、VARIANT の列は使えません。",
       "checks": [
         {
           "question": "VARIANT の列を、Liquid Clustering のクラスタリングのキーにできますか。",
@@ -3775,7 +3775,7 @@
       "oneLine": "singleVariantColumn は、Auto Loader や COPY INTO で、ファイルの 1 レコードを丸ごと VARIANT の列 1 つに入れて取り込むためのオプションです。",
       "keyPhrase": "ファイルの 1 レコードを丸ごと VARIANT の列 1 つに入れて",
       "body": "このオプションには、格納先の VARIANT の列の名前を渡します。格納先には、VARIANT の列を 1 つだけ持つテーブルを先に作っておきます。\n\n```python\n(spark.readStream.format(\"cloudFiles\")\n  .option(\"cloudFiles.format\", \"json\")\n  .option(\"singleVariantColumn\", \"v\")\n  .load(source_path)\n  .writeStream\n  .option(\"checkpointLocation\", checkpoint_path)\n  .toTable(\"main.bronze.events\"))\n```\n\nCOPY INTO では、FORMAT_OPTIONS に 'singleVariantColumn' = 'v' を書きます。公式の文書は、使えるときは COPY INTO より Auto Loader を勧めています。JSON の取り込みには Databricks Runtime 15.3 以降が、XML と CSV には 16.4 以降が要ります。\n\nこのオプションでは、レコードを 1 つの列に入れるため、スキーマの進化は起きず、rescuedDataColumn も使えません。形の崩れたレコードは、VARIANT に入れられません。よく問い合わせる項目は、VARIANT でない列に取り出しておくと、クエリが速くなり、保存の量も減ります。",
-      "examAngle": "「スキーマが変わり続ける JSON のファイルを、スキーマを決めずにブロンズに取り込みたい」要件から、singleVariantColumn と VARIANT 型の組み合わせを選ばせる形で出ます。",
+      "examAngle": "singleVariantColumn は、1 レコードを丸ごと VARIANT の列 1 つに入れるため、スキーマの進化が起きません。このオプションでは、rescuedDataColumn も使えません。COPY INTO では、FORMAT_OPTIONS の中に singleVariantColumn を書きます。",
       "checks": [
         {
           "question": "singleVariantColumn で取り込むとき、rescuedDataColumn は使えますか。",
@@ -3804,7 +3804,7 @@
       "term": "タスクの再試行(Retries)",
       "oneLine": "タスクの再試行は、タスクが失敗したときに、決めた回数と間隔でそのタスクを自動でやり直す、タスクごとの設定です。",
       "body": "多くの構成では、既定ではタスクの失敗時に再試行しません。再試行するには、タスクの設定の Retries で、再試行の方針(回数と間隔)を足します。再試行の間隔はミリ秒で指定し、失敗した実行の開始から、再試行の開始までの時間として数えます。\n\nTimeout(タイムアウト)と再試行の両方を設定すると、タイムアウトは再試行の 1 回ごとにかかります。決めた時間内に終わらなかったタスクの状態は、Timed Out になります。\n\n継続のトリガーのジョブでは、失敗したタスクを、待ち時間を指数的に伸ばしながら再試行します。サーバーレスのジョブでは、再試行が自動で調整されます。",
-      "examAngle": "「一時的なネットワークの障害で落ちるタスクを、人の手を介さずにやり直したい」要件から、タスクの再試行を選ばせる形で出ます。修復(Repair run)と取り違えないようにします。",
+      "examAngle": "タスクの再試行は、失敗したタスクを、決めた回数と間隔で自動でやり直すタスクごとの設定で、修復(Repair run)とは別のものです。多くの構成では、Retries を足さないとタスクは再試行されません。Timeout と再試行の両方を設定すると、タイムアウトは再試行の 1 回ごとにかかります。",
       "checks": [
         {
           "question": "タスクに Timeout を 30 分、再試行を 2 回設定しました。タイムアウトは、再試行を含めた合計の時間にかかりますか。",
@@ -3838,7 +3838,7 @@
       "oneLine": "修復は、複数のタスクを持つジョブの失敗した実行で、失敗したタスクと、それに依存するタスクだけを実行し直す操作です。",
       "keyPhrase": "失敗したタスクと、それに依存するタスクだけ",
       "body": "修復では、失敗か取り消しになったタスクと、その下流のタスクを実行し直します。成功したタスクは実行し直さないため、時間とコンピュートを節約できます。\n\n実行し直すタスクは、ジョブのいまの設定で動きます。そのため、ノートブックのパスやクラスターの設定を直してから修復できます。修復の画面ではパラメータを足したり変えたりでき、指定した値は元の値を上書きします。\n\n実行し直すタスクは、最初から動きます。タスクは冪等とは限らないため、途中まで書いたデータが重複することがあります。重複が困るときは、上書きか MERGE で書きます。\n\n修復は、タスクが 2 つ以上あるジョブで使います。タスクが 1 つのジョブは、Run now で実行し直します。ジョブのクラスターを使うタスクを修復すると、名前に _v1 のような接尾辞の付いた新しいクラスターが作られます。",
-      "examAngle": "「10 個のタスクのうち 1 つが失敗した。成功したタスクをやり直さずに、失敗したところから再開したい」要件から、修復を選ばせる形で出ます。",
+      "examAngle": "修復は、失敗か取り消しになったタスクと、その下流のタスクだけを実行し直します。成功したタスクは、実行し直しません。実行し直すタスクはジョブのいまの設定で動くため、修復の前に直したパスや設定が使われます。",
       "checks": [
         {
           "question": "A → B → C の順に動くジョブで B が失敗し、C は実行されませんでした。修復で実行されるタスクはどれですか。",
@@ -3867,7 +3867,7 @@
       "term": "Run if(依存関係の条件)",
       "oneLine": "Run if は、上流のタスクの結果に応じて、下流のタスクを実行するかを決める、タスクの依存関係の条件です。",
       "body": "Run if の選択肢は 6 つで、既定は All succeeded です。\n\n- All succeeded: すべての依存先が成功した\n- At least one succeeded: 依存先の 1 つ以上が成功した\n- None failed: 失敗した依存先がなく、1 つ以上が実行された\n- All done: 結果を問わず、すべての依存先の実行が終わった\n- At least one failed: 依存先の 1 つ以上が失敗した\n- All failed: すべての依存先が失敗した\n\n条件を満たさないとき、All succeeded、At least one succeeded、None failed ではタスクは Upstream failed になります。At least one failed と All failed では、条件を満たさないときにタスクが Excluded になります。条件の判断では、Excluded の上流は成功、Upstream failed と Upstream canceled の上流は失敗として数えます。\n\n実行を取り消したときも、失敗を扱う条件のタスク(後始末のタスクなど)は動きます。",
-      "examAngle": "「上流が失敗しても必ず後始末のタスクを動かしたい」「上流のどれかが失敗したときだけ通知のタスクを動かしたい」のような要件から、Run if の選択肢を選ばせる形で出ます。",
+      "examAngle": "Run if の既定は All succeeded で、すべての依存先が成功したときだけタスクが動きます。結果を問わず依存先が終われば動かすときは All done を、依存先の 1 つ以上が失敗したときだけ動かすときは At least one failed を選びます。",
       "checks": [
         {
           "question": "上流の 2 つのタスクの成否にかかわらず、両方が終わったら一時ファイルを消すタスクを動かしたいとき、Run if に何を選びますか。",
@@ -3900,7 +3900,7 @@
       "term": "If/else の条件のタスク",
       "oneLine": "If/else の条件のタスクは、2 つの値を比べた真偽で、ジョブのタスクの流れを分岐させるタスクです。",
       "body": "条件は、2 つの値と 1 つの演算子で書きます。演算子は ==、!=、>、>=、<、<= です。== と != は値を文字列として比べるため、12.0 == 12 は偽です。>、>=、<、<= は値を数値として比べるため、12.0 >= 12 は真です。\n\n値には、ジョブのパラメータ({{job.parameters.<名前>}})、タスクのパラメータ、タスクの値({{tasks.<タスク名>.values.<キー>}})を使えます。タスクの値は、数値、文字列、真偽値に限ります。\n\n下流のタスクは、Depends on で、条件のタスクの真(true)の側か偽(false)の側を選びます。既定は真の側です。条件の値を渡す上流のタスクを無効にすると、条件のタスクは失敗します。",
-      "examAngle": "「前のタスクが数えた件数が 0 より大きいときだけ、集計のタスクを動かす」のような要件から、If/else の条件のタスクとタスクの値の組み合わせを選ばせる形で出ます。",
+      "examAngle": "If/else の条件のタスクで、== と != は値を文字列として比べ、>、>=、<、<= は値を数値として比べます。そのため、12.0 == 12 は偽で、12.0 >= 12 は真です。前のタスクが数えた件数などは、タスクの値({{tasks.<タスク名>.values.<キー>}})として条件に使えます。",
       "checks": [
         {
           "question": "If/else の条件で、12.0 と 12 を == で比べると、結果はどうなりますか。",
@@ -3933,7 +3933,7 @@
       "term": "For each のタスク",
       "oneLine": "For each のタスクは、入力の配列の要素ごとに、入れ子のタスクをパラメータを変えて繰り返し実行するタスクです。",
       "body": "For each は、For each のタスクと、入れ子のタスクの 2 つで作ります。入れ子のタスクには、ふつうの種類のタスクを使えます。For each のタスクの中に、For each のタスクは入れられません。\n\n入力の配列は、次のどれかで渡します。\n\n- Inputs の欄に書いた JSON の配列(5,000 文字まで)\n- 前のタスクが設定したタスクの値({{tasks.<タスク名>.values.<キー>}})\n- ジョブのパラメータ({{job.parameters.<名前>}})\n\n入れ子のタスクでは、{{input}} で今回の要素を参照します。要素がオブジェクトなら、{{input.<キー>}} で項目を参照します。\n\n同時に動かす繰り返しの数は、並列の数(concurrency)で指定します。既定は 1 で、1 つずつ順番に動きます。下流のタスクは、入れ子のタスクではなく、For each のタスクに依存させます。",
-      "examAngle": "「100 個のテーブルに同じ処理を、パラメータだけ変えて並列に流したい」要件から、For each のタスクを選ばせる形で出ます。",
+      "examAngle": "For each のタスクは、入力の配列の要素ごとに、入れ子のタスクをパラメータを変えて繰り返し実行します。並列の数(concurrency)の既定は 1 で、変えないと繰り返しは 1 つずつ順番に動きます。下流のタスクは、入れ子のタスクではなく、For each のタスクに依存させます。",
       "checks": [
         {
           "question": "For each のタスクで並列の数を変えないと、繰り返しはどう動きますか。",
@@ -3966,7 +3966,7 @@
       "term": "タスクの値(task values)",
       "oneLine": "タスクの値は、ジョブの中で、あるタスクが設定した値を、後のタスクが読むための仕組みです。",
       "body": "Python のノートブックで dbutils.jobs.taskValues.set(key, value) を呼び、値を設定します。値は JSON で表せるものに限り、JSON にしたときの大きさは 48 KiB までです。リストも設定でき、For each のタスクの入力に使えます。\n\n```python\ndbutils.jobs.taskValues.set(key=\"table_list\", value=[\"orders\", \"customers\"])\n```\n\n後のタスクでは、タスクのパラメータに {{tasks.<タスク名>.values.<キー>}} と書いて参照します。dbutils.jobs.taskValues.get(taskKey, key) でも読めます。ただし、上流のタスクの名前を変えると参照をすべて直す必要があるため、公式の文書は get を勧めていません。get の debugValue は、ノートブックを対話的に動かすときだけ使われる値です。\n\nタスクの値は、If/else の条件のタスクの値や、For each のタスクの入力の配列に使えます。",
-      "examAngle": "「上流のタスクで決めたテーブルの一覧を、下流のタスクに渡したい」要件から、タスクの値と、その参照の書き方を選ばせる形で出ます。",
+      "examAngle": "上流のタスクが決めた値を下流のタスクに渡すには、タスクの値を使います。上流のタスクは dbutils.jobs.taskValues.set で値を設定し、下流のタスクはパラメータに {{tasks.<タスク名>.values.<キー>}} と書いて参照します。値は JSON で表せるものに限り、JSON にしたときの大きさは 48 KiB までです。",
       "checks": [
         {
           "question": "上流のタスク lookup が設定したキー tables の値を、下流のタスクのパラメータで参照する書き方は何ですか。",
@@ -3995,7 +3995,7 @@
       "term": "Lakeflow Jobs",
       "oneLine": "Lakeflow Jobs は、ノートブックやパイプラインなどのタスクを組み合わせて、データの処理を順序立てて自動で実行する、Databricks のワークフローの機能です。",
       "body": "ジョブは、処理をまとめて動かす単位の資源です。ジョブには、トリガー、実行時のパラメータ、通知、Git の設定などを持たせます。1 つのジョブは、ノートブック 1 つのタスクから、数百のタスクまで持てます。上限は、1 つのジョブに 1,000 タスクです。\n\nタスクは、ジョブの中の作業の単位です。トリガーは、ジョブの実行を始める仕組みです。トリガーには、毎日の決まった時刻のような時刻ベースのものと、クラウドストレージへの新しいデータの到着のようなイベントベースのものがあります。\n\nジョブのタスクは、DAG(有向非巡回グラフ)として画面に描かれます。利用者は、タスクどうしに依存関係を付けて順序を決め、If/else の分岐や For each の繰り返しも組み込めます。\n\nジョブは、画面のほか、Databricks CLI、Declarative Automation Bundles、SDK、Jobs の REST API で管理できます。",
-      "examAngle": "「ノートブック、SQL、パイプラインを決まった順で毎日動かしたい」要件から、Lakeflow Jobs のジョブを選ばせる形で出ます。",
+      "examAngle": "Lakeflow Jobs のジョブは、ノートブックやパイプラインなどのタスクに依存関係を付け、決めた順序で動かします。ジョブの実行を始めるのはトリガーで、時刻ベースのものとイベントベースのものがあります。1 つのジョブに置けるタスクは 1,000 までです。",
       "checks": [
         {
           "question": "Lakeflow Jobs で、ジョブの実行を始める仕組みを何と呼びますか。",
@@ -4024,7 +4024,7 @@
       "term": "タスクの種類",
       "oneLine": "タスクの種類は、ジョブの 1 つのタスクが何を実行するかを決める設定で、ノートブック、SQL、ダッシュボード、パイプラインなどがあります。",
       "body": "公式の文書が挙げる主な種類は、次のとおりです。\n\n- コードを動かす: Notebook、Python script、Python wheel、JAR、Spark Submit\n- SQL と BI: SQL、SQL Alert、Dashboards、Power BI\n- パイプライン: Pipeline(取り込みのパイプラインなどを含む)\n- ほかのツールやジョブ: dbt、Run Job\n- 制御フロー: If/else、For each\n\n利用者は、1 つのジョブの中で、種類の違うタスクを依存関係でつなげます。たとえば、次の流れを 1 つのジョブにできます。パイプラインのタスクで取り込み、ノートブックのタスクで整形し、SQL のタスクで集計します。",
-      "examAngle": "ジョブの DAG に置くタスクの種類として、ノートブック、SQL、ダッシュボード、パイプラインのどれを使うかを問う形で出ます。",
+      "examAngle": "利用者は、タスクが何を実行するかで、タスクの種類を選びます。取り込みはパイプライン、整形はノートブック、集計は SQL のように、種類の違うタスクを 1 つのジョブでつなげます。値の一覧の要素ごとに同じ処理を繰り返すときは、制御フローの For each を使います。",
       "checks": [
         {
           "question": "同じ処理を、値の一覧の要素ごとに繰り返すタスクの種類は何ですか。",
@@ -4054,7 +4054,7 @@
       "oneLine": "Depends on は、タスクの上流のタスクを選ぶ欄で、選んだタスクが終わってから、そのタスクが動くように実行の順序を決めます。",
       "keyPhrase": "選んだタスクが終わってから、そのタスクが動く",
       "body": "Depends on の欄は、ジョブにタスクが 2 つ以上あるときに出ます。利用者は、上流のタスクを一覧から選んで足し、X で外します。Databricks は、上流のタスクを下流のタスクより先に動かし、並行して動かせるタスクはできるだけ並行して動かします。\n\n1 つのタスクに上流のタスクを複数選ぶと、流れが合流します。たとえば、タスク 4 の上流にタスク 2 とタスク 3 を選ぶと、既定の Run if(All succeeded)では、両方が成功してからタスク 4 が動きます。1 つのタスクを複数のタスクの上流にすると、流れが分かれて並行します。\n\n利用者は、バンドル(Declarative Automation Bundles)の定義で、depends_on に上流のタスクの task_key を並べます。\n\n```yaml\n- task_key: aggregate\n  depends_on:\n    - task_key: clean_orders\n    - task_key: clean_customers\n```\n\n利用者は、If/else の条件のタスクに依存させるとき、条件の真(true)の側と偽(false)の側のどちらに依存するかを選びます。",
-      "examAngle": "ジョブの DAG の図を見せて、どのタスクが並行して動くか、どのタスクが最後に動くかを問う形や、合流するタスクの依存関係の設定を問う形で出ます。",
+      "examAngle": "Depends on で上流のタスクを複数選ぶと、流れが合流します。既定の Run if(All succeeded)では、上流のタスクがすべて成功してから、合流したタスクが動きます。1 つのタスクを複数のタスクの上流にすると、流れが分かれて並行します。",
       "checks": [
         {
           "question": "タスク A のあとに B と C を並行して動かし、両方が成功したら D を動かしたいとき、D の Depends on に何を選びますか。",
@@ -4091,7 +4091,7 @@
       "term": "スケジュールのトリガー",
       "oneLine": "スケジュールのトリガーは、決めた時刻と周期でジョブの実行を始める、時刻ベースのトリガーです。",
       "body": "スケジュールには 2 つの書き方があります。単純なスケジュールは、12 時間ごとのように、間隔と単位だけを決めます。このとき、最初の実行の時刻は指定できません。詳細なスケジュールは、周期、開始の時刻、タイムゾーンを決めます。Show Cron Syntax を選ぶと、Quartz の cron 式で見たり書き換えたりできます。\n\ncron 式に何を書いても、Databricks は、続く実行と実行の間を 10 秒以上空けます。\n\nタイムゾーンには、夏時間のあるタイムゾーンか UTC を選べます。夏時間のあるタイムゾーンでは、夏時間の始まりと終わりに、毎時のジョブが飛ばされたり、1〜2 時間遅れて見えたりします。毎時きっちり動かしたいときは、UTC を選びます。\n\nスケジューラーは、遅延の小さい処理を意図していません。ネットワークやクラウドの障害で、実行の開始が数分遅れることがあります。",
-      "examAngle": "「毎週月曜の 6 時に動かす」のような日時の指定から cron 式のスケジュールを選ばせる形や、夏時間の影響を問う形で出ます。",
+      "examAngle": "単純なスケジュールは間隔と単位だけを決めるので、最初の実行の時刻を指定できません。詳細なスケジュールは、Show Cron Syntax を選ぶと Quartz の cron 式で書けます。夏時間のあるタイムゾーンでは毎時のジョブが飛ばされることがあるので、毎時きっちり動かすときは UTC を選びます。",
       "checks": [
         {
           "question": "詳細なスケジュールで、日時の指定を cron 式で書くときの構文は何ですか。",
@@ -4124,7 +4124,7 @@
       "term": "ファイルの到着のトリガー",
       "oneLine": "ファイルの到着のトリガーは、Unity Catalog のボリュームか外部ロケーションに新しいファイルが届いたときに、ジョブの実行を始めるトリガーです。",
       "body": "トリガーは、新しいファイルが届いたかを、おおむね 1 分ごとに確かめます。この間隔は保証されず、クラウドストレージの性能で変わります。追加でかかる料金は、クラウドでファイルの一覧を取る料金だけです。\n\n使うには、ワークスペースで Unity Catalog が有効で、格納場所への READ の権限と、ジョブへの CAN MANAGE の権限が要ります。公式の文書は、外部ロケーションでファイルイベントを有効にするよう勧めています。ファイルイベントがないときは、このトリガーを使えるジョブは 1 つのワークスペースで 50 個まで、格納場所のファイルは 10,000 個までです。\n\nトリガーを起こすのは新しいファイルだけで、同じ名前のファイルを上書きしても起きません。サブディレクトリも再帰的に見ます。\n\n詳細の設定には、トリガーの最小の間隔(次の実行を始めるまでの最短の秒数)と、最後の変更からの待ち時間(新しいファイルが届かなくなってから待つ秒数)があります。届いた新しいファイルを見つけて処理するには、公式の文書は Auto Loader を勧めています。",
-      "examAngle": "「ファイルが届く時刻が決まっていない。届いたらすぐ処理したい」要件から、ファイルの到着のトリガーを選ばせる形で出ます。",
+      "examAngle": "ファイルの到着のトリガーは、Unity Catalog のボリュームか外部ロケーションに新しいファイルが届いたときにジョブを動かします。トリガーを起こすのは新しいファイルだけで、同じ名前のファイルを上書きしても起きません。届いたかの確認はおおむね 1 分ごとで、この間隔は保証されません。",
       "checks": [
         {
           "question": "ファイルの到着のトリガーで監視できる場所はどこですか。",
@@ -4153,7 +4153,7 @@
       "term": "表の更新のトリガー",
       "oneLine": "表の更新のトリガーは、監視する Unity Catalog の表が更新されたときに、ジョブの実行を始めるトリガーです。",
       "body": "監視できるのは、Unity Catalog の Delta と Iceberg のマネージドテーブル、Delta Lake の外部テーブル、マテリアライズドビュー、ストリーミングテーブルなどです。ビューは、依存する表が対応していれば監視でき、依存する表のどれかが変わると更新とみなします。トリガーは、更新、MERGE、削除を捉えます。\n\n1 つのトリガーで監視できる表は 25 個までです。10 個を超えて監視するには、監視するすべての表でファイルイベントが要ります。複数の表を監視するときは、すべての表が更新されたときに動かすか、どれか 1 つが更新されたときに動かすかを選びます。\n\n詳細の設定には、トリガーの最小の間隔と、最後の変更からの待ち時間があります。更新がまとまって届くときは、待ち時間を設定すると、まとまりの最後を待ってから動かせます。\n\nジョブの実行ユーザー(Run as)には、監視するすべての表への SELECT と、USE CATALOG、USE SCHEMA の権限が要ります。権限が足りないと、トリガーを評価できず、ジョブは動きません。",
-      "examAngle": "「上流のチームが表を更新する時刻が決まっていない。更新されたら下流の集計を動かしたい」要件から、表の更新のトリガーを選ばせる形で出ます。",
+      "examAngle": "表の更新のトリガーは、監視する Unity Catalog の表が更新されたときにジョブを動かします。複数の表を監視するときは、すべての表の更新で動かすか、どれか 1 つの更新で動かすかを選びます。実行ユーザーが監視する表への SELECT の権限を持たないと、トリガーを評価できず、ジョブは動きません。",
       "checks": [
         {
           "question": "上流の 3 つの表がすべて更新されたときだけジョブを動かしたいとき、表の更新のトリガーでどう設定しますか。",
@@ -4182,7 +4182,7 @@
       "term": "継続のトリガー",
       "oneLine": "継続のトリガーは、前の実行が終わるか失敗したあとすぐに次の実行を始め、ジョブを動かし続けるトリガーです。",
       "body": "公式の文書は、常時動かすストリーミングの処理に、継続のモードを勧めています。前の実行が終わってから次の実行が始まるまでの間は、60 秒未満が目安です。継続のジョブは、同時に 1 つの実行しか動きません。\n\n継続のジョブでは、タスクの依存関係(Run if を含む)を使えません。ジョブの単位の再試行の方針も使えないため、タスクの単位の再試行を使います。失敗したタスクは、待ち時間を指数的に伸ばしながら再試行されます。\n\n継続のトリガーは、ほかのトリガーと組み合わせられません。止めるときは Pause を、再開するときは Resume を押します。サーバーレスのコンピュートでは、Structured Streaming のトリガーのうち、Trigger.AvailableNow のような終わりのあるものだけを使えます。",
-      "examAngle": "「ストリーミングの処理を止めずに動かし続け、落ちたら自動で立ち上げ直したい」要件から、継続のトリガーを選ばせる形で出ます。",
+      "examAngle": "継続のトリガーは、前の実行が終わるか失敗したあと、すぐに次の実行を始めます。継続のジョブは同時に 1 つの実行しか動かず、Run if を含むタスクの依存関係も使えません。ジョブの単位の再試行の方針は使えないので、タスクの単位の再試行を使います。",
       "checks": [
         {
           "question": "継続のトリガーのジョブで、Run if の条件付きの依存関係を使えますか。",
@@ -4215,7 +4215,7 @@
       "term": "SQL クエリのスケジュール",
       "oneLine": "SQL クエリのスケジュールは、Databricks SQL の SQL エディターで、クエリを決めた周期で実行し直して結果を新しくする設定です。",
       "body": "SQL エディターで Schedule、Add schedule の順に選びます。頻度、周期、開始の時刻、タイムゾーンを決めます。Show cron syntax を選ぶと、Quartz の cron 式でも書けます。More options では、スケジュールの名前と、実行に使う SQL ウェアハウスを選べます。選ばないときは、手で実行するときと同じウェアハウスを使います。\n\nスケジュールで実行したクエリの結果は、ダッシュボードに表示できます。実行に失敗すると、Databricks は間隔を広げながら再試行します。\n\nクエリの権限とスケジュールの権限は別です。新しいスケジュールは、自動では共有されません。スケジュールの結果をほかの利用者に見せるには、スケジュールの権限で CAN VIEW を付けます。\n\nこのスケジュールは、1 つのクエリを定期実行する設定です。ほかの処理と順序立てて動かすときは、Lakeflow Jobs のジョブに SQL のタスクを置き、ジョブのトリガーで動かします。",
-      "examAngle": "「ダッシュボードが使うクエリの結果を、毎朝新しくしたい」要件から、SQL エディターのクエリのスケジュールを選ばせる形で出ます。",
+      "examAngle": "SQL クエリのスケジュールは、SQL エディターで 1 つのクエリを定期実行する設定です。ほかの処理と順序立てて動かすときは、Lakeflow Jobs のジョブに SQL のタスクを置きます。クエリの権限とスケジュールの権限は別で、新しいスケジュールは自動では共有されません。",
       "checks": [
         {
           "question": "クエリのスケジュールで、実行に使う SQL ウェアハウスを選ばないと、どのウェアハウスが使われますか。",
@@ -4244,7 +4244,7 @@
       "term": "時刻ベースのトリガー",
       "oneLine": "時刻ベースのトリガーは、毎日の決まった時刻のように、時刻を条件にジョブの実行を始めるトリガーで、Lakeflow Jobs ではスケジュールのトリガーがこれに当たります。",
       "body": "スケジュールのトリガーは、データの到着や表の更新を見ずに、決めた時刻に実行を始めます。データが届く時刻が決まっていて、決まった時刻に結果が要る処理に向きます。\n\nスケジューラーは遅延の小さい処理を意図しておらず、開始が数分遅れることがあります。ストリーミングの処理を常時動かしたいときは、継続のトリガーを使います。\n\n公式の文書は、表の更新のトリガーを主にし、スケジュールのトリガーを予備として足す例を挙げています。",
-      "examAngle": "「毎日 1 回、決まった時刻に集計する」要件からスケジュールのトリガーを、「ファイルが届いたらすぐ処理する」要件からデータ駆動のトリガーを、取り違えずに選ばせる形で出ます。",
+      "examAngle": "スケジュールのトリガーは、データの到着や表の更新を見ずに、決めた時刻に実行を始めます。このトリガーは、データが届く時刻が決まっていて、決まった時刻に結果が要る処理に向きます。スケジューラーは開始が数分遅れることがあるので、遅延の小さい処理には向きません。",
       "checks": [
         {
           "question": "業務の締めのあと、毎日 23 時に 1 回だけ集計のジョブを動かしたいとき、どのトリガーを使いますか。",
@@ -4277,7 +4277,7 @@
       "term": "データ駆動のトリガー",
       "oneLine": "データ駆動のトリガーは、新しいファイルの到着や表の更新のように、データの変化を条件にジョブの実行を始めるトリガーです。",
       "body": "Lakeflow Jobs のデータ駆動のトリガーは、ファイルの到着のトリガーと、表の更新のトリガーです。データが届く時刻が決まっていないときや、上流の処理が終わったらすぐ下流を動かしたいときに選びます。\n\nどちらを選ぶかは、監視するものの形で決めます。外部のシステムがクラウドストレージにファイルを置くときは、ファイルの到着のトリガーで、ボリュームか外部ロケーションを監視します。上流のパイプラインやジョブが Unity Catalog の表を更新するときは、表の更新のトリガーで、その表を監視します。表の更新のトリガーを使えば、常に動くクラスターを置かずに済みます。\n\n更新がまとまって届くときは、どちらのトリガーでも、最後の変更からの待ち時間を設定し、まとまりが届き終わってから動かします。",
-      "examAngle": "「上流の表が更新されたら下流を動かす」要件から表の更新のトリガーを、「外部のシステムがファイルを置いたら動かす」要件からファイルの到着のトリガーを選ばせる形で出ます。",
+      "examAngle": "ファイルの到着のトリガーと表の更新のトリガーは、監視するものの形で使い分けます。外部のシステムがクラウドストレージにファイルを置くときは、ファイルの到着のトリガーを使います。上流のパイプラインやジョブが Unity Catalog の表を更新するときは、表の更新のトリガーを使います。",
       "checks": [
         {
           "question": "別のチームのパイプラインが更新するストリーミングテーブルを読んで集計するジョブを、更新のたびに動かしたいとき、どのトリガーを使いますか。",
@@ -4314,7 +4314,7 @@
       "term": "複数のトリガー",
       "oneLine": "複数のトリガーは、1 つのジョブに、種類が同じか違うトリガーを複数付け、どれか 1 つが働けば実行を始める設定です。",
       "body": "複数のトリガーはベータの機能で、ベータの間は 1 つのジョブに 5 つまで付けられます。継続のトリガーは、ほかのトリガーと組み合わせられません。\n\n公式の文書は、使いどころの例を 2 つ挙げています。1 つは、表の更新のトリガーを主にし、スケジュールのトリガーを予備に足す形です。もう 1 つは、ファイルの到着のトリガーを複数付けて、別々の格納場所を監視する形です。\n\nトリガーごとに、Pause で止め、Resume で再開できます。Pause しても、動いている実行は止まりません。Jobs API(2.1 以降)では JobSettings の triggers の配列で設定し、古い schedule、trigger、continuous の欄と同じ要求に混ぜません。",
-      "examAngle": "「表の更新で動かしたいが、更新がない日も決まった時刻には動かしたい」のような要件から、トリガーの組み合わせを問う形が考えられます。",
+      "examAngle": "複数のトリガーを付けたジョブは、どれか 1 つのトリガーが働けば実行を始めます。たとえば、表の更新のトリガーを主にし、スケジュールのトリガーを予備に足せます。継続のトリガーは、ほかのトリガーと組み合わせられません。",
       "checks": [
         {
           "question": "継続のトリガーとスケジュールのトリガーを、1 つのジョブに組み合わせられますか。",
@@ -4344,7 +4344,7 @@
       "oneLine": "コントロールプレーンは Databricks が自分のアカウントで運用する管理の部分で、コンピュートプレーンはデータを処理するコンピュートが動く部分です。",
       "keyPhrase": "Databricks が自分のアカウントで運用する管理の部分",
       "body": "コントロールプレーンには、Web アプリケーションと、Databricks が管理するバックエンドのサービスがあります。これらは利用者の AWS アカウントではなく、Databricks のアカウントにあります。\n\nコンピュートプレーンは 2 種類です。\n\n- **クラシックのコンピュートプレーン**: コンピュートは利用者の AWS アカウントの中で、ワークスペースごとの仮想ネットワークに置かれます。\n- **サーバーレスのコンピュートプレーン**: コンピュートは Databricks のアカウントの中で動きます。ワークスペースと同じリージョンに作られ、ワークスペースごとにネットワークの境界があります。\n\nクラシックのワークスペースでは、ジョブの結果やクラスターのログなどのシステムのデータを、利用者の AWS アカウントにあるワークスペースのストレージのバケットに置きます。Unity Catalog のテーブルやボリュームのデータは、ノートブックなどのワークスペースのファイルとは分けて保管します。",
-      "examAngle": "「クラスターの VM と顧客のデータはどちらのアカウントにあるか」という問いで、コントロールプレーンとクラシックのコンピュートプレーンの境界を確かめる形で出ます。",
+      "examAngle": "コントロールプレーンの Web アプリケーションとバックエンドのサービスは、Databricks のアカウントにあります。クラシックのコンピュートプレーンのコンピュートは利用者の AWS アカウントの中に置かれ、ジョブの結果やクラスターのログなどのシステムのデータも、利用者の AWS アカウントにあるワークスペースのストレージのバケットに置きます。サーバーレスのコンピュートは、Databricks のアカウントの中で動きます。",
       "checks": [
         {
           "question": "クラシックのコンピュートで動くクラスターの VM は、どちらのアカウントにありますか。",
@@ -4374,7 +4374,7 @@
       "oneLine": "Unity Catalog は、データと AI の資産の権限、監査、リネージ、検索を一か所で管理する仕組みです。",
       "keyPhrase": "権限、監査、リネージ、検索を一か所で管理する",
       "body": "テーブル、ビュー、ボリューム、関数、モデルは、`カタログ.スキーマ.オブジェクト` の 3 層の名前で指します。\n\n```sql\nSELECT * FROM main.sales.orders;\n```\n\n権限を付けられる対象を、セキュリティ保護可能なオブジェクトと呼びます。ストレージの資格情報、外部ロケーション、接続、共有は、カタログの下ではなく、メタストアの直下に置きます。\n\nUnity Catalog の主な機能は次のとおりです。\n\n- **アクセス制御**: 権限、属性に基づくポリシー、行と列のフィルター、ワークスペースへのバインド\n- **リネージ**: ソースのデータからモデルやダッシュボードまでのつながりを、自動で記録します\n- **監査**: データへのアクセスとシステムの操作を、監査ログのシステムテーブルに残します\n- **検索**: Catalog Explorer、SQL、CLI、REST API で資産を探せます\n\nテーブルとボリュームには、保管も Unity Catalog に任せるマネージドと、管理だけを任せる外部の 2 種類があります。2023 年 11 月 8 日より後に作ったワークスペースでは、Unity Catalog が自動で有効です。",
-      "examAngle": "「ワークスペースをまたいで権限とリネージを一元管理したい」という要件から、Unity Catalog を選ばせる形で出ます。",
+      "examAngle": "Unity Catalog は、データと AI の資産の権限、監査、リネージ、検索を一か所で管理します。テーブル、ビュー、ボリュームなどは、`カタログ.スキーマ.オブジェクト` の 3 層の名前で指します。ストレージの資格情報や外部ロケーションは、カタログの下ではなく、メタストアの直下に置きます。",
       "checks": [
         {
           "question": "Unity Catalog で、テーブルを指す 3 層の名前の並びは何ですか。",
@@ -4399,7 +4399,7 @@
       "oneLine": "CREATE SCHEMA はスキーマ(データベース)を作るコマンドで、DESCRIBE SCHEMA はスキーマの名前、コメント、格納場所を表示するコマンドです。",
       "keyPhrase": "スキーマ(データベース)を作るコマンド",
       "body": "`CREATE SCHEMA` に `IF NOT EXISTS` を付けると、同じ名前のスキーマがあるときは何もしません。付けないと、同じ名前があればエラーになります。\n\n```sql\nCREATE SCHEMA IF NOT EXISTS main.sales\n  COMMENT '販売のデータ'\n  MANAGED LOCATION 's3://example-bucket/sales';\n```\n\n`MANAGED LOCATION` は、スキーマのマネージドテーブルを置く場所を、カタログやメタストアの場所と別にするときに書きます。Unity Catalog が必要で、パスは外部ロケーションの中になければなりません。その外部ロケーションの `CREATE MANAGED STORAGE` の権限も要ります。`LOCATION` は Unity Catalog では使えず、Hive メタストアのスキーマで使います。\n\n`DESCRIBE SCHEMA` は、スキーマの名前、コメント、格納場所を返します。`EXTENDED` を付けると、スキーマのプロパティも返します。`SCHEMA` と `DATABASE` はどちらの語でも書けますが、公式の文書は `SCHEMA` を勧めています。\n\n```sql\nDESCRIBE SCHEMA EXTENDED main.sales;\n```",
-      "examAngle": "「スキーマの格納場所を確かめるコマンド」を選ばせる形や、`IF NOT EXISTS` の有無で、既にあるときの動作を問う形で出ます。",
+      "examAngle": "`CREATE SCHEMA` に `IF NOT EXISTS` を付けると、同じ名前のスキーマがあっても何もしません。付けないと、同じ名前があればエラーになります。スキーマの格納場所は `DESCRIBE SCHEMA` で確かめ、プロパティまで見るときは `EXTENDED` を付けます。",
       "checks": [
         {
           "question": "既にある名前で、`IF NOT EXISTS` を付けずに `CREATE SCHEMA` を実行すると、どうなりますか。",
@@ -4433,7 +4433,7 @@
       "oneLine": "Delta Lake は、Parquet のデータファイルにファイルのトランザクションログを加えた、Databricks のテーブルの既定のストレージ形式です。",
       "keyPhrase": "Parquet のデータファイルにファイルのトランザクションログを加えた",
       "body": "Databricks では、形式を指定せずに作ったテーブルは、Delta Lake のテーブルになります。Delta Lake はオープンソースで、Apache Spark の API で読み書きできます。\n\nトランザクションログがあるので、Delta Lake のテーブルは ACID のトランザクションを持ちます。書き込みのたびに、テーブルの新しいバージョンができます。ログを見ると変更の履歴が分かり、前のバージョンを読むこともできます(タイムトラベル)。\n\n書き込むデータは、テーブルのスキーマと照らして検査されます。Delta Lake は Structured Streaming とも組み合わせられるので、同じデータのコピー 1 つを、バッチとストリーミングの両方で使えます。",
-      "examAngle": "「Databricks の表の既定の形式」や「Delta の表はどんなファイルでできているか」を問う形で出ます。",
+      "examAngle": "Databricks では、形式を指定せずに作ったテーブルは Delta Lake のテーブルになります。Delta Lake のテーブルは、Parquet のデータファイルとトランザクションログでできています。ACID のトランザクションとタイムトラベルは、このトランザクションログで成り立ちます。",
       "checks": [
         {
           "question": "Databricks で、`USING` を書かずに作ったテーブルの形式は何ですか。",
@@ -4463,7 +4463,7 @@
       "oneLine": "スキーマの強制は、Delta Lake のテーブルへの書き込みを、テーブルのスキーマと照らして検査し、合わない書き込みを止める仕組みです。",
       "keyPhrase": "合わない書き込みを止める",
       "body": "スキーマの強制は、Delta Lake のテーブルにかかります。CSV や JSON のファイルにはかかりません。\n\n`INSERT` で、テーブルにない列に値を入れようとすると、エラー(`UNRESOLVED_COLUMN.WITH_SUGGESTION`)になります。型が違うときは、Databricks が安全に変換できる範囲で変換します。たとえば、整数を `BIGINT` の列に入れる書き込みは成功します。\n\n列を足したいときは、次のどちらかでスキーマを広げます(スキーマの進化)。\n\n- `ALTER TABLE … ADD COLUMN` で、明示的に列を足す\n- DataFrame の書き込みに `mergeSchema` を `true` で渡し、書き込みと同時に列を足す\n\n```python\ndf.write.option(\"mergeSchema\", \"true\").mode(\"append\").saveAsTable(\"main.sales.orders\")\n```\n\n列の型や名前の変更は、`overwriteSchema` でテーブルを書き直すか、列のマッピングを有効にして行います。",
-      "examAngle": "「新しい列を含むデータを追記したら失敗した。列を自動で足すにはどうするか」という問いで、`mergeSchema` を選ばせる形で出ます。",
+      "examAngle": "Delta Lake のテーブルにない列を含むデータを書き込むと、スキーマの強制で書き込みが止まります。書き込みと同時に列を足すには、`mergeSchema` を `true` にします。列の型や名前を変えるときは、`overwriteSchema` でテーブルを書き直すか、列のマッピングを有効にします。",
       "checks": [
         {
           "question": "Delta Lake のテーブルに、テーブルにない列を含む DataFrame を追記したところ、失敗しました。書き込みのときに列を足すオプションは何ですか。",
@@ -4492,7 +4492,7 @@
       "oneLine": "DESCRIBE HISTORY は、Delta Lake のテーブルへの書き込みごとに、操作、実行した利用者、時刻を新しい順に返すコマンドです。",
       "keyPhrase": "操作、実行した利用者、時刻を新しい順に返す",
       "body": "```sql\nDESCRIBE HISTORY main.sales.orders;\nDESCRIBE HISTORY main.sales.orders LIMIT 1;  -- 最後の操作だけ\n```\n\n結果の 1 行が、テーブルの 1 つのバージョンに当たります。`operationParameters` と `operationMetrics` の列からは、操作の中身が分かります。たとえば `OPTIMIZE` が自動のコンパクション、Liquid Clustering、Z-order、手動のどれで実行されたかを確かめられます。\n\n履歴は、既定で 30 日分を持ちます。この長さは、テーブルのプロパティ `logRetentionDuration` で決まります。公式の文書は、履歴を長期の保管やバックアップに使わないよう勧めています。",
-      "examAngle": "「誰がいつテーブルを変更したかを確かめるコマンド」を選ばせる形で出ます。",
+      "examAngle": "`DESCRIBE HISTORY` は、Delta Lake のテーブルへの書き込みごとに、操作、実行した利用者、時刻を新しい順に返します。最後の操作だけを見るときは、`LIMIT 1` を付けます。履歴は既定で 30 日分で、この長さは `logRetentionDuration` で決まります。",
       "checks": [
         {
           "question": "Delta Lake のテーブルを最後に変更した操作と利用者を確かめるコマンドは何ですか。",
@@ -4517,7 +4517,7 @@
       "oneLine": "タイムトラベルは、Delta Lake のテーブルの過去のバージョンを、バージョンの番号か時刻を指定して読む機能です。",
       "keyPhrase": "バージョンの番号か時刻を指定して読む",
       "body": "```sql\nSELECT * FROM main.sales.orders VERSION AS OF 5;\nSELECT * FROM main.sales.orders TIMESTAMP AS OF '2026-10-01';\nSELECT * FROM main.sales.orders@v5;\n```\n\nPySpark では、`versionAsOf` か `timestampAsOf` のオプションを使います。\n\n戻れる範囲は、既定で 7 日です。データファイルを残す期間 `deletedFileRetentionDuration` の既定が 7 日だからです。`VACUUM` で古いデータファイルが消えると、そのファイルを使うバージョンは読めなくなります。範囲を延ばすには、データファイルの期間と、ログを残す期間 `logRetentionDuration`(既定 30 日)の両方を延ばします。延ばした分だけ、ストレージの費用が増えます。\n\nテーブルを過去のバージョンに戻すときは、`RESTORE TABLE` を使います。実行には `MODIFY` の権限が要ります。\n\n```sql\nRESTORE TABLE main.sales.orders TO VERSION AS OF 5;\n```",
-      "examAngle": "「誤って更新した表を前の状態に戻したい」という状況で、`RESTORE TABLE` やタイムトラベルの構文を選ばせる形で出ます。",
+      "examAngle": "タイムトラベルは過去のバージョンを読む機能で、テーブルを過去の状態に戻すのは `RESTORE TABLE` です。`RESTORE TABLE` の実行には、`MODIFY` の権限が要ります。`VACUUM` で消えたデータファイルを使うバージョンは、タイムトラベルで読めません。",
       "checks": [
         {
           "question": "Delta Lake のテーブルを、バージョン 5 の状態に戻すコマンドは何ですか。",
@@ -4547,7 +4547,7 @@
       "oneLine": "VACUUM は、Delta Lake のテーブルが参照しなくなったデータファイルのうち、保持の期間を過ぎたものを消すコマンドです。",
       "keyPhrase": "保持の期間を過ぎたものを消す",
       "body": "保持の期間の既定は 7 日です。期間のうちのファイルは、参照されていなくても残ります。\n\n```sql\nVACUUM main.sales.orders DRY RUN;  -- 消す対象を一覧にするだけ\nVACUUM main.sales.orders;\n```\n\n`VACUUM` で消えたファイルを使う過去のバージョンには、タイムトラベルで戻れなくなります。保持の期間を短くした `VACUUM` は、安全のための検査で止められます。`spark.databricks.delta.retentionDurationCheck.enabled` を `false` にすると止まりませんが、保持の期間より長く動く操作がテーブルにないときに限ります。公式の文書は、期間を 7 日以上にするよう強く勧めています。\n\nトランザクションログのファイルは `VACUUM` の対象ではありません。ログはチェックポイントのあとに自動で消え、既定で 30 日残ります。\n\nUnity Catalog のマネージドテーブルでは、予測的最適化が `VACUUM` を自動で実行します。",
-      "examAngle": "「VACUUM を実行したのに古いファイルが残っている」理由や、「VACUUM のあとに戻れなくなる操作」を問う形で出ます。",
+      "examAngle": "`VACUUM` が消すのは、参照されなくなったデータファイルのうち、保持の期間(既定 7 日)を過ぎたものだけです。期間のうちのファイルは、参照されていなくても残ります。`VACUUM` で消えたファイルを使う過去のバージョンには、タイムトラベルで戻れなくなります。",
       "checks": [
         {
           "question": "既定の設定で `VACUUM` を実行しました。3 日前に参照されなくなったデータファイルは消えますか。",
@@ -4581,7 +4581,7 @@
       "oneLine": "サーバーレスのコンピュートは、ノートブック、ジョブ、Lakeflow のパイプラインのためのコンピュートを、Databricks が割り当てて管理する方式です。",
       "keyPhrase": "Databricks が割り当てて管理する",
       "body": "利用者は、自分のクラウドアカウントにコンピュートを用意しません。起動と拡縮が速く、アイドルの時間が少なくなります。ランタイムは Databricks が自動で上げるので、ワークロードはいつも最新の版で動きます。ジョブのタスクでは、サーバーレスに対応したタスクの既定がサーバーレスです。\n\nサーバーレスには、次の制約があります。\n\n- R は使えません。Scala はノートブックでは使えません(ジョブの JAR のタスクは使えます)\n- RDD API は使えません。Spark Connect の API だけを使えます\n- Spark UI はありません。代わりにクエリのプロファイルを使います\n- コンピュートの単位の init スクリプトとライブラリは使えません。環境(environment)やノートブックの単位のライブラリを使います\n- Spark の設定は、一部だけを変えられます\n\n費用は、システムテーブル `system.billing.usage` で確かめます。",
-      "examAngle": "「起動の待ち時間とアイドルの費用を減らしたい定期のジョブ」に合うコンピュートを選ばせる形や、「サーバーレスで使えない言語」を問う形で出ます。",
+      "examAngle": "サーバーレスのコンピュートは、起動と拡縮が速く、アイドルの時間が少なくなります。サーバーレスでは R を使えず、Scala もノートブックでは使えません。Spark UI もないので、性能はクエリのプロファイルで確かめます。",
       "checks": [
         {
           "question": "サーバーレスのノートブックで使えない言語はどれですか。Python、SQL、R から選んでください。",
@@ -4619,7 +4619,7 @@
       "oneLine": "ジョブコンピュートはジョブの定義の中で設定し、ジョブの実行に合わせて起動と終了をするコンピュートで、汎用コンピュートは対話的な作業に使うコンピュートです。",
       "keyPhrase": "ジョブの実行に合わせて起動と終了をする",
       "body": "クラシックのジョブコンピュートは、Lakeflow Jobs の画面で、ジョブの定義の一部として設定します。設定の項目は、汎用コンピュートと同じです。\n\nジョブコンピュートは、1 つのタスクだけが使うときは、タスクの開始で起動し、タスクのあとに終わります。複数のタスクで共有するときは、最初のタスクで起動し、最後のタスクのあとに終わります。共有すると起動の待ち時間が減ります。共有したジョブコンピュートは、その 1 回の実行の中だけで使え、ほかのジョブや実行からは使えません。\n\n汎用コンピュートもタスクに指定できますが、Databricks は本番のジョブには勧めていません。\n\nタスクの種類ごとの推奨は次のとおりです。\n\n- ノートブック、Python のスクリプト、Python の wheel: サーバーレスのジョブ\n- SQL と dbt: サーバーレスの SQL ウェアハウス\n- JAR と Spark Submit: クラシックのジョブコンピュート",
-      "examAngle": "「本番の定期ジョブを汎用コンピュートで動かしている。どう変えるか」という問いで、ジョブ向けのコンピュートを選ばせる形で出ます。",
+      "examAngle": "Databricks は、本番のジョブに汎用コンピュートを勧めていません。ジョブコンピュートは、使う最初のタスクで起動し、最後のタスクのあとに終わります。勧められるコンピュートはタスクの種類で違い、JAR と Spark Submit にはクラシックのジョブコンピュートが勧められています。",
       "checks": [
         {
           "question": "3 つのタスクが 1 つのジョブコンピュートを共有しています。コンピュートはいつ終わりますか。",
@@ -4649,7 +4649,7 @@
       "oneLine": "SQL ウェアハウスは、Databricks SQL でデータを問い合わせるためのコンピュートで、サーバーレス、Pro、クラシックの 3 種類があります。",
       "keyPhrase": "サーバーレス、Pro、クラシックの 3 種類",
       "body": "SQL ウェアハウスは、クエリエディター、Catalog Explorer、ダッシュボードのコンピュートとして選べます。Power BI や Tableau などの BI ツールからも接続できます。止まっているウェアハウスは、クエリの実行や JDBC/ODBC の接続などで自動で起動します。\n\n3 つの種類の違いは次のとおりです。\n\n- **サーバーレス**: Databricks のアカウントで動きます。起動は 2〜6 秒ほどです。Intelligent Workload Management と Predictive IO を持ちます\n- **Pro**: 利用者の AWS アカウントで動き、起動に 4 分ほどかかります。Predictive IO を持ちます\n- **クラシック**: 利用者の AWS アカウントで動き、起動に 4 分ほどかかります。Photon だけを持ちます\n\nDatabricks は、使えるならサーバーレスを勧めています。リージョンでサーバーレスを使えないときや、利用者のクラウドやオンプレミスのデータベースへ独自のネットワークでつなぐときは、Pro を選びます。",
-      "examAngle": "「オンプレミスのデータベースへ独自のネットワークでつなぐ必要がある」といった要件から、ウェアハウスの種類を選ばせる形で出ます。",
+      "examAngle": "SQL ウェアハウスの種類は、動くアカウントと起動の時間で違います。サーバーレスは Databricks のアカウントで動き、起動は 2〜6 秒ほどです。Pro は利用者の AWS アカウントで動き、独自のネットワークでデータベースへつなぐときに勧められています。",
       "checks": [
         {
           "question": "起動を最も速くしたいとき、選ぶ SQL ウェアハウスの種類は何ですか。",
@@ -4683,7 +4683,7 @@
       "oneLine": "自動停止は、SQL ウェアハウスがアイドルのまま指定の分数を過ぎたときに、ウェアハウスを止める設定です。",
       "keyPhrase": "アイドルのまま指定の分数を過ぎたときに、ウェアハウスを止める",
       "body": "アイドルのウェアハウスも、止まるまでは DBU とクラウドのインスタンスの料金がかかります。自動停止の時間を短くすると、アイドルの費用が減ります。\n\n既定と最小の値は、種類で違います。\n\n- **Pro とクラシック**: 既定 45 分、最小 10 分\n- **サーバーレス**: 既定 10 分、画面での最小 5 分(SQL ウェアハウスの API では 1 分まで)\n\n止まったウェアハウスは、クエリを実行したときや、ダッシュボードを開いたときに、自動で起動します。",
-      "examAngle": "「業務時間外にアイドルのウェアハウスの費用がかかっている」という状況から、自動停止の設定を選ばせる形で出ます。",
+      "examAngle": "アイドルの SQL ウェアハウスにも、止まるまでは DBU とクラウドのインスタンスの料金がかかります。自動停止の時間を短くすると、アイドルの費用が減ります。自動停止の既定は、Pro とクラシックが 45 分、サーバーレスが 10 分です。",
       "checks": [
         {
           "question": "Pro の SQL ウェアハウスの自動停止の既定は何分ですか。",
@@ -4712,7 +4712,7 @@
       "oneLine": "SQL ウェアハウスのサイズは 1 つのクラスターのドライバーの大きさとワーカーの数を決め、スケーリングはクラスターの数の最小と最大を決める設定です。",
       "keyPhrase": "クラスターの数の最小と最大を決める",
       "body": "2 つの設定は、効く場面が違います。\n\nサイズ(Cluster Size)を上げると、1 つのクエリの待ち時間が短くなります。既定は X-Large です。\n\nスケーリングの最大を上げると、同時に動かせるクエリの数が増えます。既定は最小 1、最大 1 です。Databricks は、同時に動くクエリ 10 個につき 1 つのクラスターを目安にしています。\n\n24 時間を超えて動いたクラスターは入れ替えられます。24 時間を超えるクエリは止められることがあるので、長い処理はその時間のうちに終わるよう分けます。",
-      "examAngle": "「1 つのクエリが遅い」と「同時に使う人が増えて待たされる」を区別し、サイズとスケーリングのどちらを変えるかを選ばせる形で出ます。",
+      "examAngle": "サイズ(Cluster Size)は、1 つのクエリの待ち時間に効きます。スケーリングの最大は、同時に動かせるクエリの数に効きます。利用者が増えてクエリがキューで待たされるときは、スケーリングの最大を上げます。",
       "checks": [
         {
           "question": "利用者が増え、クエリがキューで待たされるようになりました。SQL ウェアハウスのどの設定を変えますか。",
@@ -4742,7 +4742,7 @@
       "oneLine": "インスタンスの種類は、クラシックのコンピュートのワーカーとドライバーに使う VM の系統で、CPU、メモリ、ローカルのストレージの比率がワークロードへの向き不向きを決めます。",
       "keyPhrase": "CPU、メモリ、ローカルのストレージの比率",
       "body": "公式の文書が挙げる選び方は、次のとおりです。\n\n- **コンピュート最適化**: `OPTIMIZE` の実行に勧められています。`OPTIMIZE` は、接続した SSD からも利点を得ます\n- **ストレージ最適化(ローカルの SSD を持つ種類)**: 同じデータを繰り返し読む分析や機械学習の学習に向きます。SSD を持つワーカーでは、ディスクキャッシュが自動で有効になります\n- **メモリを増やす**: 複雑な ETL で、ディスクへのあふれ出しやメモリ不足が多いときに選びます\n- **GPU**: 深層学習のような計算の重い処理に使います\n\nドライバーの種類は、既定でワーカーと同じです。大量のデータをドライバーに集める予定があるときは、メモリの大きいドライバーを選べます。\n\nディスクキャッシュは、クラウドのストレージから読んだ Parquet のファイルの写しを、ワーカーのローカルに置きます。2 回目からはローカルから読むので、読み取りが速くなります。",
-      "examAngle": "「OPTIMIZE を速く回したい」「同じデータを何度も読む対話的な分析」などの状況から、インスタンスの種類を選ばせる形で出ます。",
+      "examAngle": "インスタンスの種類は、ワークロードに合わせて選び分けます。`OPTIMIZE` には、コンピュート最適化が勧められています。同じデータを繰り返し読む分析には、ローカルの SSD を持つストレージ最適化が向き、ディスクキャッシュが自動で有効になります。",
       "checks": [
         {
           "question": "`OPTIMIZE` を実行するクラスターに、公式の文書が勧めるインスタンスの種類は何ですか。",
@@ -4784,7 +4784,7 @@
       "oneLine": "スポットインスタンスは、クラウドの余った容量を安く使うインスタンスで、クラウド事業者に回収されることがあります。",
       "keyPhrase": "クラウド事業者に回収されることがあります",
       "body": "クラシックのコンピュートの設定で、スポットインスタンスを有効にできます。最初のインスタンスはいつもオンデマンドで、ドライバーもオンデマンドです。2 台目からがスポットになります。\n\n公式の文書は、費用を下げるためにスポットを使うのは、遅延の要件が緩いワークロードに限るよう勧めています。ドライバーが回収されるとコンピュート全体が止まるので、ドライバーにはオンデマンドの種類を使います。",
-      "examAngle": "「費用を下げたいが、時間に余裕のあるバッチ」と「締め切りの厳しい処理」を比べ、スポットを使ってよい方を選ばせる形で出ます。",
+      "examAngle": "公式の文書は、スポットインスタンスを遅延の要件が緩いワークロードに限るよう勧めています。ドライバーが回収されるとコンピュート全体が止まるので、ドライバーはオンデマンドにします。最初のインスタンスはいつもオンデマンドで、2 台目からがスポットになります。",
       "checks": [
         {
           "question": "スポットインスタンスを有効にしたクラシックのコンピュートで、ドライバーはスポットとオンデマンドのどちらになりますか。",
@@ -4813,7 +4813,7 @@
       "oneLine": "オートスケーリングは、ワーカーの数の最小と最大を指定し、その範囲でワークロードに必要な数を Databricks が選ぶ設定です。",
       "keyPhrase": "その範囲でワークロードに必要な数を Databricks が選ぶ",
       "body": "Premium 以上のプランでは、最適化されたオートスケーリングが使えます。最小から最大まで、最大 2 回の拡大で広がります。縮小は、使われていない状態が続いたときに起こります。ジョブコンピュートでは 40 秒、汎用コンピュートでは 150 秒です。`spark-submit` のジョブでは、オートスケーリングを使えません。\n\n汎用コンピュートには、自動終了も設定します。コマンドが実行されない時間が指定の分数を過ぎると、Databricks がコンピュートを終了します。公式の文書は、分析や機械学習のコンピュートで自動終了を有効にするよう勧めています。",
-      "examAngle": "「負荷の変わるジョブで、ワーカーの数を自動で増減させたい」という要件から、最小と最大のワーカー数の設定を選ばせる形で出ます。",
+      "examAngle": "オートスケーリングでは、利用者がワーカーの数の最小と最大を指定し、その範囲で Databricks が数を選びます。`spark-submit` のジョブでは、オートスケーリングを使えません。Premium 以上のプランの最適化されたオートスケーリングでは、使われていない状態がジョブコンピュートで 40 秒、汎用コンピュートで 150 秒続くと縮小します。",
       "checks": [
         {
           "question": "オートスケーリングを使えないジョブの種類は何ですか。",
@@ -4847,7 +4847,7 @@
       "oneLine": "ジョブの実行の履歴は、ジョブの Runs の画面で、過去の実行を並べて、実行時間と各タスクの状態を比べる表示です。",
       "keyPhrase": "過去の実行を並べて、実行時間と各タスクの状態を比べる",
       "body": "1 つのジョブの Runs には、2 つの表示があります。\n\n行列の表示(matrix view)では、実行ごとに、全体の実行時間の行と、タスクごとのセルの行が並びます。棒の高さが実行時間を表し、セルの色がタスクの状態を表します。過去の実行より棒が高くなった回を見つければ、遅くなった実行と、遅れたタスクが分かります。\n\n一覧の表示(list view)では、開始時刻、実行の ID、トリガー、実行時間、状態、エラーのコード、パラメーターが並びます。\n\n実行の履歴は 60 日残ります。それより前の結果が要るときは、期限の前に書き出します。期待する完了の時間を設定しておくと、その時間を超えた実行に、一覧と行列の表示で警告が付きます。",
-      "examAngle": "「このジョブがいつから遅くなったかを確かめたい」という状況で、ジョブの実行の履歴の画面を選ばせる形で出ます。",
+      "examAngle": "ジョブの Runs の行列の表示では、棒の高さが実行時間を、セルの色がタスクの状態を表します。過去より棒が高くなった回を見つければ、遅くなった実行と遅れたタスクが分かります。実行の履歴は 60 日残り、それより前の結果が要るときは期限の前に書き出します。",
       "checks": [
         {
           "question": "Lakeflow Jobs の画面で、ジョブの実行の履歴は何日残りますか。",
@@ -4877,7 +4877,7 @@
       "oneLine": "実行時間のしきい値は、ジョブやタスクに、期待する完了の時間(警告)と最大の実行時間(タイムアウト)を決めておく設定です。",
       "keyPhrase": "期待する完了の時間(警告)と最大の実行時間(タイムアウト)",
       "body": "ジョブの詳細の Duration and streaming backlog thresholds で、指標に Run duration を選んで設定します。タスクの単位でも設定できます。\n\n- **Warning**: 期待する完了の時間です。超えるとイベントが起き、遅いジョブの通知に使えます\n- **Timeout**: 最大の実行時間です。その時間で終わらないと、実行の状態が Timed Out になります\n\n通知の Duration warning は、先に期待する時間を設定しておかないと使えません。",
-      "examAngle": "「ジョブがいつもより長くかかったら知らせてほしい」という要件で、実行時間の警告のしきい値と通知の組み合わせを選ばせる形で出ます。",
+      "examAngle": "Warning は期待する完了の時間で、超えるとイベントが起きます。Timeout は最大の実行時間で、その時間で終わらない実行は Timed Out になります。通知の Duration warning は、先に Warning のしきい値を設定しないと使えません。",
       "checks": [
         {
           "question": "ジョブが設定した最大の実行時間を超えて終わらないとき、実行の状態は何になりますか。",
@@ -4911,7 +4911,7 @@
       "oneLine": "ジョブのシステムテーブルは、アカウントの中のジョブとタスクの定義と実行の記録を、system.lakeflow のスキーマのテーブルとして SQL で問い合わせる仕組みです。",
       "keyPhrase": "system.lakeflow のスキーマのテーブル",
       "body": "主なテーブルは次の 4 つです。\n\n- `jobs`: ジョブの定義\n- `job_tasks`: ジョブのタスクの定義\n- `job_run_timeline`: ジョブの実行の記録\n- `job_task_run_timeline`: タスクの実行の記録\n\n`job_run_timeline` は、1 時間を超える実行を複数の行に分けて記録します。結果の状態(`result_state`)は、最後の行にだけ入ります。実行時間は、`period_end_time` から `period_start_time` を引いた値を、実行ごとに足して求めます。`run_duration_seconds` の列が値を持つのは、古い Jobs API で作った単一タスクのジョブだけです。\n\n```sql\nSELECT job_id, run_id,\n  SUM(unix_timestamp(period_end_time) - unix_timestamp(period_start_time)) AS seconds\nFROM system.lakeflow.job_run_timeline\nGROUP BY job_id, run_id;\n```\n\n記録は 365 日残ります。テーブルはリージョンごとで、同じクラウドのリージョンにあるすべてのワークスペースの記録を持ちます。ジョブの画面の履歴(60 日)より長い期間の傾向を見るときに使います。",
-      "examAngle": "「60 日より前からの実行時間の傾向を、ワークスペースをまたいで調べたい」という要件から、システムテーブルを選ばせる形で出ます。",
+      "examAngle": "ジョブの画面の実行の履歴は 60 日、`system.lakeflow` のシステムテーブルの記録は 365 日残ります。システムテーブルはリージョンごとで、同じリージョンのすべてのワークスペースの記録を持ちます。`job_run_timeline` は 1 時間を超える実行を複数の行に分けるので、実行時間は行ごとの時間を実行ごとに足して求めます。",
       "checks": [
         {
           "question": "`system.lakeflow` のジョブのシステムテーブルの記録は、何日残りますか。",
@@ -4940,7 +4940,7 @@
       "oneLine": "ジョブの実行の詳細は、1 回の実行について、タスクの DAG と各タスクの状態、所要時間を表示する画面です。",
       "keyPhrase": "タスクの DAG と各タスクの状態、所要時間を表示する",
       "body": "実行の詳細には 3 つの表示があります。\n\n- **グラフの表示**: タスクの DAG を描きます。タスクを選ぶと、実行した利用者、時間、状態、コード、クラスター、ログへのリンクが見られます\n- **タイムラインの表示**: タスクの所要時間、依存関係、重なりを並べます。遅いタスクを見つけるのに使います\n- **一覧の表示**: 状態、名前、種類、所要時間、依存関係を表にします\n\n実行全体の状態は、葉のタスク(下流に依存するタスクがないタスク)の結果で決まります。状態には Succeeded、Failed、Skipped、Timed Out、Canceled などがあります。\n\nタスクの実行の詳細の画面では、そのタスクの過去の実行も選べます。",
-      "examAngle": "「どのタスクで失敗し、どの下流が実行されなかったかを確かめたい」という状況で、実行の詳細のグラフの表示を選ばせる形で出ます。",
+      "examAngle": "実行の詳細のグラフの表示はタスクの DAG を描き、タスクを選ぶと状態やログへのリンクを見られます。タイムラインの表示は、タスクの所要時間と重なりを並べ、遅いタスクを見つけるのに使います。実行全体の状態は、葉のタスク(下流に依存するタスクがないタスク)の結果で決まります。",
       "checks": [
         {
           "question": "1 回の実行の中で、どのタスクが長くかかり、どのタスクと並行していたかを見るには、実行の詳細のどの表示を使いますか。",
@@ -4970,7 +4970,7 @@
       "oneLine": "ジョブの通知は、ジョブやタスクの開始、成功、失敗、実行時間の超過などのときに、メールや外部のサービスへ知らせる設定です。",
       "keyPhrase": "メールや外部のサービスへ知らせる",
       "body": "通知を送れるときは、次のとおりです。\n\n- 開始(Start)\n- 成功(Success)\n- 失敗(Failure)\n- 実行時間の警告(Duration warning)\n- ストリーミングのバックログ(Streaming backlog)\n\n送り先は、メールのアドレスと、システムの送り先(Slack、Microsoft Teams、PagerDuty、HTTP の webhook)です。システムの送り先は、管理者が管理の設定で用意します。1 つのイベントの種類に、システムの送り先を 3 つまで指定できます。\n\nジョブの単位の通知は、失敗したタスクを再試行している間は送られません。失敗の試行ごとに知りたいときは、タスクの単位で通知を設定します。タスクの通知の Mute notifications until the last retry を選ぶと、最後の再試行まで通知を止められます。スキップした実行と、取り消した実行の通知も、それぞれ止められます。\n\n通知を設定するには、ジョブの `CAN MANAGE` か `IS OWNER` の権限が要ります。",
-      "examAngle": "「失敗したときだけ担当者にメールを送りたい」「再試行の途中では知らせたくない」という要件から、通知の設定を選ばせる形で出ます。",
+      "examAngle": "ジョブの単位の通知は、失敗したタスクを再試行している間は送られません。失敗の試行ごとに知りたいときは、タスクの単位で通知を設定します。タスクの通知の Mute notifications until the last retry を選ぶと、最後の再試行まで通知を止められます。",
       "checks": [
         {
           "question": "再試行の途中の失敗では知らせず、最後の再試行でも失敗したときだけ通知したいとき、何を設定しますか。",
@@ -5000,7 +5000,7 @@
       "oneLine": "同時実行の上限は 1 つのジョブを同時に何回まで動かすかを決める設定で、キューは上限に達したときに新しい実行を待たせる仕組みです。",
       "keyPhrase": "上限に達したときに新しい実行を待たせる",
       "body": "新しいジョブの同時実行の上限(Maximum concurrent runs)は、既定で 1 です。1 より大きくすると、同じジョブの実行が重なって動けます。\n\nキューは、2024 年 4 月 15 日より後に画面で作ったジョブでは、既定で有効です。キューが有効なら、上限に達したときの新しい実行は、最大 48 時間待ってから動きます。待っている実行は、ジョブの実行の一覧に表示されます。キューが無効なら、上限に達したときの新しい実行はスキップされます。\n\n実行がキューに入るのは、次のどれかの上限に達したときです。\n\n- ワークスペースの、同時に動く実行の数の上限\n- ワークスペースの、同時に動く Run Job のタスクの数の上限\n- そのジョブの同時実行の上限",
-      "examAngle": "「前の実行が終わらないうちに次のスケジュールが来た。実行はどうなるか」という問いで、同時実行の上限とキューの有無による違いを確かめる形で出ます。",
+      "examAngle": "同時実行の上限に達したときの新しい実行は、キューの有無で扱いが変わります。キューが有効なら、新しい実行は最大 48 時間待ってから動きます。キューが無効なら、新しい実行はスキップされます。",
       "checks": [
         {
           "question": "同時実行の上限が 1 でキューが有効なジョブで、前の実行が動いている間に次の実行が始まろうとしました。次の実行はどうなりますか。",
@@ -5030,7 +5030,7 @@
       "oneLine": "ステージのサマリーメトリクスは、Spark UI のステージの画面で、そのステージの全タスクの所要時間や読み書きの量の分布を表にしたものです。",
       "keyPhrase": "全タスクの所要時間や読み書きの量の分布",
       "body": "遅いジョブを調べるときは、ジョブのページの下にあるステージの一覧を所要時間で並べ替え、最も長いステージを開きます。一覧の Input、Output、Shuffle Read、Shuffle Write の列で、そのステージの I/O の量も控えておきます。\n\nステージの画面の Summary Metrics には、タスクの所要時間、GC の時間、シャッフルの読み書きの量、Peak Execution Memory などの指標が並びます。所要時間の Max が 75 パーセンタイルより 50% 以上長ければ、偏りがあるかもしれません。あふれ出しの統計は、ステージの画面の上部に出ます。表示がなければ、そのステージにあふれ出しはありません。\n\nサーバーレスのコンピュートには Spark UI がありません。代わりにクエリのプロファイルを使います。",
-      "examAngle": "「ステージの一部のタスクだけが長い」状況で、サマリーメトリクスの Max と中位の値の差から偏りを見抜かせる形で出ます。",
+      "examAngle": "ステージの Summary Metrics で、タスクの所要時間の Max が 75 パーセンタイルより 50% 以上長ければ、データの偏りがあるかもしれません。あふれ出しの統計は、ステージの画面の上部に表示されます。サーバーレスのコンピュートには Spark UI がなく、代わりにクエリのプロファイルを使います。",
       "checks": [
         {
           "question": "Summary Metrics で、タスクの所要時間の Max が 75 パーセンタイルの 3 倍でした。何を疑いますか。",
@@ -5067,7 +5067,7 @@
       "oneLine": "データの偏りは、パーティションの大きさがそろわず、一部のタスクだけに多くのデータが集まる状態です。",
       "keyPhrase": "一部のタスクだけに多くのデータが集まる",
       "body": "偏りがあると、ステージの多くのタスクが終わったあとも、少数のタスクが動き続けます。ステージの所要時間は、最も遅いタスクで決まります。\n\n対処は、原因で選びます。\n\n- **結合の偏り**: AQE が、ソートマージ結合とシャッフルハッシュ結合で、偏ったパーティションを自動で分けます。分ける対象は、大きさのしきい値を 2 つとも超えたパーティションです。しきい値より小さい偏りは、`spark.sql.adaptive.skewJoin.skewedPartitionFactor` と `spark.sql.adaptive.skewJoin.skewedPartitionThresholdInBytes` で調整します。ブロードキャスト結合には、この扱いはかかりません\n- **集計の偏り**: 偏ったキーにランダムな値を付けて分け(ソルティング)、2 段階で集計します\n- **表の配置の偏り**: Liquid Clustering を使います\n- **出力の表への書き込み**: `REBALANCE` のヒントを使います(AQE が要ります)",
-      "examAngle": "「一部のタスクだけが長い」状況から、偏りを見抜き、AQE の偏りの扱いやソルティングなどの対処を選ばせる形で出ます。",
+      "examAngle": "データの偏りへの対処は、原因で変わります。結合の偏りは、AQE がソートマージ結合とシャッフルハッシュ結合で、大きさのしきい値を 2 つとも超えたパーティションを自動で分けますが、ブロードキャスト結合にはこの扱いがかかりません。集計の偏りには、偏ったキーにランダムな値を付けて 2 段階で集計するソルティングを使います。",
       "checks": [
         {
           "question": "偏ったキーで集計するステージが遅いとき、キーにランダムな値を付けて分け、2 段階で集計する方法を何と呼びますか。",
@@ -5097,7 +5097,7 @@
       "oneLine": "シャッフルは、Spark がデータをパーティションをまたいで配り直し、別のまとまり方にする処理です。",
       "keyPhrase": "パーティションをまたいで配り直し",
       "body": "1 つのタスクは 1 つのパーティションだけを処理します。キーごとの集計や結合では、同じキーの値を 1 か所に集める必要があります。そのため Spark は、すべてのパーティションからデータを読み、エグゼキューターやマシンをまたいでコピーします。\n\nシャッフルを起こす操作には、`repartition`、キーごとの集計(`groupByKey`、`reduceByKey` など)、結合があります。シャッフルには、ディスクの I/O、データのシリアライズ、ネットワークの I/O がかかります。\n\nSpark UI では、ステージの Shuffle Read と Shuffle Write の列で量を確かめます。最も大きな I/O の値を、ワーカーの全コア数とステージの秒数で割って、1 コアあたり毎秒 3 MB 程度になるなら、そのステージは I/O で律速しているかもしれません。\n\nシャッフルの多いステージには、`spark.sql.shuffle.partitions` を `auto` にして、パーティションの数を AQE に選ばせます。処理の能力が足りないときは、クラスターを大きくするか、サーバーレスに移します。",
-      "examAngle": "Spark UI の Shuffle Read と Shuffle Write の大きいステージを示し、原因になった操作や対処を選ばせる形で出ます。",
+      "examAngle": "シャッフルを起こす操作には、`repartition`、キーごとの集計、結合があります。シャッフルの量は、Spark UI のステージの Shuffle Read と Shuffle Write の列で確かめます。シャッフルの多いステージでは、`spark.sql.shuffle.partitions` を `auto` にして、AQE がパーティションの数を選ぶようにします。",
       "checks": [
         {
           "question": "Spark UI で、ステージがシャッフルで読んだデータの量を示す列は何ですか。",
@@ -5139,7 +5139,7 @@
       "oneLine": "ディスクへのあふれ出しは、シャッフルや集計の途中のデータがメモリに収まらず、Spark がそれをディスクに書き出すことです。",
       "keyPhrase": "メモリに収まらず、Spark がそれをディスクに書き出す",
       "body": "あふれ出すと、ディスクの I/O とガベージコレクションの負担が増え、ステージが遅くなります。Spark UI のステージの画面では、Shuffle spill (memory) と Shuffle spill (disk) で量を確かめます。前者はメモリ上の展開した形の大きさ、後者はディスク上のシリアライズした形の大きさです。\n\n公式の文書が挙げる対処は次のとおりです。\n\n- エグゼキューターのメモリの大きいインスタンスを使います。複雑なバッチの ETL では、少数の大きなワーカーにします\n- `spark.sql.shuffle.partitions` を `auto` にして、パーティションの数を Spark に選ばせます\n- メモリに載せる行や列を減らし、大きな文字列、配列、マップ、構造体を小さくします\n- Structured Streaming では、入力の量を制限して、マイクロバッチを小さくします",
-      "examAngle": "Spark UI の spill の値が大きいステージを示し、メモリを増やすか、パーティションを増やすかなどの対処を選ばせる形で出ます。",
+      "examAngle": "Shuffle spill (memory) はメモリ上の展開した形の大きさで、Shuffle spill (disk) はディスク上のシリアライズした形の大きさです。ディスクへのあふれ出しの量は、Shuffle spill (disk) で確かめます。対処には、エグゼキューターのメモリの大きいインスタンスを使う方法と、`spark.sql.shuffle.partitions` を `auto` にする方法があります。",
       "checks": [
         {
           "question": "Spark UI で、ディスクへのあふれ出しの量を示す指標は何ですか。",
@@ -5172,7 +5172,7 @@
       "oneLine": "タスクが 1 つのステージは、全データを 1 つのタスクが処理するため、クラスターのほかのコアが遊び、並列にならないステージです。",
       "keyPhrase": "クラスターのほかのコアが遊び、並列にならない",
       "body": "このステージは、ワーカーを増やしても速くなりません。よくある原因と対処は次のとおりです。\n\n- **`PARTITION BY` のないウィンドウ関数**: ウィンドウが全データにまたがります。ロジックが許すなら `PARTITION BY` を足します\n- **gzip のような分割できないファイル**: 1 つのファイルを 1 つのタスクが読みます。繰り返し読むなら、一度 Delta のテーブルに取り込みます\n- **JSON や CSV の `multiLine`**: レコードが複数行にまたがるときだけ使います\n- **大きなファイルのスキーマの推測**: スキーマを指定します\n- **`repartition(1)` や `coalesce(1)`**: 出力を 1 つのファイルにする必要がなければ外します\n- **小さなデータへの重い UDF**: 組み込みの関数で書き直すか、UDF の前に `repartition` します",
-      "examAngle": "「ステージのタスクが 1 つしかなく、ワーカーを増やしても速くならない」状況から、原因の書き方を選ばせる形で出ます。",
+      "examAngle": "タスクが 1 つのステージは、ワーカーを増やしても速くなりません。1 つのタスクは 1 つのコアで動き、ほかのコアは使われないためです。主な原因には、`PARTITION BY` のないウィンドウ関数、gzip のような分割できないファイル、`repartition(1)` や `coalesce(1)` があります。",
       "checks": [
         {
           "question": "`PARTITION BY` のないウィンドウ関数を含むステージで、タスクがいくつになりますか。",
@@ -5206,7 +5206,7 @@
       "oneLine": "Liquid Clustering は、クラスタリングのキーに沿ってテーブルのデータの配置を整え、パーティション分割と ZORDER に代わる配置の最適化です。",
       "keyPhrase": "パーティション分割と ZORDER に代わる",
       "body": "テーブルを作るときに `CLUSTER BY` でキーを指定します。既存のパーティションのないテーブルにも、あとから付けられます。\n\n```sql\nCREATE TABLE main.sales.events (event_date DATE, user_id BIGINT) CLUSTER BY (event_date);\nALTER TABLE main.sales.events CLUSTER BY (user_id, event_date);  -- キーを変える\nALTER TABLE main.sales.events CLUSTER BY NONE;                 -- キーを外す\n```\n\nキーは 4 つまでです。キーを変えても、既存のデータは書き直されません。Liquid Clustering は、パーティション分割や `ZORDER` と併用できません。\n\nクラスタリングは `OPTIMIZE` で進みます。`OPTIMIZE` は増分で、整える必要のあるデータだけを書き直します。キーを変えたあとに既存のデータもすべて整えるには、`OPTIMIZE … FULL` を使います。`INSERT INTO` や CTAS などの書き込みでも、データが一定の量を超えるとその場で整えますが、すべての操作が対象ではありません。そのため、`OPTIMIZE` を定期的に実行します。\n\n公式の文書は、すべての新しいテーブルに Liquid Clustering を勧めています。とくに、カーディナリティの高い列で絞り込むテーブル、偏りの大きいテーブル、アクセスの傾向が変わるテーブルに向きます。",
-      "examAngle": "「絞り込みに使う列が時間とともに変わる」「パーティションが細かくなりすぎた」などの状況で、Liquid Clustering を選ばせる形や、キーの変更が既存のデータに及ぼす影響を問う形で出ます。",
+      "examAngle": "Liquid Clustering は、アクセスの傾向が変わるテーブルに向きます。キーを `ALTER TABLE … CLUSTER BY` で変えても、既存のデータは書き直されません。既存のデータも新しいキーで整えるには、`OPTIMIZE … FULL` を実行します。",
       "checks": [
         {
           "question": "Liquid Clustering のキーを `ALTER TABLE … CLUSTER BY` で変えました。既存のデータはすぐに書き直されますか。",
@@ -5236,7 +5236,7 @@
       "oneLine": "自動の Liquid Clustering は、テーブルへの過去のクエリの傾向から、Databricks がクラスタリングのキーを選ぶ機能です。",
       "keyPhrase": "Databricks がクラスタリングのキーを選ぶ",
       "body": "```sql\nCREATE TABLE main.sales.orders (id BIGINT, region STRING) CLUSTER BY AUTO;\nALTER TABLE main.sales.orders CLUSTER BY AUTO;\n```\n\n自動の Liquid Clustering は、キーの選択に予測的最適化を使います。対象は Unity Catalog のマネージドテーブルです。キーは時間とともに変わりますが、Databricks がキーを変えるのは、データのスキップで見込める節約がクラスタリングの費用を上回るときだけです。\n\n小さなテーブル、問い合わせの少ないテーブル、すでに十分に整っているテーブルでは、キーが選ばれないことがあります。最初のキーの候補を示したいときは、`CLUSTER BY (c1, c2)` を指定したあとに `CLUSTER BY AUTO` にします。",
-      "examAngle": "「どの列で絞り込まれるか前もって分からない」「絞り込みの列が変わりやすい」マネージドテーブルに合う設定を選ばせる形で出ます。",
+      "examAngle": "`CLUSTER BY AUTO` では、Databricks が過去のクエリの傾向からクラスタリングのキーを選びます。`CLUSTER BY (c1, c2)` では、利用者がキーを指定します。`CLUSTER BY AUTO` の対象は、Unity Catalog のマネージドテーブルです。",
       "checks": [
         {
           "question": "CLUSTER BY AUTO で、Databricks がキーを選ぶときに使う機能は何ですか。",
@@ -5265,7 +5265,7 @@
       "oneLine": "予測的最適化は、Unity Catalog のマネージドテーブルに要る保守の操作を Databricks が見つけ、自動で実行する機能です。",
       "keyPhrase": "保守の操作を Databricks が見つけ、自動で実行する",
       "body": "予測的最適化が実行する操作は、次のとおりです。\n\n- `OPTIMIZE`: ファイルの大きさを整え、Liquid Clustering のテーブルでは増分のクラスタリングを行います\n- `VACUUM`: テーブルが参照しなくなったデータファイルを消します\n- `ANALYZE`: クエリの性能のために統計を集めます\n\n予測的最適化は `ZORDER` を実行しません。Z-order で並べたファイルは、予測的最適化の対象から外れます。対象は Unity Catalog のマネージドテーブルだけで、外部テーブルは対象になりません。\n\n2024 年 11 月 11 日以降に作ったアカウントでは、既定で有効です。カタログ、スキーマ、テーブルの単位で、有効、無効、親の設定を継ぐ(`INHERIT`)を選べます。\n\n```sql\nALTER CATALOG main ENABLE PREDICTIVE OPTIMIZATION;\nALTER SCHEMA main.staging DISABLE PREDICTIVE OPTIMIZATION;\n```\n\n操作はサーバーレスのジョブのコンピュートで動き、サーバーレスのジョブの SKU で課金されます。実行の記録は、システムテーブル `system.storage.predictive_optimization_operations_history` で確かめます。",
-      "examAngle": "「OPTIMIZE と VACUUM を手で計画せずに保守したい」という要件から予測的最適化を選ばせる形や、対象のテーブルと実行しない操作(ZORDER、外部テーブル)を問う形で出ます。",
+      "examAngle": "予測的最適化は、`OPTIMIZE`、`VACUUM`、`ANALYZE` を実行し、`ZORDER` は実行しません。対象は Unity Catalog のマネージドテーブルだけで、外部テーブルは対象になりません。Z-order で並べたファイルも、対象から外れます。",
       "checks": [
         {
           "question": "予測的最適化が実行しない操作はどれですか。OPTIMIZE、VACUUM、ZORDER、ANALYZE から選んでください。",
@@ -5295,7 +5295,7 @@
       "oneLine": "クラスターの起動失敗は、クラシックのコンピュートが起動の途中で止まる障害で、init スクリプトのエラーやネットワークの設定の誤りが主な原因です。",
       "keyPhrase": "init スクリプトのエラーやネットワークの設定の誤り",
       "body": "まず、コンピュートの詳細の Event log のタブで、起動の流れを確かめます。イベントは 60 日残ります。\n\n**init スクリプト**: クラスター単位の init スクリプトが 0 以外の終了コードを返すと、クラスターの起動は失敗します。スクリプトが設定した場所にないときや、64 KB を超えるときも失敗します。イベントログには `INIT_SCRIPTS_STARTED` と `INIT_SCRIPTS_FINISHED` が記録され、後者でどのスクリプトが成功したかが分かります。スクリプトの出力は、クラスターのログの配信を設定していれば `<ログの場所>/<クラスターの ID>/init_scripts` に書かれます。\n\n**ネットワーク**: 新しいコンピュートが応答せず、イベントログに `Node daemon ping timeout` が出るときは、ネットワークの設定の誤りが多い原因です。`failed to launch Spark container` のエラーは、インスタンスが AWS STS に届かず、ルートの S3 バケットにアクセスできないときによく出ます。\n\n公式の文書は、init スクリプトの前にコンピュートのポリシーなどの組み込みの機能を使い、ライブラリを init スクリプトで入れないよう勧めています。サーバーレスでは init スクリプトを使えません。",
-      "examAngle": "「init スクリプトを追加したらクラスターが起動しなくなった」状況で、原因の確かめ方(イベントログ、init スクリプトのログ)を選ばせる形で出ます。",
+      "examAngle": "クラスターが起動しないとき、利用者はまずコンピュートの詳細の Event log のタブで起動の流れを確かめます。`INIT_SCRIPTS_FINISHED` のイベントで、どの init スクリプトが成功したかが分かります。クラスター単位の init スクリプトが 0 以外の終了コードを返すと、クラスターの起動は失敗します。",
       "checks": [
         {
           "question": "クラスター単位の init スクリプトが 0 以外の終了コードを返すと、クラスターはどうなりますか。",
@@ -5341,7 +5341,7 @@
       "oneLine": "ライブラリの競合は、同じ名前のライブラリが複数の場所に入り、意図しない版が読み込まれる状態で、Databricks では読み込みの優先順位で決まる版が使われます。",
       "keyPhrase": "読み込みの優先順位で決まる版が使われます",
       "body": "同じ名前のライブラリがあるとき、Python は優先順位の高いものを読み込みます。主な順位は、高い順に次のとおりです。\n\n1. ノートブックの単位のライブラリ(`%pip install`)\n2. コンピュートの単位のライブラリ\n3. Databricks Runtime に組み込まれたライブラリ\n\nGit フォルダーでは、作業ディレクトリと Git フォルダーの最上位が、ノートブックの単位より上に来ます。init スクリプトで入れたライブラリは、入れ方によって、組み込みのライブラリより前にも後にもなります。\n\nノートブックの単位のライブラリは、そのノートブックだけに効き、同じコンピュートのほかのノートブックに影響しません。組み込みのライブラリの版を変えたいときにも使えます。\n\n```python\n%pip install example-package==1.2.0\ndbutils.library.restartPython()\n```\n\n`%pip` は Python のプロセスを自動では再起動しないので、入れた版を読み込むには `dbutils.library.restartPython()` が要ることがあります。コンピュートの単位で入れたライブラリは、`%pip` では消せません。組み込みのライブラリの別の版を入れたときは、`%pip uninstall` で Runtime の既定の版に戻せます。",
-      "examAngle": "「ノートブックで入れた版と、クラスターに入れた版のどちらが使われるか」を問う形や、ほかのノートブックに影響せずに版を変える方法を選ばせる形で出ます。",
+      "examAngle": "同じライブラリが複数の単位で入っているとき、Python はノートブックの単位(`%pip install`)の版を、コンピュートの単位の版より優先して読み込みます。ノートブックの単位のライブラリは、入れたノートブックだけに効きます。同じコンピュートのほかのノートブックには影響しません。",
       "checks": [
         {
           "question": "同じライブラリを、コンピュートの単位と `%pip` のノートブックの単位で別の版で入れました。ノートブックで読み込まれるのはどちらですか。",
@@ -5375,7 +5375,7 @@
       "oneLine": "ドライバーのメモリ不足は、collect や toPandas などで大量の結果をドライバーに集め、ドライバーのメモリが足りなくなる障害です。",
       "keyPhrase": "大量の結果をドライバーに集め",
       "body": "`collect()` と `toPandas()` は、全データをドライバーのメモリに読み込みます。PySpark の文書は、どちらも結果が小さいと分かっているときだけ使うよう書いています。\n\n```python\nrows = df.collect()     # 全行がドライバーに集まる\npdf = df.toPandas()     # 全行が pandas の DataFrame としてドライバーに集まる\npreview = df.limit(100).toPandas()\n```\n\nApache Spark の `spark.driver.maxResultSize` は、1 回のアクションでドライバーに返す結果の大きさの合計の上限で、Spark の既定は `1g` です。超えるとジョブは中止されます。上限を大きくしすぎると、ドライバーがメモリ不足になることがあります。\n\nドライバーの種類は、既定でワーカーと同じです。大量のデータをドライバーに集める予定があるときは、メモリの大きいドライバーの種類を選べます。",
-      "examAngle": "「大きな DataFrame を toPandas で変換したらドライバーが落ちた」状況で、原因がドライバーへの集約にあることを見抜かせる形で出ます。",
+      "examAngle": "`collect()` と `toPandas()` は、全データをドライバーのメモリに読み込みます。そのため、大きな DataFrame に使うと、ドライバーのメモリが足りなくなることがあります。PySpark の文書は、どちらも結果が小さいと分かっているときだけ使うよう書いています。",
       "checks": [
         {
           "question": "数億行の DataFrame に `toPandas()` を実行したところ、ドライバーのメモリが足りなくなりました。なぜですか。",
@@ -5412,7 +5412,7 @@
       "oneLine": "エグゼキューターのメモリ不足は、タスクの処理中にエグゼキューターのメモリが足りなくなり、Spark がエグゼキューターを外してタスクを再試行する障害です。",
       "keyPhrase": "Spark がエグゼキューターを外してタスクを再試行する",
       "body": "再試行でも失敗が続くと、ステージとジョブが失敗します。エラーは一般的な文言になりやすく、`ExecutorLostFailure` に「containers exceeding thresholds, or network issues」のような説明が付くことがあります。\n\nメモリが原因かを確かめるには、コアの数を変えずに、コアあたりのメモリを 2 倍にします(4 コア 16 GB から 4 コア 32 GB など)。失敗が遅くなるか起きなくなれば、メモリが原因です。効くのは、全体のメモリではなく、コアあたりのメモリの比率です。\n\n公式の文書が挙げる主な原因と対処は次のとおりです。\n\n- シャッフルのパーティションが少ない: `spark.sql.shuffle.partitions` を `auto` にします\n- 大きなテーブルのブロードキャスト: ブロードキャストのヒントと、実行時のしきい値を見直します\n- UDF がパーティション全体をメモリに載せる: 組み込みの関数で書き直すか、先に `repartition` します\n- `PARTITION BY` のないウィンドウ関数: ロジックが許すなら `PARTITION BY` を足します\n- データの偏り: ステージの Summary Metrics で確かめます\n- ストリーミングの状態: RocksDB の状態ストアを使い、メモリに上限を付けます\n\n大きなワーカーの種類で直るなら、そのまま使ってかまいません。",
-      "examAngle": "「シャッフルを伴う処理で ExecutorLostFailure が出る」状況から、パーティションの数やメモリの比率など、対処を選ばせる形で出ます。",
+      "examAngle": "利用者は、原因がメモリかを確かめるには、コアの数を変えずにコアあたりのメモリを 2 倍にします。効くのは、全体のメモリの量でなく、コアあたりのメモリの比率です。シャッフルのパーティションが少ないときは、`spark.sql.shuffle.partitions` を `auto` にします。",
       "checks": [
         {
           "question": "エグゼキューターのメモリ不足かを確かめるために、公式の文書が勧める方法は何ですか。",
@@ -5446,7 +5446,7 @@
       "oneLine": "Git フォルダーは、Git のリポジトリをワークスペースに複製し、ノートブックやファイルを Git で版の管理をするための、画面と API の Git のクライアントです。",
       "keyPhrase": "Git のリポジトリをワークスペースに複製し",
       "body": "Git フォルダーは、以前は Repos と呼ばれていた機能です。リモートのリポジトリを複製(クローン)して作り、その中のノートブックやファイルを編集します。\n\nGit フォルダーの Git のダイアログでは、ブランチの作成と切り替え、コミットと push、Pull、マージ、リベース、競合の解消ができます。プルリクエストの作成とマージ、リモートのブランチの削除は、Git のプロバイダー(GitHub など)の画面で行います。\n\nGit フォルダーを使うと、ブランチを分けて開発し、変更をリモートのリポジトリに記録できます。記録した変更は、チームで共有したり CI/CD の流れにつないだりできます。\n\n作業中のブランチの大きさは 1 GB まで、ワークスペースの資産とファイルの数は 20,000 未満が推奨です。",
-      "examAngle": "「チームでノートブックの変更をブランチで分けて開発し、Git のリポジトリと同期したい」という要件から、Git フォルダーを選ばせる形で出ます。",
+      "examAngle": "Git フォルダーでは、ブランチの作成と切り替え、コミットと push、Pull、マージができます。プルリクエストの作成とマージ、リモートのブランチの削除は、Git のプロバイダーの画面で行います。Git フォルダーは、以前は Repos と呼ばれていた機能です。",
       "checks": [
         {
           "question": "ノートブックの変更を、ブランチを分けて開発し、リモートの Git のリポジトリに記録したいとき、ワークスペースのどの機能を使いますか。",
@@ -5479,7 +5479,7 @@
       "oneLine": "Git フォルダーでは、Git のダイアログの Create Branch で元のブランチを選んで新しいブランチを作り、Git のダイアログのブランチのドロップダウンで切り替えます。",
       "keyPhrase": "元のブランチを選んで新しいブランチを作り",
       "body": "新しいブランチは、名前を入れ、元にするブランチを選んで作ります。ブランチを切り替えたとき、コミットしていない変更は、切り替え先のコードとぶつからなければ、切り替え先のブランチでもコミットしていない変更として残ります。\n\n切り替え先のブランチにないノートブックやファイルは、ワークスペースから消えます。元のブランチに戻すと作り直されますが、ID は新しくなります。この挙動は取り消せません。",
-      "examAngle": "「新しい機能を開発するため、既定のブランチから作業用のブランチを作りたい」という場面で、Git フォルダーのどの操作を使うかを問う形で出ます。",
+      "examAngle": "Git フォルダーでは、利用者は Git のダイアログの Create Branch で、元にするブランチを選んで新しいブランチを作ります。既存のブランチへの切り替えは、ブランチのドロップダウンで行います。切り替え先のブランチにないノートブックやファイルは、ワークスペースから消えます。",
       "checks": [
         {
           "question": "Git フォルダーで、コミットしていない変更があるままブランチを切り替えました。切り替え先のコードと変更がぶつからないとき、その変更はどうなりますか。",
@@ -5504,7 +5504,7 @@
       "oneLine": "Commit & Push は、Git フォルダーの変更を 1 回の操作でコミットしてリモートのリポジトリへ送るボタンで、Pull はリモートの変更を Git フォルダーへ取り込むボタンです。",
       "keyPhrase": "1 回の操作でコミットしてリモートのリポジトリへ送る",
       "body": "利用者は、Git のダイアログで、変更したファイルを選び、コミットのメッセージ(必須)を入れて **Commit & Push** を押します。コミットと push が続けて行われます。\n\n**Pull** を押すと、ノートブックやファイルが、リモートのリポジトリの最新の版に更新されます。手元の変更とぶつかったときは、競合を解消します。\n\n競合は、ファイルを手で直すか、Keep all current changes(手元の変更を残す)か Take all incoming changes(取り込む側の変更を採る)を選んで解消します。\n\n**Reset** は、`git reset --hard` と `git push --force` に当たる操作です。手元とリモートの両方で、そのブランチのコミット済みの変更とコミット前の変更が消えます。",
-      "examAngle": "「ほかの開発者がリモートに push した最新の変更を、自分の Git フォルダーに反映したい」「変更をリモートに送りたい」という場面で、Pull と Commit & Push のどちらを使うかを問う形で出ます。",
+      "examAngle": "Commit & Push は、手元の変更をコミットして、リモートのリポジトリへ送ります。Pull は、リモートの変更を Git フォルダーへ取り込みます。Reset は、そのブランチのコミット済みの変更とコミット前の変更を、手元とリモートの両方で消します。",
       "checks": [
         {
           "question": "同僚がリモートのリポジトリに push した変更を、自分の Git フォルダーに取り込みたいとき、どの操作を使いますか。",
@@ -5534,7 +5534,7 @@
       "oneLine": "プルリクエストの作成とマージ、リモートのブランチの削除は、Git フォルダーではなく、GitHub などの Git のプロバイダーの画面で行います。",
       "keyPhrase": "Git のプロバイダーの画面で行います",
       "body": "Git フォルダーの Git のダイアログには、プルリクエストを作る操作がありません。既定のブランチに直接コミットできないリポジトリでは、作業用のブランチを push します。そのあと、Git のプロバイダーでプルリクエストを作り、レビューを経てマージします。\n\nブランチの削除も、Git のプロバイダーで行います。リモートのブランチを消しても、Git フォルダーの手元のブランチは最大 30 日残ることがあります。\n\nマージそのものは、Git フォルダーでもできます。競合がなければ、Git フォルダーはマージの結果をリモートへ push します。",
-      "examAngle": "「Git フォルダーで開発したブランチの変更を、レビューを経て main に取り込みたい」という場面で、プルリクエストをどこで作るかを問う形で出ます。",
+      "examAngle": "プルリクエストの作成とマージは、GitHub などの Git のプロバイダーの画面で行います。Git フォルダーの Git のダイアログには、プルリクエストを作る操作がありません。ブランチどうしのマージそのものは、Git フォルダーでもできます。",
       "checks": [
         {
           "question": "Git フォルダーで開発したブランチを push しました。チームのレビューを受けるため、プルリクエストを作るにはどこで操作しますか。",
@@ -5563,7 +5563,7 @@
       "oneLine": "targets は、databricks.yml で、開発や本番などの配布先の環境を並べ、環境ごとにワークスペースや設定の上書きを書く項目です。",
       "keyPhrase": "配布先の環境を並べ、環境ごとにワークスペースや設定の上書きを書く",
       "body": "各ターゲットには、使うワークスペース、デプロイのモード、変数の値、リソースの設定の上書きなどを書きます。トップレベルの設定が既定値になり、ターゲットに書いた設定がそれを上書きします。ターゲットに書いていない項目は、トップレベルの設定がそのまま使われます。\n\n```yaml\ntargets:\n  dev:\n    mode: development\n    default: true\n    variables:\n      catalog: dev_catalog\n  prod:\n    mode: production\n    variables:\n      catalog: prod_catalog\n```\n\n`default: true` を付けられるターゲットは 1 つだけです。`bundle deploy` などのコマンドは、`-t` を付けないと既定のターゲットを使い、ほかのターゲットには `-t prod` のように指定します。",
-      "examAngle": "「開発、検証、本番の環境ごとに、配布先のワークスペースや設定を変えたい」という要件から、databricks.yml のどの項目に書くかを問う形で出ます。",
+      "examAngle": "環境ごとのワークスペースや設定は、`databricks.yml` の `targets` に書きます。ターゲットに書いた設定はトップレベルの設定を上書きし、書いていない項目にはトップレベルの設定が使われます。`-t` を付けないコマンドは、`default: true` を付けたターゲットを使います。",
       "checks": [
         {
           "question": "databricks.yml で、開発と本番の環境ごとに配布先のワークスペースを変えたいとき、どの項目に書きますか。",
@@ -5597,7 +5597,7 @@
       "oneLine": "バンドルの変数は、トップレベルの variables で宣言し、`${var.<名前>}` で参照する値で、ターゲットごとに別の値を与えられます。",
       "keyPhrase": "ターゲットごとに別の値を与えられます",
       "body": "変数は、トップレベルの `variables` で、説明と既定値を付けて宣言します。環境ごとに値を変えるときは、ターゲットの下の `variables` に値を書きます。\n\n```yaml\nvariables:\n  catalog:\n    description: 書き込み先のカタログ\n    default: dev_catalog\n\ntargets:\n  prod:\n    variables:\n      catalog: prod_catalog\n```\n\n設定の中では `${var.catalog}` で参照します。値は、次の順に強く効きます。\n\n- コマンドの `--var` の指定\n- `BUNDLE_VAR_` で始まる環境変数\n- `.databricks/bundle/<ターゲット>/variable-overrides.json` のファイル\n- ターゲットの下の `variables` の値\n- トップレベルの `default`\n\n既定値のない変数には、上のどれかで値を与えます。`type: complex` を付けると、クラスターの設定のような構造のある値も持てます。\n\n宣言しなくても使える置換もあります。`${bundle.target}` は配布中のターゲットの名前、`${workspace.current_user.userName}` は配布した利用者の名前になります。",
-      "examAngle": "「本番の環境だけ書き込み先のカタログを変えたい」という要件で、変数の宣言の場所と、ターゲットごとの値の書き方を問う形で出ます。",
+      "examAngle": "利用者は、変数をトップレベルの `variables` で宣言し、環境ごとの値をターゲットの下の `variables` に書きます。ターゲットの下の値は、トップレベルの `default` より強く効きます。コマンドの `--var` の指定は、ターゲットの下の値よりさらに強く効きます。",
       "checks": [
         {
           "question": "トップレベルで `default: dev_catalog` と宣言した変数 `catalog` に、ターゲット `prod` の下で `prod_catalog` を与えました。`-t prod` で配布すると、`${var.catalog}` は何になりますか。",
@@ -5627,7 +5627,7 @@
       "oneLine": "デプロイのモードは、ターゲットの `mode` に development か production を書き、開発用と本番用で配布の挙動を切り替える設定です。",
       "keyPhrase": "開発用と本番用で配布の挙動を切り替える",
       "body": "`mode: development` のターゲットでは、Databricks は配布するジョブやパイプラインの名前に `[dev <ユーザー名>]` の接頭辞を付けます。ジョブのスケジュールとトリガーは一時停止の状態で配布され、同時実行も許されます。開発者どうしが同じワークスペースに配布しても、名前がぶつからず、本番のように定期実行もされません。\n\n`mode: production` のターゲットでは、Databricks は配布の前に設定を確かめます。たとえば、ターゲットに Git のブランチを書いていれば、今のブランチと一致するかを確かめます。パイプラインが開発用の印(`development: true`)になっていないことも確かめます。既存のクラスターへの差し替えはできません。\n\n本番の配布では、ジョブを利用者でなくサービスプリンシパルで動かすことを Databricks は勧めています。`run_as` にサービスプリンシパルを指定すると、そのように動きます。\n\nモードの既定の挙動は、`presets` で個別に変えられます。`mode` と `presets` の両方があるときは、`presets` が優先され、リソースごとの設定はさらに `presets` より優先されます。",
-      "examAngle": "「開発者ごとに配布したジョブの名前がぶつからないようにしたい」「開発の環境で定期実行させたくない」という要件から、ターゲットのモードを選ばせる形で出ます。",
+      "examAngle": "`mode: development` では、Databricks がジョブの名前に `[dev <ユーザー名>]` を付け、スケジュールとトリガーを一時停止の状態で配布します。`mode: production` では、Databricks が配布の前に設定を確かめます。たとえば、ターゲットに書いた Git のブランチが今のブランチと一致するかを確かめます。",
       "checks": [
         {
           "question": "開発者がそれぞれ同じワークスペースにバンドルを配布しても、ジョブの名前がぶつからず、スケジュールも動かないようにしたいとき、ターゲットの `mode` に何を書きますか。",
@@ -5652,7 +5652,7 @@
       "oneLine": "Declarative Automation Bundles は、ジョブやパイプラインなどの Databricks のリソースを YAML のソースのファイルで定義し、Git で管理して、環境ごとに同じ形で配布する仕組みです。",
       "keyPhrase": "YAML のソースのファイルで定義し、Git で管理して",
       "body": "Declarative Automation Bundles は、以前は Databricks Asset Bundles と呼ばれていました。公式の文書は今の名前を使い、旧称を併記しています。試験の問題や古い記事で Databricks Asset Bundles とあれば、同じ仕組みを指します。\n\nバンドルには、ノートブックや Python のファイルなどのソースのファイルと、リソースの定義と設定、テストを入れます。設定は YAML で書き、入口のファイルは `databricks.yml` です。\n\n作業は、次の順に進めます。\n\n```bash\ndatabricks bundle init        # ひな形からプロジェクトを作る\ndatabricks bundle validate    # 設定を確かめる\ndatabricks bundle deploy -t dev\ndatabricks bundle run -t dev my_job\n```\n\n配布できるリソースには、Lakeflow Jobs のジョブ、パイプライン、ダッシュボード、モデルサービングのエンドポイント、MLflow の実験などがあります。Databricks は、CI/CD の方法としてバンドルを勧めています。\n\nバンドルを使うには、Databricks CLI の v0.218.0 以降が要ります。",
-      "examAngle": "「ジョブやパイプラインの定義をコードとして Git で管理し、開発から本番へ同じ形で配布したい」という要件から、バンドルを選ばせる形で出ます。旧称の Databricks Asset Bundles で書かれることもあります。",
+      "examAngle": "Declarative Automation Bundles と Databricks Asset Bundles は、同じ仕組みです。Databricks Asset Bundles は旧称です。バンドルでは、ジョブやパイプラインの定義を YAML で書き、Git で管理して、環境ごとに同じ形で配布します。",
       "checks": [
         {
           "question": "Databricks Asset Bundles と Declarative Automation Bundles は、別の仕組みですか。",
@@ -5686,7 +5686,7 @@
       "oneLine": "databricks.yml は、バンドルの名前、変数、リソース、ターゲットなどを書く、バンドルの設定の入口のファイルです。",
       "keyPhrase": "バンドルの設定の入口のファイル",
       "body": "`databricks.yml` のトップレベルに書く主な項目は、次のとおりです。\n\n- `bundle`: バンドルの名前(必須)など\n- `include`: リソースの設定を書いた別のファイルを取り込む\n- `variables`: 変数の宣言\n- `workspace`: ワークスペースの接続先とパス\n- `permissions`: リソースにかける権限\n- `resources`: 配布するジョブやパイプラインなど\n- `targets`: 配布先の環境\n\n```yaml\nbundle:\n  name: sales_pipeline\n\ninclude:\n  - resources/*.yml\n\ntargets:\n  dev:\n    default: true\n```\n\nリソースが多いときは、`include` でファイルを分けます。トップレベルに書いた設定は既定値になり、`targets` の中の設定で環境ごとに上書きされます。",
-      "examAngle": "「バンドルの名前、配布先の環境、配布するジョブを定義するファイルはどれか」という形で出ます。",
+      "examAngle": "`databricks.yml` は、バンドルの設定の入口のファイルです。トップレベルの `bundle` に書くバンドルの名前は必須です。配布先の環境は `targets` に、配布するジョブは `resources` に書きます。",
       "checks": [
         {
           "question": "`databricks.yml` のトップレベルの項目のうち、必ず書く必要があるのはどれですか。",
@@ -5711,7 +5711,7 @@
       "oneLine": "resources は、バンドルが配布するジョブやパイプラインなどを、種類ごとにキーを付けて定義する項目です。",
       "keyPhrase": "種類ごとにキーを付けて定義する",
       "body": "`resources` の下に、`jobs` や `pipelines` のようなリソースの種類を書き、その下に各リソースのキーと設定を書きます。設定の項目は、各リソースの REST API の形に沿います。\n\n```yaml\nresources:\n  jobs:\n    daily_sales:\n      name: daily_sales\n      tasks:\n        - task_key: load\n          notebook_task:\n            notebook_path: ../src/load.ipynb\n```\n\nキー(上の例では `daily_sales`)は、バンドルの中でリソースを指す名前です。`databricks bundle run daily_sales` のようにコマンドで実行するときや、`${resources.jobs.daily_sales.id}` のように設定の中で参照するときに使います。\n\nジョブとパイプラインのほか、ダッシュボード、スキーマ、ボリューム、アプリ、SQL ウェアハウスなども定義できます。",
-      "examAngle": "「バンドルで配布するジョブの定義を、databricks.yml のどこに書くか」という形で出ます。",
+      "examAngle": "配布するジョブは、`resources` の下の `jobs` に、キーを付けて書きます。キーはバンドルの中でリソースを指す名前です。キーは、`databricks bundle run` の引数や、`${resources.jobs.daily_sales.id}` のような参照に使います。",
       "checks": [
         {
           "question": "バンドルで配布するジョブの定義は、databricks.yml のどの項目の下に書きますか。",
@@ -5740,7 +5740,7 @@
       "oneLine": "バンドルでの昇格は、同じバンドルのソースを、CI/CD の道具から開発、検証、本番のターゲットへ順に配布して、変更を本番まで進める流れです。",
       "keyPhrase": "同じバンドルのソースを、CI/CD の道具から開発、検証、本番のターゲットへ順に配布して",
       "body": "利用者は、バンドルのファイルを Git で管理し、GitHub Actions などの CI/CD の道具から Databricks CLI を呼びます。環境ごとの違いはターゲットと変数に書くので、どの環境にも同じソースを配布できます。\n\n```bash\ndatabricks bundle validate -t staging\ndatabricks bundle deploy -t staging\ndatabricks bundle run -t staging integration_test\ndatabricks bundle deploy -t prod\n```\n\n本番のターゲットは `mode: production` にします。CI/CD の流れでは、利用者のアカウントでなくサービスプリンシパルで認証することを Databricks は勧めています。保存した秘密情報を持たずに済む、ワークロードの ID のフェデレーションが最も安全な方法です。\n\n既存のジョブを本番に置いたままバンドルの管理に移すときは、`bundle generate` と `bundle deployment bind` を使います。",
-      "examAngle": "「開発の環境で確かめたジョブを、同じ定義のまま本番の環境に配布したい」という要件で、ターゲットを分けた配布の流れを問う形で出ます。",
+      "examAngle": "検証と本番への配布では、同じソースのまま、`-t` で指定するターゲットだけを変えます。環境ごとの違いは、ターゲットと変数に書きます。本番のターゲットは `mode: production` にします。",
       "checks": [
         {
           "question": "同じバンドルを、検証の環境と本番の環境に配布し分けるとき、コマンドでは何を変えますか。",
@@ -5773,7 +5773,7 @@
       "oneLine": "`databricks bundle validate` は、バンドルの設定のファイルに構文の誤りがないかを、配布せずに確かめるコマンドです。",
       "keyPhrase": "配布せずに確かめる",
       "body": "`bundle validate` は、設定のファイルの構文を確かめ、バンドルの名前、ターゲット、配布先のワークスペースなどの要約を表示します。リソースの設定に知らない項目があれば、警告を出します。\n\n```bash\ndatabricks bundle validate -t prod\n```\n\nCI/CD の流れでは、配布の前に `validate` を置き、設定の誤りを早く見つけます。配布で何が変わるかを確かめたいときは、`databricks bundle plan` で、変更を加えずに配布の操作の一覧を見られます。",
-      "examAngle": "「CI/CD の流れで、配布の前にバンドルの設定の誤りを見つけたい」という要件から、コマンドを選ばせる形で出ます。",
+      "examAngle": "`databricks bundle validate` は、設定のファイルの構文を確かめて要約を表示するだけで、配布はしません。配布で何が変わるかを、変更を加えずに見るには、`databricks bundle plan` を使います。",
       "checks": [
         {
           "question": "ワークスペースに何も配布せずに、バンドルの設定のファイルの構文が正しいかを確かめるコマンドは何ですか。",
@@ -5802,7 +5802,7 @@
       "oneLine": "`databricks bundle deploy` は、バンドルのファイルとリソースを、指定したターゲットのワークスペースへ配布するコマンドです。",
       "keyPhrase": "指定したターゲットのワークスペースへ配布する",
       "body": "`bundle deploy` では、`-t`(`--target`)でターゲットを指定します。指定しなければ、`default: true` を付けたターゲットに配布します。\n\n```bash\ndatabricks bundle deploy -t prod\n```\n\n配布すると、ジョブやパイプラインが作られるか、前の配布から更新されます。配布するだけで、ジョブは実行されません。実行は `bundle run` で行います。\n\n配布したリソースとファイルを消すときは `databricks bundle destroy` を使います。消したものは戻せません。",
-      "examAngle": "「バンドルを本番のワークスペースに配布するコマンドはどれか」という形で、`validate` や `run` と区別させる問いで出ます。",
+      "examAngle": "`bundle validate` は設定を確かめるだけで、配布しません。`bundle deploy` はリソースを配布しますが、ジョブは実行しません。ジョブの実行は `bundle run` で行います。",
       "checks": [
         {
           "question": "`databricks bundle deploy -t prod` を実行しました。バンドルに定義したジョブは、このコマンドで実行されますか。",
@@ -5827,7 +5827,7 @@
       "oneLine": "`databricks bundle run` は、配布済みのバンドルにあるジョブやパイプラインを、リソースのキーで指定して実行するコマンドです。",
       "keyPhrase": "リソースのキーで指定して実行する",
       "body": "引数には、`resources` の下で付けたジョブやパイプラインのキーを指定します。ジョブの名前やジョブの ID ではありません。\n\n```bash\ndatabricks bundle run -t dev daily_sales\n```\n\nジョブにパラメータを渡すときは `--params`、パイプラインの表を指定してリセットし、計算し直すときは `--full-refresh` を付けます。`--no-wait` を付けると、実行の完了を待たずにコマンドが終わります。\n\n設定を変えたときは、先に `bundle deploy` で配布してから実行します。",
-      "examAngle": "「配布したジョブを、CLI から実行したい」という場面で、コマンドと引数(リソースのキー)を問う形で出ます。",
+      "examAngle": "`databricks bundle run` の引数には、`resources` の下で付けたリソースのキーを指定します。ジョブの名前やジョブの ID は、引数になりません。設定を変えたときは、先に `bundle deploy` で配布してから実行します。",
       "checks": [
         {
           "question": "`resources.jobs.daily_sales` として定義したジョブを、CLI から実行するコマンドは何ですか。",
@@ -5852,7 +5852,7 @@
       "oneLine": "`bundle generate` は既存のジョブなどからバンドルの設定のファイルを作るコマンドで、`bundle deployment bind` はバンドルのリソースを既存のジョブなどに結び付けるコマンドです。",
       "keyPhrase": "バンドルのリソースを既存のジョブなどに結び付ける",
       "body": "ワークスペースで作ったジョブをバンドルの管理に移すときは、まず `generate` で設定を作ります。\n\n```bash\ndatabricks bundle generate job --existing-job-id 1234\n```\n\nこのコマンドは、`resources` のフォルダーにジョブの設定のファイルを書き、ジョブが参照するノートブックや Python のファイルを `src` のフォルダーに取り込みます。\n\n次に `bind` で、バンドルのリソースのキーと既存のジョブの ID を結び付けます。\n\n```bash\ndatabricks bundle deployment bind daily_sales 1234\n```\n\n結び付けたあとの配布では、既存のジョブがバンドルの設定で更新されます。結び付けずに配布すると、新しいジョブが別に作られ、同じジョブが 2 つになることがあります。結び付けを外すときは `bundle deployment unbind` を使います。",
-      "examAngle": "「既存のジョブをバンドルで管理したい。配布で新しいジョブを作らず、元のジョブを更新したい」という要件から、generate と bind の組み合わせを選ばせる形で出ます。",
+      "examAngle": "`bundle generate` は、既存のジョブから設定のファイルを作ります。`bundle deployment bind` で既存のジョブの ID と結び付けると、配布で既存のジョブが更新されます。結び付けずに配布すると、新しいジョブが別に作られ、同じジョブが 2 つになることがあります。",
       "checks": [
         {
           "question": "既存のジョブから `bundle generate` で設定を作り、そのまま `bundle deploy` しました。`bind` はしていません。ワークスペースのジョブはどうなりますか。",
@@ -5881,7 +5881,7 @@
       "oneLine": "Databricks CLI は、統合認証の環境変数か、`.databrickscfg` の構成プロファイルから、接続先のワークスペースと認証情報を読みます。",
       "keyPhrase": "統合認証の環境変数か、`.databrickscfg` の構成プロファイルから",
       "body": "接続先は `DATABRICKS_HOST` に書きます。認証の情報は、方式ごとに環境変数が違います。\n\n- 個人用アクセストークン(PAT): `DATABRICKS_TOKEN`\n- サービスプリンシパルの OAuth(マシン間): `DATABRICKS_CLIENT_ID` と `DATABRICKS_CLIENT_SECRET`\n\n同じ値は、`.databrickscfg` のプロファイルにも書けます。`databricks configure` は、ホストとトークンを尋ねてプロファイルを作ります。名前を指定しなければ `DEFAULT` のプロファイルを上書きします。\n\nPAT は、公式の文書で旧来(legacy)の方式とされています。Databricks は、利用者の認証には PAT より OAuth を勧めています。CI/CD のような無人の処理では、サービスプリンシパルの OAuth か、秘密情報を保存せずに済むトークンのフェデレーションを使います。",
-      "examAngle": "「CI/CD の環境から、PAT で Databricks CLI を認証したい。どの環境変数を設定するか」という形で出ます。",
+      "examAngle": "利用者は、PAT で認証するとき、`DATABRICKS_HOST` にワークスペースの URL を、`DATABRICKS_TOKEN` に PAT を設定します。サービスプリンシパルの OAuth では、`DATABRICKS_CLIENT_ID` と `DATABRICKS_CLIENT_SECRET` を使います。CI/CD では、Databricks は利用者のアカウントでなくサービスプリンシパルを勧めています。",
       "checks": [
         {
           "question": "PAT で Databricks CLI を認証するとき、環境変数に設定する 2 つの値は何ですか。",
@@ -5919,7 +5919,7 @@
       "oneLine": "GRANT は、Unity Catalog のオブジェクトの権限を、ユーザー、グループ、サービスプリンシパルに与える SQL の文で、REVOKE はその権限を取り消す文です。",
       "keyPhrase": "ユーザー、グループ、サービスプリンシパルに与える",
       "body": "構文は、権限、オブジェクトの種類と名前、相手の順に書きます。\n\n```sql\nGRANT SELECT ON TABLE main.sales.orders TO `analysts`;\nREVOKE SELECT ON TABLE main.sales.orders FROM `analysts`;\n```\n\n相手には、ユーザー(メールアドレス)、グループの名前、サービスプリンシパル(アプリケーション ID)を書きます。特殊な文字を含む名前は、バッククォートで囲みます。権限は、カンマで区切って複数を一度に書けます。\n\n画面で操作するときは、Catalog Explorer でオブジェクトを開き、Permissions のタブで Grant を押して相手と権限を選びます。取り消しは、同じタブで権限を選んで Revoke を押します。\n\n権限を与えられるのは、オブジェクトの所有者、親のカタログやスキーマの所有者、オブジェクトの `MANAGE` を持つ利用者、メタストアの管理者です。`REVOKE` は、与えていない権限を指定しても成功します。\n\n今の付与は `SHOW GRANTS ON TABLE main.sales.orders` で確かめます。",
-      "examAngle": "「アナリストのグループに表の読み取りを許したい」という要件で、GRANT の文の形や、UI(Catalog Explorer)での操作を問う形で出ます。",
+      "examAngle": "`GRANT` の文は `TO` で相手を書き、`REVOKE` の文は `FROM` で相手を書きます。`REVOKE` は、与えていない権限を指定しても成功します。画面では、Catalog Explorer の Permissions のタブで Grant と Revoke を操作します。",
       "checks": [
         {
           "question": "グループ `analysts` に、表 `main.sales.orders` を読む権限を与える文を書いてください(親のカタログとスキーマの権限は、すでにあるものとします)。",
@@ -5957,7 +5957,7 @@
       "oneLine": "DENY は、権限を明示的に拒否して、どの付与よりも優先させる SQL の文で、`hive_metastore` のカタログだけで使え、Unity Catalog では使えません。",
       "keyPhrase": "`hive_metastore` のカタログだけで使え、Unity Catalog では使えません",
       "body": "DENY は、旧来のテーブルのアクセス制御(`hive_metastore`)の文です。拒否した権限は、明示の付与にも暗黙の付与にも優先します。スキーマで拒否すれば、その中のすべてのオブジェクトでも拒否されます。\n\n```sql\nDENY SELECT ON TABLE t TO `user@example.com`;\nREVOKE SELECT ON TABLE t FROM `user@example.com`;  -- DENY を取り消す\n```\n\nDENY を取り消すときは、同じ権限を同じ相手から `REVOKE` します。\n\nUnity Catalog には、権限を拒否する文がありません。利用者に権限を持たせたくないときは、与えた権限を `REVOKE` で取り消し、どの階層で与えているか(継承)も確かめます。\n\nUnity Catalog には、ABAC の DENY ポリシー(ベータ)があります。拒否できる権限は `MANAGE ACCESS CONTROL`(権限を管理する権限)だけで、`SELECT` や `MODIFY` は拒否できません。",
-      "examAngle": "試験ガイドの範囲には「GRANT、REVOKE、DENY」と並んでいます。「Unity Catalog の表で、特定の利用者の読み取りを止めるにはどうするか」のような問いで、DENY が Unity Catalog で使えるかを区別させる形が考えられます。",
+      "examAngle": "`DENY` は `hive_metastore` のカタログだけで使え、Unity Catalog では使えません。Unity Catalog で利用者に権限を持たせたくないときは、与えた権限を `REVOKE` で取り消します。そのとき、どの階層で権限を与えているか(継承)も確かめます。",
       "checks": [
         {
           "question": "Unity Catalog の表に対して `DENY SELECT ON TABLE … TO …` を実行できますか。",
@@ -5995,7 +5995,7 @@
       "oneLine": "USE CATALOG と USE SCHEMA は、カタログとスキーマの中のオブジェクトを使うための前提の権限で、それだけではデータを読めません。",
       "keyPhrase": "それだけではデータを読めません",
       "body": "表を読むには、次の 3 つの権限がそろっている必要があります。\n\n- 親のカタログの `USE CATALOG`\n- 親のスキーマの `USE SCHEMA`\n- 表の `SELECT`\n\n```sql\nGRANT USE CATALOG ON CATALOG main TO `analysts`;\nGRANT USE SCHEMA ON SCHEMA main.sales TO `analysts`;\nGRANT SELECT ON TABLE main.sales.orders TO `analysts`;\n```\n\n`USE CATALOG` と `USE SCHEMA` だけを持つ利用者は、中の表のデータを読めません。逆に、表の `SELECT` だけがあっても、親の `USE CATALOG` と `USE SCHEMA` がなければ読めません。\n\nオブジェクトがあることとメタデータだけを見せたいときは、`BROWSE` を使います。`BROWSE` は、`USE CATALOG` と `USE SCHEMA` がなくても、オブジェクトを見つけてメタデータを見られる権限です。",
-      "examAngle": "「アナリストに 1 つの表だけを読ませたい。最小の権限の組み合わせはどれか」という形で出ます。",
+      "examAngle": "利用者が表を読むには、親のカタログの `USE CATALOG`、親のスキーマの `USE SCHEMA`、表の `SELECT` の 3 つが要ります。`USE CATALOG` と `USE SCHEMA` だけでは、表のデータを読めません。表の `SELECT` だけでも、親の 2 つの権限がなければ読めません。",
       "checks": [
         {
           "question": "表 `main.sales.orders` の `SELECT` だけを与えられた利用者が、この表を読もうとしました。読めますか。",
@@ -6029,7 +6029,7 @@
       "oneLine": "SELECT は表やビューを読む権限で、MODIFY は表にデータを追加、更新、削除する権限です。",
       "keyPhrase": "表にデータを追加、更新、削除する権限",
       "body": "`MODIFY` は、`INSERT`、`UPDATE`、`DELETE` のようにデータを変える操作に要ります。`MODIFY` を使うときも、表の `SELECT` と、親の `USE SCHEMA` と `USE CATALOG` が要ります。\n\n```sql\nGRANT SELECT, MODIFY ON TABLE main.sales.orders TO `etl_team`;\n```\n\n新しい表を作るのは別の権限です。スキーマの `CREATE TABLE` が要り、Databricks はスキーマの単位で与えることを勧めています。関数を呼ぶには、関数の `EXECUTE` が要ります。",
-      "examAngle": "「ETL のグループに、既存の表へデータを書き込ませたい」という要件で、付与する権限を選ばせる形で出ます。",
+      "examAngle": "`SELECT` は表を読む権限で、`MODIFY` は表のデータを追加、更新、削除する権限です。`MODIFY` を使うときも、表の `SELECT` と、親の `USE SCHEMA` と `USE CATALOG` が要ります。新しい表を作るには、スキーマの `CREATE TABLE` が要ります。",
       "checks": [
         {
           "question": "グループに、既存の表の行を更新し、削除させたいとき、表の `SELECT` に加えて何の権限を与えますか(親のカタログとスキーマの権限はあるものとします)。",
@@ -6054,7 +6054,7 @@
       "oneLine": "ALL PRIVILEGES は、オブジェクトとその子のオブジェクトで使える権限をまとめて与える指定で、`MANAGE` などの一部の権限は含みません。",
       "keyPhrase": "`MANAGE` などの一部の権限は含みません",
       "body": "`ALL PRIVILEGES` は、権限を確かめる時点で、使えるすべての権限に展開されます。あとで Databricks が新しい権限を足したときも、既存の `ALL PRIVILEGES` の付与に含まれます。\n\n```sql\nGRANT ALL PRIVILEGES ON SCHEMA main.sales TO `data_engineers`;\n```\n\n含まれない権限は、`MANAGE`、`READ METADATA`、`EXTERNAL USE SCHEMA`、`EXTERNAL USE LOCATION` です。\n\n`REVOKE ALL PRIVILEGES` で取り消すと、`ALL PRIVILEGES` に含まれる個別の権限もまとめて取り消されます。含まれない上の権限は、そのまま残ります。",
-      "examAngle": "「グループに、スキーマのすべての操作を許したい」という要件で、ALL PRIVILEGES を選ばせる形や、含まれない権限を問う形で出ます。",
+      "examAngle": "`ALL PRIVILEGES` には、`MANAGE`、`READ METADATA`、`EXTERNAL USE SCHEMA`、`EXTERNAL USE LOCATION` が含まれません。あとで Databricks が足した権限は、既存の `ALL PRIVILEGES` の付与に含まれます。",
       "checks": [
         {
           "question": "`ALL PRIVILEGES` を与えた利用者は、そのオブジェクトの `MANAGE` の権限も持ちますか。",
@@ -6087,7 +6087,7 @@
       "oneLine": "カタログやスキーマに与えた権限は、その中の今あるオブジェクトと、これから作るオブジェクトに引き継がれます。",
       "keyPhrase": "今あるオブジェクトと、これから作るオブジェクトに引き継がれます",
       "body": "Unity Catalog のオブジェクトは、メタストア、カタログ、スキーマ、表(ビュー、ボリューム、関数)の階層になっています。カタログとスキーマは、オブジェクトを入れる容器です。\n\nスキーマに `SELECT` を与えると、そのスキーマの今ある表とビュー、あとで作る表とビューのすべてで `SELECT` が効きます。表ごとに与え直す必要はありません。\n\n```sql\nGRANT SELECT ON SCHEMA main.sales TO `analysts`;\n```\n\nメタストアに与えた権限は、子のオブジェクトに引き継がれません。\n\n継承は、権限を与える階層を選ぶ手がかりになります。スキーマの表すべてを読ませたいならスキーマに、1 つの表だけなら表に与えます。",
-      "examAngle": "「スキーマの表を、今後追加される表も含めて読ませたい」という要件で、どの階層に権限を与えるかを問う形で出ます。",
+      "examAngle": "スキーマに与えた権限は、スキーマの今ある表と、あとで作る表の両方に効きます。メタストアに与えた権限は、子のオブジェクトに引き継がれません。1 つの表だけを読ませるときは、権限を表に与えます。",
       "checks": [
         {
           "question": "スキーマに `SELECT` を与えたあとで、そのスキーマに新しい表を作りました。新しい表にも `SELECT` は効きますか。",
@@ -6116,7 +6116,7 @@
       "oneLine": "所有者は、オブジェクトのすべての操作と権限の付与ができる主体で、MANAGE は所有者でなくても権限の管理、所有者の変更、削除をさせる権限です。",
       "keyPhrase": "所有者でなくても権限の管理、所有者の変更、削除をさせる権限",
       "body": "Unity Catalog のオブジェクトには、必ず所有者が 1 つあります。所有者は、ユーザー、サービスプリンシパル、グループのどれでもかまいません。所有者は、自分のオブジェクトの操作をすべて行え、ほかの主体に権限を与えられます。所有権は、子のオブジェクトには引き継がれません。\n\n所有者は、SQL か Catalog Explorer で変えます。\n\n```sql\nALTER TABLE main.sales.orders OWNER TO `data_engineers`;\n```\n\nCatalog Explorer では、オブジェクトのページの Owner の横の編集のアイコンから、新しい所有者を選びます。\n\n`MANAGE` を持つ利用者は、所有者でなくても、権限の管理、所有者の変更、オブジェクトの削除ができます。ほかの権限が自動で付くわけではありませんが、自分に与えることはできます。",
-      "examAngle": "「表の所有者を、個人からグループに変えたい」という場面で、ALTER … OWNER TO や Catalog Explorer の操作を問う形で出ます。",
+      "examAngle": "所有者は、`ALTER TABLE … OWNER TO …` の文か、Catalog Explorer の Owner の横の編集のアイコンで変えます。所有権は、子のオブジェクトに引き継がれません。`MANAGE` を持つ利用者は、所有者でなくても所有者を変えられます。",
       "checks": [
         {
           "question": "表 `main.sales.orders` の所有者を、グループ `data_engineers` に変える SQL の文を書いてください。",
@@ -6149,7 +6149,7 @@
       "oneLine": "行フィルターは、真偽値を返す SQL の関数をテーブルにかけ、関数が偽を返した行をクエリの結果から外す仕組みです。",
       "keyPhrase": "関数が偽を返した行をクエリの結果から外す",
       "body": "まず、真偽値を返す関数を作り、`ALTER TABLE … SET ROW FILTER` でテーブルにかけます。`ON` の括弧には、関数に渡す列を書きます。\n\n```sql\nCREATE FUNCTION us_filter(region STRING)\nRETURN IF(IS_ACCOUNT_GROUP_MEMBER('admin'), true, region = 'US');\n\nALTER TABLE sales SET ROW FILTER us_filter ON (region);\n```\n\nこの例では、`admin` のグループの利用者はすべての行を見ます。それ以外の利用者には、`region` が `US` の行だけが返ります。\n\n表を作るときにも、`WITH ROW FILTER us_filter ON (region)` でかけられます。外すときは `ALTER TABLE sales DROP ROW FILTER` を使います。関数を消す前に、フィルターを外します。先に関数を消すと、テーブルを読めなくなります。\n\n既存のテーブルにかけるには、テーブルの所有者であるか、`MANAGE` と `SELECT` の両方が要ります。関数の `EXECUTE` も要ります。ビューには行フィルターをかけられません。",
-      "examAngle": "「利用者のグループによって、見える行を絞りたい」という要件で、関数の作り方と、SET ROW FILTER の文の形を問う形で出ます。",
+      "examAngle": "行フィルターの関数は真偽値を返し、偽を返した行がクエリの結果から外れます。利用者は `ALTER TABLE … SET ROW FILTER` で関数をテーブルにかけ、`ON` の括弧に関数へ渡す列を書きます。ビューには、行フィルターをかけられません。",
       "checks": [
         {
           "question": "行フィルターの関数が `false` を返した行は、クエリの結果でどうなりますか。",
@@ -6183,7 +6183,7 @@
       "oneLine": "列マスクは、列の値を受け取って元の値か隠した値を返す SQL の関数を列にかけ、利用者に応じて見える値を変える仕組みです。",
       "keyPhrase": "列の値を受け取って元の値か隠した値を返す",
       "body": "関数の最初の引数がマスクする列の値で、戻り値は列の型と同じか、列の型に変換できる型にします。`ALTER TABLE … ALTER COLUMN … SET MASK` で列にかけます。\n\n```sql\nCREATE FUNCTION ssn_mask(ssn STRING)\nRETURN CASE WHEN IS_ACCOUNT_GROUP_MEMBER('HumanResourceDept')\n  THEN ssn ELSE '***-**-****' END;\n\nALTER TABLE users ALTER COLUMN ssn SET MASK ssn_mask;\n```\n\nこの例では、`HumanResourceDept` のグループの利用者だけが元の値を見ます。それ以外の利用者には、隠した文字列が返ります。\n\n`USING COLUMNS` を付けると、ほかの列の値も関数に渡せます。1 つの列にかけられるマスクは 1 つです。外すときは `ALTER TABLE users ALTER COLUMN ssn DROP MASK` を使います。表を作るときにも、列の定義に `MASK ssn_mask` と書いてかけられます。",
-      "examAngle": "「人事のグループ以外には、社会保障番号の列を隠したい」という要件で、関数と SET MASK の文の形を問う形で出ます。",
+      "examAngle": "列マスクの関数は、最初の引数にマスクする列の値を受け取り、元の値か隠した値を返します。戻り値の型は、列の型と同じか、列の型に変換できる型にします。利用者は `ALTER TABLE … ALTER COLUMN … SET MASK` で関数を列にかけます。",
       "checks": [
         {
           "question": "列マスクの関数の戻り値の型は、どう決めますか。",
@@ -6212,7 +6212,7 @@
       "oneLine": "`is_account_group_member` は、クエリを実行した利用者が、アカウントの単位のグループに直接か間接に属するかを、真偽値で返す関数です。",
       "keyPhrase": "アカウントの単位のグループに直接か間接に属するか",
       "body": "この関数は、行フィルターや列マスクの関数、動的ビューの中で、グループの所属で結果を変えるために使います。\n\n```sql\nSELECT is_account_group_member('auditors');  -- true か false\n```\n\n似た関数に `is_member` があります。`is_member` はワークスペースの単位のグループを調べる関数で、Hive メタストアとの互換のために残っています。Unity Catalog のデータでは、アカウントの単位のグループを調べない `is_member` を避け、`is_account_group_member` を使うよう、Databricks は勧めています。\n\n利用者の名前そのものは `session_user()` で得られます。",
-      "examAngle": "「行フィルターや動的ビューで、特定のグループの利用者だけに全件を見せたい」という要件で、使う関数を選ばせる形で出ます。",
+      "examAngle": "`is_account_group_member` はアカウントの単位のグループを調べ、`is_member` はワークスペースの単位のグループを調べます。Unity Catalog のデータでは、Databricks は `is_account_group_member` を使うよう勧めています。",
       "checks": [
         {
           "question": "Unity Catalog のデータにかける動的ビューで、利用者のグループの所属を調べるとき、`is_member` と `is_account_group_member` のどちらを使いますか。",
@@ -6245,7 +6245,7 @@
       "oneLine": "動的ビューは、ビューの定義の中でグループの所属などを調べ、利用者に応じて見える列の値と行を変えるビューです。",
       "keyPhrase": "利用者に応じて見える列の値と行を変えるビュー",
       "body": "列を隠すときは `CASE` で、行を絞るときは `WHERE` で、`is_account_group_member` の結果を使います。\n\n```sql\nCREATE VIEW main.sales.orders_v AS\nSELECT\n  id,\n  CASE WHEN is_account_group_member('auditors') THEN email\n       ELSE 'REDACTED' END AS email,\n  total\nFROM main.sales.orders\nWHERE is_account_group_member('managers') OR total <= 1000000;\n```\n\n利用者にはビューの権限を与え、元のテーブルを読む権限は与えません。\n\n動的ビューは、結合や加工をした結果を見せたいときに向きます。元のテーブルそのものを守るときは、テーブルにかける行フィルターと列マスクを使います。多くのテーブルに同じ規則をかけるときは、Databricks は ABAC ポリシーを勧めています。\n\n動的ビューは、SQL ウェアハウスと、標準のアクセスモードのコンピュートで読めます。専用のアクセスモードでは、Databricks Runtime 15.4 LTS 以降が要ります。",
-      "examAngle": "「監査のグループ以外には email の列を隠し、管理者以外には一定額以下の行だけを見せるビューを作りたい」という形で、CASE と WHERE の組み立てを問う形で出ます。",
+      "examAngle": "動的ビューでは、列を隠すときに `CASE` を、行を絞るときに `WHERE` を使います。どちらも、条件に `is_account_group_member` の結果を使います。利用者にはビューの権限を与え、元のテーブルを読む権限は与えません。",
       "checks": [
         {
           "question": "動的ビューで行を絞るとき、利用者に元のテーブルの `SELECT` も与えるべきですか。",
@@ -6274,7 +6274,7 @@
       "oneLine": "ABAC ポリシーは、ガバナンスタグを条件に、行フィルターや列マスクをカタログ、スキーマ、テーブルに付けて、配下の条件に合う表にまとめてかける Unity Catalog の仕組みです。",
       "keyPhrase": "配下の条件に合う表にまとめてかける",
       "body": "ABAC は、属性に基づくアクセス制御です。属性には、オブジェクトに付けたガバナンスタグを使います。ポリシーを付けたカタログやスキーマの配下で、タグの条件に合う表には、ポリシーが自動でかかります。あとで作った表も、範囲の中でタグが付けば対象になります。\n\n```sql\nCREATE POLICY ssn_mask\nON CATALOG employees\nCOLUMN MASK ssn_to_last_nr\nTO 'analysts' EXCEPT 'hr_admins'\nFOR TABLES\nMATCH COLUMNS has_tag('ssn') AS ssn\nON COLUMN ssn\nUSING COLUMNS (4);\n```\n\n`TO` で対象の利用者、`EXCEPT` で外す利用者を指定します。ポリシーの関数自体は、テーブルごとの行フィルターや列マスクと同じ SQL の関数です。\n\nポリシーを作るには、付ける先のオブジェクトの `MANAGE` を持つか、その所有者であることが要ります。関数の `EXECUTE` も要ります。画面では、Catalog Explorer の Policies のタブで作ります。行フィルターと列マスクのポリシーには、Databricks Runtime 16.4 以降か、サーバーレスのコンピュートが要ります。\n\n上の階層に付けたポリシーは、テーブルの所有者が外したり変えたりできません。テーブルごとの行フィルターや列マスクと同じ表で重なり、利用者ごとに違う関数がかかると、Databricks はアクセスを止めてエラーを返します。",
-      "examAngle": "「機微なタグの付いた列を、カタログの全表で一元的にマスクしたい。今後追加される表にも自動でかけたい」という要件から、ABAC ポリシーを選ばせる形で出ます。",
+      "examAngle": "ABAC ポリシーは、カタログやスキーマに付けると、配下でタグの条件に合う表に自動でかかります。あとで作った表も、範囲の中でタグが付けば対象になります。上の階層に付けたポリシーは、テーブルの所有者が外したり変えたりできません。",
       "checks": [
         {
           "question": "カタログに付けた列マスクのポリシーがあります。そのカタログに、条件のタグの付いた列を持つ表を新しく作りました。ポリシーをかけ直す必要はありますか。",
@@ -6320,7 +6320,7 @@
       "oneLine": "ガバナンスタグは、アカウントの単位でキーと許す値を定義し、Unity Catalog のオブジェクトに付けて、ABAC ポリシーの条件に使うタグです。",
       "keyPhrase": "ABAC ポリシーの条件に使うタグ",
       "body": "ガバナンスタグのキーと値の一覧は、アカウントの管理者などが、ポリシーを書く前に定義します。タグを付けるには、タグの `ASSIGN` と、付ける先のオブジェクトの `APPLY TAG` が要ります。\n\n```sql\nALTER TABLE main.hr.employees ALTER COLUMN ssn SET TAGS ('pii' = 'ssn');\n```\n\n表は、親のカタログとスキーマのタグを既定で引き継ぎます。列は、表のタグを引き継ぎません。列のタグは、列に直接付けます。\n\nポリシーを書く人とタグを付ける人を分けられるのが、タグで対象を選ぶ利点です。データの管理者が新しい表の列にタグを付ければ、ポリシーを書き換えずに保護がかかります。",
-      "examAngle": "「ポリシーの対象の列を、名前でなくタグで選ぶ」という前提で、タグの付け方や引き継ぎを問う形で出ます。",
+      "examAngle": "表は、親のカタログとスキーマのタグを既定で引き継ぎます。列は表のタグを引き継がないので、列のタグは列に直接付けます。利用者がタグを付けるには、タグの `ASSIGN` と、付ける先のオブジェクトの `APPLY TAG` が要ります。",
       "checks": [
         {
           "question": "スキーマに付けたタグは、その中の表の列に引き継がれますか。",
@@ -6349,7 +6349,7 @@
       "oneLine": "MATCH COLUMNS は、ABAC ポリシーの中で、タグの条件(`has_tag`、`has_tag_value`)に合う列を選び、別名を付ける句です。",
       "keyPhrase": "タグの条件(`has_tag`、`has_tag_value`)に合う列を選び",
       "body": "`has_tag('キー')` はタグのキーがあるか、`has_tag_value('キー', '値')` はキーと値の組があるかを調べます。`MATCH COLUMNS` で選んだ列に `AS` で別名を付け、列マスクでは `ON COLUMN` で、マスクする列にその別名を指定します。\n\n```sql\nCREATE POLICY mask_ssn\nON SCHEMA main.hr\nCOLUMN MASK mask_value\nTO 'analysts'\nFOR TABLES\nMATCH COLUMNS has_tag_value('pii', 'ssn') AS c\nON COLUMN c;\n```\n\n`WHEN` の句は、どの表にポリシーをかけるかを決めます。`WHEN` の中のタグの関数は、表のタグと、親のカタログやスキーマから引き継いだタグを調べます。`MATCH COLUMNS` の中のタグの関数は、列に直接付けたタグだけを調べます。\n\n古い書き方の `hasTag` と `hasTagValue` も、互換のために使えます。",
-      "examAngle": "「pii のタグの値が ssn の列だけをマスクしたい」という要件で、ポリシーのどの句にタグの条件を書くかを問う形で出ます。",
+      "examAngle": "`WHEN` の句はポリシーをかける表を決め、表のタグと親から引き継いだタグを調べます。`MATCH COLUMNS` の句は、列に直接付けたタグだけを調べて、対象の列を選びます。`has_tag` はキーがあるかを、`has_tag_value` はキーと値の組があるかを調べます。",
       "checks": [
         {
           "question": "ABAC の列マスクのポリシーで、タグ `pii` の値が `ssn` の列を対象にするとき、どの句にどの関数を書きますか。",
