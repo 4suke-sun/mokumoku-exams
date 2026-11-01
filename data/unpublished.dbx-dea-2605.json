@@ -1,0 +1,859 @@
+{
+  "examCode": "DBX-DEA-2605",
+  "entries": [
+    {
+      "verdict": "rewritable",
+      "reasons": ["judge:situation-unnatural"],
+      "question": {
+        "questionId": "DEA-0003",
+        "examCode": "DBX-DEA-2605",
+        "domain": "domain2",
+        "difficulty": "medium",
+        "questionText": "あるチームは、ストリームでデータを取り込むパイプラインを運用しています。ソースに新しい列が追加されると、ストリームは例外を出して止まります。この動作を事前に把握しておきたいと考えています。\n\n例外で止まる前に行われるスキーマの更新として、正しいものはどれですか。",
+        "explanation": "## 問われている要件\n新しい列を検出して例外で止まるストリームが、止まる前にスキーマへどのような更新を行うかを問う問題です。\n\n## 正解の決め手\n停止の直前に、スキーマの末尾へ新しい列が足されます。既に定義されている列の型は、そのまま保たれます。止まることと、スキーマが更新されることは両立します。\n\n## 他の選択肢が誤りである理由\n新しい列がスキーマの先頭に追加され、既存の列は後ろへずれる\n\n新しい列が足される位置は、先頭ではなく末尾です。位置が逆になっているので誤りです。\n\n新しい列が追加され、既存の列の型は届いたデータに合わせて変更される\n\n既存の列の型は変わりません。新しい列が足されるだけで、届いたデータに合わせて既存の列の型が書き換わることはありません。\n\nスキーマは更新されず、新しい列は再起動の後に手作業で定義する\n\n止まる前に、新しい列を足すスキーマの更新が行われます。スキーマが更新されず、手作業で定義し直すという説明は、この動作に合いません。",
+        "references": [
+          {
+            "title": "Configure schema inference and evolution in Auto Loader | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/schema"
+          }
+        ],
+        "questionType": "single",
+        "choices": [
+          {
+            "key": "A",
+            "text": "新しい列がスキーマの先頭に追加され、既存の列は後ろへずれる",
+            "explanation": "新しい列が足される位置は、先頭ではなく末尾です。位置が逆になっているので誤りです。"
+          },
+          {
+            "key": "B",
+            "text": "新しい列がスキーマの末尾に追加され、既存の列の型は変わらない"
+          },
+          {
+            "key": "C",
+            "text": "新しい列が追加され、既存の列の型は届いたデータに合わせて変更される",
+            "explanation": "既存の列の型は変わりません。新しい列が足されるだけで、届いたデータに合わせて既存の列の型が書き換わることはありません。"
+          },
+          {
+            "key": "D",
+            "text": "スキーマは更新されず、新しい列は再起動の後に手作業で定義する",
+            "explanation": "止まる前に、新しい列を足すスキーマの更新が行われます。スキーマが更新されず、手作業で定義し直すという説明は、この動作に合いません。"
+          }
+        ],
+        "correctAnswers": ["B"]
+      }
+    },
+    {
+      "verdict": "rewritable",
+      "reasons": ["judge:situation-unnatural"],
+      "question": {
+        "questionId": "DEA-0013",
+        "examCode": "DBX-DEA-2605",
+        "domain": "domain7",
+        "difficulty": "hard",
+        "questionText": "あるデータエンジニアリングチームは、SQL ウェアハウスでデータを共有しています。データアクセスの権限は Unity Catalog で管理していますが、ウェアハウス独自のデータアクセス設定や Lakeguard など、関係する仕組みが複数あります。このチームは、それぞれの位置づけを正しく理解したいと考えています。\n\n次のうち、正しい説明はどれですか。",
+        "explanation": "## 問われている要件\nデータアクセスにかかわる 3 つの仕組み(Unity Catalog、ウェアハウス独自のデータアクセス設定、Lakeguard)の位置づけを、正しく区別する問題です。\n\n## 正解の決め手\n資産へのデータアクセス権限は、ほとんどを Unity Catalog が管理します。ウェアハウス側にも独自のデータアクセス設定があり、Unity Catalog と並べて使うことも、置き換えて使うこともできます。\n\n## 前提知識\nLakeguard は、コンピュートリソース上でデータのガバナンスとアクセス制御を担う、セキュリティの仕組みです。働く場所がコンピュートリソース上であることを押さえておくと、ストレージ側とする説明を見分けられます。\n\n## 解くための考え方\n選択肢を、権限の管理を述べるものと、Lakeguard の働く場所を述べるものに分けます。権限の管理を述べる案では、Unity Catalog とウェアハウス独自の設定の関係(併用と置き換えの両方が可能)に合うかを確かめます。Lakeguard の案では、働く場所がコンピュートリソース上かを確かめます。\n\n## 他の選択肢が誤りである理由\nデータアクセスの権限は Unity Catalog だけが管理し、ウェアハウス独自のデータアクセス設定は使えない\n\n権限の大半は Unity Catalog が管理しますが、ウェアハウス独自のデータアクセス設定を併用するか、代わりに使うこともできます。使えないという説明は、範囲を言い過ぎています。\n\nウェアハウス独自のデータアクセス設定は、Unity Catalog と併用できるが、代わりに使うことはできない\n\n併用できるという点は正しいものの、代わりに使うこともできます。代わりには使えないという部分が逆です。\n\nLakeguard は、コンピュートリソースではなくストレージ側で、データのアクセス制御を担う仕組みである\n\nLakeguard が働く場所は、コンピュートリソース上です。ストレージ側という説明は、働く場所の取り違えです。",
+        "references": [
+          {
+            "title": "Compute | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/compute/"
+          },
+          {
+            "title": "Connect to a SQL warehouse | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/compute/sql-warehouse/"
+          }
+        ],
+        "questionType": "single",
+        "choices": [
+          {
+            "key": "A",
+            "text": "データアクセスの権限は Unity Catalog だけが管理し、ウェアハウス独自のデータアクセス設定は使えない",
+            "explanation": "権限の大半は Unity Catalog が管理しますが、ウェアハウス独自のデータアクセス設定を併用するか、代わりに使うこともできます。使えないという説明は誤りです。"
+          },
+          {
+            "key": "B",
+            "text": "ウェアハウス独自のデータアクセス設定は、Unity Catalog と併用できるが、代わりに使うことはできない",
+            "explanation": "ウェアハウス独自の設定は、併用できるだけでなく、代わりに使うこともできます。代わりには使えないという部分が誤りです。"
+          },
+          {
+            "key": "C",
+            "text": "ほとんどの資産の権限は Unity Catalog が管理し、ウェアハウス独自の設定は併用も、代わりに使うこともできる"
+          },
+          {
+            "key": "D",
+            "text": "Lakeguard は、コンピュートリソースではなくストレージ側で、データのアクセス制御を担う仕組みである",
+            "explanation": "Lakeguard は、コンピュートリソース上でデータのガバナンスとアクセス制御を担う仕組みです。ストレージ側で働くという説明は誤りです。"
+          }
+        ],
+        "correctAnswers": ["C"]
+      }
+    },
+    {
+      "verdict": "rewritable",
+      "reasons": ["judge:explanation-inconsistent", "judge:situation-unnatural"],
+      "question": {
+        "questionId": "DEA-0017",
+        "examCode": "DBX-DEA-2605",
+        "domain": "domain2",
+        "difficulty": "medium",
+        "questionText": "ジュニアデータエンジニアは、上流のテーブルに加わった変更を、下流のテーブルへ増分で処理したいと考えています。毎回テーブル全体を処理し直す構成は避けたいです。\n\n推奨される方法はどれですか。",
+        "explanation": "## 問われている要件\n\n上流のテーブルの変更を、増分で下流へ処理するときに推奨される方法を選ぶ問題です。\n\n## 正解の決め手\n\nテーブルの変更を増分で処理するには、変更データフィードを Structured Streaming と組み合わせることが推奨されます。テーブル全体を処理し直さずに済ませたいという要件に、この組み合わせが当てはまります。\n\n## 他の選択肢が誤りである理由\n\n変更データフィードを使わず、ストリーミング処理だけでテーブルの変更を判定する。\n\nテーブルの変更を増分で処理する方法として推奨されるのは、変更データフィードを Structured Streaming と組み合わせることです。変更データフィードを使わない構成は、この推奨から外れます。\n\n更新日時の列で絞り込み、バッチ処理でテーブルの変更分だけを毎回読み直す。\n\n更新日時の列で絞り込んで毎回読み直す方法は、推奨される構成ではありません。テーブルの変更の増分処理には、変更データフィードと Structured Streaming の組み合わせが推奨されます。\n\nAuto Loader と mergeSchema オプションを組み合わせて処理する。\n\nAuto Loader と mergeSchema オプションの組み合わせは、ストリーミング書き込みでスキーマの進化を有効にするためのものです。テーブルの変更を増分で処理する方法として推奨されるものではありません。",
+        "references": [
+          {
+            "title": "Use change data feed on Databricks | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/delta/delta-change-data-feed"
+          },
+          {
+            "title": "Update table schemas with schema evolution | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/delta/update-schema"
+          }
+        ],
+        "questionType": "single",
+        "choices": [
+          {
+            "key": "A",
+            "text": "変更データフィードを使わず、ストリーミング処理だけでテーブルの変更を判定する。",
+            "explanation": "テーブルの変更を増分で処理する方法として推奨されるのは、変更データフィードを Structured Streaming と組み合わせることです。変更データフィードを使わない構成は、この推奨から外れます。"
+          },
+          {
+            "key": "B",
+            "text": "更新日時の列で絞り込み、バッチ処理でテーブルの変更分だけを毎回読み直す。",
+            "explanation": "更新日時の列で絞り込んで毎回読み直す方法は、推奨される構成ではありません。テーブルの変更の増分処理には、変更データフィードと Structured Streaming の組み合わせが推奨されます。"
+          },
+          {
+            "key": "C",
+            "text": "変更データフィードを Structured Streaming と組み合わせて処理する。"
+          },
+          {
+            "key": "D",
+            "text": "Auto Loader と mergeSchema オプションを組み合わせて処理する。",
+            "explanation": "Auto Loader と mergeSchema オプションの組み合わせは、ストリーミング書き込みでスキーマの進化を有効にするためのものです。テーブルの変更を増分で処理する方法として推奨されるものではありません。"
+          }
+        ],
+        "correctAnswers": ["C"]
+      }
+    },
+    {
+      "verdict": "rewritable",
+      "reasons": ["judge:choices-weak"],
+      "question": {
+        "questionId": "DEA-0026",
+        "examCode": "DBX-DEA-2605",
+        "domain": "domain2",
+        "difficulty": "medium",
+        "questionText": "あるデータエンジニアは、外部のデータソースからデータを取り込む仕組みを新しく設計しています。データソースごとの認証、CDC、失敗時の自動再試行、スキーマの自動進化は、取り込みの方法側に任せたいと考えています。このデータエンジニアは、Databricks の推奨に沿って、最も管理された取り込みの方法から試し、要件を満たせないときに、より自由度の高い方法へ下げる方針です。\n\nこの方針で、最初に試す取り込みの方法はどれですか。",
+        "explanation": "## 問われている要件\nデータソースごとの認証、CDC、自動再試行、スキーマの自動進化を取り込みの方法に任せたいという要件のもとで、Databricks の推奨(最も管理された方法から試す)に沿って最初に試す方法を選ぶ問題です。\n\n## 正解の決め手\n取り込みの層は、自由度の高い順に Structured Streaming、Lakeflow pipelines、マネージドコネクタの 3 つに分かれます。自由度が最も低い、つまり最も管理された層はマネージドコネクタで、Lakeflow pipelines の上に作られ、認証、CDC、自動再試行、スキーマの自動進化まで引き受ける完全マネージドの方法です。Databricks は、この層から試し、対応していないデータソースなどで要件を満たせないときに、次のより自由度の高い層へ下げることを勧めています。\n\n## 他の選択肢が誤りである理由\nStructured Streaming による取り込み\n\n**Structured Streaming** は、取り込みの 3 つの層のうち自由度が最も高い層で、管理の度合いは最も低い側です。最も管理された方法から試す方針では、要件を満たせないときに下げていく先にあたるので、最初に試す方法ではありません。\n\nLakeflow pipelines による取り込み\n\n**Lakeflow pipelines** は、オーケストレーション、チェックポイント、復旧をパイプラインが管理しますが、変換は自分で SQL か Python で定義する、中間の層です。マネージドコネクタはこの層の上に作られた、より管理された層なので、最も管理された方法から試す方針では最初になりません。\n\nSpark Data Source API による取り込み\n\n**Spark Data Source API** は、Lakehouse Federation が対応していない場合や、書き込みが必要な場合、実行や並列化を細かく制御したい場合に使う手段です。細かく自分で制御する側の手段であり、認証や再試行などを取り込みの方法に任せたい要件とは合わないので、最初に試す方法ではありません。",
+        "references": [
+          {
+            "title": "Ingest with SQL and Spark APIs | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/ingestion/"
+          },
+          {
+            "title": "Connect to external databases and catalogs | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/query-federation/"
+          },
+          {
+            "title": "Structured Streaming concepts | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/structured-streaming/"
+          }
+        ],
+        "questionType": "single",
+        "choices": [
+          {
+            "key": "A",
+            "text": "Structured Streaming による取り込み",
+            "explanation": "**Structured Streaming** は、取り込みの 3 つの層のうち自由度が最も高い層で、管理の度合いは最も低い側です。最も管理された方法から試す方針では、要件を満たせないときに下げていく先にあたるので、最初に試す方法ではありません。"
+          },
+          {
+            "key": "B",
+            "text": "Lakeflow pipelines による取り込み",
+            "explanation": "**Lakeflow pipelines** は、オーケストレーション、チェックポイント、復旧をパイプラインが管理しますが、変換は自分で SQL か Python で定義する、中間の層です。マネージドコネクタはこの層の上に作られた、より管理された層なので、最も管理された方法から試す方針では最初になりません。"
+          },
+          {
+            "key": "C",
+            "text": "Spark Data Source API による取り込み",
+            "explanation": "**Spark Data Source API** は、Lakehouse Federation が対応していない場合や、書き込みが必要な場合、実行や並列化を細かく制御したい場合に使う手段です。細かく自分で制御する側の手段であり、認証や再試行などを取り込みの方法に任せたい要件とは合わないので、最初に試す方法ではありません。"
+          },
+          {
+            "key": "D",
+            "text": "マネージドコネクタによる取り込み"
+          }
+        ],
+        "correctAnswers": ["D"]
+      }
+    },
+    {
+      "verdict": "rewritable",
+      "reasons": ["judge:choices-weak"],
+      "question": {
+        "questionId": "DEA-0028",
+        "examCode": "DBX-DEA-2605",
+        "domain": "domain4",
+        "difficulty": "medium",
+        "questionText": "あるデータエンジニアは、triggered のパイプラインを運用しています。今回の 1 回の実行に限って、パイプラインの既定の動作を変えて実行する必要があります。パイプライン自体の設定は、そのままにしておきたいと考えています。\n\nどの方法を使うべきですか。",
+        "explanation": "## 問われている要件\ntriggered のパイプラインで、今回の 1 回の実行に限って既定の動作を変える方法が問われています。パイプライン自体の設定をそのままにする点が条件です。\n\n## 正解の決め手\ntriggered のパイプラインでは、「別の設定で今すぐ実行」を使うと、特定の実行に限って既定の動作を上書きできます。設定そのものを変えずに済みます。\n\n## 他の選択肢が誤りである理由\nパイプラインの設定を書き換えて実行し、実行後に手作業で元の設定へ戻す\n\nパイプラインの設定を書き換えると、設定をそのままにしたい条件に反し、元に戻す手作業も残ります。特定の実行に限った上書きは、「別の設定で今すぐ実行」で行えます。\n\nパイプラインを継続方式に切り替え、依存する表の内容が変わったときだけ更新を実行させる\n\n継続方式は、依存する表の内容が変わったときだけ更新を実行する方式です。パイプラインの動作方式そのものを切り替えることになり、今回の 1 回に限って既定の動作を上書きする方法ではありません。\n\nジョブの修復のダイアログにパラメーターを入力し、既存の値を上書きして再実行する\n\n修復のダイアログは、ジョブの修復実行で、入力したパラメーターにより既存の値を上書きする機能です。triggered のパイプラインの既定の動作を、特定の実行に限って上書きする手段ではありません。\n\n## まとめ\ntriggered のパイプラインで、特定の実行に限って既定の動作を変えたいときは、「別の設定で今すぐ実行」を使います。",
+        "references": [
+          {
+            "title": "Triggered vs. continuous pipeline mode | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/dlt/pipeline-mode"
+          },
+          {
+            "title": "Run a pipeline update | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/dlt/updates"
+          },
+          {
+            "title": "Troubleshoot and repair job failures | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/jobs/repair-job-failures"
+          }
+        ],
+        "questionType": "single",
+        "choices": [
+          {
+            "key": "A",
+            "text": "パイプラインの設定を書き換えて実行し、実行後に手作業で元の設定へ戻す",
+            "explanation": "パイプラインの設定を書き換えると、設定をそのままにしたい条件に反し、元に戻す手作業も残ります。特定の実行に限った上書きは、「別の設定で今すぐ実行」で行えます。"
+          },
+          {
+            "key": "B",
+            "text": "「別の設定で今すぐ実行」を使い、その実行に限って既定の動作を上書きする"
+          },
+          {
+            "key": "C",
+            "text": "パイプラインを継続方式に切り替え、依存する表の内容が変わったときだけ更新を実行させる",
+            "explanation": "継続方式は、依存する表の内容が変わったときだけ更新を実行する方式です。パイプラインの動作方式そのものを切り替えることになり、今回の 1 回に限って既定の動作を上書きする方法ではありません。"
+          },
+          {
+            "key": "D",
+            "text": "ジョブの修復のダイアログにパラメーターを入力し、既存の値を上書きして再実行する",
+            "explanation": "修復のダイアログは、ジョブの修復実行で、入力したパラメーターにより既存の値を上書きする機能です。triggered のパイプラインの既定の動作を、特定の実行に限って上書きする手段ではありません。"
+          }
+        ],
+        "correctAnswers": ["B"]
+      }
+    },
+    {
+      "verdict": "rewritable",
+      "reasons": ["judge:choices-weak"],
+      "question": {
+        "questionId": "DEA-0032",
+        "examCode": "DBX-DEA-2605",
+        "domain": "domain3",
+        "difficulty": "hard",
+        "questionText": "あるデータエンジニアは、到着から数秒以内に結果を出す低遅延のストリーミング処理を運用しています。入力は無限のストリームで、そのまま処理しています。最近、メモリの圧迫が原因で、パイプラインが失敗することがあります。\n\n低遅延を保ったまま、この失敗を避けるために、どの対処を取るべきですか。",
+        "explanation": "## 問われている要件\n\n低遅延の処理を保ったまま、無限のストリームが引き起こすメモリ圧迫での失敗を避ける対処を選ぶ問題です。\n\n## 正解の決め手\n\n低遅延の処理は、有界のストリームが前提で、透かしがあれば、無限のストリームも有界にできます。透かしがない無限のストリームは、メモリ圧迫で失敗することがあります。そのため、入力のストリームに透かしを設定します。\n\n## 解くための考え方\n\n失敗の原因は、処理対象のストリームが有界になっていないことです。インフラの規模や、集計の定義、更新の方式を変えても、ストリームは有界になりません。\n\n## まとめ\n\n低遅延を保ちながらメモリ圧迫を避けるには、透かしでストリームを有界にします。\n\n## 他の選択肢が誤りである理由\n\n集計の定義を、測定値とディメンションを定めるメトリックビューに移す\n\nメトリックビューは、既存のテーブルやクエリを土台に、測定値とディメンションを定義する仕組みです。集計の定義を整理する機能で、ストリームを有界にするものではないため、メモリの圧迫による失敗は避けられません。\n\n`pipelines.reset.allowed` を `false` にして、完全な更新を実行させない\n\nこのプロパティを `false` にすると、完全な更新が実行されなくなります。しかし、完全な更新を止めても、ストリームが有界になるわけではなく、メモリの圧迫による失敗の原因は残ります。\n\nストリームの設定は変えず、Lakeflow pipelines に移してインフラの配備と拡張を自動化する\n\nLakeflow pipelines は、インフラの配備と拡張を自動で行い、ETL を簡単にします。しかし、ストリームが無限のままで透かしで有界にされていなければ、メモリの圧迫で失敗することがあり、低遅延の処理の前提も満たせません。",
+        "references": [
+          {
+            "title": "What is Delta Lake in Databricks? | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/delta/"
+          },
+          {
+            "title": "Streaming tables | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/dlt/streaming-tables"
+          },
+          {
+            "title": "Run a pipeline update | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/dlt/updates"
+          },
+          {
+            "title": "What is a view? | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/views/"
+          }
+        ],
+        "questionType": "single",
+        "choices": [
+          {
+            "key": "A",
+            "text": "集計の定義を、測定値とディメンションを定めるメトリックビューに移す",
+            "explanation": "メトリックビューは、既存のテーブルやクエリを土台に、測定値とディメンションを定義する仕組みです。集計の定義を整理する機能で、ストリームを有界にするものではないため、メモリの圧迫による失敗は避けられません。"
+          },
+          {
+            "key": "B",
+            "text": "`pipelines.reset.allowed` を `false` にして、完全な更新を実行させない",
+            "explanation": "このプロパティを `false` にすると、完全な更新が実行されなくなります。しかし、完全な更新を止めても、ストリームが有界になるわけではなく、メモリの圧迫による失敗の原因は残ります。"
+          },
+          {
+            "key": "C",
+            "text": "ストリームの設定は変えず、Lakeflow pipelines に移してインフラの配備と拡張を自動化する",
+            "explanation": "Lakeflow pipelines は、インフラの配備と拡張を自動で行い、ETL を簡単にします。しかし、ストリームが無限のままで透かしで有界にされていなければ、メモリの圧迫で失敗することがあり、低遅延の処理の前提も満たせません。"
+          },
+          {
+            "key": "D",
+            "text": "入力のストリームに透かしを設定し、処理の対象を有界の範囲に収める"
+          }
+        ],
+        "correctAnswers": ["D"]
+      }
+    },
+    {
+      "verdict": "rewritable",
+      "reasons": ["judge:choices-weak"],
+      "question": {
+        "questionId": "DEA-0046",
+        "examCode": "DBX-DEA-2605",
+        "domain": "domain3",
+        "difficulty": "medium",
+        "questionText": "ある企業のデータエンジニアは、UDF を使うマテリアライズドビューを宣言型パイプラインで運用しています。チームがこの UDF の処理内容を書き換えましたが、Databricks はこの書き換えを検知できません。\n\n書き換え後の UDF の結果をマテリアライズドビューに反映するために、正しい対応はどれですか。",
+        "explanation": "## 問われている要件\n\nUDF の処理内容を書き換えたが、Databricks がその変更を検知できないとき、マテリアライズドビューへ反映させる対応を問う設問です。\n\n## 正解の決め手\n\nUDF の振る舞いが変わったことを Databricks が検知できない場合、その UDF を使うマテリアライズドビューを全体更新するのは、利用者の責任です。\n\n## 前提知識\n\nUDF の振る舞いが変わったとき、Databricks がそれを検知できない場合があります。検知できないときは、利用者が自分で全体更新を行って結果を作り直します。\n\n## 他の選択肢が誤りである理由\n\n通常の更新に任せ、影響を受ける行だけが自動で再計算されるのを待つ\n\nこの書き換えは Databricks が検知できないため、影響を受ける行を自動で見つけて再計算する動作は期待できません。利用者が全体更新を行う必要があります。\n\nDatabricks の側で、UDF の変更に対する全体更新が行われるのを待つ\n\n検知できない変更に対する全体更新は、Databricks ではなく利用者の責任です。待っていても、Databricks が代わりに全体更新を行うことは期待できません。\n\nその UDF を使うストリーミングテーブルを、利用者が全体更新する\n\n全体更新の対象は、その UDF を使うマテリアライズドビューです。ストリーミングテーブルは、この対応の対象として挙げられていません。\n\n## まとめ\n\n検知できない UDF の変更は、利用者が、その UDF を使うマテリアライズドビューを全体更新して反映します。責任の所在と、対象のテーブルの種類の両方を押さえます。",
+        "references": [
+          {
+            "title": "Materialized views | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/dlt/materialized-views"
+          }
+        ],
+        "questionType": "single",
+        "choices": [
+          {
+            "key": "A",
+            "text": "通常の更新に任せ、影響を受ける行だけが自動で再計算されるのを待つ",
+            "explanation": "この書き換えは Databricks が検知できないため、影響を受ける行を自動で見つけて再計算する動作は期待できません。利用者が全体更新を行う必要があります。"
+          },
+          {
+            "key": "B",
+            "text": "Databricks の側で、UDF の変更に対する全体更新が行われるのを待つ",
+            "explanation": "検知できない変更に対する全体更新は、Databricks ではなく利用者の責任です。待っていても、Databricks が代わりに全体更新を行うことは期待できません。"
+          },
+          {
+            "key": "C",
+            "text": "その UDF を使うストリーミングテーブルを、利用者が全体更新する",
+            "explanation": "全体更新の対象は、その UDF を使うマテリアライズドビューです。ストリーミングテーブルは、この対応の対象として挙げられていません。"
+          },
+          {
+            "key": "D",
+            "text": "その UDF を使うマテリアライズドビューを、利用者が全体更新する"
+          }
+        ],
+        "correctAnswers": ["D"]
+      }
+    },
+    {
+      "verdict": "rewritable",
+      "reasons": ["judge:choices-weak"],
+      "question": {
+        "questionId": "DEA-0071",
+        "examCode": "DBX-DEA-2605",
+        "domain": "domain4",
+        "difficulty": "hard",
+        "questionText": "あるデータエンジニアのチームは、サーバーレスのジョブで夜間のデータ処理を運用しています。一時的な障害による失敗が週に数回あり、そのたびに通知が届いて困っています。チームは、再試行を重ねても失敗が続いたときに限って、通知を受け取りたいと考えています。再試行の設定は、自動の最適化に任せたいと考えています。\n\nこの要件を満たす設定はどれですか。",
+        "explanation": "## 問われている要件\n\nサーバーレスのジョブで、再試行の設定を自動に任せつつ、再試行を重ねても失敗が続いたときに限って通知を受け取る設定を選ぶ問題です。\n\n## 正解の決め手\n\nサーバーレスのジョブは、再試行を既定で自動最適化します。そのため、再試行の設定を手作業で調整する必要はありません。そのうえで、タスクの通知には、最後の再試行まで通知をミュートする設定があります。この 2 つを組み合わせると、途中の失敗では通知が届かず、最後の再試行まで失敗が続いたときに通知を受け取れます。\n\n## 解くための考え方\n\n要件を「再試行の扱い」と「通知の扱い」に分けます。再試行はサーバーレスの既定の自動最適化に任せ、通知はミュートの範囲(どの再試行まで止めるか)で絞ります。どちらか一方だけを満たす選択肢は誤りです。\n\n## 他の選択肢が誤りである理由\n\n再試行は既定で無効なので手作業で設定し、通知は最後の再試行までミュートする\n\nサーバーレスのジョブは、再試行を既定で自動最適化します。再試行は既定で無効という前提が誤りで、手作業で設定すると、自動の最適化に任せたいという要件に合いません。\n\nタスクの通知を無効にして、最終的な失敗は実行履歴の画面で確認する\n\n通知を無効にすると、最終的な失敗の通知も届きません。要件は、最終的な失敗のときだけ通知を受け取ることで、そのためには、最後の再試行までミュートする設定を使います。\n\n通知は最初の再試行が始まるまでミュートし、以降の失敗はそのつど受け取る\n\nミュートする範囲は、最後の再試行までです。最初の再試行が始まるまでで通知を再開すると、再試行の途中の失敗でも通知が届き、最終的な失敗のときだけ受け取りたいという要件に合いません。",
+        "references": [
+          {
+            "title": "Configure and edit tasks in Lakeflow Jobs | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/jobs/configure-task"
+          },
+          {
+            "title": "Add notifications on a job | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/jobs/notifications"
+          }
+        ],
+        "questionType": "single",
+        "choices": [
+          {
+            "key": "A",
+            "text": "再試行は既定で無効なので手作業で設定し、通知は最後の再試行までミュートする",
+            "explanation": "サーバーレスのジョブは、再試行を既定で自動最適化します。再試行は既定で無効という前提が誤りで、手作業で設定すると、自動の最適化に任せたいという要件に合いません。"
+          },
+          {
+            "key": "B",
+            "text": "タスクの通知を無効にして、最終的な失敗は実行履歴の画面で確認する",
+            "explanation": "通知を無効にすると、最終的な失敗の通知も届きません。要件は、最終的な失敗のときだけ通知を受け取ることで、そのためには、最後の再試行までミュートする設定を使います。"
+          },
+          {
+            "key": "C",
+            "text": "既定の再試行の自動最適化をそのまま使い、通知は最後の再試行までミュートする"
+          },
+          {
+            "key": "D",
+            "text": "通知は最初の再試行が始まるまでミュートし、以降の失敗はそのつど受け取る",
+            "explanation": "ミュートする範囲は、最後の再試行までです。最初の再試行が始まるまでで通知を再開すると、再試行の途中の失敗でも通知が届き、最終的な失敗のときだけ受け取りたいという要件に合いません。"
+          }
+        ],
+        "correctAnswers": ["C"]
+      }
+    },
+    {
+      "verdict": "rewritable",
+      "reasons": ["judge:choices-weak"],
+      "question": {
+        "questionId": "DEA-0072",
+        "examCode": "DBX-DEA-2605",
+        "domain": "domain3",
+        "difficulty": "hard",
+        "questionText": "あるデータエンジニアは、大きなテーブルに変更データを MERGE で反映しています。一致条件には、パーティションの列の条件を加えて、一致の検索範囲をすでに狭めてあります。1 回の MERGE で更新・削除される行は、ファイルごとにごく少数です。余分なシャッフルを減らし、既存のデータのレイアウトも保ちたいと考えています。\n\nこの要件を満たす方法はどれですか。",
+        "explanation": "## 問われている要件\n\n更新・削除される行がファイルごとに少数の MERGE で、余分なシャッフルを減らし、データのレイアウトを保つ方法を選ぶ問題です。一致の検索範囲は、すでに狭めてあります。\n\n## 正解の決め手\n\nファイルごとに少数の行だけが変わる MERGE では、低シャッフルのマージが向いています。変更のない行をシャッフルせずに処理し、元のレイアウトも残せます。\n\n## 前提知識\n\nMERGE の一致条件に、パーティションの列のような既知の制約を足すと、検索の範囲が狭まって速くなります。これは検索の範囲に効く工夫で、シャッフルの扱いやレイアウトの維持とは別の論点です。\n\n## 解くための考え方\n\n課題が「検索の範囲」なのか、「変更のない行の扱い」なのかを見分けます。この設問で残っている課題は、後者です。\n\n## 他の選択肢が誤りである理由\n\n一致条件に、別の既知の制約を足して、一致の検索範囲をさらに絞る\n\n既知の制約を足して検索の範囲を狭めると、MERGE は速くなります。ただし、この状況では、パーティションの列の条件ですでに狭めてあります。変更のない行をシャッフルなしで処理し、レイアウトを保つのは、低シャッフルのマージです。\n\nMERGE を Lakeflow pipelines の処理に移して、インフラの配備と拡張を自動化する\n\nLakeflow pipelines は、ETL の実行を最適化し、インフラの配備と拡張を自動で行う機能です。MERGE のシャッフルの扱いやデータのレイアウトを決める機能ではないため、この要件を満たしません。\n\n変更のない行もシャッフルして、データのレイアウトを組み直す\n\nこの方法は、要件と逆です。低シャッフルのマージなら、変更のない行はシャッフルを経ずに処理され、既存のデータのレイアウトも元のまま残ります。",
+        "references": [
+          {
+            "title": "What is Delta Lake in Databricks? | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/delta/"
+          },
+          {
+            "title": "Best practices: Delta Lake | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/delta/best-practices"
+          },
+          {
+            "title": "Optimization recommendations on Databricks | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/optimizations/"
+          }
+        ],
+        "questionType": "single",
+        "choices": [
+          {
+            "key": "A",
+            "text": "一致条件に、別の既知の制約を足して、一致の検索範囲をさらに絞る",
+            "explanation": "既知の制約を足して検索の範囲を狭めると、MERGE は速くなります。ただし、この状況では、パーティションの列の条件ですでに狭めてあります。変更のない行をシャッフルなしで処理し、レイアウトを保つのは、低シャッフルのマージです。"
+          },
+          {
+            "key": "B",
+            "text": "低シャッフルのマージを使って、変更のない行をシャッフルなしで処理する"
+          },
+          {
+            "key": "C",
+            "text": "MERGE を Lakeflow pipelines の処理に移して、インフラの配備と拡張を自動化する",
+            "explanation": "Lakeflow pipelines は、ETL の実行を最適化し、インフラの配備と拡張を自動で行う機能です。MERGE のシャッフルの扱いやデータのレイアウトを決める機能ではないため、この要件を満たしません。"
+          },
+          {
+            "key": "D",
+            "text": "変更のない行もシャッフルして、データのレイアウトを組み直す",
+            "explanation": "この方法は、要件と逆です。低シャッフルのマージなら、変更のない行はシャッフルを経ずに処理され、既存のデータのレイアウトも元のまま残ります。"
+          }
+        ],
+        "correctAnswers": ["B"]
+      }
+    },
+    {
+      "verdict": "rewritable",
+      "reasons": ["judge:situation-unnatural"],
+      "question": {
+        "questionId": "DEA-0073",
+        "examCode": "DBX-DEA-2605",
+        "domain": "domain3",
+        "difficulty": "medium",
+        "questionText": "あるデータエンジニアは、マテリアライズドビューとストリーミングテーブルの両方を定義するパイプラインを作成しています。パイプラインの更新方式は 2 種類から選べます。チームでは、表の種類によって使える方式が決まるのかどうかが、議論になっています。\n\n更新方式と表の種類の関係として、正しいものはどれですか。",
+        "explanation": "## 問われている要件\n\nパイプラインの更新方式と、マテリアライズドビュー・ストリーミングテーブルという表の種類との間に、どんな結びつきがあるかを答える問題です。\n\n## 正解の決め手\n\nパイプラインの更新方式は、計算する表の種類とは関係がありません。マテリアライズドビューも、ストリーミングテーブルも、どちらの方式でも更新できます。表の種類を理由に、使える方式が制限されることはありません。\n\n## 他の選択肢が誤りである理由\n\nストリーミングテーブルは一方の方式でしか更新できないが、マテリアライズドビューは両方で更新できる\n\nストリーミングテーブルだけを一方の方式に限る説明は誤りです。ストリーミングテーブルも、どちらの方式でも更新できます。\n\nマテリアライズドビューは一方の方式でしか更新できないが、ストリーミングテーブルは両方で更新できる\n\nマテリアライズドビューだけを一方の方式に限る説明も誤りです。制限される表の種類が入れ替わっただけで、方式が表の種類に左右されないという点を見落としています。\n\n更新方式は表の種類に合わせて自動で決まり、パイプラインの利用者が選ぶことはできない\n\n方式は表の種類とは関係がなく、表の種類に合わせて決まる仕組みではありません。どちらの種類の表も、どちらの方式でも更新できます。",
+        "references": [
+          {
+            "title": "Triggered vs. continuous pipeline mode | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/dlt/pipeline-mode"
+          }
+        ],
+        "questionType": "single",
+        "choices": [
+          {
+            "key": "A",
+            "text": "ストリーミングテーブルは一方の方式でしか更新できないが、マテリアライズドビューは両方で更新できる",
+            "explanation": "ストリーミングテーブルだけを一方の方式に限る説明は誤りです。ストリーミングテーブルも、どちらの方式でも更新できます。"
+          },
+          {
+            "key": "B",
+            "text": "マテリアライズドビューは一方の方式でしか更新できないが、ストリーミングテーブルは両方で更新できる",
+            "explanation": "マテリアライズドビューだけを一方の方式に限る説明も誤りです。制限される表の種類が入れ替わっただけで、方式が表の種類に左右されないという点を見落としています。"
+          },
+          {
+            "key": "C",
+            "text": "更新方式は表の種類とは関係なく、ストリーミングテーブルもマテリアライズドビューも両方の方式で更新できる"
+          },
+          {
+            "key": "D",
+            "text": "更新方式は表の種類に合わせて自動で決まり、パイプラインの利用者が選ぶことはできない",
+            "explanation": "方式は表の種類とは関係がなく、表の種類に合わせて決まる仕組みではありません。どちらの種類の表も、どちらの方式でも更新できます。"
+          }
+        ],
+        "correctAnswers": ["C"]
+      }
+    },
+    {
+      "verdict": "rewritable",
+      "reasons": ["judge:situation-unnatural"],
+      "question": {
+        "questionId": "DEA-0076",
+        "examCode": "DBX-DEA-2605",
+        "domain": "domain4",
+        "difficulty": "easy",
+        "questionText": "あるデータエンジニアは、サーバーレスジョブで動かすアプリケーションに、デプロイごとに異なる設定を渡したいと考えています。\n\nこの設定を渡す方法として適切なものはどれですか。",
+        "explanation": "## 問われている要件\n\nサーバーレスジョブで、デプロイごとに異なる設定をアプリケーションへ渡す方法を問う設問です。\n\n## 正解の決め手\n\nサーバーレスジョブでは、デプロイ固有の設定を、パラメーターではなく環境変数でアプリケーションに渡します。\n\n## 他の選択肢が誤りである理由\n\nジョブのパラメーターとして渡す\n\nサーバーレスジョブでは、デプロイ固有の設定をパラメーターで渡すのではなく、環境変数で渡します。\n\n修復のダイアログで値を入力して渡す\n\n修復のダイアログで入力したパラメーターは、既存の値を上書きするためのものです。デプロイ固有の設定をアプリケーションに渡す方法ではありません。\n\n`debugValue` に値を設定して渡す\n\n`debugValue` は、get でノートブックの手動の開発・テストに使う値を指定するためのものです。デプロイ固有の設定を渡す方法ではありません。\n\n## まとめ\n\nサーバーレスジョブのデプロイ固有の設定は、パラメーターではなく環境変数で渡します。",
+        "references": [
+          {
+            "title": "Parameterize jobs | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/jobs/parameters"
+          },
+          {
+            "title": "Troubleshoot and repair job failures | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/jobs/repair-job-failures"
+          },
+          {
+            "title": "Use task values to pass information between tasks | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/jobs/task-values"
+          }
+        ],
+        "questionType": "single",
+        "choices": [
+          {
+            "key": "A",
+            "text": "アプリケーションに環境変数として渡す"
+          },
+          {
+            "key": "B",
+            "text": "ジョブのパラメーターとして渡す",
+            "explanation": "サーバーレスジョブでは、デプロイ固有の設定をパラメーターで渡すのではなく、環境変数で渡します。"
+          },
+          {
+            "key": "C",
+            "text": "修復のダイアログで値を入力して渡す",
+            "explanation": "修復のダイアログで入力したパラメーターは、既存の値を上書きするためのものです。デプロイ固有の設定をアプリケーションに渡す方法ではありません。"
+          },
+          {
+            "key": "D",
+            "text": "`debugValue` に値を設定して渡す",
+            "explanation": "`debugValue` は、get でノートブックの手動の開発・テストに使う値を指定するためのものです。デプロイ固有の設定を渡す方法ではありません。"
+          }
+        ],
+        "correctAnswers": ["A"]
+      }
+    },
+    {
+      "verdict": "rewritable",
+      "reasons": ["judge:choices-weak"],
+      "question": {
+        "questionId": "DEA-0078",
+        "examCode": "DBX-DEA-2605",
+        "domain": "domain2",
+        "difficulty": "medium",
+        "questionText": "ジュニアデータエンジニアは、クラウドストレージのディレクトリに届くファイルを、Auto Loader で増分的に取り込むことにしました。このディレクトリには、ストリームを開始する前から多数のファイルが置かれています。開始前のファイルの扱いを、取り込みの方針に合わせて変えたいと考えています。\n\nAuto Loader での既存ファイルの扱いについて、正しい説明はどれですか。",
+        "explanation": "## 問われている要件\nAuto Loader でディレクトリを取り込むとき、ストリームの開始前から置かれているファイルをどう扱えるかを問う問題です。\n\n## 正解の決め手\nAuto Loader の基本は、クラウドストレージへ新しく届いたファイルを、効率よく増分で処理することです。そのうえで、開始前から存在するファイルを対象に入れるか外すかを、利用者が決められます。方針に合わせて扱いを変えたいという要件は、この選択で満たせます。\n\n## 他の選択肢が誤りである理由\n既にあるファイルも新しいファイルと同様に自動で対象となり、除外できない\n\n既にあるファイルを対象に含めるかどうかは、利用者が選べます。自動で対象となり除外できないという説明は、選べるという点に反します。\n\n新しく届くファイルだけが対象で、既にあるファイルは対象に含められない\n\n対象が新しく届くファイルだけに固定されているわけではありません。既にあるファイルも、含めるかどうかを選んで処理の対象にできます。\n\n既にあるファイルは増分処理の対象外のため、別のバッチ処理で先に取り込む\n\n既にあるファイルは、含めると選べば同じ処理の対象にできます。別のバッチ処理で先に取り込む手作業は、この要件に必須ではありません。",
+        "references": [
+          {
+            "title": "What is Auto Loader? | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/"
+          },
+          {
+            "title": "Structured Streaming concepts | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/structured-streaming/concepts"
+          }
+        ],
+        "questionType": "single",
+        "choices": [
+          {
+            "key": "A",
+            "text": "ディレクトリに既にあるファイルも、処理の対象に含めるかどうかを選択できる"
+          },
+          {
+            "key": "B",
+            "text": "既にあるファイルも新しいファイルと同様に自動で対象となり、除外できない",
+            "explanation": "既にあるファイルを対象に含めるかどうかは、利用者が選べます。自動で対象となり除外できないという説明は、選べるという点に反します。"
+          },
+          {
+            "key": "C",
+            "text": "新しく届くファイルだけが対象で、既にあるファイルは対象に含められない",
+            "explanation": "対象が新しく届くファイルだけに固定されているわけではありません。既にあるファイルも、含めるかどうかを選んで処理の対象にできます。"
+          },
+          {
+            "key": "D",
+            "text": "既にあるファイルは増分処理の対象外のため、別のバッチ処理で先に取り込む",
+            "explanation": "既にあるファイルは、含めると選べば同じ処理の対象にできます。別のバッチ処理で先に取り込む手作業は、この要件に必須ではありません。"
+          }
+        ],
+        "correctAnswers": ["A"]
+      }
+    },
+    {
+      "verdict": "rewritable",
+      "reasons": ["judge:choices-weak"],
+      "question": {
+        "questionId": "DEA-0085",
+        "examCode": "DBX-DEA-2605",
+        "domain": "domain6",
+        "difficulty": "medium",
+        "questionText": "あるデータエンジニアは、ノートブックで実行中の重いクエリについて、処理がどこまで進んでいるか、性能の数値がどうなっているかを追いたいと考えています。\n\nこの目的に使える手段はどれですか。",
+        "explanation": "## 問われている要件\n\nノートブックで実行中のクエリについて、進み具合と性能の数値を追う手段が問われています。\n\n## 正解の決め手\n\nSpark UI とリスナー API を使うと、クエリの進行と性能の指標を追えます。システムテーブルやイベントなど、ほかの監視の手段は、見る対象や目的が異なります。\n\n## 他の選択肢が誤りである理由\n\nシステムテーブルにある、アカウント全体のジョブ実行とタスクの記録を分析する\n\nシステムテーブルは、アカウント全体のジョブ実行とタスクの記録を持ち、性能やコストの分析に使えます。ただし、実行中のクエリの進み具合を追う手段として挙がっているのは、Spark UI とリスナー API です。\n\nエラー種別の上位を並べた表で、選んだ期間に多い種類を確かめる\n\nエラー種別の上位の表は、選んだ期間に多いエラーの種類を素早く確かめるためのものです。クエリの進み具合や性能の数値を追う手段ではありません。\n\n実行時間のしきい値を決め、超えたときに発生するイベントを受け取る\n\n実行時間のしきい値を超えたときに発生するイベントは、通知に使うための仕組みです。処理の進み具合や性能の数値を追跡する手段ではありません。",
+        "references": [
+          {
+            "title": "Lakeflow Jobs | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/jobs/"
+          },
+          {
+            "title": "Configure and edit tasks in Lakeflow Jobs | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/jobs/configure-task"
+          },
+          {
+            "title": "Monitor Lakeflow Jobs | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/jobs/monitor"
+          },
+          {
+            "title": "Structured Streaming concepts | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/structured-streaming/concepts"
+          }
+        ],
+        "questionType": "single",
+        "choices": [
+          {
+            "key": "A",
+            "text": "システムテーブルにある、アカウント全体のジョブ実行とタスクの記録を分析する",
+            "explanation": "システムテーブルは、アカウント全体のジョブ実行とタスクの記録を持ち、性能やコストの分析に使えます。ただし、実行中のクエリの進み具合を追う手段として挙がっているのは、Spark UI とリスナー API です。"
+          },
+          {
+            "key": "B",
+            "text": "Spark UI とリスナー API で、クエリの進み具合と性能の数値を追う"
+          },
+          {
+            "key": "C",
+            "text": "エラー種別の上位を並べた表で、選んだ期間に多い種類を確かめる",
+            "explanation": "エラー種別の上位の表は、選んだ期間に多いエラーの種類を素早く確かめるためのものです。クエリの進み具合や性能の数値を追う手段ではありません。"
+          },
+          {
+            "key": "D",
+            "text": "実行時間のしきい値を決め、超えたときに発生するイベントを受け取る",
+            "explanation": "実行時間のしきい値を超えたときに発生するイベントは、通知に使うための仕組みです。処理の進み具合や性能の数値を追跡する手段ではありません。"
+          }
+        ],
+        "correctAnswers": ["B"]
+      }
+    },
+    {
+      "verdict": "rewritable",
+      "reasons": ["judge:explanation-inconsistent"],
+      "question": {
+        "questionId": "DEA-0098",
+        "examCode": "DBX-DEA-2605",
+        "domain": "domain1",
+        "difficulty": "easy",
+        "questionText": "あるデータエンジニアは、ファイルを Delta の表へ変換する処理を作っています。この処理で、欠けているデータや想定外のデータを検査したいと考えています。\n\nこの要件に使える Delta Lake の機能はどれですか。",
+        "explanation": "## 問われている要件\nファイルを Delta の表へ変換するときに、欠けているデータや想定外のデータを検査できる Delta Lake の機能を選ぶ問題です。\n\n## 正解の決め手\nDelta Lake のスキーマの強制の機能を使うと、変換の際に、欠けているデータや想定外のデータを検査できます。検査という要件に合うのは、スキーマの強制です。\n\n## 他の選択肢が誤りである理由\n動的データ上書き\n\n動的データ上書きは、キー列の値か真偽式に合う行だけを置き換え、ほかの行は変えない書き込みの方式です。データを検査する機能ではありません。\n\n削除ベクトル\n\n削除ベクトルは、Delta Lake の表では明示的に有効にして使う機能です。欠けているデータや想定外のデータの検査を担うのは、スキーマの強制です。\n\nGENERATED ALWAYS の列\n\nGENERATED ALWAYS で定義した列は、挿入時に値を手動で指定できなくなる定義です。データを検査する機能ではなく、検査にはスキーマの強制を使います。",
+        "references": [
+          {
+            "title": "Deletion vectors in Databricks | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/delta/deletion-vectors"
+          },
+          {
+            "title": "Delta Lake generated columns | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/delta/generated-columns"
+          },
+          {
+            "title": "Selectively overwrite data with Delta Lake | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/delta/selective-overwrite"
+          },
+          {
+            "title": "What is a data lakehouse? | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/lakehouse/"
+          }
+        ],
+        "questionType": "single",
+        "choices": [
+          {
+            "key": "A",
+            "text": "動的データ上書き",
+            "explanation": "動的データ上書きは、キー列の値か真偽式に合う行だけを置き換え、ほかの行は変えない書き込みの方式です。データを検査する機能ではありません。"
+          },
+          {
+            "key": "B",
+            "text": "削除ベクトル",
+            "explanation": "削除ベクトルは、Delta Lake の表では明示的に有効にして使う機能です。欠けているデータや想定外のデータの検査を担うのは、スキーマの強制です。"
+          },
+          {
+            "key": "C",
+            "text": "GENERATED ALWAYS の列",
+            "explanation": "GENERATED ALWAYS で定義した列は、挿入時に値を手動で指定できなくなる定義です。データを検査する機能ではなく、検査にはスキーマの強制を使います。"
+          },
+          {
+            "key": "D",
+            "text": "スキーマの強制"
+          }
+        ],
+        "correctAnswers": ["D"]
+      }
+    },
+    {
+      "verdict": "rewritable",
+      "reasons": ["judge:explanation-inconsistent", "judge:situation-unnatural"],
+      "question": {
+        "questionId": "DEA-0115",
+        "examCode": "DBX-DEA-2605",
+        "domain": "domain4",
+        "difficulty": "medium",
+        "questionText": "あるデータエンジニアリングチームは、サーバーレスのジョブでアプリケーションを動かしています。デプロイ先の環境ごとに異なる設定を、アプリケーションに渡す必要があります。\n\nこの設定は、どの方法で渡すべきですか。",
+        "explanation": "## 問われている要件\nサーバーレスのジョブで、デプロイ先ごとに異なる設定をアプリケーションに渡す方法が問われています。\n\n## 正解の決め手\nサーバーレスジョブでは、デプロイ固有の設定を、パラメーターではなく環境変数でアプリケーションに渡します。\n\n## 他の選択肢が誤りである理由\nジョブのパラメーターとして設定し、アプリケーションに読み取らせる\n\nサーバーレスジョブでは、デプロイ固有の設定を、パラメーターではなく環境変数で渡します。パラメーターで渡す方法は、この場面には当てはまりません。\n\nFor each タスクの入力の配列に値を並べ、アプリケーションに読み取らせる\n\nFor each タスクは、入力の配列に基づいて別のタスクに繰り返しを加える機能です。デプロイ固有の設定をアプリケーションに渡す手段ではありません。\n\n修復のダイアログでパラメーターを入力し、アプリケーションに読み取らせる\n\n修復のダイアログで入力したパラメーターは、修復実行で既存の値を上書きするものです。デプロイ固有の設定は、サーバーレスジョブではパラメーターではなく環境変数で渡します。\n\n## まとめ\nサーバーレスジョブのデプロイ固有の設定は、パラメーターではなく環境変数で渡します。",
+        "references": [
+          {
+            "title": "Configure task dependencies | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/jobs/conditional-tasks"
+          },
+          {
+            "title": "Parameterize jobs | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/jobs/parameters"
+          },
+          {
+            "title": "Troubleshoot and repair job failures | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/jobs/repair-job-failures"
+          }
+        ],
+        "questionType": "single",
+        "choices": [
+          {
+            "key": "A",
+            "text": "環境変数として設定し、アプリケーションに読み取らせる"
+          },
+          {
+            "key": "B",
+            "text": "ジョブのパラメーターとして設定し、アプリケーションに読み取らせる",
+            "explanation": "サーバーレスジョブでは、デプロイ固有の設定を、パラメーターではなく環境変数で渡します。パラメーターで渡す方法は、この場面には当てはまりません。"
+          },
+          {
+            "key": "C",
+            "text": "For each タスクの入力の配列に値を並べ、アプリケーションに読み取らせる",
+            "explanation": "For each タスクは、入力の配列に基づいて別のタスクに繰り返しを加える機能です。デプロイ固有の設定をアプリケーションに渡す手段ではありません。"
+          },
+          {
+            "key": "D",
+            "text": "修復のダイアログでパラメーターを入力し、アプリケーションに読み取らせる",
+            "explanation": "修復のダイアログで入力したパラメーターは、修復実行で既存の値を上書きするものです。デプロイ固有の設定は、サーバーレスジョブではパラメーターではなく環境変数で渡します。"
+          }
+        ],
+        "correctAnswers": ["A"]
+      }
+    },
+    {
+      "verdict": "rewritable",
+      "reasons": ["judge:choices-weak"],
+      "question": {
+        "questionId": "DEA-0140",
+        "examCode": "DBX-DEA-2605",
+        "domain": "domain5",
+        "difficulty": "medium",
+        "questionText": "あるデータエンジニアのチームは、ジョブの設定をコードで管理し、変更を CI/CD ツールから自動で配布したいと考えています。ジョブは、サーバーレスコンピュートで動かす予定です。チームは、配布に Declarative Automation Bundles を使うことを検討しています。\n\nこの要件に合う、バンドルの説明はどれですか。",
+        "explanation": "## 問われている要件\n\nジョブの設定をコードで管理し、サーバーレスコンピュートで動かし、配布を CI/CD ツールから自動化したいチームに、当てはまるバンドルの説明が問われています。\n\n## 正解の決め手\n\nバンドルでは、サーバーレスコンピュートを使うジョブの設定を定義できます。また、配布の自動化には、Azure DevOps や GitHub Actions、Jenkins といった CI/CD ツールを使えます。この 2 点を満たす説明が正解です。\n\n## 前提知識\n\nバンドルの対象と外部ツール\n\n取り込みパイプラインも、バンドルを使ってデプロイでき、その管理には Databricks CLI を使います。ただし、これはバンドルの対象の一部で、ジョブの設定も対象です。Apache Airflow などの外部ツールは、Databricks のツールや API を介して、ジョブを定期実行する用途で使えます。これは配布の自動化とは別の話です。\n\n## 他の選択肢が誤りである理由\n\nバンドルの配布を自動化できるのは、Apache Airflow のような外部のツールだけである\n\nバンドルの配布は、Azure DevOps や GitHub Actions、Jenkins などの CI/CD ツールからも行えるため、Apache Airflow のような外部ツールだけが対象ではありません。Airflow などが担うのは、Databricks のツールや API を使ったジョブの定期実行です。\n\nサーバーレスコンピュートを使うジョブの設定は、バンドルでは定義できないため、手作業で作る必要がある\n\nサーバーレスコンピュートを使うジョブの設定は、バンドルで定義できます。手作業で作る必要はありません。\n\nバンドルで配布できるのは取り込みパイプラインだけで、ジョブの設定は配布の対象に含まれない\n\nバンドルでは、サーバーレスコンピュートを使うジョブの設定も定義できます。取り込みパイプラインのデプロイにも使えますが、対象はそれだけではありません。",
+        "references": [
+          {
+            "title": "Connect to serverless compute | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/compute/serverless/"
+          },
+          {
+            "title": "CI/CD on Databricks | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/dev-tools/ci-cd/"
+          },
+          {
+            "title": "Lakeflow Connect connector concepts | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/ingestion/lakeflow-connect/"
+          },
+          {
+            "title": "Lakeflow Jobs | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/jobs/"
+          }
+        ],
+        "questionType": "single",
+        "choices": [
+          {
+            "key": "A",
+            "text": "バンドルの配布を自動化できるのは、Apache Airflow のような外部のツールだけである",
+            "explanation": "バンドルの配布は、Azure DevOps や GitHub Actions、Jenkins などの CI/CD ツールからも行えるため、Apache Airflow のような外部ツールだけが対象ではありません。Airflow などが担うのは、Databricks のツールや API を使ったジョブの定期実行です。"
+          },
+          {
+            "key": "B",
+            "text": "サーバーレスコンピュートを使うジョブの設定は、バンドルでは定義できないため、手作業で作る必要がある",
+            "explanation": "サーバーレスコンピュートを使うジョブの設定は、バンドルで定義できます。手作業で作る必要はありません。"
+          },
+          {
+            "key": "C",
+            "text": "バンドルで配布できるのは取り込みパイプラインだけで、ジョブの設定は配布の対象に含まれない",
+            "explanation": "バンドルでは、サーバーレスコンピュートを使うジョブの設定も定義できます。取り込みパイプラインのデプロイにも使えますが、対象はそれだけではありません。"
+          },
+          {
+            "key": "D",
+            "text": "サーバーレスのジョブの設定をバンドルで定義でき、GitHub Actions などから配布できる"
+          }
+        ],
+        "correctAnswers": ["D"]
+      }
+    },
+    {
+      "verdict": "rewritable",
+      "reasons": ["judge:choices-weak"],
+      "question": {
+        "questionId": "DEA-0167",
+        "examCode": "DBX-DEA-2605",
+        "domain": "domain2",
+        "difficulty": "medium",
+        "questionText": "あるデータエンジニアは、ストリーミング処理を実装する方式を選んでいます。Spark の API で処理を書く層のうち、最も柔軟なものを使いたいと考えています。また、処理の耐障害性が、入力から出力まで一貫して備わっているエンジンを求めています。\n\nこの要件を満たすものはどれですか。",
+        "explanation": "## 問われている要件\n\nSpark の API で処理を書く層のうち最も自由度が高く、耐障害性が入力から出力まで備わっているストリーミングのエンジンを選ぶ問題です。\n\n## 正解の決め手\n\nStructured Streaming は、Spark の API で処理を書く層の中で最も自由度が高い、ストリーミングのエンジンです。耐障害性が、入力から出力まで一貫して備わっています。この説明に合うのは、選択肢 D です。\n\n## 前提知識\n\nAuto Loader は増分取り込みに使う機能で、Lakeflow パイプラインの中で使うことが推奨されています。COPY INTO は、データを表へ入れる操作です。Lakeflow パイプラインは、データの取り込みと、増分の変換に使われます。\n\n## 解くための考え方\n\n選択肢が、それぞれ何の機能かを整理します。取り込みの機能、データを入れる操作、パイプラインの枠組みは、いずれもストリーミングのエンジンという説明とは役割が違います。「最も自由度が高い層」という条件に合うものだけが残ります。\n\n## 他の選択肢が誤りである理由\n\nAuto Loader\n\nAuto Loader は、増分取り込みに使う機能として推奨されるものです。Spark の API で書く層の中で最も自由度が高いストリーミングのエンジンは、Structured Streaming です。\n\nCOPY INTO\n\nCOPY INTO は、データを表へ入れる操作で、入れた後の表を問い合わせできるようにします。ストリーミングのエンジンとして説明されるのは、Structured Streaming です。\n\nLakeflow パイプライン\n\nLakeflow パイプラインは、クラウドストレージやメッセージバスのデータを取り込む用途と、バッチやストリーミングの増分変換の用途で使われます。最も自由度が高い層として説明されるのは、Structured Streaming です。\n\n## まとめ\n\nSpark の API で処理を書く層で最も自由度が高く、耐障害性を入力から出力まで備えるのは Structured Streaming です。取り込みの機能やパイプラインの枠組みとは、役割を分けて覚えます。",
+        "references": [
+          {
+            "title": "Spark Declarative Pipelines on Lakeflow | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/dlt/"
+          },
+          {
+            "title": "Ingest with SQL and Spark APIs | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/ingestion/"
+          },
+          {
+            "title": "What is Auto Loader? | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/"
+          },
+          {
+            "title": "Get started using COPY INTO to load data | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/copy-into/"
+          }
+        ],
+        "questionType": "single",
+        "choices": [
+          {
+            "key": "A",
+            "text": "Auto Loader",
+            "explanation": "Auto Loader は、増分取り込みに使う機能として推奨されるものです。Spark の API で書く層の中で最も自由度が高いストリーミングのエンジンは、Structured Streaming です。"
+          },
+          {
+            "key": "B",
+            "text": "COPY INTO",
+            "explanation": "COPY INTO は、データを表へ入れる操作で、入れた後の表を問い合わせできるようにします。ストリーミングのエンジンとして説明されるのは、Structured Streaming です。"
+          },
+          {
+            "key": "C",
+            "text": "Lakeflow パイプライン",
+            "explanation": "Lakeflow パイプラインは、クラウドストレージやメッセージバスのデータを取り込む用途と、バッチやストリーミングの増分変換の用途で使われます。最も自由度が高い層として説明されるのは、Structured Streaming です。"
+          },
+          {
+            "key": "D",
+            "text": "Structured Streaming"
+          }
+        ],
+        "correctAnswers": ["D"]
+      }
+    },
+    {
+      "verdict": "rewritable",
+      "reasons": ["judge:situation-unnatural"],
+      "question": {
+        "questionId": "DEA-0171",
+        "examCode": "DBX-DEA-2605",
+        "domain": "domain7",
+        "difficulty": "medium",
+        "questionText": "あるデータエンジニアは、ワークスペース内で起きた操作を調べるために、監査ログの表を参照しています。監査を担当するチームから、この表に記録が残る期間を、調査の計画に入れておくよう求められました。\n\nこの表に含まれる監査イベントの記録の保持期間は、どれですか。",
+        "explanation": "## 問われている要件\n\n監査ログの表に含まれる、ワークスペース内の監査イベントの記録が、どれだけの期間保持されるかを答える問題です。\n\n## 正解の決め手\n\n監査ログの表の保持期間は 365 日です。調査の計画を立てるときは、この日数を前提にして、表で確認できる範囲を見積もります。\n\n## 他の選択肢が誤りである理由\n\n90 日間だけ保持され、その後は表から削除される\n\n90 日は、実際の保持期間より短い値です。この表の保持期間は 365 日です。\n\n上限はなく、手作業で削除するまで残り続ける\n\nこの表の記録には、365 日という保持期間が決まっています。無期限に残るわけではありません。\n\n直近 30 日間の記録だけが保持される\n\n30 日は、実際の保持期間よりずっと短い値です。この表の保持期間は 365 日です。",
+        "references": [
+          {
+            "title": "System tables reference | Databricks on AWS",
+            "url": "https://docs.databricks.com/aws/en/admin/system-tables/"
+          }
+        ],
+        "questionType": "single",
+        "choices": [
+          {
+            "key": "A",
+            "text": "90 日間だけ保持され、その後は表から削除される",
+            "explanation": "90 日は、実際の保持期間より短い値です。この表の保持期間は 365 日です。"
+          },
+          {
+            "key": "B",
+            "text": "365 日間にわたって記録が保持される"
+          },
+          {
+            "key": "C",
+            "text": "上限はなく、手作業で削除するまで残り続ける",
+            "explanation": "この表の記録には、365 日という保持期間が決まっています。無期限に残るわけではありません。"
+          },
+          {
+            "key": "D",
+            "text": "直近 30 日間の記録だけが保持される",
+            "explanation": "30 日は、実際の保持期間よりずっと短い値です。この表の保持期間は 365 日です。"
+          }
+        ],
+        "correctAnswers": ["B"]
+      }
+    }
+  ]
+}
