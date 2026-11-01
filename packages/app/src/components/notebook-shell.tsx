@@ -165,7 +165,22 @@ function TocDrawer({
 }
 
 /**
+ * 目次の中で、いまの中分類の項目(`aria-current="page"`)が見えていなければ、目次だけをスクロールして、項目を見える範囲の中ほどに出す。
+ * ページ(window)はスクロールしない(`scrollIntoView` は、ページごと動かすため使わない)。
+ */
+export function revealCurrent(container: HTMLElement) {
+  const item = container.querySelector<HTMLElement>('[aria-current="page"]');
+  if (!item) return;
+  const box = container.getBoundingClientRect();
+  const rect = item.getBoundingClientRect();
+  if (rect.top >= box.top && rect.bottom <= box.bottom) return;
+  container.scrollTop += rect.top - box.top - (box.height - rect.height) / 2;
+}
+
+/**
  * 体系ノートの枠。広い画面(`md` 以上)は、目次を左に固定し、狭い画面は ☰ の「目次」で、左から出す。
+ * 目次は、ページのどこまで読み進めても開ける(追従する)。広い画面の目次は、スクロールしても画面に残り、
+ * サイトの上のバー(`lg` 未満で上に固定)と重ならない。狭い画面の「☰ 目次」は、上のバーのすぐ下に固定する。
  */
 export function NotebookShell({ basePath, toc, children }: Props) {
   const pathname = usePathname();
@@ -173,21 +188,28 @@ export function NotebookShell({ basePath, toc, children }: Props) {
   const button = useRef<HTMLButtonElement>(null);
   const drawerId = useId();
   const close = useCallback(() => setOpen(false), []);
+  const side = useRef<HTMLDivElement>(null);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: 遷移したら目次を閉じる
   useEffect(() => {
     setOpen(false);
+    if (side.current) revealCurrent(side.current);
   }, [pathname]);
 
   return (
     <div className="md:grid md:grid-cols-[15rem_minmax(0,1fr)] md:gap-8">
       <aside className="hidden md:block">
-        <div className="sticky top-4 max-h-[calc(100dvh-2rem)] overflow-y-auto pb-4">
+        {/* `lg` 未満は、サイトの上のバー(上に固定。高さ約 3rem)の下に固定する */}
+        <div
+          ref={side}
+          className="sticky top-16 max-h-[calc(100dvh-5rem)] overflow-y-auto pb-4 lg:top-4 lg:max-h-[calc(100dvh-2rem)]"
+        >
           <NotebookToc basePath={basePath} toc={toc} />
         </div>
       </aside>
       <div className="min-w-0">
-        <div className="mb-4 md:hidden">
+        {/* 上のバー(高さ約 3rem)の下に、少し間を空けて固定する(`top-14`)。ボタンの外側は、下の本文を押せるよう、押す対象にしない */}
+        <div data-testid="notebook-toc-bar" className="pointer-events-none sticky top-14 z-20 mb-4 md:hidden">
           <button
             ref={button}
             type="button"
@@ -195,7 +217,7 @@ export function NotebookShell({ basePath, toc, children }: Props) {
             aria-expanded={open}
             aria-controls={open ? drawerId : undefined}
             onClick={() => setOpen(true)}
-            className="inline-flex items-center gap-2 rounded-md border border-line bg-surface px-3 py-2 text-sm font-bold"
+            className="pointer-events-auto inline-flex items-center gap-2 rounded-md border border-line bg-surface px-3 py-2 text-sm font-bold shadow-sm"
           >
             <span aria-hidden="true">☰</span>目次
           </button>
