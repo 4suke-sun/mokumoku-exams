@@ -348,7 +348,7 @@ describe("分野と図の種類", () => {
   });
   const diagramFile = (d: unknown) => files(curriculum([unit({ sections: [section({ diagram: d })] })]));
 
-  it("3 種類の図_指摘なし", () => {
+  it("流れ・比較・階層の図_指摘なし", () => {
     expect(validateCurriculumData(diagramFile(compare()), context)).toEqual([]);
     expect(validateCurriculumData(diagramFile(hierarchy()), context)).toEqual([]);
     expect(validateCurriculumData(diagramFile({ ...diagram(), type: "flow" }), context)).toEqual([]);
@@ -398,6 +398,103 @@ describe("分野と図の種類", () => {
         context,
       ),
     ).toHaveLength(1);
+  });
+
+  const timeline = (over: Record<string, unknown> = {}) => ({
+    type: "timeline",
+    title: "時系列",
+    events: [
+      { id: "drop", label: "削除" },
+      { id: "limit", label: "期限", note: "既定で 7 日" },
+      { id: "purge", label: "ファイルが消える" },
+    ],
+    spans: [{ from: "drop", to: "limit", label: "戻せる期間" }],
+    ...over,
+  });
+  const tableChange = (over: Record<string, unknown> = {}) => ({
+    type: "table-change",
+    title: "表の変化",
+    operation: "MERGE INTO",
+    before: {
+      heading: "前",
+      columns: [{ label: "id" }, { label: "値" }],
+      rows: [{ cells: ["1", "a"] }, { cells: ["2", "b"], state: "removed" }],
+    },
+    after: {
+      heading: "後",
+      columns: [{ label: "id" }, { label: "値" }, { label: "日付", state: "added" }],
+      rows: [
+        { cells: ["1", "c", "1/1"], state: "changed" },
+        { cells: ["3", "d", "1/2"], state: "added" },
+      ],
+    },
+    ...over,
+  });
+  const where = "curriculum.ex-smp-xx.json: units[0].sections[0].diagram";
+
+  it("時系列・表の変化・状態のある階層の図_指摘なし", () => {
+    expect(validateCurriculumData(diagramFile(timeline()), context)).toEqual([]);
+    expect(validateCurriculumData(diagramFile(tableChange()), context)).toEqual([]);
+    const root = {
+      label: "カタログ",
+      children: [{ label: "スキーマ", state: "origin", children: [{ label: "表", state: "covered" }] }],
+    };
+    expect(validateCurriculumData(diagramFile(hierarchy({ root })), context)).toEqual([]);
+  });
+
+  it("時系列の期間が逆向き・図にない出来事・重なる_指摘する", () => {
+    expect(
+      validateCurriculumData(diagramFile(timeline({ spans: [{ from: "limit", to: "drop", label: "逆" }] })), context),
+    ).toEqual([`${where}.spans[0]: 期間は、前の出来事から後の出来事へ向けます`]);
+    expect(
+      validateCurriculumData(diagramFile(timeline({ spans: [{ from: "drop", to: "none", label: "無" }] })), context),
+    ).toEqual([`${where}.spans[0]: 図にない出来事を指しています`]);
+    const overlap = [
+      { from: "drop", to: "purge", label: "全体" },
+      { from: "limit", to: "purge", label: "後半" },
+    ];
+    expect(validateCurriculumData(diagramFile(timeline({ spans: overlap })), context)).toEqual([
+      `${where}.spans[1]: 期間どうしが重なっています`,
+    ]);
+    const touching = [
+      { from: "drop", to: "limit", label: "前半" },
+      { from: "limit", to: "purge", label: "後半" },
+    ];
+    expect(validateCurriculumData(diagramFile(timeline({ spans: touching })), context)).toEqual([]);
+  });
+
+  it("時系列の出来事の ID が重複_指摘する", () => {
+    const events = [
+      { id: "a", label: "一" },
+      { id: "a", label: "二" },
+    ];
+    expect(validateCurriculumData(diagramFile(timeline({ events, spans: [] })), context)).toEqual([
+      `${where}.events[1].id: 出来事の ID が重複しています`,
+    ]);
+  });
+
+  it("表の変化の値の数が列と違う・状態の置き場が違う_指摘する", () => {
+    const before = {
+      heading: "前",
+      columns: [{ label: "id", state: "added" }],
+      rows: [{ cells: ["1", "x"], state: "added" }],
+    };
+    expect(validateCurriculumData(diagramFile(tableChange({ before })), context)).toEqual([
+      `${where}.before.rows[0].cells: 値の数が列の数と違います`,
+      `${where}.before.rows[0].state: 消した行は前の表に、足した行と変わった行は後の表に置きます`,
+      `${where}.before.columns[0].state: 足した列は後の表に置きます`,
+    ]);
+    const after = { heading: "後", columns: [{ label: "id" }], rows: [{ cells: ["1"], state: "removed" }] };
+    expect(validateCurriculumData(diagramFile(tableChange({ after })), context)).toEqual([
+      `${where}.after.rows[0].state: 消した行は前の表に、足した行と変わった行は後の表に置きます`,
+    ]);
+  });
+
+  it("表の変化のセルが長すぎる・URL を含む_指摘する", () => {
+    const after = { heading: "後", columns: [{ label: "id" }], rows: [{ cells: ["あ".repeat(13)] }] };
+    expect(validateCurriculumData(diagramFile(tableChange({ after })), context)).toHaveLength(1);
+    const withUrl = { heading: "後", columns: [{ label: "id" }], rows: [{ cells: ["www.example"] }] };
+    expect(validateCurriculumData(diagramFile(tableChange({ after: withUrl })), context)).toHaveLength(1);
   });
 
   it("階層の図の入れ子が深すぎる・箱が多すぎる_指摘する", () => {

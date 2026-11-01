@@ -5,6 +5,10 @@ import type {
   FlowDiagram,
   HierarchyDiagram,
   HierarchyNode,
+  HierarchyNodeState,
+  TableChangeDiagram,
+  TableChangeState,
+  TimelineDiagram,
 } from "@mokumoku-exams/data-schema/curriculum-data/schema";
 
 // 図解の配置を決める。描画(components/diagram.tsx)から切り離した純粋な関数にして、単体テストする。
@@ -15,10 +19,14 @@ import type {
 // 比較の図(compare): 左右に、見出しの箱と項目の箱を並べる。左右の項目は、同じ行どうしを対応させる。
 //   上下に積む形(`stacked`)では、左の側を上に、右の側を下に、1 列で並べる(狭い画面で、文字を小さくしないため)。
 // 階層の図(hierarchy): 根の箱の中に、子の箱を入れ子にして、上から順に並べる。
+// 時系列の図(timeline): 出来事の箱を左から右へ並べ、下に時間の軸を引き、軸の下に期間の箱を置く。
+//   上下に積む形では、出来事を上から下へ並べ、左に期間の箱、間に時間の軸を置く。
+// 表の変化の図(table-change): 操作の名前を上に置き、前の表と後の表を左右に並べる(間に矢印)。
+//   上下に積む形では、前の表、操作の名前と下向きの矢印、後の表の順に並べる。
 // 箱の文字は、折り返し、それでも収まらなければ小さくする(`fitText`)。収まらない図は、`diagramProblems` が報告する。
 // 文字の幅は、全角を 1 文字分、半角を 0.6 文字分として見積もる(描画の前に文字の大きさを測れないため)。
 
-export type { CompareDiagram, Diagram, FlowDiagram, HierarchyDiagram };
+export type { CompareDiagram, Diagram, FlowDiagram, HierarchyDiagram, TableChangeDiagram, TimelineDiagram };
 
 export type Box = { x: number; y: number; width: number; height: number };
 export type Point = { x: number; y: number };
@@ -55,19 +63,40 @@ export type DiagramLayout = {
   edges: PlacedEdge[];
 };
 
-/** 比較・階層の図の箱。`tone` は、色の役割(画面側で、色に対応させる)。`state` は、比較の項目の状態(消える・残る) */
+/** 箱の状態: 比較の項目(消える・残る)、階層の箱(起点・範囲内)、表の変化の行と列(消した・足した・変わった) */
+export type BoxState = CompareItemState | HierarchyNodeState | TableChangeState;
+
+/**
+ * 比較・階層・時系列・表の変化の図の箱。`tone` は、色の役割(画面側で、色に対応させる)。`state` は、箱の状態
+ */
 export type PlacedBox = Box & {
-  tone: "heading-left" | "heading-right" | "item" | "depth-0" | "depth-1" | "depth-2" | "depth-3";
+  tone:
+    | "heading-left"
+    | "heading-right"
+    | "item"
+    | "depth-0"
+    | "depth-1"
+    | "depth-2"
+    | "depth-3"
+    | "event"
+    | "span"
+    | "operation"
+    | "cell-header"
+    | "cell";
   texts: PlacedText[];
-  state?: CompareItemState;
+  state?: BoxState;
 };
+/** 箱どうしをつなぐ線(時間の軸、目盛り、表の間の矢印)。`arrow` の線は、終点に矢じりを描く */
+export type Connector = { start: Point; end: Point; arrow?: [Point, Point, Point] };
 export type BoxLayout = {
-  kind: "compare" | "hierarchy";
+  kind: "compare" | "hierarchy" | "timeline" | "table-change";
   width: number;
   height: number;
   boxes: PlacedBox[];
   /** 比較の図の、左右の見出しの間に置く「vs」の位置 */
   versus?: Point;
+  /** 時系列・表の変化の図の線 */
+  connectors?: Connector[];
 };
 export type AnyLayout = DiagramLayout | BoxLayout;
 
@@ -95,7 +124,7 @@ const MIN_ROWS = 3;
 const ARROW_LENGTH = 8;
 const BAND_PADDING = 6;
 const MARGIN = 8;
-/** 比較・階層の図の幅(これを基準に、画面の幅に合わせて縮む) */
+/** 比較・階層・時系列・表の変化の図の幅(これを基準に、画面の幅に合わせて縮む) */
 const WIDE_WIDTH = 600;
 const COMPARE_GAP = 48;
 const ROW_GAP = 8;
@@ -396,7 +425,7 @@ function placeTexts(texts: Omit<PlacedText, "x">[], box: Box): PlacedText[] {
 }
 
 /** 項目の状態を、箱に写す(状態のない項目には、項目を足さない) */
-const withState = (state: CompareItemState | undefined) => (state ? { state } : {});
+const withState = (state: BoxState | undefined) => (state ? { state } : {});
 
 /**
  * 比較の図: 左右の列に、見出しと項目を並べる。同じ行の左右は、高いほうに高さをそろえる。
@@ -490,6 +519,7 @@ export function layoutHierarchy(diagram: HierarchyDiagram): BoxLayout {
       height: fit.height,
       tone: DEPTH_TONES[Math.min(depth, DEPTH_TONES.length - 1)] ?? "depth-3",
       texts: [],
+      ...withState(node.state),
     };
     boxes.push(box);
     let height = fit.height;
@@ -509,7 +539,224 @@ export function layoutHierarchy(diagram: HierarchyDiagram): BoxLayout {
   return { kind: "hierarchy", width: WIDE_WIDTH + MARGIN * 2, height: rootHeight + MARGIN * 2, boxes };
 }
 
-/** 図の種類に応じて配置する。`stacked` は、比較の図を上下に積む(ほかの種類には効かない) */
+/** 線を足す。同じ始点と終点の線がすでにあれば足さない(接する期間の端の線が、同じ出来事で重なるため) */
+function addConnector(connectors: Connector[], line: Connector) {
+  const same = (a: Point, b: Point) => a.x === b.x && a.y === b.y;
+  if (connectors.some((c) => same(c.start, line.start) && same(c.end, line.end))) return;
+  connectors.push(line);
+}
+
+/** `start` から `tip` へ向かう矢印の線(線は矢じりの根元で止める) */
+function arrowConnector(start: Point, tip: Point): Connector {
+  const { base, arrow } = arrowHead(start, tip);
+  return { start, end: base, arrow };
+}
+
+/** 期間の箱の文字の行の上限(期間の箱は、出来事の間に収めるため、行を多めに許す) */
+const SPAN_MAX_LINES = 4;
+const TIMELINE_GAP = 16;
+/** 時間の軸と、出来事・期間の箱との間 */
+const AXIS_GAP = 14;
+/** 上下に積む時系列の図の、期間の列の幅 */
+const STACKED_SPAN_WIDTH = 96;
+
+/** 期間の名前を、幅 `inner` に収める(題の役。行は `SPAN_MAX_LINES` まで) */
+function fitSpanText(label: string, inner: number): { texts: Omit<PlacedText, "x">[]; height: number } {
+  const fit = fitText(label, inner, LABEL_FONT_SIZE, SPAN_MAX_LINES);
+  const texts = fit.lines.map((text, i) => ({
+    text,
+    y: NODE_PADDING_Y + LABEL_LINE_HEIGHT * i + LABEL_LINE_HEIGHT / 2,
+    fontSize: fit.fontSize,
+    role: "label" as const,
+    fits: fit.fits,
+  }));
+  return { texts, height: Math.max(NODE_MIN_HEIGHT, NODE_PADDING_Y * 2 + LABEL_LINE_HEIGHT * fit.lines.length) };
+}
+
+/** 期間の箱の文字を、箱の高さの中央にそろえる(題が 1 行でも、期間の箱は高くなることがあるため) */
+function centerTexts(texts: Omit<PlacedText, "x">[], box: Box, height: number): PlacedText[] {
+  const offset = (box.height - height) / 2;
+  return placeTexts(
+    texts.map((t) => ({ ...t, y: t.y + offset })),
+    box,
+  );
+}
+
+/**
+ * 時系列の図: 出来事を時間の順に並べ、期間の箱を、期間の始まりと終わりの出来事の間に置く。
+ * 期間どうしは重ならない(スキーマで検査する)ので、期間は 1 列(1 行)に並ぶ。
+ */
+export function layoutTimeline(diagram: TimelineDiagram, { stacked = false }: { stacked?: boolean } = {}): BoxLayout {
+  const index = new Map(diagram.events.map((event, i) => [event.id, i]));
+  const spans = (diagram.spans ?? []).flatMap((span) => {
+    const from = index.get(span.from);
+    const to = index.get(span.to);
+    return from === undefined || to === undefined ? [] : [{ ...span, fromIndex: from, toIndex: to }];
+  });
+  if (stacked) return layoutTimelineStacked(diagram, spans);
+
+  const n = diagram.events.length;
+  const width = (WIDE_WIDTH - TIMELINE_GAP * (n - 1)) / n;
+  const fits = diagram.events.map((event) => fitBoxText(event.label, event.note, width - NODE_PADDING_X * 2, "label"));
+  const height = Math.max(NODE_MIN_HEIGHT, ...fits.map((fit) => fit.height));
+  const boxes: PlacedBox[] = [];
+  const connectors: Connector[] = [];
+  const centers = diagram.events.map((_, i) => MARGIN + i * (width + TIMELINE_GAP) + width / 2);
+  const axisY = MARGIN + height + AXIS_GAP;
+  fits.forEach((fit, i) => {
+    const box = { x: MARGIN + i * (width + TIMELINE_GAP), y: MARGIN, width, height };
+    boxes.push({ ...box, tone: "event", texts: placeTexts(fit.texts, box) });
+    connectors.push({ start: { x: centers[i] ?? 0, y: MARGIN + height }, end: { x: centers[i] ?? 0, y: axisY } });
+  });
+  connectors.push(arrowConnector({ x: MARGIN, y: axisY }, { x: MARGIN + WIDE_WIDTH, y: axisY }));
+
+  const spanY = axisY + AXIS_GAP;
+  let bottom = axisY;
+  for (const span of spans) {
+    const x = centers[span.fromIndex] ?? 0;
+    const spanWidth = (centers[span.toIndex] ?? 0) - x;
+    const fit = fitSpanText(span.label, spanWidth - NODE_PADDING_X * 2);
+    const box = { x, y: spanY, width: spanWidth, height: fit.height };
+    boxes.push({ ...box, tone: "span", texts: placeTexts(fit.texts, box) });
+    for (const end of [x, x + spanWidth])
+      addConnector(connectors, { start: { x: end, y: axisY }, end: { x: end, y: spanY } });
+    bottom = Math.max(bottom, spanY + fit.height);
+  }
+  return { kind: "timeline", width: WIDE_WIDTH + MARGIN * 2, height: bottom + MARGIN, boxes, connectors };
+}
+
+/** 時系列の図を上下に積む: 右の列に出来事、左の列に期間、その間に下向きの時間の軸を置く */
+function layoutTimelineStacked(
+  diagram: TimelineDiagram,
+  spans: { label: string; fromIndex: number; toIndex: number }[],
+): BoxLayout {
+  const column = (WIDE_WIDTH - COMPARE_GAP) / 2;
+  const axisX = MARGIN + STACKED_SPAN_WIDTH + AXIS_GAP;
+  const eventX = axisX + AXIS_GAP;
+  const eventWidth = MARGIN + column - eventX;
+  const fits = diagram.events.map((event) =>
+    fitBoxText(event.label, event.note, eventWidth - NODE_PADDING_X * 2, "label"),
+  );
+  const spanFits = spans.map((span) => fitSpanText(span.label, STACKED_SPAN_WIDTH - NODE_PADDING_X * 2));
+  // 出来事の間の空き。期間の文字が、始まりと終わりの出来事の中心の間に収まるよう、期間の最後の空きを広げる
+  const gaps = diagram.events.map(() => TIMELINE_GAP);
+  const centerOf = (i: number) => {
+    let y = MARGIN;
+    for (let k = 0; k < i; k += 1) y += (fits[k]?.height ?? 0) + (gaps[k] ?? 0);
+    return y + (fits[i]?.height ?? 0) / 2;
+  };
+  spans.forEach((span, i) => {
+    const need = (spanFits[i]?.height ?? 0) - (centerOf(span.toIndex) - centerOf(span.fromIndex));
+    if (need > 0) gaps[span.toIndex - 1] = (gaps[span.toIndex - 1] ?? 0) + need;
+  });
+
+  const boxes: PlacedBox[] = [];
+  const connectors: Connector[] = [];
+  let y = MARGIN;
+  fits.forEach((fit, i) => {
+    const box = { x: eventX, y, width: eventWidth, height: fit.height };
+    boxes.push({ ...box, tone: "event", texts: placeTexts(fit.texts, box) });
+    connectors.push({ start: { x: axisX, y: y + fit.height / 2 }, end: { x: eventX, y: y + fit.height / 2 } });
+    y += fit.height + (gaps[i] ?? 0);
+  });
+  const bottom = y - (gaps.at(-1) ?? 0);
+  connectors.push(arrowConnector({ x: axisX, y: MARGIN }, { x: axisX, y: bottom }));
+  spans.forEach((span, i) => {
+    const fit = spanFits[i];
+    if (!fit) return;
+    const top = centerOf(span.fromIndex);
+    const box = { x: MARGIN, y: top, width: STACKED_SPAN_WIDTH, height: centerOf(span.toIndex) - top };
+    boxes.push({ ...box, tone: "span", texts: centerTexts(fit.texts, box, fit.height) });
+    for (const end of [box.y, box.y + box.height]) {
+      addConnector(connectors, { start: { x: MARGIN + STACKED_SPAN_WIDTH, y: end }, end: { x: axisX, y: end } });
+    }
+  });
+  return { kind: "timeline", width: column + MARGIN * 2, height: bottom + MARGIN, boxes, connectors };
+}
+
+/** 表の変化の図のセルの左右の余白と、セルどうしの間 */
+const CELL_PADDING_X = 6;
+const CELL_GAP = 2;
+
+/** 表(見出しと、列と行のセル)を、左上 (x, y)・幅 `width` に並べ、置いた高さを返す */
+function placeTable(
+  table: TableChangeDiagram["before"],
+  x: number,
+  y: number,
+  width: number,
+  tone: "heading-left" | "heading-right",
+  boxes: PlacedBox[],
+): number {
+  const heading = fitBoxText(table.heading, undefined, width - NODE_PADDING_X * 2, "heading");
+  const headingBox = { x, y, width, height: heading.height };
+  boxes.push({ ...headingBox, tone, texts: placeTexts(heading.texts, headingBox) });
+  let rowY = y + heading.height + ROW_GAP;
+  const count = table.columns.length;
+  const cellWidth = (width - CELL_GAP * (count - 1)) / count;
+  const inner = cellWidth - CELL_PADDING_X * 2;
+  const rows: { cells: { label: string; state?: BoxState }[]; tone: "cell-header" | "cell" }[] = [
+    { cells: table.columns.map((c) => ({ label: c.label, ...withState(c.state) })), tone: "cell-header" },
+    ...table.rows.map((row) => ({
+      cells: row.cells.map((label, i) => ({ label, ...withState(row.state ?? table.columns[i]?.state) })),
+      tone: "cell" as const,
+    })),
+  ];
+  for (const row of rows) {
+    const fits = row.cells.map((cell) => fitBoxText(cell.label, undefined, inner, "label"));
+    const height = Math.max(NODE_MIN_HEIGHT, ...fits.map((fit) => fit.height));
+    fits.forEach((fit, i) => {
+      const box = { x: x + i * (cellWidth + CELL_GAP), y: rowY, width: cellWidth, height };
+      boxes.push({ ...box, tone: row.tone, texts: placeTexts(fit.texts, box), ...withState(row.cells[i]?.state) });
+    });
+    rowY += height + CELL_GAP;
+  }
+  return rowY - CELL_GAP - y;
+}
+
+/**
+ * 表の変化の図: 操作の名前を上に置き、前の表(左)と後の表(右)を、間の矢印でつなぐ。
+ * `stacked` では、前の表、操作の名前と下向きの矢印、後の表の順に、1 列で積む。
+ */
+export function layoutTableChange(
+  diagram: TableChangeDiagram,
+  { stacked = false }: { stacked?: boolean } = {},
+): BoxLayout {
+  const column = (WIDE_WIDTH - COMPARE_GAP) / 2;
+  const boxes: PlacedBox[] = [];
+  const connectors: Connector[] = [];
+  if (stacked) {
+    let y = MARGIN;
+    y += placeTable(diagram.before, MARGIN, y, column, "heading-left", boxes) + ROW_GAP;
+    // 下向きの矢印の線の上に、操作の名前の箱を重ねる(線は connectors で、箱より先に描く)
+    const opWidth = column * 0.75;
+    const op = fitBoxText(diagram.operation, undefined, opWidth - NODE_PADDING_X * 2, "label");
+    const opBox = { x: MARGIN + (column - opWidth) / 2, y: y + AXIS_GAP, width: opWidth, height: op.height };
+    boxes.push({ ...opBox, tone: "operation", texts: placeTexts(op.texts, opBox) });
+    const tip = { x: MARGIN + column / 2, y: opBox.y + opBox.height + AXIS_GAP + ARROW_LENGTH };
+    connectors.push(arrowConnector({ x: tip.x, y }, tip));
+    y = tip.y + ROW_GAP;
+    y += placeTable(diagram.after, MARGIN, y, column, "heading-right", boxes);
+    return { kind: "table-change", width: column + MARGIN * 2, height: y + MARGIN, boxes, connectors };
+  }
+  const op = fitBoxText(diagram.operation, undefined, column - NODE_PADDING_X * 2, "label");
+  const opBox = { x: MARGIN + (WIDE_WIDTH - column) / 2, y: MARGIN, width: column, height: op.height };
+  boxes.push({ ...opBox, tone: "operation", texts: placeTexts(op.texts, opBox) });
+  const top = MARGIN + op.height + ROW_GAP * 2;
+  const leftHeight = placeTable(diagram.before, MARGIN, top, column, "heading-left", boxes);
+  const rightX = MARGIN + column + COMPARE_GAP;
+  const rightHeight = placeTable(diagram.after, rightX, top, column, "heading-right", boxes);
+  const middle = top + Math.min(leftHeight, rightHeight) / 2;
+  connectors.push(arrowConnector({ x: MARGIN + column + ROW_GAP, y: middle }, { x: rightX - ROW_GAP, y: middle }));
+  return {
+    kind: "table-change",
+    width: WIDE_WIDTH + MARGIN * 2,
+    height: top + Math.max(leftHeight, rightHeight) + MARGIN,
+    boxes,
+    connectors,
+  };
+}
+
+/** 図の種類に応じて配置する。`stacked` は、比較・時系列・表の変化の図を上下に積む(ほかの種類には効かない) */
 export function layoutAny(diagram: Diagram, { stacked = false }: { stacked?: boolean } = {}): AnyLayout {
   switch (diagram.type) {
     case "flow":
@@ -518,8 +765,15 @@ export function layoutAny(diagram: Diagram, { stacked = false }: { stacked?: boo
       return layoutCompare(diagram, { stacked });
     case "hierarchy":
       return layoutHierarchy(diagram);
+    case "timeline":
+      return layoutTimeline(diagram, { stacked });
+    case "table-change":
+      return layoutTableChange(diagram, { stacked });
   }
 }
+
+/** 上下に積む形を持つ図の種類(狭い画面で、左右や前後に並べると文字が小さくなりすぎるもの) */
+export const STACKABLE_TYPES: readonly Diagram["type"][] = ["compare", "timeline", "table-change"];
 
 /**
  * 図の配置の問題を、文章で返す(問題がなければ空)。CI の検査(実データのすべての図)と、画面の確認に使う。

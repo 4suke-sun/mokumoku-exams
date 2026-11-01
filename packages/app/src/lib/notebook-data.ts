@@ -10,11 +10,11 @@ export type { NotebookEntry, NotebookUnit };
 /** 体系ノートの全体。中分類は、資格マスタの分野の並び → 分野の中の並び順。見出しは、中分類の中の並び順 */
 export type Notebook = { units: NotebookUnit[]; entries: NotebookEntry[] };
 
-/** `type` のない図は、流れの図として扱う(データの検査と同じ決まり) */
-function withDiagramType(unit: NotebookUnit): NotebookUnit {
-  return unit.diagram && !("type" in unit.diagram)
-    ? { ...unit, diagram: { type: "flow" as const, ...(unit.diagram as object) } as typeof unit.diagram }
-    : unit;
+/** `type` のない図は、流れの図として扱う(データの検査と同じ決まり。中分類の図と見出しの図の両方) */
+function withDiagramType<T extends { diagram?: NotebookUnit["diagram"] }>(item: T): T {
+  return item.diagram && !("type" in item.diagram)
+    ? { ...item, diagram: { type: "flow" as const, ...(item.diagram as object) } as T["diagram"] }
+    : item;
 }
 
 /** 中分類を、資格マスタの分野の並び → 分野の中の並び順に並べ、見出しを中分類の中の並び順に並べる */
@@ -37,7 +37,7 @@ export async function loadNotebook(exam: PublishedExam): Promise<Notebook | null
       default: NotebookFile;
     };
     const sorted = sortNotebook(exam.domains, file.default);
-    return { units: sorted.units.map(withDiagramType), entries: sorted.entries };
+    return { units: sorted.units.map(withDiagramType), entries: sorted.entries.map(withDiagramType) };
   } catch {
     return null;
   }
@@ -49,6 +49,19 @@ export async function loadNotebook(exam: PublishedExam): Promise<Notebook | null
  */
 export function visibleEntries(entries: readonly NotebookEntry[], preview: boolean): NotebookEntry[] {
   return preview ? [...entries] : entries.filter((entry) => entry.status === "verified");
+}
+
+/**
+ * 画面に出す中分類。利用者には、検証済みの中分類の導入・図・比較の表だけを出す。未検証の中分類は、題と並びだけを残し
+ * (目次と見出しの置き場のため)、導入・図・表を外す。管理者のプレビュー(`preview`)は、すべてを出す。
+ */
+export function visibleUnits(units: readonly NotebookUnit[], preview: boolean): NotebookUnit[] {
+  if (preview) return [...units];
+  return units.map((unit) => {
+    if (unit.status === "verified") return unit;
+    const { intro: _intro, diagram: _diagram, comparison: _comparison, ...rest } = unit;
+    return rest;
+  });
 }
 
 /** 中分類の番号(`<分野の番号>-<分野の中の並び順>`)。分野の番号は、資格マスタの分野の並び(1 から) */
@@ -138,5 +151,6 @@ export async function loadNotebookPage(code: string, preview: boolean): Promise<
   const notebook = await loadNotebook(exam);
   if (!notebook) return null;
   const entries = visibleEntries(notebook.entries, preview);
-  return { exam, units: notebook.units, entries, toc: buildToc(exam.domains, notebook.units, entries) };
+  const units = visibleUnits(notebook.units, preview);
+  return { exam, units, entries, toc: buildToc(exam.domains, units, entries) };
 }

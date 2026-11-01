@@ -51,7 +51,8 @@
             }
           ]
         }
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain1-2",
@@ -100,7 +101,8 @@
             ]
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain2-1",
@@ -140,7 +142,8 @@
             ]
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain2-2",
@@ -179,7 +182,8 @@
             ]
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain2-3",
@@ -266,7 +270,8 @@
             "cells": ["再起動する", "そのまま続く", "スキーマを直すか、ファイルを除いてから再起動する", "そのまま続く"]
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain2-4",
@@ -360,7 +365,8 @@
             ]
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain2-5",
@@ -393,7 +399,8 @@
             "cells": ["応答をすべて読み直す", "前回の位置の続き", "新しいファイルだけ"]
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain2-6",
@@ -433,7 +440,8 @@
             ]
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain2-7",
@@ -462,7 +470,8 @@
             "cells": ["文字列のまま格納する", "parse_json で変換するか、singleVariantColumn で取り込む"]
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain3-1",
@@ -511,7 +520,8 @@
             "to": "gold"
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain3-2",
@@ -549,7 +559,8 @@
             "highlight": true
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain3-3",
@@ -596,7 +607,8 @@
             ]
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain3-4",
@@ -621,7 +633,8 @@
             "highlight": true
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain3-5",
@@ -658,7 +671,8 @@
             ]
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain3-6",
@@ -758,7 +772,8 @@
             ]
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain3-7",
@@ -791,7 +806,8 @@
             "cells": ["expect_all", "expect_all_or_drop", "expect_all_or_fail"]
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain4-1",
@@ -824,7 +840,8 @@
             "cells": ["タスクの設定の Retries", "失敗した実行の画面の Repair run", "下流のタスクの依存関係の設定"]
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain4-2",
@@ -884,7 +901,8 @@
             "to": "dash"
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain4-3",
@@ -933,7 +951,8 @@
             ]
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain4-4",
@@ -965,7 +984,8 @@
             "cells": ["データの有無を見ずに実行を始める", "実行が始まらない"]
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain5-1",
@@ -1021,7 +1041,8 @@
             "to": "pull"
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain5-2",
@@ -1057,7 +1078,8 @@
             "cells": ["開発者ごとの開発の環境", "本番の環境(サービスプリンシパルでの実行を勧める)"]
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain5-3",
@@ -1109,7 +1131,8 @@
             }
           ]
         }
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain5-4",
@@ -1157,21 +1180,24 @@
             "label": "不要になったら"
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain6-1",
       "domain": "domain6",
       "order": 1,
       "title": "実行時間の傾向",
-      "intro": "ジョブが遅くなったかどうかは、過去の実行と比べて判断します。この中分類では、ジョブの実行の履歴の画面、実行時間のしきい値、実行の記録を持つシステムテーブルを扱います。"
+      "intro": "ジョブが遅くなったかどうかは、過去の実行と比べて判断します。この中分類では、ジョブの実行の履歴の画面、実行時間のしきい値、実行の記録を持つシステムテーブルを扱います。",
+      "status": "unverified"
     },
     {
       "id": "domain6-2",
       "domain": "domain6",
       "order": 2,
       "title": "ジョブの監視",
-      "intro": "ジョブの健全性は、実行の状態と、タスクの依存関係(DAG)のどこで止まったかで見ます。この中分類では、実行の詳細の画面、通知、同時実行の上限とキューを扱います。"
+      "intro": "ジョブの健全性は、実行の状態と、タスクの依存関係(DAG)のどこで止まったかで見ます。この中分類では、実行の詳細の画面、通知、同時実行の上限とキューを扱います。",
+      "status": "unverified"
     },
     {
       "id": "domain6-3",
@@ -1240,7 +1266,8 @@
             "label": "I/O が少ない"
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain6-4",
@@ -1275,7 +1302,8 @@
             ]
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain6-5",
@@ -1309,7 +1337,8 @@
             ]
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain7-1",
@@ -1400,7 +1429,8 @@
             ]
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain7-2",
@@ -1457,7 +1487,8 @@
             ]
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain7-3",
@@ -1498,7 +1529,8 @@
             ]
           }
         ]
-      }
+      },
+      "status": "unverified"
     },
     {
       "id": "domain7-4",
@@ -1533,7 +1565,8 @@
             ]
           }
         ]
-      }
+      },
+      "status": "unverified"
     }
   ],
   "entries": [

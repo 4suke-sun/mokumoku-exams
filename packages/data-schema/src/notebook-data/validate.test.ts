@@ -8,6 +8,7 @@ const unit = (over: Record<string, unknown> = {}) => ({
   domain: "domain1",
   order: 1,
   title: "中分類 1",
+  status: "verified",
   ...over,
 });
 const entry = (over: Record<string, unknown> = {}) => ({

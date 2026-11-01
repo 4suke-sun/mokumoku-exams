@@ -32,9 +32,10 @@ const units: NotebookUnit[] = [
         { aspect: "DROP", cells: ["消える", "残る"], highlight: true },
       ],
     },
+    status: "verified",
   },
-  { id: "domain1-2", domain: "domain1", order: 2, title: "空の中分類" },
-  { id: "domain2-1", domain: "domain2", order: 1, title: "別の分野" },
+  { id: "domain1-2", domain: "domain1", order: 2, title: "空の中分類", status: "verified" },
+  { id: "domain2-1", domain: "domain2", order: 1, title: "別の分野", status: "verified" },
 ];
 const entry = (over: Partial<NotebookEntry>): NotebookEntry => ({
   id: "external-table",
@@ -119,6 +120,49 @@ describe("NotebookUnitView", () => {
     expect(screen.getByRole("heading", { name: "書きかけの用語" })).toBeTruthy();
     expect(screen.getByText("! 未検証")).toBeTruthy();
     expect(screen.getByText(/管理者のプレビューです/)).toBeTruthy();
+  });
+
+  it("見出しの図_一言の直後_解説の前に描き_図の ID は見出しごとに一意", () => {
+    const withDiagram = [
+      entry({
+        diagram: {
+          type: "timeline",
+          title: "削除から戻せるまで",
+          events: [
+            { id: "drop", label: "DROP" },
+            { id: "limit", label: "期限" },
+          ],
+        },
+      }),
+      entry({ id: "managed-table", order: 2, term: "マネージドテーブル", related: undefined }),
+    ];
+    const unit = units[0];
+    if (!unit) throw new Error("中分類がありません");
+    const { container } = render(
+      <NotebookUnitView
+        exam={exam}
+        units={units}
+        unit={unit}
+        entries={withDiagram}
+        basePath="/exams/TEST/notebook"
+        preview={false}
+      />,
+    );
+    const section = container.querySelector("#external-table") as HTMLElement;
+    const figure = section.querySelector("figure");
+    // 狭い画面で積む形と、左右に並べる形の 2 つを描き、CSS で片方だけを出す
+    expect(within(section).getAllByRole("img", { name: "削除から戻せるまで" })).toHaveLength(2);
+    const position = (el: Element | null | undefined) => (el ? [...section.querySelectorAll("*")].indexOf(el) : -1);
+    expect(position(figure)).toBeGreaterThan(position(section.querySelector("mark")));
+    expect(position(figure)).toBeLessThan(position(within(section).getByText("解説")));
+    expect(container.querySelector("#managed-table figure")).toBeNull();
+    const ids = [...container.querySelectorAll("svg title")].map((t) => t.id);
+    expect(new Set(ids).size).toBe(ids.length);
+  });
+
+  it("管理者のプレビュー_中分類の導入・図・表の検証の状態を示す", () => {
+    renderUnit("domain1-1", true);
+    expect(screen.getByText(/中分類の導入・図・表/).textContent).toContain("✓ 検証済み");
   });
 
   it("比較の表_列の見出しと値を並べ_要注意の行に文字のラベルを添える", () => {

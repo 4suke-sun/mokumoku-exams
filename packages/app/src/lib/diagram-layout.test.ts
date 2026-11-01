@@ -12,10 +12,15 @@ import {
   layoutCompare,
   layoutDiagram,
   layoutHierarchy,
+  layoutTableChange,
+  layoutTimeline,
   MAX_FLOW_WIDTH,
   MIN_FONT_SIZE,
   overlaps,
+  type PlacedBox,
   segmentCrossesBox,
+  type TableChangeDiagram,
+  type TimelineDiagram,
   textWidth,
   wrapText,
 } from "./diagram-layout.ts";
@@ -451,5 +456,168 @@ describe("比較の図を上下に積む配置", () => {
       const states = layoutCompare(compare, { stacked }).boxes.map((b) => b.state);
       expect(states.filter(Boolean).sort()).toEqual(["kept", "removed"]);
     }
+  });
+});
+
+/** 箱どうしが重ならず、図の範囲に収まり、文字が箱に収まる */
+function expectClean(layout: { boxes: PlacedBox[]; width: number; height: number }, label: string) {
+  layout.boxes.forEach((a, i) => {
+    for (const b of layout.boxes.slice(i + 1)) expect(overlaps(a, b), `${label} ${i}`).toBe(false);
+  });
+  expect(diagramProblems(layout as Parameters<typeof diagramProblems>[0])).toEqual([]);
+}
+
+describe("時系列の図の配置", () => {
+  const timeline: TimelineDiagram = {
+    type: "timeline",
+    title: "削除から消えるまで",
+    events: [
+      { id: "drop", label: "DROP TABLE" },
+      { id: "limit", label: "保持の期限", note: "既定で 7 日" },
+      { id: "purge", label: "ファイルが消える" },
+      { id: "late", label: "UNDROP は失敗" },
+    ],
+    spans: [
+      { from: "drop", to: "limit", label: "UNDROP で戻せる期間" },
+      { from: "limit", to: "late", label: "戻せない" },
+    ],
+  };
+
+  it("左右に並べる_出来事は時間の順に左から右_期間は始まりと終わりの出来事の間", () => {
+    const layout = layoutTimeline(timeline);
+    const events = layout.boxes.filter((b) => b.tone === "event");
+    const spans = layout.boxes.filter((b) => b.tone === "span");
+    // 題は折り返すことがあるので、題の行をつないで比べる
+    const label = (b: PlacedBox) =>
+      b.texts
+        .filter((t) => t.role === "label")
+        .map((t) => t.text)
+        .join("");
+    expect(events.map(label)).toEqual(["DROP TABLE", "保持の期限", "ファイルが消える", "UNDROP は失敗"]);
+    expect(events.map((b) => b.x)).toEqual([...events.map((b) => b.x)].sort((a, b) => a - b));
+    const center = (b: PlacedBox | undefined) => (b?.x ?? 0) + (b?.width ?? 0) / 2;
+    expect(spans[0]?.x).toBeCloseTo(center(events[0]));
+    expect((spans[0]?.x ?? 0) + (spans[0]?.width ?? 0)).toBeCloseTo(center(events[1]));
+    expect(Math.min(...spans.map((b) => b.y))).toBeGreaterThan(Math.max(...events.map((b) => b.y + b.height)));
+    expect(layout.connectors?.some((c) => c.arrow)).toBe(true);
+    expectClean(layout, "wide");
+  });
+
+  it("上下に積む_出来事は上から下_期間は左の列で始まりと終わりの出来事の中心の間_幅は狭い", () => {
+    const layout = layoutTimeline(timeline, { stacked: true });
+    const events = layout.boxes.filter((b) => b.tone === "event");
+    const spans = layout.boxes.filter((b) => b.tone === "span");
+    expect(events.map((b) => b.y)).toEqual([...events.map((b) => b.y)].sort((a, b) => a - b));
+    const middle = (b: PlacedBox | undefined) => (b?.y ?? 0) + (b?.height ?? 0) / 2;
+    expect(spans[0]?.y).toBeCloseTo(middle(events[0]));
+    expect((spans[0]?.y ?? 0) + (spans[0]?.height ?? 0)).toBeCloseTo(middle(events[1]));
+    expect(Math.max(...spans.map((b) => b.x + b.width))).toBeLessThan(Math.min(...events.map((b) => b.x)));
+    expect(layout.width).toBeLessThan(layoutTimeline(timeline).width);
+    expectClean(layout, "stacked");
+  });
+
+  it("端が接する期間_共有する出来事の線を重ねて描かない(広い形も積む形も)", () => {
+    const touching: TimelineDiagram = {
+      ...timeline,
+      spans: [
+        { from: "drop", to: "limit", label: "前半" },
+        { from: "limit", to: "late", label: "後半" },
+      ],
+    };
+    for (const stacked of [false, true]) {
+      const lines = layoutTimeline(touching, { stacked }).connectors ?? [];
+      const keys = lines.map((c) => `${c.start.x},${c.start.y}>${c.end.x},${c.end.y}`);
+      expect(new Set(keys).size).toBe(keys.length);
+    }
+  });
+
+  it("期間のない時系列_出来事と軸だけを描く", () => {
+    const layout = layoutTimeline({ ...timeline, spans: undefined });
+    expect(layout.boxes.every((b) => b.tone === "event")).toBe(true);
+    expectClean(layout, "nospan");
+  });
+});
+
+describe("表の変化の図の配置", () => {
+  const change: TableChangeDiagram = {
+    type: "table-change",
+    title: "MERGE INTO の前と後",
+    operation: "MERGE INTO",
+    before: {
+      heading: "対象の表(前)",
+      columns: [{ label: "id" }, { label: "名前" }],
+      rows: [{ cells: ["1", "A"] }, { cells: ["2", "B"], state: "removed" }],
+    },
+    after: {
+      heading: "対象の表(後)",
+      columns: [{ label: "id" }, { label: "名前" }, { label: "メール", state: "added" }],
+      rows: [
+        { cells: ["1", "A2", "NULL"], state: "changed" },
+        { cells: ["3", "C", "c@x"], state: "added" },
+      ],
+    },
+  };
+
+  it("左右に並べる_操作の名前を上に_前の表を左_後の表を右_状態を箱に写す", () => {
+    const layout = layoutTableChange(change);
+    const op = layout.boxes.find((b) => b.tone === "operation");
+    expect(op?.texts[0]?.text).toBe("MERGE INTO");
+    const left = layout.boxes.find((b) => b.tone === "heading-left");
+    const right = layout.boxes.find((b) => b.tone === "heading-right");
+    expect(left?.x ?? 0).toBeLessThan(right?.x ?? 0);
+    expect(op?.y ?? 0).toBeLessThan(left?.y ?? 0);
+    const states = layout.boxes.map((b) => b.state).filter(Boolean);
+    // 消した行の 2 セル、変わった行の 3 セル、足した行の 3 セル、足した列の見出し
+    expect(states.filter((s) => s === "removed")).toHaveLength(2);
+    expect(states.filter((s) => s === "changed")).toHaveLength(3);
+    expect(states.filter((s) => s === "added")).toHaveLength(4);
+    expect(layout.connectors?.filter((c) => c.arrow)).toHaveLength(1);
+    expectClean(layout, "wide");
+  });
+
+  it("上下に積む_前の表_操作の名前_後の表の順_幅は狭い", () => {
+    const layout = layoutTableChange(change, { stacked: true });
+    const y = (tone: PlacedBox["tone"]) => layout.boxes.find((b) => b.tone === tone)?.y ?? 0;
+    expect(y("heading-left")).toBeLessThan(y("operation"));
+    expect(y("operation")).toBeLessThan(y("heading-right"));
+    expect(layout.width).toBeLessThan(layoutTableChange(change).width);
+    expectClean(layout, "stacked");
+  });
+});
+
+describe("階層の図の箱の状態", () => {
+  it("起点と範囲内_箱に写す", () => {
+    const layout = layoutHierarchy({
+      type: "hierarchy",
+      title: "権限",
+      root: {
+        label: "カタログ",
+        children: [{ label: "スキーマ", state: "origin", children: [{ label: "表", state: "covered" }] }],
+      },
+    });
+    expect(layout.boxes.map((b) => b.state)).toEqual([undefined, "origin", "covered"]);
+  });
+});
+
+describe("layoutAny の時系列と表の変化", () => {
+  it("時系列と表の変化_種類に応じた配置を返し_積む指定が効く", () => {
+    const t: TimelineDiagram = {
+      type: "timeline",
+      title: "t",
+      events: [
+        { id: "a", label: "a" },
+        { id: "b", label: "b" },
+      ],
+    };
+    expect(layoutAny(t).kind).toBe("timeline");
+    expect(layoutAny(t, { stacked: true }).width).toBeLessThan(layoutAny(t).width);
+    const c: TableChangeDiagram = {
+      type: "table-change",
+      title: "c",
+      operation: "op",
+      before: { heading: "前", columns: [{ label: "x" }], rows: [{ cells: ["1"] }] },
+      after: { heading: "後", columns: [{ label: "x" }], rows: [{ cells: ["2"] }] },
+    };
+    expect(layoutAny(c).kind).toBe("table-change");
   });
 });

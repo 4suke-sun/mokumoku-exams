@@ -20,7 +20,10 @@ const UNIT_ID = /^domain\d{1,2}-\d{1,2}$/;
 const ENTRY_ID = /^[a-z][a-z0-9-]{0,63}$/;
 const ENTRY_ID_MESSAGE = "ID は英小文字・数字・ハイフンで、英字から始めます";
 
-/** 見出しの検証の状態。利用者に出すのは `verified` だけ(`unverified` は管理者のプレビューにだけ出す) */
+/**
+ * 検証の状態。利用者に出すのは `verified` だけ(`unverified` は管理者のプレビューにだけ出す)。
+ * 見出しは見出しの全体を、中分類は導入・図・比較の表をまとめて覆う。
+ */
 export const NOTEBOOK_ENTRY_STATUSES = ["verified", "unverified"] as const;
 
 /** 比較の表の 1 行: 観点と、列ごとの値。`highlight` の行は、取り違えやすい観点として目立たせる */
@@ -58,6 +61,8 @@ export const NotebookUnitSchema = z
     /** 中分類の冒頭の図(0〜1 個) */
     diagram: DiagramSchema.optional(),
     comparison: NotebookComparisonSchema.optional(),
+    /** 導入・図・比較の表の検証の状態 */
+    status: z.enum(NOTEBOOK_ENTRY_STATUSES),
   })
   .superRefine((unit, ctx) => {
     if (unit.id !== `${unit.domain}-${unit.order}`) {
@@ -85,6 +90,8 @@ export const NotebookEntrySchema = z
     oneLine: text.max(200),
     /** 一言の中で、マーカーを引く箇所(一言の部分文字列) */
     keyPhrase: text.max(200).optional(),
+    /** 見出しの図(0〜1 個。一言の直後に出す)。検証の状態は、見出しの `status` が覆う */
+    diagram: DiagramSchema.optional(),
     /** 解説 */
     body: text.max(10000),
     /** ここを押さえる(取り違えやすい点と、区別して覚える点。表示の名前は「ここを押さえる」) */
