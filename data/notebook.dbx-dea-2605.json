@@ -52,7 +52,37 @@
           ]
         }
       },
-      "status": "unverified"
+      "comparison": {
+        "columns": ["データファイルの保持(deletedFileRetentionDuration)", "ログの保持(logRetentionDuration)"],
+        "rows": [
+          {
+            "aspect": "残すもの",
+            "cells": ["参照されなくなったデータファイル", "トランザクションログ(テーブルの履歴)"]
+          },
+          {
+            "aspect": "既定の長さ",
+            "cells": ["7 日", "30 日"],
+            "highlight": true
+          },
+          {
+            "aspect": "消えるとき",
+            "cells": [
+              "保持の期間を過ぎたものを VACUUM が消す。消えたファイルを使うバージョンは読めない",
+              "保持の期間を過ぎたものが、チェックポイントのあとに自動で消える。VACUUM の対象ではない"
+            ],
+            "highlight": true
+          },
+          {
+            "aspect": "決まるもの",
+            "cells": ["タイムトラベルで戻れる範囲(既定 7 日)", "DESCRIBE HISTORY が返す履歴の長さ"]
+          },
+          {
+            "aspect": "タイムトラベルの範囲を延ばすとき",
+            "cells": ["ログの保持の期間とあわせて延ばす", "データファイルの保持の期間とあわせて延ばす"]
+          }
+        ]
+      },
+      "status": "verified"
     },
     {
       "id": "domain1-2",
@@ -60,6 +90,34 @@
       "order": 2,
       "title": "コンピュートの種類と選び方",
       "intro": "Databricks のコンピュートには、サーバーレス、ジョブコンピュート、汎用コンピュート、SQL ウェアハウスがあります。この中分類では、誰がコンピュートを管理するか、起動の速さ、使える言語と機能の制約で、ワークロードに合う種類を選ぶ方法と、インスタンスの種類、スポット、オートスケーリングの設定を扱います。",
+      "diagram": {
+        "type": "timeline",
+        "title": "複数のタスクで共有するジョブコンピュートの起動と終了",
+        "events": [
+          {
+            "id": "task1",
+            "label": "タスク 1 が始まる",
+            "note": "ジョブコンピュートが起動する"
+          },
+          {
+            "id": "task2",
+            "label": "タスク 2 が始まる",
+            "note": "共有するので起動の待ち時間が減る"
+          },
+          {
+            "id": "task3",
+            "label": "タスク 3 が終わる",
+            "note": "最後のタスクのあとにコンピュートが終わる"
+          }
+        ],
+        "spans": [
+          {
+            "from": "task1",
+            "to": "task3",
+            "label": "この 1 回の実行だけで使う"
+          }
+        ]
+      },
       "comparison": {
         "columns": ["サーバーレス(ジョブ)", "ジョブコンピュート(クラシック)", "汎用コンピュート", "SQL ウェアハウス"],
         "rows": [
@@ -83,26 +141,26 @@
             "highlight": true
           },
           {
-            "aspect": "止まるとき",
+            "aspect": "起動と停止",
             "cells": [
-              "Databricks が管理する",
-              "そのコンピュートを使う最後のタスクが終わったとき",
-              "自動終了の時間が過ぎたとき",
-              "自動停止の時間が過ぎたとき"
+              "Databricks が管理する。起動と拡縮が速い",
+              "タスクの開始で起動し、使う最後のタスクのあとに終わる",
+              "コマンドのない時間が、自動終了の分数を過ぎると終わる",
+              "クエリで自動で起動し、アイドルが自動停止の分数を過ぎると止まる"
             ]
           },
           {
             "aspect": "主な制約",
             "cells": [
               "R と RDD API は使えない。Spark UI はない",
-              "設定を利用者が受け持つ",
+              "その 1 回の実行の中だけで使える",
               "本番のジョブには勧められない",
               "SQL だけを実行する"
             ]
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain2-1",
@@ -110,6 +168,40 @@
       "order": 1,
       "title": "ロードの方式(バッチ・ストリーミング・増分)",
       "intro": "データのロードには、実行のたびにソースの全体を処理するバッチ処理と、処理済みの範囲を記録して新しいデータだけを処理するストリーミング処理があります。この中分類では、2 つの違いと、Structured Streaming のトリガー、Delta テーブルと Kafka をストリームとして読む方法を扱います。",
+      "diagram": {
+        "type": "compare",
+        "title": "バッチ処理とストリーミング処理の違い",
+        "left": {
+          "heading": "バッチ処理",
+          "items": [
+            {
+              "label": "処理済みを記録しない"
+            },
+            {
+              "label": "毎回ソース全体を読む",
+              "note": "効率が低く、処理に時間がかかる"
+            },
+            {
+              "label": "前の結果を上書きする"
+            }
+          ]
+        },
+        "right": {
+          "heading": "ストリーミング処理",
+          "items": [
+            {
+              "label": "処理済みの範囲を記録する"
+            },
+            {
+              "label": "新しいデータだけを読む",
+              "note": "ファイルや Delta テーブルも増分で読める"
+            },
+            {
+              "label": "前の結果に追記する"
+            }
+          ]
+        }
+      },
       "comparison": {
         "columns": ["指定なし", "processingTime", "availableNow", "realTime"],
         "rows": [
@@ -143,7 +235,7 @@
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain2-2",
@@ -151,6 +243,36 @@
       "order": 2,
       "title": "COPY INTO",
       "intro": "COPY INTO は、クラウドストレージやボリュームのファイルを Delta テーブルに読み込む SQL のコマンドです。この中分類では、読み込み済みのファイルを飛ばす仕組み、読み込むファイルの選び方、スキーマの扱いと、Auto Loader との違いを扱います。",
+      "diagram": {
+        "type": "timeline",
+        "title": "COPY INTO を同じ文で再実行したときに読み込むファイル",
+        "events": [
+          {
+            "id": "run1",
+            "label": "1 回目の実行",
+            "note": "100 個のファイルを読み込む"
+          },
+          {
+            "id": "arrive",
+            "label": "5 個のファイルが届く"
+          },
+          {
+            "id": "change",
+            "label": "読み込み済みの 1 個が変わる",
+            "note": "中身が上書きされる"
+          },
+          {
+            "id": "run2",
+            "label": "同じ文で 2 回目の実行",
+            "note": "新しい 5 個だけ。変わった 1 個も飛ばす"
+          },
+          {
+            "id": "force",
+            "label": "force を true で実行",
+            "note": "読み込み済みも含めて、すべて読み込む"
+          }
+        ]
+      },
       "comparison": {
         "columns": ["COPY INTO", "Auto Loader"],
         "rows": [
@@ -183,7 +305,7 @@
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain2-3",
@@ -271,7 +393,7 @@
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain2-4",
@@ -366,14 +488,66 @@
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain2-5",
       "domain": "domain2",
       "order": 5,
       "title": "JDBC/ODBC・REST からの取り込み",
-      "intro": "マネージドコネクタがないデータベースや API からは、ノートブックのコードで取り込みます。この中分類では、Spark の JDBC での読み取り、REST API からの取り込みの型、資格情報を置くシークレットを扱います。",
+      "intro": "マネージドコネクタがないデータベースや API からは、利用者が書くコードで取り込みます。この中分類では、Spark の JDBC での読み取り、REST API からの取り込みの型、資格情報を置くシークレットを扱います。",
+      "diagram": {
+        "type": "flow",
+        "title": "REST API の応答をボリュームに置いて Auto Loader で取り込む型",
+        "nodes": [
+          {
+            "id": "jobs",
+            "label": "Lakeflow Jobs",
+            "note": "ノートブックを定期実行する"
+          },
+          {
+            "id": "notebook",
+            "label": "ノートブック",
+            "note": "API を呼ぶ。トークンはシークレットに置く"
+          },
+          {
+            "id": "volume",
+            "label": "Unity Catalog のボリューム",
+            "note": "API の生の JSON の応答を置く"
+          },
+          {
+            "id": "autoloader",
+            "label": "パイプラインの Auto Loader",
+            "note": "ファイルごとに 1 回だけ処理する"
+          },
+          {
+            "id": "table",
+            "label": "ストリーミングテーブル"
+          }
+        ],
+        "edges": [
+          {
+            "from": "jobs",
+            "to": "notebook",
+            "label": "定期実行"
+          },
+          {
+            "from": "notebook",
+            "to": "volume",
+            "label": "応答を書く"
+          },
+          {
+            "from": "volume",
+            "to": "autoloader",
+            "label": "新しいファイル"
+          },
+          {
+            "from": "autoloader",
+            "to": "table",
+            "label": "取り込む"
+          }
+        ]
+      },
       "comparison": {
         "columns": ["マテリアライズドビューで定期的に取る", "Python のデータソース API", "ジョブ + Auto Loader"],
         "rows": [
@@ -386,10 +560,10 @@
             ]
           },
           {
-            "aspect": "向くデータ",
+            "aspect": "向く場面",
             "cells": [
-              "量に上限のある、小さめから中くらいのデータ",
-              "量の多い API の増分の取得",
+              "量に上限のある、小さめから中くらいのデータを取るとき",
+              "量の多い API から増分に取るとき",
               "API の扱いと変換を分けたいとき"
             ],
             "highlight": true
@@ -400,7 +574,7 @@
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain2-6",
@@ -408,6 +582,39 @@
       "order": 6,
       "title": "取り込み方法の選び方",
       "intro": "取り込みの方法は、ソースの種類と、どこまで自動化したいかで選びます。この中分類では、Databricks が勧める選ぶ順(管理された層から)と、Kafka のソース、Partner Connect、Lakehouse Federation を扱います。",
+      "diagram": {
+        "type": "flow",
+        "title": "取り込みの方法を選ぶ順(最も管理された層から)",
+        "nodes": [
+          {
+            "id": "connector",
+            "label": "マネージドコネクタ",
+            "note": "ソースごとの認証、CDC、スキーマの変化、再試行"
+          },
+          {
+            "id": "pipeline",
+            "label": "Lakeflow のパイプライン",
+            "note": "実行の順序、監視、データ品質、エラーの扱い"
+          },
+          {
+            "id": "streaming",
+            "label": "Structured Streaming",
+            "note": "障害からの回復と、1 回だけの処理"
+          }
+        ],
+        "edges": [
+          {
+            "from": "connector",
+            "to": "pipeline",
+            "label": "要件を満たさない"
+          },
+          {
+            "from": "pipeline",
+            "to": "streaming",
+            "label": "要件を満たさない"
+          }
+        ]
+      },
       "comparison": {
         "columns": [
           "Lakeflow Connect のマネージドコネクタ",
@@ -427,7 +634,12 @@
           },
           {
             "aspect": "データを Databricks に取り込むか",
-            "cells": ["取り込む", "取り込む", "パートナーの製品がテーブルを作る", "取り込まない(読み取り専用)"],
+            "cells": [
+              "取り込む",
+              "取り込む",
+              "取り込みの分類のパートナーでは、パートナーの製品がテーブルを作る",
+              "取り込まない(読み取り専用)"
+            ],
             "highlight": true
           },
           {
@@ -441,7 +653,7 @@
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain2-7",
@@ -449,6 +661,63 @@
       "order": 7,
       "title": "半構造化データの取り込み",
       "intro": "JSON などの半構造化データは、文字列のまま持つか、VARIANT 型で持ちます。この中分類では、JSON の文字列から値を取り出す記法、VARIANT 型、ファイルを VARIANT の列 1 つで取り込む singleVariantColumn を扱います。",
+      "diagram": {
+        "type": "flow",
+        "title": "半構造化データを VARIANT の列にする 2 つの経路",
+        "nodes": [
+          {
+            "id": "file",
+            "label": "JSON、XML、CSV のファイル",
+            "note": "Auto Loader か COPY INTO で取り込む"
+          },
+          {
+            "id": "string",
+            "label": "JSON の文字列の列"
+          },
+          {
+            "id": "single",
+            "label": "singleVariantColumn",
+            "note": "1 レコードを丸ごと VARIANT の列 1 つに"
+          },
+          {
+            "id": "parse",
+            "label": "parse_json",
+            "note": "文字列の JSON を VARIANT に変える"
+          },
+          {
+            "id": "variant",
+            "label": "VARIANT の列",
+            "note": "決まったスキーマなしで 1 つの列に持つ"
+          },
+          {
+            "id": "value",
+            "label": "取り出した値",
+            "note": "コロンの記法か variant_get で取り出す"
+          }
+        ],
+        "edges": [
+          {
+            "from": "file",
+            "to": "single"
+          },
+          {
+            "from": "string",
+            "to": "parse"
+          },
+          {
+            "from": "single",
+            "to": "variant"
+          },
+          {
+            "from": "parse",
+            "to": "variant"
+          },
+          {
+            "from": "variant",
+            "to": "value"
+          }
+        ]
+      },
       "comparison": {
         "columns": ["JSON の文字列(STRING の列)", "VARIANT 型の列"],
         "rows": [
@@ -471,7 +740,7 @@
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain3-1",
@@ -521,7 +790,40 @@
           }
         ]
       },
-      "status": "unverified"
+      "comparison": {
+        "columns": ["ブロンズ層", "シルバー層"],
+        "rows": [
+          {
+            "aspect": "置くデータ",
+            "cells": [
+              "取り込んだ生のデータを、元の形のまま置く",
+              "ブロンズのデータを検証し、整えて、ほかのデータと結び付けたデータを置く"
+            ]
+          },
+          {
+            "aspect": "検証",
+            "cells": ["最小限にとどめる", "スキーマの強制、データ品質の検査、重複の除去などを行う"],
+            "highlight": true
+          },
+          {
+            "aspect": "列の型",
+            "cells": ["多くの列を STRING、VARIANT、バイナリのまま持つ", "型を変換する"],
+            "highlight": true
+          },
+          {
+            "aspect": "データの入れ方",
+            "cells": [
+              "ソースから取り込み、追記で増やす。過去の分も消さない",
+              "ブロンズかシルバーのテーブルを読んで作る。読み込みの多くはストリーミング"
+            ]
+          },
+          {
+            "aspect": "主に使う人",
+            "cells": ["データエンジニアと監査の担当者", "データエンジニアのほか、アナリストやデータサイエンティスト"]
+          }
+        ]
+      },
+      "status": "verified"
     },
     {
       "id": "domain3-2",
@@ -529,6 +831,44 @@
       "order": 2,
       "title": "結合",
       "intro": "結合は、2 つの表の行を、キーの一致で横につなぐ操作です。この中分類では、結合の種類ごとに残る行の違いと、小さい表を配って結合するブロードキャスト結合、行を縦につなぐ UNION を扱います。",
+      "diagram": {
+        "type": "compare",
+        "title": "結合(JOIN)と UNION の違い",
+        "left": {
+          "heading": "結合(JOIN)",
+          "items": [
+            {
+              "label": "条件で行を突き合わせる",
+              "note": "ON の式か USING (列名)"
+            },
+            {
+              "label": "種類で残る行が変わる",
+              "note": "INNER、LEFT、RIGHT、FULL など"
+            },
+            {
+              "label": "条件がないと全組み合わせ",
+              "note": "CROSS JOIN と同じ結果"
+            }
+          ]
+        },
+        "right": {
+          "heading": "UNION",
+          "items": [
+            {
+              "label": "2 つの結果を縦につなぐ",
+              "note": "集合演算子の 1 つ"
+            },
+            {
+              "label": "既定で重複した行を除く",
+              "note": "ALL を付けると重複も残す"
+            },
+            {
+              "label": "列の数をそろえる",
+              "note": "違うと NUM_COLUMNS_MISMATCH"
+            }
+          ]
+        }
+      },
       "comparison": {
         "columns": ["一致した行", "左の表だけにある行", "右の表だけにある行", "結果の列"],
         "rows": [
@@ -560,7 +900,7 @@
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain3-3",
@@ -608,7 +948,7 @@
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain3-4",
@@ -616,6 +956,47 @@
       "order": 4,
       "title": "重複の除去と集計",
       "intro": "重複の除去と集計では、同じレコードを 1 つにまとめる方法と、グループごとに値を集計する方法を扱います。重複の除去は、DataFrame の中で除く方法と、テーブルに書き込むときに MERGE INTO で入れない方法に分かれます。",
+      "diagram": {
+        "type": "flow",
+        "title": "重複を入れずにテーブルへ書き込む流れ",
+        "nodes": [
+          {
+            "id": "source",
+            "label": "届いたデータ",
+            "note": "同じレコードが何度か届く"
+          },
+          {
+            "id": "dedup",
+            "label": "ソースの重複を除く",
+            "note": "DataFrame なら dropDuplicates"
+          },
+          {
+            "id": "merge",
+            "label": "MERGE INTO",
+            "note": "WHEN NOT MATCHED THEN INSERT"
+          },
+          {
+            "id": "target",
+            "label": "目的のテーブル",
+            "note": "既にあるキーの行は入らない"
+          }
+        ],
+        "edges": [
+          {
+            "from": "source",
+            "to": "dedup"
+          },
+          {
+            "from": "dedup",
+            "to": "merge"
+          },
+          {
+            "from": "merge",
+            "to": "target",
+            "label": "キーで突き合わせ"
+          }
+        ]
+      },
       "comparison": {
         "columns": ["dropDuplicates", "distinct", "MERGE INTO(WHEN NOT MATCHED)"],
         "rows": [
@@ -634,7 +1015,7 @@
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain3-5",
@@ -642,6 +1023,47 @@
       "order": 5,
       "title": "チューニングの基本",
       "intro": "この中分類では、Delta のテーブルのファイルを並べ直す OPTIMIZE と、Spark の実行計画を調整する AQE、ブロードキャスト結合のしきい値を扱います。違いの軸は、効く時点(ファイルの配置か、クエリの実行中か、計画を立てるときか)です。",
+      "diagram": {
+        "type": "flow",
+        "title": "結合の方式が決まる時点(計画を立てるときと、実行中)",
+        "nodes": [
+          {
+            "id": "plan",
+            "label": "実行計画を立てる",
+            "note": "片側が上限(既定 10 MB)より小さければ配る"
+          },
+          {
+            "id": "stage",
+            "label": "段階を実行する",
+            "note": "シャッフルかブロードキャスト"
+          },
+          {
+            "id": "aqe",
+            "label": "AQE が計画を立て直す",
+            "note": "終わった段階の実際の大きさを使う"
+          },
+          {
+            "id": "rest",
+            "label": "残りの段階を実行する",
+            "note": "配る結合への切り替えは既定 30 MB"
+          }
+        ],
+        "edges": [
+          {
+            "from": "plan",
+            "to": "stage"
+          },
+          {
+            "from": "stage",
+            "to": "aqe",
+            "label": "段階が終わる"
+          },
+          {
+            "from": "aqe",
+            "to": "rest"
+          }
+        ]
+      },
       "comparison": {
         "columns": ["OPTIMIZE", "AQE", "spark.sql.autoBroadcastJoinThreshold"],
         "rows": [
@@ -658,7 +1080,7 @@
             "aspect": "対象",
             "cells": [
               "Delta Lake と Apache Iceberg のテーブル",
-              "シャッフルとブロードキャストを含むクエリ",
+              "シャッフルかブロードキャストの段階を含むクエリ",
               "結合の片側の表"
             ]
           },
@@ -672,7 +1094,7 @@
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain3-6",
@@ -746,7 +1168,7 @@
               "読むたびにクエリを実行する",
               "読むたびにクエリを実行する",
               "更新のたびに、変わった分を反映する(全体の再計算もある)",
-              "更新のたびに、新しく届いた行だけを追記する"
+              "更新のたびに、新しく届いた行だけを処理する。追記済みの行は計算し直さない"
             ]
           },
           {
@@ -773,7 +1195,7 @@
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain3-7",
@@ -781,6 +1203,66 @@
       "order": 7,
       "title": "データ品質の検査",
       "intro": "宣言型パイプラインでは、expectation で、表を通る各行に品質の条件を当てます。この中分類では、条件に合わない行の扱い(残す、捨てる、更新を失敗させる)の違いと、Python でまとめて当てる書き方、Delta のテーブルそのものに付ける CHECK 制約を扱います。",
+      "diagram": {
+        "type": "flow",
+        "title": "expectation の条件に合わない行の扱い(アクションごと)",
+        "nodes": [
+          {
+            "id": "row",
+            "label": "表を通る行"
+          },
+          {
+            "id": "check",
+            "label": "expectation の条件",
+            "note": "SQL の真偽の式"
+          },
+          {
+            "id": "write",
+            "label": "表に書き込む"
+          },
+          {
+            "id": "warn",
+            "label": "書き込んで件数を記録",
+            "note": "合わない行も表に残る"
+          },
+          {
+            "id": "drop",
+            "label": "書き込む前に捨てる",
+            "note": "捨てた件数を記録。更新は続く"
+          },
+          {
+            "id": "fail",
+            "label": "更新を失敗させる",
+            "note": "トランザクションを取り消す"
+          }
+        ],
+        "edges": [
+          {
+            "from": "row",
+            "to": "check"
+          },
+          {
+            "from": "check",
+            "to": "write",
+            "label": "合う"
+          },
+          {
+            "from": "check",
+            "to": "warn",
+            "label": "warn(既定)"
+          },
+          {
+            "from": "check",
+            "to": "drop",
+            "label": "DROP ROW"
+          },
+          {
+            "from": "check",
+            "to": "fail",
+            "label": "FAIL UPDATE"
+          }
+        ]
+      },
       "comparison": {
         "columns": ["EXPECT だけ(warn)", "ON VIOLATION DROP ROW", "ON VIOLATION FAIL UPDATE"],
         "rows": [
@@ -807,7 +1289,7 @@
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain4-1",
@@ -815,6 +1297,68 @@
       "order": 1,
       "title": "制御フロー(再試行・分岐・繰り返し)",
       "intro": "Lakeflow Jobs では、タスクの失敗への備えと、実行の分岐や繰り返しを、ジョブの設定で書きます。この中分類では、再試行、修復、Run if、If/else、For each と、タスクの間で値を渡すタスクの値を扱います。",
+      "diagram": {
+        "type": "flow",
+        "title": "タスクの値で、分岐(If/else)と繰り返し(For each)を動かす例",
+        "nodes": [
+          {
+            "id": "upstream",
+            "label": "上流のタスク",
+            "note": "taskValues.set で値を設定"
+          },
+          {
+            "id": "cond",
+            "label": "If/else の条件",
+            "note": "2 つの値を演算子で比べる"
+          },
+          {
+            "id": "foreach",
+            "label": "For each",
+            "note": "値のリストを入力の配列にする"
+          },
+          {
+            "id": "true-side",
+            "label": "真の側のタスク",
+            "note": "Depends on の既定"
+          },
+          {
+            "id": "false-side",
+            "label": "偽の側のタスク"
+          },
+          {
+            "id": "nested",
+            "label": "入れ子のタスク",
+            "note": "{{input}} で要素を参照。既定は 1 つずつ"
+          }
+        ],
+        "edges": [
+          {
+            "from": "upstream",
+            "to": "cond",
+            "label": "タスクの値"
+          },
+          {
+            "from": "upstream",
+            "to": "foreach",
+            "label": "タスクの値"
+          },
+          {
+            "from": "cond",
+            "to": "true-side",
+            "label": "真(true)"
+          },
+          {
+            "from": "cond",
+            "to": "false-side",
+            "label": "偽(false)"
+          },
+          {
+            "from": "foreach",
+            "to": "nested",
+            "label": "要素ごとに"
+          }
+        ]
+      },
       "comparison": {
         "columns": ["再試行(Retries)", "修復(Repair run)", "Run if"],
         "rows": [
@@ -841,7 +1385,7 @@
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain4-2",
@@ -902,7 +1446,7 @@
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain4-3",
@@ -938,7 +1482,7 @@
               "周期、開始の時刻、タイムゾーン、cron 式",
               "トリガーの最小の間隔、最後の変更からの待ち時間",
               "トリガーの最小の間隔、最後の変更からの待ち時間、すべてかどれかの更新",
-              "Pause と Resume"
+              "なし(Pause と Resume で止める・再開する)"
             ]
           },
           {
@@ -952,7 +1496,7 @@
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain4-4",
@@ -960,6 +1504,67 @@
       "order": 4,
       "title": "トリガーの選び方",
       "intro": "トリガーは、データがいつ届くかと、処理が何を待つかで選びます。この中分類では、時刻ベースのトリガーとデータ駆動のトリガーの選び方と、1 つのジョブに複数のトリガーを付ける方法を扱います。",
+      "diagram": {
+        "type": "flow",
+        "title": "トリガーの選び方(データの届き方と、監視するもので選ぶ)",
+        "nodes": [
+          {
+            "id": "start",
+            "label": "トリガーを選ぶ"
+          },
+          {
+            "id": "schedule",
+            "label": "スケジュール",
+            "note": "決まった時刻に実行を始める"
+          },
+          {
+            "id": "watch",
+            "label": "何を監視するか"
+          },
+          {
+            "id": "continuous",
+            "label": "継続",
+            "note": "常時動かすストリーミングの処理"
+          },
+          {
+            "id": "file",
+            "label": "ファイルの到着",
+            "note": "ボリュームか外部ロケーションを監視"
+          },
+          {
+            "id": "table",
+            "label": "表の更新",
+            "note": "Unity Catalog の表を監視"
+          }
+        ],
+        "edges": [
+          {
+            "from": "start",
+            "to": "schedule",
+            "label": "届く時刻が決まる"
+          },
+          {
+            "from": "start",
+            "to": "watch",
+            "label": "届く時刻が不定"
+          },
+          {
+            "from": "start",
+            "to": "continuous",
+            "label": "常時動かす"
+          },
+          {
+            "from": "watch",
+            "to": "file",
+            "label": "ストレージのファイル"
+          },
+          {
+            "from": "watch",
+            "to": "table",
+            "label": "上流が表を更新"
+          }
+        ]
+      },
       "comparison": {
         "columns": ["時刻ベースのトリガー", "データ駆動のトリガー"],
         "rows": [
@@ -985,7 +1590,7 @@
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain5-1",
@@ -1042,7 +1647,32 @@
           }
         ]
       },
-      "status": "unverified"
+      "comparison": {
+        "columns": ["Git フォルダー", "Git のプロバイダー(GitHub など)"],
+        "rows": [
+          {
+            "aspect": "プルリクエストの作成とマージ",
+            "cells": [
+              "Git のダイアログに、プルリクエストを作る操作がない",
+              "プルリクエストを作り、レビューを経てマージする"
+            ],
+            "highlight": true
+          },
+          {
+            "aspect": "既定のブランチに直接コミットできないとき",
+            "cells": ["作業用のブランチを push する", "push されたブランチからプルリクエストを作る"]
+          },
+          {
+            "aspect": "ブランチどうしのマージ",
+            "cells": ["できる。競合がなければ、結果をリモートへ push する", "プルリクエストでマージする"]
+          },
+          {
+            "aspect": "リモートのブランチの削除",
+            "cells": ["行わない。手元のブランチは最大 30 日残ることがある", "ここで消す"]
+          }
+        ]
+      },
+      "status": "verified"
     },
     {
       "id": "domain5-2",
@@ -1050,6 +1680,58 @@
       "order": 2,
       "title": "バンドルの変数と上書き",
       "intro": "バンドルは、1 つの設定から開発、検証、本番などの環境へ配布します。この中分類では、環境を定義する targets、環境ごとに値を変える変数、環境の性格を決めるデプロイのモードを扱います。",
+      "diagram": {
+        "type": "flow",
+        "title": "バンドルの変数の値が効く強さ(弱いものから強いものへ)",
+        "nodes": [
+          {
+            "id": "top-default",
+            "label": "トップレベルの default",
+            "note": "variables で宣言した既定値"
+          },
+          {
+            "id": "target-vars",
+            "label": "ターゲットの variables",
+            "note": "環境ごとの値"
+          },
+          {
+            "id": "override-file",
+            "label": "上書きのファイル",
+            "note": "variable-overrides.json"
+          },
+          {
+            "id": "env-var",
+            "label": "BUNDLE_VAR_ の環境変数"
+          },
+          {
+            "id": "cli-var",
+            "label": "コマンドの --var",
+            "note": "最も強く効く"
+          }
+        ],
+        "edges": [
+          {
+            "from": "top-default",
+            "to": "target-vars",
+            "label": "より強い"
+          },
+          {
+            "from": "target-vars",
+            "to": "override-file",
+            "label": "より強い"
+          },
+          {
+            "from": "override-file",
+            "to": "env-var",
+            "label": "より強い"
+          },
+          {
+            "from": "env-var",
+            "to": "cli-var",
+            "label": "より強い"
+          }
+        ]
+      },
       "comparison": {
         "columns": ["development モード", "production モード"],
         "rows": [
@@ -1070,7 +1752,7 @@
             "aspect": "そのほかの挙動",
             "cells": [
               "配布のロックを外し、繰り返しの配布を速くする",
-              "Git のブランチ、パイプラインの開発用の印、実行の ID などを確かめる"
+              "今の Git のブランチがターゲットの指定と一致するか、パイプラインが開発用の印(`development: true`)でないかを確かめる"
             ]
           },
           {
@@ -1079,7 +1761,7 @@
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain5-3",
@@ -1132,7 +1814,7 @@
           ]
         }
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain5-4",
@@ -1181,7 +1863,41 @@
           }
         ]
       },
-      "status": "unverified"
+      "comparison": {
+        "columns": ["bundle validate", "bundle deploy", "bundle run"],
+        "rows": [
+          {
+            "aspect": "働き",
+            "cells": [
+              "設定のファイルの構文を確かめ、要約を表示する",
+              "ファイルとリソースを、ターゲットのワークスペースへ配布する",
+              "配布済みのジョブやパイプラインを実行する"
+            ]
+          },
+          {
+            "aspect": "配布",
+            "cells": [
+              "しない",
+              "する(ジョブやパイプラインを作るか、更新する)",
+              "しない(設定を変えたら、先に deploy する)"
+            ]
+          },
+          {
+            "aspect": "ジョブの実行",
+            "cells": ["しない", "しない", "する"],
+            "highlight": true
+          },
+          {
+            "aspect": "指定するもの",
+            "cells": [
+              "`-t` でターゲット",
+              "`-t` でターゲット(なければ `default: true` のターゲット)",
+              "リソースのキー(ジョブの名前や ID ではない)"
+            ]
+          }
+        ]
+      },
+      "status": "verified"
     },
     {
       "id": "domain6-1",
@@ -1189,7 +1905,61 @@
       "order": 1,
       "title": "実行時間の傾向",
       "intro": "ジョブが遅くなったかどうかは、過去の実行と比べて判断します。この中分類では、ジョブの実行の履歴の画面、実行時間のしきい値、実行の記録を持つシステムテーブルを扱います。",
-      "status": "unverified"
+      "diagram": {
+        "type": "timeline",
+        "title": "ジョブの実行の記録が残る期間",
+        "events": [
+          {
+            "id": "run",
+            "label": "ジョブの実行"
+          },
+          {
+            "id": "day60",
+            "label": "60 日後",
+            "note": "Runs の画面の実行の履歴の期限"
+          },
+          {
+            "id": "day365",
+            "label": "365 日後",
+            "note": "system.lakeflow の記録の期限"
+          }
+        ],
+        "spans": [
+          {
+            "from": "run",
+            "to": "day60",
+            "label": "画面とシステムテーブル"
+          },
+          {
+            "from": "day60",
+            "to": "day365",
+            "label": "システムテーブルだけ"
+          }
+        ]
+      },
+      "comparison": {
+        "columns": ["ジョブの Runs の画面", "system.lakeflow のシステムテーブル"],
+        "rows": [
+          {
+            "aspect": "記録が残る期間",
+            "cells": ["60 日", "365 日"],
+            "highlight": true
+          },
+          {
+            "aspect": "見る範囲",
+            "cells": ["1 つのジョブの過去の実行", "同じリージョンにあるすべてのワークスペースの記録"]
+          },
+          {
+            "aspect": "見方",
+            "cells": ["行列の表示と一覧の表示", "SQL で問い合わせる"]
+          },
+          {
+            "aspect": "実行時間の読み方",
+            "cells": ["行列の表示の棒の高さ", "`period_end_time` から `period_start_time` を引いた値を、実行ごとに足す"]
+          }
+        ]
+      },
+      "status": "verified"
     },
     {
       "id": "domain6-2",
@@ -1197,7 +1967,66 @@
       "order": 2,
       "title": "ジョブの監視",
       "intro": "ジョブの健全性は、実行の状態と、タスクの依存関係(DAG)のどこで止まったかで見ます。この中分類では、実行の詳細の画面、通知、同時実行の上限とキューを扱います。",
-      "status": "unverified"
+      "diagram": {
+        "type": "flow",
+        "title": "同時実行の上限に達したときの新しい実行",
+        "nodes": [
+          {
+            "id": "new-run",
+            "label": "上限に達した新しい実行",
+            "note": "ワークスペースかジョブの同時実行の上限"
+          },
+          {
+            "id": "queue",
+            "label": "キューで待つ",
+            "note": "最大 48 時間"
+          },
+          {
+            "id": "start",
+            "label": "動く",
+            "note": "前の実行が終わってから"
+          },
+          {
+            "id": "skip",
+            "label": "スキップされる"
+          }
+        ],
+        "edges": [
+          {
+            "from": "new-run",
+            "to": "queue",
+            "label": "キューが有効"
+          },
+          {
+            "from": "queue",
+            "to": "start"
+          },
+          {
+            "from": "new-run",
+            "to": "skip",
+            "label": "キューが無効"
+          }
+        ]
+      },
+      "comparison": {
+        "columns": ["グラフの表示", "タイムラインの表示", "一覧の表示"],
+        "rows": [
+          {
+            "aspect": "表すもの",
+            "cells": ["タスクの DAG", "タスクの所要時間、依存関係、重なり", "状態、名前、種類、所要時間、依存関係の表"]
+          },
+          {
+            "aspect": "主な使いどころ",
+            "cells": [
+              "タスクを選び、実行した利用者、時間、状態、コード、クラスターを見る。ログはリンクから開く",
+              "遅いタスクを見つける",
+              "タスクの情報を表で見る"
+            ],
+            "highlight": true
+          }
+        ]
+      },
+      "status": "verified"
     },
     {
       "id": "domain6-3",
@@ -1267,7 +2096,26 @@
           }
         ]
       },
-      "status": "unverified"
+      "comparison": {
+        "columns": ["Shuffle Read", "Shuffle Write", "Shuffle spill (memory)", "Shuffle spill (disk)"],
+        "rows": [
+          {
+            "aspect": "表すもの",
+            "cells": [
+              "シャッフルで読んだデータの量",
+              "シャッフルで書いたデータの量",
+              "あふれ出したデータの、メモリ上の展開した形の大きさ",
+              "あふれ出したデータの、ディスク上のシリアライズした形の大きさ"
+            ],
+            "highlight": true
+          },
+          {
+            "aspect": "見る場所",
+            "cells": ["ステージの一覧の列", "ステージの一覧の列", "ステージの画面", "ステージの画面"]
+          }
+        ]
+      },
+      "status": "verified"
     },
     {
       "id": "domain6-4",
@@ -1275,6 +2123,36 @@
       "order": 4,
       "title": "Liquid Clustering と予測的最適化",
       "intro": "表のデータの配置を整えると、クエリが読むファイルを減らせます。この中分類では、配置を整える Liquid Clustering と、キーを自動で選ぶ CLUSTER BY AUTO、保守の操作を自動で行う予測的最適化を扱います。",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "カタログで有効にした予測的最適化が及ぶ範囲",
+        "root": {
+          "label": "カタログ main",
+          "note": "ENABLE PREDICTIVE OPTIMIZATION",
+          "state": "origin",
+          "children": [
+            {
+              "label": "スキーマ sales",
+              "note": "INHERIT で親の設定を継ぐ",
+              "state": "covered",
+              "children": [
+                {
+                  "label": "マネージドテーブル",
+                  "state": "covered"
+                },
+                {
+                  "label": "外部テーブル",
+                  "note": "予測的最適化の対象にならない"
+                }
+              ]
+            },
+            {
+              "label": "スキーマ staging",
+              "note": "DISABLE で無効にする"
+            }
+          ]
+        }
+      },
       "comparison": {
         "columns": ["キーを指定する Liquid Clustering", "自動の Liquid Clustering"],
         "rows": [
@@ -1303,7 +2181,7 @@
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain6-5",
@@ -1311,6 +2189,54 @@
       "order": 5,
       "title": "障害の切り分け",
       "intro": "コンピュートの障害は、起動の段階、ライブラリの読み込み、実行中のメモリの、どこで起きたかで切り分けます。この中分類では、クラスターの起動失敗、ライブラリの競合、ドライバーとエグゼキューターのメモリ不足を扱います。",
+      "diagram": {
+        "type": "flow",
+        "title": "コンピュートの障害を、起きた段階で切り分ける",
+        "nodes": [
+          {
+            "id": "launch",
+            "label": "クラスターの起動",
+            "note": "init スクリプト、ネットワークの設定"
+          },
+          {
+            "id": "library",
+            "label": "ライブラリの読み込み",
+            "note": "同じ名前のライブラリの版がぶつかる"
+          },
+          {
+            "id": "memory",
+            "label": "実行中のメモリ"
+          },
+          {
+            "id": "driver",
+            "label": "ドライバー",
+            "note": "collect や toPandas で全データを集める"
+          },
+          {
+            "id": "executor",
+            "label": "エグゼキューター",
+            "note": "ExecutorLostFailure、タスクの再試行"
+          }
+        ],
+        "edges": [
+          {
+            "from": "launch",
+            "to": "library"
+          },
+          {
+            "from": "library",
+            "to": "memory"
+          },
+          {
+            "from": "memory",
+            "to": "driver"
+          },
+          {
+            "from": "memory",
+            "to": "executor"
+          }
+        ]
+      },
       "comparison": {
         "columns": ["ドライバーのメモリ不足", "エグゼキューターのメモリ不足"],
         "rows": [
@@ -1338,7 +2264,7 @@
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain7-1",
@@ -1430,7 +2356,7 @@
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain7-2",
@@ -1477,18 +2403,10 @@
               "`REVOKE 権限 ON オブジェクト FROM 相手`",
               "`DENY 権限 ON オブジェクト TO 相手`"
             ]
-          },
-          {
-            "aspect": "画面での操作",
-            "cells": [
-              "Catalog Explorer の Permissions のタブで Grant",
-              "Catalog Explorer の Permissions のタブで Revoke",
-              "なし"
-            ]
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain7-3",
@@ -1496,12 +2414,62 @@
       "order": 3,
       "title": "列マスキングと行セキュリティ",
       "intro": "列マスクと行フィルターは、クエリを実行した利用者に応じて、見える値と行を変える仕組みです。この中分類では、テーブルに直接かける行フィルターと列マスク、グループの所属を調べる関数、ビューで同じことをする動的ビューを扱います。",
+      "diagram": {
+        "type": "flow",
+        "title": "行フィルターと列マスクを、かけてから外すまで",
+        "nodes": [
+          {
+            "id": "create-fn",
+            "label": "関数を作る",
+            "note": "CREATE FUNCTION"
+          },
+          {
+            "id": "apply",
+            "label": "テーブルにかける",
+            "note": "SET ROW FILTER か SET MASK"
+          },
+          {
+            "id": "query",
+            "label": "利用者がクエリする",
+            "note": "グループの所属で、見える行と値が変わる"
+          },
+          {
+            "id": "drop",
+            "label": "フィルターやマスクを外す",
+            "note": "DROP ROW FILTER か DROP MASK"
+          },
+          {
+            "id": "drop-fn",
+            "label": "関数を消す",
+            "note": "行フィルターの関数を先に消すと、表を読めない"
+          }
+        ],
+        "edges": [
+          {
+            "from": "create-fn",
+            "to": "apply"
+          },
+          {
+            "from": "apply",
+            "to": "query"
+          },
+          {
+            "from": "apply",
+            "to": "drop",
+            "label": "外すとき"
+          },
+          {
+            "from": "drop",
+            "to": "drop-fn"
+          }
+        ]
+      },
       "comparison": {
         "columns": ["行フィルター", "列マスク", "動的ビュー"],
         "rows": [
           {
             "aspect": "かける先",
-            "cells": ["テーブル", "テーブルの列", "ビューを新しく作る"]
+            "cells": ["テーブル", "テーブルの列", "新しく作るビュー(元のテーブルにはかけない)"]
           },
           {
             "aspect": "書き方",
@@ -1530,7 +2498,7 @@
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     },
     {
       "id": "domain7-4",
@@ -1538,6 +2506,37 @@
       "order": 4,
       "title": "ABAC ポリシー",
       "intro": "ABAC ポリシーは、ガバナンスタグを手がかりに、行フィルターと列マスクをカタログやスキーマの単位でまとめてかける仕組みです。この中分類では、ポリシー、ガバナンスタグ、タグで列を選ぶ MATCH COLUMNS を扱います。",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "カタログに付けた ABAC ポリシーが及ぶ範囲",
+        "root": {
+          "label": "カタログ",
+          "note": "ABAC ポリシーを付ける",
+          "state": "origin",
+          "children": [
+            {
+              "label": "スキーマ",
+              "state": "covered",
+              "children": [
+                {
+                  "label": "タグの条件に合う表",
+                  "note": "ポリシーが自動でかかる。所有者は外せない",
+                  "state": "covered"
+                },
+                {
+                  "label": "あとで作った表",
+                  "note": "範囲の中でタグが付けば対象になる",
+                  "state": "covered"
+                },
+                {
+                  "label": "タグの条件に合わない表",
+                  "note": "ポリシーはかからない"
+                }
+              ]
+            }
+          ]
+        }
+      },
       "comparison": {
         "columns": ["ABAC ポリシー", "テーブルごとの行フィルターと列マスク"],
         "rows": [
@@ -1566,7 +2565,7 @@
           }
         ]
       },
-      "status": "unverified"
+      "status": "verified"
     }
   ],
   "entries": [
@@ -1644,6 +2643,34 @@
       "term": "UNDROP TABLE",
       "oneLine": "UNDROP TABLE は、削除したテーブルを、復元の期間(既定で 7 日)のうちに戻すコマンドです。",
       "keyPhrase": "復元の期間(既定で 7 日)のうちに戻す",
+      "diagram": {
+        "type": "timeline",
+        "title": "テーブルを削除してから UNDROP TABLE で戻せるまで",
+        "events": [
+          {
+            "id": "drop",
+            "label": "DROP TABLE",
+            "note": "テーブルを削除する"
+          },
+          {
+            "id": "limit",
+            "label": "復元の期間の終わり",
+            "note": "既定で 7 日。0 時間か 7〜30 日に変えられる"
+          },
+          {
+            "id": "after",
+            "label": "期間を過ぎたあと",
+            "note": "UNDROP TABLE で戻せない"
+          }
+        ],
+        "spans": [
+          {
+            "from": "drop",
+            "to": "limit",
+            "label": "UNDROP で戻せる"
+          }
+        ]
+      },
       "body": "`UNDROP TABLE` は、Unity Catalog のマネージドテーブルにも外部テーブルにも使えます。外部テーブルを戻すときは、外部ロケーションが残っていて、実行する人がその `CREATE EXTERNAL TABLE` の権限を持っている必要があります。一時テーブルは戻せません。\n\n復元の期間は、カタログ(`ALTER CATALOG`)かスキーマ(`ALTER SCHEMA`)の単位で変えられます。両方に設定があると、スキーマの設定が使われます。設定できるのは、0 時間(戻せない)か、7〜30 日です。変えた設定は、そのあとに削除したテーブルにだけ効きます。\n\n名前だけを指定すると、その名前で最後に削除した、自分が所有するテーブルが戻ります。同じ名前のテーブルを何度か削除したときは、`SHOW TABLES DROPPED` で ID を調べ、`WITH ID` で指定します。\n\n```sql\nSHOW TABLES DROPPED IN main.sales;\nUNDROP TABLE WITH ID '<テーブルの ID>';\n```\n\n戻したテーブルには、権限や列の定義などのメタデータも戻ります。主キーと外部キーの制約は戻らないので、`ALTER TABLE ADD CONSTRAINT` で付け直します。同じ名前のテーブルがすでにあるときは、先にそちらの名前を変えてから戻します。",
       "examAngle": "削除したテーブルを `UNDROP TABLE` で戻せるのは、復元の期間(既定で 7 日)のうちだけです。期間は、カタログかスキーマの単位で変えられます。両方に設定があると、スキーマの設定が使われます。",
       "checks": [
@@ -1677,6 +2704,34 @@
       "term": "ALTER TABLE SET MANAGED",
       "oneLine": "ALTER TABLE SET MANAGED は、外部テーブルを、名前と権限を保ったままマネージドテーブルに変える文です。",
       "keyPhrase": "名前と権限を保ったまま",
+      "diagram": {
+        "type": "timeline",
+        "title": "SET MANAGED から、元のデータファイルが消えるまで",
+        "events": [
+          {
+            "id": "set",
+            "label": "SET MANAGED",
+            "note": "データとログを管理ストレージへコピー"
+          },
+          {
+            "id": "day14",
+            "label": "変えてから 14 日",
+            "note": "元のデータファイルはここまで残る"
+          },
+          {
+            "id": "purge",
+            "label": "元のファイルを消す",
+            "note": "予測的最適化か、利用者の VACUUM で"
+          }
+        ],
+        "spans": [
+          {
+            "from": "set",
+            "to": "day14",
+            "label": "UNSET で戻せる"
+          }
+        ]
+      },
       "body": "`ALTER TABLE … SET MANAGED` を実行すると、外部ロケーションにあるデータファイルと Delta のトランザクションログが、管理ストレージの場所へコピーされます。テーブルの名前、設定、権限、ビュー、履歴は引き継がれます。\n\n```sql\nALTER TABLE main.sales.raw_events SET MANAGED;\n```\n\n変えられるのは、Delta Lake のテーブルだけです。外部テーブルを変えるには、Databricks Runtime 17.3 LTS 以上かサーバーレスのコンピュートと、テーブルの所有者であることが要ります。コピーの間もテーブルは使えます。最後の切り替えの間だけ、外部ロケーションへの書き込みが短く止まります。変えたあとは、動いていたストリーミングのジョブを再起動します。\n\n`CREATE TABLE … AS SELECT` や `DEEP CLONE` で作り直す方法より、Databricks は `SET MANAGED` を勧めています。設定や権限、履歴を引き継げて、止まる時間も短いためです。\n\n変えてから 14 日のうちは、`ALTER TABLE … UNSET MANAGED` で、元の外部ロケーションを指す形に戻せます。元のデータファイルは、その 14 日のあいだ残ります。そのあと、予測的最適化が有効なら自動で消え、有効でなければ利用者が `VACUUM` で消します。",
       "examAngle": "`ALTER TABLE … SET MANAGED` は、外部テーブルを、名前、設定、権限、ビュー、履歴を引き継いだままマネージドテーブルに変えます。Databricks は、`CREATE TABLE … AS SELECT` や `DEEP CLONE` で作り直す方法より、`SET MANAGED` を勧めています。変えられるのは、Delta Lake のテーブルだけです。",
       "checks": [
@@ -1795,6 +2850,53 @@
       "term": "dropna(na.drop)",
       "oneLine": "dropna は、NULL や NaN を含む行を除いた新しい DataFrame を返す PySpark のメソッドで、na.drop と同じ働きをします。",
       "keyPhrase": "NULL や NaN を含む行を除いた新しい DataFrame を返す",
+      "diagram": {
+        "type": "table-change",
+        "title": "df.na.drop(how=\"all\") は、すべての値が NULL の行だけを除く",
+        "operation": "na.drop(how=\"all\")",
+        "before": {
+          "heading": "元の DataFrame",
+          "columns": [
+            {
+              "label": "id"
+            },
+            {
+              "label": "name"
+            }
+          ],
+          "rows": [
+            {
+              "cells": ["1", "a"]
+            },
+            {
+              "cells": ["2", "NULL"]
+            },
+            {
+              "cells": ["NULL", "NULL"],
+              "state": "removed"
+            }
+          ]
+        },
+        "after": {
+          "heading": "新しい DataFrame",
+          "columns": [
+            {
+              "label": "id"
+            },
+            {
+              "label": "name"
+            }
+          ],
+          "rows": [
+            {
+              "cells": ["1", "a"]
+            },
+            {
+              "cells": ["2", "NULL"]
+            }
+          ]
+        }
+      },
       "body": "どの行を除くかは、引数で決めます。\n\n- `how`: `'any'`(既定)は、値が 1 つでも NULL か NaN の行を除きます。`'all'` は、すべての値が NULL か NaN の行だけを除きます。\n- `thresh`: NULL でも NaN でもない値が、指定した数より少ない行を除きます。指定すると、`how` より優先されます。\n- `subset`: 調べる列を絞ります。\n\n```python\ndf.dropna()                       # 欠けた値が 1 つでもある行を除く\ndf.na.drop(how=\"all\")             # すべての値が欠けた行だけを除く\ndf.dropna(subset=[\"id\", \"name\"])  # id か name が欠けた行を除く\n```\n\n`dropna` は新しい DataFrame を返し、元の DataFrame は変わりません。",
       "examAngle": "`how` の既定は `'any'` で、値が 1 つでも NULL か NaN の行を除きます。すべての値が NULL か NaN の行だけを除くときは、`how=\"all\"` を指定します。調べる列を絞るときは、`subset` を使います。",
       "checks": [
@@ -2075,6 +3177,57 @@
       "term": "UPDATE と DELETE",
       "oneLine": "UPDATE は条件に合う行の列の値を書き換える文、DELETE は条件に合う行を消す文で、どちらも Delta Lake のテーブルだけで使えます。",
       "keyPhrase": "どちらも Delta Lake のテーブルだけで使えます",
+      "diagram": {
+        "type": "table-change",
+        "title": "UPDATE で、event_type が clk の行だけを click に書き換える",
+        "operation": "UPDATE … WHERE",
+        "before": {
+          "heading": "events(前)",
+          "columns": [
+            {
+              "label": "id"
+            },
+            {
+              "label": "event_type"
+            }
+          ],
+          "rows": [
+            {
+              "cells": ["1", "clk"]
+            },
+            {
+              "cells": ["2", "view"]
+            },
+            {
+              "cells": ["3", "clk"]
+            }
+          ]
+        },
+        "after": {
+          "heading": "events(後)",
+          "columns": [
+            {
+              "label": "id"
+            },
+            {
+              "label": "event_type"
+            }
+          ],
+          "rows": [
+            {
+              "cells": ["1", "click"],
+              "state": "changed"
+            },
+            {
+              "cells": ["2", "view"]
+            },
+            {
+              "cells": ["3", "click"],
+              "state": "changed"
+            }
+          ]
+        }
+      },
       "body": "どちらの文も、`WHERE` で対象の行を絞ります。`WHERE` を省くと、すべての行が対象になります。\n\n```sql\nUPDATE main.web.events SET event_type = 'click' WHERE event_type = 'clk';\nDELETE FROM main.web.events WHERE event_date < '2025-01-01';\n```\n\n`WHERE` には、`IN` や `EXISTS` などのサブクエリを書けます。`NOT IN` のサブクエリは遅くなることがあるため、Databricks は、できるだけ `NOT EXISTS` に書き換えるよう勧めています。\n\nDatabricks SQL は、ほかの SQL の方言にある `UPDATE … FROM … JOIN` の構文に対応していません。別のテーブルとの結合をもとに値を書き換えるときは、`MERGE INTO` の `WHEN MATCHED THEN UPDATE` を使います。",
       "examAngle": "`UPDATE` と `DELETE` で `WHERE` を省くと、すべての行が対象になります。Databricks SQL は、`UPDATE … FROM … JOIN` の構文に対応していません。別のテーブルとの結合をもとに値を書き換えるときは、`MERGE INTO` の `WHEN MATCHED THEN UPDATE` を使います。",
       "checks": [
@@ -2173,6 +3326,63 @@
       "term": "PIVOT",
       "oneLine": "PIVOT は、指定した列の値ごとに新しい列を作り、縦に並んだ行を横に並べ替える句です。",
       "keyPhrase": "指定した列の値ごとに新しい列を作り",
+      "diagram": {
+        "type": "table-change",
+        "title": "PIVOT (sum(amount) FOR quarter IN (1 AS q1, 2 AS q2)) の前と後",
+        "operation": "PIVOT",
+        "before": {
+          "heading": "quarterly_sales",
+          "columns": [
+            {
+              "label": "year"
+            },
+            {
+              "label": "quarter"
+            },
+            {
+              "label": "amount"
+            }
+          ],
+          "rows": [
+            {
+              "cells": ["2025", "1", "10"]
+            },
+            {
+              "cells": ["2025", "2", "20"]
+            },
+            {
+              "cells": ["2026", "1", "30"]
+            },
+            {
+              "cells": ["2026", "2", "40"]
+            }
+          ]
+        },
+        "after": {
+          "heading": "結果",
+          "columns": [
+            {
+              "label": "year"
+            },
+            {
+              "label": "q1",
+              "state": "added"
+            },
+            {
+              "label": "q2",
+              "state": "added"
+            }
+          ],
+          "rows": [
+            {
+              "cells": ["2025", "10", "20"]
+            },
+            {
+              "cells": ["2026", "30", "40"]
+            }
+          ]
+        }
+      },
       "body": "`PIVOT` の中には、集計の式と、`FOR 列 IN (値の一覧)` を書きます。`IN` の値ごとに 1 つの列ができ、各セルには、その値に当たる行を集計した結果が入ります。\n\n```sql\nSELECT *\nFROM quarterly_sales\nPIVOT (sum(amount) FOR quarter IN (1 AS q1, 2 AS q2, 3 AS q3, 4 AS q4));\n```\n\n集計の式にも `FOR` にも使っていない列が、グループ分けの列になります。`quarterly_sales` が `year`、`quarter`、`amount` の 3 列なら、結果は `year` ごとに 1 行で、`q1` から `q4` の 4 列が並びます。\n\n`IN` の値は、リテラルで書きます。リテラルでないと、エラー(`NON_LITERAL_PIVOT_VALUES`)になります。同じ結果は、`GROUP BY` と、集計関数の `FILTER (WHERE …)` を組み合わせても書けます。",
       "examAngle": "`PIVOT` は、`FOR` の列の値ごとに列を作り、各セルに集計の結果を入れます。集計の式にも `FOR` にも使っていない列が、グループ分けの列になります。`IN` の値はリテラルで書き、リテラルでないとエラー(`NON_LITERAL_PIVOT_VALUES`)になります。",
       "checks": [
@@ -2404,6 +3614,53 @@
       "term": "MERGE INTO で重複を入れない",
       "oneLine": "MERGE INTO は、ソースの行を条件で目的の Delta のテーブルと突き合わせ、一致したかどうかで更新、挿入、削除を分けて書き込む文です。",
       "keyPhrase": "一致したかどうかで更新、挿入、削除を分けて書き込む",
+      "diagram": {
+        "type": "table-change",
+        "title": "ソースの event_id が 2 と 3 のとき、WHEN NOT MATCHED THEN INSERT * で入るのは 3 だけ",
+        "operation": "MERGE INTO",
+        "before": {
+          "heading": "目的のテーブル(前)",
+          "columns": [
+            {
+              "label": "event_id"
+            },
+            {
+              "label": "type"
+            }
+          ],
+          "rows": [
+            {
+              "cells": ["1", "a"]
+            },
+            {
+              "cells": ["2", "b"]
+            }
+          ]
+        },
+        "after": {
+          "heading": "目的のテーブル(後)",
+          "columns": [
+            {
+              "label": "event_id"
+            },
+            {
+              "label": "type"
+            }
+          ],
+          "rows": [
+            {
+              "cells": ["1", "a"]
+            },
+            {
+              "cells": ["2", "b"]
+            },
+            {
+              "cells": ["3", "c"],
+              "state": "added"
+            }
+          ]
+        }
+      },
       "body": "```sql\nMERGE INTO main.logs.events AS t\nUSING new_events AS s\nON t.event_id = s.event_id\nWHEN NOT MATCHED THEN INSERT *;\n```\n\nこの例は、`event_id` が目的のテーブルにまだない行だけを挿入します。同じレコードが何度か届くソースでも、目的のテーブルに既にある行と重複する行は入りません。\n\nただし、ソースの中に重複があると、その重複は挿入されます。MERGE INTO の前に、ソースの重複を除いておきます。\n\n一致した行は `WHEN MATCHED THEN UPDATE` で書き換えられます。Databricks SQL と Databricks Runtime 12.2 LTS 以上では、`WHEN NOT MATCHED BY SOURCE` で、ソースに対応する行がない目的のテーブルの行を、更新したり削除したりできます。\n\n目的のテーブルの 1 行に、ソースの複数の行が一致して更新しようとすると、どの行で更新するかが決まらないため、エラー(`DELTA_MULTIPLE_SOURCE_ROW_MATCHING_TARGET_ROW_IN_MERGE`)になります。この場合も、先にソースを整えて、1 つのキーに 1 行にします。",
       "examAngle": "`WHEN NOT MATCHED THEN INSERT *` だけの MERGE INTO は、目的のテーブルにまだないキーの行だけを挿入します。ただし、ソースの中の重複は除かれず、そのまま挿入されます。MERGE INTO の前に、ソースの重複を除いておきます。",
       "checks": [
@@ -2987,6 +4244,27 @@
       "term": "Delta テーブルのストリーム読み取り(readStream.table)",
       "oneLine": "`spark.readStream.table` は、Delta テーブルをストリーミングのソースとして読み、テーブルに追記された行を増分で処理する方法です。",
       "keyPhrase": "テーブルに追記された行を増分で処理する",
+      "diagram": {
+        "type": "timeline",
+        "title": "Delta テーブルをストリームとして読むクエリの動き",
+        "events": [
+          {
+            "id": "start",
+            "label": "初めて起動する",
+            "note": "その時点の最新のバージョンの全体を読む"
+          },
+          {
+            "id": "append",
+            "label": "行を追記するコミット",
+            "note": "追記された行を処理する"
+          },
+          {
+            "id": "update",
+            "label": "既存の行を UPDATE",
+            "note": "既定は例外で止まる。skipChangeCommits で読み飛ばす"
+          }
+        ]
+      },
       "body": "Delta テーブルをストリームとして読むと、クエリは新しいバージョンがコミットされるたびに、追記された行を処理します。書き込み先を Delta テーブルにするときは、`toTable` とチェックポイントの場所を指定します。\n\n```python\n(spark.readStream.table(\"main.bronze.events\")\n  .writeStream\n  .option(\"checkpointLocation\", checkpoint_path)\n  .toTable(\"main.silver.events\"))\n```\n\nクエリを初めて起動すると、クエリはその時点の最新のバージョンのテーブル全体を読み、そのあとの追記を続けて読みます。`startingVersion` か `startingTimestamp` を指定すると、そのバージョンか時刻からあとの変更だけを読みます。2 つは同時に指定できません。チェックポイントに進み具合が記録されたあとは、どちらも無視されます。\n\nStructured Streaming が受け付ける入力は、追記だけです。ソースのテーブルで既存の行を更新したり削除したりすると、既定ではストリームが例外で止まります。`skipChangeCommits` を `true` にすると、クエリは既存の行を変えたコミットを読み飛ばし、追記だけを処理します。読み飛ばした変更は、別の処理で反映します。",
       "examAngle": "Structured Streaming が入力として受け付けるのは、追記だけです。ソースの Delta テーブルで既存の行を更新や削除すると、既定ではストリームが例外で止まります。`skipChangeCommits` を `true` にすると、クエリは既存の行を変えたコミットを読み飛ばし、追記だけを処理します。",
       "checks": [
@@ -3123,6 +4401,42 @@
       "term": "modifiedAfter と modifiedBefore",
       "oneLine": "modifiedAfter と modifiedBefore は、ファイルの更新時刻で、読み込むファイルを絞る読み取りのオプションです。",
       "keyPhrase": "ファイルの更新時刻で、読み込むファイルを絞る",
+      "diagram": {
+        "type": "timeline",
+        "title": "modifiedAfter と modifiedBefore で読み込むファイル",
+        "events": [
+          {
+            "id": "fa",
+            "label": "ファイル A を更新",
+            "note": "読み込まない"
+          },
+          {
+            "id": "after",
+            "label": "modifiedAfter の時刻"
+          },
+          {
+            "id": "fb",
+            "label": "ファイル B を更新",
+            "note": "読み込む"
+          },
+          {
+            "id": "before",
+            "label": "modifiedBefore の時刻"
+          },
+          {
+            "id": "fc",
+            "label": "ファイル C を更新",
+            "note": "読み込まない"
+          }
+        ],
+        "spans": [
+          {
+            "from": "after",
+            "to": "before",
+            "label": "読み込む更新時刻の範囲"
+          }
+        ]
+      },
       "body": "`modifiedAfter` に時刻を書くと、更新時刻がその時刻よりあとのファイルだけを読み込みます。`modifiedBefore` では、その時刻より前のファイルだけを読み込みます。2 つを組み合わせると、期間を区切れます。\n\nこれらは、すべてのファイルの形式に共通する読み取りのオプションです。Databricks では、`DataFrameReader` のオプション、`read_files`、COPY INTO の `FORMAT_OPTIONS` で使えます。\n\n```sql\nCOPY INTO main.bronze.orders\nFROM '/Volumes/main/landing/orders/'\nFILEFORMAT = JSON\nFORMAT_OPTIONS ('modifiedAfter' = '2026-10-01T00:00:00');\n```\n\nSpark の文書では、時刻を `YYYY-MM-DDTHH:mm:ss` の形で書きます。タイムゾーンを指定しないときは、Spark のセッションのタイムゾーン(`spark.sql.session.timeZone`)で解釈します。\n\nファイルの名前で絞るときは、COPY INTO では `PATTERN` を、DataFrameReader と Auto Loader では `pathGlobFilter` を使います。",
       "examAngle": "`modifiedAfter` と `modifiedBefore` は、ファイルの更新時刻で読み込むファイルを絞ります。ファイルの名前で絞るときは、COPY INTO では `PATTERN` を、DataFrameReader と Auto Loader では `pathGlobFilter` を使います。",
       "checks": [
@@ -3239,6 +4553,40 @@
       "term": "ファイル通知モード",
       "oneLine": "ファイル通知モードは、クラウドの通知とキューのサービスで新しいファイルを知る、Auto Loader のファイルの検出の方式です。",
       "keyPhrase": "クラウドの通知とキューのサービスで新しいファイルを知る",
+      "diagram": {
+        "type": "compare",
+        "title": "Auto Loader のファイルの検出の 2 つの方式(どちらも順は保証しない)",
+        "left": {
+          "heading": "ディレクトリの一覧(既定)",
+          "items": [
+            {
+              "label": "入力の場所のファイルを一覧",
+              "note": "一覧して新しいファイルを探す"
+            },
+            {
+              "label": "追加の設定なしで始める",
+              "note": "ストレージのデータを読める権限があればよい"
+            }
+          ]
+        },
+        "right": {
+          "heading": "ファイル通知モード",
+          "items": [
+            {
+              "label": "ファイルのイベントを受け取る",
+              "note": "通知とキューのサービスを使う"
+            },
+            {
+              "label": "ファイルイベントを使える",
+              "note": "外部ロケーションで有効にしたとき。設定が要らない"
+            },
+            {
+              "label": "性能が高い",
+              "note": "規模を大きくしやすい"
+            }
+          ]
+        }
+      },
       "body": "Auto Loader が新しいファイルを見つける方式は 2 つあります。既定はディレクトリの一覧のモードで、Auto Loader は入力の場所のファイルを一覧して、新しいファイルを探します。このモードは、ストレージのデータを読める権限があれば、追加の設定なしで始められます。\n\nファイル通知モードでは、Auto Loader が、入力の場所のファイルのイベントを受け取る通知のサービスとキューのサービスを、利用者のクラウドのアカウントに設定できます。公式の文書では、ディレクトリの一覧より性能が高く、規模を大きくしやすい方式とされています。\n\nUnity Catalog の外部ロケーションでファイルイベントを有効にすると、ファイル通知モードはそのイベントを使います。利用者は通知の仕組みを設定する必要がなく、ストリームを作るときに追加の権限も要りません。Databricks は、多くの処理で、ファイルイベントを使うファイル通知モードを勧めています。\n\nどちらのモードでも、Auto Loader はファイルを見つける順や処理する順を保証しません。",
       "examAngle": "Auto Loader の既定の検出の方式は、入力の場所のファイルを一覧する、ディレクトリの一覧のモードです。ファイル通知モードは、通知とキューのサービスでファイルのイベントを受け取る方式です。公式の文書では、ファイル通知モードのほうが性能が高く、規模を大きくしやすいとされています。",
       "checks": [
@@ -3299,6 +4647,31 @@
       "term": "スキーマ進化モード addNewColumns",
       "oneLine": "addNewColumns は、新しい列が届くとスキーマの末尾に列を足してストリームを止め、再起動のあとに新しいスキーマで続ける、Auto Loader のスキーマ進化モードです。",
       "keyPhrase": "スキーマの末尾に列を足してストリームを止め",
+      "diagram": {
+        "type": "timeline",
+        "title": "addNewColumns のモードで新しい列が届いたとき",
+        "events": [
+          {
+            "id": "arrive",
+            "label": "新しい列のファイルが届く"
+          },
+          {
+            "id": "add",
+            "label": "スキーマの末尾に列を足す",
+            "note": "スキーマの場所を更新する。既存の列の型は変えない"
+          },
+          {
+            "id": "stop",
+            "label": "ストリームが止まる",
+            "note": "UnknownFieldException"
+          },
+          {
+            "id": "restart",
+            "label": "再起動する",
+            "note": "足した列を含むスキーマで続ける"
+          }
+        ]
+      },
       "body": "スキーマ進化モードは、`cloudFiles.schemaEvolutionMode` で指定します。スキーマを指定しないときの既定は `addNewColumns` です。スキーマを指定したときの既定は `none` です。\n\n`addNewColumns` では、Auto Loader が新しい列を見つけると、最新のマイクロバッチのデータでスキーマを推測し直します。Auto Loader は、新しい列をスキーマの末尾に足して、スキーマの場所を更新します。そのあと、ストリームは `UnknownFieldException` で止まります。既存の列の型は変えません。ストリームを再起動すると、足した列を含むスキーマで取り込みを続けます。\n\nDatabricks は、スキーマが変わって止まったあとに自動で再起動するよう、Auto Loader のストリームを Lakeflow Jobs で設定することを勧めています。\n\n型の拡張(int から long など)も行う `addNewColumnsWithTypeWidening` もあります。これは、Databricks Runtime 16.4 以降のパブリックプレビューです。",
       "examAngle": "`cloudFiles.schemaEvolutionMode` の既定は、スキーマを指定しないときは `addNewColumns`、指定したときは `none` です。`addNewColumns` では、Auto Loader が新しい列をスキーマの末尾に足してから、ストリームが `UnknownFieldException` で止まります。再起動すると、足した列を含むスキーマで取り込みを続けます。",
       "checks": [
@@ -3427,6 +4800,39 @@
       "term": "cloudFiles.allowOverwrites",
       "oneLine": "cloudFiles.allowOverwrites は、取り込み済みのファイルが変わったときに、Auto Loader がそのファイルを取り込み直すかを決めるオプションで、既定は false です。",
       "keyPhrase": "Auto Loader がそのファイルを取り込み直すかを決める",
+      "diagram": {
+        "type": "compare",
+        "title": "cloudFiles.allowOverwrites の値と、取り込み済みのファイルが変わったときの扱い",
+        "left": {
+          "heading": "false(既定)",
+          "items": [
+            {
+              "label": "取り込み直さない",
+              "note": "上書きや追記があっても"
+            },
+            {
+              "label": "各ファイルを 1 回だけ処理"
+            }
+          ]
+        },
+        "right": {
+          "heading": "true",
+          "items": [
+            {
+              "label": "変わったファイルを取り込み直す",
+              "note": "取り込むのは最新の版"
+            },
+            {
+              "label": "ファイル全体を読み直す",
+              "note": "一部だけの追記でも全体を読む"
+            },
+            {
+              "label": "重複が入ることがある",
+              "note": "重複は利用者の処理で扱う"
+            }
+          ]
+        }
+      },
       "body": "既定(`false`)では、Auto Loader はそれぞれのファイルを 1 回だけ処理します。取り込んだあとにファイルが上書きされたり追記されたりしても、取り込み直しません。\n\n`true` にすると、Auto Loader は変わったファイルを取り込み直します。一部だけ追記されたファイルでも、ファイル全体を読み直します。Auto Loader が取り込むことを保証するのはファイルの最新の版で、途中のどの版を取り込むかは保証しません。\n\nファイル全体を読み直すため、同じレコードがテーブルに重複して入ることがあります。`true` にするときは、利用者が重複を扱う処理を組み込みます。",
       "examAngle": "`cloudFiles.allowOverwrites` の既定は `false` で、取り込み済みのファイルが上書きされても、Auto Loader は取り込み直しません。`true` にすると、Auto Loader は変わったファイルを全体から読み直すため、同じレコードが重複して入ることがあります。重複は、利用者の処理で扱います。",
       "checks": [
@@ -3532,6 +4938,33 @@
       "order": 3,
       "term": "クエリベースのコネクタ",
       "oneLine": "クエリベースのコネクタは、CDC やバイナリログの設定をせずに、ソースのデータベースへ直接問い合わせて取り込む、Lakeflow Connect のコネクタです。",
+      "diagram": {
+        "type": "timeline",
+        "title": "クエリベースのコネクタが変わった行を取り込む流れ",
+        "events": [
+          {
+            "id": "run1",
+            "label": "1 回目の実行",
+            "note": "カーソル列の最大値を保存する"
+          },
+          {
+            "id": "update",
+            "label": "ある行が 3 回更新される"
+          },
+          {
+            "id": "run2",
+            "label": "2 回目の実行",
+            "note": "最大値より大きい行の、最新の状態だけを読む"
+          }
+        ],
+        "spans": [
+          {
+            "from": "run1",
+            "to": "run2",
+            "label": "途中の状態は捉えない"
+          }
+        ]
+      },
       "body": "クエリベースのコネクタは、カーソル列(単調に増えるタイムスタンプか整数の列)で、変わった行を探します。実行のたびに、前回の実行で保存した最大値(high-water mark)より大きいカーソル列の行を読みます。\n\nクエリベースのコネクタは、インジェスチョンゲートウェイとステージングのボリュームを使いません。ソースへの問い合わせの結果を、格納先のストリーミングテーブルへ直接書きます。パイプラインは、利用者が決めたスケジュールで動きます。\n\nCDC のコネクタと比べると、次の違いがあります。\n\n- CDC やバイナリログを使えないソースでも使え、ゲートウェイの準備が要らない\n- 実行と実行の間に変わった行は、最新の状態だけを捉え、途中の状態は捉えない\n- ソースのテーブルに直接問い合わせるため、ソースの負荷が増え、バイナリログを使う CDC より遅くなることがある\n\n対象のソースは、Oracle、Teradata、SQL Server、MySQL、MariaDB、PostgreSQL などです。",
       "examAngle": "クエリベースのコネクタは、CDC やバイナリログの設定ができないソースでも使えます。CDC のコネクタと違い、クエリベースのコネクタはゲートウェイを使わず、カーソル列で変わった行を探します。実行と実行の間に変わった行は、最新の状態だけを取り込みます。",
       "checks": [
@@ -3717,6 +5150,36 @@
       "term": "Lakehouse Federation",
       "oneLine": "Lakehouse Federation は、外部のデータベースやカタログのデータを移さずに、Unity Catalog の管理の下で、読み取り専用で問い合わせる仕組みです。",
       "keyPhrase": "データを移さずに",
+      "diagram": {
+        "type": "compare",
+        "title": "Lakehouse Federation の 2 つの形(どちらも読み取り専用)",
+        "left": {
+          "heading": "クエリのフェデレーション",
+          "items": [
+            {
+              "label": "問い合わせを押し下げる",
+              "note": "JDBC で外部のデータベースへ"
+            },
+            {
+              "label": "両方のコンピュートで実行",
+              "note": "Databricks と外部のコンピュート"
+            }
+          ]
+        },
+        "right": {
+          "heading": "カタログのフェデレーション",
+          "items": [
+            {
+              "label": "ストレージから直接読む",
+              "note": "外部のカタログのテーブルを Unity Catalog が読む"
+            },
+            {
+              "label": "Databricks だけで実行",
+              "note": "Databricks のコンピュートだけを使う"
+            }
+          ]
+        }
+      },
       "body": "Lakehouse Federation には 2 つの形があります。クエリのフェデレーションは、JDBC で外部のデータベースへ問い合わせを押し下げ、Databricks と外部の両方のコンピュートで実行します。カタログのフェデレーションは、外部のカタログのテーブルを Unity Catalog がオブジェクトストレージから直接読み、Databricks のコンピュートだけで実行します。\n\n使うときは、接続(connection)に資格情報と接続先を置き、接続から外部カタログ(foreign catalog)を作ります。利用者への権限は、外部カタログのテーブルの単位で付けます。\n\nクエリのフェデレーションの対象には、MySQL、PostgreSQL、Oracle、Snowflake、SQL Server、Amazon Redshift、Google BigQuery などがあります。どちらの形も、書き込みはできません。書き込みが要るときは、Spark のデータソースを使います。\n\nLakehouse Federation は、データを移さずにその場で使うための仕組みで、その場の報告、BI、検証に向きます。同じソースに Lakeflow Connect も対応していて、量が多く遅延を小さくしたいときは、公式の文書は Lakeflow Connect を勧めています。",
       "examAngle": "Lakehouse Federation は、外部のデータを移さずに、読み取り専用で問い合わせる仕組みです。どちらの形でも、書き込みはできません。同じソースで量が多く遅延を小さくしたいときは、公式の文書は Lakeflow Connect での取り込みを勧めています。",
       "checks": [
@@ -3836,6 +5299,42 @@
       "order": 1,
       "term": "タスクの再試行(Retries)",
       "oneLine": "タスクの再試行は、タスクが失敗したときに、決めた回数と間隔でそのタスクを自動でやり直す、タスクごとの設定です。",
+      "diagram": {
+        "type": "timeline",
+        "title": "タスクの再試行: 間隔は失敗した実行の開始から数え、Timeout は 1 回ごとにかかる",
+        "events": [
+          {
+            "id": "start1",
+            "label": "実行の開始",
+            "note": "1 回目"
+          },
+          {
+            "id": "fail1",
+            "label": "失敗"
+          },
+          {
+            "id": "start2",
+            "label": "再試行の開始",
+            "note": "2 回目"
+          },
+          {
+            "id": "end2",
+            "label": "終了"
+          }
+        ],
+        "spans": [
+          {
+            "from": "start1",
+            "to": "start2",
+            "label": "再試行の間隔"
+          },
+          {
+            "from": "start2",
+            "to": "end2",
+            "label": "Timeout は改めてかかる"
+          }
+        ]
+      },
       "body": "多くの構成では、既定ではタスクの失敗時に再試行しません。再試行するには、タスクの設定の Retries で、再試行の方針(回数と間隔)を足します。再試行の間隔はミリ秒で指定し、失敗した実行の開始から、再試行の開始までの時間として数えます。\n\nTimeout(タイムアウト)と再試行の両方を設定すると、タイムアウトは再試行の 1 回ごとにかかります。決めた時間内に終わらなかったタスクの状態は、Timed Out になります。\n\n継続のトリガーのジョブでは、失敗したタスクを、待ち時間を指数的に伸ばしながら再試行します。サーバーレスのジョブでは、再試行が自動で調整されます。",
       "examAngle": "タスクの再試行は、失敗したタスクを、決めた回数と間隔で自動でやり直すタスクごとの設定で、修復(Repair run)とは別のものです。多くの構成では、Retries を足さないとタスクは再試行されません。Timeout と再試行の両方を設定すると、タイムアウトは再試行の 1 回ごとにかかります。",
       "checks": [
@@ -3870,6 +5369,37 @@
       "term": "修復(Repair run)",
       "oneLine": "修復は、複数のタスクを持つジョブの失敗した実行で、失敗したタスクと、それに依存するタスクだけを実行し直す操作です。",
       "keyPhrase": "失敗したタスクと、それに依存するタスクだけ",
+      "diagram": {
+        "type": "flow",
+        "title": "A → B → C のジョブで B が失敗したときの修復",
+        "nodes": [
+          {
+            "id": "task-a",
+            "label": "A: 成功",
+            "note": "修復で実行し直さない"
+          },
+          {
+            "id": "task-b",
+            "label": "B: 失敗",
+            "note": "修復で実行し直す"
+          },
+          {
+            "id": "task-c",
+            "label": "C: 実行されず",
+            "note": "B に依存。修復で実行する"
+          }
+        ],
+        "edges": [
+          {
+            "from": "task-a",
+            "to": "task-b"
+          },
+          {
+            "from": "task-b",
+            "to": "task-c"
+          }
+        ]
+      },
       "body": "修復では、失敗か取り消しになったタスクと、その下流のタスクを実行し直します。成功したタスクは実行し直さないため、時間とコンピュートを節約できます。\n\n実行し直すタスクは、ジョブのいまの設定で動きます。そのため、ノートブックのパスやクラスターの設定を直してから修復できます。修復の画面ではパラメータを足したり変えたりでき、指定した値は元の値を上書きします。\n\n実行し直すタスクは、最初から動きます。タスクは冪等とは限らないため、途中まで書いたデータが重複することがあります。重複が困るときは、上書きか MERGE で書きます。\n\n修復は、タスクが 2 つ以上あるジョブで使います。タスクが 1 つのジョブは、Run now で実行し直します。ジョブのクラスターを使うタスクを修復すると、名前に _v1 のような接尾辞の付いた新しいクラスターが作られます。",
       "examAngle": "修復は、失敗か取り消しになったタスクと、その下流のタスクだけを実行し直します。成功したタスクは、実行し直しません。実行し直すタスクはジョブのいまの設定で動くため、修復の前に直したパスや設定が使われます。",
       "checks": [
@@ -4214,6 +5744,36 @@
       "order": 4,
       "term": "継続のトリガー",
       "oneLine": "継続のトリガーは、前の実行が終わるか失敗したあとすぐに次の実行を始め、ジョブを動かし続けるトリガーです。",
+      "diagram": {
+        "type": "timeline",
+        "title": "継続のトリガー: 前の実行が終わるとすぐ次の実行が始まる",
+        "events": [
+          {
+            "id": "run1",
+            "label": "実行の開始",
+            "note": "同時に動く実行は 1 つ"
+          },
+          {
+            "id": "end1",
+            "label": "終了か失敗"
+          },
+          {
+            "id": "run2",
+            "label": "次の実行の開始"
+          },
+          {
+            "id": "end2",
+            "label": "終了か失敗"
+          }
+        ],
+        "spans": [
+          {
+            "from": "end1",
+            "to": "run2",
+            "label": "60 秒未満が目安"
+          }
+        ]
+      },
       "body": "公式の文書は、常時動かすストリーミングの処理に、継続のモードを勧めています。前の実行が終わってから次の実行が始まるまでの間は、60 秒未満が目安です。継続のジョブは、同時に 1 つの実行しか動きません。\n\n継続のジョブでは、タスクの依存関係(Run if を含む)を使えません。ジョブの単位の再試行の方針も使えないため、タスクの単位の再試行を使います。失敗したタスクは、待ち時間を指数的に伸ばしながら再試行されます。\n\n継続のトリガーは、ほかのトリガーと組み合わせられません。止めるときは Pause を、再開するときは Resume を押します。サーバーレスのコンピュートでは、Structured Streaming のトリガーのうち、Trigger.AvailableNow のような終わりのあるものだけを使えます。",
       "examAngle": "継続のトリガーは、前の実行が終わるか失敗したあと、すぐに次の実行を始めます。継続のジョブは同時に 1 つの実行しか動かず、Run if を含むタスクの依存関係も使えません。ジョブの単位の再試行の方針は使えないので、タスクの単位の再試行を使います。",
       "checks": [
@@ -4376,6 +5936,48 @@
       "term": "コントロールプレーンとコンピュートプレーン",
       "oneLine": "コントロールプレーンは Databricks が自分のアカウントで運用する管理の部分で、コンピュートプレーンはデータを処理するコンピュートが動く部分です。",
       "keyPhrase": "Databricks が自分のアカウントで運用する管理の部分",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "コントロールプレーンとコンピュートプレーンが置かれるアカウント",
+        "root": {
+          "label": "Databricks の基盤",
+          "children": [
+            {
+              "label": "Databricks のアカウント",
+              "children": [
+                {
+                  "label": "コントロールプレーン",
+                  "children": [
+                    {
+                      "label": "Web アプリケーション"
+                    },
+                    {
+                      "label": "バックエンドのサービス"
+                    }
+                  ]
+                },
+                {
+                  "label": "サーバーレスのコンピュートプレーン",
+                  "note": "ワークスペースと同じリージョンに作られる"
+                }
+              ]
+            },
+            {
+              "label": "利用者の AWS アカウント",
+              "children": [
+                {
+                  "label": "クラシックのコンピュートプレーン",
+                  "note": "ワークスペースごとの仮想ネットワーク"
+                },
+                {
+                  "label": "ワークスペースのストレージ",
+                  "note": "クラシックのワークスペースで、ジョブの結果やログを置く"
+                }
+              ]
+            }
+          ]
+        }
+      },
       "body": "コントロールプレーンには、Web アプリケーションと、Databricks が管理するバックエンドのサービスがあります。これらは利用者の AWS アカウントではなく、Databricks のアカウントにあります。\n\nコンピュートプレーンは 2 種類です。\n\n- **クラシックのコンピュートプレーン**: コンピュートは利用者の AWS アカウントの中で、ワークスペースごとの仮想ネットワークに置かれます。\n- **サーバーレスのコンピュートプレーン**: コンピュートは Databricks のアカウントの中で動きます。ワークスペースと同じリージョンに作られ、ワークスペースごとにネットワークの境界があります。\n\nクラシックのワークスペースでは、ジョブの結果やクラスターのログなどのシステムのデータを、利用者の AWS アカウントにあるワークスペースのストレージのバケットに置きます。Unity Catalog のテーブルやボリュームのデータは、ノートブックなどのワークスペースのファイルとは分けて保管します。",
       "examAngle": "コントロールプレーンの Web アプリケーションとバックエンドのサービスは、Databricks のアカウントにあります。クラシックのコンピュートプレーンのコンピュートは利用者の AWS アカウントの中に置かれ、ジョブの結果やクラスターのログなどのシステムのデータも、利用者の AWS アカウントにあるワークスペースのストレージのバケットに置きます。サーバーレスのコンピュートは、Databricks のアカウントの中で動きます。",
       "checks": [
@@ -4495,6 +6097,48 @@
       "term": "スキーマの強制(Delta Lake)",
       "oneLine": "スキーマの強制は、Delta Lake のテーブルへの書き込みを、テーブルのスキーマと照らして検査し、合わない書き込みを止める仕組みです。",
       "keyPhrase": "合わない書き込みを止める",
+      "diagram": {
+        "type": "flow",
+        "title": "スキーマの強制での、Delta テーブルへの書き込みの扱い",
+        "nodes": [
+          {
+            "id": "write",
+            "label": "Delta テーブルへの書き込み"
+          },
+          {
+            "id": "stop",
+            "label": "書き込みが止まる",
+            "note": "ない列があり、mergeSchema の指定がないとき"
+          },
+          {
+            "id": "merge",
+            "label": "列を足して書き込む",
+            "note": "ない列があり、mergeSchema を true にしたとき"
+          },
+          {
+            "id": "cast",
+            "label": "変換して書き込む",
+            "note": "安全に変換できる範囲。例: 整数を BIGINT へ"
+          }
+        ],
+        "edges": [
+          {
+            "from": "write",
+            "to": "stop",
+            "label": "ない列がある"
+          },
+          {
+            "from": "write",
+            "to": "merge",
+            "label": "mergeSchema"
+          },
+          {
+            "from": "write",
+            "to": "cast",
+            "label": "型が違う"
+          }
+        ]
+      },
       "body": "スキーマの強制は、Delta Lake のテーブルにかかります。CSV や JSON のファイルにはかかりません。\n\n`INSERT` で、テーブルにない列に値を入れようとすると、エラー(`UNRESOLVED_COLUMN.WITH_SUGGESTION`)になります。型が違うときは、Databricks が安全に変換できる範囲で変換します。たとえば、整数を `BIGINT` の列に入れる書き込みは成功します。\n\n列を足したいときは、次のどちらかでスキーマを広げます(スキーマの進化)。\n\n- `ALTER TABLE … ADD COLUMN` で、明示的に列を足す\n- DataFrame の書き込みに `mergeSchema` を `true` で渡し、書き込みと同時に列を足す\n\n```python\ndf.write.option(\"mergeSchema\", \"true\").mode(\"append\").saveAsTable(\"main.sales.orders\")\n```\n\n列の型や名前の変更は、`overwriteSchema` でテーブルを書き直すか、列のマッピングを有効にして行います。",
       "examAngle": "Delta Lake のテーブルにない列を含むデータを書き込むと、スキーマの強制で書き込みが止まります。書き込みと同時に列を足すには、`mergeSchema` を `true` にします。列の型や名前を変えるときは、`overwriteSchema` でテーブルを書き直すか、列のマッピングを有効にします。",
       "checks": [
@@ -4549,6 +6193,38 @@
       "term": "タイムトラベル(Delta Lake)",
       "oneLine": "タイムトラベルは、Delta Lake のテーブルの過去のバージョンを、バージョンの番号か時刻を指定して読む機能です。",
       "keyPhrase": "バージョンの番号か時刻を指定して読む",
+      "diagram": {
+        "type": "timeline",
+        "title": "既定の設定で VACUUM を実行したあとに、タイムトラベルで読めるバージョン",
+        "events": [
+          {
+            "id": "d10",
+            "label": "10 日前のバージョン",
+            "note": "読めない"
+          },
+          {
+            "id": "d7",
+            "label": "7 日前"
+          },
+          {
+            "id": "d3",
+            "label": "3 日前のバージョン",
+            "note": "VERSION AS OF などで読める"
+          },
+          {
+            "id": "now",
+            "label": "いま",
+            "note": "VACUUM を実行したあと"
+          }
+        ],
+        "spans": [
+          {
+            "from": "d7",
+            "to": "now",
+            "label": "戻れる範囲(既定 7 日)"
+          }
+        ]
+      },
       "body": "```sql\nSELECT * FROM main.sales.orders VERSION AS OF 5;\nSELECT * FROM main.sales.orders TIMESTAMP AS OF '2026-10-01';\nSELECT * FROM main.sales.orders@v5;\n```\n\nPySpark では、`versionAsOf` か `timestampAsOf` のオプションを使います。\n\n戻れる範囲は、既定で 7 日です。データファイルを残す期間 `deletedFileRetentionDuration` の既定が 7 日だからです。`VACUUM` で古いデータファイルが消えると、そのファイルを使うバージョンは読めなくなります。範囲を延ばすには、データファイルの期間と、ログを残す期間 `logRetentionDuration`(既定 30 日)の両方を延ばします。延ばした分だけ、ストレージの費用が増えます。\n\nテーブルを過去のバージョンに戻すときは、`RESTORE TABLE` を使います。実行には `MODIFY` の権限が要ります。\n\n```sql\nRESTORE TABLE main.sales.orders TO VERSION AS OF 5;\n```",
       "examAngle": "タイムトラベルは過去のバージョンを読む機能で、テーブルを過去の状態に戻すのは `RESTORE TABLE` です。`RESTORE TABLE` の実行には、`MODIFY` の権限が要ります。`VACUUM` で消えたデータファイルを使うバージョンは、タイムトラベルで読めません。",
       "checks": [
@@ -4579,6 +6255,37 @@
       "term": "VACUUM",
       "oneLine": "VACUUM は、Delta Lake のテーブルが参照しなくなったデータファイルのうち、保持の期間を過ぎたものを消すコマンドです。",
       "keyPhrase": "保持の期間を過ぎたものを消す",
+      "diagram": {
+        "type": "timeline",
+        "title": "参照されなくなったデータファイルを VACUUM が消すまで",
+        "events": [
+          {
+            "id": "unref",
+            "label": "ファイルが参照されなくなる"
+          },
+          {
+            "id": "day3",
+            "label": "3 日後に VACUUM",
+            "note": "期間のうちなので消えない"
+          },
+          {
+            "id": "day7",
+            "label": "7 日を過ぎる"
+          },
+          {
+            "id": "vacuum",
+            "label": "VACUUM を実行",
+            "note": "このファイルを消す"
+          }
+        ],
+        "spans": [
+          {
+            "from": "unref",
+            "to": "day7",
+            "label": "保持の期間(既定 7 日)"
+          }
+        ]
+      },
       "body": "保持の期間の既定は 7 日です。期間のうちのファイルは、参照されていなくても残ります。\n\n```sql\nVACUUM main.sales.orders DRY RUN;  -- 消す対象を一覧にするだけ\nVACUUM main.sales.orders;\n```\n\n`VACUUM` で消えたファイルを使う過去のバージョンには、タイムトラベルで戻れなくなります。保持の期間を短くした `VACUUM` は、安全のための検査で止められます。`spark.databricks.delta.retentionDurationCheck.enabled` を `false` にすると止まりませんが、保持の期間より長く動く操作がテーブルにないときに限ります。公式の文書は、期間を 7 日以上にするよう強く勧めています。\n\nトランザクションログのファイルは `VACUUM` の対象ではありません。ログはチェックポイントのあとに自動で消え、既定で 30 日残ります。\n\nUnity Catalog のマネージドテーブルでは、予測的最適化が `VACUUM` を自動で実行します。",
       "examAngle": "`VACUUM` が消すのは、参照されなくなったデータファイルのうち、保持の期間(既定 7 日)を過ぎたものだけです。期間のうちのファイルは、参照されていなくても残ります。`VACUUM` で消えたファイルを使う過去のバージョンには、タイムトラベルで戻れなくなります。",
       "checks": [
@@ -4715,6 +6422,33 @@
       "term": "SQL ウェアハウスの自動停止(Auto Stop)",
       "oneLine": "自動停止は、SQL ウェアハウスがアイドルのまま指定の分数を過ぎたときに、ウェアハウスを止める設定です。",
       "keyPhrase": "アイドルのまま指定の分数を過ぎたときに、ウェアハウスを止める",
+      "diagram": {
+        "type": "timeline",
+        "title": "SQL ウェアハウスの自動停止と自動の起動",
+        "events": [
+          {
+            "id": "last",
+            "label": "最後のクエリが終わる"
+          },
+          {
+            "id": "stop",
+            "label": "ウェアハウスが止まる",
+            "note": "既定は Pro・クラシック 45 分、サーバーレス 10 分"
+          },
+          {
+            "id": "query",
+            "label": "クエリを実行する",
+            "note": "止まったウェアハウスが自動で起動する"
+          }
+        ],
+        "spans": [
+          {
+            "from": "last",
+            "to": "stop",
+            "label": "アイドルでも料金がかかる"
+          }
+        ]
+      },
       "body": "アイドルのウェアハウスも、止まるまでは DBU とクラウドのインスタンスの料金がかかります。自動停止の時間を短くすると、アイドルの費用が減ります。\n\n既定と最小の値は、種類で違います。\n\n- **Pro とクラシック**: 既定 45 分、最小 10 分\n- **サーバーレス**: 既定 10 分、画面での最小 5 分(SQL ウェアハウスの API では 1 分まで)\n\n止まったウェアハウスは、クエリを実行したときや、ダッシュボードを開いたときに、自動で起動します。",
       "examAngle": "アイドルの SQL ウェアハウスにも、止まるまでは DBU とクラウドのインスタンスの料金がかかります。自動停止の時間を短くすると、アイドルの費用が減ります。自動停止の既定は、Pro とクラシックが 45 分、サーバーレスが 10 分です。",
       "checks": [
@@ -4744,6 +6478,42 @@
       "term": "SQL ウェアハウスのサイズとスケーリング",
       "oneLine": "SQL ウェアハウスのサイズは 1 つのクラスターのドライバーの大きさとワーカーの数を決め、スケーリングはクラスターの数の最小と最大を決める設定です。",
       "keyPhrase": "クラスターの数の最小と最大を決める",
+      "diagram": {
+        "type": "compare",
+        "title": "SQL ウェアハウスのサイズとスケーリングが効く場面",
+        "left": {
+          "heading": "サイズ(Cluster Size)",
+          "items": [
+            {
+              "label": "1 つのクラスターの大きさ",
+              "note": "ドライバーの大きさとワーカーの数"
+            },
+            {
+              "label": "1 つのクエリの待ち時間",
+              "note": "重いクエリを速くするときに上げる"
+            },
+            {
+              "label": "既定は X-Large"
+            }
+          ]
+        },
+        "right": {
+          "heading": "スケーリング",
+          "items": [
+            {
+              "label": "クラスターの数の最小と最大"
+            },
+            {
+              "label": "同時に動かせるクエリの数",
+              "note": "キューで待たされるときに最大を上げる"
+            },
+            {
+              "label": "既定は最小 1、最大 1",
+              "note": "同時のクエリ 10 個にクラスター 1 つが目安"
+            }
+          ]
+        }
+      },
       "body": "2 つの設定は、効く場面が違います。\n\nサイズ(Cluster Size)を上げると、1 つのクエリの待ち時間が短くなります。既定は X-Large です。\n\nスケーリングの最大を上げると、同時に動かせるクエリの数が増えます。既定は最小 1、最大 1 です。Databricks は、同時に動くクエリ 10 個につき 1 つのクラスターを目安にしています。\n\n24 時間を超えて動いたクラスターは入れ替えられます。24 時間を超えるクエリは止められることがあるので、長い処理はその時間のうちに終わるよう分けます。",
       "examAngle": "サイズ(Cluster Size)は、1 つのクエリの待ち時間に効きます。スケーリングの最大は、同時に動かせるクエリの数に効きます。利用者が増えてクエリがキューで待たされるときは、スケーリングの最大を上げます。",
       "checks": [
@@ -5772,6 +7542,46 @@
       "term": "バンドルでの環境の昇格(CI/CD)",
       "oneLine": "バンドルでの昇格は、同じバンドルのソースを、CI/CD の道具から開発、検証、本番のターゲットへ順に配布して、変更を本番まで進める流れです。",
       "keyPhrase": "同じバンドルのソースを、CI/CD の道具から開発、検証、本番のターゲットへ順に配布して",
+      "diagram": {
+        "type": "flow",
+        "title": "同じバンドルを、検証の環境から本番へ進める流れ",
+        "nodes": [
+          {
+            "id": "validate",
+            "label": "validate -t staging",
+            "note": "設定を確かめる"
+          },
+          {
+            "id": "deploy-staging",
+            "label": "deploy -t staging",
+            "note": "検証の環境へ配布する"
+          },
+          {
+            "id": "run-test",
+            "label": "run integration_test",
+            "note": "検証の環境でジョブを実行する"
+          },
+          {
+            "id": "deploy-prod",
+            "label": "deploy -t prod",
+            "note": "本番のターゲットは mode: production"
+          }
+        ],
+        "edges": [
+          {
+            "from": "validate",
+            "to": "deploy-staging"
+          },
+          {
+            "from": "deploy-staging",
+            "to": "run-test"
+          },
+          {
+            "from": "run-test",
+            "to": "deploy-prod"
+          }
+        ]
+      },
       "body": "利用者は、バンドルのファイルを Git で管理し、GitHub Actions などの CI/CD の道具から Databricks CLI を呼びます。環境ごとの違いはターゲットと変数に書くので、どの環境にも同じソースを配布できます。\n\n```bash\ndatabricks bundle validate -t staging\ndatabricks bundle deploy -t staging\ndatabricks bundle run -t staging integration_test\ndatabricks bundle deploy -t prod\n```\n\n本番のターゲットは `mode: production` にします。CI/CD の流れでは、利用者のアカウントでなくサービスプリンシパルで認証することを Databricks は勧めています。保存した秘密情報を持たずに済む、ワークロードの ID のフェデレーションが最も安全な方法です。\n\n既存のジョブを本番に置いたままバンドルの管理に移すときは、`bundle generate` と `bundle deployment bind` を使います。",
       "examAngle": "検証と本番への配布では、同じソースのまま、`-t` で指定するターゲットだけを変えます。環境ごとの違いは、ターゲットと変数に書きます。本番のターゲットは `mode: production` にします。",
       "checks": [
@@ -5884,6 +7694,47 @@
       "term": "bundle generate と bundle deployment bind",
       "oneLine": "`bundle generate` は既存のジョブなどからバンドルの設定のファイルを作るコマンドで、`bundle deployment bind` はバンドルのリソースを既存のジョブなどに結び付けるコマンドです。",
       "keyPhrase": "バンドルのリソースを既存のジョブなどに結び付ける",
+      "diagram": {
+        "type": "flow",
+        "title": "既存のジョブをバンドルの管理に移す流れ",
+        "nodes": [
+          {
+            "id": "generate",
+            "label": "bundle generate",
+            "note": "既存のジョブから設定のファイルを作る"
+          },
+          {
+            "id": "bind",
+            "label": "deployment bind",
+            "note": "リソースのキーと既存のジョブの ID を結ぶ"
+          },
+          {
+            "id": "deploy-bound",
+            "label": "bundle deploy",
+            "note": "既存のジョブが更新される"
+          },
+          {
+            "id": "deploy-unbound",
+            "label": "bind せずに deploy",
+            "note": "新しいジョブが別に作られることがある"
+          }
+        ],
+        "edges": [
+          {
+            "from": "generate",
+            "to": "bind"
+          },
+          {
+            "from": "bind",
+            "to": "deploy-bound"
+          },
+          {
+            "from": "generate",
+            "to": "deploy-unbound",
+            "label": "結び付けない"
+          }
+        ]
+      },
       "body": "ワークスペースで作ったジョブをバンドルの管理に移すときは、まず `generate` で設定を作ります。\n\n```bash\ndatabricks bundle generate job --existing-job-id 1234\n```\n\nこのコマンドは、`resources` のフォルダーにジョブの設定のファイルを書き、ジョブが参照するノートブックや Python のファイルを `src` のフォルダーに取り込みます。\n\n次に `bind` で、バンドルのリソースのキーと既存のジョブの ID を結び付けます。\n\n```bash\ndatabricks bundle deployment bind daily_sales 1234\n```\n\n結び付けたあとの配布では、既存のジョブがバンドルの設定で更新されます。結び付けずに配布すると、新しいジョブが別に作られ、同じジョブが 2 つになることがあります。結び付けを外すときは `bundle deployment unbind` を使います。",
       "examAngle": "`bundle generate` は、既存のジョブから設定のファイルを作ります。`bundle deployment bind` で既存のジョブの ID と結び付けると、配布で既存のジョブが更新されます。結び付けずに配布すると、新しいジョブが別に作られ、同じジョブが 2 つになることがあります。",
       "checks": [
@@ -6119,6 +7970,45 @@
       "term": "権限の継承",
       "oneLine": "カタログやスキーマに与えた権限は、その中の今あるオブジェクトと、これから作るオブジェクトに引き継がれます。",
       "keyPhrase": "今あるオブジェクトと、これから作るオブジェクトに引き継がれます",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "スキーマに与えた SELECT が及ぶ範囲",
+        "root": {
+          "label": "メタストア",
+          "note": "ここに与えた権限は、子に引き継がれない",
+          "children": [
+            {
+              "label": "カタログ main",
+              "children": [
+                {
+                  "label": "スキーマ sales",
+                  "note": "GRANT SELECT ON SCHEMA",
+                  "state": "origin",
+                  "children": [
+                    {
+                      "label": "今ある表",
+                      "state": "covered"
+                    },
+                    {
+                      "label": "今あるビュー",
+                      "state": "covered"
+                    },
+                    {
+                      "label": "あとで作る表",
+                      "note": "与え直さなくても効く",
+                      "state": "covered"
+                    }
+                  ]
+                },
+                {
+                  "label": "スキーマ staging",
+                  "note": "権限を与えていない"
+                }
+              ]
+            }
+          ]
+        }
+      },
       "body": "Unity Catalog のオブジェクトは、メタストア、カタログ、スキーマ、表(ビュー、ボリューム、関数)の階層になっています。カタログとスキーマは、オブジェクトを入れる容器です。\n\nスキーマに `SELECT` を与えると、そのスキーマの今ある表とビュー、あとで作る表とビューのすべてで `SELECT` が効きます。表ごとに与え直す必要はありません。\n\n```sql\nGRANT SELECT ON SCHEMA main.sales TO `analysts`;\n```\n\nメタストアに与えた権限は、子のオブジェクトに引き継がれません。\n\n継承は、権限を与える階層を選ぶ手がかりになります。スキーマの表すべてを読ませたいならスキーマに、1 つの表だけなら表に与えます。",
       "examAngle": "スキーマに与えた権限は、スキーマの今ある表と、あとで作る表の両方に効きます。メタストアに与えた権限は、子のオブジェクトに引き継がれません。1 つの表だけを読ませるときは、権限を表に与えます。",
       "checks": [
@@ -6181,6 +8071,57 @@
       "term": "行フィルター(SET ROW FILTER)",
       "oneLine": "行フィルターは、真偽値を返す SQL の関数をテーブルにかけ、関数が偽を返した行をクエリの結果から外す仕組みです。",
       "keyPhrase": "関数が偽を返した行をクエリの結果から外す",
+      "diagram": {
+        "type": "table-change",
+        "title": "行フィルター us_filter をかけた表を、admin のグループ以外の利用者が読む",
+        "operation": "admin 以外が SELECT",
+        "before": {
+          "heading": "sales(元の行)",
+          "columns": [
+            {
+              "label": "id"
+            },
+            {
+              "label": "region"
+            }
+          ],
+          "rows": [
+            {
+              "cells": ["1", "US"]
+            },
+            {
+              "cells": ["2", "EU"],
+              "state": "removed"
+            },
+            {
+              "cells": ["3", "US"]
+            },
+            {
+              "cells": ["4", "JP"],
+              "state": "removed"
+            }
+          ]
+        },
+        "after": {
+          "heading": "結果(admin 以外)",
+          "columns": [
+            {
+              "label": "id"
+            },
+            {
+              "label": "region"
+            }
+          ],
+          "rows": [
+            {
+              "cells": ["1", "US"]
+            },
+            {
+              "cells": ["3", "US"]
+            }
+          ]
+        }
+      },
       "body": "まず、真偽値を返す関数を作り、`ALTER TABLE … SET ROW FILTER` でテーブルにかけます。`ON` の括弧には、関数に渡す列を書きます。\n\n```sql\nCREATE FUNCTION us_filter(region STRING)\nRETURN IF(IS_ACCOUNT_GROUP_MEMBER('admin'), true, region = 'US');\n\nALTER TABLE sales SET ROW FILTER us_filter ON (region);\n```\n\nこの例では、`admin` のグループの利用者はすべての行を見ます。それ以外の利用者には、`region` が `US` の行だけが返ります。\n\n表を作るときにも、`WITH ROW FILTER us_filter ON (region)` でかけられます。外すときは `ALTER TABLE sales DROP ROW FILTER` を使います。関数を消す前に、フィルターを外します。先に関数を消すと、テーブルを読めなくなります。\n\n既存のテーブルにかけるには、テーブルの所有者であるか、`MANAGE` と `SELECT` の両方が要ります。関数の `EXECUTE` も要ります。ビューには行フィルターをかけられません。",
       "examAngle": "行フィルターの関数は真偽値を返し、偽を返した行がクエリの結果から外れます。利用者は `ALTER TABLE … SET ROW FILTER` で関数をテーブルにかけ、`ON` の括弧に関数へ渡す列を書きます。ビューには、行フィルターをかけられません。",
       "checks": [
@@ -6215,6 +8156,51 @@
       "term": "列マスク(SET MASK)",
       "oneLine": "列マスクは、列の値を受け取って元の値か隠した値を返す SQL の関数を列にかけ、利用者に応じて見える値を変える仕組みです。",
       "keyPhrase": "列の値を受け取って元の値か隠した値を返す",
+      "diagram": {
+        "type": "table-change",
+        "title": "列マスク ssn_mask をかけた列を、HumanResourceDept の外の利用者が読む",
+        "operation": "グループ外が SELECT",
+        "before": {
+          "heading": "users(元の値)",
+          "columns": [
+            {
+              "label": "id"
+            },
+            {
+              "label": "ssn"
+            }
+          ],
+          "rows": [
+            {
+              "cells": ["1", "番号 A"]
+            },
+            {
+              "cells": ["2", "番号 B"]
+            }
+          ]
+        },
+        "after": {
+          "heading": "結果(グループ外)",
+          "columns": [
+            {
+              "label": "id"
+            },
+            {
+              "label": "ssn"
+            }
+          ],
+          "rows": [
+            {
+              "cells": ["1", "***-**-****"],
+              "state": "changed"
+            },
+            {
+              "cells": ["2", "***-**-****"],
+              "state": "changed"
+            }
+          ]
+        }
+      },
       "body": "関数の最初の引数がマスクする列の値で、戻り値は列の型と同じか、列の型に変換できる型にします。`ALTER TABLE … ALTER COLUMN … SET MASK` で列にかけます。\n\n```sql\nCREATE FUNCTION ssn_mask(ssn STRING)\nRETURN CASE WHEN IS_ACCOUNT_GROUP_MEMBER('HumanResourceDept')\n  THEN ssn ELSE '***-**-****' END;\n\nALTER TABLE users ALTER COLUMN ssn SET MASK ssn_mask;\n```\n\nこの例では、`HumanResourceDept` のグループの利用者だけが元の値を見ます。それ以外の利用者には、隠した文字列が返ります。\n\n`USING COLUMNS` を付けると、ほかの列の値も関数に渡せます。1 つの列にかけられるマスクは 1 つです。外すときは `ALTER TABLE users ALTER COLUMN ssn DROP MASK` を使います。表を作るときにも、列の定義に `MASK ssn_mask` と書いてかけられます。",
       "examAngle": "列マスクの関数は、最初の引数にマスクする列の値を受け取り、元の値か隠した値を返します。戻り値の型は、列の型と同じか、列の型に変換できる型にします。利用者は `ALTER TABLE … ALTER COLUMN … SET MASK` で関数を列にかけます。",
       "checks": [
@@ -6352,6 +8338,33 @@
       "term": "ガバナンスタグ",
       "oneLine": "ガバナンスタグは、アカウントの単位でキーと許す値を定義し、Unity Catalog のオブジェクトに付けて、ABAC ポリシーの条件に使うタグです。",
       "keyPhrase": "ABAC ポリシーの条件に使うタグ",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "スキーマに付けたガバナンスタグが及ぶ範囲",
+        "root": {
+          "label": "カタログ",
+          "children": [
+            {
+              "label": "スキーマ",
+              "note": "ガバナンスタグを付ける",
+              "state": "origin",
+              "children": [
+                {
+                  "label": "表",
+                  "note": "親のタグを既定で引き継ぐ",
+                  "state": "covered",
+                  "children": [
+                    {
+                      "label": "列",
+                      "note": "表のタグを引き継がない。列に直接付ける"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
       "body": "ガバナンスタグのキーと値の一覧は、アカウントの管理者などが、ポリシーを書く前に定義します。タグを付けるには、タグの `ASSIGN` と、付ける先のオブジェクトの `APPLY TAG` が要ります。\n\n```sql\nALTER TABLE main.hr.employees ALTER COLUMN ssn SET TAGS ('pii' = 'ssn');\n```\n\n表は、親のカタログとスキーマのタグを既定で引き継ぎます。列は、表のタグを引き継ぎません。列のタグは、列に直接付けます。\n\nポリシーを書く人とタグを付ける人を分けられるのが、タグで対象を選ぶ利点です。データの管理者が新しい表の列にタグを付ければ、ポリシーを書き換えずに保護がかかります。",
       "examAngle": "表は、親のカタログとスキーマのタグを既定で引き継ぎます。列は表のタグを引き継がないので、列のタグは列に直接付けます。利用者がタグを付けるには、タグの `ASSIGN` と、付ける先のオブジェクトの `APPLY TAG` が要ります。",
       "checks": [
@@ -6381,6 +8394,34 @@
       "term": "MATCH COLUMNS と has_tag_value",
       "oneLine": "MATCH COLUMNS は、ABAC ポリシーの中で、タグの条件(`has_tag`、`has_tag_value`)に合う列を選び、別名を付ける句です。",
       "keyPhrase": "タグの条件(`has_tag`、`has_tag_value`)に合う列を選び",
+      "diagram": {
+        "type": "compare",
+        "title": "ABAC ポリシーの WHEN の句と MATCH COLUMNS の句",
+        "left": {
+          "heading": "WHEN の句",
+          "items": [
+            {
+              "label": "ポリシーをかける表を決める"
+            },
+            {
+              "label": "表のタグを調べる",
+              "note": "親のカタログやスキーマから引き継いだタグも"
+            }
+          ]
+        },
+        "right": {
+          "heading": "MATCH COLUMNS の句",
+          "items": [
+            {
+              "label": "対象の列を選び、別名を付ける",
+              "note": "列マスクでは ON COLUMN に別名を書く"
+            },
+            {
+              "label": "列に直接付けたタグだけ調べる"
+            }
+          ]
+        }
+      },
       "body": "`has_tag('キー')` はタグのキーがあるか、`has_tag_value('キー', '値')` はキーと値の組があるかを調べます。`MATCH COLUMNS` で選んだ列に `AS` で別名を付け、列マスクでは `ON COLUMN` で、マスクする列にその別名を指定します。\n\n```sql\nCREATE POLICY mask_ssn\nON SCHEMA main.hr\nCOLUMN MASK mask_value\nTO 'analysts'\nFOR TABLES\nMATCH COLUMNS has_tag_value('pii', 'ssn') AS c\nON COLUMN c;\n```\n\n`WHEN` の句は、どの表にポリシーをかけるかを決めます。`WHEN` の中のタグの関数は、表のタグと、親のカタログやスキーマから引き継いだタグを調べます。`MATCH COLUMNS` の中のタグの関数は、列に直接付けたタグだけを調べます。\n\n古い書き方の `hasTag` と `hasTagValue` も、互換のために使えます。",
       "examAngle": "`WHEN` の句はポリシーをかける表を決め、表のタグと親から引き継いだタグを調べます。`MATCH COLUMNS` の句は、列に直接付けたタグだけを調べて、対象の列を選びます。`has_tag` はキーがあるかを、`has_tag_value` はキーと値の組があるかを調べます。",
       "checks": [
