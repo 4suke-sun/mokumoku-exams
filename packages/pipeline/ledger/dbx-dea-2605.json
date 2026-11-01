@@ -128,8 +128,8 @@
         }
       ],
       "claims": [],
-      "contentHash": "c4fc1ef209bebfcb13e3f366ee29d5f7561665e3d5f75692778ec83c9c7628b1",
-      "fetchedAt": "2026-10-29",
+      "contentHash": "eb6cc1cda0f273f4dce7e369fe92d11a248c50f403cf75cc29697d3c5046f8c9",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -137,7 +137,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "System tables reference | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/admin/system-tables/"
     },
     {
@@ -165,7 +165,7 @@
       ],
       "claims": [],
       "contentHash": "04f9271490c8962b6c3a77c6553bca9b74c9c40396e0f55073a5eaab08f9a3e6",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -173,7 +173,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Compute | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/compute/"
     },
     {
@@ -201,7 +201,7 @@
       ],
       "claims": [],
       "contentHash": "d7fc6e15f482b46960465d5f8e7f8cfe56e89c48f318c6425c12496cfd750871",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -209,7 +209,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Compute configuration reference | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/compute/configure"
     },
     {
@@ -237,7 +237,7 @@
       ],
       "claims": [],
       "contentHash": "015933fd389e28d0f7b9b34fdda306b95c22fcadcadaf67120f38c85e09fe021",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -245,7 +245,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Connect to serverless compute | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/compute/serverless/"
     },
     {
@@ -273,7 +273,7 @@
       ],
       "claims": [],
       "contentHash": "773e1bc263386eab37490aca64be41d8fadeb7338d9aaf706b8145b1bfc7b19b",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -281,7 +281,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Connect to a SQL warehouse | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/compute/sql-warehouse/"
     },
     {
@@ -309,7 +309,7 @@
       ],
       "claims": [],
       "contentHash": "26d836408b3535be730eab7dd7912f23d19c7dda04769367d2128039e148edfd",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -317,7 +317,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Connect to cloud object storage using Unity Catalog | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/connect/unity-catalog/cloud-storage/"
     },
     {
@@ -345,7 +345,7 @@
       ],
       "claims": [],
       "contentHash": "8019b911bebeca4736359d321ab3f5078a4a4d0154e258b34303f86893a23e39",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -353,7 +353,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Data engineering with Databricks | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/data-engineering/"
     },
     {
@@ -381,7 +381,7 @@
       ],
       "claims": [],
       "contentHash": "b7a5475bb25b62e4523109ed1d52bd1bc5b9bdd88fba75809a7096044eb96629",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -389,7 +389,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "What is Unity Catalog? | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/"
     },
     {
@@ -416,8 +416,8 @@
         }
       ],
       "claims": [],
-      "contentHash": "178d216ab348e1a402b1d3da246d5247819b171a2564b9aef4998064a8906172",
-      "fetchedAt": "2026-10-29",
+      "contentHash": "a966768444459aec58ca1d789f647f3cfb06952f0fa7a61a5cc8c2e4fdc4725e",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -425,7 +425,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Audit log reference | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/audit"
     },
     {
@@ -452,8 +452,8 @@
         }
       ],
       "claims": [],
-      "contentHash": "67bf118bebda290cecdb3e442dc757c8108fe8eb27eefe38686eafe4f75cc958",
-      "fetchedAt": "2026-10-29",
+      "contentHash": "03ee280aebd00563ed76803d5a1b666ad15366e37a9aac32b27463ff86a6e202",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -461,7 +461,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Unity Catalog best practices | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/best-practices"
     },
     {
@@ -489,7 +489,7 @@
       ],
       "claims": [],
       "contentHash": "c1210b1d8e845ffdf10d99fc34f8154ff972cb6d9f8ec704809e779cbf4fac79",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -497,7 +497,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Databricks tables | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/create-tables"
     },
     {
@@ -524,8 +524,8 @@
         }
       ],
       "claims": [],
-      "contentHash": "25ac7944cc8e29fee4984bcd059f69184acd79f2af1e261b5c6476daa93a1377",
-      "fetchedAt": "2026-10-29",
+      "contentHash": "0f6f91578a7916267a0a71e268b2e1413e24166d06dc65d4867aa923f16fdf17",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -533,7 +533,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Lineage in Unity Catalog | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/data-lineage"
     },
     {
@@ -561,7 +561,7 @@
       ],
       "claims": [],
       "contentHash": "44109d05e70453707e93cc8187ef4e052e38710121dcb5e4e5bd8a520474a237",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -569,7 +569,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Row filters and column masks | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/filters-and-masks/"
     },
     {
@@ -597,7 +597,7 @@
       ],
       "claims": [],
       "contentHash": "f026e412598362418cf1aef08799f2aa5958ab7f3a3b4427a5e59195dc1aa839",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -605,7 +605,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Get started with Unity Catalog | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/get-started"
     },
     {
@@ -633,7 +633,7 @@
       ],
       "claims": [],
       "contentHash": "38b1a276449a9c48b890d9d32909a67c3a3bbf6fdbfcbc56bc6d93ba7d73d090",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -641,7 +641,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Manage privileges in Unity Catalog | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/manage-privileges/"
     },
     {
@@ -669,7 +669,7 @@
       ],
       "claims": [],
       "contentHash": "2e16b6d39a924660295331bb4754ec3af62e18e0f23661be11532c814b48fbef",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -677,7 +677,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Unity Catalog privileges reference | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/manage-privileges/privileges"
     },
     {
@@ -705,7 +705,7 @@
       ],
       "claims": [],
       "contentHash": "44109d05e70453707e93cc8187ef4e052e38710121dcb5e4e5bd8a520474a237",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -713,7 +713,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Row filters and column masks | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/row-and-column-filters"
     },
     {
@@ -741,7 +741,7 @@
       ],
       "claims": [],
       "contentHash": "4dfda329acfeb16f920e2285a63cf0eb96f71511b2b9b4eadd5fefde5adc8893",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -749,7 +749,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "What is OpenSharing? | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/delta-sharing/"
     },
     {
@@ -777,7 +777,7 @@
       ],
       "claims": [],
       "contentHash": "bc9771a264e9fa447199bccc9efd808754f87aeef50a95a5056aabad0e3e7d0e",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -785,7 +785,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "What is Delta Lake in Databricks? | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/delta/"
     },
     {
@@ -812,8 +812,8 @@
         }
       ],
       "claims": [],
-      "contentHash": "783f83fec0a6c4c42944e82c5f1b88169e17e28c083e7fe3c22ed6283934c66f",
-      "fetchedAt": "2026-10-29",
+      "contentHash": "306364db9780709dd67ab6eb1b534e6f8050d26d582677c2717f6a46fd1d3ec2",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -821,7 +821,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Best practices: Delta Lake | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/delta/best-practices"
     },
     {
@@ -848,8 +848,8 @@
         }
       ],
       "claims": [],
-      "contentHash": "9a8676f5470f107d7188196211d01a1f4cd71ba56406cbc3d2f3186708a3ddc6",
-      "fetchedAt": "2026-10-29",
+      "contentHash": "c195b29af3bd3af5766686955b7f25f3c7a12634327183c6db591b9aa3cc627c",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -857,7 +857,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Use liquid clustering for tables | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/delta/clustering"
     },
     {
@@ -884,8 +884,8 @@
         }
       ],
       "claims": [],
-      "contentHash": "c9e531900b685a6bc1026f6944fec6a79b7632238156e7f25462e71ed30b4d02",
-      "fetchedAt": "2026-10-29",
+      "contentHash": "99620631c327b7e8b6a4969fbba4c18fbfa1082757c95800dff168ef2e526cc8",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -893,7 +893,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Deletion vectors in Databricks | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/delta/deletion-vectors"
     },
     {
@@ -921,7 +921,7 @@
       ],
       "claims": [],
       "contentHash": "60c83b08ca8cfbe81f4b940dc145f1b2deb23d1afbd3602f1e2f811aaf2943f8",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -929,7 +929,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Use change data feed on Databricks | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/delta/delta-change-data-feed"
     },
     {
@@ -957,7 +957,7 @@
       ],
       "claims": [],
       "contentHash": "e269ec12c5a6469cb66cb77e1899e0a4304df3bddfcb16aba6e5abc4ff9464e6",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -965,7 +965,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Delta Lake generated columns | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/delta/generated-columns"
     },
     {
@@ -993,7 +993,7 @@
       ],
       "claims": [],
       "contentHash": "700db147d2b3df99bae3de39b638e2eca6147a159fb90af4ff15f7c3db6e92f8",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1001,7 +1001,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Work with table history | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/delta/history"
     },
     {
@@ -1029,7 +1029,7 @@
       ],
       "claims": [],
       "contentHash": "f616d852fd85846320411807af21c5d7a251cf8fc42d38efce40ced794527e50",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1037,7 +1037,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Upsert into a Delta Lake table using merge | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/delta/merge"
     },
     {
@@ -1065,7 +1065,7 @@
       ],
       "claims": [],
       "contentHash": "a6d9caee754b3a522bb1cbd58b1e7b7eb4a1cd04beea45efac0712aad69e0993",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1073,7 +1073,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Optimize data file layout | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/delta/optimize"
     },
     {
@@ -1101,7 +1101,7 @@
       ],
       "claims": [],
       "contentHash": "5897bbbd5ca6c184dda2663efffe9193732b3b69a6459f471beaba732fb0a73c",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1109,7 +1109,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Selectively overwrite data with Delta Lake | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/delta/selective-overwrite"
     },
     {
@@ -1136,8 +1136,8 @@
         }
       ],
       "claims": [],
-      "contentHash": "f801b6e26b6a44f43d9db5ccf086e404a19b9ddafc669b8afd2016f87785f7ad",
-      "fetchedAt": "2026-10-29",
+      "contentHash": "23eaa1346bf7770c7a63ec995975c7e7c99e8c456cc736509a0507bf6044aeb1",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1145,7 +1145,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Table properties reference | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/delta/table-properties"
     },
     {
@@ -1173,7 +1173,7 @@
       ],
       "claims": [],
       "contentHash": "31ecaced54f79bee465a955c780d4f17d4515b1fd6ecad2ecce714cacfe80c41",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1181,7 +1181,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Tutorial: Create and manage Delta Lake tables | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/delta/tutorial"
     },
     {
@@ -1209,7 +1209,7 @@
       ],
       "claims": [],
       "contentHash": "930aeaf58539d90b92b0b72209f580b608145f3bffd5927e6ddb0dc3ee0dab9e",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1217,7 +1217,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Update table schemas with schema evolution | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/delta/update-schema"
     },
     {
@@ -1245,7 +1245,7 @@
       ],
       "claims": [],
       "contentHash": "126418729328c43e1e8a8628ae9c3681ef5d59b3c378f294a99c083323f05c28",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1253,7 +1253,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Remove unused data files with vacuum | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/delta/vacuum"
     },
     {
@@ -1281,7 +1281,7 @@
       ],
       "claims": [],
       "contentHash": "5d290db7242657b24b7a8b1347872fe27717cb96949f47fff7947f244c48a0b9",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1289,7 +1289,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "What are Declarative Automation Bundles? | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/"
     },
     {
@@ -1317,7 +1317,7 @@
       ],
       "claims": [],
       "contentHash": "44f33ad4f41f67c0f5d895f32baf9ad9f3d80a27caff783da424acb38441a7b4",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1325,7 +1325,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Declarative Automation Bundles deployment modes | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/deployment-modes"
     },
     {
@@ -1353,7 +1353,7 @@
       ],
       "claims": [],
       "contentHash": "740a8d2c375ada860c059a5eec812532d1edb0310b28bb4b232bd2910c62824d",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1361,7 +1361,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Declarative Automation Bundles configuration | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/settings"
     },
     {
@@ -1389,7 +1389,7 @@
       ],
       "claims": [],
       "contentHash": "60e035e918bf08015a9baeb391c6aae949cb018fc4601215c7a604fb46b5dffb",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1397,7 +1397,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Develop Declarative Automation Bundles | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/work-tasks"
     },
     {
@@ -1425,7 +1425,7 @@
       ],
       "claims": [],
       "contentHash": "01cf6b5caae38c8cad874cb2adb5ebb791b8ef5947bc9f3c46f294d2926532e3",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1433,7 +1433,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "CI/CD on Databricks | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/dev-tools/ci-cd/"
     },
     {
@@ -1461,7 +1461,7 @@
       ],
       "claims": [],
       "contentHash": "da71433b559fe83e822357b43c50b0336e3c58665d0db78bed83033838985169",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1469,7 +1469,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Databricks CLI | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/dev-tools/cli/"
     },
     {
@@ -1497,7 +1497,7 @@
       ],
       "claims": [],
       "contentHash": "e86f8f4b66a684dc5cdf3b4661ca1f2baeb431843ab3ed9089bac4dba3f78ff4",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1505,7 +1505,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Spark Declarative Pipelines on Lakeflow | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/dlt/"
     },
     {
@@ -1533,7 +1533,7 @@
       ],
       "claims": [],
       "contentHash": "08654298f8b1471bcb77b96aeb299c970765e9f07e2c8560a681219cdafe7718",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1541,7 +1541,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "The AUTO CDC APIs: Simplify change data capture with pipelines | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/dlt/cdc"
     },
     {
@@ -1569,7 +1569,7 @@
       ],
       "claims": [],
       "contentHash": "99f4b503a81e18735486e70d6ff0642e9b9b3433e547a833e66bc1b5f8f21a5f",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1577,7 +1577,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Manage data quality with pipeline expectations | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/dlt/expectations"
     },
     {
@@ -1605,7 +1605,7 @@
       ],
       "claims": [],
       "contentHash": "e9becc3b298ff61f489f80eee83a2d45bc198d2374ff9e34fe077069bd190085",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1613,7 +1613,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Load and process data incrementally with Lakeflow pipeline flows | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/dlt/flows"
     },
     {
@@ -1641,7 +1641,7 @@
       ],
       "claims": [],
       "contentHash": "a424db9e9298ccd36019c9afae3aa3963439b56203e90073812416f367b2160f",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1649,7 +1649,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Materialized views | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/dlt/materialized-views"
     },
     {
@@ -1677,7 +1677,7 @@
       ],
       "claims": [],
       "contentHash": "551c86090821b931b6057eb17757aba16a243c1f95c9c0051eae73723964218b",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1685,7 +1685,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Triggered vs. continuous pipeline mode | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/dlt/pipeline-mode"
     },
     {
@@ -1713,7 +1713,7 @@
       ],
       "claims": [],
       "contentHash": "aeda55e3f8151b147513db2b92e17bc13c2f164af0b396b6b58957f153d1b9cc",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1721,7 +1721,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Streaming tables | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/dlt/streaming-tables"
     },
     {
@@ -1749,7 +1749,7 @@
       ],
       "claims": [],
       "contentHash": "1d57daa7fb05a5a83a4d6839e49c8914d59707a5e4abdd941cd39d770dc2e1e4",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1757,7 +1757,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Use Unity Catalog with pipelines | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/dlt/unity-catalog"
     },
     {
@@ -1785,7 +1785,7 @@
       ],
       "claims": [],
       "contentHash": "955e29922e0372ed12d01e69455b4a833abb8bc37b611f8ed3b879d3092aa95d",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1793,7 +1793,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Run a pipeline update | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/dlt/updates"
     },
     {
@@ -1820,8 +1820,8 @@
         }
       ],
       "claims": [],
-      "contentHash": "f52f1892abebfe0f56cb1a811d4ccad6995425bf03ca6846f96ca22731767fb8",
-      "fetchedAt": "2026-10-29",
+      "contentHash": "17fddecd5ca90be222afe611b4aacf1baa36436e9f78bb5d6407c9ed0a35e602",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1829,7 +1829,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Databricks components | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/getting-started/concepts"
     },
     {
@@ -1857,7 +1857,7 @@
       ],
       "claims": [],
       "contentHash": "15957da453c0707d8a54ef8d6915298dbf92e2d45b35570b98434fc088fe202d",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1865,7 +1865,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Ingest with SQL and Spark APIs | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/ingestion/"
     },
     {
@@ -1893,7 +1893,7 @@
       ],
       "claims": [],
       "contentHash": "d7006c9201ba6a9fad04cb8b02c01b9667c8b5bb67046e298a057b9ff34e4242",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1901,7 +1901,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "What is Auto Loader? | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/"
     },
     {
@@ -1929,7 +1929,7 @@
       ],
       "claims": [],
       "contentHash": "7bf485a478a84aad89c119a3d7f9a23123aeb9bbce3e10f167ec31a8431a34e1",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1937,7 +1937,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Compare Auto Loader file detection modes | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/file-detection-modes"
     },
     {
@@ -1965,7 +1965,7 @@
       ],
       "claims": [],
       "contentHash": "fc2689fb48f767ba82a6c7f2f056fb3abc541d641ae6e9c7a0b6d0d9d30c0ac4",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -1973,7 +1973,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Spark API options reference | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/options"
     },
     {
@@ -2001,7 +2001,7 @@
       ],
       "claims": [],
       "contentHash": "ffb24041b5a2c24347c2c7a4f98809378edac596dea89e57fb493dc14fdda70e",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2009,7 +2009,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Configure schema inference and evolution in Auto Loader | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/schema"
     },
     {
@@ -2037,7 +2037,7 @@
       ],
       "claims": [],
       "contentHash": "b7b94145ce9ce03aaaf51d344f8708bdb44fdc4d51e69039726bc8db5d995066",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2045,7 +2045,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Get started using COPY INTO to load data | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/copy-into/"
     },
     {
@@ -2073,7 +2073,7 @@
       ],
       "claims": [],
       "contentHash": "f640225cef366fc13e80a12fd6bd1a13ddcf58d2e5ae46564081d249d2caa9c7",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2081,7 +2081,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Work with files in Unity Catalog volumes | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/ingestion/file-upload/"
     },
     {
@@ -2108,8 +2108,8 @@
         }
       ],
       "claims": [],
-      "contentHash": "0f66c52643e0bbe59e7bf1a70fdc0a9f94a611e3c33d8fc6285bd7b6d681c322",
-      "fetchedAt": "2026-10-29",
+      "contentHash": "2aacc24676c62b4bea19311f8571c04185875c6285e574b44f3ab6b6cc79ebf2",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2117,7 +2117,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Lakeflow Connect connector concepts | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/ingestion/lakeflow-connect/"
     },
     {
@@ -2145,7 +2145,7 @@
       ],
       "claims": [],
       "contentHash": "6a87ad50c6e37a14cfcb157f50f85be38e154a32d8e9ceb545f082514017d7c0",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2153,7 +2153,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Lakeflow Jobs | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/jobs/"
     },
     {
@@ -2181,7 +2181,7 @@
       ],
       "claims": [],
       "contentHash": "2452e49ab71967202bf3057bf8c80fcbcffb404a5fa39bea07440414b3a87973",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2189,7 +2189,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Configure task dependencies | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/jobs/conditional-tasks"
     },
     {
@@ -2217,7 +2217,7 @@
       ],
       "claims": [],
       "contentHash": "ac3147c666f0015eecaff5bfb925e8671b06d6869b6dd65d708472063943f82b",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2225,7 +2225,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Configure and edit tasks in Lakeflow Jobs | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/jobs/configure-task"
     },
     {
@@ -2252,8 +2252,8 @@
         }
       ],
       "claims": [],
-      "contentHash": "6c67b8f97651fcbaa8f1e693d4f9fe13fc09649e3f44547fa5a07ea2ede9bbc5",
-      "fetchedAt": "2026-10-29",
+      "contentHash": "f2ea4cb82fb981e3e31894770f99c431b7663898df57383cf6fada411fe25aa7",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2261,7 +2261,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Run jobs continuously | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/jobs/continuous"
     },
     {
@@ -2289,7 +2289,7 @@
       ],
       "claims": [],
       "contentHash": "828f17ea8778a8c01466c58a9dfedd2661777e5adee76b9a582afc4b353d3289",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2297,7 +2297,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Trigger jobs when new files arrive | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/jobs/file-arrival-triggers"
     },
     {
@@ -2325,7 +2325,7 @@
       ],
       "claims": [],
       "contentHash": "aad3e10aec700900db42351d6e97c4ed985c03a3aa9a3e09a888fedd8c5a1ec9",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2333,7 +2333,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Use a For each task to run another task in a loop | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/jobs/for-each"
     },
     {
@@ -2361,7 +2361,7 @@
       ],
       "claims": [],
       "contentHash": "4f1687e7fa246e9618a88614e81540dc5560786f265e1ed0d67a2a4a6c683e06",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2369,7 +2369,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Monitor Lakeflow Jobs | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/jobs/monitor"
     },
     {
@@ -2397,7 +2397,7 @@
       ],
       "claims": [],
       "contentHash": "5e999b4eaabc7911f44a3df1b0d2e9eee966cf71e6ab7d0cacfdadf3e120123e",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2405,7 +2405,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Add notifications on a job | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/jobs/notifications"
     },
     {
@@ -2433,7 +2433,7 @@
       ],
       "claims": [],
       "contentHash": "8c74988eae6a28e3e11212e0dc6cdaa1f0999e694ad4e7463afb55c1d003f952",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2441,7 +2441,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Parameterize jobs | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/jobs/parameters"
     },
     {
@@ -2469,7 +2469,7 @@
       ],
       "claims": [],
       "contentHash": "1adf58b008a6a555206c49335adb5f286995e22b0c1e90e601df7e2a9468424b",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2477,7 +2477,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Troubleshoot and repair job failures | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/jobs/repair-job-failures"
     },
     {
@@ -2505,7 +2505,7 @@
       ],
       "claims": [],
       "contentHash": "2452e49ab71967202bf3057bf8c80fcbcffb404a5fa39bea07440414b3a87973",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2513,7 +2513,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Configure task dependencies | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/jobs/run-if"
     },
     {
@@ -2540,8 +2540,8 @@
         }
       ],
       "claims": [],
-      "contentHash": "c83439dd7b7efd96f0efaf687155f1e9b6717ddd6da635853a7d33e1195bf723",
-      "fetchedAt": "2026-10-29",
+      "contentHash": "538f8b2f67c7772b7a15290ac951ae683d6615271ccd092e84784bfa152ddf99",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2549,7 +2549,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Automate jobs with schedules and triggers | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/jobs/schedule-jobs"
     },
     {
@@ -2577,7 +2577,7 @@
       ],
       "claims": [],
       "contentHash": "8b56c147c4894b1abe14cf6c919c07ede892e04cc8686b351c9af9103c1abfe2",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2585,7 +2585,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Use task values to pass information between tasks | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/jobs/task-values"
     },
     {
@@ -2612,8 +2612,8 @@
         }
       ],
       "claims": [],
-      "contentHash": "04aa6251e701120c5e7c1286921062673357b79f8c5310247715a92c5139f08b",
-      "fetchedAt": "2026-10-29",
+      "contentHash": "1e347f99bb74b9a3b05ab2d7260a3335a348796ee14b05e5ba4724d7674fa91c",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2621,7 +2621,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "What is a data lakehouse? | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/lakehouse/"
     },
     {
@@ -2648,8 +2648,8 @@
         }
       ],
       "claims": [],
-      "contentHash": "7039e50b7e483886bf1045656ad7da369c4968db7bee569c28046c30c25aa737",
-      "fetchedAt": "2026-10-29",
+      "contentHash": "a75b5c362a0ba3622c2dc6d3a153b7069ed0fd9e742d219da9696f6727cc0ff7",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2657,7 +2657,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "What is the medallion lakehouse architecture? | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/lakehouse/medallion"
     },
     {
@@ -2685,7 +2685,7 @@
       ],
       "claims": [],
       "contentHash": "883e4f0e730c52d2324ea9890d2322602dd5c2423d08bb625f35b85d34109abf",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2693,7 +2693,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Unit testing for Databricks notebooks | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/notebooks/testing"
     },
     {
@@ -2721,7 +2721,7 @@
       ],
       "claims": [],
       "contentHash": "64ee7a3015ade3c5ce68f55983cfba360e7d096c8846990f2058c858bd4eb3f5",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2729,7 +2729,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Optimization recommendations on Databricks | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/optimizations/"
     },
     {
@@ -2757,7 +2757,7 @@
       ],
       "claims": [],
       "contentHash": "deafcefd383ddb9cbb89e3f9308aa30193b3675f7c656476d3382c936f46454d",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2765,7 +2765,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Adaptive query execution | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/optimizations/aqe"
     },
     {
@@ -2793,7 +2793,7 @@
       ],
       "claims": [],
       "contentHash": "4dbd49551f77c6fc4441046d0da779d7622bb600f62b1c05c93f2ceb03e1ee7c",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2801,7 +2801,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Optimize performance with caching on Databricks | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/optimizations/disk-cache"
     },
     {
@@ -2829,7 +2829,7 @@
       ],
       "claims": [],
       "contentHash": "3f2fefb4085507c11d03a6529507766e23807726407ed87e08dcb7b02a3d2fd0",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2837,7 +2837,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Predictive optimization for Unity Catalog managed tables | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/optimizations/predictive-optimization"
     },
     {
@@ -2865,7 +2865,7 @@
       ],
       "claims": [],
       "contentHash": "fc341e729d930e65c07ae75f7040ff91418165907de4057ea10a6c4b66d1f9dc",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2873,7 +2873,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Diagnose cost and performance issues using the Spark UI | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/optimizations/spark-ui-guide/"
     },
     {
@@ -2901,7 +2901,7 @@
       ],
       "claims": [],
       "contentHash": "e7933a19e38b110bc1f10f346c136ce4a58b28cf30b9362a91c0b59c02b6f016",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2909,7 +2909,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Connect to external databases and catalogs | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/query-federation/"
     },
     {
@@ -2937,7 +2937,7 @@
       ],
       "claims": [],
       "contentHash": "5d01d7ccb32f69d9c43b2f55a5cf5c96d745d1cdea2f1f8d8993a96effb44b20",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2945,7 +2945,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Databricks Git folders | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/repos/"
     },
     {
@@ -2973,7 +2973,7 @@
       ],
       "claims": [],
       "contentHash": "e77ae03cbd84fb08d6768d9fff2b3b8c73bffb0b01404fb58661d3f262d60304",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -2981,7 +2981,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Create and manage Git folders | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/repos/git-operations-with-repos"
     },
     {
@@ -3009,7 +3009,7 @@
       ],
       "claims": [],
       "contentHash": "6d89461fbca2fd560744acaad3e0a5f56d08133b99f682a5d05ffe8be4ca5f10",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3017,7 +3017,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Secret management | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/security/secrets/"
     },
     {
@@ -3045,7 +3045,7 @@
       ],
       "claims": [],
       "contentHash": "2c79033783b75285ef12736a7537447b0cf18011aa6dc1fd4052223e217a5768",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3053,7 +3053,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Apache Spark overview | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/spark/"
     },
     {
@@ -3081,7 +3081,7 @@
       ],
       "claims": [],
       "contentHash": "e75d3ccdb4865f7a9b06404b5f17592dc7b0c15fd0ca4f5394134df0ab5c5f9e",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3089,7 +3089,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "explode table-valued generator function | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/sql/language-manual/functions/explode"
     },
     {
@@ -3117,7 +3117,7 @@
       ],
       "claims": [],
       "contentHash": "cd1cfbca3ba3138dcc3daea91c87f8ea84fec050982c0f0cefef33a1d02a1b86",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3125,7 +3125,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Structured Streaming concepts | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/structured-streaming/"
     },
     {
@@ -3153,7 +3153,7 @@
       ],
       "claims": [],
       "contentHash": "a24361591379bab755984a9b02ba3c35802506f190c6220c9ce58d6df695ce38",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3161,7 +3161,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Structured Streaming checkpoints | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/structured-streaming/checkpoints"
     },
     {
@@ -3189,7 +3189,7 @@
       ],
       "claims": [],
       "contentHash": "cd1cfbca3ba3138dcc3daea91c87f8ea84fec050982c0f0cefef33a1d02a1b86",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3197,7 +3197,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Structured Streaming concepts | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/structured-streaming/concepts"
     },
     {
@@ -3225,7 +3225,7 @@
       ],
       "claims": [],
       "contentHash": "3cb0f2d464f02b019bbbb5de9a978c86d9e689d069b082e6673d1a7e5cd2cd8b",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3233,7 +3233,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Delta Lake table streaming reads and writes | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/structured-streaming/delta-lake"
     },
     {
@@ -3261,7 +3261,7 @@
       ],
       "claims": [],
       "contentHash": "0eba607c5ab5c034335c2b71dcbb0b3166c90472dceca91adee90e4004617551",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3269,7 +3269,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Configure Structured Streaming trigger intervals | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/structured-streaming/triggers"
     },
     {
@@ -3297,7 +3297,7 @@
       ],
       "claims": [],
       "contentHash": "c7cc0b2cef4810da445cfd9e4eec81006d39bd4a3a7b0c70af43918c21d8a6d4",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3305,7 +3305,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Apply watermarks to control data processing thresholds | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/structured-streaming/watermarks"
     },
     {
@@ -3333,7 +3333,7 @@
       ],
       "claims": [],
       "contentHash": "03c09e36e57f0cb0b63b4fe725febb204a86d3bd62ea764df1ccecd926ae32ce",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3341,7 +3341,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Work with external tables | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/tables/external"
     },
     {
@@ -3368,8 +3368,8 @@
         }
       ],
       "claims": [],
-      "contentHash": "aa46bf592ba0e11d0d30f247deabbd84ce7ea7093c9cb1a2b9dcc904fb317497",
-      "fetchedAt": "2026-10-29",
+      "contentHash": "bb8a2b01abbd0e1a74b9125baaedd78e9f3194f4f2d0a1ceb57cf5ee4ada562d",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3377,7 +3377,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "Unity Catalog managed tables for Delta Lake and Apache Iceberg | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/tables/managed"
     },
     {
@@ -3405,7 +3405,7 @@
       ],
       "claims": [],
       "contentHash": "1719d6b04c98c2f46a282889c7910916495bfe94172de5b3ef6d6c6bdc0ed3b5",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3413,7 +3413,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "What is a view? | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/views/"
     },
     {
@@ -3441,7 +3441,7 @@
       ],
       "claims": [],
       "contentHash": "aaa651c164a208b666d7476ac76b908fbe060a8d0352557df4a6eea8403c40b3",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "official-doc",
       "status": "active",
       "target": {
@@ -3449,7 +3449,7 @@
         "examCode": "DBX-DEA-2605"
       },
       "title": "What are Unity Catalog volumes? | Databricks on AWS",
-      "updatedAt": "2026-10-28",
+      "updatedAt": "2026-10-30",
       "url": "https://docs.databricks.com/aws/en/volumes/"
     },
     {
@@ -3513,7 +3513,7 @@
       ],
       "claims": [],
       "contentHash": "9714ef0b0625324e88826ef7794a01dbf3478ef04baa75a12e70dd342eb50d7a",
-      "fetchedAt": "2026-10-29",
+      "fetchedAt": "2026-11-01",
       "kind": "exam-guide",
       "status": "active",
       "target": {

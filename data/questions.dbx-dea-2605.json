@@ -1048,6 +1048,55 @@
       "correctAnswers": ["A"]
     },
     {
+      "questionId": "DEA-0032",
+      "examCode": "DBX-DEA-2605",
+      "domain": "domain3",
+      "difficulty": "hard",
+      "questionType": "single",
+      "questionText": "あるデータエンジニアは、到着から数秒以内に結果を出す低遅延のストリーミング処理を運用しています。入力は無限のストリームで、そのまま処理しています。最近、メモリの圧迫が原因で、パイプラインが失敗することがあります。\n\n低遅延を保ったまま、この失敗を避けるために、どの対処を取るべきですか。",
+      "explanation": "## 問われている要件\n\n低遅延の処理を保ったまま、無限のストリームが引き起こすメモリ圧迫での失敗を避ける対処を選ぶ問題です。\n\n## 正解の決め手\n\n低遅延の処理は、有界のストリームが前提で、透かしがあれば、無限のストリームも有界にできます。透かしがない無限のストリームは、メモリ圧迫で失敗することがあります。そのため、入力のストリームに透かしを設定します。\n\n## 解くための考え方\n\n失敗の原因は、処理対象のストリームが有界になっていないことです。インフラの規模や、完全な更新の扱いを変えても、ストリームは有界になりません。\n\n## まとめ\n\n低遅延を保ちながらメモリ圧迫を避けるには、透かしでストリームを有界にします。\n\n## 他の選択肢が誤りである理由\n\nパイプラインの実行のたびに、完全な更新を行うように設定する\n\n完全な更新は、必要なときだけ実行することが推奨されています。毎回実行しても、ストリームが有界になるわけではなく、メモリの圧迫による失敗の原因は残ります。\n\n`pipelines.reset.allowed` を `false` にして、完全な更新を実行させない\n\nこのプロパティを `false` にすると、完全な更新が実行されなくなります。しかし、完全な更新を止めても、ストリームが有界になるわけではなく、メモリの圧迫による失敗の原因は残ります。\n\nストリームの設定は変えず、Lakeflow pipelines に移してインフラの配備と拡張を自動化する\n\nLakeflow pipelines は、インフラの配備と拡張を自動で行い、ETL を簡単にします。しかし、ストリームが無限のままで透かしで有界にされていなければ、メモリの圧迫で失敗することがあり、低遅延の処理の前提も満たせません。",
+      "references": [
+        {
+          "url": "https://docs.databricks.com/aws/en/delta/",
+          "title": "What is Delta Lake in Databricks? | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dlt/streaming-tables",
+          "title": "Streaming tables | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dlt/updates",
+          "title": "Run a pipeline update | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/views/",
+          "title": "What is a view? | Databricks on AWS"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "パイプラインの実行のたびに、完全な更新を行うように設定する",
+          "explanation": "完全な更新は必要なときだけ実行することが推奨されており、毎回行う設定は推奨と逆です。毎回行っても、ストリームは有界にならず、失敗の原因は残ります。"
+        },
+        {
+          "key": "B",
+          "text": "`pipelines.reset.allowed` を `false` にして、完全な更新を実行させない",
+          "explanation": "`pipelines.reset.allowed` を `false` にすると完全な更新が実行されなくなるだけです。ストリームを有界にする設定ではなく、メモリ圧迫の原因は解消されません。"
+        },
+        {
+          "key": "C",
+          "text": "ストリームの設定は変えず、Lakeflow pipelines に移してインフラの配備と拡張を自動化する",
+          "explanation": "Lakeflow pipelines はインフラの配備と拡張を自動化する仕組みです。透かしのない無限のストリームがメモリ圧迫で失敗する問題は、これだけでは解消されません。"
+        },
+        {
+          "key": "D",
+          "text": "入力のストリームに透かしを設定し、処理の対象を有界の範囲に収める"
+        }
+      ],
+      "correctAnswers": ["D"]
+    },
+    {
       "questionId": "DEA-0033",
       "examCode": "DBX-DEA-2605",
       "domain": "domain3",
@@ -2509,6 +2558,43 @@
       "correctAnswers": ["B"]
     },
     {
+      "questionId": "DEA-0073",
+      "examCode": "DBX-DEA-2605",
+      "domain": "domain3",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "あるデータエンジニアは、1 つのパイプラインでマテリアライズドビューとストリーミングテーブルの両方を定義しています。現在の更新方式とは別の方式に切り替えたいと考えていますが、表の種類によっては切り替え後に更新できなくなるのではないかと心配しています。\n\n更新方式と表の種類の関係として、正しいものはどれですか。",
+      "explanation": "## 問われている要件\n\nパイプラインの更新方式を切り替えるときに、マテリアライズドビューとストリーミングテーブルという表の種類が、制約になるかどうかを答える問題です。\n\n## 正解の決め手\n\nパイプラインの更新方式は、計算する表の種類とは関係がありません。マテリアライズドビューも、ストリーミングテーブルも、どちらの方式でも更新できます。そのため、表の種類を理由に切り替えをあきらめる必要はありません。\n\n## 他の選択肢が誤りである理由\n\nストリーミングテーブルは一方の方式でしか更新できず、マテリアライズドビューは両方で更新できる\n\nストリーミングテーブルだけを一方の方式に限る説明は誤りです。ストリーミングテーブルも、どちらの方式でも更新できます。\n\nマテリアライズドビューは一方の方式でしか更新できず、ストリーミングテーブルは両方で更新できる\n\nマテリアライズドビューだけを一方の方式に限る説明も誤りです。制限される表の種類が入れ替わっただけで、方式が表の種類に左右されないという点を見落としています。\n\n更新方式は表の種類に合わせて自動で決まり、パイプラインの利用者が選ぶことはできない\n\n方式は表の種類とは関係がなく、表の種類に合わせて決まる仕組みではありません。どちらの種類の表も、どちらの方式でも更新できます。",
+      "references": [
+        {
+          "url": "https://docs.databricks.com/aws/en/dlt/pipeline-mode",
+          "title": "Triggered vs. continuous pipeline mode | Databricks on AWS"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "ストリーミングテーブルは一方の方式でしか更新できず、マテリアライズドビューは両方で更新できる",
+          "explanation": "ストリーミングテーブルだけが一方の方式に限られるという説明は誤りです。更新方式は表の種類と関係がなく、ストリーミングテーブルもどちらの方式でも更新できます。"
+        },
+        {
+          "key": "B",
+          "text": "マテリアライズドビューは一方の方式でしか更新できず、ストリーミングテーブルは両方で更新できる",
+          "explanation": "マテリアライズドビューだけが一方の方式に限られるという説明は誤りです。制限される側を入れ替えただけで、方式が表の種類に左右されない点を見落としています。"
+        },
+        {
+          "key": "C",
+          "text": "更新方式は表の種類と関係なく、どちらの種類の表も両方の方式で更新できる"
+        },
+        {
+          "key": "D",
+          "text": "更新方式は表の種類に合わせて自動で決まり、パイプラインの利用者が選ぶことはできない",
+          "explanation": "更新方式は表の種類とは関係がなく、表の種類に合わせて自動で決まる仕組みではありません。どちらの種類の表も、どちらの方式でも更新できます。"
+        }
+      ],
+      "correctAnswers": ["C"]
+    },
+    {
       "questionId": "DEA-0074",
       "examCode": "DBX-DEA-2605",
       "domain": "domain2",
@@ -2622,6 +2708,47 @@
         }
       ],
       "correctAnswers": ["B"]
+    },
+    {
+      "questionId": "DEA-0078",
+      "examCode": "DBX-DEA-2605",
+      "domain": "domain2",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "ジュニアデータエンジニアは、クラウドストレージのディレクトリに届くファイルを、Auto Loader で増分的に取り込むことにしました。このディレクトリには、ストリームを開始する前から多数のファイルが置かれています。開始前のファイルの扱いを、取り込みの方針に合わせて変えたいと考えています。\n\nAuto Loader での既存ファイルの扱いについて、正しい説明はどれですか。",
+      "explanation": "## 問われている要件\nAuto Loader でディレクトリを取り込むとき、ストリームの開始前から置かれているファイルをどう扱えるかを問う問題です。\n\n## 正解の決め手\nAuto Loader の基本は、クラウドストレージへ新しく届いたファイルを、効率よく増分で処理することです。そのうえで、ディレクトリに既にあるファイルを処理の対象に含めるかどうかを、利用者が選べます。方針に合わせて扱いを変えたいという要件は、この選択で満たせます。\n\n## 他の選択肢が誤りである理由\n既存ファイルを対象に含めると、新しいファイルも増分ではなく毎回全体を読み直す\n\n新しいファイルを増分的に処理することは Auto Loader の基本の動作です。既存ファイルを含めるかどうかは別の選択で、含めても増分処理が全体の読み直しに変わるわけではありません。\n\n新しく届くファイルは、既存ファイルを対象に含める場合だけ増分で処理される\n\n新しく届くファイルの増分処理は、既存ファイルを含めるかどうかに左右されません。既存ファイルの扱いは、これとは独立に選べます。\n\n既存ファイルは増分処理の対象外のため、別のバッチ処理で先に取り込む必要がある\n\n既存ファイルは、対象に含めると選べば同じ処理で扱えます。別のバッチ処理で先に取り込むことは、必須の手順ではありません。",
+      "references": [
+        {
+          "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/",
+          "title": "What is Auto Loader? | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/structured-streaming/concepts",
+          "title": "Structured Streaming concepts | Databricks on AWS"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "ディレクトリに既にあるファイルも、処理の対象に含めるかどうかを選択できる"
+        },
+        {
+          "key": "B",
+          "text": "既存ファイルを対象に含めると、新しいファイルも増分ではなく毎回全体を読み直す",
+          "explanation": "Auto Loader は新しいファイルを増分的かつ効率的に処理します。既存ファイルを含めても、毎回全体を読み直す動作には変わりません。"
+        },
+        {
+          "key": "C",
+          "text": "新しく届くファイルは、既存ファイルを対象に含める場合だけ増分で処理される",
+          "explanation": "新しく届くファイルの増分処理は、既存ファイルを含めるかどうかに関係なく Auto Loader の基本の動作です。条件が逆になっています。"
+        },
+        {
+          "key": "D",
+          "text": "既存ファイルは増分処理の対象外のため、別のバッチ処理で先に取り込む必要がある",
+          "explanation": "既存ファイルは、処理の対象に含めるかどうかを選べます。含めれば同じ処理で扱えるので、先にバッチ処理で取り込む必要はありません。"
+        }
+      ],
+      "correctAnswers": ["A"]
     },
     {
       "questionId": "DEA-0079",
@@ -6193,6 +6320,875 @@
         }
       ],
       "correctAnswers": ["C"]
+    },
+    {
+      "questionId": "DEA-0176",
+      "examCode": "DBX-DEA-2605",
+      "domain": "domain3",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "あるデータエンジニアは、顧客情報を持つ既存のテーブルに、毎日届く変更データを反映する必要があります。変更データには、既存の顧客の更新と、新規の顧客の追加が混在しています。\n\n1 回の操作で、一致する行は更新し、一致しない行は新しく追加するには、どの方法を使うべきでしょうか。",
+      "explanation": "## 問われている要件\n既存のテーブルに対して、更新と追加を 1 回の操作でまとめて行う方法を選ぶ問題です。\n\n## 正解の決め手\n既存のテーブルへの更新と追加は、`MERGE` でまとめて行います。ソースと一致した行は更新し、一致しない行は新しい行として追加できるので、要件にそのまま合います。\n\n## 他の選択肢が誤りである理由\n`MERGE` 文で、`WHEN NOT MATCHED BY SOURCE` 句だけを指定する\n\nこの句は、ソースに対応する行がないターゲット側の行を扱う句で、指定できる動作は delete と update です。新規の行を追加する動作ではないので、要件を満たしません。\n\nターゲットを、マテリアライズドビューとして定義し直す\n\nマテリアライズドビューは、パイプラインの起動時に自動で最新に保たれる仕組みです。既存のテーブルの行を、変更データと突き合わせて更新・追加する操作ではありません。\n\nターゲットに、check 制約と not null 制約を定義する\n\nこれらの制約は、データ品質のルールを適用・強制するためのものです。変更データを反映して行を更新・追加する機能はありません。",
+      "references": [
+        {
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/create-tables",
+          "title": "Databricks tables | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/delta/merge",
+          "title": "Upsert into a Delta Lake table using merge | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/delta/tutorial",
+          "title": "Tutorial: Create and manage Delta Lake tables | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dlt/materialized-views",
+          "title": "Materialized views | Databricks on AWS"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "`MERGE` 文で、`WHEN NOT MATCHED BY SOURCE` 句だけを指定する",
+          "explanation": "`WHEN NOT MATCHED BY SOURCE` 句で指定できる動作は delete と update です。ソースにない行を扱う句なので、新規の行の追加はできず、要件を一部しか満たしません。"
+        },
+        {
+          "key": "B",
+          "text": "`MERGE` 文で、一致する行は更新し、一致しない行は挿入する"
+        },
+        {
+          "key": "C",
+          "text": "ターゲットを、マテリアライズドビューとして定義し直す",
+          "explanation": "マテリアライズドビューは、パイプラインの起動で自動的に最新に保たれる仕組みです。既存のテーブルへ更新と追加をまとめて行う操作とは役割が異なります。"
+        },
+        {
+          "key": "D",
+          "text": "ターゲットに、check 制約と not null 制約を定義する",
+          "explanation": "check 制約と not null 制約は、データ品質のルールを適用・強制するためのものです。変更データを反映して、行を更新・追加する機能ではありません。"
+        }
+      ],
+      "correctAnswers": ["B"]
+    },
+    {
+      "questionId": "DEA-0177",
+      "examCode": "DBX-DEA-2605",
+      "domain": "domain2",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "あるデータエンジニアは、システムテーブルをストリーミングで読み込むジョブを運用しています。\n\nこのテーブルで削除が行われても、ジョブが中断されないようにしたいと考えています。どの設定を使うべきですか。",
+      "explanation": "## 問われている要件\nシステムテーブルをストリーミングで読むとき、テーブルでの削除によってジョブが止まらないようにする設定を選ぶ問題です。\n\n## 正解の決め手\n読み込みで `skipChangeCommits` を `true` にすると、テーブルでの削除によってジョブが中断されなくなります。\n\n## 他の選択肢が誤りである理由\n削除が起きるたびに、ジョブを手動で再実行する\n\n手作業での再実行は、削除のたびにジョブが中断されることを前提にしています。中断そのものを防ぐ設定ではないので、要件を満たしません。\n\nAvro のスキーマ変更時の動作を、再起動が要る設定にする\n\nこれは Avro のスキーマが変わったときに例外を出して再起動を求める設定で、削除への対応とは別物です。むしろジョブを止める方向に働きます。\n\nストリームのトリガー間隔を新しい値に変更して再開する\n\nトリガー間隔は処理を動かす頻度の設定です。変更しても、削除によってジョブが中断される動作は変わりません。",
+      "references": [
+        {
+          "url": "https://docs.databricks.com/aws/en/admin/system-tables/",
+          "title": "System tables reference | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/options",
+          "title": "Spark API options reference | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/structured-streaming/triggers",
+          "title": "Configure Structured Streaming trigger intervals | Databricks on AWS"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "削除が起きるたびに、ジョブを手動で再実行する",
+          "explanation": "手作業での再実行は、削除のたびにジョブが中断されることを前提にしています。中断そのものを防ぐ設定ではないので、要件を満たしません。"
+        },
+        {
+          "key": "B",
+          "text": "`skipChangeCommits` を `true` に設定する"
+        },
+        {
+          "key": "C",
+          "text": "Avro のスキーマ変更時の動作を、再起動が要る設定にする",
+          "explanation": "これは Avro のスキーマが変わったときに例外を出して再起動を求める設定で、削除への対応とは別物です。むしろジョブを止める方向に働きます。"
+        },
+        {
+          "key": "D",
+          "text": "ストリームのトリガー間隔を新しい値に変更して再開する",
+          "explanation": "トリガー間隔は処理を動かす頻度の設定です。変更しても、削除によってジョブが中断される動作は変わりません。"
+        }
+      ],
+      "correctAnswers": ["B"]
+    },
+    {
+      "questionId": "DEA-0178",
+      "examCode": "DBX-DEA-2605",
+      "domain": "domain4",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "あるデータエンジニアは、Lakeflow Jobs のジョブで、取り込みタスクの下流に、失敗を扱う Run if 条件を設定した通知タスクを置いています。\n\n実行中の取り込みタスクを手動でキャンセルしたとき、下流のタスクはどうなりますか。",
+      "explanation": "## 問われている要件\n\nタスク実行をキャンセルしたとき、下流のタスク、とくに失敗を扱う Run if 条件のタスクがどう扱われるかを問う設問です。\n\n## 正解の決め手\n\nキャンセルの影響は下流のタスクへ伝わります。ただし、失敗を扱う条件を設定したタスクは、キャンセルのあとでも実行されます。したがって、通知タスクは動きます。\n\n## 他の選択肢が誤りである理由\n\nキャンセルは下流へ伝わり、通知タスクを含む下流のタスクは実行されない\n\nキャンセルが下流へ伝わる点は正しいものの、失敗を扱う条件のタスクまで止まるという部分が逆です。このタスクはキャンセル後も実行されます。\n\nキャンセルは対象のタスクだけに影響し、下流のタスクは通常どおり動く\n\nキャンセルは対象のタスクにとどまらず、下流のタスクへ伝わります。下流が通常どおり動くという説明は誤りです。\n\nキャンセルした実行は、修復の実行をするまで、下流のタスクが保留になる\n\nキャンセルのあと下流のタスクが保留になる動作はありません。失敗を扱う条件のタスクは、修復の実行を待たずに実行されます。",
+      "references": [
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/conditional-tasks",
+          "title": "Configure task dependencies | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/run-if",
+          "title": "Configure task dependencies | Databricks on AWS"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "キャンセルは下流へ伝わるが、失敗を扱う条件の通知タスクは実行される"
+        },
+        {
+          "key": "B",
+          "text": "キャンセルは下流へ伝わり、通知タスクを含む下流のタスクは実行されない",
+          "explanation": "キャンセルが下流へ伝わる点は正しいものの、失敗を扱う条件のタスクまで止まるという部分が逆です。このタスクはキャンセル後も実行されます。"
+        },
+        {
+          "key": "C",
+          "text": "キャンセルは対象のタスクだけに影響し、下流のタスクは通常どおり動く",
+          "explanation": "キャンセルは対象のタスクにとどまらず、下流のタスクへ伝わります。下流が通常どおり動くという説明は誤りです。"
+        },
+        {
+          "key": "D",
+          "text": "キャンセルした実行は、修復の実行をするまで、下流のタスクが保留になる",
+          "explanation": "キャンセルのあと下流のタスクが保留になる動作はありません。失敗を扱う条件のタスクは、修復の実行を待たずに実行されます。"
+        }
+      ],
+      "correctAnswers": ["A"]
+    },
+    {
+      "questionId": "DEA-0179",
+      "examCode": "DBX-DEA-2605",
+      "domain": "domain6",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "あるデータエンジニアのチームは、Unity Catalog の管理テーブルを多数運用しており、OPTIMIZE・VACUUM・ANALYZE を実行するジョブをテーブルごとに組んで保守しています。\n\nこのチームは、保守のスケジュールを組む手間を最小限にしたいと考えています。どの方法を選ぶべきですか。",
+      "explanation": "## 問われている要件\n\nUnity Catalog の管理テーブルの保守を、スケジュールを組まずに済ませる方法を選ぶ問題です。\n\n## 正解の決め手\n\nUnity Catalog の管理テーブルでは、予測的な最適化が OPTIMIZE・VACUUM・ANALYZE を自動で実行し、コストベースオプティマイザーが使う統計も更新します。そのため、保守のスケジュールを組む必要がありません。管理テーブルでは、この機能の利用が推奨されています。\n\n## 他の選択肢が誤りである理由\n\n夜間に毎日 OPTIMIZE を実行するジョブを、テーブルごとに用意する\n\n夜間の毎日の実行は、手動で頻度を決める場合の出発点としては成り立ちます。ただし、ジョブを自分で組む手間が残るため、スケジュールを組みたくないという要件を満たしません。\n\n利用者がいない時間帯だけ OPTIMIZE を実行し、実行中は問い合わせを止める\n\nDelta Lake は読み取りにスナップショット分離を使うので、最適化の実行中も他の利用者やジョブはテーブルを問い合わせられます。問い合わせを止める前提が誤りで、スケジュールの手間も減りません。\n\n予測的な最適化を有効にし、ZORDER による並べ替えも自動で任せる\n\n予測的な最適化の OPTIMIZE は ZORDER を実行せず、Z-order のファイルも対象にしません。ZORDER まで自動で任せられるという説明は誤りです。",
+      "references": [
+        {
+          "url": "https://docs.databricks.com/aws/en/delta/best-practices",
+          "title": "Best practices: Delta Lake | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/delta/optimize",
+          "title": "Optimize data file layout | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/delta/tutorial",
+          "title": "Tutorial: Create and manage Delta Lake tables | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/optimizations/",
+          "title": "Optimization recommendations on Databricks | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/optimizations/predictive-optimization",
+          "title": "Predictive optimization for Unity Catalog managed tables | Databricks on AWS"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "夜間に毎日 OPTIMIZE を実行するジョブを、テーブルごとに用意する",
+          "explanation": "夜間の毎日の実行は手動運用の出発点としては成り立ちますが、ジョブを自分で組む手間が残ります。管理テーブルでは予測的な最適化がスケジュールなしで保守を自動で行います。"
+        },
+        {
+          "key": "B",
+          "text": "利用者がいない時間帯だけ OPTIMIZE を実行し、実行中は問い合わせを止める",
+          "explanation": "Delta Lake は読み取りにスナップショット分離を使うため、最適化の実行中もテーブルを問い合わせられます。問い合わせを止める必要はなく、スケジュールの手間も減りません。"
+        },
+        {
+          "key": "C",
+          "text": "予測的な最適化を有効にし、ZORDER による並べ替えも自動で任せる",
+          "explanation": "予測的な最適化の OPTIMIZE は ZORDER を実行せず、Z-order のファイルも対象にしません。自動の対象範囲を広く言いすぎた説明です。"
+        },
+        {
+          "key": "D",
+          "text": "予測的な最適化を有効にし、OPTIMIZE・VACUUM・ANALYZE の実行を任せる"
+        }
+      ],
+      "correctAnswers": ["D"]
+    },
+    {
+      "questionId": "DEA-0180",
+      "examCode": "DBX-DEA-2605",
+      "domain": "domain4",
+      "difficulty": "medium",
+      "questionType": "multiple",
+      "questionText": "あるデータエンジニアリングチームは、Lakeflow Jobs のジョブで、ノートブックのクエリ結果として得た複数の値のそれぞれに、同じ処理を適用したいと考えています。また、上流のタスクが失敗した場合にだけ、後続のタスクを動かす必要があります。\n\nこの 2 つの要件を満たすために使う設定はどれですか。(2 つ選択)",
+      "explanation": "## 問われている要件\n\n要件は 2 つあります。1 つは、ノートブックのクエリ結果の各値に同じ処理を繰り返すこと。もう 1 つは、上流タスクが失敗したときだけ後続のタスクを動かすことです。どちらも、ジョブの制御フローに関わる設定が答えになります。\n\n## 正解の決め手\n\nノートブックのクエリ結果はリストとして取り出せ、For each タスクで要素ごとに繰り返し処理できます。また、Run if dependencies 欄では、上流タスクの成功・失敗・完了に基づく条件を、タスクに加えられます。\n\n## 他の選択肢が誤りである理由\n\nジョブの Schedules & Triggers の欄に、トリガーを追加する\n\nトリガーは、ジョブをいつ自動で動かすかを決める設定です。繰り返しや、上流の失敗に応じた分岐は表せません。\n\nジョブ単位の通知を設定し、失敗ごとの通知を受け取る\n\n通知は、後続のタスクを動かす仕組みではありません。ジョブ単位の通知は、失敗したタスクの再試行では送られず、失敗ごとの通知が必要ならタスク単位で設定します。\n\nタスクの再試行の上限を、三回に設定する\n\n再試行は、失敗したタスクを同じ内容でやり直す設定です。後続のタスクを動かす条件にはなりません。また、三回という上限は、単一タスクの継続ジョブでの値です。",
+      "references": [
+        {
+          "url": "https://docs.databricks.com/aws/en/data-engineering/",
+          "title": "Data engineering with Databricks | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/continuous",
+          "title": "Run jobs continuously | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/notifications",
+          "title": "Add notifications on a job | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/parameters",
+          "title": "Parameterize jobs | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/run-if",
+          "title": "Configure task dependencies | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/schedule-jobs",
+          "title": "Automate jobs with schedules and triggers | Databricks on AWS"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "ジョブの Schedules & Triggers の欄に、トリガーを追加する",
+          "explanation": "トリガーは、ジョブをいつ自動で動かすかを決める設定です。繰り返しや、上流の失敗に応じた分岐は表せません。"
+        },
+        {
+          "key": "B",
+          "text": "クエリ結果をリストとして取り出し、For each タスクで繰り返す"
+        },
+        {
+          "key": "C",
+          "text": "ジョブ単位の通知を設定し、失敗ごとの通知を受け取る",
+          "explanation": "通知は、後続のタスクを動かす仕組みではありません。ジョブ単位の通知は、失敗したタスクの再試行では送られず、失敗ごとの通知が必要ならタスク単位で設定します。"
+        },
+        {
+          "key": "D",
+          "text": "タスクの再試行の上限を、三回に設定する",
+          "explanation": "再試行は、失敗したタスクを同じ内容でやり直す設定です。後続のタスクを動かす条件にはなりません。また、三回という上限は、単一タスクの継続ジョブでの値です。"
+        },
+        {
+          "key": "E",
+          "text": "Run if dependencies 欄で、上流タスクの失敗を条件にする"
+        }
+      ],
+      "correctAnswers": ["B", "E"]
+    },
+    {
+      "questionId": "DEA-0181",
+      "examCode": "DBX-DEA-2605",
+      "domain": "domain5",
+      "difficulty": "easy",
+      "questionType": "multiple",
+      "questionText": "Databricks CLI と Declarative Automation Bundles に関する説明として正しいものはどれですか。(2 つ選択)",
+      "explanation": "## 問われている要件\nバンドルと CLI の基本的な機能について、正しい説明を 2 つ選ぶ問題です。\n\n## 正解の決め手\n取り込みパイプラインは、バンドルを使って開発・ステージング・本番などの環境へデプロイできます。また、バンドルのリソースは `bundle run` コマンドで実行できます。この 2 点が正しい説明です。\n\n## 他の選択肢が誤りである理由\nCLI のバージョン 0.18 以下は、現行の推奨版として扱われる\n\nバージョン 0.18 以下は、現行の推奨版ではなく、レガシー版として扱われます。\n\ndefault: true の dev が設定されていれば、prod への操作でも対象の指定は不要である\n\ndefault: true の dev がある状態で prod を操作するときは、対象の指定が必要です。既定の対象に任せることはできません。\n\n本番モードの Git ブランチの検証は、デプロイ時にオプションを付けても上書きできない\n\n本番モードでは、現在のブランチが指定されたブランチと一致するかを検証しますが、指定は任意です。デプロイ時に `--force` を付ければ、この検証を上書きできます。\n\n## まとめ\nバンドルは環境ごとのデプロイを支え、`bundle run` で実行まで行えます。レガシー版の区分、対象の指定、本番モードのブランチ検証の扱いも、あわせて押さえておきましょう。",
+      "references": [
+        {
+          "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/deployment-modes",
+          "title": "Declarative Automation Bundles deployment modes | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/settings",
+          "title": "Declarative Automation Bundles configuration | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dev-tools/ci-cd/",
+          "title": "CI/CD on Databricks | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dev-tools/cli/",
+          "title": "Databricks CLI | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/ingestion/lakeflow-connect/",
+          "title": "Lakeflow Connect connector concepts | Databricks on AWS"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "CLI のバージョン 0.18 以下は、現行の推奨版として扱われる",
+          "explanation": "バージョン 0.18 以下は、現行の推奨版ではなく、レガシー版として扱われます。"
+        },
+        {
+          "key": "B",
+          "text": "default: true の dev が設定されていれば、prod への操作でも対象の指定は不要である",
+          "explanation": "default: true の dev がある状態で prod を操作するには、対象の指定が必要です。指定が不要という条件が逆になっています。"
+        },
+        {
+          "key": "C",
+          "text": "取り込みパイプラインをバンドルでデプロイし、開発・ステージング・本番などの環境へ配布できる"
+        },
+        {
+          "key": "D",
+          "text": "`bundle run` コマンドで、バンドルのリソースを実行できる"
+        },
+        {
+          "key": "E",
+          "text": "本番モードの Git ブランチの検証は、デプロイ時にオプションを付けても上書きできない",
+          "explanation": "本番モードのブランチ検証は、デプロイ時に `--force` を付けると上書きできます。上書きできないという説明は誤りです。"
+        }
+      ],
+      "correctAnswers": ["C", "D"]
+    },
+    {
+      "questionId": "DEA-0182",
+      "examCode": "DBX-DEA-2605",
+      "domain": "domain4",
+      "difficulty": "hard",
+      "questionType": "multiple",
+      "questionText": "あるデータエンジニアリングチームは、Lakeflow Jobs で運用しているジョブの制御フローと、失敗時の運用の設計を見直しています。新しく加わるメンバーに向けて、機能の仕様を正確に整理する必要があります。\n\nLakeflow Jobs の仕様の説明として正しいものはどれですか。(2 つ選択)",
+      "explanation": "## 問われている要件\nLakeflow Jobs の制御フロー、通知、修復の実行、再試行に関する仕様のうち、正しい説明を 2 つ選ぶ問題です。\n\n## 正解の決め手\nノートブックのクエリ結果をリストとして取り出すと、For each タスクで要素ごとの繰り返し処理ができます。また、ジョブ単位の通知は、失敗したタスクの再試行では送られません。失敗ごとの通知が必要なら、タスク単位の通知を使います。\n\n## 他の選択肢が誤りである理由\n外部データソースの障害で失敗したジョブは、障害の解消後も修復の実行の対象にならず、最初から実行し直す。\n\n上流が原因の失敗でも、外部の問題を解決したあとで修復の実行を使えます。最初から実行し直す必要はありません。\n\n再試行の間隔は、失敗した実行の終了から、再試行の実行の開始までを測った時間である。\n\n間隔は、失敗した実行の終了ではなく、その実行の開始から再試行の実行の開始までを測ります。起点が違います。\n\n単一タスクの継続ジョブでは、タスクの再試行の上限は 5 回である。\n\nこの場合の再試行の上限は 3 回です。5 回は数値が違います。",
+      "references": [
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/configure-task",
+          "title": "Configure and edit tasks in Lakeflow Jobs | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/continuous",
+          "title": "Run jobs continuously | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/notifications",
+          "title": "Add notifications on a job | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/parameters",
+          "title": "Parameterize jobs | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/repair-job-failures",
+          "title": "Troubleshoot and repair job failures | Databricks on AWS"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "ノートブックのクエリ結果をリストとして取り出し、For each タスクでその要素ごとに繰り返し処理できる。"
+        },
+        {
+          "key": "B",
+          "text": "失敗のたびに通知が必要なときは、ジョブ単位ではなくタスク単位の通知を使う。"
+        },
+        {
+          "key": "C",
+          "text": "外部データソースの障害で失敗したジョブは、障害の解消後も修復の実行の対象にならず、最初から実行し直す。",
+          "explanation": "上流の外部データソースが原因の失敗でも、外部の問題を解決したあとで修復の実行を使えます。最初から実行し直す必要があるという説明は誤りです。"
+        },
+        {
+          "key": "D",
+          "text": "再試行の間隔は、失敗した実行の終了から、再試行の実行の開始までを測った時間である。",
+          "explanation": "再試行の間隔の起点は、失敗した実行の開始です。終了から測るという説明は、起点を逆にしています。"
+        },
+        {
+          "key": "E",
+          "text": "単一タスクの継続ジョブでは、タスクの再試行の上限は 5 回である。",
+          "explanation": "単一タスクの継続ジョブでのタスクの再試行の上限は 3 回です。5 回という数値は誤りです。"
+        }
+      ],
+      "correctAnswers": ["A", "B"]
+    },
+    {
+      "questionId": "DEA-0183",
+      "examCode": "DBX-DEA-2605",
+      "domain": "domain2",
+      "difficulty": "medium",
+      "questionType": "multiple",
+      "questionText": "あるデータエンジニアリングチームは、外部システムが出力する生データを Databricks に取り込み、ストリーミングテーブルで処理しています。\n\nこのチームは、生データの受け口を用意し、別のストリーミング元も既存のストリーミングテーブルに加える必要があります。ただし、テーブル全体の再読み込みは避けたいと考えています。この要件を満たす対応はどれですか。(2 つ選択)",
+      "explanation": "## 問われている要件\n外部システムが出力する生データの受け口を用意することと、既存のストリーミングテーブルに別のソースを足すときに全体の再読み込みを避けることの、2 つを満たす対応を選びます。\n\n## 正解の決め手\nボリュームは、外部システムが生成した生データを置く着地場所として登録できます。また、既存のストリーミングテーブルには、全体を読み込み直さずにストリーミングのソースを追加できます。この 2 つが、設問の要件にそれぞれ対応します。\n\n## 他の選択肢が誤りである理由\n新しいソースを追加するたびに、既存のストリーミングテーブルの全体を再読み込みする。\n\nソースの追加に全体の再読み込みは要りません。再読み込みを避けたいという要件にも反します。\n\nOpenSharing を選び、データを複製せずに最新の値を問い合わせる構成にする。\n\nOpenSharing は、データを複製せずに最新の値を問い合わせたいときの選択肢です。この設問は、生データを取り込んで処理する場面なので、取り込みの要件に合いません。\n\nどのソースや表も増分の取り込みに対応するとみなし、対応状況を確認せずに設計する。\n\nソースや表によっては、増分の取り込みに対応していないものがあります。対応状況を確かめずに設計する前提は誤りです。\n\n## まとめ\n生データの受け口にはボリューム、ソースの追加には既存のストリーミングテーブルへの追加、と役割を分けて覚えましょう。",
+      "references": [
+        {
+          "url": "https://docs.databricks.com/aws/en/delta-sharing/",
+          "title": "What is OpenSharing? | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dlt/flows",
+          "title": "Load and process data incrementally with Lakeflow pipeline flows | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/ingestion/lakeflow-connect/",
+          "title": "Lakeflow Connect connector concepts | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/volumes/",
+          "title": "What are Unity Catalog volumes? | Databricks on AWS"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "新しいソースを追加するたびに、既存のストリーミングテーブルの全体を再読み込みする。",
+          "explanation": "既存のストリーミングテーブルには、全体を読み込み直さずにソースを追加できます。追加のたびに全体を再読み込みする必要はなく、要件にも反します。"
+        },
+        {
+          "key": "B",
+          "text": "OpenSharing を選び、データを複製せずに最新の値を問い合わせる構成にする。",
+          "explanation": "取り込みには管理コネクタが推奨され、OpenSharing は複製せずに最新の値を問い合わせたい場合の選択肢です。生データを取り込んで処理する要件には合いません。"
+        },
+        {
+          "key": "C",
+          "text": "どのソースや表も増分の取り込みに対応するとみなし、対応状況を確認せずに設計する。",
+          "explanation": "ソースや表によっては、増分の取り込みに対応していないものがあります。すべてが対応するという前提は誤りです。"
+        },
+        {
+          "key": "D",
+          "text": "ボリュームを、外部システムが生成した生データの着地場所として登録する。"
+        },
+        {
+          "key": "E",
+          "text": "既存のストリーミングテーブルに、全体を再読み込みせずに新しいストリーミングのソースを追加する。"
+        }
+      ],
+      "correctAnswers": ["D", "E"]
+    },
+    {
+      "questionId": "DEA-0184",
+      "examCode": "DBX-DEA-2605",
+      "domain": "domain7",
+      "difficulty": "medium",
+      "questionType": "multiple",
+      "questionText": "あるデータエンジニアリングチームは、Unity Catalog のカタログにある表の存在を分析チームに見つけてもらい、データの中身は隠したままアクセスを依頼してもらいたいと考えています。そのために BROWSE 権限の利用を検討しています。\n\nBROWSE 権限について正しい説明はどれですか。2 つ選択してください。",
+      "explanation": "## 問われている要件\n\nチームの要件は、データの中身を見せずに、表の存在とメタデータだけを分析チームに見つけさせ、アクセスの依頼につなげることです。この目的に使う BROWSE 権限の性質を正しく選ぶ問題です。\n\n## 正解の決め手\n\nBROWSE は、データを読まずにオブジェクトの存在やメタデータを見つけ、アクセスを依頼できる権限です。これが 1 つ目の正答です。また、リネージについては、BROWSE と SELECT のどちらも持たない利用者は、その表のリネージをたどれません。そのため、リネージを確認させたい利用者には、どちらかの権限が要ります。これが 2 つ目の正答です。\n\n## 前提知識\n\nBROWSE をデータオブジェクトに付与できる単位は、カタログだけです。表やスキーマには直接付与しません。\n\n## 他の選択肢が誤りである理由\n\nBROWSE は、カタログに加えて、個別の表にも直接付与して使える権限である。\n\nBROWSE をデータオブジェクトに付与できるのは、カタログ単位だけです。個別の表に直接付与できるとする点が誤りです。\n\nBROWSE を付与された利用者は、SELECT がなくても、その表の行を読み取れる。\n\nBROWSE は、データを読まずにメタデータを見つけるための権限です。行の読み取りは SELECT の役割で、BROWSE に読み取りの効果はありません。\n\nBROWSE も SELECT も持たない利用者でも、その表のリネージはたどれる。\n\nどちらの権限も持たない利用者は、その表のリネージをたどれません。条件を逆にした説明です。\n\n## まとめ\n\nBROWSE は、カタログ単位で付与する、メタデータの発見とアクセス依頼のための権限です。リネージをたどるには、BROWSE か SELECT のどちらかが要ります。",
+      "references": [
+        {
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/data-lineage",
+          "title": "Lineage in Unity Catalog | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/manage-privileges/privileges",
+          "title": "Unity Catalog privileges reference | Databricks on AWS"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "BROWSE は、カタログに加えて、個別の表にも直接付与して使える権限である。",
+          "explanation": "BROWSE をデータオブジェクトに付与できるのは、カタログ単位だけです。個別の表に直接付与できるとする点が誤りです。"
+        },
+        {
+          "key": "B",
+          "text": "BROWSE を持つ利用者は、データを読まずに、オブジェクトのメタデータを見つけてアクセスを依頼できる。"
+        },
+        {
+          "key": "C",
+          "text": "表のリネージをたどるには、その表について BROWSE か SELECT のどちらかを持っている必要がある。"
+        },
+        {
+          "key": "D",
+          "text": "BROWSE を付与された利用者は、SELECT がなくても、その表の行を読み取れる。",
+          "explanation": "BROWSE は、データを読まずにメタデータを見つけるための権限です。行の読み取りは SELECT の役割で、BROWSE に読み取りの効果はありません。"
+        },
+        {
+          "key": "E",
+          "text": "BROWSE も SELECT も持たない利用者でも、その表のリネージはたどれる。",
+          "explanation": "どちらの権限も持たない利用者は、その表のリネージをたどれません。条件を逆にした説明です。"
+        }
+      ],
+      "correctAnswers": ["B", "C"]
+    },
+    {
+      "questionId": "DEA-0185",
+      "examCode": "DBX-DEA-2605",
+      "domain": "domain6",
+      "difficulty": "easy",
+      "questionType": "multiple",
+      "questionText": "Databricks の予測的最適化の説明として正しいものを 2 つ選択してください。",
+      "explanation": "## 問われている要件\n予測的最適化について、正しい説明を 2 つ選ぶ問題です。\n\n## 正解の決め手\nUnity Catalog の管理テーブルでは、予測的最適化が OPTIMIZE・VACUUM・ANALYZE を自動で実行し、コストベースオプティマイザーが使う統計も更新します。そのため、保守のスケジュールを自分で組む必要がありません。また、2024年11月11日以降に作成されたアカウントでは既定で有効になっています。\n\n## 他の選択肢が誤りである理由\nOPTIMIZE の一部として ZORDER も自動で実行し、Z-order のファイルも対象にする\n\n予測的最適化の OPTIMIZE は ZORDER を実行せず、Z-order のファイルも対象にしません。\n\n最適化の実行中は、ほかのジョブがそのテーブルを問い合わせることができない\n\nDelta Lake は読み取りにスナップショット分離を使うため、最適化の実行中もほかの利用者やジョブがテーブルを問い合わせられます。\n\n2024年11月11日より前に作成された既存のアカウントでは、有効にならず利用できない\n\n既存のアカウントについても、Databricks が順次、予測的最適化を有効にしています。\n\n## まとめ\n予測的最適化は、管理テーブルの保守を自動化する機能で、新しいアカウントでは既定で有効です。ZORDER は対象外である点も押さえましょう。",
+      "references": [
+        {
+          "url": "https://docs.databricks.com/aws/en/delta/tutorial",
+          "title": "Tutorial: Create and manage Delta Lake tables | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/optimizations/",
+          "title": "Optimization recommendations on Databricks | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/optimizations/predictive-optimization",
+          "title": "Predictive optimization for Unity Catalog managed tables | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/tables/managed",
+          "title": "Unity Catalog managed tables for Delta Lake and Apache Iceberg | Databricks on AWS"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "Unity Catalog の管理テーブルで、OPTIMIZE・VACUUM・ANALYZE を自動で実行する"
+        },
+        {
+          "key": "B",
+          "text": "2024年11月11日以降に作成されたアカウントでは、既定で有効になっている"
+        },
+        {
+          "key": "C",
+          "text": "OPTIMIZE の一部として ZORDER も自動で実行し、Z-order のファイルも対象にする",
+          "explanation": "予測的最適化の OPTIMIZE は ZORDER を実行せず、Z-order のファイルも対象にしません。ZORDER まで自動化されるという説明は誤りです。"
+        },
+        {
+          "key": "D",
+          "text": "最適化の実行中は、ほかのジョブがそのテーブルを問い合わせることができない",
+          "explanation": "Delta Lake は読み取りにスナップショット分離を使うため、最適化の実行中もほかの利用者やジョブはテーブルを問い合わせられます。"
+        },
+        {
+          "key": "E",
+          "text": "2024年11月11日より前に作成された既存のアカウントでは、有効にならず利用できない",
+          "explanation": "既存のアカウントにも、Databricks が順次、予測的最適化を有効にしています。日付より前のアカウントで使えないわけではありません。"
+        }
+      ],
+      "correctAnswers": ["A", "B"]
+    },
+    {
+      "questionId": "DEA-0186",
+      "examCode": "DBX-DEA-2605",
+      "domain": "domain2",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "あるデータエンジニアは、クラウドストレージに届くファイルを Auto Loader で取り込むパイプラインを設計しています。\n\nAuto Loader が新しいファイルを検出する方式として用意されている組み合わせは、どれですか。",
+      "explanation": "## 問われている要件\nAuto Loader が新しいファイルを見つけるために備えている検出方式の組み合わせを選ぶ問題です。\n\n## 正解の決め手\n検出方式は、ディレクトリ一覧モードとファイル通知モードの 2 つだけです。この 2 つがそろっている選択肢が正解です。\n\n## 他の選択肢が誤りである理由\nディレクトリ一覧モードとトリガー通知モード\n\nトリガー通知モードという検出方式はありません。方式は 2 つに限られ、ディレクトリ一覧モードとファイル通知モードです。\n\nファイル通知モードとチェックポイント走査モード\n\nチェックポイント走査モードという検出方式はありません。チェックポイントは処理の進み具合を記録する仕組みで、検出方式ではありません。\n\nスキーマ一覧モードとファイル通知モード\n\nスキーマ一覧モードという検出方式はありません。スキーマは列の定義に関わる話で、ファイルの検出方式とは別の範囲です。",
+      "references": [
+        {
+          "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/file-detection-modes",
+          "title": "Compare Auto Loader file detection modes | Databricks on AWS"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "ディレクトリ一覧モードとファイル通知モード"
+        },
+        {
+          "key": "B",
+          "text": "ディレクトリ一覧モードとトリガー通知モード",
+          "explanation": "トリガー通知モードという検出方式はありません。方式は、ディレクトリ一覧モードとファイル通知モードの 2 つだけです。"
+        },
+        {
+          "key": "C",
+          "text": "ファイル通知モードとチェックポイント走査モード",
+          "explanation": "チェックポイント走査モードという検出方式はありません。チェックポイントは処理の進み具合を記録する仕組みで、検出方式ではありません。"
+        },
+        {
+          "key": "D",
+          "text": "スキーマ一覧モードとファイル通知モード",
+          "explanation": "スキーマ一覧モードという検出方式はありません。スキーマは列の定義に関わる話で、ファイルの検出方式とは別の範囲です。"
+        }
+      ],
+      "correctAnswers": ["A"]
+    },
+    {
+      "questionId": "DEA-0187",
+      "examCode": "DBX-DEA-2605",
+      "domain": "domain6",
+      "difficulty": "medium",
+      "questionType": "multiple",
+      "questionText": "あるデータエンジニアリングチームは、Unity Catalog の管理テーブルを運用しており、OPTIMIZE・VACUUM・ANALYZE を夜間のジョブで手動実行しています。保守のスケジュールを組む手間を最小限にしたいと考えており、予測的最適化の導入を検討しています。\n\n予測的最適化の説明として正しいものを 2 つ選択してください。",
+      "explanation": "## 問われている要件\n管理テーブルの保守のスケジュールを組む手間を減らす目的で、予測的最適化の動作として正しい説明を 2 つ選ぶ問題です。\n\n## 正解の決め手\nUnity Catalog の管理テーブルでは、予測的最適化が OPTIMIZE・VACUUM・ANALYZE を自動で実行し、コストベースオプティマイザーが使う統計も更新します。そのため保守のスケジュールを組む必要がありません。一方、予測的最適化の OPTIMIZE は ZORDER を実行せず、Z-order のファイルを対象にしません。この 2 点が正しい説明です。\n\n## 他の選択肢が誤りである理由\n自動で実行されるのは OPTIMIZE だけで、VACUUM と ANALYZE は引き続きジョブで予定を組む必要がある\n\n自動で実行されるのは OPTIMIZE だけではありません。VACUUM と ANALYZE も自動で実行されるため、別にスケジュールを組む必要はありません。\n\noperationParameters の auto が true の OPTIMIZE は、運用担当者が手動で実行したものである\n\nauto が true の OPTIMIZE は、書き込みの後に自動で行われた自動コンパクションを示します。手動実行ではなく、意味が逆です。\n\nOPTIMIZE の実行中は、ほかの利用者やジョブがそのテーブルを問い合わせられなくなる\n\nDelta Lake は読み取りにスナップショット分離を使うため、最適化の実行中も、ほかの利用者やジョブはテーブルを問い合わせられます。",
+      "references": [
+        {
+          "url": "https://docs.databricks.com/aws/en/delta/history",
+          "title": "Work with table history | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/delta/tutorial",
+          "title": "Tutorial: Create and manage Delta Lake tables | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/optimizations/",
+          "title": "Optimization recommendations on Databricks | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/optimizations/predictive-optimization",
+          "title": "Predictive optimization for Unity Catalog managed tables | Databricks on AWS"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "自動で実行されるのは OPTIMIZE だけで、VACUUM と ANALYZE は引き続きジョブで予定を組む必要がある",
+          "explanation": "自動で実行されるのは OPTIMIZE だけではありません。VACUUM と ANALYZE も自動で実行されるため、別にスケジュールを組む必要はありません。"
+        },
+        {
+          "key": "B",
+          "text": "operationParameters の auto が true の OPTIMIZE は、運用担当者が手動で実行したものである",
+          "explanation": "auto が true の OPTIMIZE は、書き込みの後に自動で行われた自動コンパクションを示します。手動実行ではなく、意味が逆です。"
+        },
+        {
+          "key": "C",
+          "text": "OPTIMIZE・VACUUM・ANALYZE が自動で実行され、コストベースオプティマイザーの統計も更新される"
+        },
+        {
+          "key": "D",
+          "text": "自動で行われる OPTIMIZE は ZORDER を実行しないため、Z-order のファイルは対象にならない"
+        },
+        {
+          "key": "E",
+          "text": "OPTIMIZE の実行中は、ほかの利用者やジョブがそのテーブルを問い合わせられなくなる",
+          "explanation": "Delta Lake は読み取りにスナップショット分離を使うため、最適化の実行中も、ほかの利用者やジョブはテーブルを問い合わせられます。"
+        }
+      ],
+      "correctAnswers": ["C", "D"]
+    },
+    {
+      "questionId": "DEA-0188",
+      "examCode": "DBX-DEA-2605",
+      "domain": "domain5",
+      "difficulty": "easy",
+      "questionType": "single",
+      "questionText": "Declarative Automation Bundles でデプロイしたジョブについて、正しい説明はどれですか。",
+      "explanation": "## 問われている要件\nバンドルで作成したジョブを、UI や設定ファイルからどう扱うかという基本の仕様を問う設問です。\n\n## 正解の決め手\nバンドルで作られたジョブは、UI では既定で読み取り専用です。変更は、バンドルの設定ファイルを直してデプロイし直すことで行います。設定ファイルを正とすることで、UI での手作業による変更と、定義とのずれを防げます。\n\n## 他の選択肢が誤りである理由\nデプロイは GitHub Actions からだけ行え、Jenkins からは行えない。\n\nバンドルを使った配布は、Azure DevOps・GitHub Actions・Jenkins などの CI/CD ツールから行えます。特定のツールに限られるわけではありません。\n\n名前・ターゲット・デプロイする人が同じ組でも、互いのデプロイを妨げない。\n\nこの 3 つが同じ組のバンドルは、互いのデプロイを妨げ合います。妨げないという説明は、条件が逆です。\n\nサーバーレスコンピュートを使うジョブの設定は、バンドルでは定義できない。\n\nバンドルでは、サーバーレスコンピュートを使うジョブの設定も定義できます。\n\n## まとめ\nバンドルのジョブは設定ファイルが正で、UI は既定で読み取り専用です。",
+      "references": [
+        {
+          "url": "https://docs.databricks.com/aws/en/compute/serverless/",
+          "title": "Connect to serverless compute | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/work-tasks",
+          "title": "Develop Declarative Automation Bundles | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dev-tools/ci-cd/",
+          "title": "CI/CD on Databricks | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/monitor",
+          "title": "Monitor Lakeflow Jobs | Databricks on AWS"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "デプロイは GitHub Actions からだけ行え、Jenkins からは行えない。",
+          "explanation": "バンドルを使った配布は、Azure DevOps・GitHub Actions・Jenkins などの CI/CD ツールから行えます。GitHub Actions に限定するのは範囲の狭めすぎです。"
+        },
+        {
+          "key": "B",
+          "text": "UI では既定で読み取り専用になり、変更は設定ファイルで行う。"
+        },
+        {
+          "key": "C",
+          "text": "名前・ターゲット・デプロイする人が同じ組でも、互いのデプロイを妨げない。",
+          "explanation": "名前・ターゲット・デプロイする人の組が同じバンドルは、互いのデプロイを妨げ合います。妨げないという説明は、条件が逆です。"
+        },
+        {
+          "key": "D",
+          "text": "サーバーレスコンピュートを使うジョブの設定は、バンドルでは定義できない。",
+          "explanation": "バンドルでは、サーバーレスコンピュートを使うジョブの設定も定義できます。定義できないというのは誤解です。"
+        }
+      ],
+      "correctAnswers": ["B"]
+    },
+    {
+      "questionId": "DEA-0189",
+      "examCode": "DBX-DEA-2605",
+      "domain": "domain2",
+      "difficulty": "hard",
+      "questionType": "multiple",
+      "questionText": "あるデータエンジニアリングチームは、Structured Streaming と Unity Catalog を使った取り込みパイプラインの運用を引き継ぎました。チームは、停止や再設定、スキーマの変化があったときの動作を整理しています。\n\n取り込みパイプラインの動作の説明として正しいものを、2 つ選択してください。",
+      "explanation": "## 問われている要件\n取り込みパイプラインの動作について、正しい説明を 2 つ選ぶ問題です。トリガー間隔の変更、foreachBatch の保証、システムテーブルの読み方、パイプラインの読み込み元、Avro のスキーマ進化モードの 5 つを見分けます。\n\n## 正解の決め手\nトリガー間隔を変えるために停止したとき、処理中のマイクロバッチは最後まで完了し、そのあとに新しい間隔が適用されます。途中のバッチが捨てられるわけではありません。\n\nAvro の avroSchemaEvolutionMode を restart にすると、スキーマの変更を検出した時点で例外が出ます。ジョブを再起動する運用が前提になります。\n\n## 他の選択肢が誤りである理由\nforeachBatch でファイルの URL だけを取り出して独自に処理する場合、処理の保証は厳密に一度になる。\n\nfile の URL だけを取り出して自前で処理すると、保証は少なくとも一度になります。厳密に一度ではないので、重複の扱いを自分で考える必要があります。\n\nシステムテーブルをストリーミングで読むとき、skipChangeCommits を false にすると、表での削除でジョブが中断されない。\n\n削除でジョブが中断されないようにするのは、skipChangeCommits を true にしたときです。設定値が逆になっています。\n\nUnity Catalog を使うパイプラインは、UC の表とビューだけを読み込め、Kafka や Kinesis は読み込めない。\n\nUnity Catalog を使うパイプラインは、UC の表やビューに加えて、Hive metastore の表やビュー、Apache Kafka、Amazon Kinesis からも読み込めます。読み込み元を UC の表とビューに限る説明は、範囲が狭すぎます。",
+      "references": [
+        {
+          "url": "https://docs.databricks.com/aws/en/admin/system-tables/",
+          "title": "System tables reference | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dlt/unity-catalog",
+          "title": "Use Unity Catalog with pipelines | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/options",
+          "title": "Spark API options reference | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/file-arrival-triggers",
+          "title": "Trigger jobs when new files arrive | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/structured-streaming/triggers",
+          "title": "Configure Structured Streaming trigger intervals | Databricks on AWS"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "ストリームを停止してトリガー間隔を変えると、処理中のマイクロバッチが完了してから、新しい間隔が適用される。"
+        },
+        {
+          "key": "B",
+          "text": "foreachBatch でファイルの URL だけを取り出して独自に処理する場合、処理の保証は厳密に一度になる。",
+          "explanation": "foreachBatch でファイルの URL だけを取り出して独自に処理する場合、保証は少なくとも一度です。厳密に一度ではありません。"
+        },
+        {
+          "key": "C",
+          "text": "システムテーブルをストリーミングで読むとき、skipChangeCommits を false にすると、表での削除でジョブが中断されない。",
+          "explanation": "削除でジョブが中断されないのは、skipChangeCommits を true にしたときです。false にしたときの説明は、設定値が逆になっています。"
+        },
+        {
+          "key": "D",
+          "text": "Unity Catalog を使うパイプラインは、UC の表とビューだけを読み込め、Kafka や Kinesis は読み込めない。",
+          "explanation": "Unity Catalog を使うパイプラインは、UC の表とビュー以外に、Hive metastore の表とビュー、Kafka、Kinesis も読み込めます。"
+        },
+        {
+          "key": "E",
+          "text": "Avro の avroSchemaEvolutionMode を restart にすると、スキーマが変わった時点で例外が出て、ジョブの再起動が必要になる。"
+        }
+      ],
+      "correctAnswers": ["A", "E"]
+    },
+    {
+      "questionId": "DEA-0190",
+      "examCode": "DBX-DEA-2605",
+      "domain": "domain2",
+      "difficulty": "easy",
+      "questionType": "multiple",
+      "questionText": "Databricks へのデータの取り込みに関する説明として正しいものはどれですか。2 つ選択してください。",
+      "explanation": "## 問われている要件\n\n取り込みに関する機能の説明のうち、正しいものを 2 つ選ぶ問題です。\n\n## 正解の決め手\n\nLakeflow Connect は、業務アプリ、データベース、ファイル、ストリーミング元といった多様な入力元に向けたコネクタを備えています。また、ボリュームは、外部システムが出力した生データの着地場所として登録できます。この 2 つが正しい説明です。\n\n## 他の選択肢が誤りである理由\n\n既存のストリーミングテーブルにソースを追加するときは、全体を再読み込みする必要があります\n\nストリーミングテーブルには、全体を読み込み直さずに新しいソースを足せます。再読み込みが必要という説明は逆です。\n\nどのソースや表でも増分の取り込みを利用でき、対応状況を確認する必要はありません\n\nソースや表によっては、増分の取り込みに対応していないものがあります。使う前に対応状況を確かめる必要があります。\n\nHive 形式の構造が矛盾していても、パーティションの列は推定されて使われます\n\nパーティション列の推定は key=value 形式のディレクトリ構造が前提です。構造が矛盾する場合や Hive 形式でない場合は、推定の結果が無視されます。",
+      "references": [
+        {
+          "url": "https://docs.databricks.com/aws/en/data-engineering/",
+          "title": "Data engineering with Databricks | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dlt/flows",
+          "title": "Load and process data incrementally with Lakeflow pipeline flows | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/schema",
+          "title": "Configure schema inference and evolution in Auto Loader | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/ingestion/lakeflow-connect/",
+          "title": "Lakeflow Connect connector concepts | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/volumes/",
+          "title": "What are Unity Catalog volumes? | Databricks on AWS"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "既存のストリーミングテーブルにソースを追加するときは、全体を再読み込みする必要があります",
+          "explanation": "ストリーミングテーブルには、全体を読み込み直さずに新しいソースを足せます。再読み込みが必要という説明は逆です。"
+        },
+        {
+          "key": "B",
+          "text": "Lakeflow Connect は、業務アプリやデータベース、ファイル、ストリーミング元から取り込むコネクタを備えています"
+        },
+        {
+          "key": "C",
+          "text": "どのソースや表でも増分の取り込みを利用でき、対応状況を確認する必要はありません",
+          "explanation": "ソースや表によっては、増分の取り込みに対応していないものがあります。使う前に対応状況を確かめる必要があります。"
+        },
+        {
+          "key": "D",
+          "text": "ボリュームは、外部システムが生成した生データを置く着地場所として登録できます"
+        },
+        {
+          "key": "E",
+          "text": "Hive 形式の構造が矛盾していても、パーティションの列は推定されて使われます",
+          "explanation": "パーティション列の推定は key=value 形式のディレクトリ構造が前提です。構造が矛盾する場合や Hive 形式でない場合は、推定の結果が無視されます。"
+        }
+      ],
+      "correctAnswers": ["B", "D"]
+    },
+    {
+      "questionId": "DEA-0191",
+      "examCode": "DBX-DEA-2605",
+      "domain": "domain3",
+      "difficulty": "easy",
+      "questionType": "multiple",
+      "questionText": "Delta Lake の表の更新とデータ品質の確保に関する説明として正しいものはどれですか。2 つ選択してください。",
+      "explanation": "## 問われている要件\n表の更新と追加を 1 度に行う方法と、データ品質のルールを表に強制する方法の、2 つの正しい説明を選ぶ問題です。\n\n## 正解の決め手\n既存の表に更新と追加をまとめて行うときは `MERGE` を使い、一致する行は更新し、一致しない行は新しく追加します。また、check 制約と not null 制約を表に定義すれば、データ品質のルールを適用・強制できます。\n\n## 他の選択肢が誤りである理由\nComplete モードの集計では、集計の状態を捨て、トリガーごとに新しく届いた行だけを書き出す。\n\nComplete モードは集計の状態を捨てません。状態を保ったまま、トリガーごとに対象の表を書き直します。\n\n`maxBytesPerTrigger` は既定で値が設定され、1 回の処理量の厳密な上限として働く。\n\n`maxBytesPerTrigger` は既定では設定されません。設定しても厳密な上限ではなく、おおよその上限として働きます。\n\n`expect_or_drop` は、違反したレコードも対象へ書いたうえで、落とした件数だけを記録する。\n\n`expect_or_drop` は、違反したレコードを対象へ書く前に落とします。落とした件数は、ほかのデータセットの指標と一緒に記録されます。",
+      "references": [
+        {
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/create-tables",
+          "title": "Databricks tables | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/delta/tutorial",
+          "title": "Tutorial: Create and manage Delta Lake tables | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dlt/expectations",
+          "title": "Manage data quality with pipeline expectations | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/structured-streaming/delta-lake",
+          "title": "Delta Lake table streaming reads and writes | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/structured-streaming/watermarks",
+          "title": "Apply watermarks to control data processing thresholds | Databricks on AWS"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "Complete モードの集計では、集計の状態を捨て、トリガーごとに新しく届いた行だけを書き出す。",
+          "explanation": "Complete モードは集計の状態を捨てません。状態を保ったまま、トリガーごとに対象の表を書き直します。"
+        },
+        {
+          "key": "B",
+          "text": "既存の表に、一致する行の更新と一致しない行の追加をまとめて行うには、`MERGE` を使う。"
+        },
+        {
+          "key": "C",
+          "text": "check 制約と not null 制約を表に定義すると、データ品質のルールを適用・強制できる。"
+        },
+        {
+          "key": "D",
+          "text": "`maxBytesPerTrigger` は既定で値が設定され、1 回の処理量の厳密な上限として働く。",
+          "explanation": "`maxBytesPerTrigger` は既定では設定されません。設定しても厳密な上限ではなく、おおよその上限として働きます。"
+        },
+        {
+          "key": "E",
+          "text": "`expect_or_drop` は、違反したレコードも対象へ書いたうえで、落とした件数だけを記録する。",
+          "explanation": "`expect_or_drop` は、違反したレコードを対象へ書く前に落とします。落とした件数は、ほかのデータセットの指標と一緒に記録されます。"
+        }
+      ],
+      "correctAnswers": ["B", "C"]
+    },
+    {
+      "questionId": "DEA-0192",
+      "examCode": "DBX-DEA-2605",
+      "domain": "domain2",
+      "difficulty": "hard",
+      "questionType": "single",
+      "questionText": "あるデータエンジニアは、Avro 形式のファイルをストリーミングで取り込むジョブを運用しています。上流の変更でスキーマが変わったときに、ジョブを黙って進めず、いったん失敗させて気づきたいと考えています。\n\nこのジョブで avroSchemaEvolutionMode を restart に設定した場合、スキーマが変更されたときの動作はどれですか。",
+      "explanation": "## 問われている要件\nスキーマが変わったときに、ジョブを黙って進めず失敗させたい、という要件です。問われているのは、avroSchemaEvolutionMode を restart にしたときの動作です。\n\n## 正解の決め手\nこの設定では、スキーマの変更を検知すると例外が出て、ジョブの再起動が必要になります。要件の「いったん失敗させて気づく」動作と一致します。\n\n## 他の選択肢が誤りである理由\n例外は発生せず、再起動もしないまま、新しいスキーマで処理を続ける。\n\n例外が出て再起動が必要になる、という動作の逆です。この設定は、スキーマ変更を黙って吸収しません。\n\nテーブルでの削除によって中断されないよう、変更のコミットを読み飛ばす。\n\nこれは、システムテーブルをストリーミングで読むときの別のオプション(変更のコミットの読み飛ばし)の説明です。Avro のスキーマ変更への動作とは別の話です。\n\n独自処理を行う方式に切り替わり、処理の保証が少なくとも一度になる。\n\n少なくとも一度になるのは、ファイルの情報だけを取り出して独自の処理を書く方式のときです。スキーマ進化のモードを変えても、処理方式は切り替わりません。",
+      "references": [
+        {
+          "url": "https://docs.databricks.com/aws/en/admin/system-tables/",
+          "title": "System tables reference | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/options",
+          "title": "Spark API options reference | Databricks on AWS"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/file-arrival-triggers",
+          "title": "Trigger jobs when new files arrive | Databricks on AWS"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "例外が発生し、ジョブを再起動してからでないと処理を続けられない。"
+        },
+        {
+          "key": "B",
+          "text": "例外は発生せず、再起動もしないまま、新しいスキーマで処理を続ける。",
+          "explanation": "例外が出て再起動が必要になる、という動作の逆です。この設定は、スキーマ変更を黙って吸収しません。"
+        },
+        {
+          "key": "C",
+          "text": "テーブルでの削除によって中断されないよう、変更のコミットを読み飛ばす。",
+          "explanation": "これは、システムテーブルをストリーミングで読むときの別のオプション(変更のコミットの読み飛ばし)の説明です。Avro のスキーマ変更への動作とは別の話です。"
+        },
+        {
+          "key": "D",
+          "text": "独自処理を行う方式に切り替わり、処理の保証が少なくとも一度になる。",
+          "explanation": "少なくとも一度になるのは、ファイルの情報だけを取り出して独自の処理を書く方式のときです。スキーマ進化のモードを変えても、処理方式は切り替わりません。"
+        }
+      ],
+      "correctAnswers": ["A"]
     }
   ]
 }
