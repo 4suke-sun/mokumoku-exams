@@ -15,6 +15,7 @@ import {
   writeDecisions,
 } from "../decisions/decisions.ts";
 import { EXIT, type ExitCode } from "../exit-codes.ts";
+import { criteriaAccepted } from "../export/criteria.ts";
 import { type FactCard, FactsError, type FactsFile, factsPath, readFacts } from "../facts/schema.ts";
 import { contentHash, inputFromQuestion } from "../judge/input.ts";
 import { type Output, report } from "../log.ts";
@@ -69,8 +70,10 @@ import {
 import {
   buildReviewSheet,
   decisionsFromSheet,
+  NO_SKIP,
   type ReviewSheet,
   ReviewSheetSchema,
+  type ReviewSkip,
   renderDraftReview,
   reviewCounts,
 } from "./review.ts";
@@ -218,9 +221,9 @@ export function runDraft(options: DraftOptions): ExitCode {
     case "check":
       return checkStep(options, facts, drafts, provenance, ledger, master.exam.vendor, decisions);
     case "review":
-      return reviewStep(options, paths, facts, drafts, provenance, decisions);
+      return reviewStep(options, paths, facts, drafts, provenance, decisions, ledger, master.exam.vendor);
     case "decide":
-      return decideStep(options, paths, facts, drafts, provenance, decisions);
+      return decideStep(options, paths, facts, drafts, provenance, decisions, ledger, master.exam.vendor);
   }
 }
 
@@ -232,14 +235,18 @@ function reviewStep(
   drafts: DraftsFile,
   provenance: ProvenanceFile,
   decisions: DecisionsFile,
+  ledger: LedgerFile,
+  vendor: string,
 ): ExitCode {
   const { config, rootDir, examCode, output, dryRun } = options;
+  const skip = reviewSkipOf(options, facts, drafts, provenance, ledger, vendor);
+  if (skip === "invalid") return EXIT.checkFailed;
   const { plan, paths: samplingPaths } = planFor(config, rootDir, examCode, { facts, drafts, provenance, decisions });
-  const counts = reviewCounts(drafts, decisions, plan);
+  const counts = reviewCounts(drafts, decisions, plan, skip);
   if (!dryRun) {
     mkdirSync(dirname(paths.reviewMd), { recursive: true });
-    writeFileSync(paths.reviewMd, renderDraftReview(examCode, drafts, facts, provenance, decisions, plan));
-    writeJson(paths.reviewSheet, buildReviewSheet(examCode, drafts, decisions, plan));
+    writeFileSync(paths.reviewMd, renderDraftReview(examCode, drafts, facts, provenance, decisions, plan, skip));
+    writeJson(paths.reviewSheet, buildReviewSheet(examCode, drafts, decisions, plan, skip));
     // 抜き取りの結果(率、種、確認した件数、確認しなかった件数)を、人の判断の記録のそばに残す
     writeSampling(samplingPaths.record, recordOf(examCode, plan));
     report(output, "レビューレポート", relative(rootDir, paths.reviewMd));
@@ -266,8 +273,49 @@ function reportReviewCounts(output: DraftOptions["output"], counts: ReturnType<t
   report(
     output,
     "情報",
-    `人の確認: 対象 ${counts.total} 件、承認 ${counts.approved} 件、却下 ${counts.rejected} 件、未済 ${counts.pending} 件`,
+    `人の確認: 要判断 ${counts.total} 件、承認 ${counts.approved} 件、却下 ${counts.rejected} 件、未済 ${counts.pending} 件` +
+      `(ほかに、基準を満たして承認を省ける ${counts.byCriteria.length} 件、書き出し済み ${counts.exported.length} 件、` +
+      `基準を満たすが来歴の検査で止まる ${counts.blocked.length} 件)`,
   );
+}
+
+/**
+ * 人が判断しなくてよい下書きを、書き出し(export)と同じ判定で選ぶ。設定 review.autoApprove に挙げた試験だけで、
+ * ほかの試験は、これまでどおり、不採用でない下書きをすべて確認の対象にする。
+ */
+function reviewSkipOf(
+  options: DraftOptions,
+  facts: FactsFile,
+  drafts: DraftsFile,
+  provenance: ProvenanceFile,
+  ledger: LedgerFile,
+  vendor: string,
+): ReviewSkip | "invalid" {
+  const { config, rootDir, examCode, output } = options;
+  if (!config.review.autoApprove.includes(examCode)) return NO_SKIP;
+  const published = readExistingTexts(config, rootDir, examCode);
+  if (published === "invalid") {
+    report(output, "問題データの誤り", `questions.${examCode.toLowerCase()}.json`);
+    return "invalid";
+  }
+  const byCriteria = criteriaAccepted({
+    drafts: drafts.drafts,
+    examCode,
+    targets: config.plan.overrides[examCode]?.services,
+    services: ledger.guide?.services ?? [],
+    publishedTexts: published,
+  });
+  const failed = new Set(
+    [...checkProvenance(provenance, facts, vendor), ...checkRecheck(provenance, ledger)].map((p) => p.draftId),
+  );
+  const exported = new Set<string>();
+  const blocked = new Set<string>();
+  for (const d of drafts.drafts) {
+    const entry = provenance.entries.find((e) => e.draftId === d.id);
+    if (d.status === "passed" && entry?.questionId !== undefined) exported.add(d.id);
+    if (entry === undefined || failed.has(d.id)) blocked.add(d.id);
+  }
+  return { byCriteria, exported, blocked };
 }
 
 /** 判断を書き込んだシートを検査し、人の判断の記録に取り込む */
@@ -278,6 +326,8 @@ function decideStep(
   drafts: DraftsFile,
   provenance: ProvenanceFile,
   decisions: DecisionsFile,
+  ledger: LedgerFile,
+  vendor: string,
 ): ExitCode {
   const { config, rootDir, examCode, output, dryRun } = options;
   if (!existsSync(paths.reviewSheet)) {
@@ -304,11 +354,14 @@ function decideStep(
   for (const p of result.problems) report(output, "判断のシートの誤り", `items.${p.index} ${p.code}`);
   if (result.problems.length > 0) return EXIT.checkFailed;
   const next = upsertDecisions(decisions, result.decisions);
+  // 取り込んだ判断を、下書きの状態にも反映して数える
+  const applied = applyDraftDecisions(drafts, (id) => draftDecision(next, id));
+  // 件数に要る入力(問題データ)が読めないときは、判断を書き込む前に止める(シートの誤りと同じく、何も取り込まない)
+  const skip = reviewSkipOf(options, facts, applied.file, provenance, ledger, vendor);
+  if (skip === "invalid") return EXIT.checkFailed;
   if (!dryRun) writeDecisions(paths.decisions, next);
   else report(output, "書き込みをしない(dry-run)");
   report(output, "情報", `判断の取り込み: ${result.decisions.length} 件、未記入 ${result.skipped} 件`);
-  // 取り込んだ判断を、下書きの状態にも反映して数える
-  const applied = applyDraftDecisions(drafts, (id) => draftDecision(next, id));
   if (applied.changed > 0 && !dryRun) writeDrafts(paths.drafts, applied.file);
   // 数えるときは、記録した抜き取りの計画(確認しないと決めたもの)を使う。判断が増えても、確認の対象は変わらない
   const plan = recordedOrComputed(config, rootDir, examCode, {
@@ -317,7 +370,7 @@ function decideStep(
     provenance,
     decisions: next,
   });
-  reportReviewCounts(output, reviewCounts(applied.file, next, plan));
+  reportReviewCounts(output, reviewCounts(applied.file, next, plan, skip));
   return EXIT.ok;
 }
 
@@ -478,7 +531,16 @@ function requestStep(
       continue;
     }
     const requestPath = join(paths.requestsDir, `${key}.json`);
+    // 同じ実行の次の依頼は、まだ使われていない事実カードを先に選ぶ(同じ根拠の下書きが並ばないようにする)。
+    // 待ちの依頼の事実カードも足す。足さないと、後ろの項目の選び方と鍵が初回の実行と変わり、別の鍵の依頼が重ねて書かれる
+    const countUsage = () => {
+      for (const c of selected.slice(0, count)) {
+        usage.set(c.id, (usage.get(c.id) ?? 0) + 1);
+        sourceUsage.set(factSource(c), (sourceUsage.get(factSource(c)) ?? 0) + 1);
+      }
+    };
     if (existsSync(requestPath)) {
+      countUsage();
       pending++;
       continue;
     }
@@ -517,11 +579,7 @@ function requestStep(
       agent: stamp,
     };
     if (!dryRun) writeJson(requestPath, request);
-    // 同じ実行の次の依頼は、まだ使われていない事実カードを先に選ぶ(同じ根拠の下書きが並ばないようにする)
-    for (const c of selected.slice(0, count)) {
-      usage.set(c.id, (usage.get(c.id) ?? 0) + 1);
-      sourceUsage.set(factSource(c), (sourceUsage.get(factSource(c)) ?? 0) + 1);
-    }
+    countUsage();
     report(output, "下書きの依頼", relative(rootDir, requestPath));
     requested++;
   }
@@ -1175,7 +1233,9 @@ function checkStep(
   // 人の確認の済み・未済を報告する(未済は失敗にしない)
   const plan = recordedOrComputed(config, rootDir, examCode, { facts, drafts, provenance, decisions });
   reportSampling(output, plan);
-  reportReviewCounts(output, reviewCounts(drafts, decisions, plan));
+  const skip = reviewSkipOf(options, facts, drafts, provenance, ledger, vendor);
+  if (skip === "invalid") return EXIT.checkFailed;
+  reportReviewCounts(output, reviewCounts(drafts, decisions, plan, skip));
   // 形と根拠の検査に、再検証の検査(来歴と台帳の今の状態の比較)を足す
   const problems = [...checkProvenance(provenance, facts, vendor), ...checkRecheck(provenance, ledger)];
   for (const p of problems) report(output, "来歴の誤り", `${p.draftId} ${p.code}`);
