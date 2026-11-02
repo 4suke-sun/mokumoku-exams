@@ -434,7 +434,7 @@ function importStep(
 }
 
 /** 検査の場所(cards.N.…)のカードが、不採用になっているか。不採用のカードの誤りは、理由コードで記録済み */
-function rejectedIndexes(file: FactsFile, path: string): boolean {
+export function rejectedIndexes(file: FactsFile, path: string): boolean {
   const n = Number(/^cards\.(\d+)\./.exec(path)?.[1]);
   return Number.isInteger(n) && file.cards[n]?.status === "rejected";
 }
