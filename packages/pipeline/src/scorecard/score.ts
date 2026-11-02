@@ -1,4 +1,4 @@
-import { CATCH_ALL, NEGATION, statedCount } from "../draft/style.ts";
+import { CATCH_ALL, COUNT_NOTE, NEGATION, statedCount } from "../draft/style.ts";
 import { dice } from "../shared/similarity.ts";
 import { PASSING, type ScorecardProfile } from "./profiles.ts";
 
@@ -63,9 +63,6 @@ const POLITE_ENDING = /(でしょうか|ですか|ますか|ください|なさ�
 
 /** 要件を示す語 */
 const REQUIREMENT = /必要|したい|考えて|予定|求められ|ため|際|要件|目的|検討|計画|しています|しました|決定/;
-
-/** 複数選択の表記(括弧書き)。長さを数えるときに除く */
-const COUNT_NOTE = /[（(]\s*(?:[0-9０-９]+|複数)\s*(?:つ|数)?\s*選択\s*(?:し)?[）)]/g;
 
 /** 選択肢の形 */
 export type ChoiceForm = "name" | "phrase" | "sentence";

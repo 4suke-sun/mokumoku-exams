@@ -63,6 +63,12 @@ const average = (values: number[]) => values.reduce((a, b) => a + b, 0) / values
 /** 問いの形で終わる: 疑問・指示の語尾か、疑問符 */
 const QUESTION_ENDING = /(か|ください|なさい|選べ|答えよ|[?？])[。.!！]*$/;
 
+/** 複数選択の選ぶ数の注記(括弧書き。「(2 つ選択)」など)。点数票は長さを数えるときに除き、下書きの検査は問いの形を見るときに末尾から除く */
+export const COUNT_NOTE = /[（(]\s*(?:[0-9０-９]+|複数)\s*(?:つ|数)?\s*選択\s*(?:し)?[）)]/g;
+
+/** 末尾にある COUNT_NOTE。問いの形は、この注記を除いた末尾で見る */
+const TRAILING_COUNT_NOTE = new RegExp(`\\s*${COUNT_NOTE.source}\\s*$`);
+
 /** 否定の表現。長い語を先に並べ、重なって数えないようにする */
 export const NEGATION = /適切でない|不適切|誤っている|含まれない|ではない|できない|以外|でない/g;
 
@@ -105,8 +111,11 @@ export const STYLE_RULES: readonly StyleRule[] = [
     name: "stem-question-form",
     appliesTo: "both",
     severity: "block",
-    summary: "設問文は、問いの形(「〜か。」「〜してください。」など)で終える",
-    check: (d) => (QUESTION_ENDING.test(d.questionText.normalize("NFKC").trim()) ? [] : ["questionText"]),
+    summary: "設問文は、問いの形(「〜か。」「〜してください。」など)で終える(末尾の「(2 つ選択)」は除いて見る)",
+    check: (d) =>
+      QUESTION_ENDING.test(d.questionText.normalize("NFKC").trim().replace(TRAILING_COUNT_NOTE, ""))
+        ? []
+        : ["questionText"],
   },
   {
     name: "multi-select-count",
