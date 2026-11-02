@@ -7,11 +7,66 @@ import { findDenylistPaths } from "./local-denylist.ts";
 
 export const INSPECT_DIR = ".drafts/inspect";
 export const STAMP_FILE = "stamp.txt";
+/**
+ * 検査役 1 つに読ませる差分の行数の目安。差分がこれを超えると、diff.patch の代わりに、分担ごとのファイル
+ * (diff-1.patch、diff-2.patch、…)と、分担の一覧(parts.txt)を書き出す。
+ * 検査役が読み切れなかったと報告したら、この値を下げる。
+ */
+export const INSPECT_PART_LINES = 4000;
+export const PARTS_FILE = "parts.txt";
 
 export type InspectionMode = { kind: "cached" } | { kind: "range"; range: string } | { kind: "pr"; base: string };
 
 const COMMIT_FORMAT = "=== コミット %h%n作者: %ae%nコミッター: %ce%n%n%B";
 const OMITTED = "(すべてのコミットが検査済みのため、差分は省略した。covered.txt を参照)\n";
+
+/** 差分の 1 ファイル分(またはコミットの見出し)の始まりの行。分担は、この境目で切る。 */
+const BOUNDARY = /^(diff --git |diff --cc |=== コミット )/;
+
+/**
+ * 差分を、行数の目安以下の分担に分ける。ファイルの境目で切り、1 ファイルが目安を超えるときは、行の範囲で切る。
+ * 分担をつなぐと、元の差分と一致する。目安以下なら、1 つのまま返す。
+ */
+export function splitDiff(diff: string, limit = INSPECT_PART_LINES): string[] {
+  const lines = diff.split(/(?<=\n)/); // 改行を残して分ける(つなぐと元に戻る)
+  if (lines.length <= limit) return [diff];
+  const chunks: string[][] = [];
+  let chunk: string[] = [];
+  for (const line of lines) {
+    if (chunk.length > 0 && BOUNDARY.test(line)) {
+      chunks.push(chunk);
+      chunk = [];
+    }
+    chunk.push(line);
+  }
+  chunks.push(chunk);
+  const parts: string[][] = [];
+  let current: string[] = [];
+  const flush = () => {
+    if (current.length > 0) parts.push(current);
+    current = [];
+  };
+  for (const block of chunks) {
+    if (current.length + block.length > limit) flush();
+    if (block.length > limit) {
+      for (let i = 0; i < block.length; i += limit) parts.push(block.slice(i, i + limit));
+      continue;
+    }
+    current.push(...block);
+  }
+  flush();
+  return parts.map((part) => part.join(""));
+}
+
+/** 分担の一覧の本文。分担の名前・ファイル・行数と、差分が始まるファイルの名前を 1 行ずつ書く。 */
+function partsList(parts: string[]): string {
+  const rows = parts.map((part, i) => {
+    const lines = part.split(/(?<=\n)/).length;
+    const firstFile = /^diff (?:--git a\/|--cc )(\S+)/m.exec(part)?.[1] ?? "(前の分担のファイルの続き)";
+    return `分担 ${i + 1}\tdiff-${i + 1}.patch\t${lines} 行\t最初のファイル: ${firstFile}`;
+  });
+  return `差分が ${INSPECT_PART_LINES} 行(INSPECT_PART_LINES)を超えたため、${parts.length} つの分担に分けた。\n${rows.join("\n")}\n`;
+}
 
 /** 台帳が読めないときは、省略せず、すべてのコミットの差分を出す。 */
 function safeCovered(range: string, root: string): string[] {
@@ -63,14 +118,22 @@ export function buildInspection(mode: InspectionMode, root: string): Record<stri
   }
   const denylist = findDenylistPaths();
 
+  const parts = splitDiff(diff);
+  const diffFiles: Record<string, string> =
+    parts.length === 1
+      ? { "diff.patch": diff }
+      : {
+          ...Object.fromEntries(parts.map((part, i) => [`diff-${i + 1}.patch`, part])),
+          [PARTS_FILE]: partsList(parts),
+        };
   const files: Record<string, string> = {
-    "diff.patch": diff,
+    ...diffFiles,
     "files.txt": names,
     "commits.txt": commits,
     "covered.txt":
       covered.length > 0
-        ? `検査済みのため、diff.patch から差分を省いたコミット(メッセージと作者は commits.txt にある):\n${covered.map((sha) => sha.slice(0, 7)).join("\n")}\n`
-        : "なし(すべてのコミットの差分を diff.patch に出している)\n",
+        ? `検査済みのため、差分のファイル(diff.patch、分けたときは diff-N.patch)から差分を省いたコミット(メッセージと作者は commits.txt にある):\n${covered.map((sha) => sha.slice(0, 7)).join("\n")}\n`
+        : "なし(すべてのコミットの差分を、差分のファイルに出している)\n",
     "branch.txt": `${git(["branch", "--show-current"]).trim()}\n`,
     "denylist.txt":
       denylist.length > 0

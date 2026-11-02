@@ -76,6 +76,43 @@
       ]
     },
     {
+      "draftId": "d-035c71184ef6",
+      "factIds": [
+        "f-007435cd0532",
+        "f-02bdad3ce86c",
+        "f-18e7d07174af",
+        "f-1c768e4e1f5a",
+        "f-dee1a37ccf73"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "6a87ad50c6e37a14cfcb157f50f85be38e154a32d8e9ceb545f082514017d7c0"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/conditional-tasks",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "2452e49ab71967202bf3057bf8c80fcbcffb404a5fa39bea07440414b3a87973"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/continuous",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "f2ea4cb82fb981e3e31894770f99c431b7663898df57383cf6fada411fe25aa7"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/monitor",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "4f1687e7fa246e9618a88614e81540dc5560786f265e1ed0d67a2a4a6c683e06"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/task-values",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "8b56c147c4894b1abe14cf6c919c07ede892e04cc8686b351c9af9103c1abfe2"
+        }
+      ]
+    },
+    {
       "draftId": "d-0373f4a0bcd6",
       "questionId": "DEA-0005",
       "factIds": [
@@ -235,6 +272,33 @@
       ]
     },
     {
+      "draftId": "d-08efadb08caa",
+      "factIds": [
+        "f-21157fd5c834",
+        "f-234033906cea",
+        "f-25e08376b545",
+        "f-8adb5d98d6f2",
+        "f-acb9edbf4bfd"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/ingestion/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "15957da453c0707d8a54ef8d6915298dbf92e2d45b35570b98434fc088fe202d"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/query-federation/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "e7933a19e38b110bc1f10f346c136ce4a58b28cf30b9362a91c0b59c02b6f016"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/structured-streaming/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "cd1cfbca3ba3138dcc3daea91c87f8ea84fec050982c0f0cefef33a1d02a1b86"
+        }
+      ]
+    },
+    {
       "draftId": "d-0935361bff23",
       "questionId": "DEA-0012",
       "factIds": [
@@ -279,6 +343,80 @@
           "url": "https://docs.databricks.com/aws/en/connect/unity-catalog/cloud-storage/",
           "fetchedAt": "2026-10-29",
           "contentHash": "26d836408b3535be730eab7dd7912f23d19c7dda04769367d2128039e148edfd"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0ad63fa95453",
+      "factIds": [
+        "f-0ad2fd4aa0fc",
+        "f-0d0bbb4e7c4b",
+        "f-1d3626c716eb",
+        "f-252284265529",
+        "f-6518fa694c45"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "5d290db7242657b24b7a8b1347872fe27717cb96949f47fff7947f244c48a0b9"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/deployment-modes",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "44f33ad4f41f67c0f5d895f32baf9ad9f3d80a27caff783da424acb38441a7b4"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dev-tools/ci-cd/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "01cf6b5caae38c8cad874cb2adb5ebb791b8ef5947bc9f3c46f294d2926532e3"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/monitor",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "4f1687e7fa246e9618a88614e81540dc5560786f265e1ed0d67a2a4a6c683e06"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/repos/git-operations-with-repos",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "e77ae03cbd84fb08d6768d9fff2b3b8c73bffb0b01404fb58661d3f262d60304"
+        }
+      ]
+    },
+    {
+      "draftId": "d-0ca8d8b2e147",
+      "factIds": [
+        "f-03c700145859",
+        "f-0bda0b3a2542",
+        "f-139c2054a305",
+        "f-14042e24ff47",
+        "f-4a6383076cec"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/audit",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "a966768444459aec58ca1d789f647f3cfb06952f0fa7a61a5cc8c2e4fdc4725e"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/best-practices",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "03ee280aebd00563ed76803d5a1b666ad15366e37a9aac32b27463ff86a6e202"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/manage-privileges/privileges",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "2e16b6d39a924660295331bb4754ec3af62e18e0f23661be11532c814b48fbef"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/row-and-column-filters",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "44109d05e70453707e93cc8187ef4e052e38710121dcb5e4e5bd8a520474a237"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/volumes/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "aaa651c164a208b666d7476ac76b908fbe060a8d0352557df4a6eea8403c40b3"
         }
       ]
     },
@@ -372,6 +510,63 @@
       ]
     },
     {
+      "draftId": "d-14ae4d744be3",
+      "questionId": "DEA-0078",
+      "factIds": [
+        "f-10bdea3fba32",
+        "f-17eff4c3f97c"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "d7006c9201ba6a9fad04cb8b02c01b9667c8b5bb67046e298a057b9ff34e4242"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/structured-streaming/concepts",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "cd1cfbca3ba3138dcc3daea91c87f8ea84fec050982c0f0cefef33a1d02a1b86"
+        }
+      ]
+    },
+    {
+      "draftId": "d-159f6c2796e4",
+      "factIds": [
+        "f-084cf6042287",
+        "f-08fb323a440b",
+        "f-1fd5e78d136d",
+        "f-21a58b92dad3",
+        "f-5cdbd6eaee63"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/filters-and-masks/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "44109d05e70453707e93cc8187ef4e052e38710121dcb5e4e5bd8a520474a237"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dlt/cdc",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "08654298f8b1471bcb77b96aeb299c970765e9f07e2c8560a681219cdafe7718"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/lakehouse/medallion",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "a75b5c362a0ba3622c2dc6d3a153b7069ed0fd9e742d219da9696f6727cc0ff7"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/optimizations/aqe",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "deafcefd383ddb9cbb89e3f9308aa30193b3675f7c656476d3382c936f46454d"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/structured-streaming/checkpoints",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "a24361591379bab755984a9b02ba3c35802506f190c6220c9ce58d6df695ce38"
+        }
+      ]
+    },
+    {
       "draftId": "d-173d6f89dab0",
       "questionId": "DEA-0020",
       "factIds": [
@@ -382,6 +577,25 @@
           "url": "https://docs.databricks.com/aws/en/lakehouse/medallion",
           "fetchedAt": "2026-10-29",
           "contentHash": "7039e50b7e483886bf1045656ad7da369c4968db7bee569c28046c30c25aa737"
+        }
+      ]
+    },
+    {
+      "draftId": "d-1a9497f9b9e1",
+      "factIds": [
+        "f-101afe95b581",
+        "f-1a6b640686a9"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/configure-task",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "ac3147c666f0015eecaff5bfb925e8671b06d6869b6dd65d708472063943f82b"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/notifications",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "5e999b4eaabc7911f44a3df1b0d2e9eee966cf71e6ab7d0cacfdadf3e120123e"
         }
       ]
     },
@@ -504,6 +718,38 @@
       ]
     },
     {
+      "draftId": "d-25508dc58129",
+      "questionId": "DEA-0176",
+      "factIds": [
+        "f-011236a515eb",
+        "f-0192402fb3fb",
+        "f-0800ac41b978",
+        "f-0d54093eb584"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/create-tables",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "c1210b1d8e845ffdf10d99fc34f8154ff972cb6d9f8ec704809e779cbf4fac79"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/delta/merge",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "f616d852fd85846320411807af21c5d7a251cf8fc42d38efce40ced794527e50"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/delta/tutorial",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "31ecaced54f79bee465a955c780d4f17d4515b1fd6ecad2ecce714cacfe80c41"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dlt/materialized-views",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "a424db9e9298ccd36019c9afae3aa3963439b56203e90073812416f367b2160f"
+        }
+      ]
+    },
+    {
       "draftId": "d-25d2aff9044d",
       "questionId": "DEA-0026",
       "factIds": [
@@ -620,34 +866,28 @@
       ]
     },
     {
-      "draftId": "d-2c7f613d5bd8",
-      "questionId": "DEA-0032",
+      "draftId": "d-2cf6fad13549",
       "factIds": [
-        "f-17edb976200c",
-        "f-1b0322ccfccc",
-        "f-2f3580ad06ba",
-        "f-4f16050c5466"
+        "f-177946b0e3e5",
+        "f-18ffb8c2e836",
+        "f-1b59614dcd6a",
+        "f-4c3093800d3d"
       ],
       "sources": [
         {
-          "url": "https://docs.databricks.com/aws/en/delta/",
-          "fetchedAt": "2026-10-29",
-          "contentHash": "bc9771a264e9fa447199bccc9efd808754f87aeef50a95a5056aabad0e3e7d0e"
+          "url": "https://docs.databricks.com/aws/en/jobs/conditional-tasks",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "2452e49ab71967202bf3057bf8c80fcbcffb404a5fa39bea07440414b3a87973"
         },
         {
-          "url": "https://docs.databricks.com/aws/en/dlt/streaming-tables",
-          "fetchedAt": "2026-10-29",
-          "contentHash": "aeda55e3f8151b147513db2b92e17bc13c2f164af0b396b6b58957f153d1b9cc"
+          "url": "https://docs.databricks.com/aws/en/jobs/parameters",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "8c74988eae6a28e3e11212e0dc6cdaa1f0999e694ad4e7463afb55c1d003f952"
         },
         {
-          "url": "https://docs.databricks.com/aws/en/dlt/updates",
-          "fetchedAt": "2026-10-29",
-          "contentHash": "955e29922e0372ed12d01e69455b4a833abb8bc37b611f8ed3b879d3092aa95d"
-        },
-        {
-          "url": "https://docs.databricks.com/aws/en/views/",
-          "fetchedAt": "2026-10-29",
-          "contentHash": "1719d6b04c98c2f46a282889c7910916495bfe94172de5b3ef6d6c6bdc0ed3b5"
+          "url": "https://docs.databricks.com/aws/en/jobs/repair-job-failures",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "1adf58b008a6a555206c49335adb5f286995e22b0c1e90e601df7e2a9468424b"
         }
       ]
     },
@@ -672,6 +912,19 @@
       ]
     },
     {
+      "draftId": "d-2d5dee9850d5",
+      "factIds": [
+        "f-09ab19ed8a1b"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/schema",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "ffb24041b5a2c24347c2c7a4f98809378edac596dea89e57fb493dc14fdda70e"
+        }
+      ]
+    },
+    {
       "draftId": "d-2e356ba02e76",
       "questionId": "DEA-0034",
       "factIds": [
@@ -686,6 +939,32 @@
       ]
     },
     {
+      "draftId": "d-2e4ad28cb15a",
+      "questionId": "DEA-0177",
+      "factIds": [
+        "f-0830737dcf2e",
+        "f-1e75748aa4b2",
+        "f-3a666ce0e302"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/admin/system-tables/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "eb6cc1cda0f273f4dce7e369fe92d11a248c50f403cf75cc29697d3c5046f8c9"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/options",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "fc2689fb48f767ba82a6c7f2f056fb3abc541d641ae6e9c7a0b6d0d9d30c0ac4"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/structured-streaming/triggers",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "0eba607c5ab5c034335c2b71dcbb0b3166c90472dceca91adee90e4004617551"
+        }
+      ]
+    },
+    {
       "draftId": "d-2eb0e236ff8f",
       "questionId": "DEA-0035",
       "factIds": [
@@ -696,6 +975,25 @@
           "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/deployment-modes",
           "fetchedAt": "2026-10-29",
           "contentHash": "44f33ad4f41f67c0f5d895f32baf9ad9f3d80a27caff783da424acb38441a7b4"
+        }
+      ]
+    },
+    {
+      "draftId": "d-2fe714146425",
+      "factIds": [
+        "f-9129cdddda34",
+        "f-a1a6a2799bf9"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/delta/delta-change-data-feed",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "60c83b08ca8cfbe81f4b940dc145f1b2deb23d1afbd3602f1e2f811aaf2943f8"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/delta/update-schema",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "930aeaf58539d90b92b0b72209f580b608145f3bffd5927e6ddb0dc3ee0dab9e"
         }
       ]
     },
@@ -861,6 +1159,26 @@
       ]
     },
     {
+      "draftId": "d-36d881870b55",
+      "questionId": "DEA-0178",
+      "factIds": [
+        "f-02bdad3ce86c",
+        "f-0a703ce8f14e"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/conditional-tasks",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "2452e49ab71967202bf3057bf8c80fcbcffb404a5fa39bea07440414b3a87973"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/run-if",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "2452e49ab71967202bf3057bf8c80fcbcffb404a5fa39bea07440414b3a87973"
+        }
+      ]
+    },
+    {
       "draftId": "d-36ead762dccf",
       "factIds": [
         "f-21157fd5c834",
@@ -982,6 +1300,44 @@
       ]
     },
     {
+      "draftId": "d-42e6a6aae013",
+      "questionId": "DEA-0179",
+      "factIds": [
+        "f-069fe3d6a510",
+        "f-17e2ced2d37c",
+        "f-1ec17d730597",
+        "f-35ac5ea46ca3",
+        "f-4bcacc6f6fe4"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/delta/best-practices",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "306364db9780709dd67ab6eb1b534e6f8050d26d582677c2717f6a46fd1d3ec2"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/delta/optimize",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "a6d9caee754b3a522bb1cbd58b1e7b7eb4a1cd04beea45efac0712aad69e0993"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/delta/tutorial",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "31ecaced54f79bee465a955c780d4f17d4515b1fd6ecad2ecce714cacfe80c41"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/optimizations/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "64ee7a3015ade3c5ce68f55983cfba360e7d096c8846990f2058c858bd4eb3f5"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/optimizations/predictive-optimization",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "3f2fefb4085507c11d03a6529507766e23807726407ed87e08dcb7b02a3d2fd0"
+        }
+      ]
+    },
+    {
       "draftId": "d-434b18baf03f",
       "questionId": "DEA-0048",
       "factIds": [
@@ -1035,6 +1391,88 @@
           "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/",
           "fetchedAt": "2026-10-29",
           "contentHash": "b7a5475bb25b62e4523109ed1d52bd1bc5b9bdd88fba75809a7096044eb96629"
+        }
+      ]
+    },
+    {
+      "draftId": "d-45508bbe95d1",
+      "questionId": "DEA-0180",
+      "factIds": [
+        "f-018d522328eb",
+        "f-02fe7af0851a",
+        "f-0415cc6b5bf5",
+        "f-07ad6bcade6f",
+        "f-184911b59133",
+        "f-23d9692f796f"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/data-engineering/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "8019b911bebeca4736359d321ab3f5078a4a4d0154e258b34303f86893a23e39"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/continuous",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "f2ea4cb82fb981e3e31894770f99c431b7663898df57383cf6fada411fe25aa7"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/notifications",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "5e999b4eaabc7911f44a3df1b0d2e9eee966cf71e6ab7d0cacfdadf3e120123e"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/parameters",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "8c74988eae6a28e3e11212e0dc6cdaa1f0999e694ad4e7463afb55c1d003f952"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/run-if",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "2452e49ab71967202bf3057bf8c80fcbcffb404a5fa39bea07440414b3a87973"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/schedule-jobs",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "538f8b2f67c7772b7a15290ac951ae683d6615271ccd092e84784bfa152ddf99"
+        }
+      ]
+    },
+    {
+      "draftId": "d-45e765e9fdd1",
+      "questionId": "DEA-0181",
+      "factIds": [
+        "f-120dd53c8ae7",
+        "f-198960d17023",
+        "f-2da9369cdf03",
+        "f-641047775d83",
+        "f-9aab5b308411"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/deployment-modes",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "44f33ad4f41f67c0f5d895f32baf9ad9f3d80a27caff783da424acb38441a7b4"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/settings",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "740a8d2c375ada860c059a5eec812532d1edb0310b28bb4b232bd2910c62824d"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dev-tools/ci-cd/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "01cf6b5caae38c8cad874cb2adb5ebb791b8ef5947bc9f3c46f294d2926532e3"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dev-tools/cli/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "da71433b559fe83e822357b43c50b0336e3c58665d0db78bed83033838985169"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/ingestion/lakeflow-connect/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "2aacc24676c62b4bea19311f8571c04185875c6285e574b44f3ab6b6cc79ebf2"
         }
       ]
     },
@@ -1138,6 +1576,37 @@
       ]
     },
     {
+      "draftId": "d-4eca3a11f9d3",
+      "factIds": [
+        "f-036d50606c3f",
+        "f-0b57bb5d0bd5",
+        "f-0b9551f41038",
+        "f-0ca14ed99ab4"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "6a87ad50c6e37a14cfcb157f50f85be38e154a32d8e9ceb545f082514017d7c0"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/configure-task",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "ac3147c666f0015eecaff5bfb925e8671b06d6869b6dd65d708472063943f82b"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/monitor",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "4f1687e7fa246e9618a88614e81540dc5560786f265e1ed0d67a2a4a6c683e06"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/structured-streaming/concepts",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "cd1cfbca3ba3138dcc3daea91c87f8ea84fec050982c0f0cefef33a1d02a1b86"
+        }
+      ]
+    },
+    {
       "draftId": "d-51928369cf91",
       "questionId": "DEA-0054",
       "factIds": [
@@ -1208,6 +1677,44 @@
       ]
     },
     {
+      "draftId": "d-5aaeb43cc725",
+      "questionId": "DEA-0182",
+      "factIds": [
+        "f-029aba46eb92",
+        "f-02fe7af0851a",
+        "f-07ad6bcade6f",
+        "f-184911b59133",
+        "f-5505237ce438"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/configure-task",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "ac3147c666f0015eecaff5bfb925e8671b06d6869b6dd65d708472063943f82b"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/continuous",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "f2ea4cb82fb981e3e31894770f99c431b7663898df57383cf6fada411fe25aa7"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/notifications",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "5e999b4eaabc7911f44a3df1b0d2e9eee966cf71e6ab7d0cacfdadf3e120123e"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/parameters",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "8c74988eae6a28e3e11212e0dc6cdaa1f0999e694ad4e7463afb55c1d003f952"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/repair-job-failures",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "1adf58b008a6a555206c49335adb5f286995e22b0c1e90e601df7e2a9468424b"
+        }
+      ]
+    },
+    {
       "draftId": "d-5cc31318a91d",
       "questionId": "DEA-0059",
       "factIds": [
@@ -1238,6 +1745,38 @@
           "url": "https://docs.databricks.com/aws/en/delta-sharing/",
           "fetchedAt": "2026-10-29",
           "contentHash": "4dfda329acfeb16f920e2285a63cf0eb96f71511b2b9b4eadd5fefde5adc8893"
+        }
+      ]
+    },
+    {
+      "draftId": "d-5ed12c88ef50",
+      "questionId": "DEA-0183",
+      "factIds": [
+        "f-021fb3d43100",
+        "f-0320b27f044c",
+        "f-0342cac900dd",
+        "f-d91c59f447c9"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/delta-sharing/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "4dfda329acfeb16f920e2285a63cf0eb96f71511b2b9b4eadd5fefde5adc8893"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dlt/flows",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "e9becc3b298ff61f489f80eee83a2d45bc198d2374ff9e34fe077069bd190085"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/ingestion/lakeflow-connect/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "2aacc24676c62b4bea19311f8571c04185875c6285e574b44f3ab6b6cc79ebf2"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/volumes/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "aaa651c164a208b666d7476ac76b908fbe060a8d0352557df4a6eea8403c40b3"
         }
       ]
     },
@@ -1330,6 +1869,39 @@
           "url": "https://docs.databricks.com/aws/en/structured-streaming/triggers",
           "fetchedAt": "2026-10-29",
           "contentHash": "0eba607c5ab5c034335c2b71dcbb0b3166c90472dceca91adee90e4004617551"
+        }
+      ]
+    },
+    {
+      "draftId": "d-6806338ca6fa",
+      "questionId": "DEA-0032",
+      "factIds": [
+        "f-17edb976200c",
+        "f-1b0322ccfccc",
+        "f-2f3580ad06ba",
+        "f-4f16050c5466",
+        "f-5c6aafcdd378"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/delta/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "bc9771a264e9fa447199bccc9efd808754f87aeef50a95a5056aabad0e3e7d0e"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dlt/streaming-tables",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "aeda55e3f8151b147513db2b92e17bc13c2f164af0b396b6b58957f153d1b9cc"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dlt/updates",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "955e29922e0372ed12d01e69455b4a833abb8bc37b611f8ed3b879d3092aa95d"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/views/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "1719d6b04c98c2f46a282889c7910916495bfe94172de5b3ef6d6c6bdc0ed3b5"
         }
       ]
     },
@@ -1487,16 +2059,22 @@
       ]
     },
     {
-      "draftId": "d-71283d56d4da",
-      "questionId": "DEA-0073",
+      "draftId": "d-6f9953b4574c",
+      "questionId": "DEA-0184",
       "factIds": [
-        "f-17113a234664"
+        "f-14042e24ff47",
+        "f-4d8978490036"
       ],
       "sources": [
         {
-          "url": "https://docs.databricks.com/aws/en/dlt/pipeline-mode",
-          "fetchedAt": "2026-10-29",
-          "contentHash": "551c86090821b931b6057eb17757aba16a243c1f95c9c0051eae73723964218b"
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/data-lineage",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "0f6f91578a7916267a0a71e268b2e1413e24166d06dc65d4867aa923f16fdf17"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/manage-privileges/privileges",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "2e16b6d39a924660295331bb4754ec3af62e18e0f23661be11532c814b48fbef"
         }
       ]
     },
@@ -1561,6 +2139,52 @@
       ]
     },
     {
+      "draftId": "d-74b7acbb330b",
+      "questionId": "DEA-0185",
+      "factIds": [
+        "f-069fe3d6a510",
+        "f-17e2ced2d37c",
+        "f-42b240c83d23",
+        "f-4bcacc6f6fe4"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/delta/tutorial",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "31ecaced54f79bee465a955c780d4f17d4515b1fd6ecad2ecce714cacfe80c41"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/optimizations/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "64ee7a3015ade3c5ce68f55983cfba360e7d096c8846990f2058c858bd4eb3f5"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/optimizations/predictive-optimization",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "3f2fefb4085507c11d03a6529507766e23807726407ed87e08dcb7b02a3d2fd0"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/tables/managed",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "bb8a2b01abbd0e1a74b9125baaedd78e9f3194f4f2d0a1ceb57cf5ee4ada562d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-79e4c10bb321",
+      "questionId": "DEA-0186",
+      "factIds": [
+        "f-017705eefac9"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/file-detection-modes",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "7bf485a478a84aad89c119a3d7f9a23123aeb9bbce3e10f167ec31a8431a34e1"
+        }
+      ]
+    },
+    {
       "draftId": "d-7a5649623e43",
       "questionId": "DEA-0077",
       "factIds": [
@@ -1571,26 +2195,6 @@
           "url": "https://docs.databricks.com/aws/en/dlt/flows",
           "fetchedAt": "2026-10-29",
           "contentHash": "e9becc3b298ff61f489f80eee83a2d45bc198d2374ff9e34fe077069bd190085"
-        }
-      ]
-    },
-    {
-      "draftId": "d-7ae23b84aa8b",
-      "questionId": "DEA-0078",
-      "factIds": [
-        "f-10bdea3fba32",
-        "f-17eff4c3f97c"
-      ],
-      "sources": [
-        {
-          "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/",
-          "fetchedAt": "2026-10-29",
-          "contentHash": "d7006c9201ba6a9fad04cb8b02c01b9667c8b5bb67046e298a057b9ff34e4242"
-        },
-        {
-          "url": "https://docs.databricks.com/aws/en/structured-streaming/concepts",
-          "fetchedAt": "2026-10-29",
-          "contentHash": "cd1cfbca3ba3138dcc3daea91c87f8ea84fec050982c0f0cefef33a1d02a1b86"
         }
       ]
     },
@@ -1780,6 +2384,38 @@
       ]
     },
     {
+      "draftId": "d-8cb6abd333c3",
+      "questionId": "DEA-0187",
+      "factIds": [
+        "f-069fe3d6a510",
+        "f-17e2ced2d37c",
+        "f-4bcacc6f6fe4",
+        "f-58a3391092c7"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/delta/history",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "700db147d2b3df99bae3de39b638e2eca6147a159fb90af4ff15f7c3db6e92f8"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/delta/tutorial",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "31ecaced54f79bee465a955c780d4f17d4515b1fd6ecad2ecce714cacfe80c41"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/optimizations/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "64ee7a3015ade3c5ce68f55983cfba360e7d096c8846990f2058c858bd4eb3f5"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/optimizations/predictive-optimization",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "3f2fefb4085507c11d03a6529507766e23807726407ed87e08dcb7b02a3d2fd0"
+        }
+      ]
+    },
+    {
       "draftId": "d-8d3e2f168289",
       "questionId": "DEA-0090",
       "factIds": [
@@ -1790,6 +2426,38 @@
           "url": "https://docs.databricks.com/aws/en/dlt/updates",
           "fetchedAt": "2026-10-29",
           "contentHash": "955e29922e0372ed12d01e69455b4a833abb8bc37b611f8ed3b879d3092aa95d"
+        }
+      ]
+    },
+    {
+      "draftId": "d-8f487795443a",
+      "questionId": "DEA-0188",
+      "factIds": [
+        "f-112972000053",
+        "f-252284265529",
+        "f-6518fa694c45",
+        "f-b2515338161d"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/compute/serverless/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "015933fd389e28d0f7b9b34fdda306b95c22fcadcadaf67120f38c85e09fe021"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dev-tools/bundles/work-tasks",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "60e035e918bf08015a9baeb391c6aae949cb018fc4601215c7a604fb46b5dffb"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dev-tools/ci-cd/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "01cf6b5caae38c8cad874cb2adb5ebb791b8ef5947bc9f3c46f294d2926532e3"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/monitor",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "4f1687e7fa246e9618a88614e81540dc5560786f265e1ed0d67a2a4a6c683e06"
         }
       ]
     },
@@ -2170,6 +2838,19 @@
       ]
     },
     {
+      "draftId": "d-a6bc012d9542",
+      "factIds": [
+        "f-477fbcc86b48"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/dlt/materialized-views",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "a424db9e9298ccd36019c9afae3aa3963439b56203e90073812416f367b2160f"
+        }
+      ]
+    },
+    {
       "draftId": "d-a6d7a9856d62",
       "factIds": [
         "f-307a15a641c8"
@@ -2249,6 +2930,44 @@
           "url": "https://docs.databricks.com/aws/en/jobs/file-arrival-triggers",
           "fetchedAt": "2026-10-29",
           "contentHash": "828f17ea8778a8c01466c58a9dfedd2661777e5adee76b9a582afc4b353d3289"
+        }
+      ]
+    },
+    {
+      "draftId": "d-aa4122d3a640",
+      "questionId": "DEA-0189",
+      "factIds": [
+        "f-0830737dcf2e",
+        "f-1e75748aa4b2",
+        "f-2c5b6aabcb32",
+        "f-3a666ce0e302",
+        "f-4dffaf797ee7"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/admin/system-tables/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "eb6cc1cda0f273f4dce7e369fe92d11a248c50f403cf75cc29697d3c5046f8c9"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dlt/unity-catalog",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "1d57daa7fb05a5a83a4d6839e49c8914d59707a5e4abdd941cd39d770dc2e1e4"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/options",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "fc2689fb48f767ba82a6c7f2f056fb3abc541d641ae6e9c7a0b6d0d9d30c0ac4"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/file-arrival-triggers",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "828f17ea8778a8c01466c58a9dfedd2661777e5adee76b9a582afc4b353d3289"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/structured-streaming/triggers",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "0eba607c5ab5c034335c2b71dcbb0b3166c90472dceca91adee90e4004617551"
         }
       ]
     },
@@ -2381,6 +3100,25 @@
       ]
     },
     {
+      "draftId": "d-afef380d17d2",
+      "factIds": [
+        "f-852acfdbbdb6",
+        "f-95b6eaac40e4"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/compute/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "04f9271490c8962b6c3a77c6553bca9b74c9c40396e0f55073a5eaab08f9a3e6"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/compute/sql-warehouse/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "773e1bc263386eab37490aca64be41d8fadeb7338d9aaf706b8145b1bfc7b19b"
+        }
+      ]
+    },
+    {
       "draftId": "d-b1a3cffa22b5",
       "questionId": "DEA-0122",
       "factIds": [
@@ -2468,6 +3206,44 @@
           "url": "https://docs.databricks.com/aws/en/dlt/expectations",
           "fetchedAt": "2026-10-29",
           "contentHash": "99f4b503a81e18735486e70d6ff0642e9b9b3433e547a833e66bc1b5f8f21a5f"
+        }
+      ]
+    },
+    {
+      "draftId": "d-bae9f79082f3",
+      "questionId": "DEA-0190",
+      "factIds": [
+        "f-021fb3d43100",
+        "f-0320b27f044c",
+        "f-0342cac900dd",
+        "f-0a2e7daa4d75",
+        "f-2f7d0112d8b7"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/data-engineering/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "8019b911bebeca4736359d321ab3f5078a4a4d0154e258b34303f86893a23e39"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dlt/flows",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "e9becc3b298ff61f489f80eee83a2d45bc198d2374ff9e34fe077069bd190085"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/schema",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "ffb24041b5a2c24347c2c7a4f98809378edac596dea89e57fb493dc14fdda70e"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/ingestion/lakeflow-connect/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "2aacc24676c62b4bea19311f8571c04185875c6285e574b44f3ab6b6cc79ebf2"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/volumes/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "aaa651c164a208b666d7476ac76b908fbe060a8d0352557df4a6eea8403c40b3"
         }
       ]
     },
@@ -2722,6 +3498,44 @@
       ]
     },
     {
+      "draftId": "d-cc58e63d795a",
+      "questionId": "DEA-0191",
+      "factIds": [
+        "f-00d8c46245eb",
+        "f-0800ac41b978",
+        "f-0bfeb36459dc",
+        "f-0d54093eb584",
+        "f-14736973b748"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/create-tables",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "c1210b1d8e845ffdf10d99fc34f8154ff972cb6d9f8ec704809e779cbf4fac79"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/delta/tutorial",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "31ecaced54f79bee465a955c780d4f17d4515b1fd6ecad2ecce714cacfe80c41"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dlt/expectations",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "99f4b503a81e18735486e70d6ff0642e9b9b3433e547a833e66bc1b5f8f21a5f"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/structured-streaming/delta-lake",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "3cb0f2d464f02b019bbbb5de9a978c86d9e689d069b082e6673d1a7e5cd2cd8b"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/structured-streaming/watermarks",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "c7cc0b2cef4810da445cfd9e4eec81006d39bd4a3a7b0c70af43918c21d8a6d4"
+        }
+      ]
+    },
+    {
       "draftId": "d-cd1f3de59fab",
       "questionId": "DEA-0140",
       "factIds": [
@@ -2802,6 +3616,32 @@
       ]
     },
     {
+      "draftId": "d-d2eaf2f0c665",
+      "factIds": [
+        "f-2bbfce52808f",
+        "f-2e2d70174a05",
+        "f-4509e279c0b7",
+        "f-4c3093800d3d"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/dlt/pipeline-mode",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "551c86090821b931b6057eb17757aba16a243c1f95c9c0051eae73723964218b"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/dlt/updates",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "955e29922e0372ed12d01e69455b4a833abb8bc37b611f8ed3b879d3092aa95d"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/repair-job-failures",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "1adf58b008a6a555206c49335adb5f286995e22b0c1e90e601df7e2a9468424b"
+        }
+      ]
+    },
+    {
       "draftId": "d-d55d5a1536f5",
       "questionId": "DEA-0144",
       "factIds": [
@@ -2847,6 +3687,20 @@
           "url": "https://docs.databricks.com/aws/en/jobs/notifications",
           "fetchedAt": "2026-10-29",
           "contentHash": "5e999b4eaabc7911f44a3df1b0d2e9eee966cf71e6ab7d0cacfdadf3e120123e"
+        }
+      ]
+    },
+    {
+      "draftId": "d-da62bc572277",
+      "questionId": "DEA-0073",
+      "factIds": [
+        "f-17113a234664"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/dlt/pipeline-mode",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "551c86090821b931b6057eb17757aba16a243c1f95c9c0051eae73723964218b"
         }
       ]
     },
@@ -3140,6 +3994,31 @@
       ]
     },
     {
+      "draftId": "d-f2b64f207a11",
+      "factIds": [
+        "f-0480c5b95986",
+        "f-177946b0e3e5",
+        "f-4c3093800d3d"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/parameters",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "8c74988eae6a28e3e11212e0dc6cdaa1f0999e694ad4e7463afb55c1d003f952"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/repair-job-failures",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "1adf58b008a6a555206c49335adb5f286995e22b0c1e90e601df7e2a9468424b"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/task-values",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "8b56c147c4894b1abe14cf6c919c07ede892e04cc8686b351c9af9103c1abfe2"
+        }
+      ]
+    },
+    {
       "draftId": "d-f3a72c462b8c",
       "questionId": "DEA-0161",
       "factIds": [
@@ -3222,6 +4101,37 @@
       ]
     },
     {
+      "draftId": "d-f80b96b623d1",
+      "factIds": [
+        "f-27782f794331",
+        "f-42cbc1d6dcc0",
+        "f-47cc99aa31a2",
+        "f-d6de889565d0"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/dlt/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "e86f8f4b66a684dc5cdf3b4661ca1f2baeb431843ab3ed9089bac4dba3f78ff4"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/ingestion/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "15957da453c0707d8a54ef8d6915298dbf92e2d45b35570b98434fc088fe202d"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "d7006c9201ba6a9fad04cb8b02c01b9667c8b5bb67046e298a057b9ff34e4242"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/copy-into/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "b7b94145ce9ce03aaaf51d344f8708bdb44fdc4d51e69039726bc8db5d995066"
+        }
+      ]
+    },
+    {
       "draftId": "d-f836c86871e3",
       "questionId": "DEA-0166",
       "factIds": [
@@ -3264,6 +4174,32 @@
           "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/copy-into/",
           "fetchedAt": "2026-10-29",
           "contentHash": "b7b94145ce9ce03aaaf51d344f8708bdb44fdc4d51e69039726bc8db5d995066"
+        }
+      ]
+    },
+    {
+      "draftId": "d-f95c058326b7",
+      "questionId": "DEA-0192",
+      "factIds": [
+        "f-1e75748aa4b2",
+        "f-3a666ce0e302",
+        "f-4dffaf797ee7"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.databricks.com/aws/en/admin/system-tables/",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "eb6cc1cda0f273f4dce7e369fe92d11a248c50f403cf75cc29697d3c5046f8c9"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/options",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "fc2689fb48f767ba82a6c7f2f056fb3abc541d641ae6e9c7a0b6d0d9d30c0ac4"
+        },
+        {
+          "url": "https://docs.databricks.com/aws/en/jobs/file-arrival-triggers",
+          "fetchedAt": "2026-11-01",
+          "contentHash": "828f17ea8778a8c01466c58a9dfedd2661777e5adee76b9a582afc4b353d3289"
         }
       ]
     },

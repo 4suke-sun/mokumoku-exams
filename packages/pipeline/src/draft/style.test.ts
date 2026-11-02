@@ -29,6 +29,17 @@ describe("スタイル規則", () => {
       const f = findings(choiceDraft({ questionText: "バケットの上限は 100 個です。" }), "stem-question-form");
       expect(f).toEqual([{ rule: "stem-question-form", severity: "block", path: "questionText" }]);
     });
+
+    it("問いの形のあとに選ぶ数の注記がある_通る", () => {
+      for (const stem of ["正しいものはどれですか。(2 つ選択)", "正しいものはどれですか。（2 つ選択）"]) {
+        expect(findings(multipleDraft({ questionText: stem }), "stem-question-form")).toEqual([]);
+      }
+    });
+
+    it("選ぶ数の注記の前が問いの形でない_止める", () => {
+      const f = findings(multipleDraft({ questionText: "上限は 100 個です。(2 つ選択)" }), "stem-question-form");
+      expect(f).toEqual([{ rule: "stem-question-form", severity: "block", path: "questionText" }]);
+    });
   });
 
   describe("multi-select-count", () => {

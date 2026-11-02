@@ -116,7 +116,7 @@
 | `term-not-found` | 主張の固有名詞が、アンカーの節にない | 表記の揺れ、別の節の内容 |
 | `anchor-not-found` / `quote-not-found` | 見出し・引用が本文にない(引用は取り込むときだけ照合する) | アンカーの書き方 |
 | `hash-mismatch` / `body-not-cached` / `source-not-active` | 出典の本文が変わった・キャッシュにない・検査に合格していない | 収集をやり直し、抽出をやり直す |
-| `unknown-domain` / `scope-item-out-of-range` | 分野が資格マスタにない・試験ガイドの項目の添字が範囲外 | 依頼の `domains` を確かめる |
+| `unknown-domain` / `scope-item-out-of-range` | 分野が資格マスタにない・試験ガイドの項目の添字が範囲外 | 依頼の `domains` を確かめる(試験ガイドの取り込みが `scope-item-out-of-range` で止まったときは、カードは不採用にならない。「5.3」と[出典の収集](./source-collection.md)の「試験ガイドの取り込みの停止」の表を見る) |
 | `conflict` | 食い違う主張(保留) | 上の「保留のカード」 |
 
 取り込みを止める理由コード: `extract-invalid`(出力の形が違う)、`request-mismatch`(依頼と違う資格・出典・本文)、
@@ -151,6 +151,13 @@
 - 見出しの文は、文字参照(`&nbsp;` など)を文字に戻してから比べる。
 - 矛盾の判定のしきい値(`packages/pipeline/src/facts/dedupe.ts` の `CONFLICT_MIN_SIMILARITY`)は、見逃しや誤った保留の例が見つかったときに、その例を根拠に見直す。
 - 試験ガイドのページ(`exam-guide`)は抽出の対象にしないので、技術の事実の根拠には、サービスの文書を収集の計画に足す([出典の収集](./source-collection.md))。
+
+## 5.3 試験ガイドの出題範囲の項目を変えるとき
+
+`scopeItems` は、台帳の試験ガイドの出題範囲の項目(`guide.domains[].scope`)の番号です。試験ガイドの再抽出では、件数と順を前回と同じにします(抽出の依頼に前回の項目 `previousScope` が載ります)。
+試験ガイドの取り込み(`collect <試験コード> --import-guide`)は、通過・保留のカードの `scopeItems` が、取り込む項目数の外を指すとき、台帳を書き換えずに `scope-item-out-of-range` で止めます(不採用のカードは数えません。取り込む試験ガイドにない分野は、項目数を 0 として数えます)。
+
+試験ガイドの改訂で、項目の件数や順を意図して変える手順(カードの `scopeItems` の付け直しを含む)は、まだ用意していません([出典の収集](./source-collection.md)の「出題範囲の項目の件数や順を変えるとき」)。
 
 ## 6. 規約
 

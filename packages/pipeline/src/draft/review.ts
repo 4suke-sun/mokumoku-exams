@@ -8,22 +8,46 @@ import { evidenceLocations } from "./revise.ts";
 import type { DraftRecord, DraftsFile } from "./store.ts";
 
 /**
- * 人が通過と保留の下書き(と、人が却下した下書き)をすべて確かめるための表と、判断を書き込むシート。
+ * 人が要判断の下書き(通過と保留の下書きと、人が却下した下書き。設定 review.autoApprove に挙げた試験では、
+ * 基準を満たして承認を省ける下書き、書き出し済みの下書き、基準を満たすが来歴の検査で止まる下書きを除く)を確かめるための表と、判断を書き込むシート。
  * 表には、設問文・選択肢・正答・解説、根拠にした事実カードの主張(出典の言い換え)と節、検証役が読む根拠の節の場所(出典の URL・節の名前・見出し)、
  * 出典の URL、警告と保留の理由コード、直した下書きの直す前の下書きの ID を載せる。
  * 取得した本文の写しは載せない。表とシートは作業用の置き場に出し、コミットしない。
  */
 
-/** 確認の済み・未済。承認か却下の判断があるものを、確認済みとする */
+/**
+ * 人が判断しなくてよい下書き(設定 review.autoApprove に挙げた試験だけ。書き出しと同じ判定で選ぶ)。
+ * byCriteria: 基準を満たして承認なしで書き出せる下書き(export/criteria.ts の criteriaAccepted)。
+ * exported: 書き出し済みの下書き(来歴に問題 ID がある)。
+ * blocked: 来歴がないか、来歴の検査に落ちた下書き(人が承認しても、書き出せるようにならない)。
+ * これらは書き出しの判定の入力で、表の分類(基準を満たして承認を省ける下書き、書き出し済みの下書き、
+ * 基準を満たすが来歴の検査で止まる下書き)は、classify が、これらと人の判断を組み合わせて決める。
+ */
+export interface ReviewSkip {
+  byCriteria: ReadonlySet<string>;
+  exported: ReadonlySet<string>;
+  blocked: ReadonlySet<string>;
+}
+
+export const NO_SKIP: ReviewSkip = { byCriteria: new Set(), exported: new Set(), blocked: new Set() };
+
+/**
+ * 確認の済み・未済。total・approved・rejected・pending は、要判断の下書き(下の 3 種類のどれにも当たらないもの)だけを数える。
+ * 承認か却下の判断があるものを、確認済みとする。基準を満たして承認を省ける下書き、書き出し済みの下書き、
+ * 基準を満たすが来歴の検査で止まる下書きは、別の件数にする(ID は表の冒頭にだけ出す)。
+ */
 export interface ReviewCounts {
   total: number;
   approved: number;
   rejected: number;
   pending: number;
+  byCriteria: string[];
+  exported: string[];
+  blocked: string[];
 }
 
-/** 確認の対象: 不採用でない下書き(人が却下したものは、確認済みとして数える) */
-export function reviewTargets(drafts: DraftsFile, decisions: DecisionsFile, plan?: SamplingPlan): DraftRecord[] {
+/** 確認の候補: 不採用でない下書き(人が却下したものは、確認済みとして数える)。抜き取りで確認しないものは除く */
+function candidates(drafts: DraftsFile, decisions: DecisionsFile, plan?: SamplingPlan): DraftRecord[] {
   // 抜き取りのとき、通過した下書きのうち確認しないものは、対象にしない(人がすでに判断したものは、確認済みとして残す)
   const skipped = plan?.mode === "sample" ? new Set(plan.draft.notReviewed) : new Set<string>();
   return drafts.drafts.filter(
@@ -33,16 +57,84 @@ export function reviewTargets(drafts: DraftsFile, decisions: DecisionsFile, plan
   );
 }
 
-export function reviewCounts(drafts: DraftsFile, decisions: DecisionsFile, plan?: SamplingPlan): ReviewCounts {
-  const targets = reviewTargets(drafts, decisions, plan);
-  const approved = targets.filter((d) => draftDecision(decisions, d.id) === "approve").length;
-  const rejected = targets.filter((d) => draftDecision(decisions, d.id) === "reject").length;
-  return { total: targets.length, approved, rejected, pending: targets.length - approved - rejected };
+/**
+ * 候補を、要判断・書き出し済み・基準を満たして承認を省ける・基準を満たすが来歴の検査で止まる、に分ける。
+ * 分け方は、書き出し(export/export.ts の selectExportable)の順に合わせる。非公開の問題の書き直しは、必ず要判断にする。
+ */
+function classify(
+  drafts: DraftsFile,
+  decisions: DecisionsFile,
+  plan: SamplingPlan | undefined,
+  skip: ReviewSkip,
+): { needed: DraftRecord[]; byCriteria: string[]; exported: string[]; blocked: string[] } {
+  const result = {
+    needed: [] as DraftRecord[],
+    byCriteria: [] as string[],
+    exported: [] as string[],
+    blocked: [] as string[],
+  };
+  for (const d of candidates(drafts, decisions, plan)) {
+    const decision = draftDecision(decisions, d.id);
+    if (d.rewriteOf !== undefined) result.needed.push(d);
+    else if (skip.exported.has(d.id)) result.exported.push(d.id);
+    else if (skip.byCriteria.has(d.id) && decision === undefined)
+      (skip.blocked.has(d.id) ? result.blocked : result.byCriteria).push(d.id);
+    else result.needed.push(d);
+  }
+  return result;
+}
+
+/** 確認の対象: 要判断の下書き。表の節と、判断のシートの行になる */
+export function reviewTargets(
+  drafts: DraftsFile,
+  decisions: DecisionsFile,
+  plan?: SamplingPlan,
+  skip: ReviewSkip = NO_SKIP,
+): DraftRecord[] {
+  return classify(drafts, decisions, plan, skip).needed;
+}
+
+export function reviewCounts(
+  drafts: DraftsFile,
+  decisions: DecisionsFile,
+  plan?: SamplingPlan,
+  skip: ReviewSkip = NO_SKIP,
+): ReviewCounts {
+  const { needed, byCriteria, exported, blocked } = classify(drafts, decisions, plan, skip);
+  const approved = needed.filter((d) => draftDecision(decisions, d.id) === "approve").length;
+  const rejected = needed.filter((d) => draftDecision(decisions, d.id) === "reject").length;
+  return {
+    total: needed.length,
+    approved,
+    rejected,
+    pending: needed.length - approved - rejected,
+    byCriteria,
+    exported,
+    blocked,
+  };
 }
 
 /** Markdown の表の 1 マスに入れる。縦棒と改行を、表を壊さない形にする */
 function cell(text: string): string {
   return text.replace(/\|/g, "\\|").replace(/\r?\n/g, "<br>");
+}
+
+/** 人が判断しなくてよい下書きの件数と ID。どれも 0 件なら、何も出さない */
+function skippedLines(counts: ReviewCounts): string[] {
+  const groups: [string, string[]][] = [
+    ["基準を満たして承認を省ける(却下するときは、判断の記録を直す)", counts.byCriteria],
+    ["書き出し済み", counts.exported],
+    ["基準を満たすが来歴の検査で止まる(人の承認では書き出せない)", counts.blocked],
+  ];
+  const shown = groups.filter(([, ids]) => ids.length > 0);
+  if (shown.length === 0) return [];
+  return [
+    "",
+    "表に載せない下書き:",
+    "",
+    ...shown.map(([label, ids]) => `- ${label}: ${ids.length} 件(${ids.join(", ")})`),
+    "",
+  ];
 }
 
 /** 下書きの確認用の表(Markdown)。1 件を 1 つの節にし、項目を表で並べる */
@@ -53,12 +145,14 @@ export function renderDraftReview(
   provenance: ProvenanceFile,
   decisions: DecisionsFile,
   plan?: SamplingPlan,
+  skip: ReviewSkip = NO_SKIP,
 ): string {
-  const counts = reviewCounts(drafts, decisions, plan);
+  const counts = reviewCounts(drafts, decisions, plan, skip);
   const lines = [
     `# 下書きの確認(${examCode})`,
     "",
-    `対象 ${counts.total} 件(承認 ${counts.approved} 件、却下 ${counts.rejected} 件、未済 ${counts.pending} 件)。`,
+    `要判断 ${counts.total} 件(承認 ${counts.approved} 件、却下 ${counts.rejected} 件、未済 ${counts.pending} 件)。`,
+    ...skippedLines(counts),
     ...(plan?.mode === "sample"
       ? [
           `抜き取りで確認する(率 ${plan.rate}、種 ${plan.seed})。通過した下書き ${plan.draft.eligible} 件のうち、確認するもの ${plan.draft.reviewed.length} 件、確認しないもの ${plan.draft.notReviewed.length} 件。保留は全件を確認する。`,
@@ -67,7 +161,7 @@ export function renderDraftReview(
     "判断は、同じ置き場の review-sheet.json に書き、`draft <試験コード> --decide` で取り込む。",
     "",
   ];
-  for (const record of reviewTargets(drafts, decisions, plan)) {
+  for (const record of reviewTargets(drafts, decisions, plan, skip)) {
     const d = record.draft;
     const decision = draftDecision(decisions, record.id) ?? "未済";
     lines.push(`## ${record.id}`, "", "| 項目 | 内容 |", "| --- | --- |");
@@ -146,10 +240,11 @@ export function buildReviewSheet(
   drafts: DraftsFile,
   decisions: DecisionsFile,
   plan?: SamplingPlan,
+  skip: ReviewSkip = NO_SKIP,
 ): ReviewSheet {
   return {
     examCode,
-    items: reviewTargets(drafts, decisions, plan).map((d) => {
+    items: reviewTargets(drafts, decisions, plan, skip).map((d) => {
       const existing = decisions.decisions.find((x) => x.target === "draft" && x.id === d.id);
       return {
         id: d.id,

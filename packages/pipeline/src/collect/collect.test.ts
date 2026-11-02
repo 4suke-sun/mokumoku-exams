@@ -4,7 +4,8 @@ import { join, resolve } from "node:path";
 import { describe, expect, it } from "vitest";
 import { decisionsPath, writeDecisions } from "../decisions/decisions.ts";
 import { EXIT } from "../exit-codes.ts";
-import { factsPath, writeFacts } from "../facts/schema.ts";
+import { emptyFacts, factsPath, writeFacts } from "../facts/schema.ts";
+import { card } from "../facts/test-helpers.ts";
 import { main } from "../main.ts";
 import { readAgentStamp } from "../shared/agents.ts";
 import { installAgentDefinitions } from "../shared/test-helpers.ts";
@@ -629,5 +630,86 @@ describe("collect --import-guide", () => {
       expect(r.net.requests).toEqual([]);
       expect(r.code).toBe(EXIT.ok);
     });
+  });
+});
+
+describe("collect --import-guide と事実カードの出題範囲の項目", () => {
+  const hash = contentHashOf(Buffer.from(fixture("guide.html")));
+  async function collected() {
+    const root = setupRoot({ ...plan, scope: { prefixes: [BASE], maxDepth: 0 } });
+    await run(root, ["collect", CODE]);
+    return root;
+  }
+  function writeExtract(root: string, scope: string[]) {
+    writeFileSync(
+      join(root, config.workDir, "guide/aws-aib-c01.extract.json"),
+      JSON.stringify({
+        examCode: CODE,
+        sourceUrl: GUIDE,
+        contentHash: hash,
+        domains: [{ number: 1, name: "分野 1", weightPercent: 100, scope }],
+      }),
+    );
+  }
+  function writeCards(root: string, cards: ReturnType<typeof card>[]) {
+    writeFacts(factsPath(join(root, config.factsDir), CODE), { ...emptyFacts(CODE), cards });
+  }
+
+  it("事実カードが新しい項目数の外を指す_台帳を書き換えずに止め、分野ごとの件数を理由コードと出す", async () => {
+    const root = await collected();
+    writeCards(root, [
+      card({ id: "f-000000000001", scopeItems: [0, 2] }),
+      card({ id: "f-000000000002", scopeItems: [3] }),
+      card({ id: "f-000000000003", scopeItems: [0] }),
+    ]);
+    writeExtract(root, ["項目 1", "項目 2"]);
+    const r = await run(root, ["collect", CODE, "--import-guide"]);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain("試験ガイドの取り込みの停止: scope-item-out-of-range domain1 事実カード 2 件");
+    expect(r.ledger().guide).toBeNull();
+  });
+
+  it("取り込む試験ガイドにない分野を指す事実カード_項目数 0 として範囲の外に数えて止める", async () => {
+    const root = await collected();
+    writeCards(root, [card({ id: "f-000000000001", domain: "domain2", scopeItems: [0] })]);
+    writeExtract(root, ["項目 1"]);
+    const r = await run(root, ["collect", CODE, "--import-guide"]);
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain("試験ガイドの取り込みの停止: scope-item-out-of-range domain2 事実カード 1 件");
+  });
+
+  it("事実カードがすべて項目数の内を指す_取り込む", async () => {
+    const root = await collected();
+    writeCards(root, [card({ id: "f-000000000001", scopeItems: [0, 1] })]);
+    writeExtract(root, ["項目 1", "項目 2"]);
+    const r = await run(root, ["collect", CODE, "--import-guide"]);
+    expect(r.code).toBe(EXIT.ok);
+    expect(r.ledger().guide?.domains[0]?.scope).toHaveLength(2);
+  });
+
+  it("項目数の外を指すのが不採用のカードだけ_数えずに取り込む", async () => {
+    const root = await collected();
+    writeCards(root, [
+      card({ id: "f-000000000001", scopeItems: [5], status: "rejected", reasons: ["claim-too-long"] }),
+    ]);
+    writeExtract(root, ["項目 1"]);
+    expect((await run(root, ["collect", CODE, "--import-guide"])).code).toBe(EXIT.ok);
+  });
+
+  it("前回の取り込みがない依頼_前回の項目を載せず、取り込みのあとの再依頼_前回の項目を分野ごとに載せる", async () => {
+    const root = await collected();
+    const requestPath = join(root, config.workDir, "guide/aws-aib-c01.request.json");
+    expect(JSON.parse(readFileSync(requestPath, "utf8")).previousScope).toBeUndefined();
+    writeExtract(root, ["項目 1", "項目 2"]);
+    expect((await run(root, ["collect", CODE, "--import-guide"])).code).toBe(EXIT.ok);
+    // 試験ガイドの本文が変わったことにして、再抽出の依頼を出させる
+    const ledgerPath = join(root, config.ledgerDir, "aws-aib-c01.json");
+    const ledger = JSON.parse(readFileSync(ledgerPath, "utf8"));
+    ledger.guide.contentHash = "f".repeat(64);
+    writeFileSync(ledgerPath, JSON.stringify(ledger));
+    await run(root, ["collect", CODE]);
+    expect(JSON.parse(readFileSync(requestPath, "utf8")).previousScope).toEqual([
+      { code: "domain1", scope: ["項目 1", "項目 2"] },
+    ]);
   });
 });
