@@ -759,7 +759,16 @@ U3. 公開の問題の数(規則 16)は、非公開の問題を数えない。
       "diagram": { "type": "timeline", "title": "…", "events": [ … ] },
       "body": "解説(「6. 文字の書き方」の記法が使えます)",
       "examAngle": "ここを押さえる",
-      "checks": [{ "question": "問い", "answer": "答え", "reason": "理由" }],
+      "checks": [
+        {
+          "question": "問い(条件を示して、当てはまるほうを選ぶ)",
+          "choices": [
+            { "key": "A", "text": "選択肢 A", "reason": "A が正しい・誤りである理由" },
+            { "key": "B", "text": "選択肢 B", "reason": "B が正しい・誤りである理由" }
+          ],
+          "correct": "A"
+        }
+      ],
       "related": ["term-b"],
       "references": [{ "title": "公式の文書", "url": "https://docs.databricks.com/…" }],
       "status": "verified"
@@ -795,7 +804,9 @@ U3. 公開の問題の数(規則 16)は、非公開の問題を数えない。
 | `entries[].diagram` | オブジェクト | 任意 | 見出しの図(0〜1 個)。一言の直後に出す。形は「11. カリキュラムのデータ」の「図解」と同じ。検証の状態は、見出しの `status` が覆う |
 | `entries[].body` | 文字列 | 必須 | 空白だけは不可。10000 文字以内。解説 |
 | `entries[].examAngle` | 文字列 | 任意 | 空白だけは不可。1000 文字以内。「ここを押さえる」の囲みに出す。取り違えやすい点と、区別して覚える点を、解説にある事実から書く(試験での問われ方の予想は書かない) |
-| `entries[].checks` | 配列 | 必須 | 1〜10 件。確認の問い。`question`(300 文字以内)・`answer`(500 文字以内)・`reason`(1000 文字以内) |
+| `entries[].checks` | 配列 | 必須 | 1〜10 件。確認の問い(2 択)。`question`(300 文字以内)・`choices`・`correct`。中分類の末尾のおさらいにも、同じ問いを出す |
+| `checks[].choices` | 配列 | 必須 | ちょうど 2 件。`key` は `A`・`B` の順。`text`(選択肢の文。200 文字以内)と `reason`(その選択肢が正しい・誤りである理由。500 文字以内)を、選択肢ごとに持つ。2 つの `text` は同じにしない。画面では、見出しの確認は表示の設定に従って、中分類の末尾のおさらいは設定によらず毎回、並びを入れ替え、記号は上から A・B と付け直す(理由の文で、記号を指さない) |
+| `checks[].correct` | 文字列 | 必須 | 正解の選択肢のキー(`A` か `B`)。ファイルの中で、A と B がほぼ半々になるように置く |
 | `entries[].related` | 配列 | 任意 | 1〜10 件。関連する見出しの ID。ファイルの `entries[].id` にあり、自分自身と重複は不可 |
 | `entries[].references` | 配列 | 必須 | 出典(公式の文書)。形と規則は問題の `references` と同じ(「3.1 出典」。1 件以上で、ホストは許すドメインの一覧にある) |
 | `entries[].status` | 文字列 | 必須 | `verified`(検証済み)か `unverified`(未検証)。利用者の画面には `verified` だけを出し、`unverified` は管理者のプレビューにだけ出す |
@@ -813,7 +824,7 @@ U3. 公開の問題の数(規則 16)は、非公開の問題を数えない。
 | 項目 | 解釈する記法 |
 | --- | --- |
 | `entries[].body`・`entries[].examAngle` | 空行、`**太字**`、`` `コード` ``、行頭の `- `、行頭の `## `、コードのブロック |
-| `checks[].question`・`checks[].answer`・`checks[].reason`、`comparison.columns`・`rows[].aspect`・`rows[].cells` | `**太字**`、`` `コード` `` |
+| `checks[].question`・`choices[].text`・`choices[].reason`、`comparison.columns`・`rows[].aspect`・`rows[].cells` | `**太字**`、`` `コード` `` |
 | `units[].title`・`units[].intro`、`entries[].term`・`entries[].oneLine`、`units[].diagram`・`entries[].diagram` の文字、`references[].title` | なし(文字をそのまま表示する) |
 
 体系ノートの本文の文体は、[体系ノートの文体の規則](./notebook-style.md)に従います。

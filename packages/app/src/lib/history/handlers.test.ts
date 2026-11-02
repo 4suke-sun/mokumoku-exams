@@ -9,6 +9,7 @@ import {
   type HistoryDeps,
   handleDeleteReview,
   handleGetGoal,
+  handleGetNotebook,
   handleGetPrefs,
   handleGetResult,
   handleListBookmarks,
@@ -19,6 +20,7 @@ import {
   handlePostResult,
   handlePutBookmark,
   handlePutGoal,
+  handlePutNotebook,
   handlePutPrefs,
   reviewChangeOf,
   tallyOf,
@@ -431,6 +433,12 @@ const failing: HistoryRepository = {
     throw new Error("unavailable");
   },
   async setPrefs() {
+    throw new Error("unavailable");
+  },
+  async listNotebookUnits() {
+    throw new Error("unavailable");
+  },
+  async completeNotebookUnit() {
     throw new Error("unavailable");
   },
 };
@@ -960,5 +968,94 @@ describe("表示の設定の API", () => {
     expect(saved.status).toBe(503);
     expect(await saved.json()).toEqual({ error: "unavailable" });
     expect((await read(deps(failing), "a")).status).toBe(503);
+  });
+});
+
+describe("体系ノートの履修済みの API", () => {
+  const notebookUnits = async (examCode: string) =>
+    examCode === "EX-SMP-XX" ? new Set(["domain1-1", "domain1-2"]) : null;
+  const withNotebook = (repository: HistoryRepository = createMemoryRepository(), now = NOW): HistoryDeps => ({
+    ...deps(repository),
+    now: () => now,
+    notebookUnits,
+  });
+  const put = (value: unknown, headers: Record<string, string> = {}, raw?: string) =>
+    new Request(`${ORIGIN}/api/history/notebook`, {
+      method: "PUT",
+      headers: { "content-type": "application/json", ...headers },
+      body: raw ?? JSON.stringify(value),
+    });
+  const read = (d: HistoryDeps, sub: string | null, query = "examCode=EX-SMP-XX") =>
+    handleGetNotebook(
+      new Request(`${ORIGIN}/api/history/notebook?${query}`, { headers: sub ? { cookie: asUser(sub) } : {} }),
+      d,
+    );
+
+  it("記録して取得する_自分の分だけを_サーバーの時刻で返す", async () => {
+    const d = withNotebook();
+    expect(await (await read(d, "a")).json()).toEqual({ units: [] });
+    const saved = await handlePutNotebook(
+      put({ examCode: "EX-SMP-XX", unit: "domain1-2" }, { cookie: asUser("a") }),
+      d,
+    );
+    expect(saved.status).toBe(200);
+    expect(await (await read(d, "a")).json()).toEqual({
+      units: [{ unit: "domain1-2", completedAt: new Date(NOW).toISOString() }],
+    });
+    expect(await (await read(d, "b")).json()).toEqual({ units: [] });
+  });
+
+  it("同じ中分類を後から記録し直す_最初の時刻を残す", async () => {
+    const repository = createMemoryRepository();
+    const first = { examCode: "EX-SMP-XX", unit: "domain1-1" };
+    await handlePutNotebook(put(first, { cookie: asUser("a") }), withNotebook(repository, NOW));
+    const again = await handlePutNotebook(put(first, { cookie: asUser("a") }), withNotebook(repository, NOW + 60_000));
+    expect(again.status).toBe(200);
+    expect(await (await read(withNotebook(repository), "a")).json()).toEqual({
+      units: [{ unit: "domain1-1", completedAt: new Date(NOW).toISOString() }],
+    });
+  });
+
+  it("本文が正しくない・ノートにない中分類・ノートのない資格・時刻や sub を含む_400 を返し_保存しない", async () => {
+    const d = withNotebook();
+    const cases: unknown[] = [
+      { examCode: "EX-SMP-XX", unit: "domain9-9" }, // ノートにない(見出しのない)中分類
+      { examCode: "EX-OTH-XX", unit: "domain1-1" }, // ノートのない資格
+      { examCode: "EX-SMP-XX", unit: "domain1" },
+      { examCode: "EX-SMP-XX", unit: "" },
+      { examCode: "EX-SMP-XX" },
+      { examCode: "sample", unit: "domain1-1" },
+      { examCode: "EX-SMP-XX", unit: "domain1-1", completedAt: "2026-01-01T00:00:00.000Z" },
+      { examCode: "EX-SMP-XX", unit: "domain1-1", sub: "other-user" },
+      [],
+      null,
+    ];
+    for (const value of cases) {
+      const response = await handlePutNotebook(put(value, { cookie: asUser("a") }), d);
+      expect(response.status, JSON.stringify(value)).toBe(400);
+      expect(await response.json()).toEqual({ error: "bad-request" });
+    }
+    expect(await (await read(d, "a")).json()).toEqual({ units: [] });
+  });
+
+  it("未ログイン・別サイト・JSON でない・大きすぎる・未知の問い合わせ・保存先の失敗_それぞれの種類で断る", async () => {
+    const d = withNotebook();
+    const change = { examCode: "EX-SMP-XX", unit: "domain1-1" };
+    expect((await handlePutNotebook(put(change), d)).status).toBe(401);
+    expect((await read(d, null)).status).toBe(401);
+    expect(
+      (await handlePutNotebook(put(change, { cookie: asUser("a"), "sec-fetch-site": "cross-site" }), d)).status,
+    ).toBe(403);
+    expect(
+      (await handlePutNotebook(put(change, { cookie: asUser("a"), "content-type": "text/plain" }), d)).status,
+    ).toBe(415);
+    expect(
+      (await handlePutNotebook(put(null, { cookie: asUser("a") }, JSON.stringify({ pad: "x".repeat(2000) })), d))
+        .status,
+    ).toBe(413);
+    expect((await handlePutNotebook(put(null, { cookie: asUser("a") }, "{"), d)).status).toBe(400);
+    for (const query of ["", "examCode=EX-SMP-XX&sub=b"]) expect((await read(d, "a", query)).status, query).toBe(400);
+    expect((await handlePutNotebook(put(change, { cookie: asUser("a") }), withNotebook(failing))).status).toBe(503);
+    expect((await read(withNotebook(failing), "a")).status).toBe(503);
   });
 });

@@ -3,9 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type ReactNode, type RefObject, useCallback, useEffect, useId, useRef, useState } from "react";
+import { NotebookTocMark } from "@/components/notebook-check.tsx";
+import { NotebookProgressProvider } from "@/components/notebook-progress.tsx";
 import type { TocDomain } from "@/lib/notebook-data.ts";
 
 type Props = {
+  examCode: string;
+  /** 管理者のプレビュー(履修済みを読まず、記録もしない) */
+  preview: boolean;
   /** 表紙の URL。中分類のページは `<basePath>/<中分類の ID>` */
   basePath: string;
   toc: TocDomain[];
@@ -52,7 +57,7 @@ export function NotebookToc({ basePath, toc }: { basePath: string; toc: TocDomai
                       className={`${itemClass(active, unit.count === 0)} pl-4`}
                     >
                       <span>
-                        {unit.number} {unit.title}
+                        {unit.number} {unit.title} <NotebookTocMark unitId={unit.id} />
                       </span>
                       <span className="shrink-0 text-xs">
                         {unit.count}
@@ -182,7 +187,7 @@ export function revealCurrent(container: HTMLElement) {
  * 目次は、ページのどこまで読み進めても開ける(追従する)。広い画面の目次は、スクロールしても画面に残り、
  * サイトの上のバー(`lg` 未満で上に固定)と重ならない。狭い画面の「☰ 目次」は、上のバーのすぐ下に固定する。
  */
-export function NotebookShell({ basePath, toc, children }: Props) {
+export function NotebookShell({ examCode, preview, basePath, toc, children }: Props) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const button = useRef<HTMLButtonElement>(null);
@@ -197,34 +202,36 @@ export function NotebookShell({ basePath, toc, children }: Props) {
   }, [pathname]);
 
   return (
-    <div className="md:grid md:grid-cols-[15rem_minmax(0,1fr)] md:gap-8">
-      <aside className="hidden md:block">
-        {/* `lg` 未満は、サイトの上のバー(上に固定。高さ約 3rem)の下に固定する */}
-        <div
-          ref={side}
-          className="sticky top-16 max-h-[calc(100dvh-5rem)] overflow-y-auto pb-4 lg:top-4 lg:max-h-[calc(100dvh-2rem)]"
-        >
-          <NotebookToc basePath={basePath} toc={toc} />
-        </div>
-      </aside>
-      <div className="min-w-0">
-        {/* 上のバー(高さ約 3rem)の下に、少し間を空けて固定する(`top-14`)。ボタンの外側は、下の本文を押せるよう、押す対象にしない */}
-        <div data-testid="notebook-toc-bar" className="pointer-events-none sticky top-14 z-20 mb-4 md:hidden">
-          <button
-            ref={button}
-            type="button"
-            aria-haspopup="dialog"
-            aria-expanded={open}
-            aria-controls={open ? drawerId : undefined}
-            onClick={() => setOpen(true)}
-            className="pointer-events-auto inline-flex items-center gap-2 rounded-md border border-line bg-surface px-3 py-2 text-sm font-bold shadow-sm"
+    <NotebookProgressProvider examCode={examCode} preview={preview}>
+      <div className="md:grid md:grid-cols-[15rem_minmax(0,1fr)] md:gap-8">
+        <aside className="hidden md:block">
+          {/* `lg` 未満は、サイトの上のバー(上に固定。高さ約 3rem)の下に固定する */}
+          <div
+            ref={side}
+            className="sticky top-16 max-h-[calc(100dvh-5rem)] overflow-y-auto pb-4 lg:top-4 lg:max-h-[calc(100dvh-2rem)]"
           >
-            <span aria-hidden="true">☰</span>目次
-          </button>
+            <NotebookToc basePath={basePath} toc={toc} />
+          </div>
+        </aside>
+        <div className="min-w-0">
+          {/* 上のバー(高さ約 3rem)の下に、少し間を空けて固定する(`top-14`)。ボタンの外側は、下の本文を押せるよう、押す対象にしない */}
+          <div data-testid="notebook-toc-bar" className="pointer-events-none sticky top-14 z-20 mb-4 md:hidden">
+            <button
+              ref={button}
+              type="button"
+              aria-haspopup="dialog"
+              aria-expanded={open}
+              aria-controls={open ? drawerId : undefined}
+              onClick={() => setOpen(true)}
+              className="pointer-events-auto inline-flex items-center gap-2 rounded-md border border-line bg-surface px-3 py-2 text-sm font-bold shadow-sm"
+            >
+              <span aria-hidden="true">☰</span>目次
+            </button>
+          </div>
+          {children}
         </div>
-        {children}
+        {open ? <TocDrawer id={drawerId} basePath={basePath} toc={toc} onClose={close} returnFocus={button} /> : null}
       </div>
-      {open ? <TocDrawer id={drawerId} basePath={basePath} toc={toc} onClose={close} returnFocus={button} /> : null}
-    </div>
+    </NotebookProgressProvider>
   );
 }

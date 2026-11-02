@@ -143,6 +143,7 @@ const PROTECTED_APIS = [
   "/api/history/bookmarks",
   "/api/history/days",
   "/api/history/goal",
+  "/api/history/notebook",
   "/api/history/prefs",
   "/api/history/sections",
   "/api/history/result",

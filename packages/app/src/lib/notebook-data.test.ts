@@ -31,7 +31,16 @@ const entry = (id: string, unitId: string, order: number, status: NotebookEntry[
   term: id,
   oneLine: "一言です。",
   body: "解説です。",
-  checks: [{ question: "問い", answer: "答え", reason: "理由" }],
+  checks: [
+    {
+      question: "問い",
+      choices: [
+        { key: "A", text: "正しい", reason: "理由" },
+        { key: "B", text: "誤り", reason: "理由" },
+      ],
+      correct: "A",
+    },
+  ],
   references: [{ url: "https://docs.databricks.com/" }],
   status,
 });

@@ -53,6 +53,10 @@ export function fakeTable(options: { scanPageSize?: number; queryPageSize?: numb
       if (command instanceof PutCommand) {
         const item = command.input.Item as Record<string, unknown>;
         const old = items.get(`${item.PK}|${item.SK}`);
+        // 条件は、項目がないときだけ書く形(attribute_not_exists)だけを扱う
+        if (command.input.ConditionExpression === "attribute_not_exists(SK)" && old) {
+          throw Object.assign(new Error("条件に合いません"), { name: "ConditionalCheckFailedException" });
+        }
         items.set(`${item.PK}|${item.SK}`, item);
         return command.input.ReturnValues === "ALL_OLD" && old ? { Attributes: old } : {};
       }

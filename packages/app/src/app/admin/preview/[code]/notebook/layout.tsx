@@ -14,7 +14,12 @@ export default async function NotebookPreviewLayout({ children, params }: Props)
   const data = await loadNotebookPage(code, true);
   if (!data) notFound();
   return (
-    <NotebookShell basePath={`/admin/preview/${data.exam.examCode}/notebook`} toc={data.toc}>
+    <NotebookShell
+      examCode={data.exam.examCode}
+      preview={true}
+      basePath={`/admin/preview/${data.exam.examCode}/notebook`}
+      toc={data.toc}
+    >
       {children}
     </NotebookShell>
   );

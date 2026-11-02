@@ -15,7 +15,8 @@ const text = prose;
 
 const DOMAIN_CODE = /^domain\d{1,2}$/;
 /** 中分類の ID: `<分野のコード>-<分野の中の番号>`。URL の一部(`/exams/<資格コード>/notebook/<ID>`)になる */
-const UNIT_ID = /^domain\d{1,2}-\d{1,2}$/;
+export const NOTEBOOK_UNIT_ID = /^domain\d{1,2}-\d{1,2}$/;
+const UNIT_ID = NOTEBOOK_UNIT_ID;
 /** 見出しの ID: 英小文字・数字・ハイフンで、英字から始める。ページの中の位置(`#<ID>`)になる */
 const ENTRY_ID = /^[a-z][a-z0-9-]{0,63}$/;
 const ENTRY_ID_MESSAGE = "ID は英小文字・数字・ハイフンで、英字から始めます";
@@ -70,12 +71,37 @@ export const NotebookUnitSchema = z
     }
   });
 
-/** 確認の問い: 自己確認の問いと、答えと理由。結果は保存しない */
-export const NotebookCheckSchema = z.strictObject({
-  question: text.max(300),
-  answer: text.max(500),
-  reason: text.max(1000),
+/** 確認の問いの選択肢のキー。2 択で、A・B の順に置く */
+export const NOTEBOOK_CHECK_KEYS = ["A", "B"] as const;
+
+/** 確認の問いの選択肢: 選択肢の文と、その選択肢が正しい・誤りである理由 */
+export const NotebookCheckChoiceSchema = z.strictObject({
+  key: z.enum(NOTEBOOK_CHECK_KEYS),
+  text: text.max(200),
+  reason: text.max(500),
 });
+
+/**
+ * 確認の問い: 2 択(A・B)の問いと、選択肢ごとの理由と、正解のキー。
+ * 個々の問いの結果は保存しない(中分類の末尾のおさらいで全問正解したときだけ、中分類の履修済みを記録する)。
+ */
+export const NotebookCheckSchema = z
+  .strictObject({
+    question: text.max(300),
+    choices: z.array(NotebookCheckChoiceSchema).length(2),
+    correct: z.enum(NOTEBOOK_CHECK_KEYS),
+  })
+  .superRefine((check, ctx) => {
+    check.choices.forEach((choice, i) => {
+      if (choice.key !== NOTEBOOK_CHECK_KEYS[i]) {
+        ctx.addIssue({ code: "custom", path: ["choices", i, "key"], message: "選択肢のキーは A・B の順にします" });
+      }
+    });
+    const [a, b] = check.choices;
+    if (a !== undefined && b !== undefined && a.text.trim() === b.text.trim()) {
+      ctx.addIssue({ code: "custom", path: ["choices", 1, "text"], message: "2 つの選択肢の文が同じです" });
+    }
+  });
 
 /** 見出し: 用語 1 つで 1 つ */
 export const NotebookEntrySchema = z
@@ -163,7 +189,9 @@ export const NotebookFileSchema = z
 
 export type NotebookComparison = z.infer<typeof NotebookComparisonSchema>;
 export type NotebookUnit = z.infer<typeof NotebookUnitSchema>;
+export type NotebookCheckChoice = z.infer<typeof NotebookCheckChoiceSchema>;
 export type NotebookCheck = z.infer<typeof NotebookCheckSchema>;
+export type NotebookCheckKey = (typeof NOTEBOOK_CHECK_KEYS)[number];
 export type NotebookEntry = z.infer<typeof NotebookEntrySchema>;
 export type NotebookEntryStatus = (typeof NOTEBOOK_ENTRY_STATUSES)[number];
 export type NotebookFile = z.infer<typeof NotebookFileSchema>;

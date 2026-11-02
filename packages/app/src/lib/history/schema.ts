@@ -1,4 +1,5 @@
 import { EXAM_CODE, QUESTION_ID } from "@mokumoku-exams/data-schema/exam-data/shape";
+import { NOTEBOOK_UNIT_ID } from "@mokumoku-exams/data-schema/notebook-data/schema";
 import { z } from "zod";
 import {
   checkPerQuestionLengths,
@@ -126,3 +127,12 @@ export const SectionsChangeSchema = SectionProgressSchema.refine(
   (progress) => EXAM_CODE.test(progress.examCode),
   "資格コードが正しくありません。",
 );
+
+/** 体系ノートの履修済みの記録の本文の上限(資格コードと中分類の ID だけなので、小さい) */
+export const MAX_NOTEBOOK_BODY_BYTES = 1_000;
+
+/** 体系ノートの中分類を、履修済みとして記録する。時刻はサーバーで付ける(本文では受け取らない)。 */
+export const NotebookCompletionChangeSchema = z.strictObject({
+  examCode: z.string().regex(EXAM_CODE),
+  unit: z.string().regex(NOTEBOOK_UNIT_ID),
+});
