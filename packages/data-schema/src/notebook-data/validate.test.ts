@@ -11,12 +11,11 @@ const unit = (over: Record<string, unknown> = {}) => ({
   status: "verified",
   ...over,
 });
+const choiceA = { key: "A", text: "選択肢 A です。", reason: "A の理由です。" };
+const choiceB = { key: "B", text: "選択肢 B です。", reason: "B の理由です。" };
 const check = (over: Record<string, unknown> = {}) => ({
   question: "どちらが正しいですか。",
-  choices: [
-    { key: "A", text: "選択肢 A です。", reason: "A の理由です。" },
-    { key: "B", text: "選択肢 B です。", reason: "B の理由です。" },
-  ],
+  choices: [choiceA, choiceB],
   correct: "A",
   ...over,
 });
@@ -122,14 +121,14 @@ describe("validateNotebookData", () => {
   });
 
   it("確認の問いの選択肢が 2 つでない_指摘する", () => {
-    const [a] = check().choices;
+    const a = choiceA;
     expect(run(notebook([unit()], [entry({ checks: [check({ choices: [a] })] })]))).toHaveLength(1);
     const c = { key: "C", text: "選択肢 C です。", reason: "C の理由です。" };
     expect(run(notebook([unit()], [entry({ checks: [check({ choices: [...check().choices, c] })] })]))).toHaveLength(1);
   });
 
   it("選択肢のキーが A・B の順でない_場所と種類だけを報告する", () => {
-    const [a, b] = check().choices;
+    const [a, b] = [choiceA, choiceB];
     expect(run(notebook([unit()], [entry({ checks: [check({ choices: [b, a] })] })]))).toEqual([
       "notebook.ex-smp-xx.json: entries[0].checks[0].choices[0].key: 選択肢のキーは A・B の順にします",
       "notebook.ex-smp-xx.json: entries[0].checks[0].choices[1].key: 選択肢のキーは A・B の順にします",
@@ -141,16 +140,14 @@ describe("validateNotebookData", () => {
   });
 
   it("選択肢に理由がない_指摘する", () => {
-    const [a, b] = check().choices;
-    const { reason: _omit, ...noReason } = b;
-    expect(run(notebook([unit()], [entry({ checks: [check({ choices: [a, noReason] })] })]))).toHaveLength(1);
+    const { reason: _omit, ...noReason } = choiceB;
+    expect(run(notebook([unit()], [entry({ checks: [check({ choices: [choiceA, noReason] })] })]))).toHaveLength(1);
   });
 
   it("2 つの選択肢の文が同じ_場所と種類だけを報告する", () => {
-    const [a, b] = check().choices;
-    expect(run(notebook([unit()], [entry({ checks: [check({ choices: [a, { ...b, text: a.text }] })] })]))).toEqual([
-      "notebook.ex-smp-xx.json: entries[0].checks[0].choices[1].text: 2 つの選択肢の文が同じです",
-    ]);
+    expect(
+      run(notebook([unit()], [entry({ checks: [check({ choices: [choiceA, { ...choiceB, text: choiceA.text }] })] })])),
+    ).toEqual(["notebook.ex-smp-xx.json: entries[0].checks[0].choices[1].text: 2 つの選択肢の文が同じです"]);
   });
 
   it("旧い形の確認の問い(答えと理由)_指摘する", () => {
@@ -159,7 +156,7 @@ describe("validateNotebookData", () => {
   });
 
   it("選択肢の文と理由の URL_場所と種類だけを報告する", () => {
-    const [a, b] = check().choices;
+    const [a, b] = [choiceA, choiceB];
     expect(
       run(
         notebook(
