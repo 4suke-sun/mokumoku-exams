@@ -122,7 +122,7 @@ function Verdict({ correct, text, focus }: { correct: boolean; text: string; foc
   );
 }
 
-/** 表示の設定の「選択肢をシャッフル」を、端末から読む(読めなければ既定) */
+/** 表示の設定の「選択肢の並びをシャッフルする」を、端末から読む(読めなければ既定) */
 function useShuffleChoices(): boolean | null {
   const [shuffled, setShuffled] = useState<boolean | null>(null);
   useEffect(() => {
@@ -137,7 +137,7 @@ function useShuffleChoices(): boolean | null {
 
 /**
  * 見出しの確認の問い(2 択)。選んで「回答する」を押すと確定し、正誤と選択肢ごとの理由を出す。「もう一度」で未回答に戻る。
- * 選択肢の並びは、表示の設定の「選択肢をシャッフル」に従う。結果は保存しない。
+ * 選択肢の並びは、表示の設定の「選択肢の並びをシャッフルする」に従う。結果は保存しない。
  */
 export function NotebookCheckItem({ id, check }: { id: string; check: NotebookCheck }) {
   const shuffled = useShuffleChoices();

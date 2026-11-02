@@ -39,7 +39,7 @@ tools: Read, Write
 
 - `unit` と `entries` は、直したあとの本文です。項目の追加・削除・並べ替えをしません。
 - `where` は、`revisions` と `skipped` のどちらでも、場所の文字列の配列です。場所は、出力の JSON の中の項目を、点でつないだ道筋で書きます
-  (`unit.intro`、`entries.0.body`、`entries.2.checks.0.reason`、見出しの図の文字なら `entries.1.diagram.events.0.label` など)。配列の添字は 0 から数えます。場所だけを書き、本文は書きません。
+  (`unit.intro`、`entries.0.body`、`entries.2.checks.0.choices.1.reason`、見出しの図の文字なら `entries.1.diagram.events.0.label` など)。配列の添字は 0 から数えます。場所だけを書き、本文は書きません。
 - `revisions` は、直した箇所を規則の名前ごとにまとめたものです。1 つの規則につき 1 件にします。
   - `count` は、その規則で直した箇所の数です(1 つの項目の中で 2 か所直したら 2 と数えます)。
   - `where` は、その規則で直した箇所を含む項目の一覧で、重複させません。1 つの項目に複数の箇所があることがあるので、`where` の要素数は `count` 以下になります。
