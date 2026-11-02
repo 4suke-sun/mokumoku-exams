@@ -3,10 +3,10 @@ import { join } from "node:path";
 import { CurriculumFileSchema } from "@mokumoku-exams/data-schema/curriculum-data/schema";
 import { NotebookFileSchema } from "@mokumoku-exams/data-schema/notebook-data/schema";
 import { describe, expect, it } from "vitest";
-import { type Diagram, diagramProblems, layoutAny } from "./diagram-layout.ts";
+import { type Diagram, diagramProblems, layoutAny, STACKABLE_TYPES } from "./diagram-layout.ts";
 
 // 実際のカリキュラム(data/curriculum.*.json)と体系ノート(data/notebook.*.json)のすべての図で、文字が箱に収まることを検査する。
-// 体系ノートの比較の図は、狭い画面で上下に積むので、積んだ形でも検査する。
+// 体系ノートの図(中分類の図と見出しの図)のうち、比較・時系列・表の変化の図は、狭い画面で上下に積むので、積んだ形でも検査する。
 // 図を増やしたり、文字を長くしたりして収まらなくなったら、ここが失敗する。報告は、資格・単元・節・図の題で場所が分かる形にする。
 
 const DATA_DIR = join(import.meta.dirname, "../../../../data");
@@ -30,19 +30,18 @@ function realDiagrams(): Located[] {
   return found;
 }
 
-/** 体系ノートの中分類の図。比較の図は、上下に積んだ形も並べる */
+/** 体系ノートの中分類の図と見出しの図。積む種類の図は、上下に積んだ形も並べる */
 function notebookDiagrams(): (Located & { stacked: boolean })[] {
   const found: (Located & { stacked: boolean })[] = [];
+  const push = (place: string, diagram: Diagram) => {
+    const where = `${place} / 図「${diagram.title}」(${diagram.type})`;
+    found.push({ where, diagram, stacked: false });
+    if (STACKABLE_TYPES.includes(diagram.type)) found.push({ where: `${where}(上下に積む)`, diagram, stacked: true });
+  };
   for (const name of readdirSync(DATA_DIR).filter((n) => /^notebook\..+\.json$/.test(n))) {
     const file = NotebookFileSchema.parse(JSON.parse(readFileSync(join(DATA_DIR, name), "utf8")));
-    for (const unit of file.units) {
-      if (!unit.diagram) continue;
-      const where = `${file.examCode} / 中分類 ${unit.id} / 図「${unit.diagram.title}」(${unit.diagram.type})`;
-      found.push({ where, diagram: unit.diagram, stacked: false });
-      if (unit.diagram.type === "compare") {
-        found.push({ where: `${where}(上下に積む)`, diagram: unit.diagram, stacked: true });
-      }
-    }
+    for (const unit of file.units) if (unit.diagram) push(`${file.examCode} / 中分類 ${unit.id}`, unit.diagram);
+    for (const entry of file.entries) if (entry.diagram) push(`${file.examCode} / 見出し ${entry.id}`, entry.diagram);
   }
   return found;
 }

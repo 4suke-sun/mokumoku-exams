@@ -1,52 +1,84 @@
-import type { CompareItemState, HierarchyNode } from "@mokumoku-exams/data-schema/curriculum-data/schema";
+import type { HierarchyNode, TableChangeDiagram } from "@mokumoku-exams/data-schema/curriculum-data/schema";
 import {
   type AnyLayout,
   type BoxLayout,
+  type BoxState,
   type Diagram,
   type DiagramLayout,
   LABEL_FONT_SIZE,
   layoutAny,
   type PlacedText,
+  STACKABLE_TYPES,
 } from "@/lib/diagram-layout.ts";
 
 type Props = {
   diagram: Diagram;
   /** 図の要素の ID の接頭辞(読み上げの名前と説明を結びつける。ページの中で一意にする) */
   id: string;
-  /** 狭い画面(`sm` 未満)では、比較の図を上下に積む(左右に並べると、文字が小さくなりすぎるため) */
+  /** 狭い画面(`sm` 未満)では、比較・時系列・表の変化の図を上下に積む(左右に並べると、文字が小さくなりすぎるため) */
   stackOnNarrow?: boolean;
 };
 
 /** 箱の題と説明を、読み上げ用に 1 つの文字にする */
 const withNote = (label: string, note?: string) => (note ? `${label}(${note})` : label);
 
-/** 比較の項目の状態の読み上げ */
-const STATE_NAMES: Record<CompareItemState, string> = { removed: "消える", kept: "残る" };
+/** 箱の状態の読み上げ(比較の項目、階層の箱、表の変化の行と列) */
+const STATE_NAMES: Record<BoxState, string> = {
+  removed: "消える",
+  kept: "残る",
+  origin: "起点",
+  covered: "範囲内",
+  added: "足した",
+  changed: "変わった",
+};
+/** 表の変化の図では、消える行を「消した」と読む(操作のあとの結果として) */
+const TABLE_STATE_NAMES: Record<BoxState, string> = { ...STATE_NAMES, removed: "消した" };
+
+const mark = (state: BoxState | undefined, names = STATE_NAMES) => (state ? `【${names[state]}】` : "");
 
 function describeHierarchy(node: HierarchyNode): string {
   const children = node.children ?? [];
   if (children.length === 0) return "";
-  const own = `「${node.label}」の中に${children.map((c) => `「${withNote(c.label, c.note)}」`).join("、")}。`;
+  const own = `「${node.label}」の中に${children
+    .map((c) => `「${withNote(c.label, c.note)}」${mark(c.state)}`)
+    .join("、")}。`;
   return own + children.map(describeHierarchy).join("");
+}
+
+function describeTable(name: string, table: TableChangeDiagram["before"]): string {
+  const columns = table.columns.map((c) => `${c.label}${mark(c.state, TABLE_STATE_NAMES)}`).join("、");
+  const rows = table.rows.map((r) => `${r.cells.join("、")}${mark(r.state, TABLE_STATE_NAMES)}`).join("。");
+  return `${name}「${table.heading}」: 列は${columns}。行は${rows}。`;
 }
 
 /**
  * 読み上げ用の説明。種類ごとに、図の読み方を文にする。
  * - 流れ: 矢印ごとに「「A」から「B」へ(ラベル)。」
  * - 比較: 「左「見出し」: 項目、項目。右「見出し」: …」。状態のある項目は、後ろに「【消える】」「【残る】」を添える
- * - 階層: 親ごとに「「親」の中に「子」、「子」。」
+ * - 階層: 親ごとに「「親」の中に「子」、「子」。」。状態のある箱は、後ろに「【起点】」「【範囲内】」を添える
+ * - 時系列: 「時間の順に「A」、「B」。」のあと、期間ごとに「「A」から「B」まで: 期間の名前。」
+ * - 表の変化: 「操作「名前」の前と後。」のあと、前と後の表ごとに、列と行。状態のある行と列は「【消した】」などを添える
  */
 export function describeDiagram(diagram: Diagram): string {
   if (diagram.type === "compare") {
     const side = (name: string, s: typeof diagram.left) =>
-      `${name}「${s.heading}」: ${s.items
-        .map((i) => `${withNote(i.label, i.note)}${i.state ? `【${STATE_NAMES[i.state]}】` : ""}`)
-        .join("、")}。`;
+      `${name}「${s.heading}」: ${s.items.map((i) => `${withNote(i.label, i.note)}${mark(i.state)}`).join("、")}。`;
     return `${side("左", diagram.left)}${side("右", diagram.right)}`;
   }
   if (diagram.type === "hierarchy") {
     const root = diagram.root;
-    return `「${withNote(root.label, root.note)}」。${describeHierarchy(root)}`;
+    return `「${withNote(root.label, root.note)}」${mark(root.state)}。${describeHierarchy(root)}`;
+  }
+  if (diagram.type === "timeline") {
+    const labels = new Map(diagram.events.map((event) => [event.id, event.label]));
+    const events = `時間の順に${diagram.events.map((e) => `「${withNote(e.label, e.note)}」`).join("、")}。`;
+    const spans = (diagram.spans ?? [])
+      .map((span) => `「${labels.get(span.from) ?? ""}」から「${labels.get(span.to) ?? ""}」まで: ${span.label}。`)
+      .join("");
+    return events + spans;
+  }
+  if (diagram.type === "table-change") {
+    return `操作「${diagram.operation}」の前と後。${describeTable("前", diagram.before)}${describeTable("後", diagram.after)}`;
   }
   const labels = new Map(diagram.nodes.map((node) => [node.id, node.label]));
   return diagram.edges
@@ -136,15 +168,25 @@ const BOX_STYLES: Record<BoxLayout["boxes"][number]["tone"], { rect: string; lab
   "depth-1": { rect: "fill-surface stroke-violet", label: "fill-fg", note: "fill-muted" },
   "depth-2": { rect: "fill-orange-soft stroke-orange", label: "fill-orange", note: "fill-orange" },
   "depth-3": { rect: "fill-bg stroke-line", label: "fill-fg", note: "fill-muted" },
+  event: { rect: "fill-surface stroke-primary", label: "fill-fg", note: "fill-muted" },
+  span: { rect: "fill-soft stroke-primary", label: "fill-primary", note: "fill-primary" },
+  operation: { rect: "fill-surface stroke-muted", label: "fill-fg", note: "fill-muted" },
+  "cell-header": { rect: "fill-bg stroke-line", label: "fill-fg", note: "fill-muted" },
+  cell: { rect: "fill-surface stroke-line", label: "fill-fg", note: "fill-muted" },
 };
 
 /**
- * 比較の項目の状態ごとの色。消える項目は、ふだんの箱に、不正解の色の斜線を重ねる(文字は補助の色)。
- * 残る項目は、正解の面と太い枠で強調する。色だけでなく、斜線の形と、読み上げの説明でも伝える。
+ * 箱の状態ごとの色。消える(消した)箱は、ふだんの箱に、不正解の色の斜線を重ねる(文字は補助の色)。
+ * 残る箱、足した行・列、範囲内の箱は、正解の面で強調する(残る・足したは太い枠も)。変わった行は注意の面にする。
+ * 起点の箱は、主要な操作の色の太い枠にする。色だけでなく、斜線と枠の形と、読み上げの説明でも伝える。
  */
-const STATE_STYLES: Record<CompareItemState, { rect: string; label: string; note: string; strokeWidth: string }> = {
+const STATE_STYLES: Record<BoxState, { rect: string; label: string; note: string; strokeWidth: string }> = {
   removed: { rect: "fill-surface stroke-line", label: "fill-muted", note: "fill-muted", strokeWidth: "1.5" },
   kept: { rect: "fill-correct-bg stroke-correct", label: "fill-fg", note: "fill-correct", strokeWidth: "2.5" },
+  added: { rect: "fill-correct-bg stroke-correct", label: "fill-fg", note: "fill-correct", strokeWidth: "2.5" },
+  changed: { rect: "fill-warn-bg stroke-warn", label: "fill-fg", note: "fill-warn", strokeWidth: "2" },
+  origin: { rect: "fill-soft stroke-primary", label: "fill-primary", note: "fill-primary", strokeWidth: "3" },
+  covered: { rect: "fill-correct-bg stroke-correct", label: "fill-fg", note: "fill-correct", strokeWidth: "1.5" },
 };
 
 /** 消える項目の斜線の、箱の角からの内側の余白 */
@@ -153,6 +195,21 @@ const STRIKE_INSET = 6;
 function BoxShapes({ layout }: { layout: BoxLayout }) {
   return (
     <>
+      {layout.connectors?.map((line) => (
+        <g key={`${line.start.x},${line.start.y}>${line.end.x},${line.end.y}`}>
+          <line
+            x1={line.start.x}
+            y1={line.start.y}
+            x2={line.end.x}
+            y2={line.end.y}
+            strokeWidth="1.5"
+            className="stroke-muted"
+          />
+          {line.arrow ? (
+            <polygon points={line.arrow.map((p) => `${p.x},${p.y}`).join(" ")} className="fill-muted" />
+          ) : null}
+        </g>
+      ))}
       {layout.boxes.map((box) => {
         const style = box.state ? STATE_STYLES[box.state] : { ...BOX_STYLES[box.tone], strokeWidth: "1.5" };
         return (
@@ -231,12 +288,13 @@ function DiagramSvg({ diagram, id, stacked, className }: Props & { stacked: bool
 }
 
 /**
- * 流れ・比較・階層の図。色はテーマの役割の色だけを使い、ライトとダークの両方で読めるようにする。
- * `stackOnNarrow` の比較の図は、左右に並べた図と、上下に積んだ図を描き、画面の幅で片方だけを出す(CSS の `sm`)。
+ * 流れ・比較・階層・時系列・表の変化の図。色はテーマの役割の色だけを使い、ライトとダークの両方で読めるようにする。
+ * 体系ノートなど、特定の画面に依存しない(どの画面からも使える)。
+ * `stackOnNarrow` の比較・時系列・表の変化の図は、左右に並べた図と、上下に積んだ図を描き、画面の幅で片方だけを出す(CSS の `sm`)。
  * 出さないほうは `display: none` なので、読み上げでも 1 つだけになる。
  */
 export function DiagramView({ diagram, id, stackOnNarrow = false }: Props) {
-  const stack = stackOnNarrow && diagram.type === "compare";
+  const stack = stackOnNarrow && STACKABLE_TYPES.includes(diagram.type);
   return (
     <figure className="space-y-2">
       {stack ? (

@@ -218,3 +218,93 @@ describe("既存のカリキュラムの図", () => {
     }
   });
 });
+
+describe("時系列・表の変化・階層の状態の図", () => {
+  const timeline: Diagram = {
+    type: "timeline",
+    title: "削除から消えるまで",
+    events: [
+      { id: "drop", label: "DROP TABLE" },
+      { id: "limit", label: "保持の期限", note: "既定で 7 日" },
+      { id: "purge", label: "ファイルが消える" },
+    ],
+    spans: [{ from: "drop", to: "limit", label: "戻せる期間" }],
+  };
+  const change: Diagram = {
+    type: "table-change",
+    title: "行の削除",
+    operation: "DELETE",
+    before: {
+      heading: "前",
+      columns: [{ label: "id" }],
+      rows: [{ cells: ["1"] }, { cells: ["2"], state: "removed" }],
+    },
+    after: {
+      heading: "後",
+      columns: [{ label: "id" }, { label: "日付", state: "added" }],
+      rows: [{ cells: ["1", "x"], state: "changed" }],
+    },
+  };
+  const grant: Diagram = {
+    type: "hierarchy",
+    title: "権限の継承",
+    root: {
+      label: "カタログ",
+      children: [{ label: "スキーマ", state: "origin", children: [{ label: "表", state: "covered" }] }],
+    },
+  };
+
+  it("時系列の図_出来事と期間を描き_読み上げで時間の順と期間を伝える", () => {
+    render(<DiagramView diagram={timeline} id="tl" />);
+    const image = screen.getByRole("img", { name: "削除から消えるまで" });
+    expect(image.getAttribute("data-diagram-type")).toBe("timeline");
+    for (const text of ["DROP TABLE", "保持の期限", "既定で 7 日", "ファイルが消える", "戻せる期間"]) {
+      expect(screen.getByText(text)).toBeTruthy();
+    }
+    expect(describeDiagram(timeline)).toBe(
+      "時間の順に「DROP TABLE」、「保持の期限(既定で 7 日)」、「ファイルが消える」。「DROP TABLE」から「保持の期限」まで: 戻せる期間。",
+    );
+  });
+
+  it("表の変化の図_消した行に斜線_足した列と変わった行を状態の色で描き_読み上げで状態を添える", () => {
+    const { container } = render(<DiagramView diagram={change} id="tc" />);
+    expect(container.querySelector('g[data-state="removed"] line')?.getAttribute("class")).toContain("motion-strike");
+    expect(container.querySelector('g[data-state="added"] rect')?.getAttribute("class")).toContain("stroke-correct");
+    expect(container.querySelector('g[data-state="changed"] rect')?.getAttribute("class")).toContain("stroke-warn");
+    expect(describeDiagram(change)).toBe(
+      "操作「DELETE」の前と後。前「前」: 列はid。行は1。2【消した】。後「後」: 列はid、日付【足した】。行は1、x【変わった】。",
+    );
+  });
+
+  it("階層の図の状態_起点を太い枠で_範囲内を正解の面で描き_読み上げで添える", () => {
+    const { container } = render(<DiagramView diagram={grant} id="gr" />);
+    expect(container.querySelector('g[data-state="origin"] rect')?.getAttribute("stroke-width")).toBe("3");
+    expect(container.querySelector('g[data-state="covered"] rect')?.getAttribute("class")).toContain("fill-correct-bg");
+    expect(describeDiagram(grant)).toBe(
+      "「カタログ」。「カタログ」の中に「スキーマ」【起点】。「スキーマ」の中に「表」【範囲内】。",
+    );
+  });
+
+  it("積む指定_時系列と表の変化も、左右に並べた図と上下に積んだ図を描き分ける", () => {
+    for (const d of [timeline, change]) {
+      const { container, unmount } = render(<DiagramView diagram={d} id="s" stackOnNarrow />);
+      expect([...container.querySelectorAll("svg")].map((svg) => svg.getAttribute("data-stacked"))).toEqual([
+        "true",
+        null,
+      ]);
+      unmount();
+    }
+  });
+
+  it("時系列・表の変化・状態のある階層の図_色はテーマの役割の色だけを使う", () => {
+    const { container } = render(
+      <>
+        <DiagramView diagram={timeline} id="a" />
+        <DiagramView diagram={change} id="b" />
+        <DiagramView diagram={grant} id="c" />
+      </>,
+    );
+    expect(container.innerHTML).not.toMatch(/#[0-9a-f]{3,8}\b/i);
+    expect(container.innerHTML).not.toMatch(/(fill|stroke)="(?!none)/);
+  });
+});

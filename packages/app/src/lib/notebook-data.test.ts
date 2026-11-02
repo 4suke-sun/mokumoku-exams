@@ -10,6 +10,7 @@ import {
   splitKeyPhrase,
   unitNumber,
   visibleEntries,
+  visibleUnits,
 } from "./notebook-data.ts";
 
 const domains = [
@@ -21,6 +22,7 @@ const unit = (domain: string, order: number): NotebookUnit => ({
   domain,
   order,
   title: `${domain} の ${order}`,
+  status: "verified",
 });
 const entry = (id: string, unitId: string, order: number, status: NotebookEntry["status"]): NotebookEntry => ({
   id,
@@ -75,6 +77,31 @@ describe("公開の絞り込み", () => {
       [2, 0, 0, [0]],
     ]);
     expect(buildToc(domains, units, visibleEntries(entries, true))[0]?.count).toBe(2);
+  });
+
+  it("未検証の中分類_利用者の画面では導入・図・表を外し_題と並びは残す", () => {
+    const draft: NotebookUnit = {
+      ...unit("domain1", 1),
+      intro: "導入です。",
+      diagram: { type: "hierarchy", title: "階層", root: { label: "根" } },
+      comparison: { columns: ["a", "b"], rows: [{ aspect: "観点", cells: ["1", "2"] }] },
+      status: "unverified",
+    };
+    const [shown] = visibleUnits([draft], false);
+    expect(shown).toEqual({
+      id: "domain1-1",
+      domain: "domain1",
+      order: 1,
+      title: "domain1 の 1",
+      status: "unverified",
+    });
+  });
+
+  it("検証済みの中分類と管理者のプレビュー_導入・図・表をそのまま出す", () => {
+    const done: NotebookUnit = { ...unit("domain1", 1), intro: "導入です。" };
+    expect(visibleUnits([done], false)[0]?.intro).toBe("導入です。");
+    const draft: NotebookUnit = { ...done, status: "unverified" };
+    expect(visibleUnits([draft], true)[0]?.intro).toBe("導入です。");
   });
 });
 

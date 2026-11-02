@@ -37,8 +37,8 @@ export const DiagramEdgeSchema = z.strictObject({
   label: text.max(12).optional(),
 });
 
-/** 図の種類。流れ(箱と矢印)、左右の比較、入れ子の階層 */
-export const DIAGRAM_TYPES = ["flow", "compare", "hierarchy"] as const;
+/** 図の種類。流れ(箱と矢印)、左右の比較、入れ子の階層、時系列、表の変化(操作の前後) */
+export const DIAGRAM_TYPES = ["flow", "compare", "hierarchy", "timeline", "table-change"] as const;
 
 /**
  * 流れの図: 箱と矢印の図。箱は、矢印の向きに沿って上から下へ段に並べて描く(packages/app/src/lib/diagram-layout.ts)。
@@ -113,13 +113,25 @@ const CompareDiagramSchema = z.strictObject({
   right: CompareSideSchema,
 });
 
+/**
+ * 階層の図の箱の状態(任意)。範囲が及ぶ起点の箱(`origin`。例: 権限を付けた箱)と、起点から範囲が及ぶ箱(`covered`)。
+ * 画面は、起点を太い枠で、範囲内を正解の面で示す。状態のない箱は、ふだんの箱にする。
+ */
+export const HIERARCHY_NODE_STATES = ["origin", "covered"] as const;
+
 /** 階層の図の箱。子の箱は、親の箱の中に入れ子にして描く */
-export type HierarchyNode = { label: string; note?: string; children?: HierarchyNode[] };
+export type HierarchyNode = {
+  label: string;
+  note?: string;
+  state?: (typeof HIERARCHY_NODE_STATES)[number];
+  children?: HierarchyNode[];
+};
 
 const HierarchyNodeSchema: z.ZodType<HierarchyNode> = z.lazy(() =>
   z.strictObject({
     label: BOX_LABEL,
     note: BOX_NOTE.optional(),
+    state: z.enum(HIERARCHY_NODE_STATES).optional(),
     children: z.array(HierarchyNodeSchema).min(1).max(8).optional(),
   }),
 );
@@ -152,8 +164,133 @@ const HierarchyDiagramSchema = z
     }
   });
 
+/** 時系列の図の出来事。左から右(狭い画面では上から下)へ、時間の順に並べる */
+const TimelineEventSchema = z.strictObject({
+  id: z.string().regex(ID, ID_MESSAGE),
+  label: BOX_LABEL,
+  note: BOX_NOTE.optional(),
+});
+
+/** 時系列の図の期間: 出来事 `from` から出来事 `to` までの間に付ける名前(例: 戻せる期間) */
+const TimelineSpanSchema = z.strictObject({
+  from: z.string().regex(ID, ID_MESSAGE),
+  to: z.string().regex(ID, ID_MESSAGE),
+  label: text.max(16),
+});
+
+/** 時系列の図の出来事と期間の数の上限 */
+export const TIMELINE_MAX_EVENTS = 6;
+export const TIMELINE_MAX_SPANS = 3;
+
 /**
- * 図解: `type` で 3 種類(`flow`・`compare`・`hierarchy`)を分ける判別ユニオン。
+ * 時系列の図: 出来事を時間の順(配列の順)に並べ、出来事の間の期間に名前を付ける。
+ * 期間は、前の出来事から後の出来事へ向かい、期間どうしは重ならない(端の出来事は共有してよい)。並びが一意に決まる。
+ */
+const TimelineDiagramSchema = z
+  .strictObject({
+    type: z.literal("timeline"),
+    title: text.max(80),
+    events: z.array(TimelineEventSchema).min(2).max(TIMELINE_MAX_EVENTS),
+    spans: z.array(TimelineSpanSchema).max(TIMELINE_MAX_SPANS).optional(),
+  })
+  .superRefine((diagram, ctx) => {
+    const index = new Map<string, number>();
+    diagram.events.forEach((event, i) => {
+      if (index.has(event.id)) {
+        ctx.addIssue({ code: "custom", path: ["events", i, "id"], message: "出来事の ID が重複しています" });
+      }
+      index.set(event.id, i);
+    });
+    const ranges: [number, number][] = [];
+    diagram.spans?.forEach((span, i) => {
+      const from = index.get(span.from);
+      const to = index.get(span.to);
+      if (from === undefined || to === undefined) {
+        ctx.addIssue({ code: "custom", path: ["spans", i], message: "図にない出来事を指しています" });
+        return;
+      }
+      if (from >= to) {
+        ctx.addIssue({ code: "custom", path: ["spans", i], message: "期間は、前の出来事から後の出来事へ向けます" });
+        return;
+      }
+      if (ranges.some(([a, b]) => from < b && a < to)) {
+        ctx.addIssue({ code: "custom", path: ["spans", i], message: "期間どうしが重なっています" });
+      }
+      ranges.push([from, to]);
+    });
+  });
+
+/**
+ * 表の変化の図の状態(任意)。操作の前の表に置く `removed`(消した行)と、
+ * 操作の後の表に置く `added`(足した行・列)・`changed`(値が変わった行)。
+ */
+export const TABLE_CHANGE_STATES = ["removed", "added", "changed"] as const;
+
+const TABLE_CELL = text.max(12);
+
+/** 表の変化の図の列。列を足す操作では、後の表の列に `added` を付ける */
+const TableChangeColumnSchema = z.strictObject({
+  label: TABLE_CELL,
+  state: z.literal("added").optional(),
+});
+
+const TableChangeRowSchema = z.strictObject({
+  cells: z.array(TABLE_CELL).min(1).max(4),
+  state: z.enum(TABLE_CHANGE_STATES).optional(),
+});
+
+/** 表の変化の図の片側(操作の前か後の表) */
+const TableChangeSideSchema = z.strictObject({
+  heading: BOX_LABEL,
+  columns: z.array(TableChangeColumnSchema).min(1).max(4),
+  rows: z.array(TableChangeRowSchema).min(1).max(5),
+});
+
+/**
+ * 表の変化の図: 操作の前の表と後の表を並べる。広い画面は、操作の名前を上に置き、前と後の表を左右に並べて矢印でつなぐ。
+ * 狭い画面は、前の表、操作の名前と下向きの矢印、後の表の順に積む。
+ * 消した行は前の表に、足した行・列と変わった行は後の表に、状態で示す。
+ */
+const TableChangeDiagramSchema = z
+  .strictObject({
+    type: z.literal("table-change"),
+    title: text.max(80),
+    /** 前の表から後の表への矢印に添える、操作の名前(例: `MERGE INTO`) */
+    operation: BOX_LABEL,
+    before: TableChangeSideSchema,
+    after: TableChangeSideSchema,
+  })
+  .superRefine((diagram, ctx) => {
+    for (const side of ["before", "after"] as const) {
+      const table = diagram[side];
+      table.rows.forEach((row, i) => {
+        if (row.cells.length !== table.columns.length) {
+          ctx.addIssue({ code: "custom", path: [side, "rows", i, "cells"], message: "値の数が列の数と違います" });
+        }
+        if (row.state && (side === "before") !== (row.state === "removed")) {
+          ctx.addIssue({
+            code: "custom",
+            path: [side, "rows", i, "state"],
+            message: "消した行は前の表に、足した行と変わった行は後の表に置きます",
+          });
+        }
+      });
+      if (side === "before") {
+        table.columns.forEach((column, i) => {
+          if (column.state) {
+            ctx.addIssue({
+              code: "custom",
+              path: [side, "columns", i, "state"],
+              message: "足した列は後の表に置きます",
+            });
+          }
+        });
+      }
+    }
+  });
+
+/**
+ * 図解: `type` で 5 種類(`flow`・`compare`・`hierarchy`・`timeline`・`table-change`)を分ける判別ユニオン。
  * `type` のない図は、流れの図として読む(`type` は省略できる)。
  */
 export const DiagramSchema = z.preprocess(
@@ -161,7 +298,13 @@ export const DiagramSchema = z.preprocess(
     typeof value === "object" && value !== null && !Array.isArray(value) && !("type" in value)
       ? { type: "flow", ...value }
       : value,
-  z.discriminatedUnion("type", [FlowDiagramSchema, CompareDiagramSchema, HierarchyDiagramSchema]),
+  z.discriminatedUnion("type", [
+    FlowDiagramSchema,
+    CompareDiagramSchema,
+    HierarchyDiagramSchema,
+    TimelineDiagramSchema,
+    TableChangeDiagramSchema,
+  ]),
 );
 
 /** 矢印をたどって元の箱に戻れる形があるか(入ってくる矢印のない箱から順に取り除き、残りがあれば閉路) */
@@ -311,7 +454,11 @@ export type Diagram = z.infer<typeof DiagramSchema>;
 export type FlowDiagram = Extract<Diagram, { type: "flow" }>;
 export type CompareDiagram = Extract<Diagram, { type: "compare" }>;
 export type HierarchyDiagram = Extract<Diagram, { type: "hierarchy" }>;
+export type TimelineDiagram = Extract<Diagram, { type: "timeline" }>;
+export type TableChangeDiagram = Extract<Diagram, { type: "table-change" }>;
 export type CompareItemState = (typeof COMPARE_ITEM_STATES)[number];
+export type HierarchyNodeState = (typeof HIERARCHY_NODE_STATES)[number];
+export type TableChangeState = (typeof TABLE_CHANGE_STATES)[number];
 export type CurriculumDomain = z.infer<typeof CurriculumDomainSchema>;
 export type CurriculumSection = z.infer<typeof CurriculumSectionSchema>;
 export type CurriculumStage = z.infer<typeof CurriculumStageSchema>;

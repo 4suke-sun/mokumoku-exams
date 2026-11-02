@@ -104,7 +104,7 @@ function StatusChip({ status }: { status: NotebookEntry["status"] }) {
   );
 }
 
-/** 見出しのブロック: 一言 → 解説 → こう聞かれる → 確認 → 検証の状態 → 関連 */
+/** 見出しのブロック: 一言 → 図 → 解説 → ここを押さえる → 確認 → 検証の状態 → 関連 */
 export function NotebookEntryBlock({
   entry,
   related,
@@ -122,13 +122,19 @@ export function NotebookEntryBlock({
         {entry.term}
       </h2>
       <OneLine entry={entry} />
+      {entry.diagram ? (
+        <div className="card p-4">
+          {/* 図の要素の ID は、見出しの ID から作る(ページの中で一意) */}
+          <DiagramView diagram={entry.diagram} id={`${entry.id}-diagram`} stackOnNarrow />
+        </div>
+      ) : null}
       <div className="space-y-2">
         <h3 className="h3 text-muted">解説</h3>
         <RichText text={entry.body} className="notebook-prose" />
       </div>
       {entry.examAngle ? (
         <div className="space-y-1 rounded-r-md border-l-4 border-warn bg-warn-bg px-4 py-3">
-          <p className="font-bold text-warn">こう聞かれる</p>
+          <p className="font-bold text-warn">ここを押さえる</p>
           <RichText text={entry.examAngle} className="notebook-prose" />
         </div>
       ) : null}
@@ -272,6 +278,11 @@ export function NotebookUnitView({
       </div>
 
       {preview ? <PreviewNote /> : null}
+      {preview ? (
+        <p className="flex flex-wrap items-center gap-2 text-sm text-muted">
+          中分類の導入・図・表: <StatusChip status={unit.status} />
+        </p>
+      ) : null}
 
       {unit.diagram ? (
         <div className="card p-4">
