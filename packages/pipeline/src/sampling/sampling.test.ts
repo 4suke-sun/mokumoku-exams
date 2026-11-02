@@ -381,7 +381,7 @@ describe("draft --review の抜き取り", () => {
     sheet.items[0].reason = "reviewed";
     writeFileSync(sheetPath, JSON.stringify(sheet));
     const r = await runMain(root, ["draft", EXAM, "--decide"], sampleConfig(0.2));
-    expect(r.out).toContain(`人の確認: 対象 ${record?.draft.reviewed.length} 件、承認 1 件`);
+    expect(r.out).toContain(`人の確認: 要判断 ${record?.draft.reviewed.length} 件、承認 1 件`);
   });
 
   it("壊れた抜き取りの記録_場所だけを報告して終了コード 1 になる(書き出し)", async () => {

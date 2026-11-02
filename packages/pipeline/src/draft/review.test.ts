@@ -1,10 +1,13 @@
 import { readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { decisionsPath, readDecisions } from "../decisions/decisions.ts";
+import { decisionsPath, emptyDecisions, readDecisions } from "../decisions/decisions.ts";
 import { EXIT } from "../exit-codes.ts";
+import { emptyFacts } from "../facts/schema.ts";
 import { DOC_URL } from "../facts/test-helpers.ts";
-import { readDrafts } from "./store.ts";
+import { emptyProvenance } from "./provenance.ts";
+import { buildReviewSheet, renderDraftReview, reviewCounts } from "./review.ts";
+import { type DraftsFile, readDrafts } from "./store.ts";
 import {
   baseConfig,
   draftFor,
@@ -36,7 +39,7 @@ describe("draft --review と --decide", () => {
     const id = await imported(root);
     const r = await runMain(root, ["draft", EXAM, "--review"]);
     expect(r.code).toBe(EXIT.ok);
-    expect(r.out).toContain("人の確認: 対象 1 件、承認 0 件、却下 0 件、未済 1 件");
+    expect(r.out).toContain("人の確認: 要判断 1 件、承認 0 件、却下 0 件、未済 1 件");
     const md = readFileSync(workPath(root, "review.md"), "utf8");
     const draft = readDrafts(workPath(root, "drafts.json"), EXAM).drafts[0]?.draft;
     expect(md).toContain(`## ${id}`);
@@ -96,9 +99,97 @@ describe("draft --review と --decide", () => {
     expect(readDecisions(path, EXAM).decisions).toEqual([]);
   });
 
+  it("基準で承認を省く試験で問題データが読めない_--decide は判断を何も取り込まずに止まる", async () => {
+    const root = setupDraftRoot();
+    const id = await imported(root);
+    await runMain(root, ["draft", EXAM, "--review"]);
+    writeFileSync(
+      sheetPath(root),
+      JSON.stringify({ examCode: EXAM, items: [{ id, decision: "approve", reason: "ok" }] }),
+    );
+    writeFileSync(join(root, "data/questions.aws-aib-c01.json"), "{壊れた");
+    const r = await runMain(root, ["draft", EXAM, "--decide"], {
+      review: { ...baseConfig.review, autoApprove: [EXAM] },
+    });
+    expect(r.code).toBe(EXIT.checkFailed);
+    expect(r.err).toContain("問題データの誤り");
+    const path = decisionsPath(join(root, baseConfig.decisionsDir), EXAM);
+    expect(readDecisions(path, EXAM).decisions).toEqual([]);
+  });
+
   it("シートがない_入力の誤りで終わる", async () => {
     const root = setupDraftRoot();
     await imported(root);
     expect((await runMain(root, ["draft", EXAM, "--decide"])).code).toBe(EXIT.inputError);
+  });
+});
+
+describe("要判断の下書きと、人が判断しなくてよい下書き", () => {
+  /** 通過した下書き 4 件(基準を満たす・書き出し済み・基準を満たすが来歴の検査で止まる・要判断)と、書き直しの下書き 1 件 */
+  async function fiveDrafts(): Promise<DraftsFile> {
+    const root = setupDraftRoot();
+    await imported(root);
+    const file = readDrafts(workPath(root, "drafts.json"), EXAM);
+    const base = file.drafts[0] as DraftsFile["drafts"][number];
+    const ids = ["d-aaaaaaaaaaaa", "d-bbbbbbbbbbbb", "d-cccccccccccc", "d-dddddddddddd", "d-eeeeeeeeeeee"];
+    return {
+      ...file,
+      drafts: ids.map((id, i) => ({ ...base, id, ...(i === 4 ? { rewriteOf: "AIB-0001" } : {}) })),
+    };
+  }
+  const [criteria, exported, blocked, needed, rewrite] = [
+    "d-aaaaaaaaaaaa",
+    "d-bbbbbbbbbbbb",
+    "d-cccccccccccc",
+    "d-dddddddddddd",
+    "d-eeeeeeeeeeee",
+  ];
+  const skip = {
+    byCriteria: new Set([criteria, blocked, rewrite]),
+    exported: new Set([exported]),
+    blocked: new Set([blocked]),
+  };
+
+  it("省ける下書きがある_要判断だけを数え、基準を満たして承認を省ける・書き出し済み・基準を満たすが来歴の検査で止まる件数を分ける。書き直しは必ず要判断にする", async () => {
+    const drafts = await fiveDrafts();
+    const counts = reviewCounts(drafts, emptyDecisions(EXAM), undefined, skip);
+    expect(counts).toMatchObject({ total: 2, approved: 0, rejected: 0, pending: 2 });
+    expect(counts.byCriteria).toEqual([criteria]);
+    expect(counts.exported).toEqual([exported]);
+    expect(counts.blocked).toEqual([blocked]);
+  });
+
+  it("省ける下書きがある_表の節とシートの行は要判断の下書きだけで、要判断から外した下書きは冒頭に件数と ID だけを出す", async () => {
+    const drafts = await fiveDrafts();
+    const decisions = emptyDecisions(EXAM);
+    const md = renderDraftReview(EXAM, drafts, emptyFacts(EXAM), emptyProvenance(EXAM), decisions, undefined, skip);
+    expect(md).toContain(`## ${needed}`);
+    expect(md).toContain(`## ${rewrite}`);
+    expect(md).not.toContain(`## ${criteria}`);
+    expect(md).toContain(`基準を満たして承認を省ける(却下するときは、判断の記録を直す): 1 件(${criteria})`);
+    expect(md).toContain(`書き出し済み: 1 件(${exported})`);
+    expect(buildReviewSheet(EXAM, drafts, decisions, undefined, skip).items.map((i) => i.id)).toEqual([
+      needed,
+      rewrite,
+    ]);
+  });
+
+  it("基準を満たす下書きに人の判断がある_要判断の承認・却下に数える", async () => {
+    const drafts = await fiveDrafts();
+    const decisions = {
+      ...emptyDecisions(EXAM),
+      decisions: [{ target: "draft" as const, id: criteria, decision: "approve" as const, reason: "ok" }],
+    };
+    const counts = reviewCounts(drafts, decisions, undefined, skip);
+    expect(counts).toMatchObject({ total: 3, approved: 1, pending: 2 });
+    expect(counts.byCriteria).toEqual([]);
+  });
+
+  it("省く下書きの指定がない(review.autoApprove に挙げていない試験)_すべてを要判断にし、冒頭の一覧を出さない", async () => {
+    const drafts = await fiveDrafts();
+    const decisions = emptyDecisions(EXAM);
+    expect(reviewCounts(drafts, decisions)).toMatchObject({ total: 5, pending: 5, byCriteria: [], exported: [] });
+    const md = renderDraftReview(EXAM, drafts, emptyFacts(EXAM), emptyProvenance(EXAM), decisions);
+    expect(md).not.toContain("表に載せない下書き");
   });
 });

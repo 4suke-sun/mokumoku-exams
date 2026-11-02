@@ -11,7 +11,8 @@ import {
 } from "../decisions/decisions.ts";
 import { ProvenanceError, provenancePath, readProvenance } from "../draft/provenance.ts";
 import { EXIT, type ExitCode } from "../exit-codes.ts";
-import { FactsError, factsPath, readFacts } from "../facts/schema.ts";
+import { rejectedIndexes } from "../facts/facts.ts";
+import { checkFactsContext, FactsError, type FactsFile, factsPath, readFacts } from "../facts/schema.ts";
 import { type Output, report } from "../log.ts";
 import { type AgentStamp, readAgentStampOrReport, sameDefinition } from "../shared/agents.ts";
 import { prepareExam } from "../shared/exam.ts";
@@ -358,6 +359,9 @@ async function writeGuideRequest(
     contentHash: source.contentHash,
     bodyPath: await bodyPath(source.contentHash),
     pages: await Promise.all(readyPages.map(async (p) => ({ ...p, bodyPath: await bodyPath(p.contentHash) }))),
+    ...(imported !== undefined && imported !== null
+      ? { previousScope: imported.domains.map((d) => ({ code: d.code, scope: d.scope })) }
+      : {}),
     outputPath: relative(rootDir, join(paths.guideDir, `${code}.extract.json`)),
     agent: stamp,
   };
@@ -442,6 +446,13 @@ async function importGuideStep(
       `ガイドが示す採点対象の問題数 ${result.guide.exam.scoredQuestionCount}(出題数とは突き合わせない)`,
     );
   }
+  // 事実カードの scopeItems が、新しい出題範囲の項目数の外を指すときは、台帳を書き換えずに止める(不採用のカードは除く)
+  const outOfRange = scopeOutOfRange(options, result.guide, masterDomains);
+  if (outOfRange === "invalid") return EXIT.checkFailed;
+  for (const [code, count] of outOfRange) {
+    report(output, "試験ガイドの取り込みの停止", `scope-item-out-of-range ${code} 事実カード ${count} 件`);
+  }
+  if (outOfRange.size > 0) return EXIT.checkFailed;
   if (dryRun) {
     report(output, "書き込みをしない(dry-run)");
     return EXIT.ok;
@@ -455,6 +466,46 @@ async function importGuideStep(
     diff.examMissingInMaster.length;
   report(output, "情報", `試験ガイドを台帳に取り込んだ(マスタとの差分 ${total} 件。マスタは書き換えない)`);
   return EXIT.ok;
+}
+
+/**
+ * 取り込む試験ガイドの分野ごとの項目数と、事実カードの台帳の scopeItems を突き合わせ(事実カードの検査 checkFactsContext)、
+ * 範囲の外を指す通過・保留のカードの数を、分野ごとに返す。事実カードの台帳がなければ、空を返す。
+ */
+function scopeOutOfRange(
+  options: CollectOptions,
+  guide: NonNullable<LedgerFile["guide"]>,
+  masterDomains: { code: string }[],
+): Map<string, number> | "invalid" {
+  const { config, rootDir, examCode, output } = options;
+  const path = factsPath(resolve(rootDir, config.factsDir), examCode);
+  if (!existsSync(path)) return new Map();
+  let facts: FactsFile;
+  try {
+    facts = readFacts(path, examCode);
+  } catch (error) {
+    if (!(error instanceof FactsError)) throw error;
+    for (const p of error.paths) report(output, "事実カードの誤り", p);
+    return "invalid";
+  }
+  const problems = checkFactsContext(facts, {
+    domains: masterDomains.map((d) => d.code),
+    // 新しい試験ガイドにない分野は、項目数を 0 として数える(その分野で出題範囲を指すカードも、範囲の外として止める)
+    scopeSizes: Object.fromEntries([
+      ...masterDomains.map((d): [string, number] => [d.code, 0]),
+      ...guide.domains.map((g): [string, number] => [g.code, g.scope.length]),
+    ]),
+  });
+  const counts = new Map<string, number>();
+  const seen = new Set<number>();
+  for (const p of problems) {
+    const n = Number(/^cards\.(\d+)\.scopeItems\./.exec(p)?.[1]);
+    if (!Number.isInteger(n) || seen.has(n) || rejectedIndexes(facts, p)) continue;
+    seen.add(n);
+    const code = facts.cards[n]?.domain ?? "-";
+    counts.set(code, (counts.get(code) ?? 0) + 1);
+  }
+  return counts;
 }
 
 /** 本文が PDF なら、読めるようにしたテキストを返す(なければ作って、キャッシュの付属のファイルに置く)。PDF でなければ null */

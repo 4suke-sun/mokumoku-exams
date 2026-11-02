@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
+import { INSPECT_PART_LINES, splitDiff } from "./inspection-input.ts";
 
 const script = fileURLToPath(new URL("../prepare-inspection.ts", import.meta.url));
 const ledgerScript = fileURLToPath(new URL("../inspection-ledger.ts", import.meta.url));
@@ -250,6 +251,61 @@ describe("prepare-inspection", () => {
       expect(run(dir, "--verify", stamp).status).toBe(0);
       writeFileSync(join(dir, "a.txt"), "first\nsecond\nthird\n");
       git(dir, "commit", "-q", "-am", "chore: third");
+      expect(run(dir, "--verify", stamp).status).toBe(1);
+    });
+  });
+
+  describe("分担", () => {
+    const fileDiff = (name: string, lines: number) =>
+      `diff --git a/${name} b/${name}\n${Array.from({ length: lines - 1 }, (_, i) => `+${i}\n`).join("")}`;
+
+    it("目安以下の差分_1 つのまま返す", () => {
+      const diff = fileDiff("a.txt", 10);
+      expect(splitDiff(diff, 100)).toEqual([diff]);
+    });
+
+    it("目安を超える差分_ファイルの境目で分け、つなぐと元の差分に戻る", () => {
+      const diff = fileDiff("a.txt", 60) + fileDiff("b.txt", 60) + fileDiff("c.txt", 30);
+      const parts = splitDiff(diff, 100);
+      expect(parts.length).toBe(2);
+      expect(parts[0]?.startsWith("diff --git a/a.txt")).toBe(true);
+      expect(parts[1]?.startsWith("diff --git a/b.txt")).toBe(true);
+      expect(parts.join("")).toBe(diff);
+    });
+
+    it("マージの差分の見出し(diff --cc)_ファイルの境目として分ける", () => {
+      const merged = fileDiff("m.txt", 60).replace("diff --git a/m.txt b/m.txt", "diff --cc m.txt");
+      const diff = fileDiff("a.txt", 60) + merged;
+      const parts = splitDiff(diff, 100);
+      expect(parts.length).toBe(2);
+      expect(parts[1]?.startsWith("diff --cc m.txt")).toBe(true);
+      expect(parts.join("")).toBe(diff);
+    });
+
+    it("1 ファイルが目安を超える_行の範囲で分け、どの分担も目安以下になる", () => {
+      const diff = fileDiff("big.txt", 250);
+      const parts = splitDiff(diff, 100);
+      expect(parts.length).toBe(3);
+      for (const part of parts) expect(part.split(/(?<=\n)/).length).toBeLessThanOrEqual(100);
+      expect(parts.join("")).toBe(diff);
+    });
+
+    it("書き出しで目安を超える_分担ごとのファイルと一覧を書き、分けたファイルが変わると --verify が止める", () => {
+      const dir = makeRepo();
+      for (const name of ["x.txt", "y.txt"]) {
+        writeFileSync(join(dir, name), Array.from({ length: INSPECT_PART_LINES * 0.6 }, (_, i) => `${i}\n`).join(""));
+      }
+      git(dir, "add", "-A");
+      const r = run(dir, "--cached");
+      expect(r.status, r.stderr).toBe(0);
+      expect(existsSync(join(dir, ".drafts/inspect/diff.patch"))).toBe(false);
+      const names = [...read(dir, "parts.txt").matchAll(/diff-\d+\.patch/g)].map((m) => m[0]);
+      expect(names.length).toBeGreaterThanOrEqual(2);
+      const whole = spawnSync("git", ["diff", "--cached"], { cwd: dir, encoding: "utf8" }).stdout;
+      expect(names.map((name) => read(dir, name)).join("")).toBe(whole);
+      const stamp = /^スタンプ: ([0-9a-f]+)$/m.exec(r.stdout)?.[1] ?? "";
+      expect(run(dir, "--verify", stamp).status).toBe(0);
+      writeFileSync(join(dir, ".drafts/inspect/diff-2.patch"), "古い入力\n");
       expect(run(dir, "--verify", stamp).status).toBe(1);
     });
   });

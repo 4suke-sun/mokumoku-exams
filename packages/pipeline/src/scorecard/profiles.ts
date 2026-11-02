@@ -191,9 +191,10 @@ export const EXAM_OVERRIDES: Readonly<Record<string, ExamOverride>> = {
       openerPrefixChars: 8,
     },
   },
-  // Data Engineer Associate: 状況の問が約 6 割、知識の問が約 4 割。すべて単一選択
+  // Data Engineer Associate: 状況の問が約 6 割、知識の問が約 4 割。単一選択が中心で、複数選択は約 1 割(上限はベンダー共通)。
+  // 書き出しの偏りの上限は、公式の試験ガイドの例題(10 問のうち 6 問が「データエンジニア」から書き出す。チームを含めると 8 問)に合わせる
   "DBX-DEA-2605": {
-    batch: { multiShare: [0, 0], situationShare: [0.5, 0.75], stemMedian: [120, 180] },
+    batch: { situationShare: [0.5, 0.75], stemMedian: [120, 180], openerTopMax: 0.7 },
   },
 };
 

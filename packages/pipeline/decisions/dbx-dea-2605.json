@@ -3,9 +3,21 @@
   "decisions": [
     {
       "target": "draft",
+      "id": "d-035c71184ef6",
+      "decision": "reject",
+      "reason": "unsupported"
+    },
+    {
+      "target": "draft",
       "id": "d-0417bb142cf8",
       "decision": "reject",
       "reason": "evidence-insufficient"
+    },
+    {
+      "target": "draft",
+      "id": "d-08efadb08caa",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -15,15 +27,81 @@
     },
     {
       "target": "draft",
+      "id": "d-0ad63fa95453",
+      "decision": "reject",
+      "reason": "unsupported"
+    },
+    {
+      "target": "draft",
+      "id": "d-0ca8d8b2e147",
+      "decision": "reject",
+      "reason": "unsupported"
+    },
+    {
+      "target": "draft",
       "id": "d-0d69f038605d",
       "decision": "approve",
       "reason": "overlap-acceptable"
     },
     {
       "target": "draft",
+      "id": "d-14ae4d744be3",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-159f6c2796e4",
+      "decision": "reject",
+      "reason": "unsupported"
+    },
+    {
+      "target": "draft",
+      "id": "d-1a9497f9b9e1",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-25508dc58129",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-2bdd60e9cda1",
       "decision": "approve",
       "reason": "overlap-acceptable"
+    },
+    {
+      "target": "draft",
+      "id": "d-2cf6fad13549",
+      "decision": "reject",
+      "reason": "unsupported"
+    },
+    {
+      "target": "draft",
+      "id": "d-2d5dee9850d5",
+      "decision": "reject",
+      "reason": "unsupported"
+    },
+    {
+      "target": "draft",
+      "id": "d-2e4ad28cb15a",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-2fe714146425",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-36d881870b55",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -39,6 +117,24 @@
     },
     {
       "target": "draft",
+      "id": "d-42e6a6aae013",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-45508bbe95d1",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-45e765e9fdd1",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-474b39a99f3b",
       "decision": "reject",
       "reason": "evidence-insufficient"
@@ -48,6 +144,12 @@
       "id": "d-4814b0e45167",
       "decision": "reject",
       "reason": "evidence-insufficient"
+    },
+    {
+      "target": "draft",
+      "id": "d-4eca3a11f9d3",
+      "decision": "reject",
+      "reason": "unsupported"
     },
     {
       "target": "draft",
@@ -69,15 +171,63 @@
     },
     {
       "target": "draft",
+      "id": "d-5aaeb43cc725",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-5ed12c88ef50",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-61ef3e3d8b64",
       "decision": "reject",
       "reason": "duplicate-topic"
     },
     {
       "target": "draft",
+      "id": "d-6806338ca6fa",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-6bb301ca31c8",
       "decision": "reject",
       "reason": "evidence-insufficient"
+    },
+    {
+      "target": "draft",
+      "id": "d-6f9953b4574c",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-74b7acbb330b",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-79e4c10bb321",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-8cb6abd333c3",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-8f487795443a",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -99,9 +249,21 @@
     },
     {
       "target": "draft",
+      "id": "d-a6bc012d9542",
+      "decision": "reject",
+      "reason": "similar-to-correct"
+    },
+    {
+      "target": "draft",
       "id": "d-a6d7a9856d62",
       "decision": "reject",
       "reason": "overlap-duplicate"
+    },
+    {
+      "target": "draft",
+      "id": "d-aa4122d3a640",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -117,9 +279,39 @@
     },
     {
       "target": "draft",
+      "id": "d-afef380d17d2",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-bae9f79082f3",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-cc58e63d795a",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-d2eaf2f0c665",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-d586cd8aff2d",
       "decision": "reject",
       "reason": "evidence-insufficient"
+    },
+    {
+      "target": "draft",
+      "id": "d-da62bc572277",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -129,9 +321,27 @@
     },
     {
       "target": "draft",
+      "id": "d-f2b64f207a11",
+      "decision": "reject",
+      "reason": "unsupported"
+    },
+    {
+      "target": "draft",
+      "id": "d-f80b96b623d1",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-f836c86871e3",
       "decision": "approve",
       "reason": "overlap-acceptable"
+    },
+    {
+      "target": "draft",
+      "id": "d-f95c058326b7",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",

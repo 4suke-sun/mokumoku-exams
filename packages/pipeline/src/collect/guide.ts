@@ -65,6 +65,11 @@ export interface GuideRequest {
   bodyPath: string;
   /** 試験ガイドの続きのページ(計画の guidePages)。分野ごとの出題範囲などを読む */
   pages: { url: string; contentHash: string; bodyPath: string }[];
+  /**
+   * 前回の取り込みの出題範囲の項目(台帳の guide.domains[].scope)。分野ごとに、件数とその順の項目。
+   * 事実カードの scopeItems は、この添字を指すので、再抽出では、件数と順を変えない。前回の取り込みがなければ載せない
+   */
+  previousScope?: { code: string; scope: string[] }[];
   /** 抽出の結果を書く場所。リポジトリ直下からの相対パス */
   outputPath: string;
   /** 依頼を出した時点の、エージェントの定義(役・モデルの ID・定義のハッシュ) */

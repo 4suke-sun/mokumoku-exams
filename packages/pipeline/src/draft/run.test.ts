@@ -195,6 +195,29 @@ describe("draft の依頼", () => {
     expect(readRequests(root)).toHaveLength(4);
   });
 
+  it("待ちの依頼があるまま再実行する_後ろの項目の依頼の鍵が初回と同じで_依頼のファイルが増えない", async () => {
+    // 同じ分野の項目が、事実カードの候補を共有する(待ちの依頼のカードを数えないと、後ろの項目の選び方が変わる)
+    const cards = Array.from({ length: 40 }, (_, i) =>
+      card({
+        id: `f-${(i + 1).toString(16).padStart(12, "0")}`,
+        domain: `domain${(i % 4) + 1}`,
+        claim: `架空の主張 ${i + 1}`,
+      }),
+    );
+    const root = setupDraftRoot({ cards });
+    expect((await prepare(root)).code).toBe(EXIT.ok);
+    const keys = readRequests(root)
+      .map((r) => r.requestKey)
+      .sort();
+    const again = await runMain(root, ["draft", EXAM]);
+    expect(again.out).toContain(`依頼済みで待っている ${keys.length} 件`);
+    expect(
+      readRequests(root)
+        .map((r) => r.requestKey)
+        .sort(),
+    ).toEqual(keys);
+  });
+
   it("--dry-run_何も書かない", async () => {
     const root = setupDraftRoot();
     await runMain(root, ["plan", EXAM]);
