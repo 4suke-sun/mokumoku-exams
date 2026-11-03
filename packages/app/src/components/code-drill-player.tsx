@@ -101,7 +101,8 @@ export function CodeDrillPlayer({
   const fillGrade = gradeFill(problem, fragments, fill);
   const textJudge = judgeCode(problem, text);
   const correct = mode === "fill" ? fillGrade.correct : textJudge.correct;
-  const fillHintLeft = problem.blanks.some((_, i) => !blankIsCorrect(problem, fragments, fill, i));
+  // まだヒントで明かしていない穴があるか(入れた断片の正誤では決めない。押せるかどうかで正誤が分からないように)
+  const fillHintLeft = fill.hinted.includes(false);
   const hintLeft = mode === "fill" ? fillHintLeft : textLevel < textHintSteps(problem);
   const canSubmit = mode === "fill" ? fillComplete(fill) : text.trim() !== "";
 

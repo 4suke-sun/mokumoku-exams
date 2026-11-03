@@ -77,6 +77,15 @@ describe("CodeDrillPlayer(穴埋め)", () => {
   });
 });
 
+describe("CodeDrillPlayer(ヒントと正誤)", () => {
+  it("自分で正解を入れても_ヒントは押せるままで_押せるかどうかで正誤が分からない", async () => {
+    await renderPlayer();
+    fireEvent.click(fragment("WHERE"));
+    fireEvent.click(fragment(">"));
+    expect(screen.getByRole("button", { name: "ヒント" }).hasAttribute("disabled")).toBe(false);
+  });
+});
+
 describe("CodeDrillPlayer(全文入力)", () => {
   function switchToText() {
     fireEvent.click(screen.getByRole("tab", { name: "全文入力" }));

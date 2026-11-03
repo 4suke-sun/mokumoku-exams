@@ -81,7 +81,7 @@ describe("穴埋めの操作", () => {
 });
 
 describe("ヒント", () => {
-  it("穴埋め_空か正解でない穴のうち最初の穴に正解を入れ_入っていた断片を外し_外せない印を付ける", () => {
+  it("穴埋め_まだ明かしていない最初の穴に正解を入れ_入っていた断片を外し_外せない印を付ける", () => {
     let state = placeFragment(emptyFill(problem), "d1");
     state = hintFill(problem, fragments, state);
     expect(state).toEqual({ placed: ["b1", null], hinted: [true, false] });
@@ -89,6 +89,14 @@ describe("ヒント", () => {
     state = hintFill(problem, fragments, state);
     expect(state.placed).toEqual(["b1", "b2"]);
     expect(hintFill(problem, fragments, state)).toBe(state);
+  });
+
+  it("穴埋め_すでに正解の断片が入った穴も_先頭から順に明かして外せない印を付ける", () => {
+    let state = placeFragment(emptyFill(problem), "b1");
+    state = hintFill(problem, fragments, state);
+    expect(state).toEqual({ placed: ["b1", null], hinted: [true, false] });
+    state = hintFill(problem, fragments, state);
+    expect(state).toEqual({ placed: ["b1", "b2"], hinted: [true, true] });
   });
 
   it("全文入力_1 回目は穴を伏せたコード_そのあとは穴を 1 つずつ明かす", () => {

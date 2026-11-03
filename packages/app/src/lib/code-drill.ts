@@ -56,12 +56,18 @@ export function blankIsCorrect(problem: CodeDrillProblem, fragments: readonly Fr
 }
 
 /**
- * 穴埋めのヒント: 先頭から見て、空か、正解でない断片が入った穴のうち最初の穴に、正解の断片を入れる(入っていた断片は外れる)。
+ * 穴埋めのヒント: 先頭から見て、まだヒントで明かしていない穴のうち最初の穴に、正解の断片を入れて、外せない印を付ける
+ * (入っていた断片は外れる。すでに正解の断片が入っていても、同じく印を付ける。押せるかどうかで正誤が分からないように)。
  * 正解の断片がほかの穴に正しくなく入っていれば、そこから移す。明かせる穴がなければ、そのまま。
  */
 export function hintFill(problem: CodeDrillProblem, fragments: readonly Fragment[], state: FillState): FillState {
-  const index = problem.blanks.findIndex((_, i) => !blankIsCorrect(problem, fragments, state, i));
+  const index = state.hinted.findIndex((hinted) => !hinted);
   if (index < 0) return state;
+  if (blankIsCorrect(problem, fragments, state, index)) {
+    const hinted = [...state.hinted];
+    hinted[index] = true;
+    return { ...state, hinted };
+  }
   const answer = problem.blanks[index]?.answer;
   const candidates = fragments.filter((f) => f.text === answer);
   const unused = candidates.find((f) => !state.placed.includes(f.id));
