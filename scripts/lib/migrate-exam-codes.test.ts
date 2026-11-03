@@ -40,6 +40,10 @@ describe("renameSortKey", () => {
     expect(renameSortKey("GOAL#AIB", mapping)).toEqual({ to: "GOAL#AWS-AIB-C01", kind: "GOAL" });
     expect(renameSortKey("SECTIONS#AIB", mapping)?.to).toBe("SECTIONS#AWS-AIB-C01");
     expect(renameSortKey("BOOKMARK#AIB#AIB-0001", mapping)?.to).toBe("BOOKMARK#AWS-AIB-C01#AIB-0001");
+    expect(renameSortKey("NOTEBOOK#AIB#domain1-1", mapping)).toEqual({
+      to: "NOTEBOOK#AWS-AIB-C01#domain1-1",
+      kind: "NOTEBOOK",
+    });
   });
 
   it("対象でない SK_null(コードの一部が同じだけのもの、表示の設定、通知の購読)", () => {
@@ -62,6 +66,7 @@ describe("DynamoDB の移行", () => {
     put("USER#a", "REVIEW#AIB#AIB-0001", { type: "review", examCode: "AIB", streak: 1 });
     put("USER#a", "GOAL#AIB", { type: "goal", examCode: "AIB", date: "2026-12-01" });
     put("USER#b", "SECTIONS#AIB", { type: "sections", examCode: "AIB", best: {} });
+    put("USER#b", "NOTEBOOK#AIB#domain1-1", { type: "notebook", examCode: "AIB", unit: "domain1-1" });
     put("USER#a", "PREFS", { type: "prefs" });
     put("USER#a", "RESULT#AWS-AIB-C01#2026-10-02T00:00:00.000Z", { type: "result", examCode: "AWS-AIB-C01" });
     return table;
@@ -71,8 +76,8 @@ describe("DynamoDB の移行", () => {
     const { client, items } = seed();
     const before = new Map(items);
     const plan = await planMigration(client, "table-example", mapping);
-    expect(plan.moves).toHaveLength(4);
-    expect(plan.counts).toMatchObject({ RESULT: 1, REVIEW: 1, GOAL: 1, SECTIONS: 1 });
+    expect(plan.moves).toHaveLength(5);
+    expect(plan.counts).toMatchObject({ RESULT: 1, REVIEW: 1, GOAL: 1, SECTIONS: 1, NOTEBOOK: 1 });
     expect(plan.conflicts).toBe(0);
     expect(items).toEqual(before);
   });
@@ -80,7 +85,7 @@ describe("DynamoDB の移行", () => {
   it("実行_新コードの SK に写し_項目の中のコードも新しくし_旧い項目を消す", async () => {
     const { client, items } = seed();
     const plan = await planMigration(client, "table-example", mapping);
-    expect(await applyMigration(client, "table-example", mapping, plan)).toEqual({ moved: 4, conflicts: 0 });
+    expect(await applyMigration(client, "table-example", mapping, plan)).toEqual({ moved: 5, conflicts: 0 });
     expect(items.has("USER#a|RESULT#AIB#2026-10-01T00:00:00.000Z")).toBe(false);
     expect(items.get("USER#a|RESULT#AWS-AIB-C01#2026-10-01T00:00:00.000Z")).toMatchObject({
       examCode: "AWS-AIB-C01",
@@ -88,6 +93,7 @@ describe("DynamoDB の移行", () => {
     });
     expect(items.get("USER#a|REVIEW#AWS-AIB-C01#AIB-0001")).toMatchObject({ streak: 1, examCode: "AWS-AIB-C01" });
     expect(items.get("USER#b|SECTIONS#AWS-AIB-C01")).toBeDefined();
+    expect(items.get("USER#b|NOTEBOOK#AWS-AIB-C01#domain1-1")).toMatchObject({ examCode: "AWS-AIB-C01" });
     expect(items.get("USER#a|PREFS")).toBeDefined();
   });
 
@@ -105,7 +111,7 @@ describe("DynamoDB の移行", () => {
     const plan = await planMigration(client, "table-example", mapping);
     items.set("USER#a|GOAL#AWS-AIB-C01", { PK: "USER#a", SK: "GOAL#AWS-AIB-C01", date: "2027-01-01" });
     const result = await applyMigration(client, "table-example", mapping, plan);
-    expect(result).toEqual({ moved: 3, conflicts: 1 });
+    expect(result).toEqual({ moved: 4, conflicts: 1 });
     expect(items.get("USER#a|GOAL#AWS-AIB-C01")).toMatchObject({ date: "2027-01-01" });
     expect(items.has("USER#a|GOAL#AIB")).toBe(true);
   });

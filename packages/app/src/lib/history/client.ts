@@ -104,6 +104,23 @@ export async function putGoal(examCode: string, date: string | null): Promise<bo
   return (await requestJson("/api/history/goal", { method: "PUT", body: { examCode, date } })).ok;
 }
 
+const NotebookUnitsSchema = z.object({
+  units: z.array(z.object({ unit: z.string().max(16), completedAt: z.string().max(40) })).max(1000),
+});
+
+/** 体系ノートの、履修済みの中分類と最初に履修した時刻(中分類の ID から時刻)。取得できなければ null(ログイン切れ・通信の失敗など)。 */
+export async function fetchNotebookUnits(examCode: string): Promise<Map<string, string> | null> {
+  const result = await requestJson(`/api/history/notebook?examCode=${encodeURIComponent(examCode)}`, {
+    schema: NotebookUnitsSchema,
+  });
+  return result.ok ? new Map(result.data.units.map((u) => [u.unit, u.completedAt])) : null;
+}
+
+/** 体系ノートの中分類を、履修済みとして記録する。記録できたら true。 */
+export async function putNotebookUnit(examCode: string, unit: string): Promise<boolean> {
+  return (await requestJson("/api/history/notebook", { method: "PUT", body: { examCode, unit } })).ok;
+}
+
 const SectionsSchema = z.object({ progress: SectionProgressSchema });
 
 /** サーバーに保存したセクションの進捗。取得できなければ null(ログイン切れ・通信の失敗など)。 */

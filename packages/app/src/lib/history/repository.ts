@@ -8,6 +8,8 @@ import {
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { EXAM_CODE, QUESTION_ID } from "@mokumoku-exams/data-schema/exam-data/shape";
+import { NOTEBOOK_UNIT_ID } from "@mokumoku-exams/data-schema/notebook-data/schema";
+import { z } from "zod";
 import { type Prefs, PrefsSchema } from "@/lib/prefs.ts";
 import { RECENT_STAT_LIMIT } from "@/lib/question-stats.ts";
 import {
@@ -81,7 +83,16 @@ export interface HistoryRepository {
   getPrefs(sub: string): Promise<Prefs | null>;
   /** 表示の設定を保存する(上書き)。 */
   setPrefs(sub: string, prefs: Prefs): Promise<void>;
+  /** 体系ノートの、履修済みの中分類と、最初に履修した時刻。中分類の ID の順。壊れた項目は除く。 */
+  listNotebookUnits(sub: string, examCode: string): Promise<NotebookCompletion[]>;
+  /**
+   * 体系ノートの中分類を、履修済みとして記録する。すでに記録があれば書かない(最初の時刻を残す。繰り返しても結果は変わらない)。
+   */
+  completeNotebookUnit(sub: string, examCode: string, unit: string, at: string): Promise<void>;
 }
+
+/** 体系ノートの中分類の履修済みの記録(中分類の ID と、最初に履修した時刻)。 */
+export type NotebookCompletion = { unit: string; completedAt: string };
 
 /** 1 回の結果の学習量(解いた問題の数と、そのうちの正解の数)。 */
 export type DayTally = { answered: number; correct: number };
@@ -136,6 +147,21 @@ export const goalKey = (examCode: string) => `GOAL#${examCode}`;
 export const sectionsKey = (examCode: string) => `SECTIONS#${examCode}`;
 /** 表示の設定(利用者ごとに 1 件) */
 export const PREFS_SORT_KEY = "PREFS";
+/** 体系ノートの中分類の履修済み(中分類ごとに 1 項目) */
+export const notebookKeyPrefix = (examCode: string) => `NOTEBOOK#${examCode}#`;
+
+const COMPLETED_AT = z.iso.datetime({ precision: 3 });
+
+/** 保存した履修済みの項目を、外部入力として検査する(壊れた値は、保存していないものとして扱う)。 */
+function notebookCompletionOf(item: Record<string, unknown>, examCode: string): NotebookCompletion | null {
+  const sk = String(item.SK ?? "");
+  const unit = sk.slice(notebookKeyPrefix(examCode).length);
+  const completedAt = item.completedAt;
+  if (!NOTEBOOK_UNIT_ID.test(unit) || item.unit !== unit || item.examCode !== examCode) return null;
+  if (typeof completedAt !== "string" || !COMPLETED_AT.safeParse(completedAt).success) return null;
+  return { unit, completedAt };
+}
+const byUnit = (a: NotebookCompletion, b: NotebookCompletion) => (a.unit < b.unit ? -1 : a.unit > b.unit ? 1 : 0);
 export const statKeyPrefix = (examCode: string) => `STAT#${examCode}#`;
 /** すべての資格の復習の項目(資格をまたいで一覧するとき) */
 export const REVIEW_PREFIX = "REVIEW#";
@@ -425,6 +451,34 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
     async setPrefs(sub, prefs) {
       await put(sub, PREFS_SORT_KEY, { type: "prefs", ...prefs });
     },
+
+    async listNotebookUnits(sub, examCode) {
+      return (await queryAll(sub, notebookKeyPrefix(examCode)))
+        .flatMap((item) => notebookCompletionOf(item, examCode) ?? [])
+        .sort(byUnit);
+    },
+
+    async completeNotebookUnit(sub, examCode, unit, at) {
+      try {
+        // 最初の時刻を残すため、項目がないときだけ書く(2 つの端末が同時に記録しても、片方だけが書く)
+        await client.send(
+          new PutCommand({
+            TableName: tableName,
+            Item: {
+              PK: userKey(sub),
+              SK: `${notebookKeyPrefix(examCode)}${unit}`,
+              type: "notebook",
+              examCode,
+              unit,
+              completedAt: at,
+            },
+            ConditionExpression: "attribute_not_exists(SK)",
+          }),
+        );
+      } catch (error) {
+        if ((error as { name?: unknown } | null)?.name !== "ConditionalCheckFailedException") throw error;
+      }
+    },
   };
 }
 
@@ -442,6 +496,8 @@ export function createMemoryRepository(): HistoryRepository {
   const sections = new Map<string, SectionProgress>();
   // 利用者ごとの、表示の設定
   const prefs = new Map<string, Prefs>();
+  // 利用者と資格ごとの、中分類の ID ごとの最初に履修した時刻
+  const notebook = new Map<string, Map<string, string>>();
   const scope = (sub: string, examCode: string) => `${userKey(sub)}|${examCode}`;
   const setOf = (sets: Map<string, Set<string>>, sub: string, examCode: string) => {
     const key = scope(sub, examCode);
@@ -565,6 +621,13 @@ export function createMemoryRepository(): HistoryRepository {
     async setGoal(sub, examCode, date) {
       if (date === null) goals.delete(scope(sub, examCode));
       else goals.set(scope(sub, examCode), date);
+    },
+    async listNotebookUnits(sub, examCode) {
+      return [...mapOf(notebook, sub, examCode)].map(([unit, completedAt]) => ({ unit, completedAt })).sort(byUnit);
+    },
+    async completeNotebookUnit(sub, examCode, unit, at) {
+      const units = mapOf(notebook, sub, examCode);
+      if (!units.has(unit)) units.set(unit, at);
     },
   };
 }

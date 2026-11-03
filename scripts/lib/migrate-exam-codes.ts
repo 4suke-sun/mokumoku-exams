@@ -12,7 +12,7 @@ export interface Sender {
 }
 
 /** 資格ごとに持つ項目の SK の種類(アプリの `repository.ts` の SK の接頭辞と同じ) */
-export const KINDS = ["RESULT", "BOOKMARK", "REVIEW", "DAY", "STAT", "GOAL", "SECTIONS"] as const;
+export const KINDS = ["RESULT", "BOOKMARK", "REVIEW", "DAY", "STAT", "GOAL", "SECTIONS", "NOTEBOOK"] as const;
 
 export type Move = { pk: string; from: string; to: string; kind: string };
 export type Plan = { moves: Move[]; counts: Record<string, number>; conflicts: number };

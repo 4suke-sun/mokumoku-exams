@@ -24,7 +24,7 @@ const toc: TocDomain[] = [
 
 function renderShell() {
   return render(
-    <NotebookShell basePath="/exams/TEST/notebook" toc={toc}>
+    <NotebookShell examCode="TEST" preview basePath="/exams/TEST/notebook" toc={toc}>
       <p>本文</p>
     </NotebookShell>,
   );

@@ -2,6 +2,13 @@ import type { NotebookComparison } from "@mokumoku-exams/data-schema/notebook-da
 import Link from "next/link";
 import { DiagramView } from "@/components/diagram.tsx";
 import { EmptyState } from "@/components/empty-state.tsx";
+import {
+  NotebookCheckItem,
+  NotebookCoverProgress,
+  NotebookDomainProgress,
+  NotebookReview,
+  NotebookUnitCompleted,
+} from "@/components/notebook-check.tsx";
 import { ReferenceList } from "@/components/reference-list.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
 import { domainColorClasses } from "@/lib/domain-color.ts";
@@ -13,6 +20,7 @@ import {
   type TocDomain,
   unitNumber,
 } from "@/lib/notebook-data.ts";
+import { reviewItemsOf } from "@/lib/notebook-review.ts";
 import type { PublishedExam } from "@/lib/types.ts";
 
 type ExamInfo = Pick<PublishedExam, "examCode" | "name" | "domains">;
@@ -52,7 +60,7 @@ export function NotebookCover({
           {exam.name}。試験の分野 → 出題範囲の項目(中分類)→ 用語の順に、用語の解説を並べます。
         </p>
       </div>
-      {preview ? <PreviewNote /> : null}
+      {preview ? <PreviewNote /> : <NotebookCoverProgress toc={toc} basePath={basePath} />}
       <ol className="motion-stagger grid gap-3 sm:grid-cols-2">
         {toc.map((domain) => {
           const color = domainColorClasses(exam.domains, domain.code);
@@ -71,6 +79,7 @@ export function NotebookCover({
                   {domain.weight === undefined ? null : `配点 ${Math.round(domain.weight * 100)}% / `}見出し{" "}
                   {domain.count} 件 / 中分類 {domain.filled} / {domain.units.length} に記載
                 </span>
+                {preview ? null : <NotebookDomainProgress domain={domain} />}
                 <span aria-hidden="true" className="block h-1.5 overflow-hidden rounded-full bg-bg">
                   <span className={`block h-full ${color?.bar ?? "bg-primary"}`} style={{ width: `${ratio * 100}%` }} />
                 </span>
@@ -140,22 +149,9 @@ export function NotebookEntryBlock({
       ) : null}
       <div className="space-y-2">
         <h3 className="h3 text-muted">確認</h3>
-        {entry.checks.map((check) => (
-          <details key={check.question} className="card px-4 py-2">
-            <summary className="cursor-pointer font-bold">
-              <InlineText text={check.question} />
-            </summary>
-            <div className="mt-2 space-y-1 notebook-prose">
-              <p>
-                <span className="font-bold">答え: </span>
-                <InlineText text={check.answer} />
-              </p>
-              <p>
-                <span className="font-bold">理由: </span>
-                <InlineText text={check.reason} />
-              </p>
-            </div>
-          </details>
+        {entry.checks.map((check, i) => (
+          // biome-ignore lint/suspicious/noArrayIndexKey: 見出しの中の問いの並びは固定(問いの番号が識別子)
+          <NotebookCheckItem key={`${entry.id}-${i + 1}`} id={`${entry.id}-${i + 1}`} check={check} />
         ))}
       </div>
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
@@ -224,7 +220,7 @@ function ComparisonTable({ comparison }: { comparison: NotebookComparison }) {
 }
 
 /**
- * 中分類のページ: パンくず → 題 → 導入 → 図 → 見出しごとのブロック → 比較の表 → 前後の中分類。
+ * 中分類のページ: パンくず → 題 → 導入 → 図 → 見出しごとのブロック → 比較の表 → ここまでのおさらい → 前後の中分類。
  * 見出しのない中分類は「まだ見出しがありません」を出す。
  * `entries` は、画面に出す見出し(利用者は検証済みだけ。管理者のプレビューは未検証も)を、ファイルの全体から渡す。
  */
@@ -274,6 +270,7 @@ export function NotebookUnitView({
           </ol>
         </nav>
         <h1 className="h1">{label(unit)}</h1>
+        <NotebookUnitCompleted unitId={unit.id} />
         {unit.intro ? <p className="text-muted">{unit.intro}</p> : null}
       </div>
 
@@ -308,6 +305,8 @@ export function NotebookUnitView({
       )}
 
       {unit.comparison ? <ComparisonTable comparison={unit.comparison} /> : null}
+
+      {own.length > 0 ? <NotebookReview key={unit.id} unitId={unit.id} items={reviewItemsOf(own, unit.id)} /> : null}
 
       <nav aria-label="前後の中分類" className="grid gap-3 border-t border-line pt-6 sm:grid-cols-2">
         {prev ? (

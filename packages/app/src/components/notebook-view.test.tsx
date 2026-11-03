@@ -46,7 +46,16 @@ const entry = (over: Partial<NotebookEntry>): NotebookEntry => ({
   keyPhrase: "DROP してもファイルは残る",
   body: "解説です。\n\n```\nDROP TABLE sales;\n```",
   examAngle: "ファイルが残る理由を、テーブルの種類と結びつけて覚える。",
-  checks: [{ question: "何が残る?", answer: "データファイル。", reason: "持ち主がストレージだから。" }],
+  checks: [
+    {
+      question: "DROP したとき、外部テーブルで残るのはどっち?",
+      choices: [
+        { key: "A", text: "データファイル", reason: "持ち主がストレージだから。" },
+        { key: "B", text: "メタデータ", reason: "メタデータは消えるから。" },
+      ],
+      correct: "A",
+    },
+  ],
   related: ["managed-table"],
   references: [{ title: "公式の文書", url: "https://docs.databricks.com/" }],
   status: "verified",
@@ -86,21 +95,35 @@ describe("NotebookUnitView", () => {
     expect(at("figure")).toBeGreaterThan(at("h1"));
     expect(at("h2:外部テーブル")).toBeGreaterThan(at("figure"));
     expect(at("h2:比べる")).toBeGreaterThan(at("h2:マネージドテーブル"));
+    expect(at("h2:ここまでのおさらい")).toBeGreaterThan(at("h2:比べる"));
     const pager = screen.getByRole("navigation", { name: "前後の中分類" });
     expect(within(pager).getByRole("link").getAttribute("href")).toBe("/exams/TEST/notebook/domain1-2");
   });
 
-  it("見出し_一言の要点にマーカー_ここを押さえるの囲み_確認は折りたたみで答えと理由", () => {
+  it("おさらい_画面に出す見出しの確認の問いだけを集め_見出しのない中分類には出さない", () => {
+    renderUnit("domain1-1", false);
+    const review = screen.getByRole("region", { name: "ここまでのおさらい" });
+    expect(within(review).getAllByRole("group")).toHaveLength(2);
+    expect(review.textContent).not.toContain("書きかけの用語");
+  });
+
+  it("おさらい_見出しのない中分類_出さない", () => {
+    renderUnit("domain1-2", false);
+    expect(screen.queryByRole("region", { name: "ここまでのおさらい" })).toBeNull();
+  });
+
+  it("見出し_一言の要点にマーカー_ここを押さえるの囲み_確認は 2 択の問いで回答の前は理由を出さない", () => {
     const { container } = renderUnit("domain1-1", false);
     const section = container.querySelector("#external-table");
     expect(section?.querySelector("mark")?.textContent).toBe("DROP してもファイルは残る");
     expect(section?.querySelector("mark")?.getAttribute("class")).toContain("motion-marker");
     expect(section?.textContent).toContain("ここを押さえる");
-    const details = section?.querySelector("details");
-    expect(details?.hasAttribute("open")).toBe(false);
-    expect(details?.querySelector("summary")?.textContent).toBe("何が残る?");
-    expect(details?.textContent).toContain("答え: データファイル。");
-    expect(details?.textContent).toContain("理由: 持ち主がストレージだから。");
+    const check = within(section as HTMLElement).getByRole("group", {
+      name: "DROP したとき、外部テーブルで残るのはどっち?",
+    });
+    expect(within(check).getAllByRole("radio")).toHaveLength(2);
+    expect(within(check).getByRole("button", { name: "回答する" }).hasAttribute("disabled")).toBe(true);
+    expect(check.textContent).not.toContain("持ち主がストレージだから。");
     expect(section?.textContent).toContain("✓ 検証済み");
     expect(
       within(section as HTMLElement)

@@ -496,3 +496,82 @@ describe("DynamoDB の古い形の保存", () => {
     expect(items.get("USER#user-a|REVIEW#EX-SMP-XX#SAMPLE-0001")?.streak).toBe(1);
   });
 });
+
+describe("体系ノートの履修済み", () => {
+  const at = "2026-10-11T12:00:00.000Z";
+  const later = "2026-10-12T12:00:00.000Z";
+
+  it("DynamoDB_SK は資格と中分類ごとに 1 つで_中分類の ID と時刻だけを置き_最初の時刻を残す", async () => {
+    const { items, client } = fakeTable();
+    const repository = createDynamoRepository({ tableName: "table-example", client });
+    expect(await repository.listNotebookUnits("user-a", "EX-SMP-XX")).toEqual([]);
+    await repository.completeNotebookUnit("user-a", "EX-SMP-XX", "domain2-1", at);
+    await repository.completeNotebookUnit("user-a", "EX-SMP-XX", "domain1-3", at);
+    await repository.completeNotebookUnit("user-a", "EX-SMP-XX", "domain2-1", later);
+    expect(items.get("USER#user-a|NOTEBOOK#EX-SMP-XX#domain2-1")).toEqual({
+      PK: "USER#user-a",
+      SK: "NOTEBOOK#EX-SMP-XX#domain2-1",
+      type: "notebook",
+      examCode: "EX-SMP-XX",
+      unit: "domain2-1",
+      completedAt: at,
+    });
+    expect(await repository.listNotebookUnits("user-a", "EX-SMP-XX")).toEqual([
+      { unit: "domain1-3", completedAt: at },
+      { unit: "domain2-1", completedAt: at },
+    ]);
+    expect(await repository.listNotebookUnits("user-b", "EX-SMP-XX")).toEqual([]);
+    expect(await repository.listNotebookUnits("user-a", "EX-OTH-XX")).toEqual([]);
+  });
+
+  it("DynamoDB_保存した値が壊れている項目_保存していないものとして除く", async () => {
+    const { items, client } = fakeTable();
+    const repository = createDynamoRepository({ tableName: "table-example", client });
+    const base = { PK: "USER#user-a", type: "notebook", examCode: "EX-SMP-XX" };
+    items.set("USER#user-a|NOTEBOOK#EX-SMP-XX#domain1-1", {
+      ...base,
+      SK: "NOTEBOOK#EX-SMP-XX#domain1-1",
+      unit: "domain1-1",
+      completedAt: "昨日",
+    });
+    items.set("USER#user-a|NOTEBOOK#EX-SMP-XX#domain1-2", {
+      ...base,
+      SK: "NOTEBOOK#EX-SMP-XX#domain1-2",
+      unit: "domain9-9",
+      completedAt: at,
+    });
+    items.set("USER#user-a|NOTEBOOK#EX-SMP-XX#bad", {
+      ...base,
+      SK: "NOTEBOOK#EX-SMP-XX#bad",
+      unit: "bad",
+      completedAt: at,
+    });
+    items.set("USER#user-a|NOTEBOOK#EX-SMP-XX#domain1-4", {
+      ...base,
+      SK: "NOTEBOOK#EX-SMP-XX#domain1-4",
+      unit: "domain1-4",
+      completedAt: at,
+    });
+    expect(await repository.listNotebookUnits("user-a", "EX-SMP-XX")).toEqual([{ unit: "domain1-4", completedAt: at }]);
+  });
+
+  it("DynamoDB_条件に合わない以外の失敗_そのまま投げる", async () => {
+    const client = {
+      async send() {
+        throw new Error("unavailable");
+      },
+    };
+    const repository = createDynamoRepository({ tableName: "table-example", client });
+    await expect(repository.completeNotebookUnit("user-a", "EX-SMP-XX", "domain1-1", at)).rejects.toThrow(
+      "unavailable",
+    );
+  });
+
+  it("メモリ上_最初の時刻を残し_利用者と資格で分かれる", async () => {
+    const repository = createMemoryRepository();
+    await repository.completeNotebookUnit("user-a", "EX-SMP-XX", "domain1-1", at);
+    await repository.completeNotebookUnit("user-a", "EX-SMP-XX", "domain1-1", later);
+    expect(await repository.listNotebookUnits("user-a", "EX-SMP-XX")).toEqual([{ unit: "domain1-1", completedAt: at }]);
+    expect(await repository.listNotebookUnits("user-b", "EX-SMP-XX")).toEqual([]);
+  });
+});

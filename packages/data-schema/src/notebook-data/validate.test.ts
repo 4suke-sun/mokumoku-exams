@@ -11,6 +11,14 @@ const unit = (over: Record<string, unknown> = {}) => ({
   status: "verified",
   ...over,
 });
+const choiceA = { key: "A", text: "選択肢 A です。", reason: "A の理由です。" };
+const choiceB = { key: "B", text: "選択肢 B です。", reason: "B の理由です。" };
+const check = (over: Record<string, unknown> = {}) => ({
+  question: "どちらが正しいですか。",
+  choices: [choiceA, choiceB],
+  correct: "A",
+  ...over,
+});
 const entry = (over: Record<string, unknown> = {}) => ({
   id: "term-one",
   unit: "domain1-1",
@@ -19,7 +27,7 @@ const entry = (over: Record<string, unknown> = {}) => ({
   oneLine: "用語 1 は、決まった場所にデータを置くしくみ。",
   keyPhrase: "決まった場所にデータを置く",
   body: "解説です。`CREATE TABLE` を使います。",
-  checks: [{ question: "問いです。", answer: "答えです。", reason: "理由です。" }],
+  checks: [check()],
   references: [{ title: "出典", url: "https://docs.databricks.com/" }],
   status: "verified",
   ...over,
@@ -110,6 +118,53 @@ describe("validateNotebookData", () => {
 
   it("確認の問いがない_指摘する", () => {
     expect(run(notebook([unit()], [entry({ checks: [] })]))).toHaveLength(1);
+  });
+
+  it("確認の問いの選択肢が 2 つでない_指摘する", () => {
+    const a = choiceA;
+    expect(run(notebook([unit()], [entry({ checks: [check({ choices: [a] })] })]))).toHaveLength(1);
+    const c = { key: "C", text: "選択肢 C です。", reason: "C の理由です。" };
+    expect(run(notebook([unit()], [entry({ checks: [check({ choices: [...check().choices, c] })] })]))).toHaveLength(1);
+  });
+
+  it("選択肢のキーが A・B の順でない_場所と種類だけを報告する", () => {
+    const [a, b] = [choiceA, choiceB];
+    expect(run(notebook([unit()], [entry({ checks: [check({ choices: [b, a] })] })]))).toEqual([
+      "notebook.ex-smp-xx.json: entries[0].checks[0].choices[0].key: 選択肢のキーは A・B の順にします",
+      "notebook.ex-smp-xx.json: entries[0].checks[0].choices[1].key: 選択肢のキーは A・B の順にします",
+    ]);
+  });
+
+  it("正解のキーが A・B のどちらでもない_指摘する", () => {
+    expect(run(notebook([unit()], [entry({ checks: [check({ correct: "C" })] })]))).toHaveLength(1);
+  });
+
+  it("選択肢に理由がない_指摘する", () => {
+    const { reason: _omit, ...noReason } = choiceB;
+    expect(run(notebook([unit()], [entry({ checks: [check({ choices: [choiceA, noReason] })] })]))).toHaveLength(1);
+  });
+
+  it("2 つの選択肢の文が同じ_場所と種類だけを報告する", () => {
+    expect(
+      run(notebook([unit()], [entry({ checks: [check({ choices: [choiceA, { ...choiceB, text: choiceA.text }] })] })])),
+    ).toEqual(["notebook.ex-smp-xx.json: entries[0].checks[0].choices[1].text: 2 つの選択肢の文が同じです"]);
+  });
+
+  it("旧い形の確認の問い(答えと理由)_指摘する", () => {
+    const old = { question: "問いです。", answer: "答えです。", reason: "理由です。" };
+    expect(run(notebook([unit()], [entry({ checks: [old] })])).length).toBeGreaterThan(0);
+  });
+
+  it("選択肢の文と理由の URL_場所と種類だけを報告する", () => {
+    const [a, b] = [choiceA, choiceB];
+    expect(
+      run(
+        notebook(
+          [unit()],
+          [entry({ checks: [check({ choices: [a, { ...b, reason: "理由 https://example.com/" }] })] })],
+        ),
+      ),
+    ).toEqual(["notebook.ex-smp-xx.json: entries[0].checks[0].choices[1].reason: 本文に URL が含まれています"]);
   });
 
   it("要点が一言の部分文字列でない_場所と種類だけを報告する", () => {
