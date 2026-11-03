@@ -12,8 +12,9 @@ function Inlines({ items }: { items: Inline[] }) {
         </mark>
       );
     if (item.kind === "code") {
+      // 切れ目のない長い名前でも、狭い幅で折り返す(画面の幅を超えて、ページ全体が縮んで表示されないように)
       return (
-        <code key={key} className="rounded bg-bg px-1 font-mono text-[0.9em]">
+        <code key={key} className="wrap-anywhere rounded bg-bg px-1 font-mono text-[0.9em]">
           {item.text}
         </code>
       );
