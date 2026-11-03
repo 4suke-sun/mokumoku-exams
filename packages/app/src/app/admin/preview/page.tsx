@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { loadCodeDrill } from "@/lib/code-drill-data.ts";
 import { listPublishedExams, loadQuestions } from "@/lib/exam-data.ts";
 import { loadNotebook } from "@/lib/notebook-data.ts";
 
@@ -12,6 +13,7 @@ export default async function AdminPreviewIndexPage() {
       exam,
       count: (await loadQuestions(exam)).length,
       notebook: await loadNotebook(exam),
+      codeDrill: await loadCodeDrill(exam),
     })),
   );
   return (
@@ -24,7 +26,7 @@ export default async function AdminPreviewIndexPage() {
         <p className="text-sm text-muted">資格を選ぶと、全問の正解・解説・出典を一覧できます。</p>
       </div>
       <ul className="space-y-2">
-        {exams.map(({ exam, count, notebook }) => (
+        {exams.map(({ exam, count, notebook, codeDrill }) => (
           <li key={exam.examCode} className="space-y-1">
             <Link href={`/admin/preview/${exam.examCode}`} className="card block p-4">
               <span className="block font-bold text-primary">{exam.name}</span>
@@ -38,6 +40,14 @@ export default async function AdminPreviewIndexPage() {
                 className="inline-block px-4 text-sm text-primary underline"
               >
                 体系ノートのプレビュー(見出し {notebook.entries.length} 件。未検証を含む)
+              </Link>
+            ) : null}
+            {codeDrill ? (
+              <Link
+                href={`/admin/preview/${exam.examCode}/code-drill`}
+                className="inline-block px-4 text-sm text-primary underline"
+              >
+                コードドリルのプレビュー({codeDrill.length} 問。未検証を含む)
               </Link>
             ) : null}
           </li>

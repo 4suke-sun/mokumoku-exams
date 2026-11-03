@@ -19,7 +19,7 @@
 | --- | --- |
 | `packages/app` | アプリ本体(Next.js / TypeScript / App Router / Tailwind) |
 | `packages/infra` | インフラの定義(AWS CDK / TypeScript)。Cognito、DynamoDB、Lambda、CloudFront、S3 |
-| `data/` | 資格、問題、カリキュラム、体系ノート、要約カード、リリースノートの JSON |
+| `data/` | 資格、問題、カリキュラム、体系ノート、コードドリル、要約カード、リリースノートの JSON |
 | `scripts/` | データの検査、リリースノートの検査、機密検査などのスクリプト |
 | `docs/` | 設計、データの仕様、運用の手順 |
 
