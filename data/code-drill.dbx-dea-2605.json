@@ -1,0 +1,2812 @@
+{
+  "examCode": "DBX-DEA-2605",
+  "problems": [
+    {
+      "id": "DEA-CD-0001",
+      "domain": "domain3",
+      "language": "sql",
+      "title": "MERGE INTO で顧客の表を upsert する",
+      "prompt": "表 `customers`(列 `id`・`city`)に、更新の表 `updates`(同じ列)の内容を反映します。\n\n**要件**: `id` が一致する行は `updates` の値で更新し、`customers` にない `id` の行は新しく挿入します。`customers` にだけある行は、そのまま残します。",
+      "template": "MERGE INTO customers AS t\nUSING updates AS s\nON t.id = s.id\nWHEN MATCHED THEN {{1}}\nWHEN {{2}} THEN {{3}};",
+      "blanks": [
+        {
+          "answer": "UPDATE SET *"
+        },
+        {
+          "answer": "NOT MATCHED"
+        },
+        {
+          "answer": "INSERT *"
+        }
+      ],
+      "distractors": [
+        {
+          "text": "DELETE",
+          "blank": 1,
+          "outcome": {
+            "kind": "different-result",
+            "text": "文は実行できますが、`id` が一致した行は更新されずに削除されます。`id` が 2 の行が消え、`updates` にだけある `id` が 3 の行は挿入されます。要件の「一致する行を更新する」を満たしません。",
+            "diagram": {
+              "type": "table-change",
+              "title": "一致した行を DELETE にしたとき",
+              "operation": "MERGE INTO",
+              "before": {
+                "heading": "customers(前)",
+                "columns": [
+                  {
+                    "label": "id"
+                  },
+                  {
+                    "label": "city"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1", "Tokyo"]
+                  },
+                  {
+                    "cells": ["2", "Osaka"],
+                    "state": "removed"
+                  }
+                ]
+              },
+              "after": {
+                "heading": "customers(後)",
+                "columns": [
+                  {
+                    "label": "id"
+                  },
+                  {
+                    "label": "city"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1", "Tokyo"]
+                  },
+                  {
+                    "cells": ["3", "Nagoya"],
+                    "state": "added"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "text": "NOT MATCHED BY SOURCE",
+          "blank": 2,
+          "outcome": {
+            "kind": "error",
+            "text": "エラーになります。`WHEN NOT MATCHED BY SOURCE` は、ソースに対応する行がない対象の行に対する句で、使える操作は `DELETE` と `UPDATE` だけです。`INSERT` は書けません。"
+          }
+        },
+        {
+          "text": "INSERT INTO",
+          "blank": 3,
+          "outcome": {
+            "kind": "error",
+            "text": "構文のエラーになります。`WHEN NOT MATCHED` の操作は `INSERT *` か `INSERT (列) VALUES (値)` の形で書き、対象の表の名前は書きません。"
+          }
+        }
+      ],
+      "solutions": [
+        "MERGE INTO customers AS t\nUSING updates AS s\nON t.id = s.id\nWHEN MATCHED THEN UPDATE SET *\nWHEN NOT MATCHED THEN INSERT *;"
+      ],
+      "result": {
+        "text": "`id` が 2 の行は `city` が `updates` の値(Kyoto)に更新され、`updates` にだけある `id` が 3 の行(Nagoya)が挿入されます。`customers` にだけある `id` が 1 の行は変わりません。",
+        "diagram": {
+          "type": "table-change",
+          "title": "MERGE INTO による upsert",
+          "operation": "MERGE INTO",
+          "before": {
+            "heading": "customers(前)",
+            "columns": [
+              {
+                "label": "id"
+              },
+              {
+                "label": "city"
+              }
+            ],
+            "rows": [
+              {
+                "cells": ["1", "Tokyo"]
+              },
+              {
+                "cells": ["2", "Osaka"]
+              }
+            ]
+          },
+          "after": {
+            "heading": "customers(後)",
+            "columns": [
+              {
+                "label": "id"
+              },
+              {
+                "label": "city"
+              }
+            ],
+            "rows": [
+              {
+                "cells": ["1", "Tokyo"]
+              },
+              {
+                "cells": ["2", "Kyoto"],
+                "state": "changed"
+              },
+              {
+                "cells": ["3", "Nagoya"],
+                "state": "added"
+              }
+            ]
+          }
+        }
+      },
+      "explanation": "ソースの複数の行が対象の同じ行に一致すると、`MERGE` はエラーで失敗します(一致した行を条件なしで削除するだけのときは除きます)。ソースの重複は、先に取り除いておきます。",
+      "references": [
+        {
+          "title": "MERGE INTO",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/delta-merge-into"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "DEA-CD-0002",
+      "domain": "domain3",
+      "language": "sql",
+      "title": "返品された注文の状態を UPDATE で書き換える",
+      "prompt": "表 `orders`(列 `order_id`・`status`)のうち、返品の表 `returned_orders`(列 `order_id`)に `order_id` がある注文だけ、`status` を `'returned'` にします。\n\n**要件**: 返品の表にない注文の `status` は変えません。",
+      "template": "UPDATE orders AS o\n{{1}} status = 'returned'\n{{2}} {{3}} (SELECT 1 FROM returned_orders AS r WHERE r.order_id = o.order_id);",
+      "blanks": [
+        {
+          "answer": "SET"
+        },
+        {
+          "answer": "WHERE"
+        },
+        {
+          "answer": "EXISTS"
+        }
+      ],
+      "distractors": [
+        {
+          "text": "NOT EXISTS",
+          "blank": 3,
+          "outcome": {
+            "kind": "different-result",
+            "text": "文は実行できますが、条件が逆になります。返品の表に**ない**注文(`order_id` が 1 と 3)の `status` が `'returned'` になり、返品された注文(2)は変わりません。",
+            "diagram": {
+              "type": "table-change",
+              "title": "条件を NOT EXISTS にしたとき",
+              "operation": "UPDATE",
+              "before": {
+                "heading": "orders(前)",
+                "columns": [
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "status"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1", "shipped"]
+                  },
+                  {
+                    "cells": ["2", "shipped"]
+                  },
+                  {
+                    "cells": ["3", "shipped"]
+                  }
+                ]
+              },
+              "after": {
+                "heading": "orders(後)",
+                "columns": [
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "status"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1", "returned"],
+                    "state": "changed"
+                  },
+                  {
+                    "cells": ["2", "shipped"]
+                  },
+                  {
+                    "cells": ["3", "returned"],
+                    "state": "changed"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "text": "FROM",
+          "blank": 2,
+          "outcome": {
+            "kind": "error",
+            "text": "構文のエラーになります。`UPDATE` は `SET` のあとに、行を絞る `WHERE` 句を書く形です。ほかの表と結合して更新する `UPDATE … FROM` の形は、Databricks SQL では使えません。"
+          }
+        },
+        {
+          "text": "VALUES",
+          "blank": 1,
+          "outcome": {
+            "kind": "error",
+            "text": "構文のエラーになります。`UPDATE` で列に値を入れるときは、`SET 列 = 式` の形で書きます。"
+          }
+        }
+      ],
+      "solutions": [
+        "UPDATE orders AS o\nSET status = 'returned'\nWHERE EXISTS (SELECT 1 FROM returned_orders AS r WHERE r.order_id = o.order_id);"
+      ],
+      "result": {
+        "text": "返品の表にある `order_id` が 2 の注文だけ、`status` が `'returned'` に変わります。1 と 3 の注文は `'shipped'` のままです。",
+        "diagram": {
+          "type": "table-change",
+          "title": "返品された注文だけを更新",
+          "operation": "UPDATE",
+          "before": {
+            "heading": "orders(前)",
+            "columns": [
+              {
+                "label": "order_id"
+              },
+              {
+                "label": "status"
+              }
+            ],
+            "rows": [
+              {
+                "cells": ["1", "shipped"]
+              },
+              {
+                "cells": ["2", "shipped"]
+              },
+              {
+                "cells": ["3", "shipped"]
+              }
+            ]
+          },
+          "after": {
+            "heading": "orders(後)",
+            "columns": [
+              {
+                "label": "order_id"
+              },
+              {
+                "label": "status"
+              }
+            ],
+            "rows": [
+              {
+                "cells": ["1", "shipped"]
+              },
+              {
+                "cells": ["2", "returned"],
+                "state": "changed"
+              },
+              {
+                "cells": ["3", "shipped"]
+              }
+            ]
+          }
+        }
+      },
+      "explanation": "`UPDATE` は `SET 列 = 式` で新しい値を決め、`WHERE` 句で更新する行を絞ります。`WHERE` 句を省くと、表のすべての行が更新されます。\n\nほかの表の内容で絞り込むときは、`WHERE` 句に `EXISTS` の副問い合わせを書けます。副問い合わせが 1 行以上を返す行だけが更新されます。\n\nDatabricks SQL の `UPDATE` は、ほかの表と結合する `UPDATE … FROM … JOIN` の形を持ちません。結合した表の値で更新したいときは、`MERGE INTO` を使います。",
+      "references": [
+        {
+          "title": "UPDATE",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/delta-update"
+        },
+        {
+          "title": "exists function",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/functions/exists"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "DEA-CD-0003",
+      "domain": "domain3",
+      "language": "sql",
+      "title": "高階関数で配列から 60 点以上だけを残す",
+      "prompt": "表 `exams` の列 `scores` は、整数の配列です(例: `[80, 45, 60]`)。\n\n**要件**: 各行の `scores` から、60 以上の要素だけを残した配列を、列 `passed` として返します(例: `[80, 60]`)。",
+      "template": "SELECT id, {{1}}(scores, {{2}}) AS passed\nFROM exams;",
+      "blanks": [
+        {
+          "answer": "filter"
+        },
+        {
+          "answer": "x -> x >= 60"
+        }
+      ],
+      "distractors": [
+        {
+          "text": "transform",
+          "blank": 1,
+          "outcome": {
+            "kind": "different-result",
+            "text": "文は実行できますが、`transform` は要素ごとにラムダ関数の結果へ置き換えた配列を返します。条件式の結果が並ぶため、`[80, 45, 60]` は `[true, false, true]` になります。"
+          }
+        },
+        {
+          "text": "exists",
+          "blank": 1,
+          "outcome": {
+            "kind": "different-result",
+            "text": "文は実行できますが、`exists` は、条件を満たす要素が 1 つでもあるかを BOOLEAN で返します。`[80, 45, 60]` の行は、配列ではなく `true` になります。"
+          }
+        },
+        {
+          "text": "x => x >= 60",
+          "blank": 2,
+          "outcome": {
+            "kind": "error",
+            "text": "エラーになります。ラムダ関数の矢印は `->` です。`=>` は、関数の引数を名前で渡すときの記号で、ラムダ関数には使えません。"
+          }
+        }
+      ],
+      "solutions": ["SELECT id, filter(scores, x -> x >= 60) AS passed\nFROM exams;"],
+      "result": {
+        "text": "`scores` が `[80, 45, 60]` の行では、`passed` が `[80, 60]` になります。60 未満の要素だけが除かれ、残った要素の順は元の配列のままです。"
+      },
+      "explanation": "`filter(配列, ラムダ関数)` は、ラムダ関数が真を返す要素だけを残した配列を返します。結果の型は、元の配列と同じです。\n\nラムダ関数は `引数 -> 式` の形で書きます。引数が 2 つのときは `(x, i) -> …` と括弧でくくり、2 つ目の引数には要素の位置が入ります。\n\n似た高階関数との違いを押さえます。\n\n- `transform` は、要素ごとに式の値へ置き換えた配列を返します(要素の数は変わりません)。\n- `exists` は、条件を満たす要素があるかを BOOLEAN で返します。",
+      "references": [
+        {
+          "title": "filter function",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/functions/filter"
+        },
+        {
+          "title": "transform function",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/functions/transform"
+        },
+        {
+          "title": "Lambda functions",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-lambda-functions"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "DEA-CD-0004",
+      "domain": "domain3",
+      "language": "sql",
+      "title": "配列の列を explode_outer で行に展開する",
+      "prompt": "表 `orders` の列 `items` は、商品名の配列です。`items` が NULL の注文もあります。\n\n**要件**: 配列の要素ごとに 1 行にし、列 `order_id` と `item` を返します。`items` が NULL の注文も、`item` が NULL の 1 行として残します。",
+      "template": "SELECT order_id, {{1}}({{2}}) AS item\nFROM orders;",
+      "blanks": [
+        {
+          "answer": "explode_outer"
+        },
+        {
+          "answer": "items"
+        }
+      ],
+      "distractors": [
+        {
+          "text": "explode",
+          "blank": 1,
+          "outcome": {
+            "kind": "different-result",
+            "text": "文は実行できますが、`explode` は、配列が NULL のときに行を 1 つも作りません。`items` が NULL の注文(2)が結果から消え、要件の「NULL の注文も残す」を満たしません。",
+            "diagram": {
+              "type": "table-change",
+              "title": "explode では NULL の注文が消える",
+              "operation": "explode",
+              "before": {
+                "heading": "orders",
+                "columns": [
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "items"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1", "[pen, ink]"]
+                  },
+                  {
+                    "cells": ["2", "NULL"],
+                    "state": "removed"
+                  }
+                ]
+              },
+              "after": {
+                "heading": "結果",
+                "columns": [
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "item"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1", "pen"]
+                  },
+                  {
+                    "cells": ["1", "ink"]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "text": "order_id",
+          "blank": 2,
+          "outcome": {
+            "kind": "error",
+            "text": "エラーになります。`explode_outer` の引数は、配列(ARRAY)かマップ(MAP)の式でなければなりません。`order_id` は配列ではないため、型が合いません。"
+          }
+        }
+      ],
+      "solutions": ["SELECT order_id, explode_outer(items) AS item\nFROM orders;"],
+      "result": {
+        "text": "注文 1 は要素ごとに 2 行(`pen` と `ink`)になり、`items` が NULL の注文 2 は、`item` が NULL の 1 行として残ります。",
+        "diagram": {
+          "type": "table-change",
+          "title": "explode_outer による展開",
+          "operation": "explode_outer",
+          "before": {
+            "heading": "orders",
+            "columns": [
+              {
+                "label": "order_id"
+              },
+              {
+                "label": "items"
+              }
+            ],
+            "rows": [
+              {
+                "cells": ["1", "[pen, ink]"]
+              },
+              {
+                "cells": ["2", "NULL"]
+              }
+            ]
+          },
+          "after": {
+            "heading": "結果",
+            "columns": [
+              {
+                "label": "order_id"
+              },
+              {
+                "label": "item"
+              }
+            ],
+            "rows": [
+              {
+                "cells": ["1", "pen"]
+              },
+              {
+                "cells": ["1", "ink"]
+              },
+              {
+                "cells": ["2", "NULL"],
+                "state": "added"
+              }
+            ]
+          }
+        }
+      },
+      "explanation": "`explode` と `explode_outer` は、どちらも配列の要素(マップならキーと値)ごとに行を作る生成関数です。違いは、入力が NULL のときです。\n\n- `explode` は、NULL の入力から行を作りません。\n- `explode_outer` は、NULL の入力から、値が NULL の行を 1 つ作ります。\n\n別名を付けないとき、配列から作った列の名前は `col` になります。\n\nこの問題のように `SELECT` の並びで呼ぶ書き方は、Databricks Runtime 12.2 LTS 以降では非推奨で、`FROM` 句に表として置く書き方(例: `FROM explode_outer(…) AS t(item)`)が勧められています。",
+      "references": [
+        {
+          "title": "explode_outer table-valued generator function",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/functions/explode_outer"
+        },
+        {
+          "title": "explode table-valued generator function",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/functions/explode"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "DEA-CD-0005",
+      "domain": "domain3",
+      "language": "sql",
+      "title": "ウィンドウ関数で地域ごとに金額の順位を付ける",
+      "prompt": "表 `sales`(列 `region`・`order_id`・`amount`)の各行に、地域ごとの通し番号 `rn` を付けます。\n\n**要件**: 番号は地域ごとに 1 から振り直し、金額の**大きい**順に付けます。金額が同じ行どうしにも、別々の番号を付けます(各地域の 1 番を 1 行だけ取り出すため)。",
+      "template": "SELECT region, order_id, amount,\n  {{1}}() OVER ({{2}} region ORDER BY amount {{3}}) AS rn\nFROM sales;",
+      "blanks": [
+        {
+          "answer": "row_number"
+        },
+        {
+          "answer": "PARTITION BY"
+        },
+        {
+          "answer": "DESC"
+        }
+      ],
+      "distractors": [
+        {
+          "text": "rank",
+          "blank": 1,
+          "outcome": {
+            "kind": "different-result",
+            "text": "文は実行できますが、`rank` は同じ金額の行に同じ番号を付け、次の番号を飛ばします(1, 1, 3 のように)。同じ金額の行が 1 番に並ぶと、1 番が 1 行に決まらず、要件を満たしません。"
+          }
+        },
+        {
+          "text": "GROUP BY",
+          "blank": 2,
+          "outcome": {
+            "kind": "error",
+            "text": "構文のエラーになります。`OVER` の括弧の中で行を分けるのは `PARTITION BY` です。`GROUP BY` は、問い合わせの行を集約する句で、ウィンドウの指定には書けません。"
+          }
+        },
+        {
+          "text": "ASC",
+          "blank": 3,
+          "outcome": {
+            "kind": "different-result",
+            "text": "文は実行できますが、金額の小さい順に番号が付きます。各地域で金額のいちばん小さい行が 1 番になり、要件の「大きい順」と逆になります。"
+          }
+        }
+      ],
+      "solutions": [
+        "SELECT region, order_id, amount,\n  row_number() OVER (PARTITION BY region ORDER BY amount DESC) AS rn\nFROM sales;"
+      ],
+      "result": {
+        "text": "地域ごとに、金額の大きい行から 1, 2, 3 … の番号が付きます。金額が同じ行どうしにも別々の番号が付きます。ただし、同じ金額の行のどちらが先になるかは決まりません(順位を決める列で並びが一意でないため)。"
+      },
+      "explanation": "ウィンドウ関数は `関数() OVER (PARTITION BY … ORDER BY …)` の形で書きます。`PARTITION BY` で行を組に分け、組の中で `ORDER BY` の順に計算します。`PARTITION BY` を省くと、すべての行が 1 つの組になります。\n\n順位の関数は、`OVER` の中に `ORDER BY` が必要です。同じ値の行の扱いが違います。\n\n- `row_number` は、同じ値の行にも別々の番号を付けます(1, 2, 3)。\n- `rank` は、同じ値の行に同じ番号を付け、次の番号を飛ばします(1, 1, 3)。\n- `dense_rank` は、同じ値の行に同じ番号を付け、番号を飛ばしません(1, 1, 2)。\n\n`row_number` で同じ値の行の順を決めたいときは、`ORDER BY amount DESC, order_id` のように並びの列を足します。",
+      "references": [
+        {
+          "title": "row_number ranking window function",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/functions/row_number"
+        },
+        {
+          "title": "rank ranking window function",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/functions/rank"
+        },
+        {
+          "title": "Window functions",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-window-functions"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "DEA-CD-0006",
+      "domain": "domain2",
+      "language": "sql",
+      "title": "COPY INTO で JSON のファイルを冪等に取り込む",
+      "prompt": "ボリュームの `/Volumes/main/landing/orders/` に置かれる JSON のファイルを、Delta の表 `main.bronze.orders` に取り込みます。この文は、ファイルが増えるたびに何度も実行します。\n\n**要件**: 拡張子が `.json` のファイルだけを読みます。すでに取り込んだファイルは、再実行しても読み直しません。",
+      "template": "{{1}} main.bronze.orders\nFROM '/Volumes/main/landing/orders/'\n{{2}} = JSON\n{{3}} = '*.json'\nCOPY_OPTIONS ('force' = '{{4}}');",
+      "blanks": [
+        {
+          "answer": "COPY INTO"
+        },
+        {
+          "answer": "FILEFORMAT"
+        },
+        {
+          "answer": "PATTERN"
+        },
+        {
+          "answer": "false"
+        }
+      ],
+      "distractors": [
+        {
+          "text": "INSERT INTO",
+          "blank": 1,
+          "outcome": {
+            "kind": "error",
+            "text": "構文のエラーになります。`INSERT INTO` は、値の並びか問い合わせの結果を表に入れる文で、ファイルの場所を `FROM` に書いて読み込む形を持ちません。"
+          }
+        },
+        {
+          "text": "FORMAT",
+          "blank": 2,
+          "outcome": {
+            "kind": "error",
+            "text": "構文のエラーになります。`COPY INTO` でファイルの形式を指定するキーワードは `FILEFORMAT` です。読み取りのオプションを渡す `FORMAT_OPTIONS` とは別の句です。"
+          }
+        },
+        {
+          "text": "FILES",
+          "blank": 3,
+          "outcome": {
+            "kind": "error",
+            "text": "構文のエラーになります。`FILES` は、読み込むファイルの名前を括弧の中に並べる句で、`*` のようなパターンは `PATTERN` に書きます。"
+          }
+        },
+        {
+          "text": "true",
+          "blank": 4,
+          "outcome": {
+            "kind": "different-result",
+            "text": "文は実行できますが、`force` を真にすると冪等ではなくなり、取り込み済みのファイルも毎回読み直します。再実行のたびに、前に取り込んだ `a.json` の行が重ねて入ります。",
+            "diagram": {
+              "type": "table-change",
+              "title": "force を true にして再実行したとき",
+              "operation": "COPY INTO",
+              "before": {
+                "heading": "orders(前)",
+                "columns": [
+                  {
+                    "label": "id"
+                  },
+                  {
+                    "label": "取り込み元"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1", "a.json"]
+                  },
+                  {
+                    "cells": ["2", "a.json"]
+                  }
+                ]
+              },
+              "after": {
+                "heading": "orders(後)",
+                "columns": [
+                  {
+                    "label": "id"
+                  },
+                  {
+                    "label": "取り込み元"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1", "a.json"]
+                  },
+                  {
+                    "cells": ["2", "a.json"]
+                  },
+                  {
+                    "cells": ["1", "a.json"],
+                    "state": "added"
+                  },
+                  {
+                    "cells": ["2", "a.json"],
+                    "state": "added"
+                  },
+                  {
+                    "cells": ["3", "b.json"],
+                    "state": "added"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "solutions": [
+        "COPY INTO main.bronze.orders\nFROM '/Volumes/main/landing/orders/'\nFILEFORMAT = JSON\nPATTERN = '*.json'\nCOPY_OPTIONS ('force' = 'false');",
+        "COPY INTO main.bronze.orders\nFROM '/Volumes/main/landing/orders/'\nFILEFORMAT = JSON\nPATTERN = '*.json';"
+      ],
+      "result": {
+        "text": "前回までに取り込んだ `a.json` は飛ばされ、新しく置かれた `b.json` の行だけが追加されます。同じ文を続けてもう一度実行しても、新しいファイルがなければ行は増えません。",
+        "diagram": {
+          "type": "table-change",
+          "title": "再実行で新しいファイルだけを取り込む",
+          "operation": "COPY INTO",
+          "before": {
+            "heading": "orders(前)",
+            "columns": [
+              {
+                "label": "id"
+              },
+              {
+                "label": "取り込み元"
+              }
+            ],
+            "rows": [
+              {
+                "cells": ["1", "a.json"]
+              },
+              {
+                "cells": ["2", "a.json"]
+              }
+            ]
+          },
+          "after": {
+            "heading": "orders(後)",
+            "columns": [
+              {
+                "label": "id"
+              },
+              {
+                "label": "取り込み元"
+              }
+            ],
+            "rows": [
+              {
+                "cells": ["1", "a.json"]
+              },
+              {
+                "cells": ["2", "a.json"]
+              },
+              {
+                "cells": ["3", "b.json"],
+                "state": "added"
+              }
+            ]
+          }
+        }
+      },
+      "explanation": "`COPY INTO` は、ファイルの場所から Delta の表へデータを読み込む文で、再試行しても結果が変わらない冪等な操作です。取り込み済みのファイルは、あとで中身が変わっていても飛ばされます。\n\n句の役割を押さえます。\n\n- `FILEFORMAT` は形式(`CSV`・`JSON`・`PARQUET` など)を決めます。\n- `PATTERN` は glob のパターンで読むファイルを絞ります。`FILES` はファイルの名前を括弧の中に並べ、`PATTERN` と同時には使えません。\n- `FORMAT_OPTIONS` は読み取りのオプション、`COPY_OPTIONS` は `force` や `mergeSchema` などの取り込みのオプションです。\n\n`force` の既定は偽なので、`COPY_OPTIONS` の行を省いても同じ結果になります。真にすると、取り込み済みかにかかわらずファイルを読み込みます。",
+      "references": [
+        {
+          "title": "COPY INTO",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/delta-copy-into"
+        },
+        {
+          "title": "Common data loading patterns using COPY INTO",
+          "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/copy-into/examples"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "DEA-CD-0007",
+      "domain": "domain2",
+      "language": "sql",
+      "title": "read_files でストリーミングテーブルに取り込む",
+      "prompt": "パイプラインの SQL で、ボリュームの `/Volumes/main/landing/orders/` に届く JSON のファイルを、表 `orders_bronze` に増分で取り込みます。\n\n**要件**: 更新のたびに、新しく届いたファイルの行だけを追記します。ファイルの形式は JSON と明示します。表を作る前から置かれていたファイルも取り込みます。",
+      "template": "CREATE OR REFRESH {{1}} orders_bronze\nAS SELECT * FROM {{2}} read_files(\n  '/Volumes/main/landing/orders/',\n  format {{3}} 'json'\n);",
+      "blanks": [
+        {
+          "answer": "STREAMING TABLE"
+        },
+        {
+          "answer": "STREAM"
+        },
+        {
+          "answer": "=>"
+        }
+      ],
+      "distractors": [
+        {
+          "text": "=",
+          "blank": 3,
+          "outcome": {
+            "kind": "error",
+            "text": "エラーになります。`read_files` のオプションは、`format => 'json'` のように名前付きの引数で渡す決まりです。`=` では、オプションとして渡せません。"
+          }
+        },
+        {
+          "text": "STREAMING VIEW",
+          "blank": 1,
+          "outcome": {
+            "kind": "error",
+            "text": "構文のエラーになります。パイプラインで増分に追記する表は `CREATE OR REFRESH STREAMING TABLE` で定義します。`STREAMING VIEW` は、この文の書式にありません。"
+          }
+        }
+      ],
+      "solutions": [
+        "CREATE OR REFRESH STREAMING TABLE orders_bronze\nAS SELECT * FROM STREAM read_files(\n  '/Volumes/main/landing/orders/',\n  format => 'json'\n);"
+      ],
+      "mistakes": [
+        {
+          "code": "CREATE OR REFRESH STREAMING TABLE orders_bronze\nAS SELECT * FROM STREAM read_files(\n  '/Volumes/main/landing/orders/',\n  format => 'json',\n  includeExistingFiles => false\n);",
+          "outcome": {
+            "kind": "different-result",
+            "text": "文は実行できますが、`includeExistingFiles` を偽にすると、ストリームを始めた時点で置かれていたファイルを読みません。表を作った直後はほぼ空で、そのあとに届いたファイルだけが入ります。要件の「前から置かれていたファイルも取り込む」を満たしません。"
+          }
+        }
+      ],
+      "result": {
+        "text": "最初の更新で、置かれていた JSON のファイルが読み込まれます。以降の更新では、新しく届いたファイルの行だけが `orders_bronze` に追記されます。スキーマは、データの一部から推定されます。"
+      },
+      "explanation": "ストリーミングテーブルは、更新のたびにソースに増えた分だけを追記する表です。定義の問い合わせはストリーミングの問い合わせでなければならず、ソースは `STREAM` のキーワードで読みます。\n\n`read_files` を `STREAM` 付きで使うと、Auto Loader でファイルを増分に読みます。このときスキーマはデータの見本から推定され、データが増えるにつれて変わることがあります。\n\n`read_files` の第 1 引数はパスで、そのあとのオプションは `キー => 値` の名前付きの引数で渡します。`format` を省くと形式は推定されます。\n\n`includeExistingFiles` の既定は真で、すでに置かれているファイルも読みます。この値は、ストリームを最初に始めたときだけ評価されます。",
+      "references": [
+        {
+          "title": "CREATE STREAMING TABLE (pipelines)",
+          "url": "https://docs.databricks.com/aws/en/ldp/developer/ldp-sql-ref-create-streaming-table"
+        },
+        {
+          "title": "read_files table-valued function",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/functions/read_files"
+        },
+        {
+          "title": "Auto Loader options",
+          "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/options"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "DEA-CD-0008",
+      "domain": "domain7",
+      "language": "sql",
+      "title": "表を読むのに必要な権限を GRANT で付ける",
+      "prompt": "Unity Catalog の表 `main.sales.orders` を、グループ `analysts` が `SELECT` で読めるようにします。`analysts` は、まだどの権限も持っていません。\n\n**要件**: 読み取りに必要な最小限の権限だけを付けます。表への書き込みは許しません。",
+      "template": "GRANT {{1}} ON CATALOG main TO `analysts`;\nGRANT {{2}} ON SCHEMA main.sales TO `analysts`;\nGRANT {{3}} ON TABLE main.sales.orders TO `analysts`;",
+      "blanks": [
+        {
+          "answer": "USE CATALOG"
+        },
+        {
+          "answer": "USE SCHEMA"
+        },
+        {
+          "answer": "SELECT"
+        }
+      ],
+      "distractors": [
+        {
+          "text": "BROWSE",
+          "blank": 1,
+          "outcome": {
+            "kind": "different-result",
+            "text": "3 つの文は実行できますが、`BROWSE` はオブジェクトのメタデータを見る権限で、データへの入り口にはなりません。カタログの `USE CATALOG` がないため、`analysts` が表を `SELECT` すると、権限が足りずに失敗します。"
+          }
+        },
+        {
+          "text": "MODIFY",
+          "blank": 3,
+          "outcome": {
+            "kind": "different-result",
+            "text": "3 つの文は実行できますが、`MODIFY` は表に行を挿入・更新・削除する権限で、読み取りを含みません。`analysts` は表を読めず、要件で許さない書き込みができるようになります。"
+          }
+        }
+      ],
+      "solutions": [
+        "GRANT USE CATALOG ON CATALOG main TO `analysts`;\nGRANT USE SCHEMA ON SCHEMA main.sales TO `analysts`;\nGRANT SELECT ON TABLE main.sales.orders TO `analysts`;"
+      ],
+      "result": {
+        "text": "`analysts` は、カタログ `main` とスキーマ `main.sales` に入れるようになり、表 `main.sales.orders` を `SELECT` で読めます。表への書き込みはできません。"
+      },
+      "explanation": "Unity Catalog で表を読むには、表の `SELECT` に加えて、親のカタログの `USE CATALOG` と、親のスキーマの `USE SCHEMA` が要ります。どれか 1 つが欠けても読めません。\n\n取り違えやすい権限を押さえます。\n\n- `BROWSE` は、メタデータを見てアクセスを申請できる権限で、データは読めません。\n- `MODIFY` は、表への挿入・更新・削除の権限です。読み取りには別に `SELECT` が要ります。\n\n権限は下の階層へ引き継がれます。たとえば `SELECT` をスキーマに付けると、そのスキーマの今ある表と今後できる表のすべてに及びます。この問題では、1 つの表だけを読めるよう、表に付けています。\n\n`GRANT` は `GRANT 権限 ON オブジェクト TO 相手` の形で書き、特殊な文字を含む名前はバッククォートでくくります。",
+      "references": [
+        {
+          "title": "Unity Catalog privileges and securable objects",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/manage-privileges/privileges"
+        },
+        {
+          "title": "GRANT",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/security-grant"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "DEA-CD-0009",
+      "domain": "domain7",
+      "language": "sql",
+      "title": "書き込みの権限だけを REVOKE で取り消す",
+      "prompt": "グループ `etl_team` には、表 `main.sales.orders` に対して `SELECT` と `MODIFY` が、それぞれ明示的に付いています。\n\n**要件**: `etl_team` の書き込み(挿入・更新・削除)の権限だけを取り消し、読み取りの権限は残します。",
+      "template": "{{1}} {{2}} ON TABLE main.sales.orders {{3}} `etl_team`;",
+      "blanks": [
+        {
+          "answer": "REVOKE"
+        },
+        {
+          "answer": "MODIFY"
+        },
+        {
+          "answer": "FROM"
+        }
+      ],
+      "distractors": [
+        {
+          "text": "SELECT",
+          "blank": 2,
+          "outcome": {
+            "kind": "different-result",
+            "text": "文は実行できますが、取り消されるのは読み取りの `SELECT` です。`etl_team` は表を読めなくなり、取り消したかった `MODIFY` は残ります。"
+          }
+        },
+        {
+          "text": "DENY",
+          "blank": 1,
+          "outcome": {
+            "kind": "error",
+            "text": "構文のエラーになります。`DENY` は相手を `TO` で指定する文で、`FROM` とは組み合わせられません。また、`DENY` の文は Unity Catalog のオブジェクトには使えず、`hive_metastore` のカタログのオブジェクトだけが対象です。"
+          }
+        },
+        {
+          "text": "TO",
+          "blank": 3,
+          "outcome": {
+            "kind": "error",
+            "text": "構文のエラーになります。`REVOKE` では、権限を取り消す相手を `FROM` で指定します。`TO` は `GRANT` で使うキーワードです。"
+          }
+        }
+      ],
+      "solutions": ["REVOKE MODIFY ON TABLE main.sales.orders FROM `etl_team`;"],
+      "result": {
+        "text": "`etl_team` の `MODIFY` が取り消され、表への挿入・更新・削除ができなくなります。`SELECT` は残るため、表は引き続き読めます。"
+      },
+      "explanation": "`REVOKE` は、明示的に付けた権限を取り消す文で、`REVOKE 権限 ON オブジェクト FROM 相手` の形で書きます。`GRANT` の `TO` に対して、`REVOKE` は `FROM` です。付いていない権限を取り消そうとしても、文は成功します。\n\n表の `MODIFY` は、行の挿入・更新・削除の権限です。読み取りは `SELECT` の権限なので、`MODIFY` だけを取り消せば、読み取りは残ります。\n\n`DENY` は、権限を明示的に拒む文です。Unity Catalog では使えず、`hive_metastore` のカタログのオブジェクトにだけ使えます。",
+      "references": [
+        {
+          "title": "REVOKE",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/security-revoke"
+        },
+        {
+          "title": "Unity Catalog privileges and securable objects",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/manage-privileges/privileges"
+        },
+        {
+          "title": "DENY",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/security-deny"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "DEA-CD-0010",
+      "domain": "domain7",
+      "language": "sql",
+      "title": "行フィルターで米国の行だけを見せる",
+      "prompt": "表 `sales` の列 `region` で、見える行を利用者ごとに変えます。\n\n**要件**: アカウントのグループ `admin` のメンバーは、すべての行を見られます。それ以外の利用者は、`region` が `'US'` の行だけを見られます。関数 `us_filter` を作り、表に行フィルターとして付けます。",
+      "template": "CREATE FUNCTION us_filter(region STRING)\nRETURN IF({{1}}('admin'), {{2}}, region = 'US');\n\nALTER TABLE sales {{3}} us_filter {{4}} (region);",
+      "blanks": [
+        {
+          "answer": "is_account_group_member"
+        },
+        {
+          "answer": "true"
+        },
+        {
+          "answer": "SET ROW FILTER"
+        },
+        {
+          "answer": "ON"
+        }
+      ],
+      "distractors": [
+        {
+          "text": "false",
+          "blank": 2,
+          "outcome": {
+            "kind": "different-result",
+            "text": "文は実行できますが、`admin` のメンバーには関数が常に偽を返します。行フィルターは真を返した行だけを見せるため、`admin` のメンバーには 1 行も見えなくなります。それ以外の利用者には `'US'` の行が見えます。"
+          }
+        },
+        {
+          "text": "SET MASK",
+          "blank": 3,
+          "outcome": {
+            "kind": "error",
+            "text": "構文のエラーになります。`SET MASK` は、`ALTER COLUMN 列` のあとに書いて列にマスクを付ける句です。表の全体に行フィルターを付けるのは `SET ROW FILTER` です。"
+          }
+        },
+        {
+          "text": "DROP ROW FILTER",
+          "blank": 3,
+          "outcome": {
+            "kind": "error",
+            "text": "構文のエラーになります。`DROP ROW FILTER` は、表から行フィルターを外す句で、関数の名前や列を続けて書きません。"
+          }
+        }
+      ],
+      "solutions": [
+        "CREATE FUNCTION us_filter(region STRING)\nRETURN IF(is_account_group_member('admin'), true, region = 'US');\n\nALTER TABLE sales SET ROW FILTER us_filter ON (region);"
+      ],
+      "result": {
+        "text": "`admin` のメンバーが `sales` を読むと、すべての行が返ります。それ以外の利用者が読むと、`region` が `'US'` の行だけが返ります。"
+      },
+      "explanation": "行フィルターは、表の行ごとに関数を評価し、真を返した行だけを問い合わせに返す仕組みです。関数の戻り値は BOOLEAN にします。\n\n`ALTER TABLE 表 SET ROW FILTER 関数 ON (列)` で付け、`ALTER TABLE 表 DROP ROW FILTER` で外します。`ON` の括弧には、関数の引数に渡す列を並べます。1 つの表に付けられる行フィルターは 1 つです。\n\n`is_account_group_member` は、いまの利用者がアカウントのグループのメンバーかを返します。利用者を調べる関数は、関数の作成者ではなく、問い合わせる利用者の権限で評価されます。\n\n関数を消す前に、表から行フィルターを外しておきます。外さずに消すと、表を読めなくなります。",
+      "references": [
+        {
+          "title": "Manually apply row filters and column masks",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/filters-and-masks/manually-apply"
+        },
+        {
+          "title": "ALTER TABLE",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/sql-ref-syntax-ddl-alter-table"
+        },
+        {
+          "title": "is_account_group_member function",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/functions/is_account_group_member"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "DEA-CD-0011",
+      "domain": "domain7",
+      "language": "sql",
+      "title": "列マスクで人事部以外には番号を伏せる",
+      "prompt": "表 `users` の列 `ssn`(文字列)を、利用者ごとに見え方を変えます。`hr` は、ワークスペースには割り当てていないアカウントのグループです。\n\n**要件**: アカウントのグループ `hr` のメンバーには、`ssn` の値をそのまま見せます。それ以外の利用者には `'***-**-****'` を見せます。関数 `ssn_mask` を作り、列にマスクとして付けます。",
+      "template": "CREATE FUNCTION ssn_mask(ssn STRING)\nRETURN CASE WHEN {{1}}('hr') THEN {{2}} ELSE '***-**-****' END;\n\nALTER TABLE users {{3}} ssn {{4}} ssn_mask;",
+      "blanks": [
+        {
+          "answer": "is_account_group_member"
+        },
+        {
+          "answer": "ssn"
+        },
+        {
+          "answer": "ALTER COLUMN"
+        },
+        {
+          "answer": "SET MASK"
+        }
+      ],
+      "distractors": [
+        {
+          "text": "is_member",
+          "blank": 1,
+          "outcome": {
+            "kind": "different-result",
+            "text": "文は実行できますが、`is_member` が調べるのは、ワークスペースのローカルのグループと、ワークスペースに割り当てたアカウントのグループです。`hr` はワークスペースに割り当てていないため、`hr` のメンバーにも `'***-**-****'` が返ります。"
+          }
+        },
+        {
+          "text": "SET ROW FILTER",
+          "blank": 4,
+          "outcome": {
+            "kind": "error",
+            "text": "構文のエラーになります。`SET ROW FILTER` は表の全体に付ける句で、`ALTER COLUMN 列` のあとには書けません。列に付けるのは `SET MASK` です。"
+          }
+        },
+        {
+          "text": "DROP MASK",
+          "blank": 4,
+          "outcome": {
+            "kind": "error",
+            "text": "構文のエラーになります。`DROP MASK` は、列からマスクを外す句で、関数の名前を続けて書きません。"
+          }
+        }
+      ],
+      "solutions": [
+        "CREATE FUNCTION ssn_mask(ssn STRING)\nRETURN CASE WHEN is_account_group_member('hr') THEN ssn ELSE '***-**-****' END;\n\nALTER TABLE users ALTER COLUMN ssn SET MASK ssn_mask;"
+      ],
+      "result": {
+        "text": "`hr` のメンバーが `users` を読むと、`ssn` の値がそのまま返ります。それ以外の利用者には、`ssn` の列が `'***-**-****'` として返ります。行の数は変わりません。"
+      },
+      "explanation": "列マスクは、列の値を、関数の結果に置き換えて返す仕組みです。関数の第 1 引数にマスクする列の値が渡り、戻り値の型は第 1 引数と同じにします。\n\n`ALTER TABLE 表 ALTER COLUMN 列 SET MASK 関数` で付け、`ALTER TABLE 表 ALTER COLUMN 列 DROP MASK` で外します。行を絞る行フィルター(`SET ROW FILTER`)は表に付け、列マスクは列に付けます。\n\nグループのメンバーかを調べる関数は 2 つあります。\n\n- `is_account_group_member` は、アカウントのグループを調べます。\n- `is_member` は、ワークスペースのローカルのグループと、ワークスペースに割り当てたアカウントのグループを調べます。\n\n文書は、多くの場合に `is_account_group_member` を使うよう勧めています。",
+      "references": [
+        {
+          "title": "Manually apply row filters and column masks",
+          "url": "https://docs.databricks.com/aws/en/data-governance/unity-catalog/filters-and-masks/manually-apply"
+        },
+        {
+          "title": "is_account_group_member function",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/functions/is_account_group_member"
+        },
+        {
+          "title": "is_member function",
+          "url": "https://docs.databricks.com/aws/en/sql/language-manual/functions/is_member"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "DEA-CD-0012",
+      "domain": "domain3",
+      "language": "pyspark",
+      "title": "注文に顧客の名前を付け、顧客のない注文も残す",
+      "prompt": "`orders`(列 `order_id`・`customer_id`)に、`customers`(列 `customer_id`・`name`)の `name` を付けます。\n\n**要件**: `customers` にない顧客の注文も、結果に残します(その注文の `name` は NULL にします)。結合に使う列 `customer_id` は、結果に 1 列だけ出します。",
+      "template": "result = orders.join(customers, {{1}}, {{2}})",
+      "blanks": [
+        {
+          "answer": "\"customer_id\""
+        },
+        {
+          "answer": "\"left\""
+        }
+      ],
+      "distractors": [
+        {
+          "text": "orders.customer_id == customers.customer_id",
+          "blank": 1,
+          "outcome": {
+            "kind": "different-result",
+            "text": "結合の条件を列の式で書くと、`orders` と `customers` の `customer_id` が別々の列として残ります。行は正解と同じ 3 行ですが、`customer_id` が 2 列になり、要件(結合の列を 1 列にする)を満たしません。",
+            "diagram": {
+              "type": "table-change",
+              "title": "条件を式で書いた左外部結合",
+              "operation": "join(式, left)",
+              "before": {
+                "heading": "orders(前)",
+                "columns": [
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "customer_id"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1", "c1"]
+                  },
+                  {
+                    "cells": ["2", "c2"]
+                  },
+                  {
+                    "cells": ["3", "c9"]
+                  }
+                ]
+              },
+              "after": {
+                "heading": "結果",
+                "columns": [
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "customer_id"
+                  },
+                  {
+                    "label": "customer_id"
+                  },
+                  {
+                    "label": "name"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1", "c1", "c1", "Alice"]
+                  },
+                  {
+                    "cells": ["2", "c2", "c2", "Bob"]
+                  },
+                  {
+                    "cells": ["3", "c9", "NULL", "NULL"]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "text": "\"inner\"",
+          "blank": 2,
+          "outcome": {
+            "kind": "different-result",
+            "text": "内部結合になり、両方の表に `customer_id` がある行だけが残ります。`customers` にない顧客 c9 の注文 3 は、結果から消えます。",
+            "diagram": {
+              "type": "table-change",
+              "title": "内部結合で消える注文",
+              "operation": "join(inner)",
+              "before": {
+                "heading": "orders(前)",
+                "columns": [
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "customer_id"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1", "c1"]
+                  },
+                  {
+                    "cells": ["2", "c2"]
+                  },
+                  {
+                    "cells": ["3", "c9"],
+                    "state": "removed"
+                  }
+                ]
+              },
+              "after": {
+                "heading": "結果",
+                "columns": [
+                  {
+                    "label": "customer_id"
+                  },
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "name"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["c1", "1", "Alice"]
+                  },
+                  {
+                    "cells": ["c2", "2", "Bob"]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "text": "\"left_anti\"",
+          "blank": 2,
+          "outcome": {
+            "kind": "different-result",
+            "text": "左反結合になり、`customers` に相手がない注文だけが残ります。結果は注文 3 の 1 行だけで、列も `orders` の列だけになり、`name` は付きません。",
+            "diagram": {
+              "type": "table-change",
+              "title": "左反結合で残る行",
+              "operation": "join(left_anti)",
+              "before": {
+                "heading": "orders(前)",
+                "columns": [
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "customer_id"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1", "c1"],
+                    "state": "removed"
+                  },
+                  {
+                    "cells": ["2", "c2"],
+                    "state": "removed"
+                  },
+                  {
+                    "cells": ["3", "c9"]
+                  }
+                ]
+              },
+              "after": {
+                "heading": "結果",
+                "columns": [
+                  {
+                    "label": "customer_id"
+                  },
+                  {
+                    "label": "order_id"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["c9", "3"]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "text": "\"right\"",
+          "blank": 2,
+          "outcome": {
+            "kind": "different-result",
+            "text": "右外部結合になり、`customers` の行がすべて残ります。注文のない顧客 c3 の行が足され、`customers` にない顧客 c9 の注文 3 は消えます。",
+            "diagram": {
+              "type": "table-change",
+              "title": "右外部結合の結果",
+              "operation": "join(right)",
+              "before": {
+                "heading": "orders(前)",
+                "columns": [
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "customer_id"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1", "c1"]
+                  },
+                  {
+                    "cells": ["2", "c2"]
+                  },
+                  {
+                    "cells": ["3", "c9"],
+                    "state": "removed"
+                  }
+                ]
+              },
+              "after": {
+                "heading": "結果",
+                "columns": [
+                  {
+                    "label": "customer_id"
+                  },
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "name"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["c1", "1", "Alice"]
+                  },
+                  {
+                    "cells": ["c2", "2", "Bob"]
+                  },
+                  {
+                    "cells": ["c3", "NULL", "Carol"],
+                    "state": "added"
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "solutions": [
+        "result = orders.join(customers, \"customer_id\", \"left\")",
+        "result = orders.join(customers, \"customer_id\", \"left_outer\")"
+      ],
+      "mistakes": [
+        {
+          "code": "result = orders.join(customers, \"customer_id\")",
+          "outcome": {
+            "kind": "different-result",
+            "text": "`how` を省くと、既定の内部結合になります。`customers` にない顧客 c9 の注文 3 は、結果から消えます。",
+            "diagram": {
+              "type": "table-change",
+              "title": "how を省いた結合(内部結合)",
+              "operation": "join(既定)",
+              "before": {
+                "heading": "orders(前)",
+                "columns": [
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "customer_id"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1", "c1"]
+                  },
+                  {
+                    "cells": ["2", "c2"]
+                  },
+                  {
+                    "cells": ["3", "c9"],
+                    "state": "removed"
+                  }
+                ]
+              },
+              "after": {
+                "heading": "結果",
+                "columns": [
+                  {
+                    "label": "customer_id"
+                  },
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "name"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["c1", "1", "Alice"]
+                  },
+                  {
+                    "cells": ["c2", "2", "Bob"]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "result": {
+        "text": "`orders` の 3 行がすべて残ります。顧客 c9 は `customers` にないため、注文 3 の `name` は NULL です。結合の列を名前で渡したので、`customer_id` は結果に 1 列だけ出ます。",
+        "diagram": {
+          "type": "table-change",
+          "title": "左外部結合の前と後",
+          "operation": "join(left)",
+          "before": {
+            "heading": "orders(前)",
+            "columns": [
+              {
+                "label": "order_id"
+              },
+              {
+                "label": "customer_id"
+              }
+            ],
+            "rows": [
+              {
+                "cells": ["1", "c1"]
+              },
+              {
+                "cells": ["2", "c2"]
+              },
+              {
+                "cells": ["3", "c9"]
+              }
+            ]
+          },
+          "after": {
+            "heading": "結果",
+            "columns": [
+              {
+                "label": "customer_id"
+              },
+              {
+                "label": "order_id"
+              },
+              {
+                "label": "name"
+              }
+            ],
+            "rows": [
+              {
+                "cells": ["c1", "1", "Alice"]
+              },
+              {
+                "cells": ["c2", "2", "Bob"]
+              },
+              {
+                "cells": ["c9", "3", "NULL"]
+              }
+            ]
+          }
+        }
+      },
+      "explanation": "`DataFrame.join` は、2 つ目の引数 `on` に結合の条件を、3 つ目の引数 `how` に結合の種類を受け取ります。\n\n- `on` に列の名前(文字列)を渡すと、その列が両方の表にあることが前提の等価結合になり、結合の列は結果に 1 列だけ出ます。列の式(`orders.customer_id == customers.customer_id`)で渡すと、両方の表の列が別々に残ります。\n- `how` の既定は `inner` です。左の表の行をすべて残すには `left`(別名は `leftouter`・`left_outer`)を指定します。\n- `left_anti` は相手がない左の行だけを、`left_semi` は相手がある左の行だけを、左の表の列だけで返します。`right` は右の表の行をすべて残します。\n\n左外部結合で相手がない行は、右の表の列が NULL になります。",
+      "references": [
+        {
+          "title": "pyspark.sql.DataFrame.join — PySpark documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.DataFrame.join.html"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "DEA-CD-0013",
+      "domain": "domain3",
+      "language": "pyspark",
+      "title": "地域ごとの売上の合計を、名前を付けた列で求める",
+      "prompt": "`sales`(列 `region`・`amount`)から、地域ごとの売上の合計を求めます。\n\n**要件**: 結果は、列 `region` と、合計の列 `total` の 2 列にします。",
+      "template": "from pyspark.sql import functions as F\n\nresult = sales.{{1}}(\"region\").agg({{2}}(\"amount\").{{3}}(\"total\"))",
+      "blanks": [
+        {
+          "answer": "groupBy"
+        },
+        {
+          "answer": "F.sum"
+        },
+        {
+          "answer": "alias"
+        }
+      ],
+      "distractors": [
+        {
+          "text": "orderBy",
+          "blank": 1,
+          "outcome": {
+            "kind": "different-result",
+            "text": "`orderBy` は並べ替えた DataFrame を返すだけで、グループを作りません。DataFrame の `agg` は、グループなしで表全体を集計するため、結果は全体の合計 350 の 1 行だけになり、`region` の列も出ません。",
+            "diagram": {
+              "type": "table-change",
+              "title": "グループなしの集計",
+              "operation": "orderBy().agg",
+              "before": {
+                "heading": "sales(前)",
+                "columns": [
+                  {
+                    "label": "region"
+                  },
+                  {
+                    "label": "amount"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["East", "100"]
+                  },
+                  {
+                    "cells": ["East", "200"]
+                  },
+                  {
+                    "cells": ["West", "50"]
+                  }
+                ]
+              },
+              "after": {
+                "heading": "結果",
+                "columns": [
+                  {
+                    "label": "total"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["350"]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "text": "F.count",
+          "blank": 2,
+          "outcome": {
+            "kind": "different-result",
+            "text": "`F.count` は、金額を足さず、グループの中の値の個数を数えます。`total` は East が 2、West が 1 になり、売上の合計になりません。",
+            "diagram": {
+              "type": "table-change",
+              "title": "個数を数えた集計",
+              "operation": "groupBy().agg",
+              "before": {
+                "heading": "sales(前)",
+                "columns": [
+                  {
+                    "label": "region"
+                  },
+                  {
+                    "label": "amount"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["East", "100"]
+                  },
+                  {
+                    "cells": ["East", "200"]
+                  },
+                  {
+                    "cells": ["West", "50"]
+                  }
+                ]
+              },
+              "after": {
+                "heading": "結果",
+                "columns": [
+                  {
+                    "label": "region"
+                  },
+                  {
+                    "label": "total"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["East", "2"],
+                    "state": "changed"
+                  },
+                  {
+                    "cells": ["West", "1"],
+                    "state": "changed"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "text": "withColumnRenamed",
+          "blank": 3,
+          "outcome": {
+            "kind": "different-result",
+            "text": "`withColumnRenamed` は DataFrame のメソッドで、列(Column)のメソッドにはありません。`F.sum(\"amount\")` が返す列に続けて書いても、列の名前は付かず、このコードは要件どおりに動きません。列の名前は、列の `alias` で付けます。"
+          }
+        }
+      ],
+      "solutions": [
+        "from pyspark.sql import functions as F\n\nresult = sales.groupBy(\"region\").agg(F.sum(\"amount\").alias(\"total\"))",
+        "from pyspark.sql import functions as F\n\nresult = sales.groupby(\"region\").agg(F.sum(\"amount\").alias(\"total\"))"
+      ],
+      "mistakes": [
+        {
+          "code": "from pyspark.sql import functions as F\n\nresult = sales.groupBy(\"region\").agg(F.sum(\"amount\"))",
+          "outcome": {
+            "kind": "different-result",
+            "text": "合計の値は正しく求まりますが、列の名前を付けていないため、合計の列の名前は `sum(amount)` になります。要件(列の名前を `total` にする)を満たしません。",
+            "diagram": {
+              "type": "table-change",
+              "title": "名前を付けない集計",
+              "operation": "groupBy().agg",
+              "before": {
+                "heading": "sales(前)",
+                "columns": [
+                  {
+                    "label": "region"
+                  },
+                  {
+                    "label": "amount"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["East", "100"]
+                  },
+                  {
+                    "cells": ["East", "200"]
+                  },
+                  {
+                    "cells": ["West", "50"]
+                  }
+                ]
+              },
+              "after": {
+                "heading": "結果",
+                "columns": [
+                  {
+                    "label": "region"
+                  },
+                  {
+                    "label": "sum(amount)"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["East", "300"]
+                  },
+                  {
+                    "cells": ["West", "50"]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "result": {
+        "text": "地域ごとに 1 行になり、East は 300、West は 50 です。列は `region` と `total` の 2 列です。",
+        "diagram": {
+          "type": "table-change",
+          "title": "地域ごとの集計の前と後",
+          "operation": "groupBy().agg",
+          "before": {
+            "heading": "sales(前)",
+            "columns": [
+              {
+                "label": "region"
+              },
+              {
+                "label": "amount"
+              }
+            ],
+            "rows": [
+              {
+                "cells": ["East", "100"]
+              },
+              {
+                "cells": ["East", "200"]
+              },
+              {
+                "cells": ["West", "50"]
+              }
+            ]
+          },
+          "after": {
+            "heading": "結果",
+            "columns": [
+              {
+                "label": "region"
+              },
+              {
+                "label": "total"
+              }
+            ],
+            "rows": [
+              {
+                "cells": ["East", "300"]
+              },
+              {
+                "cells": ["West", "50"]
+              }
+            ]
+          }
+        }
+      },
+      "explanation": "`groupBy` で列ごとのグループ(`GroupedData`)を作り、その `agg` に集計の列を渡すと、グループごとに 1 行の DataFrame が返ります。`groupby` は `groupBy` の別名です。\n\n- `F.sum` は値の合計、`F.count` は値の個数を返す集計関数です。\n- 集計の列に名前を付けないと、`sum(amount)` のような式の形の名前になります。名前は、列の `alias`(別名は `name`)で付けます。\n- DataFrame に直接 `agg` を呼ぶと、`groupBy()` を省いた形になり、表全体を 1 つのグループとして集計します。`orderBy` は並べ替えるだけで、グループは作りません。",
+      "references": [
+        {
+          "title": "pyspark.sql.GroupedData.agg — PySpark documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.GroupedData.agg.html"
+        },
+        {
+          "title": "pyspark.sql.DataFrame.agg — PySpark documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.DataFrame.agg.html"
+        },
+        {
+          "title": "pyspark.sql.DataFrame.groupBy — PySpark documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.DataFrame.groupBy.html"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "DEA-CD-0014",
+      "domain": "domain3",
+      "language": "pyspark",
+      "title": "取り込みの時刻だけ違う重複を、注文ごとに 1 行にする",
+      "prompt": "`orders`(列 `order_id`・`amount`・`loaded_at`)には、同じ注文が、取り込みの時刻 `loaded_at` だけが違う行として、2 回以上入っていることがあります。\n\n**要件**: `order_id` ごとに 1 行だけを残します。",
+      "template": "result = orders.{{1}}({{2}})",
+      "blanks": [
+        {
+          "answer": "dropDuplicates"
+        },
+        {
+          "answer": "[\"order_id\"]"
+        }
+      ],
+      "distractors": [
+        {
+          "text": "distinct",
+          "blank": 1,
+          "outcome": {
+            "kind": "error",
+            "text": "`distinct` は引数を取らないメソッドです。比べる列の一覧を渡すと、エラーになります。引数なしで呼んでも、すべての列が同じ行だけを 1 つにするため、`loaded_at` が違う重複は残ります。"
+          }
+        },
+        {
+          "text": "[\"order_id\", \"loaded_at\"]",
+          "blank": 2,
+          "outcome": {
+            "kind": "different-result",
+            "text": "`order_id` と `loaded_at` の組で比べるため、`loaded_at` が違う注文 1 の 2 行は、重複とみなされません。3 行がすべて残ります。",
+            "diagram": {
+              "type": "table-change",
+              "title": "時刻も比べた重複の排除",
+              "operation": "dropDuplicates",
+              "before": {
+                "heading": "orders(前)",
+                "columns": [
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "amount"
+                  },
+                  {
+                    "label": "loaded_at"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1", "500", "10:00"]
+                  },
+                  {
+                    "cells": ["1", "500", "10:05"]
+                  },
+                  {
+                    "cells": ["2", "500", "10:00"]
+                  }
+                ]
+              },
+              "after": {
+                "heading": "結果",
+                "columns": [
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "amount"
+                  },
+                  {
+                    "label": "loaded_at"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1", "500", "10:00"]
+                  },
+                  {
+                    "cells": ["1", "500", "10:05"]
+                  },
+                  {
+                    "cells": ["2", "500", "10:00"]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "text": "[\"amount\"]",
+          "blank": 2,
+          "outcome": {
+            "kind": "different-result",
+            "text": "`amount` だけで比べるため、金額が同じ 500 の行は、注文が違っても 1 つにまとめられます。結果は 1 行だけになり、注文が消えます。",
+            "diagram": {
+              "type": "table-change",
+              "title": "金額で比べた重複の排除",
+              "operation": "dropDuplicates",
+              "before": {
+                "heading": "orders(前)",
+                "columns": [
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "amount"
+                  },
+                  {
+                    "label": "loaded_at"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1", "500", "10:00"]
+                  },
+                  {
+                    "cells": ["1", "500", "10:05"]
+                  },
+                  {
+                    "cells": ["2", "500", "10:00"]
+                  }
+                ]
+              },
+              "after": {
+                "heading": "結果",
+                "columns": [
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "amount"
+                  },
+                  {
+                    "label": "loaded_at"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1 か 2", "500", "どれか"]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "solutions": [
+        "result = orders.dropDuplicates([\"order_id\"])",
+        "result = orders.drop_duplicates([\"order_id\"])"
+      ],
+      "mistakes": [
+        {
+          "code": "result = orders.distinct()",
+          "outcome": {
+            "kind": "different-result",
+            "text": "`distinct` は、すべての列の値が同じ行だけを 1 つにします。注文 1 の 2 行は `loaded_at` が違うため、両方とも残ります。",
+            "diagram": {
+              "type": "table-change",
+              "title": "distinct の結果",
+              "operation": "distinct",
+              "before": {
+                "heading": "orders(前)",
+                "columns": [
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "amount"
+                  },
+                  {
+                    "label": "loaded_at"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1", "500", "10:00"]
+                  },
+                  {
+                    "cells": ["1", "500", "10:05"]
+                  },
+                  {
+                    "cells": ["2", "500", "10:00"]
+                  }
+                ]
+              },
+              "after": {
+                "heading": "結果",
+                "columns": [
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "amount"
+                  },
+                  {
+                    "label": "loaded_at"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1", "500", "10:00"]
+                  },
+                  {
+                    "cells": ["1", "500", "10:05"]
+                  },
+                  {
+                    "cells": ["2", "500", "10:00"]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "result": {
+        "text": "注文 1 と注文 2 が 1 行ずつ残ります。注文 1 の 2 行のうち、どちらの行が残るかは、このコードでは指定していません(残す行を選ぶには、並べ替えと `row_number` などを使います)。",
+        "diagram": {
+          "type": "table-change",
+          "title": "order_id で比べた重複の排除",
+          "operation": "dropDuplicates",
+          "before": {
+            "heading": "orders(前)",
+            "columns": [
+              {
+                "label": "order_id"
+              },
+              {
+                "label": "amount"
+              },
+              {
+                "label": "loaded_at"
+              }
+            ],
+            "rows": [
+              {
+                "cells": ["1", "500", "10:00"]
+              },
+              {
+                "cells": ["1", "500", "10:05"]
+              },
+              {
+                "cells": ["2", "500", "10:00"]
+              }
+            ]
+          },
+          "after": {
+            "heading": "結果",
+            "columns": [
+              {
+                "label": "order_id"
+              },
+              {
+                "label": "amount"
+              },
+              {
+                "label": "loaded_at"
+              }
+            ],
+            "rows": [
+              {
+                "cells": ["1", "500", "どちらか"]
+              },
+              {
+                "cells": ["2", "500", "10:00"]
+              }
+            ]
+          }
+        }
+      },
+      "explanation": "`dropDuplicates` は、重複した行を除いた DataFrame を返します。引数 `subset` に列の名前の一覧を渡すと、その列だけで重複を比べます。省くと、すべての列で比べます。`drop_duplicates` は `dropDuplicates` の別名です。\n\n- `distinct` は引数を取らず、すべての列が同じ行だけを 1 つにします。一部の列だけが違う重複は除けません。\n- 比べる列を増やすと、重複とみなす行が減ります。逆に、キーでない列(`amount`)で比べると、別の注文がまとめられて消えます。\n\nストリームの DataFrame では、重複を判断するために、トリガーをまたいでデータを状態として持ちます。状態の大きさは、`withWatermark` で抑えられます。",
+      "references": [
+        {
+          "title": "pyspark.sql.DataFrame.dropDuplicates — PySpark documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.DataFrame.dropDuplicates.html"
+        },
+        {
+          "title": "pyspark.sql.DataFrame.distinct — PySpark documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.DataFrame.distinct.html"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "DEA-CD-0015",
+      "domain": "domain3",
+      "language": "pyspark",
+      "title": "顧客ごとに最も新しい注文を 1 行だけ取り出す",
+      "prompt": "`orders`(列 `customer_id`・`order_id`・`order_date`)から、顧客ごとに、最も新しい注文を取り出します。\n\n**要件**: 同じ日に 2 件以上の注文がある顧客でも、顧客ごとに 1 行だけにします。",
+      "template": "from pyspark.sql import Window\nfrom pyspark.sql import functions as F\n\nw = Window.{{1}}(\"customer_id\").orderBy({{2}})\nresult = (orders\n    .withColumn(\"rn\", F.{{3}}().over(w))\n    .filter(F.col(\"rn\") == 1))",
+      "blanks": [
+        {
+          "answer": "partitionBy"
+        },
+        {
+          "answer": "F.col(\"order_date\").desc()"
+        },
+        {
+          "answer": "row_number"
+        }
+      ],
+      "distractors": [
+        {
+          "text": "groupBy",
+          "blank": 1,
+          "outcome": {
+            "kind": "error",
+            "text": "`Window` には `groupBy` がありません。属性がないためエラーになります。ウィンドウを区切る列は `partitionBy` で指定します。"
+          }
+        },
+        {
+          "text": "F.col(\"order_date\")",
+          "blank": 2,
+          "outcome": {
+            "kind": "different-result",
+            "text": "並べ替えの向きを指定しないと、昇順になります。顧客ごとに最も古い注文の `rn` が 1 になり、顧客 c1 は最新の o2 ではなく o1 が残ります。",
+            "diagram": {
+              "type": "table-change",
+              "title": "昇順で並べたときに残る行",
+              "operation": "row_number().over",
+              "before": {
+                "heading": "orders(前)",
+                "columns": [
+                  {
+                    "label": "customer_id"
+                  },
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "order_date"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["c1", "o1", "11/01"]
+                  },
+                  {
+                    "cells": ["c1", "o2", "11/03"]
+                  },
+                  {
+                    "cells": ["c2", "o3", "11/02"]
+                  },
+                  {
+                    "cells": ["c2", "o4", "11/02"]
+                  }
+                ]
+              },
+              "after": {
+                "heading": "結果",
+                "columns": [
+                  {
+                    "label": "customer_id"
+                  },
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "order_date"
+                  },
+                  {
+                    "label": "rn"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["c1", "o1", "11/01", "1"],
+                    "state": "changed"
+                  },
+                  {
+                    "cells": ["c2", "o3 か o4", "11/02", "1"]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "text": "rank",
+          "blank": 3,
+          "outcome": {
+            "kind": "different-result",
+            "text": "`rank` は、並べ替えの値が同じ行に同じ順位を付けます。同じ日に 2 件の注文がある顧客 c2 は、両方の行の `rn` が 1 になり、c2 の行が 2 行残ります。要件(1 行だけにする)を満たしません。",
+            "diagram": {
+              "type": "table-change",
+              "title": "rank で同じ順位が付く",
+              "operation": "rank().over",
+              "before": {
+                "heading": "orders(前)",
+                "columns": [
+                  {
+                    "label": "customer_id"
+                  },
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "order_date"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["c1", "o1", "11/01"]
+                  },
+                  {
+                    "cells": ["c1", "o2", "11/03"]
+                  },
+                  {
+                    "cells": ["c2", "o3", "11/02"]
+                  },
+                  {
+                    "cells": ["c2", "o4", "11/02"]
+                  }
+                ]
+              },
+              "after": {
+                "heading": "結果",
+                "columns": [
+                  {
+                    "label": "customer_id"
+                  },
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "order_date"
+                  },
+                  {
+                    "label": "rn"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["c1", "o2", "11/03", "1"]
+                  },
+                  {
+                    "cells": ["c2", "o3", "11/02", "1"]
+                  },
+                  {
+                    "cells": ["c2", "o4", "11/02", "1"]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "text": "dense_rank",
+          "blank": 3,
+          "outcome": {
+            "kind": "different-result",
+            "text": "`dense_rank` は、並べ替えの値が同じ行に同じ順位を付けます。同じ日に 2 件の注文がある顧客 c2 は、両方の行の `rn` が 1 になり、c2 の行が 2 行残ります。要件(1 行だけにする)を満たしません。",
+            "diagram": {
+              "type": "table-change",
+              "title": "dense_rank で同じ順位が付く",
+              "operation": "dense_rank().over",
+              "before": {
+                "heading": "orders(前)",
+                "columns": [
+                  {
+                    "label": "customer_id"
+                  },
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "order_date"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["c1", "o1", "11/01"]
+                  },
+                  {
+                    "cells": ["c1", "o2", "11/03"]
+                  },
+                  {
+                    "cells": ["c2", "o3", "11/02"]
+                  },
+                  {
+                    "cells": ["c2", "o4", "11/02"]
+                  }
+                ]
+              },
+              "after": {
+                "heading": "結果",
+                "columns": [
+                  {
+                    "label": "customer_id"
+                  },
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "order_date"
+                  },
+                  {
+                    "label": "rn"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["c1", "o2", "11/03", "1"]
+                  },
+                  {
+                    "cells": ["c2", "o3", "11/02", "1"]
+                  },
+                  {
+                    "cells": ["c2", "o4", "11/02", "1"]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "solutions": [
+        "from pyspark.sql import Window\nfrom pyspark.sql import functions as F\n\nw = Window.partitionBy(\"customer_id\").orderBy(F.col(\"order_date\").desc())\nresult = (orders\n    .withColumn(\"rn\", F.row_number().over(w))\n    .filter(F.col(\"rn\") == 1))"
+      ],
+      "result": {
+        "text": "顧客ごとに 1 行だけ残ります。c1 は最新の o2 です。c2 は同じ日の o3 と o4 のどちらか一方で、どちらが残るかは、`order_date` だけの並べ替えでは決まりません(決めたいときは、並べ替えの列を足します)。",
+        "diagram": {
+          "type": "table-change",
+          "title": "顧客ごとの最新の注文",
+          "operation": "row_number().over",
+          "before": {
+            "heading": "orders(前)",
+            "columns": [
+              {
+                "label": "customer_id"
+              },
+              {
+                "label": "order_id"
+              },
+              {
+                "label": "order_date"
+              }
+            ],
+            "rows": [
+              {
+                "cells": ["c1", "o1", "11/01"]
+              },
+              {
+                "cells": ["c1", "o2", "11/03"]
+              },
+              {
+                "cells": ["c2", "o3", "11/02"]
+              },
+              {
+                "cells": ["c2", "o4", "11/02"]
+              }
+            ]
+          },
+          "after": {
+            "heading": "結果",
+            "columns": [
+              {
+                "label": "customer_id"
+              },
+              {
+                "label": "order_id"
+              },
+              {
+                "label": "order_date"
+              },
+              {
+                "label": "rn"
+              }
+            ],
+            "rows": [
+              {
+                "cells": ["c1", "o2", "11/03", "1"]
+              },
+              {
+                "cells": ["c2", "o3 か o4", "11/02", "1"]
+              }
+            ]
+          }
+        }
+      },
+      "explanation": "ウィンドウ関数は、`Window.partitionBy` で区切った範囲(ここでは顧客ごと)の中で、`orderBy` の順に行へ値を付けます。\n\n- `row_number` は、区切りの中で 1 から始まる連番を付けます。値が同じ行にも別の番号を付けるため、`rn == 1` で絞ると、区切りごとに必ず 1 行になります。\n- `rank` と `dense_rank` は、値が同じ行に同じ順位を付けます(違いは、そのあとの順位を飛ばすかどうかです)。同じ日の注文があると、1 位が 2 行になります。\n- 並べ替えは既定で昇順です。新しい順にするには、列の `desc()` を使います。\n\n`Window` にあるのは `partitionBy`・`orderBy`・`rowsBetween`・`rangeBetween` などで、`groupBy` はありません。",
+      "references": [
+        {
+          "title": "pyspark.sql.functions.row_number — PySpark documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.functions.row_number.html"
+        },
+        {
+          "title": "pyspark.sql.functions.rank — PySpark documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.functions.rank.html"
+        },
+        {
+          "title": "Window — PySpark documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/window.html"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "DEA-CD-0016",
+      "domain": "domain3",
+      "language": "pyspark",
+      "title": "商品の配列を、商品 1 つにつき 1 行に展開する",
+      "prompt": "`orders`(列 `order_id` と、商品の名前の配列の列 `items`)を、商品 1 つにつき 1 行の形にします。\n\n**要件**: 列は `order_id` と、商品の列 `item` の 2 列にします。`items` が空の配列の注文は、結果に出しません。",
+      "template": "from pyspark.sql import functions as F\n\nresult = orders.select(\"order_id\", F.{{1}}(\"items\").{{2}}(\"item\"))",
+      "blanks": [
+        {
+          "answer": "explode"
+        },
+        {
+          "answer": "alias"
+        }
+      ],
+      "distractors": [
+        {
+          "text": "explode_outer",
+          "blank": 1,
+          "outcome": {
+            "kind": "different-result",
+            "text": "`explode_outer` は、配列が空か NULL の行にも、値が NULL の行を 1 行作ります。空の配列の注文 2 が `item` が NULL の行として残り、要件(空の配列の注文は出さない)を満たしません。",
+            "diagram": {
+              "type": "table-change",
+              "title": "explode_outer の結果",
+              "operation": "explode_outer",
+              "before": {
+                "heading": "orders(前)",
+                "columns": [
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "items"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1", "[pen, ink]"]
+                  },
+                  {
+                    "cells": ["2", "[]"]
+                  },
+                  {
+                    "cells": ["3", "[cup]"]
+                  }
+                ]
+              },
+              "after": {
+                "heading": "結果",
+                "columns": [
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "item"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1", "pen"]
+                  },
+                  {
+                    "cells": ["1", "ink"]
+                  },
+                  {
+                    "cells": ["2", "NULL"],
+                    "state": "added"
+                  },
+                  {
+                    "cells": ["3", "cup"]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        {
+          "text": "withColumnRenamed",
+          "blank": 2,
+          "outcome": {
+            "kind": "different-result",
+            "text": "`withColumnRenamed` は DataFrame のメソッドで、列(Column)のメソッドにはありません。`F.explode(\"items\")` が返す列に続けて書いても、列の名前は付かず、このコードは要件どおりに動きません。列の名前は、列の `alias` で付けます。"
+          }
+        }
+      ],
+      "solutions": [
+        "from pyspark.sql import functions as F\n\nresult = orders.select(\"order_id\", F.explode(\"items\").alias(\"item\"))",
+        "from pyspark.sql import functions as F\n\nresult = orders.select(\"order_id\", F.explode(\"items\").name(\"item\"))"
+      ],
+      "mistakes": [
+        {
+          "code": "from pyspark.sql import functions as F\n\nresult = orders.select(\"order_id\", F.explode(\"items\"))",
+          "outcome": {
+            "kind": "different-result",
+            "text": "行の展開は正しく行われますが、名前を付けていないため、配列の要素の列は既定の名前 `col` になります。要件(列の名前を `item` にする)を満たしません。",
+            "diagram": {
+              "type": "table-change",
+              "title": "名前を付けない explode",
+              "operation": "explode",
+              "before": {
+                "heading": "orders(前)",
+                "columns": [
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "items"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1", "[pen, ink]"]
+                  },
+                  {
+                    "cells": ["2", "[]"]
+                  },
+                  {
+                    "cells": ["3", "[cup]"]
+                  }
+                ]
+              },
+              "after": {
+                "heading": "結果",
+                "columns": [
+                  {
+                    "label": "order_id"
+                  },
+                  {
+                    "label": "col"
+                  }
+                ],
+                "rows": [
+                  {
+                    "cells": ["1", "pen"]
+                  },
+                  {
+                    "cells": ["1", "ink"]
+                  },
+                  {
+                    "cells": ["3", "cup"]
+                  }
+                ]
+              }
+            }
+          }
+        }
+      ],
+      "result": {
+        "text": "配列の要素ごとに 1 行になり、注文 1 は 2 行、注文 3 は 1 行です。空の配列の注文 2 は、行を作りません。列は `order_id` と `item` の 2 列です。",
+        "diagram": {
+          "type": "table-change",
+          "title": "explode の前と後",
+          "operation": "explode",
+          "before": {
+            "heading": "orders(前)",
+            "columns": [
+              {
+                "label": "order_id"
+              },
+              {
+                "label": "items"
+              }
+            ],
+            "rows": [
+              {
+                "cells": ["1", "[pen, ink]"]
+              },
+              {
+                "cells": ["2", "[]"]
+              },
+              {
+                "cells": ["3", "[cup]"]
+              }
+            ]
+          },
+          "after": {
+            "heading": "結果",
+            "columns": [
+              {
+                "label": "order_id"
+              },
+              {
+                "label": "item"
+              }
+            ],
+            "rows": [
+              {
+                "cells": ["1", "pen"]
+              },
+              {
+                "cells": ["1", "ink"]
+              },
+              {
+                "cells": ["3", "cup"]
+              }
+            ]
+          }
+        }
+      },
+      "explanation": "`F.explode` は、配列(またはマップ)の列の要素ごとに 1 行を作ります。配列の要素の列の名前は、指定しなければ `col`(マップでは `key` と `value`)です。\n\n- 配列が空か NULL の行からは、行を作りません。そうした行も NULL の値で残したいときは `F.explode_outer` を使います。\n- 列の名前は、列の `alias`(別名は `name`)で付けます。`withColumnRenamed` は DataFrame のメソッドで、列には使えません。\n- 1 つの `select` に置ける `explode` は 1 つだけです。",
+      "references": [
+        {
+          "title": "pyspark.sql.functions.explode — PySpark documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.functions.explode.html"
+        },
+        {
+          "title": "pyspark.sql.functions.explode_outer — PySpark documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.functions.explode_outer.html"
+        },
+        {
+          "title": "pyspark.sql.Column.alias — PySpark documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/api/pyspark.sql.Column.alias.html"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "DEA-CD-0017",
+      "domain": "domain2",
+      "language": "pyspark",
+      "title": "Auto Loader で JSON のファイルを、スキーマを推論して読む",
+      "prompt": "Auto Loader で、ボリュームの `/Volumes/main/default/landing/events/` に届く JSON のファイルを、ストリームとして読みます。\n\n**要件**: スキーマは Auto Loader に推論させ、推論したスキーマを `/Volumes/main/default/checkpoints/events/` に保存します。",
+      "template": "df = (spark.readStream\n    .format({{1}})\n    .option({{2}}, \"json\")\n    .option({{3}}, \"/Volumes/main/default/checkpoints/events/\")\n    .load(\"/Volumes/main/default/landing/events/\"))",
+      "blanks": [
+        {
+          "answer": "\"cloudFiles\""
+        },
+        {
+          "answer": "\"cloudFiles.format\""
+        },
+        {
+          "answer": "\"cloudFiles.schemaLocation\""
+        }
+      ],
+      "distractors": [
+        {
+          "text": "\"json\"",
+          "blank": 1,
+          "outcome": {
+            "kind": "error",
+            "text": "Auto Loader ではなく、Spark のファイルのソースで読むことになります。ファイルのソースのストリームは、既定でスキーマの指定を求めるため、スキーマを指定していないこのコードはエラーになります。"
+          }
+        },
+        {
+          "text": "\"cloudFiles.fileFormat\"",
+          "blank": 2,
+          "outcome": {
+            "kind": "error",
+            "text": "`cloudFiles.fileFormat` というオプションはありません。ファイルの形式を示す必須のオプション `cloudFiles.format` が欠けるうえ、Auto Loader は既定で知らないオプションを検査してエラーにする(`cloudFiles.validateOptions` が既定で true)ため、エラーになります。"
+          }
+        },
+        {
+          "text": "\"cloudFiles.schemaHints\"",
+          "blank": 3,
+          "outcome": {
+            "kind": "error",
+            "text": "`cloudFiles.schemaHints` は、推論するスキーマに列の型を指示するオプションで、値には列と型の並び(例: `amount DOUBLE`)を書きます。保存先のパスを渡す場所ではありません。スキーマの推論に必要な `cloudFiles.schemaLocation` が指定されないため、エラーになります。"
+          }
+        }
+      ],
+      "solutions": [
+        "df = (spark.readStream\n    .format(\"cloudFiles\")\n    .option(\"cloudFiles.format\", \"json\")\n    .option(\"cloudFiles.schemaLocation\", \"/Volumes/main/default/checkpoints/events/\")\n    .load(\"/Volumes/main/default/landing/events/\"))"
+      ],
+      "result": {
+        "text": "Auto Loader(`cloudFiles` のソース)で読むストリームの DataFrame ができます。最初の読み込みで、届いているファイルの一部から列を推論し(JSON の列は既定で文字列)、スキーマを保存先の `_schemas` に記録します。推論したスキーマには、救済データの列 `_rescued_data` が加わります。"
+      },
+      "explanation": "Auto Loader は、`readStream.format(\"cloudFiles\")` で使うストリームのソースです。\n\n- `cloudFiles.format` は必須のオプションで、ファイルの形式(`json`・`csv`・`parquet` など)を指定します。\n- `cloudFiles.schemaLocation` は、推論したスキーマとその変更を保存する場所です。スキーマを推論させるときは必須です。書き込みの `checkpointLocation` と同じ場所を使ってもかまいません。\n- `cloudFiles.schemaHints` は、推論するスキーマの一部の列の型を指示するオプションで、保存場所の代わりにはなりません。\n- `format(\"json\")` のようにファイルのソースで読むと、Auto Loader の機能(推論したスキーマの保存、新しいファイルだけの処理の追跡など)は使えません。\n\nLakeflow のパイプラインで Auto Loader を使うときは、スキーマの保存先とチェックポイントを、パイプラインが管理します。",
+      "references": [
+        {
+          "title": "Auto Loader options",
+          "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/options"
+        },
+        {
+          "title": "Configure schema inference and evolution in Auto Loader",
+          "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/schema"
+        },
+        {
+          "title": "Structured Streaming APIs on DataFrames and Datasets",
+          "url": "https://spark.apache.org/docs/latest/streaming/apis-on-dataframes-and-datasets.html"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "DEA-CD-0018",
+      "domain": "domain2",
+      "language": "pyspark",
+      "title": "新しい列でストリームを止めず、救済データの列に入れる",
+      "prompt": "Auto Loader で、ボリュームに届く JSON のファイルを読みます。\n\n**要件**: 元のデータに新しい列が現れても、ストリームを止めず、スキーマも変えません。新しい列の値は、救済データの列(`_rescued_data`)に入れます。",
+      "template": "df = (spark.readStream\n    .format(\"cloudFiles\")\n    .option(\"cloudFiles.format\", \"json\")\n    .option(\"cloudFiles.schemaLocation\", \"/Volumes/main/default/checkpoints/orders/\")\n    .option({{1}}, {{2}})\n    .load(\"/Volumes/main/default/landing/orders/\"))",
+      "blanks": [
+        {
+          "answer": "\"cloudFiles.schemaEvolutionMode\""
+        },
+        {
+          "answer": "\"rescue\""
+        }
+      ],
+      "distractors": [
+        {
+          "text": "\"cloudFiles.schemaEvolution\"",
+          "blank": 1,
+          "outcome": {
+            "kind": "error",
+            "text": "`cloudFiles.schemaEvolution` というオプションはありません。Auto Loader は既定で知らないオプションを検査してエラーにする(`cloudFiles.validateOptions` が既定で true)ため、エラーになります。"
+          }
+        },
+        {
+          "text": "\"addNewColumns\"",
+          "blank": 2,
+          "outcome": {
+            "kind": "error",
+            "text": "新しい列を見つけると、Auto Loader はその列をスキーマの末尾に足してから、ストリームを `UnknownFieldException` で止めます。再起動すると、新しいスキーマで処理を続けます。ストリームが止まり、スキーマも変わるため、要件を満たしません(スキーマを指定しないときの既定のモードです)。"
+          }
+        },
+        {
+          "text": "\"failOnNewColumns\"",
+          "blank": 2,
+          "outcome": {
+            "kind": "error",
+            "text": "新しい列を見つけると、ストリームが失敗して止まります。スキーマは自動では更新されず、スキーマを直すか、その列を含むファイルを除くまで、再起動しても進みません。"
+          }
+        }
+      ],
+      "solutions": [
+        "df = (spark.readStream\n    .format(\"cloudFiles\")\n    .option(\"cloudFiles.format\", \"json\")\n    .option(\"cloudFiles.schemaLocation\", \"/Volumes/main/default/checkpoints/orders/\")\n    .option(\"cloudFiles.schemaEvolutionMode\", \"rescue\")\n    .load(\"/Volumes/main/default/landing/orders/\"))"
+      ],
+      "result": {
+        "text": "新しい列が現れても、ストリームは止まらず、スキーマも変わりません。スキーマにない新しい列の値は、救済データの列 `_rescued_data` に、元のファイルのパスとともに JSON の形で入ります。"
+      },
+      "explanation": "Auto Loader のスキーマの進化は、`cloudFiles.schemaEvolutionMode` で選びます。新しい列を見つけたときの動きは、モードごとに次のとおりです。\n\n- `addNewColumns`: 列をスキーマに足してから、ストリームを `UnknownFieldException` で止めます。再起動で新しいスキーマに進みます。スキーマを指定しないときの既定です。\n- `rescue`: スキーマを変えず、ストリームも止めません。新しい列は救済データの列に入ります。\n- `failOnNewColumns`: ストリームを止め、スキーマは更新しません。\n- `none`: スキーマを変えず、新しい列を無視します。`rescuedDataColumn` を指定しない限り、データは救済されません。スキーマを指定したときの既定です。\n\n救済データの列は、スキーマにない列のほか、型や大文字小文字が合わない値も受け止めます。`addNewColumns` で止まったストリームは、ジョブの再試行で自動で再起動させる構成が勧められています。",
+      "references": [
+        {
+          "title": "Configure schema inference and evolution in Auto Loader",
+          "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/schema"
+        },
+        {
+          "title": "Auto Loader options",
+          "url": "https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/options"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "DEA-CD-0019",
+      "domain": "domain2",
+      "language": "pyspark",
+      "title": "届いている分をすべて処理して止まる、増分のストリームを書く",
+      "prompt": "ブロンズのテーブル `main.default.events_bronze` をストリームで読み、シルバーのテーブル `main.default.events_silver` に書きます。\n\n**要件**: ジョブで定期的に動かし、そのときに届いているデータをすべて処理したら止まります(データが多いときは、複数のバッチに分けて処理します)。どこまで処理したかは、`/Volumes/main/default/checkpoints/events_silver/` に記録します。",
+      "template": "query = (spark.readStream.table(\"main.default.events_bronze\")\n    .writeStream\n    .option({{1}}, \"/Volumes/main/default/checkpoints/events_silver/\")\n    .trigger({{2}})\n    .{{3}}(\"main.default.events_silver\"))",
+      "blanks": [
+        {
+          "answer": "\"checkpointLocation\""
+        },
+        {
+          "answer": "availableNow=True"
+        },
+        {
+          "answer": "toTable"
+        }
+      ],
+      "distractors": [
+        {
+          "text": "processingTime=\"10 seconds\"",
+          "blank": 2,
+          "outcome": {
+            "kind": "different-result",
+            "text": "10 秒ごとに新しいデータを確かめるマイクロバッチを、止めずに続けます。届いている分を処理し終えても止まらないため、ジョブが終わらず、要件(処理したら止まる)を満たしません。"
+          }
+        },
+        {
+          "text": "once=True",
+          "blank": 2,
+          "outcome": {
+            "kind": "same-result",
+            "text": "届いているデータを処理して止まる点は似ていますが、1 つのバッチだけで処理します。データが多くても複数のバッチに分けられず、要件を満たしません。Databricks Runtime 11.3 LTS 以降、このトリガー(Trigger.Once)は非推奨で、`availableNow` が勧められています。"
+          }
+        },
+        {
+          "text": "saveAsTable",
+          "blank": 3,
+          "outcome": {
+            "kind": "error",
+            "text": "`saveAsTable` はバッチの書き込み(DataFrameWriter)のメソッドで、ストリームの書き込み(DataStreamWriter)にはありません。属性がないためエラーになります。ストリームをテーブルに書くときは `toTable` を使います。"
+          }
+        }
+      ],
+      "solutions": [
+        "query = (spark.readStream.table(\"main.default.events_bronze\")\n    .writeStream\n    .option(\"checkpointLocation\", \"/Volumes/main/default/checkpoints/events_silver/\")\n    .trigger(availableNow=True)\n    .toTable(\"main.default.events_silver\"))"
+      ],
+      "mistakes": [
+        {
+          "code": "query = (spark.readStream.table(\"main.default.events_bronze\")\n    .writeStream\n    .option(\"checkpointLocation\", \"/Volumes/main/default/checkpoints/events_silver/\")\n    .toTable(\"main.default.events_silver\"))",
+          "outcome": {
+            "kind": "different-result",
+            "text": "トリガーを指定しないと、間隔 0 の `processingTime` と同じ扱いになり、新しいデータを確かめ続けて止まりません。要件(処理したら止まる)を満たさず、クラウドのストレージへの呼び出しが増えて費用がかさむこともあります。"
+          }
+        }
+      ],
+      "result": {
+        "text": "クエリが始まり、ブロンズに届いているデータをすべて、必要なら複数のバッチに分けてシルバーに書き、終わると止まります。処理した位置はチェックポイントに記録され、次に動かすと、その続きから処理します。"
+      },
+      "explanation": "ストリームの書き込みは、`writeStream` のあとに、チェックポイント、トリガー、書き先を指定します。\n\n- `checkpointLocation`: 処理した位置(オフセット)やコミットの記録を置く場所です。クエリを動かす前に指定します。クエリごとに別の場所にします。\n- `trigger(availableNow=True)`: 動かした時点で届いているデータを、複数のバッチに分けてすべて処理し、止まります。スケジュールで動かす増分の処理に向きます。`once=True` は 1 つのバッチで処理する古いトリガーで、Databricks Runtime 11.3 LTS 以降は非推奨です。\n- `trigger(processingTime=...)` は、指定した間隔でバッチを続けます。トリガーを省くと、間隔 0 で続けます。\n- `toTable`: ストリームをテーブルに書き、クエリを始めます。`saveAsTable` はバッチの書き込みのメソッドです。\n\nサーバーレスのノートブックとジョブでは、使えるトリガーが `availableNow` と `once` に限られます。",
+      "references": [
+        {
+          "title": "Configure Structured Streaming trigger intervals",
+          "url": "https://docs.databricks.com/aws/en/structured-streaming/triggers"
+        },
+        {
+          "title": "Structured Streaming checkpoints",
+          "url": "https://docs.databricks.com/aws/en/structured-streaming/checkpoints"
+        },
+        {
+          "title": "pyspark.sql.streaming.DataStreamWriter.trigger — PySpark documentation",
+          "url": "https://spark.apache.org/docs/latest/api/python/reference/pyspark.ss/api/pyspark.sql.streaming.DataStreamWriter.trigger.html"
+        }
+      ],
+      "status": "verified"
+    },
+    {
+      "id": "DEA-CD-0020",
+      "domain": "domain2",
+      "language": "pyspark",
+      "title": "Kafka のトピックを読み、値を文字列の列にする",
+      "prompt": "Kafka のトピック `orders` をストリームで読み、メッセージの値を文字列の列 `json` にします。ブローカーは `broker1.example.com:9092` です。\n\n**要件**: 読み込みには Spark の Kafka のソースを使い、`orders` は列 `json` の 1 列にします。",
+      "template": "raw = (spark.readStream\n    .format({{1}})\n    .option({{2}}, \"broker1.example.com:9092\")\n    .option({{3}}, \"orders\")\n    .load())\n\norders = raw.selectExpr(\"CAST(value AS STRING) AS json\")",
+      "blanks": [
+        {
+          "answer": "\"kafka\""
+        },
+        {
+          "answer": "\"kafka.bootstrap.servers\""
+        },
+        {
+          "answer": "\"subscribe\""
+        }
+      ],
+      "distractors": [
+        {
+          "text": "\"bootstrap.servers\"",
+          "blank": 2,
+          "outcome": {
+            "kind": "error",
+            "text": "Kafka 自身の設定は、`kafka.` を前に付けたオプションで渡します。前置きのない `bootstrap.servers` は Kafka の設定として渡らず、Kafka のソースに必須の `kafka.bootstrap.servers` が欠けるため、エラーになります。"
+          }
+        },
+        {
+          "text": "\"topic\"",
+          "blank": 3,
+          "outcome": {
+            "kind": "error",
+            "text": "読み込みで購読するトピックは、`assign`・`subscribe`・`subscribePattern` のどれか 1 つで指定します。`topic` は読んだ行が持つ列の名前で、購読の指定にはなりません。購読の指定が欠けるため、エラーになります。"
+          }
+        }
+      ],
+      "solutions": [
+        "raw = (spark.readStream\n    .format(\"kafka\")\n    .option(\"kafka.bootstrap.servers\", \"broker1.example.com:9092\")\n    .option(\"subscribe\", \"orders\")\n    .load())\n\norders = raw.selectExpr(\"CAST(value AS STRING) AS json\")"
+      ],
+      "mistakes": [
+        {
+          "code": "raw = (spark.readStream\n    .format(\"kafka\")\n    .option(\"kafka.bootstrap.servers\", \"broker1.example.com:9092\")\n    .option(\"subscribe\", \"orders\")\n    .load())\n\norders = raw.select(\"value\")",
+          "outcome": {
+            "kind": "different-result",
+            "text": "Kafka のソースの `value` はバイナリの列です。型を変えずに選ぶと、`orders` の列は名前が `value` のバイナリの列のままで、要件(文字列の列 `json`)を満たしません。"
+          }
+        }
+      ],
+      "result": {
+        "text": "`raw` は、`key`・`value`(どちらもバイナリ)、`topic`・`partition`・`offset`・`timestamp` などの列を持つストリームの DataFrame です。`orders` は、`value` を文字列に変えた列 `json` の 1 列だけを持ちます。"
+      },
+      "explanation": "Spark の Kafka のソースは、`format(\"kafka\")` で使います。\n\n- 接続先のブローカーは `kafka.bootstrap.servers` に、`host:port` をカンマで区切って書きます。Kafka 自身の設定は、`kafka.` を前に付けたオプションで渡します。\n- 購読するトピックは、`subscribe`(トピックの一覧)、`subscribePattern`(トピックの名前の正規表現)、`assign`(トピックとパーティションの組)のどれか 1 つだけで指定します。\n- 読んだ行は、`key`・`value`(バイナリ)と、`topic`・`partition`・`offset`・`timestamp` などの列を持ちます。メッセージの中身を扱うには、`CAST(value AS STRING)` のように型を変えます。\n\nストリームの読み込みでは、開始の位置 `startingOffsets` の既定は `latest` です。",
+      "references": [
+        {
+          "title": "Structured Streaming + Kafka Integration Guide",
+          "url": "https://spark.apache.org/docs/latest/streaming/structured-streaming-kafka-integration.html"
+        },
+        {
+          "title": "Stream processing with Apache Kafka and Databricks",
+          "url": "https://docs.databricks.com/aws/en/connect/streaming/kafka"
+        }
+      ],
+      "status": "verified"
+    }
+  ]
+}

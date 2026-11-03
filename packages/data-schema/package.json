@@ -16,7 +16,10 @@
     "./summary-data/schema": "./src/summary-data/schema.ts",
     "./summary-data/validate": "./src/summary-data/validate.ts",
     "./help-data/schema": "./src/help-data/schema.ts",
-    "./help-data/validate": "./src/help-data/validate.ts"
+    "./help-data/validate": "./src/help-data/validate.ts",
+    "./code-drill-data/schema": "./src/code-drill-data/schema.ts",
+    "./code-drill-data/normalize": "./src/code-drill-data/normalize.ts",
+    "./code-drill-data/validate": "./src/code-drill-data/validate.ts"
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
