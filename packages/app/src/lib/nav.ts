@@ -83,6 +83,8 @@ const READ_PATHS = ["/help", "/release-notes", "/account", "/login", "/forgot-pa
 export function pageWidth(pathname: string): PageWidth {
   // 体系ノートは、左に目次を置くので、広い幅にする(管理者のプレビューも同じ)
   if (/^(\/exams|\/admin\/preview)\/[^/]+\/notebook(\/|$)/.test(pathname)) return "wide";
+  // コードドリルは、コードを横に広く出すので、広い幅にする(管理者のプレビューも同じ)
+  if (/^(\/exams|\/admin\/preview)\/[^/]+\/code-drill(\/|$)/.test(pathname)) return "wide";
   // 管理者の全問のプレビューは、問題を読むので、学ぶ画面と同じ幅にする
   if (isActive(pathname, "/admin/preview")) return "study";
   if (/^\/exams\/[^/]+\/play$/.test(pathname)) return "play";

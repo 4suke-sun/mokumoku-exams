@@ -17,8 +17,9 @@ describe("normalizeCode(SQL)", () => {
     expect(normalizeCode("sql", "merge into customers as t")).toBe(normalizeCode("sql", "MERGE INTO customers AS t"));
   });
 
-  it("識別子の大文字小文字_区別する", () => {
+  it("識別子と型の名前の大文字小文字_区別する", () => {
     expect(normalizeCode("sql", "SELECT Id FROM sales")).not.toBe(normalizeCode("sql", "SELECT id FROM sales"));
+    expect(normalizeCode("sql", "CAST(x AS string)")).not.toBe(normalizeCode("sql", "CAST(x AS STRING)"));
   });
 
   it("文字列リテラルの中_空白も大文字小文字も変えない", () => {
@@ -57,7 +58,7 @@ describe("normalizeCode(PySpark)", () => {
 });
 
 describe("SQL_KEYWORDS", () => {
-  it("コードドリルの SQL の正解と別解に出る全大文字の語_すべてキーワードの一覧にある", () => {
+  it("コードドリルの SQL の正解と別解に出る全大文字の語_キーワードの一覧にない語は型と形式の名前だけ", () => {
     const file = JSON.parse(
       readFileSync(new URL("../../../../data/code-drill.dbx-dea-2605.json", import.meta.url), "utf8"),
     ) as { problems: { language: string; solutions: string[] }[] };
@@ -65,6 +66,7 @@ describe("SQL_KEYWORDS", () => {
       .filter((p) => p.language === "sql")
       .flatMap((p) => p.solutions)
       .flatMap((s) => s.replace(/'(?:[^'\\]|\\.)*'/g, "").match(/\b[A-Z][A-Z_]+\b/g) ?? []);
-    expect(words.filter((w) => !SQL_KEYWORDS.has(w))).toEqual([]);
+    // 型・形式の名前は、大文字小文字を区別して比べる(公式の文書で、区別しないとされていないため)
+    expect([...new Set(words.filter((w) => !SQL_KEYWORDS.has(w)))].sort()).toEqual(["JSON", "STRING"]);
   });
 });

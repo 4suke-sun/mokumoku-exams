@@ -1,17 +1,17 @@
 /**
  * コードドリルの全文入力の正規化。データの検査(別解の重なり)と、画面の判定で、同じ関数を使う。
- * 決まりは docs/data-spec.md の「15. コードドリルのデータ」の「全文入力の判定」。
+ * 決まりは docs/app/specs/code-drill.md の「必要なデータ」の「全文入力の判定」。
  * - 両方の言語: 改行の形をそろえ、行末の空白と空行を除く。文字列リテラル(`'…'`・`"…"`)の中は変えない。
  * - SQL: 文字列リテラルの外の空白の連続(改行とインデントを含む)を 1 つにし、記号の前後の空白を除き、末尾の `;` を除く。
  *   キーワード(`SQL_KEYWORDS`)は、大文字小文字を区別しない(公式の文書で、キーワードは大文字小文字を区別しないとされている)。
- *   識別子と文字列リテラルは、大文字小文字を区別する。
+ *   一覧にない語(識別子、型・形式の名前など)と文字列リテラルは、大文字小文字を区別する。一覧の語は、識別子として使っていても区別しない。
  * - PySpark: 括弧の中の改行とインデントは、空白 1 つと同じに扱う。括弧の外の行頭のインデントは、深さの相対を保つ。
  *   名前と文字列リテラルは、大文字小文字を区別する。引用符の種類はそろえない。
  */
 
 export type CodeLanguage = "sql" | "pyspark";
 
-/** 大文字小文字を区別しない SQL のキーワード。コードドリルの正解・別解に出る全大文字の語は、すべてここにある(テストで確かめる) */
+/** 大文字小文字を区別しない SQL のキーワード(公式の文書で、キーワードは大文字小文字を区別しないとされている)。型・形式の名前は含めない */
 export const SQL_KEYWORDS: ReadonlySet<string> = new Set(
   `ADD ALL ALTER AND ANTI ANY AS ASC AUTO BETWEEN BY CASE CAST CATALOG CHANGE COLUMN COLUMNS COMMENT CONSTRAINT COPY CREATE CROSS
   CURRENT DATABASE DEFAULT DELETE DESC DESCRIBE DISTINCT DROP ELSE END EXCEPT EXISTS EXPECT EXPLAIN EXTERNAL FALSE FETCH FILES
@@ -19,8 +19,7 @@ export const SQL_KEYWORDS: ReadonlySet<string> = new Set(
   LATERAL LEFT LIKE LIMIT LIVE LOCATION MASK MATCHED MATERIALIZED MERGE MODIFY NOT NULL NULLS ON OPTIONS OR ORDER OUTER OVER
   OVERWRITE PARTITION PATTERN PRIVILEGES REFRESH REPLACE RETURN RETURNS REVOKE RIGHT ROW ROWS SCHEMA SELECT SEMI SET SHOW SOURCE
   STREAM STREAMING TABLE TABLES TARGET THEN TO TRUE TRUNCATE UNION UPDATE USE USING VALUES VIEW VIOLATION WHEN WHERE WINDOW WITH
-  FILEFORMAT JSON CSV PARQUET AVRO ORC TEXT BINARYFILE DELTA STRING INT INTEGER BIGINT SMALLINT TINYINT DOUBLE FLOAT DECIMAL
-  BOOLEAN DATE TIMESTAMP ARRAY MAP STRUCT`
+  FILEFORMAT`
     .split(/\s+/)
     .filter(Boolean),
 );

@@ -68,6 +68,8 @@ type Props = {
   summaryCount?: number | null;
   /** 体系ノートの見出しの数(検証済みだけ)。体系ノートがない資格では null(入口を出さない) */
   notebookCount?: number | null;
+  /** コードドリルの問題の数(検証済みだけ)。コードドリルがない資格では null(入口を出さない) */
+  codeDrillCount?: number | null;
 };
 
 const COUNT_CHOICES = [5, 10, 20, 50];
@@ -107,7 +109,14 @@ type ModeCard = {
 
 const MODE_NAMES: Record<SettingsMode, string> = { normal: "通常出題", review: "復習", "free-text": "自由記述" };
 
-export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null, notebookCount = null }: Props) {
+export function ModeSelect({
+  exam,
+  pool,
+  studyUnits = null,
+  summaryCount = null,
+  notebookCount = null,
+  codeDrillCount = null,
+}: Props) {
   const router = useRouter();
   const countId = useId();
   const settingsId = useId();
@@ -325,6 +334,20 @@ export function ModeSelect({ exam, pool, studyUnits = null, summaryCount = null,
             meta: `見出し ${notebookCount} 件`,
             kind: "link" as const,
             href: `/exams/${exam.examCode}/notebook`,
+          },
+        ]),
+    ...(codeDrillCount === null
+      ? []
+      : [
+          {
+            id: "code-drill",
+            name: "コードドリル",
+            emoji: "⌨️",
+            tone: "tone-domain-4",
+            description: "コードの穴を埋めるか、コード全体を書いて解きます。コードは実行しません。",
+            meta: `${codeDrillCount} 問`,
+            kind: "link" as const,
+            href: `/exams/${exam.examCode}/code-drill`,
           },
         ]),
     {

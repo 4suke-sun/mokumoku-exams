@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ModeSelect } from "@/components/mode-select.tsx";
+import { loadCodeDrill, visibleProblems } from "@/lib/code-drill-data.ts";
 import { loadCurriculum } from "@/lib/curriculum-data.ts";
 import { findPublishedExam, listPublishedExams, loadQuestions } from "@/lib/exam-data.ts";
 import { loadNotebook, visibleEntries } from "@/lib/notebook-data.ts";
@@ -24,12 +25,14 @@ export default async function ExamPage({ params }: Props) {
   const { code } = await params;
   const exam = findPublishedExam(code);
   if (!exam) notFound();
-  const [questions, units, summary, notebook] = await Promise.all([
+  const [questions, units, summary, notebook, codeDrill] = await Promise.all([
     loadQuestions(exam),
     loadCurriculum(exam),
     loadSummaryCards(exam),
     loadNotebook(exam),
+    loadCodeDrill(exam),
   ]);
+  const codeDrillCount = codeDrill ? visibleProblems(codeDrill, false).length : 0;
 
   return (
     <ModeSelect
@@ -46,6 +49,8 @@ export default async function ExamPage({ params }: Props) {
       summaryCount={summary?.length ?? null}
       // 利用者に出すのは、検証済みの見出しだけ(数も同じ)
       notebookCount={notebook ? visibleEntries(notebook.entries, false).length : null}
+      // 検証済みの問題が 1 つもない資格では、入口を出さない
+      codeDrillCount={codeDrillCount > 0 ? codeDrillCount : null}
     />
   );
 }
