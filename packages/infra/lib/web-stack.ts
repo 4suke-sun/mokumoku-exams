@@ -133,7 +133,7 @@ export class WebStack extends Stack {
     appFunction.addToRolePolicy(
       new iam.PolicyStatement({ actions: HISTORY_TABLE_ACTIONS, resources: [props.historyTable.tableArn] }),
     );
-    // 管理者の画面の、利用者の一覧・招待・無効化だけを、このユーザープールに限って許す
+    // 管理者の画面の一覧・無効化と、登録し直しの状態の確認・削除だけを、このユーザープールに限って許す
     appFunction.addToRolePolicy(
       new iam.PolicyStatement({ actions: USER_ADMIN_ACTIONS, resources: [props.userPoolArn] }),
     );

@@ -387,6 +387,9 @@ describe("履歴 API の入力の検証", () => {
 });
 
 const failing: HistoryRepository = {
+  async deleteUserData() {
+    throw new Error("unavailable");
+  },
   async putResult() {
     throw new Error("unavailable");
   },

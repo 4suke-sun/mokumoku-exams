@@ -42,13 +42,22 @@ export async function authenticate(cookieHeader: string | null, deps: GuardDeps)
  * 1 つずつ列挙する(`change-password` のようにログインが必要なものは含めない。新しい API は、足さない限り保護される)。
  */
 export const PUBLIC_AUTH_API_PATHS: ReadonlySet<string> = new Set(
-  ["login", "new-password", "forgot-password", "reset-password", "refresh", "logout", "session"].map(
-    (name) => `/api/auth/${name}`,
-  ),
+  [
+    "login",
+    "new-password",
+    "forgot-password",
+    "reset-password",
+    "refresh",
+    "logout",
+    "session",
+    "sign-up",
+    "confirm-sign-up",
+    "resend-code",
+  ].map((name) => `/api/auth/${name}`),
 );
 
 /** ログインなしで開ける画面。sitemap に載せるのも、この画面だけ。 */
-export const PUBLIC_PAGE_PATHS: ReadonlySet<string> = new Set(["/login", "/forgot-password"]);
+export const PUBLIC_PAGE_PATHS: ReadonlySet<string> = new Set(["/login", "/forgot-password", "/signup", "/privacy"]);
 
 /**
  * ログインなしで取れるファイル。ブラウザや検索エンジンが Cookie なしで取りに来るもの(マニフェスト、アイコン、
@@ -68,7 +77,7 @@ export const PUBLIC_FILE_PATHS: ReadonlySet<string> = new Set([
 ]);
 
 /**
- * ログインなしで開けるか。公開する経路は、ログインに必要な 2 つの画面、認証の API(列挙したものだけ)、
+ * ログインなしで開けるか。公開する経路は、ログインと登録に必要な画面と、プライバシーと利用条件の画面、認証の API(列挙したものだけ)、
  * 列挙したファイル、Next の静的ファイル(`/_next/`)に限る。大文字小文字は区別し、末尾のスラッシュや `..`・`%`・`\` を含むものは公開しない。
  */
 export function isPublicPath(pathname: string): boolean {

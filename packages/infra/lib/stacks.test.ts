@@ -11,7 +11,8 @@ import {
   TEMP_PASSWORD_DAYS,
   USER_ADMIN_ACTIONS,
 } from "./auth-stack.ts";
-import type { CustomDomain, InfraConfig, PushConfig } from "./config.ts";
+import { BUDGET_NOTIFICATIONS, BudgetStack } from "./budget-stack.ts";
+import type { BudgetConfig, CustomDomain, InfraConfig, PushConfig } from "./config.ts";
 import { DataStack, HISTORY_TABLE_ACTIONS, POINT_IN_TIME_RECOVERY_DAYS } from "./data-stack.ts";
 import {
   PUSH_HANDLER,
@@ -20,6 +21,7 @@ import {
   PushStack,
   VAPID_PRIVATE_KEY_ACTIONS,
 } from "./push-stack.ts";
+import { addCommonTags, SERVICE_TAG, SERVICE_TAG_COST_FILTER } from "./tags.ts";
 import {
   API_FAILURE_EVENT,
   API_FAILURE_METRIC,
@@ -103,6 +105,15 @@ function webTemplate(alarmEmail?: string, extra: Partial<InfraConfig> = {}): Tem
   return Template.fromStack(stack);
 }
 
+// 予算の見本の値(すべてプレースホルダー)
+const budget: BudgetConfig = { monthlyUsd: 10, email: "billing@example.com" };
+
+function budgetTemplate(): Template {
+  return Template.fromStack(
+    new BudgetStack(new App(), "Budget", { env, synthesizer, stackPrefix: config.stackPrefix, budget }),
+  );
+}
+
 function pushTemplate(): Template {
   const app = new App();
   const data = new DataStack(app, "Data", { env, synthesizer });
@@ -126,9 +137,10 @@ describe("AuthStack", () => {
     expect(authTemplate().toJSON()).toMatchSnapshot();
   });
 
-  it("セルフサインアップが禁止されている", () => {
+  it("セルフサインアップが許され_登録の確認はメールで行う", () => {
     authTemplate().hasResourceProperties("AWS::Cognito::UserPool", {
-      AdminCreateUserConfig: { AllowAdminCreateUserOnly: true },
+      AdminCreateUserConfig: { AllowAdminCreateUserOnly: false },
+      AutoVerifiedAttributes: ["email"],
     });
   });
 
@@ -150,7 +162,7 @@ describe("AuthStack", () => {
   });
 });
 
-describe("AuthStack のパスワードと招待", () => {
+describe("AuthStack のパスワードと確認コード", () => {
   it("パスワードの規則と仮パスワードの有効期間が_アプリの案内と同じ", () => {
     expect(PASSWORD_MIN_LENGTH).toBe(12);
     expect(REFRESH_TOKEN_DAYS).toBe(30);
@@ -167,18 +179,21 @@ describe("AuthStack のパスワードと招待", () => {
     });
   });
 
-  it("招待メールに_ユーザー名と仮パスワードの差し込みがある", () => {
+  it("UserPool は_招待のメールの設定を持たない", () => {
     const [pool] = Object.values(authTemplate().findResources("AWS::Cognito::UserPool"));
-    const message = pool?.Properties.AdminCreateUserConfig.InviteMessageTemplate;
-    expect(message.EmailMessage).toContain("{username}");
-    expect(message.EmailMessage).toContain("{####}");
-    expect(message.EmailSubject).toBeTruthy();
+    expect(pool?.Properties.AdminCreateUserConfig?.InviteMessageTemplate).toBeUndefined();
   });
 
-  it("再設定のメールは確認コード方式で_コードの差し込みがある", () => {
+  it("確認コードのメールは確認コード方式で_コードの差し込みと_登録と再設定の両方の有効期限がある", () => {
     const [pool] = Object.values(authTemplate().findResources("AWS::Cognito::UserPool"));
-    expect(pool?.Properties.EmailVerificationMessage).toContain("{####}");
-    expect(pool?.Properties.VerificationMessageTemplate.DefaultEmailOption).toBe("CONFIRM_WITH_CODE");
+    const template = pool?.Properties.VerificationMessageTemplate;
+    expect(template.DefaultEmailOption).toBe("CONFIRM_WITH_CODE");
+    expect(template.EmailMessage).toContain("{####}");
+    expect(template.EmailSubject).toBe("【もくもく問題集】確認コード");
+    // 登録の確認(24 時間)と、パスワードの再設定(1 時間)の両方に合う書き方にする
+    expect(template.EmailMessage).toContain("24 時間");
+    expect(template.EmailMessage).toContain("1 時間");
+    expect(template.EmailSubject).not.toContain("再設定");
   });
 
   it("クライアントは_メールとパスワードの認証と更新だけを許し_トークンの失効を使える", () => {
@@ -255,10 +270,11 @@ describe("WebStack", () => {
     expect(JSON.stringify(history[0].Resource)).not.toContain("*");
   });
 
-  it("Lambda は_Cognito の一覧・招待・無効化だけを_そのユーザープールに限って許される", () => {
+  it("Lambda は_Cognito の一覧・無効化・状態の確認・削除だけを_そのユーザープールに限って許される", () => {
     expect([...USER_ADMIN_ACTIONS].sort()).toEqual([
-      "cognito-idp:AdminCreateUser",
+      "cognito-idp:AdminDeleteUser",
       "cognito-idp:AdminDisableUser",
+      "cognito-idp:AdminGetUser",
       "cognito-idp:ListUsers",
     ]);
     const policies = Object.values(webTemplate().findResources("AWS::IAM::Policy"));
@@ -587,5 +603,60 @@ describe("PushStack", () => {
 
   it("送信の Lambda のログに_保持期間がある", () => {
     pushTemplate().hasResourceProperties("AWS::Logs::LogGroup", { RetentionInDays: 30 });
+  });
+});
+
+describe("共通のタグ", () => {
+  it("タグのキーと値は_環境の接頭辞を含まない固定の値", () => {
+    expect(SERVICE_TAG).toEqual({ key: "Service", value: "mokumoku-exams" });
+    expect(SERVICE_TAG_COST_FILTER).toBe("user:Service$mokumoku-exams");
+  });
+
+  it("アプリに付ける_各スタックのリソースに同じタグが付く", () => {
+    const app = new App();
+    addCommonTags(app);
+    const auth = new AuthStack(app, "Auth", { env, synthesizer, stackPrefix: config.stackPrefix });
+    const data = new DataStack(app, "Data", { env, synthesizer });
+    Template.fromStack(auth).hasResourceProperties("AWS::Cognito::UserPool", {
+      UserPoolTags: { [SERVICE_TAG.key]: SERVICE_TAG.value },
+    });
+    Template.fromStack(data).hasResourceProperties("AWS::DynamoDB::Table", {
+      Tags: Match.arrayWith([{ Key: SERVICE_TAG.key, Value: SERVICE_TAG.value }]),
+    });
+  });
+});
+
+describe("BudgetStack", () => {
+  it("合成すると_スナップショットと一致する", () => {
+    expect(budgetTemplate().toJSON()).toMatchSnapshot();
+  });
+
+  it("月の費用の予算を_共通のタグで絞って_設定した金額で作る", () => {
+    const template = budgetTemplate();
+    template.resourceCountIs("AWS::Budgets::Budget", 1);
+    template.hasResourceProperties("AWS::Budgets::Budget", {
+      Budget: {
+        BudgetName: `${config.stackPrefix}-monthly`,
+        BudgetType: "COST",
+        TimeUnit: "MONTHLY",
+        BudgetLimit: { Amount: budget.monthlyUsd, Unit: "USD" },
+        CostFilters: { TagKeyValue: [SERVICE_TAG_COST_FILTER] },
+      },
+    });
+  });
+
+  it("実績と予測が予算を超えそうなとき_設定した宛先へメールで知らせる", () => {
+    const [resource] = Object.values(budgetTemplate().findResources("AWS::Budgets::Budget"));
+    const notifications = resource?.Properties.NotificationsWithSubscribers;
+    expect(notifications).toHaveLength(BUDGET_NOTIFICATIONS.length);
+    const types = notifications.map(
+      (n: { Notification: { NotificationType: string } }) => n.Notification.NotificationType,
+    );
+    expect(new Set(types)).toEqual(new Set(["ACTUAL", "FORECASTED"]));
+    for (const n of notifications) {
+      expect(n.Notification.ComparisonOperator).toBe("GREATER_THAN");
+      expect(n.Notification.ThresholdType).toBe("PERCENTAGE");
+      expect(n.Subscribers).toEqual([{ SubscriptionType: "EMAIL", Address: budget.email }]);
+    }
   });
 });

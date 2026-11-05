@@ -1,28 +1,40 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { ownerTag } from "../owner-tag.ts";
 import {
+  createFakeDirectory,
   createFakeProvider,
+  createFakeUserAdmin,
+  createFakeVerifier,
   FAKE_ADMIN_EMAIL,
   FAKE_ADMIN_PHRASE,
   FAKE_INVITED_EMAIL,
   FAKE_INVITED_PHRASE,
   FAKE_RESET_CODE,
+  FAKE_SEND_LIMIT_EMAIL,
+  FAKE_SIGNUP_CODE,
   FAKE_USER_EMAIL,
   FAKE_USER_PHRASE,
   fakeSub,
 } from "./fake.ts";
 import {
+  type DeleteAccountDeps,
   type Deps,
   handleChangePassword,
+  handleConfirmSignUp,
+  handleDeleteAccount,
   handleForgotPassword,
   handleLogin,
   handleLogout,
   handleNewPassword,
   handleRefresh,
+  handleResendCode,
   handleResetPassword,
   handleSession,
+  handleSignUp,
+  type SignUpDeps,
 } from "./handlers.ts";
 import { AuthError, type AuthProvider } from "./types.ts";
+import { UNCONFIRMED_REPLACE_AFTER_MS } from "./user-admin.ts";
 
 // 規則に合うテスト用の値。実行時に組み立てる
 const phrase = (name: string) => ["Example", name, "Phrase-9"].join("-");
@@ -284,5 +296,282 @@ describe("パスワードの変更", () => {
     );
     expect(response.status).toBe(401);
     expect(await response.json()).toEqual({ error: "session-expired" });
+  });
+});
+
+const NEW_EMAIL = "new@example.com";
+const OTHER = phrase("Other");
+
+/** 登録の API の依存。代替の認証と代替の利用者の管理が、同じ一覧を共有する。`clock.now` を進めて時間をたたせる */
+function signUpDeps(start = Date.parse("2026-01-01T00:00:00.000Z")) {
+  const clock = { now: start };
+  const now = () => clock.now;
+  const directory = createFakeDirectory(now);
+  const provider = createFakeProvider(now, directory);
+  const users = createFakeUserAdmin(directory);
+  const d: SignUpDeps = { provider, secure: true, now, users };
+  return { d, clock, provider, users };
+}
+
+const signUp = (d: SignUpDeps, email: string, password: string) => handleSignUp(post({ email, password }), d);
+
+describe("新規登録", () => {
+  it("新しいメールアドレス_確認コードを送ったと返し_確認待ちになり_Cookie は付けない", async () => {
+    const { d, users } = signUpDeps();
+    const response = await signUp(d, NEW_EMAIL, FRESH);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ status: "code-sent" });
+    expect(response.headers.getSetCookie()).toHaveLength(0);
+    expect(await users.getSignUpState(NEW_EMAIL)).toMatchObject({ status: "UNCONFIRMED" });
+  });
+
+  it("規則に合わないパスワード_400", async () => {
+    const { d } = signUpDeps();
+    const response = await signUp(d, NEW_EMAIL, "short");
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ error: "password-policy" });
+  });
+
+  it("送信の上限に当たる_429 で送信の上限の種類を返す", async () => {
+    const { d } = signUpDeps();
+    const response = await signUp(d, FAKE_SEND_LIMIT_EMAIL, FRESH);
+    expect(response.status).toBe(429);
+    expect(await response.json()).toEqual({ error: "send-limit" });
+  });
+
+  it("確認済みのメールアドレス_パスワードを試さずに登録できないと返す", async () => {
+    const { d, provider } = signUpDeps();
+    const signIn = vi.spyOn(provider, "signIn");
+    const response = await signUp(d, FAKE_USER_EMAIL, FAKE_USER_PHRASE);
+    expect(response.status).toBe(409);
+    expect(await response.json()).toEqual({ error: "already-exists" });
+    expect(signIn).not.toHaveBeenCalled();
+  });
+
+  it("確認待ちで同じパスワードの登録し直し_確認コードを送り直して登録と同じ応答にし_Cookie は付けない", async () => {
+    const { d, provider } = signUpDeps();
+    await signUp(d, NEW_EMAIL, FRESH);
+    const resend = vi.spyOn(provider, "resendCode");
+    const response = await signUp(d, NEW_EMAIL, FRESH);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ status: "code-sent" });
+    expect(response.headers.getSetCookie()).toHaveLength(0);
+    expect(resend).toHaveBeenCalledWith(NEW_EMAIL);
+  });
+
+  it("確認待ちで違うパスワード_24 時間たつ前は登録できず_たったあとは置き換えて登録し直せる", async () => {
+    const { d, clock, users } = signUpDeps();
+    await signUp(d, NEW_EMAIL, FRESH);
+    clock.now += UNCONFIRMED_REPLACE_AFTER_MS - 1;
+    const early = await signUp(d, NEW_EMAIL, OTHER);
+    expect(early.status).toBe(409);
+    expect(await early.json()).toEqual({ error: "already-exists" });
+    clock.now += 1;
+    const replaced = await signUp(d, NEW_EMAIL, OTHER);
+    expect(replaced.status).toBe(200);
+    expect(await replaced.json()).toEqual({ status: "code-sent" });
+    // 置き換えたアカウントは、新しいパスワードで確認待ちになる(作成日時も新しくなる)
+    expect(await users.getSignUpState(NEW_EMAIL)).toEqual({
+      status: "UNCONFIRMED",
+      createdAt: new Date(clock.now).toISOString(),
+    });
+    const confirmed = await handleConfirmSignUp(post({ email: NEW_EMAIL, code: FAKE_SIGNUP_CODE, password: OTHER }), d);
+    expect(await confirmed.json()).toEqual({ status: "signed-in" });
+  });
+
+  it("確認済みのアカウント_24 時間たっていても削除を呼ばない", async () => {
+    const { d, clock, users } = signUpDeps();
+    const remove = vi.spyOn(users, "deleteStaleUnconfirmed");
+    clock.now += UNCONFIRMED_REPLACE_AFTER_MS * 10;
+    expect((await signUp(d, FAKE_USER_EMAIL, OTHER)).status).toBe(409);
+    expect(remove).not.toHaveBeenCalled();
+    expect(await users.getSignUpState(FAKE_USER_EMAIL)).toMatchObject({ status: "CONFIRMED" });
+  });
+
+  it("確認待ちの判定のあとに確認済みになっていた_利用者の管理が状態を読み直して消さない", async () => {
+    const { d, clock, provider } = signUpDeps();
+    await signUp(d, NEW_EMAIL, FRESH);
+    clock.now += UNCONFIRMED_REPLACE_AFTER_MS;
+    // 登録の API がパスワードを試す前に、本人が確認を済ませる
+    const original = provider.signIn.bind(provider);
+    vi.spyOn(provider, "signIn").mockImplementation(async (email, password) => {
+      await provider.confirmSignUp({ email, code: FAKE_SIGNUP_CODE });
+      return original(email, password);
+    });
+    const response = await signUp(d, NEW_EMAIL, OTHER);
+    expect(response.status).toBe(409);
+    vi.mocked(provider.signIn).mockRestore();
+    expect((await handleLogin(post({ email: NEW_EMAIL, password: FRESH }), d)).status).toBe(200);
+  });
+
+  it("状態を読めない_503 にして登録し直さない", async () => {
+    const { d } = signUpDeps();
+    await signUp(d, NEW_EMAIL, FRESH);
+    const users: SignUpDeps["users"] = {
+      getSignUpState: async () => {
+        throw new Error("MARKER");
+      },
+      deleteStaleUnconfirmed: vi.fn(),
+    };
+    const response = await signUp({ ...d, users }, NEW_EMAIL, FRESH);
+    expect(response.status).toBe(503);
+    expect(await response.text()).not.toContain("MARKER");
+    expect(users.deleteStaleUnconfirmed).not.toHaveBeenCalled();
+  });
+});
+
+describe("登録の確認", () => {
+  it("正しいコード_確認が通り_ログインして Cookie を付ける", async () => {
+    const { d } = signUpDeps();
+    await signUp(d, NEW_EMAIL, FRESH);
+    const response = await handleConfirmSignUp(post({ email: NEW_EMAIL, code: FAKE_SIGNUP_CODE, password: FRESH }), d);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ status: "signed-in" });
+    expect(response.headers.getSetCookie()).toHaveLength(3);
+  });
+
+  it("コードが違う_400 で確認しない", async () => {
+    const { d, users } = signUpDeps();
+    await signUp(d, NEW_EMAIL, FRESH);
+    const response = await handleConfirmSignUp(post({ email: NEW_EMAIL, code: "000000", password: FRESH }), d);
+    expect(response.status).toBe(400);
+    expect(await response.json()).toEqual({ error: "code-invalid" });
+    expect(await users.getSignUpState(NEW_EMAIL)).toMatchObject({ status: "UNCONFIRMED" });
+  });
+
+  it("確認は通ったがパスワードが違う_Cookie を付けずに確認済みと返す", async () => {
+    const { d } = signUpDeps();
+    await signUp(d, NEW_EMAIL, FRESH);
+    const response = await handleConfirmSignUp(post({ email: NEW_EMAIL, code: FAKE_SIGNUP_CODE, password: OTHER }), d);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ status: "confirmed" });
+    expect(response.headers.getSetCookie()).toHaveLength(0);
+  });
+
+  it("確認がまだのアカウントでログインする_403 で確認がまだの種類を返す", async () => {
+    const { d } = signUpDeps();
+    await signUp(d, NEW_EMAIL, FRESH);
+    const response = await handleLogin(post({ email: NEW_EMAIL, password: FRESH }), d);
+    expect(response.status).toBe(403);
+    expect(await response.json()).toEqual({ error: "not-confirmed" });
+    expect(response.headers.getSetCookie()).toHaveLength(0);
+  });
+});
+
+describe("確認コードの送り直し", () => {
+  it("登録のないメールアドレスでも_送ったと同じ応答になる", async () => {
+    const response = await handleResendCode(post({ email: "nobody@example.com" }), deps());
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ status: "sent" });
+  });
+
+  it("送信の上限に当たる_429 で送信の上限の種類を返す", async () => {
+    const response = await handleResendCode(post({ email: FAKE_SEND_LIMIT_EMAIL }), deps());
+    expect(response.status).toBe(429);
+    expect(await response.json()).toEqual({ error: "send-limit" });
+  });
+
+  it("パスワードの再設定で送信の上限に当たる_429 で送信の上限の種類を返す", async () => {
+    const response = await handleForgotPassword(post({ email: FAKE_SEND_LIMIT_EMAIL }), deps());
+    expect(response.status).toBe(429);
+    expect(await response.json()).toEqual({ error: "send-limit" });
+  });
+});
+
+describe("退会", () => {
+  function deleteDeps(provider: AuthProvider = createFakeProvider()) {
+    const purged: string[] = [];
+    const d: DeleteAccountDeps = {
+      ...deps(provider),
+      verifier: createFakeVerifier(),
+      purge: async (sub) => {
+        purged.push(sub);
+      },
+    };
+    return { d, purged };
+  }
+  const remove = (d: DeleteAccountDeps, password: string, cookie?: string) =>
+    handleDeleteAccount(post({ password }, cookie ? { cookie } : {}), d);
+
+  it("正しいパスワード_データを消してからアカウントを消し_Cookie を破棄する", async () => {
+    const provider = createFakeProvider();
+    const { d, purged } = deleteDeps(provider);
+    const order: string[] = [];
+    const purge = d.purge;
+    d.purge = async (sub) => {
+      order.push("purge");
+      await purge(sub);
+    };
+    const original = provider.deleteAccount.bind(provider);
+    vi.spyOn(provider, "deleteAccount").mockImplementation(async (token) => {
+      order.push("delete");
+      await original(token);
+    });
+    const cookie = cookieHeader(await login(d));
+    const response = await remove(d, FAKE_USER_PHRASE, cookie);
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ status: "deleted" });
+    expect(response.headers.getSetCookie().every((c) => c.includes("Max-Age=0"))).toBe(true);
+    expect(purged).toEqual([fakeSub(FAKE_USER_EMAIL)]);
+    expect(order).toEqual(["purge", "delete"]);
+    expect((await login(d)).status).toBe(401);
+  });
+
+  it("パスワードが違う_401 で何も消さない", async () => {
+    const provider = createFakeProvider();
+    const { d, purged } = deleteDeps(provider);
+    const deleteAccount = vi.spyOn(provider, "deleteAccount");
+    const cookie = cookieHeader(await login(d));
+    const response = await remove(d, "wrong", cookie);
+    expect(response.status).toBe(401);
+    expect(await response.json()).toEqual({ error: "invalid-credentials" });
+    expect(purged).toEqual([]);
+    expect(deleteAccount).not.toHaveBeenCalled();
+    expect((await login(d)).status).toBe(200);
+  });
+
+  it("ログインしていない_401 で何も消さない", async () => {
+    const { d, purged } = deleteDeps();
+    const response = await remove(d, FAKE_USER_PHRASE);
+    expect(response.status).toBe(401);
+    expect(await response.json()).toEqual({ error: "session-expired" });
+    expect(purged).toEqual([]);
+  });
+
+  it("データを消せない_503 でアカウントは消さず_もう一度呼ぶと続きから消せる", async () => {
+    const { d } = deleteDeps();
+    const cookie = cookieHeader(await login(d));
+    let fail = true;
+    d.purge = async () => {
+      if (fail) throw new Error("MARKER");
+    };
+    const failed = await remove(d, FAKE_USER_PHRASE, cookie);
+    expect(failed.status).toBe(503);
+    expect(await failed.text()).not.toContain("MARKER");
+    expect((await login(d)).status).toBe(200);
+    fail = false;
+    expect((await remove(d, FAKE_USER_PHRASE, cookie)).status).toBe(200);
+    expect((await login(d)).status).toBe(401);
+  });
+
+  it("アカウントを消せない_503 を返す", async () => {
+    const provider = createFakeProvider();
+    const { d } = deleteDeps(provider);
+    vi.spyOn(provider, "deleteAccount").mockRejectedValue(new AuthError("unavailable"));
+    const cookie = cookieHeader(await login(d));
+    const response = await remove(d, FAKE_USER_PHRASE, cookie);
+    expect(response.status).toBe(503);
+    expect(await response.json()).toEqual({ error: "unavailable" });
+  });
+
+  it("本文で利用者の識別子を渡す_400 で何も消さない", async () => {
+    const { d, purged } = deleteDeps();
+    const cookie = cookieHeader(await login(d));
+    const response = await handleDeleteAccount(
+      post({ password: FAKE_USER_PHRASE, sub: fakeSub(FAKE_ADMIN_EMAIL) }, { cookie }),
+      d,
+    );
+    expect(response.status).toBe(400);
+    expect(purged).toEqual([]);
   });
 });

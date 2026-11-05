@@ -87,6 +87,21 @@ export function removeUnownedRecords(storage: Pick<Storage, "length" | "key" | "
 }
 
 /**
+ * 持ち主の印のついた記録(`mokumoku:v1:<持ち主の印>:…`)を、読まずにすべて消す(退会のあとに、この端末の学習の記録を消す)。
+ * 印の形でない値を渡したときは、何も消さない。ほかの持ち主の記録と、表示の設定など持ち主のない値は残す。
+ */
+export function removeOwnerRecords(storage: Pick<Storage, "length" | "key" | "removeItem">, tag: string): void {
+  if (!OWNER_PATTERN.test(tag)) return;
+  const prefix = `${KEY_PREFIX}:${tag}:`;
+  const keys: string[] = [];
+  for (let i = 0; i < storage.length; i++) {
+    const key = storage.key(i);
+    if (key?.startsWith(prefix)) keys.push(key);
+  }
+  for (const key of keys) storage.removeItem(key);
+}
+
+/**
  * ブラウザの localStorage を、いまの持ち主の照合を付けて返す(`ownedStore`)。
  * 保存が禁止されていると、`window.localStorage` を参照した時点で例外になる。
  * 参照を各メソッドの中で行い、この例外を、保存の処理の try で受けられるようにする。

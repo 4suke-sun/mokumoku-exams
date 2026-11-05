@@ -2,6 +2,7 @@
 import { cleanup, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
+import { SEND_LIMIT_MESSAGE } from "@/lib/auth/messages.ts";
 import { ForgotPasswordForm } from "./forgot-password-form.tsx";
 
 const VALID = "Valid-Password-123";
@@ -99,5 +100,13 @@ describe("ForgotPasswordForm", () => {
     await user.click(screen.getByRole("button", { name: "パスワードを変更する" }));
     expect(await screen.findByRole("alert")).toBeTruthy();
     expect(screen.getByRole("heading", { name: "新しいパスワードを決める" })).toBeTruthy();
+  });
+
+  it("送信の上限に当たる_上限の文言を読み上げの対象で出し_最初の段階にとどまる", async () => {
+    stubFetch([{ status: 429, body: { error: "send-limit" } }]);
+    render(<ForgotPasswordForm />);
+    await requestCode(userEvent.setup());
+    expect((await screen.findByRole("alert")).textContent).toContain(SEND_LIMIT_MESSAGE);
+    expect(screen.getByRole("button", { name: "確認コードを送る" })).toBeTruthy();
   });
 });

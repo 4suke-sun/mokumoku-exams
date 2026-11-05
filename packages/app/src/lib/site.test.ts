@@ -22,6 +22,8 @@ describe("sitemap", () => {
     expect(entries.map((e) => e.url).sort()).toEqual([
       "https://example.com/forgot-password",
       "https://example.com/login",
+      "https://example.com/privacy",
+      "https://example.com/signup",
     ]);
     for (const entry of entries) expect(isPublicPath(new URL(entry.url).pathname), entry.url).toBe(true);
   });
@@ -41,7 +43,11 @@ describe("sitemap", () => {
 describe("robots", () => {
   it("ログインなしで開ける画面だけをクロールの対象にし_ほかは対象外にする", () => {
     const robots = robotsOf("https://example.com");
-    expect(robots.rules).toEqual({ userAgent: "*", allow: ["/login", "/forgot-password"], disallow: "/" });
+    expect(robots.rules).toEqual({
+      userAgent: "*",
+      allow: ["/login", "/forgot-password", "/signup", "/privacy"],
+      disallow: "/",
+    });
     expect(robots.sitemap).toBe("https://example.com/sitemap.xml");
   });
 

@@ -3,6 +3,8 @@ import { type Browser, type BrowserContext, expect, type Locator, type Page, tes
 import {
   FAKE_ADMIN_EMAIL,
   FAKE_ADMIN_PHRASE,
+  FAKE_SEND_LIMIT_EMAIL,
+  FAKE_SIGNUP_CODE,
   FAKE_USER_EMAIL,
   FAKE_USER_PHRASE,
   fakeSub,
@@ -49,6 +51,19 @@ async function openLogin(page: Page) {
     const form = document.querySelector("form");
     return form !== null && Object.keys(form).some((key) => key.startsWith("__reactProps"));
   });
+}
+
+// openLogin と同じく、フォームを React が受け持つまで待つ(ログイン以外の画面と、移ってきたあとの画面)
+async function waitForForm(page: Page) {
+  await page.waitForFunction(() => {
+    const form = document.querySelector("form");
+    return form !== null && Object.keys(form).some((key) => key.startsWith("__reactProps"));
+  });
+}
+
+async function openPage(page: Page, path: string) {
+  await page.goto(path);
+  await waitForForm(page);
 }
 
 async function login(page: Page, email = FAKE_USER_EMAIL, phrase = FAKE_USER_PHRASE) {
@@ -142,6 +157,11 @@ test("主要な画面_WCAG 2.1 AA の自動検査で違反がない", async ({ p
   await stubHistory(page);
   await openLogin(page);
   await expectAccessible(page, "ログイン");
+  await openPage(page, "/signup");
+  await expectAccessible(page, "新規登録");
+  await page.goto("/privacy");
+  await expect(page.getByRole("heading", { level: 1, name: "プライバシーと利用条件" })).toBeVisible();
+  await expectAccessible(page, "プライバシーと利用条件");
   await login(page);
 
   await page.goto("/exams");
@@ -306,4 +326,49 @@ test("ログアウトを経ずに別のアカウントでログイン_前のア�
   await switchAccountsInSameBrowser(browser, async (page) => {
     await page.context().clearCookies();
   });
+});
+
+// 登録に使う、規則に合うパスワード。実行時に組み立てる
+const SIGNUP_PHRASE = ["Signup", "Example", "123"].join("-");
+
+async function fillSignup(page: Page, email: string) {
+  await openPage(page, "/signup");
+  await page.getByLabel("メールアドレス").fill(email);
+  await page.getByLabel("パスワード", { exact: true }).fill(SIGNUP_PHRASE);
+  await page.getByLabel("パスワード(確認)").fill(SIGNUP_PHRASE);
+  await page.getByRole("button", { name: "登録する" }).click();
+}
+
+test("ログインの画面から新規登録して確認コードを入れる_ログインした状態でホームへ移り_退会するとログインできなくなる", async ({
+  page,
+}) => {
+  // 開発サーバーの代替の認証はメモリ上なので、実行ごとに別のメールアドレスにする
+  const email = `signup-${Date.now()}@example.com`;
+  await openLogin(page);
+  await clickUntilUrl(page, page.getByRole("link", { name: "新規登録" }), /\/signup$/);
+  await fillSignup(page, email);
+  await expect(page.getByRole("heading", { level: 1, name: "確認コードの入力" })).toBeVisible();
+  await page.getByLabel("確認コード").fill(FAKE_SIGNUP_CODE);
+  await page.getByRole("button", { name: "確認する" }).click();
+  await page.waitForURL((url) => url.pathname === "/");
+
+  await page.goto("/account");
+  await page.getByRole("button", { name: "退会する…" }).click();
+  await page.getByLabel("パスワード", { exact: true }).fill(SIGNUP_PHRASE);
+  await page.getByRole("button", { name: "退会する", exact: true }).click();
+  await page.waitForURL((url) => url.pathname === "/login");
+  await expect(page.getByRole("status").filter({ hasText: "退会しました" })).toBeVisible();
+  await waitForForm(page);
+
+  await page.getByLabel("メールアドレス").fill(email);
+  await page.getByLabel("パスワード").fill(SIGNUP_PHRASE);
+  await page.getByRole("button", { name: "ログインする" }).click();
+  // 画面の移動を読み上げる Next の領域も alert なので、通知の部品(data-kind)に絞る
+  await expect(page.locator('[role="alert"][data-kind="error"]')).toContainText("正しくありません");
+});
+
+test("確認コードの送信の上限に当たる_登録の画面に上限の文言を出す", async ({ page }) => {
+  await fillSignup(page, FAKE_SEND_LIMIT_EMAIL);
+  await expect(page.locator('[role="alert"][data-kind="error"]')).toContainText("1 日 50 通まで");
+  await expect(page.getByRole("button", { name: "登録する" })).toBeVisible();
 });

@@ -8,6 +8,7 @@ import AdminLayout from "@/app/admin/layout.tsx";
 import * as adminDisableRoute from "@/app/api/admin/users/disable/route.ts";
 import * as adminUsersRoute from "@/app/api/admin/users/route.ts";
 import * as changePasswordRoute from "@/app/api/auth/change-password/route.ts";
+import * as deleteAccountRoute from "@/app/api/auth/delete-account/route.ts";
 import * as bookmarksRoute from "@/app/api/history/bookmarks/route.ts";
 import * as daysRoute from "@/app/api/history/days/route.ts";
 import * as goalRoute from "@/app/api/history/goal/route.ts";
@@ -35,6 +36,7 @@ import { isPublicPath, PUBLIC_AUTH_API_PATHS, PUBLIC_FILE_PATHS, PUBLIC_PAGE_PAT
 import { getAuthProvider, getUserAdmin } from "@/lib/auth/index.ts";
 import { withTokenCookies } from "@/lib/auth/session.ts";
 import { SUB_PATTERN } from "@/lib/auth/verify.ts";
+import { getHistoryRepository } from "@/lib/history/repository.ts";
 import { getPushRepository } from "@/lib/push/repository.ts";
 import { proxy } from "./proxy.ts";
 
@@ -89,7 +91,7 @@ function filesOf(): string[] {
   return found.sort();
 }
 
-const PUBLIC_PAGES = ["/forgot-password", "/login"];
+const PUBLIC_PAGES = ["/forgot-password", "/login", "/privacy", "/signup"];
 const PROTECTED_PAGES = [
   "/",
   "/account",
@@ -137,18 +139,22 @@ const ADMIN_PAGES = [
 /** 保護される API のうち、管理者だけが呼べるもの */
 const ADMIN_APIS = ["/api/admin/users", "/api/admin/users/disable"];
 const PUBLIC_APIS = [
+  "/api/auth/confirm-sign-up",
   "/api/auth/forgot-password",
   "/api/auth/login",
   "/api/auth/logout",
   "/api/auth/new-password",
   "/api/auth/refresh",
+  "/api/auth/resend-code",
   "/api/auth/reset-password",
   "/api/auth/session",
+  "/api/auth/sign-up",
 ];
 const PROTECTED_APIS = [
   "/api/admin/users",
   "/api/admin/users/disable",
   "/api/auth/change-password",
+  "/api/auth/delete-account",
   "/api/history/bookmarks",
   "/api/history/days",
   "/api/history/goal",
@@ -231,7 +237,14 @@ describe("経路の一覧", () => {
   });
 
   it("保護される API_公開の一覧に似た経路でも_公開にならない", () => {
-    for (const path of ["/api/auth", "/api/auth/", "/api/auth/change-password", "/api/auth/login/x", "/api/history"]) {
+    for (const path of [
+      "/api/auth",
+      "/api/auth/",
+      "/api/auth/change-password",
+      "/api/auth/delete-account",
+      "/api/auth/login/x",
+      "/api/history",
+    ]) {
       expect(isPublicPath(path)).toBe(false);
     }
   });
@@ -366,6 +379,17 @@ describe("認可: 未ログインの拒否", () => {
     expect(response.status).toBe(401);
   });
 
+  it("退会の API 本体_入口を通らなくても未ログインを断り_何も消さない(二重の防御)", async () => {
+    for (const cookie of [undefined, "mokumoku_id=forged; mokumoku_access=forged"]) {
+      const response = await deleteAccountRoute.POST(
+        request("/api/auth/delete-account", { method: "POST", cookie, body: { password: FAKE_USER_PHRASE } }),
+      );
+      expect(response.status).toBe(401);
+    }
+    const signedIn = await getAuthProvider().signIn(FAKE_USER_EMAIL, FAKE_USER_PHRASE);
+    expect(signedIn.kind).toBe("signed-in");
+  });
+
   it("保護される API_受け付けるメソッドは宣言した分だけ(足したときは認可のテストも足す)", () => {
     const methods = (module: object) => Object.keys(module).filter((k) => /^[A-Z]+$/.test(k));
     expect(methods(historyRoute).sort()).toEqual(["GET", "POST"]);
@@ -379,7 +403,8 @@ describe("認可: 未ログインの拒否", () => {
     expect(methods(prefsRoute).sort()).toEqual(["GET", "PUT"]);
     expect(methods(sectionsRoute).sort()).toEqual(["GET", "PUT"]);
     expect(methods(changePasswordRoute)).toEqual(["POST"]);
-    expect(methods(adminUsersRoute).sort()).toEqual(["GET", "POST"]);
+    expect(methods(deleteAccountRoute)).toEqual(["POST"]);
+    expect(methods(adminUsersRoute)).toEqual(["GET"]);
     expect(methods(adminDisableRoute)).toEqual(["POST"]);
     expect(methods(pushSubscriptionRoute).sort()).toEqual(["DELETE", "PUT"]);
     expect(methods(pushTestRoute)).toEqual(["POST"]);
@@ -657,6 +682,58 @@ describe("認可: 他人のデータに触れない", () => {
     expect(response.status).toBe(200);
     expect(await repository.listSubscriptions("other-user")).toHaveLength(1);
   });
+
+  it("退会_自分の区画の記録と購読とアカウントだけが消え_本文で識別子を渡しても使われない", async () => {
+    // 退会で消える代替の利用者の一覧を、このテストの前後で作り直す
+    delete (globalThis as FakeState).__mokumokuFakeAuth;
+    try {
+      const own = await cookie();
+      const other = await adminCookie();
+      const saved = {
+        examCode: "EX-SMP-XX",
+        questionIds: ["SAMPLE-0001"],
+        answers: { "SAMPLE-0001": ["D"] },
+        finishedAt: new Date().toISOString(),
+      };
+      for (const c of [own, other]) {
+        const posted = await historyRoute.POST(
+          request("/api/history/results", { method: "POST", cookie: c, body: saved }),
+        );
+        expect(posted.status).toBe(200);
+      }
+      const target = { endpoint: "https://fcm.googleapis.com/fcm/send/device-1", p256dh: "p", auth: "a" };
+      await getPushRepository().putSubscription(fakeSub(FAKE_USER_EMAIL), target, "t");
+      await getPushRepository().putSubscription(fakeSub(FAKE_ADMIN_EMAIL), target, "t");
+      const remove = (body: unknown) =>
+        deleteAccountRoute.POST(request("/api/auth/delete-account", { method: "POST", cookie: own, body }));
+
+      expect((await remove({ password: FAKE_USER_PHRASE, sub: fakeSub(FAKE_ADMIN_EMAIL) })).status).toBe(400);
+      const deleted = await remove({ password: FAKE_USER_PHRASE });
+      expect(deleted.status).toBe(200);
+
+      const results = async (c: string) =>
+        (
+          (await (
+            await historyRoute.GET(request("/api/history/results?examCode=EX-SMP-XX", { cookie: c }))
+          ).json()) as {
+            results: unknown[];
+          }
+        ).results;
+      expect(await results(other)).toHaveLength(1);
+      expect(await getPushRepository().listSubscriptions(fakeSub(FAKE_USER_EMAIL))).toEqual([]);
+      expect(await getPushRepository().listSubscriptions(fakeSub(FAKE_ADMIN_EMAIL))).toHaveLength(1);
+      await expect(getAuthProvider().signIn(FAKE_USER_EMAIL, FAKE_USER_PHRASE)).rejects.toMatchObject({
+        code: "invalid-credentials",
+      });
+      // 同じ利用者の区画を、別の手段で読み直しても空
+      expect((await getHistoryRepository().listResults(fakeSub(FAKE_USER_EMAIL), "EX-SMP-XX")).results).toEqual([]);
+    } finally {
+      // 管理者の分として保存した記録も、後のテストに残さない
+      delete (globalThis as FakeState).__mokumokuFakeAuth;
+      delete (globalThis as { __mokumokuFakeHistory?: unknown }).__mokumokuFakeHistory;
+      delete (globalThis as { __mokumokuFakePush?: unknown }).__mokumokuFakePush;
+    }
+  });
 });
 
 type FakeState = { __mokumokuFakeAuth?: unknown; __mokumokuFakeAudit?: { entries: AuditEntry[] } };
@@ -664,7 +741,7 @@ type FakeState = { __mokumokuFakeAuth?: unknown; __mokumokuFakeAudit?: { entries
 describe("認可: 管理者だけが開ける", () => {
   beforeEach(() => {
     vi.stubEnv("AUTH_FAKE", "1");
-    // 招待・無効化で変わる代替の利用者の一覧と、操作の記録を、テストごとに作り直す
+    // 登録・無効化で変わる代替の利用者の一覧と、操作の記録を、テストごとに作り直す
     delete (globalThis as FakeState).__mokumokuFakeAuth;
     delete (globalThis as FakeState).__mokumokuFakeAudit;
     delete (globalThis as { __mokumokuFakePush?: unknown }).__mokumokuFakePush;
@@ -744,8 +821,6 @@ describe("認可: 管理者だけが開ける", () => {
   });
   const auditEntries = () => (globalThis as FakeState).__mokumokuFakeAudit?.entries ?? [];
   const listedUsers = () => getUserAdmin().listUsers();
-  const invite = (cookie: string | undefined, body: unknown) =>
-    adminUsersRoute.POST(request("/api/admin/users", { method: "POST", cookie, body }));
   const disable = (cookie: string | undefined, body: unknown) =>
     adminDisableRoute.POST(request("/api/admin/users/disable", { method: "POST", cookie, body }));
 
@@ -754,25 +829,23 @@ describe("認可: 管理者だけが開ける", () => {
     for (const cookie of [undefined, "mokumoku_id=forged; mokumoku_access=forged", await learner()]) {
       const label = cookie ? cookie.slice(0, 12) : "none";
       expect((await adminUsersRoute.GET(request("/api/admin/users", { cookie }))).status, label).toBe(403);
-      expect((await invite(cookie, { email: "someone@example.com" })).status, label).toBe(403);
       expect((await disable(cookie, { username: target })).status, label).toBe(403);
     }
     const users = await listedUsers();
-    expect(users.map((u) => u.email)).not.toContain("someone@example.com");
     expect(users.find((u) => u.username === target)?.enabled).toBe(true);
     expect(auditEntries()).toEqual([]);
   });
 
-  it("管理者の API_管理者は一覧・招待・無効化ができ_操作の記録に検証した管理者の sub が残る", async () => {
+  it("管理者の API_管理者は一覧・無効化ができ_操作の記録に検証した管理者の sub が残る", async () => {
     const cookie = await admin();
     const listed = await adminUsersRoute.GET(request("/api/admin/users", { cookie }));
     expect(listed.status).toBe(200);
     const { users } = (await listed.json()) as { users: { email: string; self: boolean }[] };
     expect(users.find((u) => u.email === FAKE_ADMIN_EMAIL)?.self).toBe(true);
 
-    expect((await invite(cookie, { email: "someone@example.com" })).status).toBe(200);
-    // 招待した利用者は、初回ログインで新しいパスワードを決める入力に進む
-    expect((await listedUsers()).find((u) => u.email === "someone@example.com")?.status).toBe("FORCE_CHANGE_PASSWORD");
+    // 招待済みで未使用の利用者は、一覧に初回ログイン前の状態で出る
+    expect(users.find((u) => u.email === FAKE_INVITED_EMAIL)).toBeTruthy();
+    expect((await listedUsers()).find((u) => u.email === FAKE_INVITED_EMAIL)?.status).toBe("FORCE_CHANGE_PASSWORD");
 
     const target = fakeSub(FAKE_USER_EMAIL);
     expect((await disable(cookie, { username: target })).status).toBe(200);
@@ -789,7 +862,6 @@ describe("認可: 管理者だけが開ける", () => {
     for (const key of ["sub", "userId", "actor", "PK"]) {
       const response = await adminUsersRoute.GET(request(`/api/admin/users?${key}=other-user`, { cookie }));
       expect(response.status, key).toBe(400);
-      expect((await invite(cookie, { email: "someone@example.com", [key]: "other-user" })).status, key).toBe(400);
       expect((await disable(cookie, { username: fakeSub(FAKE_USER_EMAIL), [key]: "other-user" })).status, key).toBe(
         400,
       );

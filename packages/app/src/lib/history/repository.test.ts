@@ -20,6 +20,20 @@ const result = (examCode: string, minute: number, extra: Partial<Result> = {}): 
 });
 
 describe("DynamoDB の履歴", () => {
+  it("利用者のデータをすべて消す_自分の区画の項目だけが種類によらずページをたどって消え_ほかの利用者は残る", async () => {
+    const { items, client } = fakeTable({ queryPageSize: 2 });
+    const repository = createDynamoRepository({ tableName: "table-example", client });
+    for (const minute of [1, 2, 3]) await repository.putResult("user-a", result("EX-SMP-XX", minute));
+    await repository.setBookmark("user-a", "EX-SMP-XX", "Q-0001", true);
+    items.set("USER#user-a|PUSH#example", { PK: "USER#user-a", SK: "PUSH#example" });
+    await repository.putResult("user-b", result("EX-SMP-XX", 1));
+    await repository.deleteUserData("user-a");
+    expect([...items.values()].filter((item) => item.PK === "USER#user-a")).toEqual([]);
+    expect([...items.values()].filter((item) => item.PK === "USER#user-b")).toHaveLength(1);
+    // 消し済みでも、もう一度呼べる
+    await expect(repository.deleteUserData("user-a")).resolves.toBeUndefined();
+  });
+
   it("結果を保存する_PK は利用者の sub で SK は資格コードと完了時刻になる", async () => {
     const { items, client } = fakeTable();
     const repository = createDynamoRepository({ tableName: "table-example", client });
@@ -359,6 +373,32 @@ describe("DynamoDB の日ごとの学習量と目標日", () => {
 });
 
 describe("メモリ上の履歴", () => {
+  it("利用者のデータをすべて消す_自分の分だけが消え_ほかの利用者は残る", async () => {
+    const repository = createMemoryRepository();
+    for (const sub of ["user-a", "user-b"]) {
+      await repository.putResult(sub, result("EX-SMP-XX", 1), { answered: 2, correct: 1 });
+      await repository.setBookmark(sub, "EX-SMP-XX", "Q-0001", true);
+      await repository.updateReview(sub, "EX-SMP-XX", { wrong: ["Q-0002"], correct: [], at: "t" });
+      await repository.updateStats(sub, "EX-SMP-XX", [{ questionId: "Q-0001", correct: true }], "t");
+      await repository.setGoal(sub, "EX-SMP-XX", "2026-12-20");
+      await repository.setPrefs(sub, { theme: "dark", style: "simple", shuffleChoices: true });
+      await repository.completeNotebookEntry(sub, "EX-SMP-XX", "unit-1", "term-1", "2026-10-11T00:00:00.000Z");
+    }
+    await repository.deleteUserData("user-a");
+    const remaining = async (sub: string) => [
+      (await repository.listResults(sub, "EX-SMP-XX")).results.length,
+      (await repository.listBookmarks(sub, "EX-SMP-XX")).length,
+      (await repository.listReviewItems(sub)).length,
+      (await repository.listStats(sub, "EX-SMP-XX")).length,
+      (await repository.listDays(sub, "EX-SMP-XX")).length,
+      await repository.getGoal(sub, "EX-SMP-XX"),
+      await repository.getPrefs(sub),
+      (await repository.listNotebook(sub, "EX-SMP-XX")).entries.length,
+    ];
+    expect(await remaining("user-a")).toEqual([0, 0, 0, 0, 0, null, null, 0]);
+    expect((await remaining("user-b")).every((value) => value !== 0 && value !== null)).toBe(true);
+  });
+
   it("利用者ごとに分かれ_結果は残し_一覧はページで返す", async () => {
     const repository = createMemoryRepository();
     for (let minute = 0; minute <= RESULTS_PAGE_SIZE; minute++)

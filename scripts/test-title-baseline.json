@@ -164,9 +164,6 @@
   "packages/infra/lib/config.test.ts": [
     "ホストゾーンは省略できる"
   ],
-  "packages/infra/lib/stacks.test.ts": [
-    "セルフサインアップが禁止されている"
-  ],
   "packages/pipeline/src/collect/cache.test.ts": [
     "ハッシュをキーに書いて読める"
   ],

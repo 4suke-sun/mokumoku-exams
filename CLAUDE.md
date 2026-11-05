@@ -33,7 +33,7 @@
 - `packages/pipeline` は、app など他のワークスペースの内部を import しない。共有するのは `data-schema` だけ
   (`npm run check:boundary` が CI で守る)。進め方は [docs/pipeline-workflow.md](docs/pipeline-workflow.md)、
   出典の扱いは [docs/source-policy.md](docs/source-policy.md)。
-- 認証は Cognito UserPool のみ。セルフサインアップ禁止、管理者の招待制、管理者グループ。
+- 認証は Cognito UserPool のみ。セルフサインアップ(メールアドレスとパスワードで登録し、確認コードで確かめる)、利用者自身による退会、管理者グループ。
 - データは DynamoDB 単一テーブル(`PK=USER#{sub}` / `SK` で種別分岐)。サーバー側で ID トークンを検証し、
   `sub` で自分の分だけ操作する。
 - ホスティングは Lambda Web Adapter + CloudFront + S3。Function URL は `authType: NONE` + シークレットヘッダー方式。

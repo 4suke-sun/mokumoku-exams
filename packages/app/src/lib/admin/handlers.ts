@@ -16,7 +16,6 @@ export type AdminError =
   | "self-disable"
   | "forbidden"
   | "not-found"
-  | "already-exists"
   | "too-large"
   | "limit-exceeded"
   | "unavailable";
@@ -26,13 +25,12 @@ const STATUS: Record<AdminError, number> = {
   "self-disable": 400,
   forbidden: 403,
   "not-found": 404,
-  "already-exists": 409,
   "too-large": 413,
   "limit-exceeded": 429,
   unavailable: 503,
 };
 
-/** 本文の上限(メールアドレスかユーザー名だけを受け取る) */
+/** 本文の上限(ユーザー名だけを受け取る) */
 export const MAX_ADMIN_BODY_BYTES = 1024;
 
 /** 操作の失敗を応答にする。503 にするもの(種類のわからない失敗を含む)は、経路・状態・例外の名前だけを記録する */
@@ -42,9 +40,6 @@ function failure(request: Request, error: unknown, cookies: string[]): Response 
   return unavailable(request, error, cookies);
 }
 
-export const InviteSchema = z.strictObject({
-  email: z.string().trim().max(254).pipe(z.email()),
-});
 export const DisableSchema = z.strictObject({ username: z.string().regex(SUB_PATTERN) });
 
 /** 一覧の 1 行。`self` は、操作している管理者自身か(画面で無効化の操作を出さないため) */
@@ -63,23 +58,6 @@ export async function handleListUsers(request: Request, deps: AdminDeps): Promis
       .sort(newestFirst)
       .map((user) => ({ ...user, self: user.username === auth.user.sub }));
     return json({ users: rows }, 200, auth.setCookies);
-  } catch (error) {
-    return failure(request, error, auth.setCookies);
-  }
-}
-
-/** メールアドレスで招待する。Cognito が招待メール(仮パスワードつき)を送る。 */
-export async function handleInviteUser(request: Request, deps: AdminDeps): Promise<Response> {
-  const accepted = await acceptBody(request, deps, {
-    access: "admin-only",
-    maxBytes: MAX_ADMIN_BODY_BYTES,
-    body: InviteSchema,
-  });
-  if (accepted instanceof Response) return accepted;
-  const { auth, body: input } = accepted;
-  try {
-    const user = await deps.users.inviteUser(input.email);
-    return json({ user }, 200, auth.setCookies);
   } catch (error) {
     return failure(request, error, auth.setCookies);
   }

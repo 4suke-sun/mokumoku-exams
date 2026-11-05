@@ -84,8 +84,10 @@ export function fakeTable(options: { scanPageSize?: number; queryPageSize?: numb
       }
       if (command instanceof QueryCommand) {
         const values = command.input.ExpressionAttributeValues as Record<string, string>;
+        // 条件は、PK だけの形と、PK と SK の接頭辞の形だけを扱う
+        const prefix = values[":prefix"] ?? "";
         let found = [...items.values()]
-          .filter((i) => i.PK === values[":pk"] && String(i.SK).startsWith(values[":prefix"] as string))
+          .filter((i) => i.PK === values[":pk"] && String(i.SK).startsWith(prefix))
           .sort((a, b) => compareUtf8(String(a.SK), String(b.SK)));
         if (command.input.ScanIndexForward === false) found = found.reverse();
         // 続きの問い合わせ(ExclusiveStartKey の項目のあとから)と、1 回で返す数

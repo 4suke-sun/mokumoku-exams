@@ -93,6 +93,11 @@ export interface HistoryRepository {
    * 中分類の旧い記録があっても、節の記録は普通に書く。中分類の履修済みの記録は、新しく書かない。
    */
   completeNotebookEntry(sub: string, examCode: string, unit: string, entry: string, at: string): Promise<void>;
+  /**
+   * 利用者の区画(`PK=USER#{sub}`)の項目を、種類によらずすべて消す(退会。通知の購読も同じ区画にある)。
+   * 消し済みの項目をもう一度消しても、結果は変わらない(途中で失敗しても、もう一度呼べば続きから消せる)。
+   */
+  deleteUserData(sub: string): Promise<void>;
 }
 
 /** 体系ノートの中分類の履修済みの旧い記録(中分類の ID と、最初に履修した時刻)。読むだけで、新しくは書かない。 */
@@ -518,6 +523,26 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
         if ((error as { name?: unknown } | null)?.name !== "ConditionalCheckFailedException") throw error;
       }
     },
+
+    async deleteUserData(sub) {
+      // 消しながら読むと、続きの位置がずれうる。先に区画のキーをすべて集めてから消す
+      const keys: string[] = [];
+      let start: Record<string, unknown> | undefined;
+      do {
+        const { Items = [], LastEvaluatedKey } = (await client.send(
+          new QueryCommand({
+            TableName: tableName,
+            KeyConditionExpression: "PK = :pk",
+            ExpressionAttributeValues: { ":pk": userKey(sub) },
+            ProjectionExpression: "SK",
+            ...(start ? { ExclusiveStartKey: start } : {}),
+          }),
+        )) as QueryOutput;
+        keys.push(...Items.map((item) => String(item.SK)));
+        start = LastEvaluatedKey;
+      } while (start);
+      for (const sk of keys) await remove(sub, sk);
+    },
   };
 }
 
@@ -672,6 +697,14 @@ export function createMemoryRepository(): HistoryRepository {
       const entries = mapOf(notebook, sub, examCode);
       const key = `${unit}#${entry}`;
       if (!entries.has(key)) entries.set(key, at);
+    },
+    async deleteUserData(sub) {
+      store.delete(userKey(sub));
+      prefs.delete(sub);
+      const own = `${userKey(sub)}|`;
+      for (const scoped of [bookmarks, review, stats, days, goals, sections, notebook] as Map<string, unknown>[]) {
+        for (const key of [...scoped.keys()]) if (key.startsWith(own)) scoped.delete(key);
+      }
     },
   };
 }
