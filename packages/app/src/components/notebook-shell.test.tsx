@@ -144,7 +144,8 @@ describe("NotebookShell", () => {
     await renderShell(false);
     const target = screen.getByRole("navigation", { name: "体系ノートの目次" });
     expect(target.textContent).not.toContain("✓");
-    expect(within(target).getByRole("button", { name: /1-1 テーブルの種類/ }).textContent).toContain("2 件");
+    const row = within(target).getByRole("button", { name: /1-1 テーブルの種類/ });
+    expect(within(row).getByText("2 件")).toBeTruthy();
   });
 
   it("狭い画面の目次_開くと閉じるボタンに移り_節を選ぶと閉じる", async () => {

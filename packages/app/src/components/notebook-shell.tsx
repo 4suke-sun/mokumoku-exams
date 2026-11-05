@@ -77,9 +77,7 @@ function TocBody({
                         <span>
                           {unit.number} {unit.title}
                         </span>
-                        <span className="shrink-0 text-xs">
-                          0<span className="sr-only"> 件</span>
-                        </span>
+                        <span className="shrink-0 text-xs">0 件</span>
                       </p>
                     </li>
                   );
@@ -108,8 +106,8 @@ function TocBody({
                         ) : null}
                       </span>
                       <span className="shrink-0 text-xs">
-                        {progress ? `${progress.done} / ${progress.total}` : unit.count}
-                        <span className="sr-only">{progress ? " 節完了" : " 件"}</span>
+                        {progress ? `${progress.done} / ${progress.total}` : `${unit.count} 件`}
+                        {progress ? <span className="sr-only"> 節完了</span> : null}
                       </span>
                     </button>
                     {open ? (
