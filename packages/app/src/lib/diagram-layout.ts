@@ -28,6 +28,15 @@ import type {
 
 export type { CompareDiagram, Diagram, FlowDiagram, HierarchyDiagram, TableChangeDiagram, TimelineDiagram };
 
+/** 利用者の操作で動く図の種類。SVG に配置せず、HTML で描く(components/diagram.tsx) */
+export const INTERACTIVE_TYPES = ["stepper", "toggle", "decision"] as const;
+
+/** 配置して SVG で描く(静止した)図 */
+export type StaticDiagram = Exclude<Diagram, { type: (typeof INTERACTIVE_TYPES)[number] }>;
+
+export const isStaticDiagram = (diagram: Diagram): diagram is StaticDiagram =>
+  !(INTERACTIVE_TYPES as readonly string[]).includes(diagram.type);
+
 export type Box = { x: number; y: number; width: number; height: number };
 export type Point = { x: number; y: number };
 
@@ -757,7 +766,7 @@ export function layoutTableChange(
 }
 
 /** 図の種類に応じて配置する。`stacked` は、比較・時系列・表の変化の図を上下に積む(ほかの種類には効かない) */
-export function layoutAny(diagram: Diagram, { stacked = false }: { stacked?: boolean } = {}): AnyLayout {
+export function layoutAny(diagram: StaticDiagram, { stacked = false }: { stacked?: boolean } = {}): AnyLayout {
   switch (diagram.type) {
     case "flow":
       return layoutDiagram(diagram);
@@ -773,7 +782,7 @@ export function layoutAny(diagram: Diagram, { stacked = false }: { stacked?: boo
 }
 
 /** 上下に積む形を持つ図の種類(狭い画面で、左右や前後に並べると文字が小さくなりすぎるもの) */
-export const STACKABLE_TYPES: readonly Diagram["type"][] = ["compare", "timeline", "table-change"];
+export const STACKABLE_TYPES: readonly StaticDiagram["type"][] = ["compare", "timeline", "table-change"];
 
 /**
  * 図の配置の問題を、文章で返す(問題がなければ空)。CI の検査(実データのすべての図)と、画面の確認に使う。

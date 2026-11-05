@@ -1,4 +1,13 @@
-import type { HierarchyNode, TableChangeDiagram } from "@mokumoku-exams/data-schema/curriculum-data/schema";
+"use client";
+
+import type {
+  DecisionDiagram,
+  HierarchyNode,
+  StepperDiagram,
+  TableChangeDiagram,
+  ToggleDiagram,
+} from "@mokumoku-exams/data-schema/curriculum-data/schema";
+import { type ReactNode, useEffect, useRef, useState } from "react";
 import {
   type AnyLayout,
   type BoxLayout,
@@ -9,6 +18,7 @@ import {
   layoutAny,
   type PlacedText,
   STACKABLE_TYPES,
+  type StaticDiagram,
 } from "@/lib/diagram-layout.ts";
 
 type Props = {
@@ -58,8 +68,32 @@ function describeTable(name: string, table: TableChangeDiagram["before"]): strin
  * - 階層: 親ごとに「「親」の中に「子」、「子」。」。状態のある箱は、後ろに「【起点】」「【範囲内】」を添える
  * - 時系列: 「時間の順に「A」、「B」。」のあと、期間ごとに「「A」から「B」まで: 期間の名前。」
  * - 表の変化: 「操作「名前」の前と後。」のあと、前と後の表ごとに、列と行。状態のある行と列は「【消した】」などを添える
+ * - 手順: 「手順の図。順に「A(説明)」、「B」。」
+ * - 切り替え: 「2 つの状態「X」と「Y」を切り替える。」のあと、状態ごとに、項目と「【残る】」「【消える】」
+ * - 判断: 質問ごとに「質問「Q」: 「選択肢」なら「行き先」へ。」、結論ごとに「結論「R(説明)」。」
  */
 export function describeDiagram(diagram: Diagram): string {
+  if (diagram.type === "stepper") {
+    return `手順の図。順に${diagram.steps.map((s) => `「${withNote(s.label, s.note)}」`).join("、")}。`;
+  }
+  if (diagram.type === "toggle") {
+    const [a, b] = diagram.states;
+    const side = (state: typeof a) =>
+      `「${state.label}」では: ${diagram.items
+        .map((item) => `${withNote(item.label, item.note)}${mark(item.result[state.id])}`)
+        .join("、")}。`;
+    return `2 つの状態「${a.label}」と「${b.label}」を切り替える。${side(a)}${side(b)}`;
+  }
+  if (diagram.type === "decision") {
+    const names = new Map(diagram.nodes.map((n) => [n.id, "question" in n ? n.question : n.result]));
+    return `判断の図。最初の質問から選んで進む。${diagram.nodes
+      .map((n) =>
+        "question" in n
+          ? `質問「${n.question}」: ${n.choices.map((c) => `「${c.label}」なら「${names.get(c.to) ?? ""}」へ`).join("、")}。`
+          : `結論「${withNote(n.result, n.note)}」。`,
+      )
+      .join("")}`;
+  }
   if (diagram.type === "compare") {
     const side = (name: string, s: typeof diagram.left) =>
       `${name}「${s.heading}」: ${s.items.map((i) => `${withNote(i.label, i.note)}${mark(i.state)}`).join("、")}。`;
@@ -262,7 +296,12 @@ function Shapes({ layout }: { layout: AnyLayout }) {
 }
 
 /** 図の本体(SVG)。読み上げの名前は図の題、説明は describeDiagram */
-function DiagramSvg({ diagram, id, stacked, className }: Props & { stacked: boolean; className: string }) {
+function DiagramSvg({
+  diagram,
+  id,
+  stacked,
+  className,
+}: Props & { diagram: StaticDiagram; stacked: boolean; className: string }) {
   const layout = layoutAny(diagram, { stacked });
   const titleId = `${id}-title`;
   const descId = `${id}-desc`;
@@ -287,13 +326,324 @@ function DiagramSvg({ diagram, id, stacked, className }: Props & { stacked: bool
   );
 }
 
+/** 操作で動く図の共通の枠。名前は図の題、説明は describeDiagram(読み上げ)。内容は、操作のたびに変わる */
+function InteractiveFrame({ diagram, id, children }: { diagram: Diagram; id: string; children: ReactNode }) {
+  return (
+    <figure
+      aria-labelledby={`${id}-title`}
+      aria-describedby={`${id}-desc`}
+      data-diagram-type={diagram.type}
+      className="mx-auto w-full max-w-xl space-y-3"
+    >
+      <figcaption id={`${id}-title`} className="text-sm text-muted">
+        {diagram.title}
+      </figcaption>
+      <span id={`${id}-desc`} className="sr-only">
+        {describeDiagram(diagram)}
+      </span>
+      {children}
+    </figure>
+  );
+}
+
+const BUTTON =
+  "rounded-md border border-line bg-surface px-3 py-1.5 text-sm font-medium text-fg hover:border-primary disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-line";
+
+/** 状態の読み上げ。画面には出さず、変わったときに伝える(`aria-live`) */
+function LiveText({ children }: { children: string }) {
+  return (
+    <p className="sr-only" aria-live="polite" aria-atomic="true">
+      {children}
+    </p>
+  );
+}
+
+/** 手順の図: 「次へ」「前へ」「最初から」で 1 段ずつ点灯する。点灯した段に説明が出て、前の段は薄くなる。 */
+function StepperView({ diagram, id }: { diagram: StepperDiagram; id: string }) {
+  const [current, setCurrent] = useState(0);
+  const last = diagram.steps.length - 1;
+  const step = diagram.steps[current];
+  return (
+    <InteractiveFrame diagram={diagram} id={id}>
+      <ol className="space-y-2">
+        {diagram.steps.map((s, i) => {
+          const phase = i < current ? "done" : i === current ? "now" : "next";
+          return (
+            <li
+              key={s.id}
+              data-phase={phase}
+              aria-current={phase === "now" ? "step" : undefined}
+              className={[
+                "motion-lit min-w-0 rounded-md border px-3 py-2",
+                phase === "now"
+                  ? "border-2 border-primary bg-soft"
+                  : phase === "done"
+                    ? "border-line bg-surface opacity-60"
+                    : "border-dashed border-line bg-bg",
+              ].join(" ")}
+            >
+              <div className="flex min-w-0 items-baseline gap-2">
+                <span aria-hidden="true" className={phase === "now" ? "text-primary" : "text-muted"}>
+                  {phase === "done" ? "✓" : phase === "now" ? "●" : "○"}
+                </span>
+                <span
+                  className={["min-w-0 break-words font-bold", phase === "now" ? "text-primary" : "text-fg"].join(" ")}
+                >
+                  {i + 1}. {s.label}
+                </span>
+                <span className="ml-auto shrink-0 text-xs text-muted">
+                  {phase === "done" ? "済み" : phase === "now" ? "いま" : "これから"}
+                </span>
+              </div>
+              {phase === "now" && s.note ? <p className="mt-1 break-words text-sm text-fg">{s.note}</p> : null}
+            </li>
+          );
+        })}
+      </ol>
+      <div className="flex flex-wrap items-center gap-2">
+        <button type="button" className={BUTTON} disabled={current === 0} onClick={() => setCurrent(current - 1)}>
+          前へ
+        </button>
+        <button type="button" className={BUTTON} disabled={current === last} onClick={() => setCurrent(current + 1)}>
+          次へ
+        </button>
+        <button type="button" className={BUTTON} disabled={current === 0} onClick={() => setCurrent(0)}>
+          最初から
+        </button>
+        <span className="text-sm text-muted">
+          {current + 1} / {diagram.steps.length}
+        </span>
+      </div>
+      <LiveText>{`手順 ${current + 1} / ${diagram.steps.length}: ${step?.label ?? ""}。${step?.note ?? ""}`}</LiveText>
+    </InteractiveFrame>
+  );
+}
+
 /**
- * 流れ・比較・階層・時系列・表の変化の図。色はテーマの役割の色だけを使い、ライトとダークの両方で読めるようにする。
+ * 消える項目の斜線。親の箱(`relative`)の大きさを測って、実寸の座標で引く(`compare` の斜線と同じ引き方)。
+ * 測れない環境(`ResizeObserver` がない)では、既定の大きさで描く。
+ */
+function StrikeOverlay() {
+  const ref = useRef<SVGSVGElement>(null);
+  const [size, setSize] = useState({ width: 100, height: 40 });
+  useEffect(() => {
+    const box = ref.current?.parentElement;
+    if (!box || typeof ResizeObserver === "undefined") return;
+    const measure = () => {
+      const { width, height } = box.getBoundingClientRect();
+      if (width > 0 && height > 0) setSize({ width, height });
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(box);
+    return () => observer.disconnect();
+  }, []);
+  return (
+    <svg
+      ref={ref}
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 h-full w-full"
+      width={size.width}
+      height={size.height}
+      viewBox={`0 0 ${size.width} ${size.height}`}
+    >
+      <line
+        x1={STRIKE_INSET}
+        y1={STRIKE_INSET}
+        x2={size.width - STRIKE_INSET}
+        y2={size.height - STRIKE_INSET}
+        strokeWidth="2"
+        strokeLinecap="round"
+        pathLength={1}
+        className="motion-strike stroke-incorrect"
+      />
+    </svg>
+  );
+}
+
+/** 切り替えの図: スイッチで 2 つの状態を切り替える。消える項目に斜線(.motion-strike)を引き、残る項目を強調する。 */
+function ToggleView({ diagram, id }: { diagram: ToggleDiagram; id: string }) {
+  const [second, setSecond] = useState(false);
+  const state = diagram.states[second ? 1 : 0];
+  const kept = diagram.items.filter((item) => item.result[state.id] === "kept");
+  const removed = diagram.items.filter((item) => item.result[state.id] === "removed");
+  return (
+    <InteractiveFrame diagram={diagram} id={id}>
+      <div className="flex flex-wrap items-center gap-2 text-sm">
+        <span className={second ? "text-muted" : "font-bold text-primary"}>
+          {second ? "○" : "●"} {diagram.states[0].label}
+        </span>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={second}
+          aria-label={`${diagram.states[0].label}と${diagram.states[1].label}を切り替える`}
+          onClick={() => setSecond(!second)}
+          className="relative h-7 w-12 shrink-0 rounded-full border border-line bg-surface hover:border-primary"
+        >
+          <span
+            aria-hidden="true"
+            className={[
+              "motion-lit absolute top-0.5 h-5 w-5 rounded-full bg-primary",
+              second ? "left-[calc(100%-1.375rem)]" : "left-0.5",
+            ].join(" ")}
+          />
+        </button>
+        <span className={second ? "font-bold text-primary" : "text-muted"}>
+          {second ? "●" : "○"} {diagram.states[1].label}
+        </span>
+      </div>
+      <ul className="space-y-2">
+        {diagram.items.map((item) => {
+          const isKept = item.result[state.id] === "kept";
+          return (
+            <li
+              key={item.id}
+              data-state={isKept ? "kept" : "removed"}
+              className={[
+                "motion-lit relative min-w-0 overflow-hidden rounded-md border px-3 py-2",
+                isKept ? "border-2 border-correct bg-correct-bg" : "border-line bg-surface",
+              ].join(" ")}
+            >
+              <div className="flex min-w-0 items-baseline gap-2">
+                <span aria-hidden="true" className={isKept ? "text-correct" : "text-muted"}>
+                  {isKept ? "✓" : "×"}
+                </span>
+                <span className={["min-w-0 break-words font-bold", isKept ? "text-fg" : "text-muted"].join(" ")}>
+                  {item.label}
+                </span>
+                <span className={["ml-auto shrink-0 text-xs", isKept ? "text-correct" : "text-muted"].join(" ")}>
+                  {isKept ? "残る" : "消える"}
+                </span>
+              </div>
+              {item.note ? <p className="mt-1 break-words text-sm text-muted">{item.note}</p> : null}
+              {isKept ? null : <StrikeOverlay />}
+            </li>
+          );
+        })}
+      </ul>
+      <LiveText>{`状態「${state.label}」。残る: ${kept.map((i) => i.label).join("、") || "なし"}。消える: ${removed.map((i) => i.label).join("、") || "なし"}。`}</LiveText>
+    </InteractiveFrame>
+  );
+}
+
+/** 判断の図: 質問に答えて進む。選んだ分岐の道筋が点灯し、行き着いた結論が出る。「最初から」で戻る。 */
+function DecisionView({ diagram, id }: { diagram: DecisionDiagram; id: string }) {
+  // 選んだ選択肢の番号を、先頭の節から順にたどる
+  const [picks, setPicks] = useState<number[]>([]);
+  const byId = new Map(diagram.nodes.map((n) => [n.id, n]));
+  const trail: { node: DecisionDiagram["nodes"][number]; pick?: number }[] = [];
+  let node: DecisionDiagram["nodes"][number] | undefined = diagram.nodes[0];
+  for (const pick of picks) {
+    if (!node || !("choices" in node)) break;
+    trail.push({ node, pick });
+    node = byId.get(node.choices[pick]?.to ?? "");
+  }
+  const currentRef = useRef<HTMLDivElement>(null);
+  const moved = useRef(false);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: 進んだとき(選択の数が変わったとき)だけ、新しい節へ目印を移す
+  useEffect(() => {
+    // 選んだボタンが消えるので、フォーカスを新しい節に移す(最初の表示では動かさない)
+    if (moved.current) currentRef.current?.focus();
+    moved.current = true;
+  }, [picks.length]);
+  if (!node) return null;
+  const finished = "result" in node;
+  const live =
+    "result" in node
+      ? `結論: ${node.result}。${node.note ?? ""}`
+      : `質問: ${node.question}。選択肢は ${node.choices.map((c) => c.label).join("、")}。`;
+  return (
+    <InteractiveFrame diagram={diagram} id={id}>
+      <ol className="space-y-2">
+        {trail.map(({ node: past, pick }) =>
+          "choices" in past ? (
+            <li
+              key={past.id}
+              data-phase="done"
+              className="motion-lit min-w-0 rounded-md border border-primary bg-soft px-3 py-2"
+            >
+              <p className="break-words font-bold text-primary">
+                <span aria-hidden="true">✓ </span>
+                {past.question}
+              </p>
+              <ul className="mt-1 flex flex-wrap gap-1.5">
+                {past.choices.map((c, i) => (
+                  <li
+                    key={c.label}
+                    data-picked={i === pick ? "true" : undefined}
+                    className={[
+                      "min-w-0 break-words rounded-md border px-2 py-0.5 text-sm",
+                      i === pick
+                        ? "border-2 border-primary font-bold text-primary"
+                        : "border-line text-muted opacity-60",
+                    ].join(" ")}
+                  >
+                    {i === pick ? "▶ 選んだ: " : ""}
+                    {c.label}
+                  </li>
+                ))}
+              </ul>
+            </li>
+          ) : null,
+        )}
+        <li>
+          <div
+            ref={currentRef}
+            tabIndex={-1}
+            data-phase="now"
+            className={[
+              "motion-lit min-w-0 rounded-md border-2 px-3 py-2",
+              finished ? "border-correct bg-correct-bg" : "border-primary bg-surface",
+            ].join(" ")}
+          >
+            {"question" in node ? (
+              <>
+                <p className="break-words font-bold text-fg">
+                  <span aria-hidden="true">? </span>
+                  {node.question}
+                </p>
+                <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:flex-wrap">
+                  {node.choices.map((choice, i) => (
+                    <button key={choice.label} type="button" className={BUTTON} onClick={() => setPicks([...picks, i])}>
+                      {choice.label}
+                    </button>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="break-words font-bold text-correct">
+                  <span aria-hidden="true">◎ </span>結論: {node.result}
+                </p>
+                {node.note ? <p className="mt-1 break-words text-sm text-fg">{node.note}</p> : null}
+              </>
+            )}
+          </div>
+        </li>
+      </ol>
+      <div>
+        <button type="button" className={BUTTON} disabled={picks.length === 0} onClick={() => setPicks([])}>
+          最初から
+        </button>
+      </div>
+      <LiveText>{live}</LiveText>
+    </InteractiveFrame>
+  );
+}
+
+/**
+ * 流れ・比較・階層・時系列・表の変化の図(SVG)と、手順・切り替え・判断の図(HTML。利用者の操作で動く)。
+ * 色はテーマの役割の色だけを使い、ライトとダークの両方で読めるようにする。
  * 体系ノートなど、特定の画面に依存しない(どの画面からも使える)。
  * `stackOnNarrow` の比較・時系列・表の変化の図は、左右に並べた図と、上下に積んだ図を描き、画面の幅で片方だけを出す(CSS の `sm`)。
- * 出さないほうは `display: none` なので、読み上げでも 1 つだけになる。
+ * 出さないほうは `display: none` なので、読み上げでも 1 つだけになる。操作で動く図は、もともと上下に積む。
+ * 動きは、「動きを減らす」設定とシンプルな画面スタイルでは止まり、状態だけが切り替わる(globals.css の `.motion-*`)。
  */
 export function DiagramView({ diagram, id, stackOnNarrow = false }: Props) {
+  if (diagram.type === "stepper") return <StepperView diagram={diagram} id={id} />;
+  if (diagram.type === "toggle") return <ToggleView diagram={diagram} id={id} />;
+  if (diagram.type === "decision") return <DecisionView diagram={diagram} id={id} />;
   const stack = stackOnNarrow && STACKABLE_TYPES.includes(diagram.type);
   return (
     <figure className="space-y-2">

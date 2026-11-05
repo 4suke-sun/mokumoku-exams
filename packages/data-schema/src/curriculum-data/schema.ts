@@ -37,8 +37,20 @@ export const DiagramEdgeSchema = z.strictObject({
   label: text.max(12).optional(),
 });
 
-/** 図の種類。流れ(箱と矢印)、左右の比較、入れ子の階層、時系列、表の変化(操作の前後) */
-export const DIAGRAM_TYPES = ["flow", "compare", "hierarchy", "timeline", "table-change"] as const;
+/**
+ * 図の種類。流れ(箱と矢印)、左右の比較、入れ子の階層、時系列、表の変化(操作の前後)に、
+ * 利用者の操作で動く 3 種類(手順を進める `stepper`、状態を切り替える `toggle`、条件を選んで進む `decision`)。
+ */
+export const DIAGRAM_TYPES = [
+  "flow",
+  "compare",
+  "hierarchy",
+  "timeline",
+  "table-change",
+  "stepper",
+  "toggle",
+  "decision",
+] as const;
 
 /**
  * 流れの図: 箱と矢印の図。箱は、矢印の向きに沿って上から下へ段に並べて描く(packages/app/src/lib/diagram-layout.ts)。
@@ -289,8 +301,181 @@ const TableChangeDiagramSchema = z
     }
   });
 
+/** 手順の図の段の数の上限と、段の説明の文字数の上限 */
+export const STEPPER_MAX_STEPS = 8;
+const STEP_NOTE = text.max(80);
+
+/** 手順の図の 1 段。点灯したとき、`note`(その段の説明)がその場に出る */
+const StepperStepSchema = z.strictObject({
+  id: z.string().regex(ID, ID_MESSAGE),
+  label: BOX_LABEL,
+  note: STEP_NOTE.optional(),
+});
+
+/** 手順の図: 手順を上から順に並べ、利用者が 1 段ずつ点灯して進める(次へ・前へ・最初から)。 */
+const StepperDiagramSchema = z
+  .strictObject({
+    type: z.literal("stepper"),
+    title: text.max(80),
+    steps: z.array(StepperStepSchema).min(2).max(STEPPER_MAX_STEPS),
+  })
+  .superRefine((diagram, ctx) => {
+    const ids = new Set<string>();
+    diagram.steps.forEach((step, i) => {
+      if (ids.has(step.id)) {
+        ctx.addIssue({ code: "custom", path: ["steps", i, "id"], message: "手順の ID が重複しています" });
+      }
+      ids.add(step.id);
+    });
+  });
+
+/** 切り替えの図の状態(スイッチの 2 つの側)。ID は、項目の `result` で参照する */
+const ToggleStateSchema = z.strictObject({
+  id: z.string().regex(ID, ID_MESSAGE),
+  label: BOX_LABEL,
+});
+
+/** 切り替えの図の項目の数の上限 */
+export const TOGGLE_MAX_ITEMS = 8;
+
 /**
- * 図解: `type` で 5 種類(`flow`・`compare`・`hierarchy`・`timeline`・`table-change`)を分ける判別ユニオン。
+ * 切り替えの図の項目。`result` は、状態の ID ごとに、その状態でこの項目が消えるか(`removed`)、残るか(`kept`)。
+ * 状態の ID は、図の 2 つの状態をすべて、過不足なく書く。
+ */
+const ToggleItemSchema = z.strictObject({
+  id: z.string().regex(ID, ID_MESSAGE),
+  label: BOX_LABEL,
+  note: BOX_NOTE.optional(),
+  result: z.record(z.string().regex(ID, ID_MESSAGE), z.enum(COMPARE_ITEM_STATES)),
+});
+
+/** 切り替えの図: スイッチで 2 つの状態を切り替え、状態ごとに消える項目に斜線を引き、残る項目を強調する。 */
+const ToggleDiagramSchema = z
+  .strictObject({
+    type: z.literal("toggle"),
+    title: text.max(80),
+    states: z.tuple([ToggleStateSchema, ToggleStateSchema]),
+    items: z.array(ToggleItemSchema).min(1).max(TOGGLE_MAX_ITEMS),
+  })
+  .superRefine((diagram, ctx) => {
+    const [first, second] = diagram.states;
+    if (first.id === second.id) {
+      ctx.addIssue({ code: "custom", path: ["states", 1, "id"], message: "状態の ID が重複しています" });
+    }
+    const stateIds = new Set(diagram.states.map((state) => state.id));
+    const ids = new Set<string>();
+    diagram.items.forEach((item, i) => {
+      if (ids.has(item.id)) {
+        ctx.addIssue({ code: "custom", path: ["items", i, "id"], message: "項目の ID が重複しています" });
+      }
+      ids.add(item.id);
+      for (const key of Object.keys(item.result)) {
+        if (!stateIds.has(key)) {
+          ctx.addIssue({ code: "custom", path: ["items", i, "result"], message: "図にない状態を指しています" });
+          break;
+        }
+      }
+      for (const id of stateIds) {
+        if (!(id in item.result)) {
+          ctx.addIssue({ code: "custom", path: ["items", i, "result"], message: "状態ごとの結果がそろっていません" });
+          break;
+        }
+      }
+    });
+  });
+
+/** 判断の図の選択肢。選ぶと、`to` の節(質問か結論)へ進む */
+const DecisionChoiceSchema = z.strictObject({
+  label: BOX_LABEL,
+  to: z.string().regex(ID, ID_MESSAGE),
+});
+
+/** 判断の図の質問の節 */
+const DecisionQuestionSchema = z.strictObject({
+  id: z.string().regex(ID, ID_MESSAGE),
+  question: text.max(60),
+  choices: z.array(DecisionChoiceSchema).min(2).max(4),
+});
+
+/** 判断の図の結論の節(行き止まり) */
+const DecisionResultSchema = z.strictObject({
+  id: z.string().regex(ID, ID_MESSAGE),
+  result: text.max(60),
+  note: STEP_NOTE.optional(),
+});
+
+/** 判断の図の節の数の上限 */
+export const DECISION_MAX_NODES = 12;
+
+/** 判断の図の節(質問か結論)。質問は `question` と `choices`、結論は `result` を持つ */
+export type DecisionNode = z.infer<typeof DecisionQuestionSchema> | z.infer<typeof DecisionResultSchema>;
+
+/**
+ * 判断の図: 質問と選択肢の木。先頭の節が最初の質問で、選択肢を選んで結論まで進む。
+ * 矢印が一周して戻る形(閉路)と、先頭の節から行き着けない節は置けない。結論は 1 つ以上要る。
+ */
+const DecisionDiagramSchema = z
+  .strictObject({
+    type: z.literal("decision"),
+    title: text.max(80),
+    nodes: z
+      .array(z.union([DecisionQuestionSchema, DecisionResultSchema]))
+      .min(2)
+      .max(DECISION_MAX_NODES),
+  })
+  .superRefine((diagram, ctx) => {
+    // 参照の誤りがあるときは、閉路と到達の検査を省く(誤りの報告を重ねない)
+    let valid = true;
+    const ids = new Set<string>();
+    diagram.nodes.forEach((node, i) => {
+      if (ids.has(node.id)) {
+        valid = false;
+        ctx.addIssue({ code: "custom", path: ["nodes", i, "id"], message: "判断の節の ID が重複しています" });
+      }
+      ids.add(node.id);
+    });
+    const edges: { from: string; to: string }[] = [];
+    diagram.nodes.forEach((node, i) => {
+      if (!("choices" in node)) return;
+      node.choices.forEach((choice, j) => {
+        if (!ids.has(choice.to)) {
+          valid = false;
+          ctx.addIssue({ code: "custom", path: ["nodes", i, "choices", j, "to"], message: "図にない節を指しています" });
+        } else if (choice.to === node.id) {
+          valid = false;
+          ctx.addIssue({ code: "custom", path: ["nodes", i, "choices", j], message: "自分自身へは進めません" });
+        }
+        edges.push({ from: node.id, to: choice.to });
+      });
+    });
+    if (!diagram.nodes.some((node) => "result" in node)) {
+      ctx.addIssue({ code: "custom", path: ["nodes"], message: "結論の節が 1 つもありません" });
+    }
+    if (!valid) return;
+    if (hasCycle(diagram.nodes, edges)) {
+      ctx.addIssue({ code: "custom", path: ["nodes"], message: "選択肢が一周して戻る形(閉路)になっています" });
+      return;
+    }
+    const reached = new Set<string>();
+    const queue = [diagram.nodes[0]?.id];
+    for (let id = queue.shift(); id !== undefined; id = queue.shift()) {
+      if (reached.has(id)) continue;
+      reached.add(id);
+      for (const edge of edges) if (edge.from === id) queue.push(edge.to);
+    }
+    diagram.nodes.forEach((node, i) => {
+      if (!reached.has(node.id)) {
+        ctx.addIssue({
+          code: "custom",
+          path: ["nodes", i],
+          message: "先頭の節から行き着けない節があります",
+        });
+      }
+    });
+  });
+
+/**
+ * 図解: `type` で 8 種類(`flow`・`compare`・`hierarchy`・`timeline`・`table-change`・`stepper`・`toggle`・`decision`)を分ける判別ユニオン。
  * `type` のない図は、流れの図として読む(`type` は省略できる)。
  */
 export const DiagramSchema = z.preprocess(
@@ -304,6 +489,9 @@ export const DiagramSchema = z.preprocess(
     HierarchyDiagramSchema,
     TimelineDiagramSchema,
     TableChangeDiagramSchema,
+    StepperDiagramSchema,
+    ToggleDiagramSchema,
+    DecisionDiagramSchema,
   ]),
 );
 
@@ -456,6 +644,9 @@ export type CompareDiagram = Extract<Diagram, { type: "compare" }>;
 export type HierarchyDiagram = Extract<Diagram, { type: "hierarchy" }>;
 export type TimelineDiagram = Extract<Diagram, { type: "timeline" }>;
 export type TableChangeDiagram = Extract<Diagram, { type: "table-change" }>;
+export type StepperDiagram = Extract<Diagram, { type: "stepper" }>;
+export type ToggleDiagram = Extract<Diagram, { type: "toggle" }>;
+export type DecisionDiagram = Extract<Diagram, { type: "decision" }>;
 export type CompareItemState = (typeof COMPARE_ITEM_STATES)[number];
 export type HierarchyNodeState = (typeof HIERARCHY_NODE_STATES)[number];
 export type TableChangeState = (typeof TABLE_CHANGE_STATES)[number];

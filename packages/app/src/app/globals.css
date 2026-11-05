@@ -941,6 +941,15 @@ body {
   animation: strike-draw 0.45s ease-out 0.3s backwards;
 }
 
+/* 操作で動く図(手順・切り替え・判断)の、点灯と強調の移り変わり */
+.motion-lit {
+  transition:
+    opacity 0.25s ease,
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    left 0.2s ease;
+}
+
 /* 体系ノートの目次が、左から出る(狭い画面) */
 @keyframes drawer-in {
   from {
@@ -986,6 +995,7 @@ body {
     animation: none;
   }
   .motion-bar,
+  .motion-lit,
   .nav-indicator,
   a.card {
     transition: none;
@@ -1032,7 +1042,7 @@ body {
 :root[data-style="simple"] .motion-shine::after {
   animation: none;
 }
-:root[data-style="simple"] :is(.motion-bar, .nav-indicator, a.card) {
+:root[data-style="simple"] :is(.motion-bar, .motion-lit, .nav-indicator, a.card) {
   transition: none;
 }
 :root[data-style="simple"] :is(a.card:hover, a.card:active) {

@@ -3,7 +3,7 @@ import { join } from "node:path";
 import { CurriculumFileSchema } from "@mokumoku-exams/data-schema/curriculum-data/schema";
 import { NotebookFileSchema } from "@mokumoku-exams/data-schema/notebook-data/schema";
 import { describe, expect, it } from "vitest";
-import { type Diagram, diagramProblems, layoutAny, STACKABLE_TYPES } from "./diagram-layout.ts";
+import { type Diagram, diagramProblems, isStaticDiagram, layoutAny, STACKABLE_TYPES } from "./diagram-layout.ts";
 
 // 実際のカリキュラム(data/curriculum.*.json)と体系ノート(data/notebook.*.json)のすべての図で、文字が箱に収まることを検査する。
 // 体系ノートの図(中分類の図と見出しの図)のうち、比較・時系列・表の変化の図は、狭い画面で上下に積むので、積んだ形でも検査する。
@@ -36,7 +36,8 @@ function notebookDiagrams(): (Located & { stacked: boolean })[] {
   const push = (place: string, diagram: Diagram) => {
     const where = `${place} / 図「${diagram.title}」(${diagram.type})`;
     found.push({ where, diagram, stacked: false });
-    if (STACKABLE_TYPES.includes(diagram.type)) found.push({ where: `${where}(上下に積む)`, diagram, stacked: true });
+    if (isStaticDiagram(diagram) && STACKABLE_TYPES.includes(diagram.type))
+      found.push({ where: `${where}(上下に積む)`, diagram, stacked: true });
   };
   for (const name of readdirSync(DATA_DIR).filter((n) => /^notebook\..+\.json$/.test(n))) {
     const file = NotebookFileSchema.parse(JSON.parse(readFileSync(join(DATA_DIR, name), "utf8")));
@@ -48,7 +49,9 @@ function notebookDiagrams(): (Located & { stacked: boolean })[] {
 
 /** 収まっていない図の報告(収まっていれば空) */
 function violations(diagrams: Located[]): string[] {
-  return diagrams.flatMap(({ where, diagram }) => diagramProblems(layoutAny(diagram)).map((p) => `${where}: ${p}`));
+  return diagrams.flatMap(({ where, diagram }) =>
+    isStaticDiagram(diagram) ? diagramProblems(layoutAny(diagram)).map((p) => `${where}: ${p}`) : [],
+  );
 }
 
 describe("実データの図の文字の収まり", () => {
@@ -65,7 +68,7 @@ describe("実データの図の文字の収まり", () => {
 
   it("体系ノートのすべての図_上下に積んだ形を含めて、文字が箱に収まる", () => {
     const problems = notebookDiagrams().flatMap(({ where, diagram, stacked }) =>
-      diagramProblems(layoutAny(diagram, { stacked })).map((p) => `${where}: ${p}`),
+      isStaticDiagram(diagram) ? diagramProblems(layoutAny(diagram, { stacked })).map((p) => `${where}: ${p}`) : [],
     );
     expect(problems).toEqual([]);
   });

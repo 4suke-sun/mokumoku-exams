@@ -4,6 +4,7 @@ import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { CurriculumFileSchema } from "@mokumoku-exams/data-schema/curriculum-data/schema";
 import { render, screen } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { describe, expect, it } from "vitest";
 import type { Diagram, FlowDiagram } from "@/lib/diagram-layout.ts";
 import { DiagramView, describeDiagram } from "./diagram.tsx";
@@ -306,5 +307,286 @@ describe("時系列・表の変化・階層の状態の図", () => {
     );
     expect(container.innerHTML).not.toMatch(/#[0-9a-f]{3,8}\b/i);
     expect(container.innerHTML).not.toMatch(/(fill|stroke)="(?!none)/);
+  });
+});
+
+describe("手順の図", () => {
+  const stepper: Diagram = {
+    type: "stepper",
+    title: "手順",
+    steps: [
+      { id: "a", label: "最初", note: "最初の説明" },
+      { id: "b", label: "次", note: "次の説明" },
+      { id: "c", label: "最後", note: "最後の説明" },
+    ],
+  };
+  const phases = (container: HTMLElement) =>
+    [...container.querySelectorAll("li[data-phase]")].map((li) => li.getAttribute("data-phase"));
+
+  it("最初の表示_先頭の段だけが点灯し_その段の説明だけが出る_前へと最初からは押せない", () => {
+    const { container } = render(<DiagramView diagram={stepper} id="st" />);
+    expect(phases(container)).toEqual(["now", "next", "next"]);
+    expect(screen.getByText("最初の説明")).toBeTruthy();
+    expect(screen.queryByText("次の説明")).toBeNull();
+    expect((screen.getByRole("button", { name: "前へ" }) as HTMLButtonElement).disabled).toBe(true);
+    expect((screen.getByRole("button", { name: "最初から" }) as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it("次へを押す_点灯が進み_前の段は済みになり_説明が入れ替わる", async () => {
+    const { container } = render(<DiagramView diagram={stepper} id="st" />);
+    await userEvent.click(screen.getByRole("button", { name: "次へ" }));
+    expect(phases(container)).toEqual(["done", "now", "next"]);
+    expect(screen.getByText("次の説明")).toBeTruthy();
+    expect(screen.queryByText("最初の説明")).toBeNull();
+    expect(container.querySelector('li[data-phase="done"]')?.getAttribute("class")).toContain("opacity-60");
+    expect(container.querySelector('li[data-phase="done"]')?.textContent).toContain("済み");
+  });
+
+  it("最後の段まで進める_次へは押せなくなり_前へで戻り_最初からで先頭に戻る", async () => {
+    const { container } = render(<DiagramView diagram={stepper} id="st" />);
+    const next = screen.getByRole("button", { name: "次へ" }) as HTMLButtonElement;
+    await userEvent.click(next);
+    await userEvent.click(next);
+    expect(phases(container)).toEqual(["done", "done", "now"]);
+    expect(next.disabled).toBe(true);
+    await userEvent.click(screen.getByRole("button", { name: "前へ" }));
+    expect(phases(container)).toEqual(["done", "now", "next"]);
+    await userEvent.click(screen.getByRole("button", { name: "最初から" }));
+    expect(phases(container)).toEqual(["now", "next", "next"]);
+  });
+
+  it("キーボードでボタンを押す_Enter で次へ進む", async () => {
+    const { container } = render(<DiagramView diagram={stepper} id="st" />);
+    await userEvent.tab();
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "次へ" }));
+    await userEvent.keyboard("{Enter}");
+    expect(phases(container)).toEqual(["done", "now", "next"]);
+  });
+
+  it("操作する_状態を文字と記号で示し_読み上げの領域に現在の手順を入れる", async () => {
+    const { container } = render(<DiagramView diagram={stepper} id="st" />);
+    const live = container.querySelector("[aria-live]");
+    expect(live?.getAttribute("aria-live")).toBe("polite");
+    expect(live?.textContent).toBe("手順 1 / 3: 最初。最初の説明");
+    await userEvent.click(screen.getByRole("button", { name: "次へ" }));
+    expect(live?.textContent).toBe("手順 2 / 3: 次。次の説明");
+    expect(container.querySelector('li[data-phase="now"]')?.getAttribute("aria-current")).toBe("step");
+    expect(container.querySelector('li[data-phase="now"]')?.textContent).toContain("いま");
+  });
+
+  it("読み上げ用に_図の題を名前に_全体の説明を説明にする", () => {
+    render(<DiagramView diagram={stepper} id="st" />);
+    const group = screen.getByRole("figure", { name: "手順" });
+    expect(group.getAttribute("aria-describedby")).toBe("st-desc");
+    expect(document.getElementById("st-desc")?.textContent).toBe(
+      "手順の図。順に「最初(最初の説明)」、「次(次の説明)」、「最後(最後の説明)」。",
+    );
+  });
+});
+
+describe("切り替えの図", () => {
+  const toggle: Diagram = {
+    type: "toggle",
+    title: "切り替え",
+    states: [
+      { id: "on", label: "有効" },
+      { id: "off", label: "無効" },
+    ],
+    items: [
+      { id: "a", label: "項目 A", result: { on: "kept", off: "removed" } },
+      { id: "b", label: "項目 B", note: "説明", result: { on: "removed", off: "kept" } },
+    ],
+  };
+  const states = (container: HTMLElement) =>
+    [...container.querySelectorAll("li[data-state]")].map((li) => li.getAttribute("data-state"));
+
+  it("最初の表示_最初の状態で_消える項目に斜線が引かれ_残る項目が強調される", () => {
+    const { container } = render(<DiagramView diagram={toggle} id="tg" />);
+    expect(states(container)).toEqual(["kept", "removed"]);
+    const lines = container.querySelectorAll("li[data-state] line");
+    expect(lines).toHaveLength(1);
+    expect(lines[0]?.getAttribute("class")).toContain("motion-strike");
+    expect(container.querySelector('li[data-state="kept"]')?.getAttribute("class")).toContain("border-correct");
+    expect(screen.getByRole("switch").getAttribute("aria-checked")).toBe("false");
+  });
+
+  it("スイッチを押す_状態が入れ替わり_斜線の項目も入れ替わる_もう一度押すと戻る", async () => {
+    const { container } = render(<DiagramView diagram={toggle} id="tg" />);
+    await userEvent.click(screen.getByRole("switch"));
+    expect(states(container)).toEqual(["removed", "kept"]);
+    expect(screen.getByRole("switch").getAttribute("aria-checked")).toBe("true");
+    expect(container.querySelector('li[data-state="removed"] line')).not.toBeNull();
+    expect(container.querySelector('li[data-state="kept"] line')).toBeNull();
+    await userEvent.click(screen.getByRole("switch"));
+    expect(states(container)).toEqual(["kept", "removed"]);
+  });
+
+  it("キーボードで切り替える_Enter でスイッチが動く", async () => {
+    const { container } = render(<DiagramView diagram={toggle} id="tg" />);
+    await userEvent.tab();
+    expect(document.activeElement).toBe(screen.getByRole("switch"));
+    await userEvent.keyboard("{Enter}");
+    expect(states(container)).toEqual(["removed", "kept"]);
+  });
+
+  it("状態を示す_色だけでなく記号と文字で残る・消えるを出し_読み上げの領域に伝える", async () => {
+    const { container } = render(<DiagramView diagram={toggle} id="tg" />);
+    const items = [...container.querySelectorAll("li[data-state]")];
+    expect(items[0]?.textContent).toContain("✓");
+    expect(items[0]?.textContent).toContain("残る");
+    expect(items[1]?.textContent).toContain("×");
+    expect(items[1]?.textContent).toContain("消える");
+    const live = container.querySelector("[aria-live]");
+    expect(live?.textContent).toBe("状態「有効」。残る: 項目 A。消える: 項目 B。");
+    await userEvent.click(screen.getByRole("switch"));
+    expect(live?.textContent).toBe("状態「無効」。残る: 項目 B。消える: 項目 A。");
+  });
+
+  it("読み上げ用の説明_状態ごとに項目と残る・消えるを並べる", () => {
+    expect(describeDiagram(toggle)).toBe(
+      "2 つの状態「有効」と「無効」を切り替える。「有効」では: 項目 A【残る】、項目 B(説明)【消える】。「無効」では: 項目 A【消える】、項目 B(説明)【残る】。",
+    );
+  });
+});
+
+describe("判断の図", () => {
+  const decision: Diagram = {
+    type: "decision",
+    title: "判断",
+    nodes: [
+      {
+        id: "q1",
+        question: "最初の質問",
+        choices: [
+          { label: "はい", to: "q2" },
+          { label: "いいえ", to: "no" },
+        ],
+      },
+      {
+        id: "q2",
+        question: "次の質問",
+        choices: [
+          { label: "A", to: "ra" },
+          { label: "B", to: "no" },
+        ],
+      },
+      { id: "ra", result: "結論 A", note: "A の理由" },
+      { id: "no", result: "結論 N" },
+    ],
+  };
+
+  it("最初の表示_先頭の質問と選択肢のボタンだけが出る_最初からは押せない", () => {
+    render(<DiagramView diagram={decision} id="dc" />);
+    expect(screen.getByText("最初の質問")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "はい" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "いいえ" })).toBeTruthy();
+    expect(screen.queryByText("次の質問")).toBeNull();
+    expect((screen.getByRole("button", { name: "最初から" }) as HTMLButtonElement).disabled).toBe(true);
+  });
+
+  it("選択肢を選ぶ_選んだ道筋が点灯して残り_次の質問が出る", async () => {
+    const { container } = render(<DiagramView diagram={decision} id="dc" />);
+    await userEvent.click(screen.getByRole("button", { name: "はい" }));
+    expect(screen.getByText("次の質問")).toBeTruthy();
+    const done = container.querySelector('li[data-phase="done"]');
+    expect(done?.textContent).toContain("最初の質問");
+    expect(done?.querySelector('[data-picked="true"]')?.textContent).toBe("▶ 選んだ: はい");
+    expect(done?.querySelectorAll("li")).toHaveLength(2);
+  });
+
+  it("結論まで進める_結論と説明が出て_選択肢のボタンはなくなる", async () => {
+    const { container } = render(<DiagramView diagram={decision} id="dc" />);
+    await userEvent.click(screen.getByRole("button", { name: "はい" }));
+    await userEvent.click(screen.getByRole("button", { name: "A" }));
+    expect(screen.getByText("結論: 結論 A")).toBeTruthy();
+    expect(screen.getByText("A の理由")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "B" })).toBeNull();
+    expect(container.querySelectorAll('li[data-phase="done"]')).toHaveLength(2);
+    expect(container.querySelector("[aria-live]")?.textContent).toBe("結論: 結論 A。A の理由");
+  });
+
+  it("最初からを押す_先頭の質問に戻り_道筋の点灯が消える", async () => {
+    const { container } = render(<DiagramView diagram={decision} id="dc" />);
+    await userEvent.click(screen.getByRole("button", { name: "いいえ" }));
+    expect(screen.getByText("結論: 結論 N")).toBeTruthy();
+    await userEvent.click(screen.getByRole("button", { name: "最初から" }));
+    expect(screen.getByText("最初の質問")).toBeTruthy();
+    expect(container.querySelectorAll('li[data-phase="done"]')).toHaveLength(0);
+  });
+
+  it("キーボードで選ぶ_選択肢のボタンへ Tab で移り_Enter で進む_フォーカスは新しい節に移る", async () => {
+    render(<DiagramView diagram={decision} id="dc" />);
+    await userEvent.tab();
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "はい" }));
+    await userEvent.keyboard("{Enter}");
+    expect(screen.getByText("次の質問")).toBeTruthy();
+    expect(document.activeElement?.textContent).toContain("次の質問");
+  });
+
+  it("読み上げ用の説明_質問ごとに選択肢と行き先_結論ごとに説明を並べる", () => {
+    expect(describeDiagram(decision)).toBe(
+      "判断の図。最初の質問から選んで進む。質問「最初の質問」: 「はい」なら「次の質問」へ、「いいえ」なら「結論 N」へ。質問「次の質問」: 「A」なら「結論 A」へ、「B」なら「結論 N」へ。結論「結論 A(A の理由)」。結論「結論 N」。",
+    );
+  });
+});
+
+describe("操作で動く図の共通の決まり", () => {
+  const all: Diagram[] = [
+    {
+      type: "stepper",
+      title: "手",
+      steps: [
+        { id: "a", label: "一" },
+        { id: "b", label: "二" },
+      ],
+    },
+    {
+      type: "toggle",
+      title: "切",
+      states: [
+        { id: "x", label: "X" },
+        { id: "y", label: "Y" },
+      ],
+      items: [{ id: "i", label: "項目", result: { x: "kept", y: "removed" } }],
+    },
+    {
+      type: "decision",
+      title: "判",
+      nodes: [
+        {
+          id: "q",
+          question: "質問",
+          choices: [
+            { label: "a", to: "r" },
+            { label: "b", to: "r" },
+          ],
+        },
+        { id: "r", result: "結論" },
+      ],
+    },
+  ];
+
+  it("3 種類_色の直書きと fill・stroke の値を持たず_animate 要素を持たない", () => {
+    const { container } = render(
+      <div>
+        {all.map((d) => (
+          <DiagramView key={d.type} diagram={d} id={d.type} />
+        ))}
+      </div>,
+    );
+    expect(container.innerHTML).not.toMatch(/#[0-9a-f]{3,8}\b/i);
+    expect(container.innerHTML).not.toMatch(/(fill|stroke)="(?!none)/);
+    expect(container.innerHTML).not.toMatch(/<animate/);
+    expect(container.querySelectorAll("[data-diagram-type]")).toHaveLength(3);
+  });
+
+  it("3 種類_有効なボタンに tabindex を付けない", () => {
+    for (const d of all) {
+      const { container, unmount } = render(<DiagramView diagram={d} id={d.type} />);
+      const operable = container.querySelectorAll("button:not([disabled])");
+      expect(operable.length).toBeGreaterThan(0);
+      for (const element of operable) expect(element.getAttribute("tabindex")).toBeNull();
+      unmount();
+    }
   });
 });
