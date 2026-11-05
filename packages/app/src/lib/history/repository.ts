@@ -8,7 +8,7 @@ import {
   UpdateCommand,
 } from "@aws-sdk/lib-dynamodb";
 import { EXAM_CODE, QUESTION_ID } from "@mokumoku-exams/data-schema/exam-data/shape";
-import { NOTEBOOK_UNIT_ID } from "@mokumoku-exams/data-schema/notebook-data/schema";
+import { NOTEBOOK_ENTRY_ID, NOTEBOOK_UNIT_ID } from "@mokumoku-exams/data-schema/notebook-data/schema";
 import { z } from "zod";
 import { type Prefs, PrefsSchema } from "@/lib/prefs.ts";
 import { RECENT_STAT_LIMIT } from "@/lib/question-stats.ts";
@@ -83,16 +83,25 @@ export interface HistoryRepository {
   getPrefs(sub: string): Promise<Prefs | null>;
   /** 表示の設定を保存する(上書き)。 */
   setPrefs(sub: string, prefs: Prefs): Promise<void>;
-  /** 体系ノートの、履修済みの中分類と、最初に履修した時刻。中分類の ID の順。壊れた項目は除く。 */
-  listNotebookUnits(sub: string, examCode: string): Promise<NotebookCompletion[]>;
   /**
-   * 体系ノートの中分類を、履修済みとして記録する。すでに記録があれば書かない(最初の時刻を残す。繰り返しても結果は変わらない)。
+   * 体系ノートの、完了した節と、旧い中分類の履修済みの記録(どちらも最初の時刻つき)。SK の順。壊れた項目は除く。
+   * ノートにない ID の項目も、そのまま返す(絞り込みは呼び出し側)。
    */
-  completeNotebookUnit(sub: string, examCode: string, unit: string, at: string): Promise<void>;
+  listNotebook(sub: string, examCode: string): Promise<NotebookRecords>;
+  /**
+   * 体系ノートの節を、完了として記録する。すでに記録があれば書かない(最初の時刻を残す。繰り返しても結果は変わらない)。
+   * 中分類の旧い記録があっても、節の記録は普通に書く。中分類の履修済みの記録は、新しく書かない。
+   */
+  completeNotebookEntry(sub: string, examCode: string, unit: string, entry: string, at: string): Promise<void>;
 }
 
-/** 体系ノートの中分類の履修済みの記録(中分類の ID と、最初に履修した時刻)。 */
+/** 体系ノートの中分類の履修済みの旧い記録(中分類の ID と、最初に履修した時刻)。読むだけで、新しくは書かない。 */
 export type NotebookCompletion = { unit: string; completedAt: string };
+
+/** 体系ノートの節の完了の記録(中分類の ID・見出しの ID・最初に完了した時刻)。 */
+export type NotebookEntryCompletion = { unit: string; entry: string; completedAt: string };
+
+export type NotebookRecords = { units: NotebookCompletion[]; entries: NotebookEntryCompletion[] };
 
 /** 1 回の結果の学習量(解いた問題の数と、そのうちの正解の数)。 */
 export type DayTally = { answered: number; correct: number };
@@ -147,21 +156,42 @@ export const goalKey = (examCode: string) => `GOAL#${examCode}`;
 export const sectionsKey = (examCode: string) => `SECTIONS#${examCode}`;
 /** 表示の設定(利用者ごとに 1 件) */
 export const PREFS_SORT_KEY = "PREFS";
-/** 体系ノートの中分類の履修済み(中分類ごとに 1 項目) */
+/** 体系ノートの完了(節ごとに 1 項目。旧い中分類の履修済みの項目も同じ接頭辞の下にある) */
 export const notebookKeyPrefix = (examCode: string) => `NOTEBOOK#${examCode}#`;
+export const notebookEntryKey = (examCode: string, unit: string, entry: string) =>
+  `${notebookKeyPrefix(examCode)}${unit}#${entry}`;
 
 const COMPLETED_AT = z.iso.datetime({ precision: 3 });
 
-/** 保存した履修済みの項目を、外部入力として検査する(壊れた値は、保存していないものとして扱う)。 */
-function notebookCompletionOf(item: Record<string, unknown>, examCode: string): NotebookCompletion | null {
-  const sk = String(item.SK ?? "");
-  const unit = sk.slice(notebookKeyPrefix(examCode).length);
+/**
+ * 保存した完了の項目を、外部入力として検査し、旧い中分類の記録(`notebook`)と節の完了(`notebook-entry`)に分ける。
+ * 壊れた値は、保存していないものとして扱う(null)。
+ */
+function notebookRecordOf(
+  item: Record<string, unknown>,
+  examCode: string,
+): ({ kind: "unit" } & NotebookCompletion) | ({ kind: "entry" } & NotebookEntryCompletion) | null {
+  const rest = String(item.SK ?? "").slice(notebookKeyPrefix(examCode).length);
   const completedAt = item.completedAt;
-  if (!NOTEBOOK_UNIT_ID.test(unit) || item.unit !== unit || item.examCode !== examCode) return null;
+  if (item.examCode !== examCode) return null;
   if (typeof completedAt !== "string" || !COMPLETED_AT.safeParse(completedAt).success) return null;
-  return { unit, completedAt };
+  if (item.type === "notebook") {
+    if (!NOTEBOOK_UNIT_ID.test(rest) || item.unit !== rest) return null;
+    return { kind: "unit", unit: rest, completedAt };
+  }
+  if (item.type === "notebook-entry") {
+    const [unit, entry, ...extra] = rest.split("#");
+    if (unit === undefined || entry === undefined || extra.length > 0) return null;
+    if (!NOTEBOOK_UNIT_ID.test(unit) || !NOTEBOOK_ENTRY_ID.test(entry)) return null;
+    if (item.unit !== unit || item.entry !== entry) return null;
+    return { kind: "entry", unit, entry, completedAt };
+  }
+  return null;
 }
-const byUnit = (a: NotebookCompletion, b: NotebookCompletion) => (a.unit < b.unit ? -1 : a.unit > b.unit ? 1 : 0);
+const compare = (a: string, b: string) => (a < b ? -1 : a > b ? 1 : 0);
+const byUnit = (a: NotebookCompletion, b: NotebookCompletion) => compare(a.unit, b.unit);
+const byEntry = (a: NotebookEntryCompletion, b: NotebookEntryCompletion) =>
+  compare(a.unit, b.unit) || compare(a.entry, b.entry);
 export const statKeyPrefix = (examCode: string) => `STAT#${examCode}#`;
 /** すべての資格の復習の項目(資格をまたいで一覧するとき) */
 export const REVIEW_PREFIX = "REVIEW#";
@@ -452,13 +482,21 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
       await put(sub, PREFS_SORT_KEY, { type: "prefs", ...prefs });
     },
 
-    async listNotebookUnits(sub, examCode) {
-      return (await queryAll(sub, notebookKeyPrefix(examCode)))
-        .flatMap((item) => notebookCompletionOf(item, examCode) ?? [])
-        .sort(byUnit);
+    async listNotebook(sub, examCode) {
+      const records = (await queryAll(sub, notebookKeyPrefix(examCode))).flatMap(
+        (item) => notebookRecordOf(item, examCode) ?? [],
+      );
+      return {
+        units: records
+          .flatMap((r) => (r.kind === "unit" ? [{ unit: r.unit, completedAt: r.completedAt }] : []))
+          .sort(byUnit),
+        entries: records
+          .flatMap((r) => (r.kind === "entry" ? [{ unit: r.unit, entry: r.entry, completedAt: r.completedAt }] : []))
+          .sort(byEntry),
+      };
     },
 
-    async completeNotebookUnit(sub, examCode, unit, at) {
+    async completeNotebookEntry(sub, examCode, unit, entry, at) {
       try {
         // 最初の時刻を残すため、項目がないときだけ書く(2 つの端末が同時に記録しても、片方だけが書く)
         await client.send(
@@ -466,10 +504,11 @@ export function createDynamoRepository(options: { tableName: string; client: Doc
             TableName: tableName,
             Item: {
               PK: userKey(sub),
-              SK: `${notebookKeyPrefix(examCode)}${unit}`,
-              type: "notebook",
+              SK: notebookEntryKey(examCode, unit, entry),
+              type: "notebook-entry",
               examCode,
               unit,
+              entry,
               completedAt: at,
             },
             ConditionExpression: "attribute_not_exists(SK)",
@@ -496,7 +535,7 @@ export function createMemoryRepository(): HistoryRepository {
   const sections = new Map<string, SectionProgress>();
   // 利用者ごとの、表示の設定
   const prefs = new Map<string, Prefs>();
-  // 利用者と資格ごとの、中分類の ID ごとの最初に履修した時刻
+  // 利用者と資格ごとの、節(`<中分類の ID>#<見出しの ID>`)ごとの最初に完了した時刻
   const notebook = new Map<string, Map<string, string>>();
   const scope = (sub: string, examCode: string) => `${userKey(sub)}|${examCode}`;
   const setOf = (sets: Map<string, Set<string>>, sub: string, examCode: string) => {
@@ -622,12 +661,17 @@ export function createMemoryRepository(): HistoryRepository {
       if (date === null) goals.delete(scope(sub, examCode));
       else goals.set(scope(sub, examCode), date);
     },
-    async listNotebookUnits(sub, examCode) {
-      return [...mapOf(notebook, sub, examCode)].map(([unit, completedAt]) => ({ unit, completedAt })).sort(byUnit);
+    async listNotebook(sub, examCode) {
+      const entries = [...mapOf(notebook, sub, examCode)].map(([key, completedAt]) => {
+        const [unit = "", entry = ""] = key.split("#");
+        return { unit, entry, completedAt };
+      });
+      return { units: [], entries: entries.sort(byEntry) };
     },
-    async completeNotebookUnit(sub, examCode, unit, at) {
-      const units = mapOf(notebook, sub, examCode);
-      if (!units.has(unit)) units.set(unit, at);
+    async completeNotebookEntry(sub, examCode, unit, entry, at) {
+      const entries = mapOf(notebook, sub, examCode);
+      const key = `${unit}#${entry}`;
+      if (!entries.has(key)) entries.set(key, at);
     },
   };
 }

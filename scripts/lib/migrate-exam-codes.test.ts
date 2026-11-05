@@ -44,6 +44,11 @@ describe("renameSortKey", () => {
       to: "NOTEBOOK#AWS-AIB-C01#domain1-1",
       kind: "NOTEBOOK",
     });
+    // 節の完了(資格・中分類・見出しの 4 つ組)も、資格コードの部分だけを直す
+    expect(renameSortKey("NOTEBOOK#AIB#domain1-1#term-a", mapping)).toEqual({
+      to: "NOTEBOOK#AWS-AIB-C01#domain1-1#term-a",
+      kind: "NOTEBOOK",
+    });
   });
 
   it("対象でない SK_null(コードの一部が同じだけのもの、表示の設定、通知の購読)", () => {
@@ -95,6 +100,32 @@ describe("DynamoDB の移行", () => {
     expect(items.get("USER#b|SECTIONS#AWS-AIB-C01")).toBeDefined();
     expect(items.get("USER#b|NOTEBOOK#AWS-AIB-C01#domain1-1")).toMatchObject({ examCode: "AWS-AIB-C01" });
     expect(items.get("USER#a|PREFS")).toBeDefined();
+  });
+
+  it("実行_節の完了の項目(4 つ組の SK)も写し_項目の中の資格コードだけを新しくする", async () => {
+    const { client, items } = seed();
+    items.set("USER#b|NOTEBOOK#AIB#domain1-1#term-a", {
+      PK: "USER#b",
+      SK: "NOTEBOOK#AIB#domain1-1#term-a",
+      type: "notebook-entry",
+      examCode: "AIB",
+      unit: "domain1-1",
+      entry: "term-a",
+      completedAt: "2026-10-01T00:00:00.000Z",
+    });
+    const plan = await planMigration(client, "table-example", mapping);
+    expect(plan.counts).toMatchObject({ NOTEBOOK: 2 });
+    await applyMigration(client, "table-example", mapping, plan);
+    expect(items.has("USER#b|NOTEBOOK#AIB#domain1-1#term-a")).toBe(false);
+    expect(items.get("USER#b|NOTEBOOK#AWS-AIB-C01#domain1-1#term-a")).toEqual({
+      PK: "USER#b",
+      SK: "NOTEBOOK#AWS-AIB-C01#domain1-1#term-a",
+      type: "notebook-entry",
+      examCode: "AWS-AIB-C01",
+      unit: "domain1-1",
+      entry: "term-a",
+      completedAt: "2026-10-01T00:00:00.000Z",
+    });
   });
 
   it("もう一度実行_対象がなく_結果は変わらない", async () => {
