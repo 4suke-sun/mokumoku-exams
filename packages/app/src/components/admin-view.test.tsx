@@ -38,12 +38,13 @@ describe("AdminView", () => {
           row("u-self", "admin@example.com", { self: true }),
           row("u-off", "off@example.com", { enabled: false }),
           row("u-new", "new@example.com", { status: "FORCE_CHANGE_PASSWORD" }),
+          row("u-wait", "wait@example.com", { status: "UNCONFIRMED" }),
         ],
       },
     });
     render(<AdminView />);
     const items = await screen.findAllByRole("listitem");
-    expect(items).toHaveLength(3);
+    expect(items).toHaveLength(4);
     expect(items[0]?.textContent).toContain("admin@example.com");
     expect(items[0]?.textContent).toContain("(自分)");
     expect(items[1]?.textContent).toContain("無効");
@@ -52,6 +53,7 @@ describe("AdminView", () => {
     expect(within(items[0] as HTMLElement).queryByRole("button")).toBeNull();
     expect(within(items[1] as HTMLElement).queryByRole("button")).toBeNull();
     expect(within(items[2] as HTMLElement).getByRole("button", { name: "無効にする…" })).toBeTruthy();
+    expect(items[3]?.textContent).toContain("確認待ち");
   });
 
   it("無効化_確認のステップのあとにだけ送る_やめると送らない", async () => {
@@ -75,25 +77,12 @@ describe("AdminView", () => {
     await waitFor(() => expect(screen.getByRole("listitem").textContent).toContain("無効"));
   });
 
-  it("招待_結果を出し_一覧を読み直す_失敗は固定の文言を出す", async () => {
-    const fetchMock = mockFetch(
-      { status: 200, body: { users: [] } },
-      { status: 200, body: { user: row("u-2", "two@example.com", { status: "FORCE_CHANGE_PASSWORD" }) } },
-      { status: 200, body: { users: [row("u-2", "two@example.com", { status: "FORCE_CHANGE_PASSWORD" })] } },
-      { status: 409, body: { error: "already-exists" } },
-    );
+  it("招待の入力_出さない", async () => {
+    mockFetch({ status: 200, body: { users: [] } });
     render(<AdminView />);
     expect(await screen.findByText("ユーザーはいません。")).toBeTruthy();
-    await userEvent.type(screen.getByLabelText("メールアドレス"), "two@example.com");
-    await userEvent.click(screen.getByRole("button", { name: "招待する" }));
-    expect((await screen.findByRole("status")).textContent).toContain("two@example.com を招待しました");
-    expect(fetchMock.mock.calls[1]?.[0]).toBe("/api/admin/users");
-    expect(JSON.parse(fetchMock.mock.calls[1]?.[1].body)).toEqual({ email: "two@example.com" });
-    expect(await screen.findByRole("listitem")).toBeTruthy();
-
-    await userEvent.type(screen.getByLabelText("メールアドレス"), "two@example.com");
-    await userEvent.click(screen.getByRole("button", { name: "招待する" }));
-    expect((await screen.findByRole("alert")).textContent).toContain("すでに登録されています");
+    expect(screen.queryByLabelText("メールアドレス")).toBeNull();
+    expect(screen.queryByRole("button", { name: "招待する" })).toBeNull();
   });
 });
 
@@ -101,6 +90,7 @@ describe("表示の文言", () => {
   it("状態_無効を優先し_既知の状態は日本語にする", () => {
     expect(statusLabel({ enabled: false, status: "CONFIRMED" })).toBe("無効");
     expect(statusLabel({ enabled: true, status: "CONFIRMED" })).toBe("有効");
+    expect(statusLabel({ enabled: true, status: "UNCONFIRMED" })).toBe("確認待ち");
     expect(statusLabel({ enabled: true, status: "FORCE_CHANGE_PASSWORD" })).toBe("招待中(初回ログイン前)");
     expect(statusLabel({ enabled: true, status: "UNKNOWN" })).toBe("その他");
   });

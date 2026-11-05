@@ -176,6 +176,47 @@ describe("loadConfig の独自ドメイン", () => {
   });
 });
 
+describe("loadConfig の予算", () => {
+  const budget = { BUDGET_MONTHLY_USD: "10", BUDGET_EMAIL: "billing@example.com" };
+
+  it("指定しない_予算を作らない", () => {
+    expect(loadConfig(valid).budget).toBeUndefined();
+  });
+
+  it("金額と宛先をそろえて指定する_その値を使う", () => {
+    expect(loadConfig({ ...valid, ...budget }).budget).toEqual({ monthlyUsd: 10, email: budget.BUDGET_EMAIL });
+    expect(loadConfig({ ...valid, ...budget, BUDGET_MONTHLY_USD: "12.5" }).budget?.monthlyUsd).toBe(12.5);
+  });
+
+  it("金額と宛先の片方だけ_失敗する", () => {
+    expect(() => loadConfig({ ...valid, BUDGET_MONTHLY_USD: "10" })).toThrow(/そろえて/);
+    expect(() => loadConfig({ ...valid, BUDGET_EMAIL: budget.BUDGET_EMAIL })).toThrow(/そろえて/);
+  });
+
+  it("形が不正な値_失敗し_値そのものはメッセージに出さない", () => {
+    // 金額の不正な値は、どれを渡してもメッセージが同じになる(値をメッセージに埋め込んでいない)
+    const amountMessages = ["0", "-5", "1.234", "ten", "1e3"].map((bad) => {
+      try {
+        loadConfig({ ...valid, ...budget, BUDGET_MONTHLY_USD: bad });
+        return expect.unreachable(bad);
+      } catch (error) {
+        return (error as Error).message;
+      }
+    });
+    expect(amountMessages[0]).toContain("BUDGET_MONTHLY_USD");
+    expect(new Set(amountMessages).size).toBe(1);
+    const badEmail = "not-an-address";
+    try {
+      loadConfig({ ...valid, ...budget, BUDGET_EMAIL: badEmail });
+      expect.unreachable();
+    } catch (error) {
+      const message = (error as Error).message;
+      expect(message).toContain("BUDGET_EMAIL");
+      expect(message).not.toContain(badEmail);
+    }
+  });
+});
+
 describe(".env.example", () => {
   it("設定の変数の一覧と_一致している", () => {
     const text = readFileSync(new URL("../../../.env.example", import.meta.url), "utf8");

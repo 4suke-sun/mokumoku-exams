@@ -1,9 +1,8 @@
 "use client";
 
-import { type FormEvent, useCallback, useEffect, useState } from "react";
-import { createdLabel, disableUser, fetchUsers, inviteUser, statusLabel } from "@/lib/admin/client.ts";
+import { useCallback, useEffect, useState } from "react";
+import { createdLabel, disableUser, fetchUsers, statusLabel } from "@/lib/admin/client.ts";
 import type { AdminUserRow } from "@/lib/admin/handlers.ts";
-import { Field, FormError, SubmitButton } from "./form-parts.tsx";
 import { Notice } from "./notice.tsx";
 
 type ListState =
@@ -13,13 +12,9 @@ type ListState =
 
 const secondaryButton = "rounded-md border border-line px-3 py-1 disabled:opacity-50";
 
-/** 管理者の画面: 招待のフォームと、利用者の一覧(無効化は、確認のステップのあとに行う)。 */
+/** 管理者の画面: 利用者の一覧(無効化は、確認のステップのあとに行う)。利用者は、自分で登録する。 */
 export function AdminView() {
   const [list, setList] = useState<ListState>({ status: "loading" });
-  const [email, setEmail] = useState("");
-  const [inviteError, setInviteError] = useState<string | null>(null);
-  const [invited, setInvited] = useState<string | null>(null);
-  const [inviting, setInviting] = useState(false);
   // 無効にする前の確認の対象(ユーザー名)
   const [confirming, setConfirming] = useState<string | null>(null);
   const [disabling, setDisabling] = useState(false);
@@ -33,19 +28,6 @@ export function AdminView() {
   useEffect(() => {
     void load();
   }, [load]);
-
-  async function submitInvite(event: FormEvent) {
-    event.preventDefault();
-    setInviting(true);
-    setInviteError(null);
-    setInvited(null);
-    const result = await inviteUser(email);
-    setInviting(false);
-    if (!result.ok) return setInviteError(result.message);
-    setInvited(result.data.user.email ?? email.trim());
-    setEmail("");
-    await load();
-  }
 
   async function confirmDisable(user: AdminUserRow) {
     setDisabling(true);
@@ -66,26 +48,6 @@ export function AdminView() {
         <h1 className="h1">管理</h1>
         <p className="text-sm text-muted">この画面は、管理者のグループに入っているアカウントだけが開けます。</p>
       </div>
-
-      <form onSubmit={submitInvite} className="max-w-md space-y-5" noValidate>
-        <h2 className="h2">ユーザーを招待する</h2>
-        <Field
-          id="invite-email"
-          label="メールアドレス"
-          type="email"
-          value={email}
-          onChange={setEmail}
-          autoComplete="off"
-          hint="招待メール(仮のパスワードつき)が送られます。サイトの URL は、別に伝えてください。"
-        />
-        <FormError message={inviteError} />
-        {invited ? (
-          <Notice kind="success">
-            {invited} を招待しました。仮のパスワードでログインすると、新しいパスワードを決める画面に進みます。
-          </Notice>
-        ) : null}
-        <SubmitButton busy={inviting}>招待する</SubmitButton>
-      </form>
 
       <div className="space-y-3">
         <h2 className="h2">ユーザーの一覧</h2>

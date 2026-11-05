@@ -12,6 +12,12 @@ export function siteUrl(env: Record<string, string | undefined> = process.env): 
   return value && SITE_URL_PATTERN.test(value) ? value : null;
 }
 
+/** このサービスのリポジトリ */
+export const REPOSITORY_URL = "https://github.com/4suke-sun/mokumoku-exams";
+
+/** 問い合わせ先(リポジトリの Issue の一覧)。プライバシーと利用条件の画面に出す。 */
+export const ISSUES_URL = `${REPOSITORY_URL}/issues`;
+
 /** 検索エンジンに案内するのは、ログインなしで開ける画面だけ。ほかはすべて対象外にする。 */
 export function robotsOf(origin: string | null): MetadataRoute.Robots {
   return {

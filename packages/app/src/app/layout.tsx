@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { NavigationProgress } from "@/components/navigation-progress.tsx";
 import { PageFooter, PageMain } from "@/components/page-main.tsx";
@@ -79,7 +80,12 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             <div className="min-w-0 flex-1">
               <PageMain>{children}</PageMain>
               <PageFooter>
-                <p>学習用の問題集です。</p>
+                <p>
+                  学習用の問題集です。
+                  <Link href="/privacy" className="ml-3 underline">
+                    プライバシーと利用条件
+                  </Link>
+                </p>
               </PageFooter>
             </div>
           </div>

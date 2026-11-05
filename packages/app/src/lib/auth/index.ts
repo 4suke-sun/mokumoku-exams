@@ -7,7 +7,7 @@ import { createCognitoVerifier, type TokenVerifier } from "./verify.ts";
 type FakeAuth = { provider: AuthProvider; users: UserAdmin };
 
 // 手元の開発サーバーでは、画面の処理と API の処理が別々に読み込まれることがあるので、代替の状態は globalThis に置く。
-// 代替の認証と代替の利用者の管理は、同じ利用者の一覧を共有する(招待・無効化が、ログインに反映される)
+// 代替の認証と代替の利用者の管理は、同じ利用者の一覧を共有する(登録・無効化が、ログインに反映される)
 const shared = globalThis as typeof globalThis & { __mokumokuFakeAuth?: FakeAuth };
 let fakeVerifier: TokenVerifier | undefined;
 let cognitoVerifier: { key: string; verifier: TokenVerifier } | undefined;

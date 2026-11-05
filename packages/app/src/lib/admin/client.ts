@@ -1,6 +1,5 @@
 import { z } from "zod";
 import { requestJson } from "@/lib/api/client.ts";
-import type { ManagedUser } from "@/lib/auth/user-admin.ts";
 import type { AdminError, AdminUserRow } from "./handlers.ts";
 
 // 画面に出す文言。原因の詳細は、サーバーから返らない
@@ -9,7 +8,6 @@ const MESSAGES: Record<AdminError, string> = {
   "self-disable": "自分のアカウントは無効にできません。",
   forbidden: "この操作は、管理者だけができます。ログインし直してください。",
   "not-found": "対象のユーザーが見つかりません。一覧を読み直してください。",
-  "already-exists": "このメールアドレスのユーザーは、すでに登録されています。",
   "too-large": "入力が長すぎます。",
   "limit-exceeded": "操作の回数が多すぎます。しばらく待ってから、もう一度お試しください。",
   unavailable: "いま処理できません。しばらくしてから、もう一度お試しください。",
@@ -23,6 +21,9 @@ export function adminMessageFor(code: unknown): string {
 export function statusLabel(user: Pick<AdminUserRow, "enabled" | "status">): string {
   if (!user.enabled) return "無効";
   if (user.status === "CONFIRMED") return "有効";
+  // 登録のあと、確認コードの入力がまだ(ログインできない)
+  if (user.status === "UNCONFIRMED") return "確認待ち";
+  // 招待済みで未使用の利用者(仮パスワードでの初回ログインの前)
   if (user.status === "FORCE_CHANGE_PASSWORD") return "招待中(初回ログイン前)";
   if (user.status === "RESET_REQUIRED") return "パスワードの再設定が必要";
   return "その他";
@@ -49,5 +50,4 @@ async function request<T>(path: string, body?: unknown): Promise<AdminResult<T>>
 const postJson = <T>(path: string, body: unknown) => request<T>(path, body);
 
 export const fetchUsers = () => request<{ users: AdminUserRow[] }>("/api/admin/users");
-export const inviteUser = (email: string) => postJson<{ user: ManagedUser }>("/api/admin/users", { email });
 export const disableUser = (username: string) => postJson<{ status: string }>("/api/admin/users/disable", { username });

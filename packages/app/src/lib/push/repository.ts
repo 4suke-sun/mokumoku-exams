@@ -12,6 +12,8 @@ export interface PushRepository {
   putSubscription(sub: string, target: PushTarget, createdAt: string): Promise<void>;
   /** 購読を消す(ないものを消しても、何もしない)。 */
   deleteSubscription(sub: string, endpoint: string): Promise<void>;
+  /** 自分の購読をすべて消す(退会。購読がなくても、何もしない)。 */
+  deleteAllSubscriptions(sub: string): Promise<void>;
 }
 
 type QueryOutput = { Items?: Record<string, unknown>[] };
@@ -47,6 +49,21 @@ export function createDynamoPushRepository(options: { tableName: string; client:
     async deleteSubscription(sub, endpoint) {
       await client.send(new DeleteCommand({ TableName: tableName, Key: { PK: userKey(sub), SK: pushKey(endpoint) } }));
     },
+
+    async deleteAllSubscriptions(sub) {
+      // 形の壊れた購読も残さないよう、項目のキーで消す
+      const { Items = [] } = (await client.send(
+        new QueryCommand({
+          TableName: tableName,
+          KeyConditionExpression: "PK = :pk AND begins_with(SK, :prefix)",
+          ExpressionAttributeValues: { ":pk": userKey(sub), ":prefix": PUSH_KEY_PREFIX },
+          ProjectionExpression: "SK",
+        }),
+      )) as QueryOutput;
+      for (const item of Items) {
+        await client.send(new DeleteCommand({ TableName: tableName, Key: { PK: userKey(sub), SK: String(item.SK) } }));
+      }
+    },
   };
 }
 
@@ -67,6 +84,9 @@ export function createMemoryPushRepository(): PushRepository {
     },
     async deleteSubscription(sub, endpoint) {
       own(sub).delete(pushKey(endpoint));
+    },
+    async deleteAllSubscriptions(sub) {
+      store.delete(userKey(sub));
     },
   };
 }
