@@ -130,9 +130,9 @@
 
 ## 文書の直し
 
-招待制を前提にした記述を、実装と同じ PR で直す(#488 の「3」の一覧。`CLAUDE.md`、`README.md`、`docs/app/auth.md`、`docs/app/architecture-plan.md`、`docs/app/infra.md`、`docs/app/data.md`、`docs/post-deploy-smoke.md`)。
+招待制を前提にした記述は、実装と同じ PR で直してある(#488 の「3」の一覧。`CLAUDE.md`、`README.md`、`docs/app/auth.md`、`docs/app/architecture-plan.md`、`docs/app/infra.md`、`docs/app/data.md`、`docs/post-deploy-smoke.md`)。
 
-インフラのテストとスナップショット(`packages/infra/lib/stacks.test.ts` の、セルフサインアップの禁止、管理者に許す操作の一覧、招待の文面の確認と、`__snapshots__/stacks.test.ts.snap`)も、同じ PR で合わせる。テストの題を変えたときは、`scripts/test-title-baseline.json` も合わせる。
+インフラのテストとスナップショット(`packages/infra/lib/stacks.test.ts` の、セルフサインアップを許すこと、管理者に許す操作の一覧、確認コードのメールの文面を確かめるテストと、`__snapshots__/stacks.test.ts.snap`)も、同じ PR で合わせてある。題を変えたテストの、`scripts/test-title-baseline.json` の古い項目は消してある。
 
 ## 未決の点
 

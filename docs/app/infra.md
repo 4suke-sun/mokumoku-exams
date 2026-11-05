@@ -17,8 +17,8 @@
 設定したときだけ、`SITE_URL`(sitemap の絶対 URL)と、`VAPID_PUBLIC_KEY`・`VAPID_PRIVATE_KEY_PARAMETER`・`VAPID_SUBJECT`(通知の購読とテスト通知)も渡されます。
 VAPID の秘密鍵は、値ではなく、置き場所(SSM パラメーター)の名前だけを渡します(「VAPID の秘密鍵」)。
 履歴のテーブルに許す操作は、`GetItem`・`PutItem`・`UpdateItem`・`Query`・`DeleteItem` だけです(テーブル 1 つに限り、スキャンやテーブルの管理はできません)。管理者の操作の記録も、このテーブルに置きます。
-Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminDisableUser` と、登録し直し(確認がまだのアカウントの状態を読み、24 時間たったものだけを消す)が使う `AdminGetUser`・`AdminDeleteUser` だけです(`<接頭辞>-auth` の UserPool 1 つに限ります)。
-登録・確認・確認コードの送り直し・退会(本人による削除)は、認証情報のいらない Cognito の API で行うため、Lambda の権限は要りません。
+Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminDisableUser` と、登録し直し(確認がまだのアカウントの状態を読み、24 時間たったものだけを消す)が使う `AdminGetUser`・`AdminDeleteUser` だけです(`<接頭辞>-auth` スタックの UserPool 1 つに限ります)。
+それ以外の、登録・確認・確認コードの送り直し・退会(本人による削除)は、認証情報のいらない Cognito の API で行うため、Lambda の権限は要りません(登録したメールアドレスがすでにあるときの登録し直しだけは、上の `AdminGetUser`・`AdminDeleteUser` を使います)。
 仮パスワードの有効日数(7 日)は、管理者が作ったユーザーの仮パスワードの扱いを変えないよう、明示して残しています。
 デプロイの順は、auth → data → web で、push は data と web のあとです(web のアラームの通知先を使うため。`cdkd deploy --all` が依存から決めます)。budget は、ほかのスタックに依存しません。
 
