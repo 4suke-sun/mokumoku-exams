@@ -7,17 +7,20 @@
 
 | スタック | 内容 |
 | --- | --- |
-| `<接頭辞>-auth` | Cognito UserPool。セルフサインアップ禁止、管理者の招待制、管理者グループ(`admins`)。招待メールと再設定の確認コードの文面、パスワードの規則を持ちます。Identity Pool は作りません。画面と API は [認証の仕組み](./auth.md) |
+| `<接頭辞>-auth` | Cognito UserPool。セルフサインアップを許し(登録の確認はメールの確認コード)、管理者グループ(`admins`)を持ちます。確認コードのメール(登録の確認とパスワードの再設定で共通)の文面と、パスワードの規則を持ちます。Identity Pool は作りません。画面と API は [認証の仕組み](./auth.md) |
 | `<接頭辞>-data` | DynamoDB の単一テーブル(学習の履歴)。使った分だけの課金で、暗号化は既定(AWS 所有のキー)。スタックを消してもテーブルは残り、削除保護と時点復旧(過去 35 日)が有効です。設計は [データの設計](./data.md) |
 | `<接頭辞>-web` | Lambda(Next.js + Lambda Web Adapter)、Function URL、CloudFront、静的ファイル用の S3 |
 | `<接頭辞>-push` | (通知の設定をそろえたときだけ)毎日の通知を送る Lambda と、そのスケジュール(EventBridge のルール) |
+| `<接頭辞>-budget` | (予算の設定をそろえたときだけ)月の費用の予算(AWS Budgets)。「費用の予算と共通のタグ」 |
 
 `<接頭辞>-web` の Lambda には、`COGNITO_USER_POOL_ID`(ID トークンの検証)と `HISTORY_TABLE_NAME`(履歴のテーブル)が渡されます。
 設定したときだけ、`SITE_URL`(sitemap の絶対 URL)と、`VAPID_PUBLIC_KEY`・`VAPID_PRIVATE_KEY_PARAMETER`・`VAPID_SUBJECT`(通知の購読とテスト通知)も渡されます。
 VAPID の秘密鍵は、値ではなく、置き場所(SSM パラメーター)の名前だけを渡します(「VAPID の秘密鍵」)。
 履歴のテーブルに許す操作は、`GetItem`・`PutItem`・`UpdateItem`・`Query`・`DeleteItem` だけです(テーブル 1 つに限り、スキャンやテーブルの管理はできません)。管理者の操作の記録も、このテーブルに置きます。
-Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCreateUser`・`AdminDisableUser` だけです(`<接頭辞>-auth` の UserPool 1 つに限ります)。
-デプロイの順は、auth → data → web で、push は data と web のあとです(web のアラームの通知先を使うため。`cdkd deploy --all` が依存から決めます)。
+Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminDisableUser` と、登録し直し(確認がまだのアカウントの状態を読み、24 時間たったものだけを消す)が使う `AdminGetUser`・`AdminDeleteUser` だけです(`<接頭辞>-auth` の UserPool 1 つに限ります)。
+登録・確認・確認コードの送り直し・退会(本人による削除)は、認証情報のいらない Cognito の API で行うため、Lambda の権限は要りません。
+仮パスワードの有効日数(7 日)は、管理者が作ったユーザーの仮パスワードの扱いを変えないよう、明示して残しています。
+デプロイの順は、auth → data → web で、push は data と web のあとです(web のアラームの通知先を使うため。`cdkd deploy --all` が依存から決めます)。budget は、ほかのスタックに依存しません。
 
 ### 通知の送信(`<接頭辞>-push`)
 
@@ -82,6 +85,26 @@ Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCre
 - `.env` の `ALARM_EMAIL` を渡すと、そのアドレスをトピックに購読させます。デプロイの後に届く確認のメールで、購読を承認します。
   渡さないときは、トピックだけが作られ、アラームの状態は CloudWatch の画面で確かめます。
 
+### 費用の予算と共通のタグ
+
+- CDK のアプリ全体(`packages/infra/bin/app.ts`)で、すべてのスタックとリソースに、共通のタグ `Service=mokumoku-exams` を付けます。
+  値は固定で、`STACK_PREFIX` を変えても同じです(値は `packages/infra/lib/tags.ts` の `SERVICE_TAG`)。
+- タグで費用を絞るには、請求の設定で、このタグをコスト配分タグとして有効にします。AWS アカウントごとに一度だけ、管理アカウント(請求を見られるユーザー)で行います。
+  1. デプロイして、タグの付いたリソースを作ります(タグのキーが選択肢に出るまで、最大で 24 時間ほどかかります)。
+  2. 請求とコスト管理のコンソールの「コスト配分タグ」を開き、ユーザー定義のタグの一覧から `Service` を選んで「有効化」します。
+  3. 有効にしたあとの費用から、Cost Explorer と AWS Budgets でタグを使って絞れます(有効にする前の費用は、タグでは絞れません)。
+- `.env` に `BUDGET_MONTHLY_USD` と `BUDGET_EMAIL` をそろえて渡すと、`<接頭辞>-budget` に月の費用の予算を作ります。
+  共通のタグ(`user:Service$mokumoku-exams`)で絞った費用について、次のときに `BUDGET_EMAIL` へメールで知らせます(購読の承認は要りません)。
+
+  | 種類 | 条件 |
+  | --- | --- |
+  | 実績(ACTUAL) | 予算の 80% を超えたとき、100% を超えたとき |
+  | 予測(FORECASTED) | 月末までの予測が、予算の 100% を超えたとき |
+
+- 片方だけを渡すと、合成の前に止まります。どちらも渡さないときは、予算を作りません。
+- 予算はアカウントの単位で、タグは環境の接頭辞を含みません。同じアカウントに接頭辞の違う環境を置くときは、予算の設定はどれか 1 つの環境の `.env` だけに書きます(ほかの環境も同じタグで数えられるため)。
+- タグを付けられない費用(税など)は、予算に数えられません。アカウント全体の費用は、請求の画面で確かめます。
+
 ### 同時実行の上限
 
 - `.env` の `APP_RESERVED_CONCURRENCY` を渡すと、アプリの Lambda に、その数の同時実行を予約します(それより多くは同時に動きません)。
@@ -136,6 +159,8 @@ Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminCre
    | `VAPID_PRIVATE_KEY_PARAMETER` | (省略可)VAPID の秘密鍵を置いた SSM パラメーター(SecureString)の名前。`/` で始まる階層の名前にします。値は `.env` に書きません |
    | `VAPID_SUBJECT` | (省略可)送信者の連絡先(`mailto:` か `https://` で始まる)。プッシュサービスが、問題があったときの連絡に使います |
    | `DOMAIN_NAME`、`CERTIFICATE_ARN`、`HOSTED_ZONE_ID` | (省略可)独自ドメイン。「独自ドメイン」を参照 |
+   | `BUDGET_MONTHLY_USD` | (省略可)月の費用の予算の金額(USD。小数は 2 桁まで)。`BUDGET_EMAIL` とそろえて渡します(「費用の予算と共通のタグ」) |
+   | `BUDGET_EMAIL` | (省略可)予算を超えそうなときに知らせるメールアドレス |
 
    VAPID の鍵は、`npx web-push generate-vapid-keys` で作ります。公開鍵は `.env` に書き、秘密鍵は SSM パラメーターに置きます(「VAPID の秘密鍵」)。秘密鍵は、ほかに書き写しません。
    鍵を作り直すと、それまでの購読には送れなくなります(利用者が、アカウントの画面で購読し直します)。

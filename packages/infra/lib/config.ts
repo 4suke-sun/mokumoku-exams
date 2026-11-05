@@ -14,6 +14,8 @@ export const OPTIONAL_VARIABLES = [
   "DOMAIN_NAME",
   "CERTIFICATE_ARN",
   "HOSTED_ZONE_ID",
+  "BUDGET_MONTHLY_USD",
+  "BUDGET_EMAIL",
 ] as const;
 
 /**
@@ -21,6 +23,9 @@ export const OPTIONAL_VARIABLES = [
  * 秘密鍵の値そのものは扱わない(SecureString のパラメーターとして、運用者が作る。docs/app/infra.md)。
  */
 const VAPID_VARIABLES = ["VAPID_PUBLIC_KEY", "VAPID_PRIVATE_KEY_PARAMETER", "VAPID_SUBJECT"] as const;
+
+/** 月の費用の予算の金額(USD)と、知らせる先のメールアドレス。2 つそろえて設定する(どれかだけは不可)。 */
+const BUDGET_VARIABLES = ["BUDGET_MONTHLY_USD", "BUDGET_EMAIL"] as const;
 
 /** .env.example に載せる変数の全体。載せる変数と、ここの一覧が食い違わないことをテストで確かめる。 */
 export const ENV_VARIABLES = [...TOOL_VARIABLES, ...REQUIRED_VARIABLES, ...OPTIONAL_VARIABLES] as const;
@@ -45,6 +50,15 @@ export type InfraConfig = {
    * アカウントの同時実行の上限から、予約していない分を 100 以上残す必要がある(docs/app/infra.md)
    */
   appReservedConcurrency?: number;
+  /** 月の費用の予算。なければ、予算(BudgetStack)を作らない */
+  budget?: BudgetConfig;
+};
+
+export type BudgetConfig = {
+  /** 月の予算の金額(USD)。共通のタグで絞った費用と比べる */
+  monthlyUsd: number;
+  /** 予算を超えそうなときに知らせるメールアドレス */
+  email: string;
 };
 
 export type CustomDomain = {
@@ -80,6 +94,8 @@ const DOMAIN_NAME = /^(?=.{1,253}$)([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{
 // CloudFront に付ける証明書は、us-east-1 に置く必要がある
 const CERTIFICATE_ARN = /^arn:aws:acm:us-east-1:\d{12}:certificate\/[0-9a-f-]{36}$/;
 const HOSTED_ZONE_ID = /^Z[A-Z0-9]{1,31}$/;
+// 予算の金額(USD)。小数は 2 桁まで
+const BUDGET_AMOUNT = /^\d{1,9}(\.\d{1,2})?$/;
 
 /**
  * 環境変数からインフラの設定を作る。
@@ -145,6 +161,7 @@ export function loadConfig(env: Env): InfraConfig {
   }
 
   const customDomain = loadCustomDomain(env, problems);
+  const budget = loadBudget(env, problems);
 
   if (problems.length > 0) {
     throw new Error(`.env の設定に問題があります:\n- ${problems.join("\n- ")}`);
@@ -158,7 +175,26 @@ export function loadConfig(env: Env): InfraConfig {
     ...(appReservedConcurrency !== undefined ? { appReservedConcurrency } : {}),
     ...(push ? { push } : {}),
     ...(customDomain ? { customDomain } : {}),
+    ...(budget ? { budget } : {}),
   };
+}
+
+/** 月の費用の予算。金額と宛先はそろえて渡す。どちらもなければ、予算を作らない。 */
+function loadBudget(env: Env, problems: string[]): BudgetConfig | undefined {
+  const set = BUDGET_VARIABLES.filter((name) => env[name]);
+  if (set.length === 0) return undefined;
+  if (set.length < BUDGET_VARIABLES.length) {
+    problems.push(`${BUDGET_VARIABLES.join(" / ")} は、そろえて設定してください`);
+    return undefined;
+  }
+  const amount = env.BUDGET_MONTHLY_USD ?? "";
+  const monthlyUsd = Number(amount);
+  if (!BUDGET_AMOUNT.test(amount) || !(monthlyUsd > 0)) {
+    problems.push("BUDGET_MONTHLY_USD は、0 より大きい金額(USD。小数は 2 桁まで)にしてください");
+  }
+  const email = env.BUDGET_EMAIL ?? "";
+  if (!EMAIL.test(email)) problems.push("BUDGET_EMAIL は、メールアドレスの形にしてください");
+  return { monthlyUsd, email };
 }
 
 /** 独自ドメインの設定。ドメイン名と証明書はそろえて渡す。ホストゾーンは、ドメイン名があるときだけ使う。 */
