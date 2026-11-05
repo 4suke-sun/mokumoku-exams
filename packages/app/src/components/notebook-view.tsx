@@ -3,11 +3,13 @@ import Link from "next/link";
 import { DiagramView } from "@/components/diagram.tsx";
 import { EmptyState } from "@/components/empty-state.tsx";
 import {
-  NotebookCheckItem,
   NotebookCoverProgress,
   NotebookDomainProgress,
   NotebookReview,
-  NotebookUnitCompleted,
+  NotebookSectionChecks,
+  NotebookSectionPager,
+  NotebookSectionScope,
+  NotebookSectionStatus,
 } from "@/components/notebook-check.tsx";
 import { ReferenceList } from "@/components/reference-list.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
@@ -15,6 +17,7 @@ import { domainColorClasses } from "@/lib/domain-color.ts";
 import {
   type NotebookEntry,
   type NotebookUnit,
+  neighborEntries,
   neighborUnits,
   splitKeyPhrase,
   type TocDomain,
@@ -113,20 +116,30 @@ function StatusChip({ status }: { status: NotebookEntry["status"] }) {
   );
 }
 
-/** 見出しのブロック: 一言 → 図 → 解説 → ここを押さえる → 確認 → 検証の状態 → 関連 */
+/**
+ * 節(見出し 1 つ分)のブロック: 一言 → 図 → 解説 → ここを押さえる → 確認 → 検証の状態 → 関連。
+ * 確認の問いと記録の状態は、節の確認の状態(`NotebookSectionScope`)の中に置く。
+ */
 export function NotebookEntryBlock({
   entry,
   related,
   basePath,
+  separated,
 }: {
   entry: NotebookEntry;
   /** 関連する見出し(画面に出すものだけ) */
   related: NotebookEntry[];
   basePath: string;
+  /** 上に区切りの線を引く(中分類の最初の節の、導入と図の下) */
+  separated: boolean;
 }) {
   const headingId = `${entry.id}-term`;
   return (
-    <section id={entry.id} aria-labelledby={headingId} className="scroll-mt-24 space-y-4 border-t border-line pt-6">
+    <section
+      id={entry.id}
+      aria-labelledby={headingId}
+      className={`scroll-mt-24 space-y-4 ${separated ? "border-t border-line pt-6" : ""}`}
+    >
       <h2 id={headingId} className="h2">
         {entry.term}
       </h2>
@@ -149,10 +162,7 @@ export function NotebookEntryBlock({
       ) : null}
       <div className="space-y-2">
         <h3 className="h3 text-muted">確認</h3>
-        {entry.checks.map((check, i) => (
-          // biome-ignore lint/suspicious/noArrayIndexKey: 見出しの中の問いの並びは固定(問いの番号が識別子)
-          <NotebookCheckItem key={`${entry.id}-${i + 1}`} id={`${entry.id}-${i + 1}`} check={check} />
-        ))}
+        <NotebookSectionChecks entryId={entry.id} checks={entry.checks} />
       </div>
       <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-sm">
         <StatusChip status={entry.status} />
@@ -162,10 +172,7 @@ export function NotebookEntryBlock({
             {related.map((other, i) => (
               <span key={other.id}>
                 {i > 0 ? "、" : null}
-                <Link
-                  href={other.unit === entry.unit ? `#${other.id}` : `${basePath}/${other.unit}#${other.id}`}
-                  className="text-primary underline"
-                >
+                <Link href={`${basePath}/${other.unit}/${other.id}`} className="text-primary underline">
                   {other.term}
                 </Link>
               </span>
@@ -220,14 +227,16 @@ function ComparisonTable({ comparison }: { comparison: NotebookComparison }) {
 }
 
 /**
- * 中分類のページ: パンくず → 題 → 導入 → 図 → 見出しごとのブロック → 比較の表 → ここまでのおさらい → 前後の中分類。
- * 見出しのない中分類は「まだ見出しがありません」を出す。
+ * 節のページ: パンくず → 完了の行 →(中分類の最初の節だけ)題・導入・図 → 見出しのブロック → 前後の節 →
+ * (最後の節だけ)比較の表 → ここまでのおさらい → 前後の中分類。
+ * 見出しのない中分類(`entry` が null)は「まだ見出しがありません」を出す。
  * `entries` は、画面に出す見出し(利用者は検証済みだけ。管理者のプレビューは未検証も)を、ファイルの全体から渡す。
  */
-export function NotebookUnitView({
+export function NotebookSectionView({
   exam,
   units,
   unit,
+  entry,
   entries,
   basePath,
   preview,
@@ -235,6 +244,7 @@ export function NotebookUnitView({
   exam: ExamInfo;
   units: NotebookUnit[];
   unit: NotebookUnit;
+  entry: NotebookEntry | null;
   entries: NotebookEntry[];
   basePath: string;
   preview: boolean;
@@ -242,14 +252,17 @@ export function NotebookUnitView({
   const domain = exam.domains.find((d) => d.code === unit.domain);
   const color = domainColorClasses(exam.domains, unit.domain);
   const domainNumber = exam.domains.findIndex((d) => d.code === unit.domain) + 1;
-  const own = entries.filter((entry) => entry.unit === unit.id);
-  const byId = new Map(entries.map((entry) => [entry.id, entry]));
-  const { prev, next } = neighborUnits(units, unit.id);
+  const own = entries.filter((e) => e.unit === unit.id);
+  const byId = new Map(entries.map((e) => [e.id, e]));
+  const { prev: prevUnit, next: nextUnit } = neighborUnits(units, unit.id);
   const label = (u: NotebookUnit) => `${unitNumber(exam.domains, u)} ${u.title}`;
+  const isFirst = !entry || own[0]?.id === entry.id;
+  const isLast = !!entry && own.at(-1)?.id === entry.id;
+  const { prev, next } = entry ? neighborEntries(entries, unit.id, entry.id) : { prev: null, next: null };
 
   return (
-    // 中分類ごとに作り直して、ページの切り替えの動きを 1 回出す
-    <article key={unit.id} className="motion-page space-y-6">
+    // 節ごとに作り直して、ページの切り替えの動きを 1 回出す
+    <article key={entry?.id ?? unit.id} className="motion-page space-y-6">
       <div className="space-y-2">
         <nav aria-label="パンくずリスト" className="text-sm text-muted">
           <ol className="flex flex-wrap gap-x-1">
@@ -266,61 +279,90 @@ export function NotebookUnitView({
                 ›{" "}
               </span>
             </li>
-            <li aria-current="page">{unitNumber(exam.domains, unit)}</li>
+            <li aria-current={entry ? undefined : "page"}>
+              {label(unit)}
+              {entry ? (
+                <span aria-hidden="true" className="text-muted">
+                  {" "}
+                  ›{" "}
+                </span>
+              ) : null}
+            </li>
+            {entry ? <li aria-current="page">{entry.term}</li> : null}
           </ol>
         </nav>
-        <h1 className="h1">{label(unit)}</h1>
-        <NotebookUnitCompleted unitId={unit.id} />
-        {unit.intro ? <p className="text-muted">{unit.intro}</p> : null}
+        {entry ? <NotebookSectionStatus unitId={unit.id} entryId={entry.id} entryIds={own.map((e) => e.id)} /> : null}
+        {isFirst ? (
+          <>
+            <h1 className="h1">{label(unit)}</h1>
+            {unit.intro ? <p className="text-muted">{unit.intro}</p> : null}
+          </>
+        ) : (
+          <h1 className="sr-only">{label(unit)}</h1>
+        )}
       </div>
 
       {preview ? <PreviewNote /> : null}
-      {preview ? (
+      {preview && isFirst ? (
         <p className="flex flex-wrap items-center gap-2 text-sm text-muted">
           中分類の導入・図・表: <StatusChip status={unit.status} />
         </p>
       ) : null}
 
-      {unit.diagram ? (
+      {isFirst && unit.diagram ? (
         <div className="card p-4">
           <DiagramView diagram={unit.diagram} id={`${unit.id}-diagram`} stackOnNarrow />
         </div>
       ) : null}
 
-      {own.length === 0 ? (
+      {entry ? (
+        <NotebookSectionScope key={entry.id} unitId={unit.id} entryId={entry.id} total={entry.checks.length}>
+          <div className="space-y-6">
+            <NotebookEntryBlock
+              entry={entry}
+              related={(entry.related ?? []).flatMap((id) => byId.get(id) ?? [])}
+              basePath={basePath}
+              separated={isFirst}
+            />
+            <NotebookSectionPager
+              basePath={basePath}
+              unitId={unit.id}
+              prev={prev ? { id: prev.id, term: prev.term } : null}
+              next={next ? { id: next.id, term: next.term } : null}
+            />
+          </div>
+        </NotebookSectionScope>
+      ) : (
         <EmptyState
           icon="📝"
           title="まだ見出しがありません"
           description="この中分類の見出しは、これから書き足します。"
         />
-      ) : (
-        own.map((entry) => (
-          <NotebookEntryBlock
-            key={entry.id}
-            entry={entry}
-            related={(entry.related ?? []).flatMap((id) => byId.get(id) ?? [])}
-            basePath={basePath}
-          />
-        ))
       )}
 
-      {unit.comparison ? <ComparisonTable comparison={unit.comparison} /> : null}
+      {isLast && unit.comparison ? <ComparisonTable comparison={unit.comparison} /> : null}
 
-      {own.length > 0 ? <NotebookReview key={unit.id} unitId={unit.id} items={reviewItemsOf(own, unit.id)} /> : null}
+      {isLast ? (
+        <NotebookReview
+          key={unit.id}
+          unit={{ id: unit.id, entries: own.map((e) => ({ id: e.id })) }}
+          items={reviewItemsOf(own, unit.id)}
+        />
+      ) : null}
 
       <nav aria-label="前後の中分類" className="grid gap-3 border-t border-line pt-6 sm:grid-cols-2">
-        {prev ? (
-          <Link href={`${basePath}/${prev.id}`} className="card p-3 text-sm">
+        {prevUnit ? (
+          <Link href={`${basePath}/${prevUnit.id}`} className="card p-3 text-sm">
             <span className="block text-muted">← 前の中分類</span>
-            <span className="block font-bold text-primary">{label(prev)}</span>
+            <span className="block font-bold text-primary">{label(prevUnit)}</span>
           </Link>
         ) : (
           <span />
         )}
-        {next ? (
-          <Link href={`${basePath}/${next.id}`} className="card p-3 text-right text-sm">
+        {nextUnit ? (
+          <Link href={`${basePath}/${nextUnit.id}`} className="card p-3 text-right text-sm">
             <span className="block text-muted">次の中分類 →</span>
-            <span className="block font-bold text-primary">{label(next)}</span>
+            <span className="block font-bold text-primary">{label(nextUnit)}</span>
           </Link>
         ) : null}
       </nav>

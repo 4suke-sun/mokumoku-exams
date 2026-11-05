@@ -3,26 +3,48 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type ReactNode, type RefObject, useCallback, useEffect, useId, useRef, useState } from "react";
-import { NotebookTocMark } from "@/components/notebook-check.tsx";
-import { NotebookProgressProvider } from "@/components/notebook-progress.tsx";
+import { NotebookProgressProvider, useNotebookProgress } from "@/components/notebook-progress.tsx";
 import type { TocDomain } from "@/lib/notebook-data.ts";
+import { currentOf, isEntryDone, unitProgress } from "@/lib/notebook-review.ts";
 
 type Props = {
   examCode: string;
   /** 管理者のプレビュー(履修済みを読まず、記録もしない) */
   preview: boolean;
-  /** 表紙の URL。中分類のページは `<basePath>/<中分類の ID>` */
+  /** 表紙の URL。節のページは `<basePath>/<中分類の ID>/<見出しの ID>` */
   basePath: string;
   toc: TocDomain[];
   children: ReactNode;
 };
 
-/** 2 段の目次(分野 → 中分類)。中分類ごとに見出しの数を出し、空の中分類は補助の色で薄く出す */
+/**
+ * 3 段の目次(分野 → 中分類 → 節)。節に完了の印、中分類に完了した節の数と履修済みの印を付ける(アカウントから読めたときだけ)。
+ * いまの中分類だけ節を開き、中分類の行で開閉する。見出しのない中分類は、補助の色で薄く出し、開けない。
+ * いまの中分類が変わったら、開閉の操作を捨てる(いまの中分類を開く)。
+ */
 export function NotebookToc({ basePath, toc }: { basePath: string; toc: TocDomain[] }) {
   const pathname = usePathname();
-  const itemClass = (active: boolean, empty = false) =>
+  const current = currentOf(pathname, basePath);
+  return <TocBody key={current.unit ?? ""} basePath={basePath} toc={toc} current={current} pathname={pathname} />;
+}
+
+function TocBody({
+  basePath,
+  toc,
+  current,
+  pathname,
+}: {
+  basePath: string;
+  toc: TocDomain[];
+  current: { unit?: string; entry?: string };
+  pathname: string;
+}) {
+  const { records } = useNotebookProgress();
+  const [toggled, setToggled] = useState<ReadonlyMap<string, boolean>>(new Map());
+  const panelPrefix = useId();
+  const itemClass = (active: boolean) =>
     `flex items-baseline justify-between gap-2 rounded-md px-2 py-1 ${
-      active ? "bg-soft font-bold text-primary" : empty ? "text-muted hover:bg-bg" : "text-fg hover:bg-bg"
+      active ? "bg-soft font-bold text-primary" : "text-fg hover:bg-bg"
     }`;
   return (
     <nav aria-label="体系ノートの目次" className="space-y-3 text-sm">
@@ -47,23 +69,74 @@ export function NotebookToc({ basePath, toc }: { basePath: string; toc: TocDomai
             </p>
             <ol className="space-y-0.5">
               {domain.units.map((unit) => {
-                const href = `${basePath}/${unit.id}`;
-                const active = pathname === href;
+                if (unit.count === 0) {
+                  // 見出しのない中分類: 薄く出し、開けない。印も付けない
+                  return (
+                    <li key={unit.id}>
+                      <p className="flex items-baseline justify-between gap-2 px-2 py-1 pl-4 text-muted">
+                        <span>
+                          {unit.number} {unit.title}
+                        </span>
+                        <span className="shrink-0 text-xs">
+                          0<span className="sr-only"> 件</span>
+                        </span>
+                      </p>
+                    </li>
+                  );
+                }
+                const open = toggled.get(unit.id) ?? unit.id === current.unit;
+                const panelId = `${panelPrefix}-${unit.id}`;
+                const progress = records ? unitProgress(unit, records) : null;
                 return (
                   <li key={unit.id}>
-                    <Link
-                      href={href}
-                      aria-current={active ? "page" : undefined}
-                      className={`${itemClass(active, unit.count === 0)} pl-4`}
+                    <button
+                      type="button"
+                      aria-expanded={open}
+                      aria-controls={panelId}
+                      onClick={() => setToggled((m) => new Map(m).set(unit.id, !open))}
+                      className={`${itemClass(false)} w-full pl-4 text-left ${unit.id === current.unit ? "font-bold" : ""}`}
                     >
                       <span>
-                        {unit.number} {unit.title} <NotebookTocMark unitId={unit.id} />
+                        <span aria-hidden="true">{open ? "▾" : "▸"} </span>
+                        {unit.number} {unit.title}
+                        {progress?.completed ? (
+                          <span className="text-correct">
+                            {" "}
+                            <span aria-hidden="true">✓</span>
+                            <span className="sr-only">履修済み</span>
+                          </span>
+                        ) : null}
                       </span>
                       <span className="shrink-0 text-xs">
-                        {unit.count}
-                        <span className="sr-only"> 件</span>
+                        {progress ? `${progress.done} / ${progress.total}` : unit.count}
+                        <span className="sr-only">{progress ? " 節完了" : " 件"}</span>
                       </span>
-                    </Link>
+                    </button>
+                    {open ? (
+                      <ol id={panelId} className="space-y-0.5 pt-0.5">
+                        {unit.entries.map((entry) => {
+                          const active = unit.id === current.unit && entry.id === current.entry;
+                          const done = records ? isEntryDone(records, unit.id, entry.id) : false;
+                          return (
+                            <li key={entry.id}>
+                              <Link
+                                href={`${basePath}/${unit.id}/${entry.id}`}
+                                aria-current={active ? "page" : undefined}
+                                className={`${itemClass(active)} pl-8`}
+                              >
+                                <span>{entry.term}</span>
+                                {done ? (
+                                  <span className="shrink-0 text-correct">
+                                    <span aria-hidden="true">✓</span>
+                                    <span className="sr-only">完了</span>
+                                  </span>
+                                ) : null}
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ol>
+                    ) : null}
                   </li>
                 );
               })}
@@ -170,7 +243,7 @@ function TocDrawer({
 }
 
 /**
- * 目次の中で、いまの中分類の項目(`aria-current="page"`)が見えていなければ、目次だけをスクロールして、項目を見える範囲の中ほどに出す。
+ * 目次の中で、いまの節の項目(`aria-current="page"`)が見えていなければ、目次だけをスクロールして、項目を見える範囲の中ほどに出す。
  * ページ(window)はスクロールしない(`scrollIntoView` は、ページごと動かすため使わない)。
  */
 export function revealCurrent(container: HTMLElement) {

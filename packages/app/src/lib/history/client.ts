@@ -131,23 +131,9 @@ export async function fetchNotebook(examCode: string): Promise<NotebookProgressD
   };
 }
 
-/** 体系ノートの、旧い中分類の履修済みと最初に履修した時刻(中分類の ID から時刻)。取得できなければ null。 */
-export async function fetchNotebookUnits(examCode: string): Promise<Map<string, string> | null> {
-  return (await fetchNotebook(examCode))?.units ?? null;
-}
-
 /** 体系ノートの節を、完了として記録する。記録できたら true。 */
 export async function putNotebookEntry(examCode: string, unit: string, entry: string): Promise<boolean> {
   return (await requestJson("/api/history/notebook", { method: "PUT", body: { examCode, unit, entry } })).ok;
-}
-
-/**
- * 旧い形(中分類だけ)の記録。サーバーは `entry` のない本文を `400` で断るので、記録できない(常に失敗する)。
- * 画面が節の完了に移るまでの一時の残り。
- * @deprecated `putNotebookEntry` を使う。
- */
-export async function putNotebookUnit(examCode: string, unit: string): Promise<boolean> {
-  return (await requestJson("/api/history/notebook", { method: "PUT", body: { examCode, unit } })).ok;
 }
 
 const SectionsSchema = z.object({ progress: SectionProgressSchema });

@@ -5,6 +5,7 @@ import {
   loadNotebook,
   type NotebookEntry,
   type NotebookUnit,
+  neighborEntries,
   neighborUnits,
   sortNotebook,
   splitKeyPhrase,
@@ -76,6 +77,32 @@ describe("公開の絞り込み", () => {
 
   it("管理者のプレビュー_未検証の見出しも出す", () => {
     expect(visibleEntries(entries, true).map((e) => e.id)).toEqual(["a", "b"]);
+  });
+
+  it("目次の節_絞り込みのあとの見出しの並びで 3 段にし_空の中分類は節を持たない", () => {
+    const units = [unit("domain1", 1), unit("domain1", 2)];
+    const all = [
+      entry("b", "domain1-1", 2, "verified"),
+      entry("a", "domain1-1", 1, "verified"),
+      entry("x", "domain1-1", 3, "unverified"),
+    ];
+    const sorted = sortNotebook(domains, { units, entries: all }).entries;
+    const toc = buildToc(domains, units, visibleEntries(sorted, false));
+    expect(toc[0]?.units.map((u) => u.entries.map((e) => e.id))).toEqual([["a", "b"], []]);
+    expect(toc[0]?.units[0]?.entries[0]).toEqual({ id: "a", term: "a" });
+  });
+
+  it("節の前後_同じ中分類の中の並びで_端では null", () => {
+    const list = [
+      entry("a", "domain1-1", 1, "verified"),
+      entry("b", "domain1-1", 2, "verified"),
+      entry("c", "domain1-1", 3, "verified"),
+      entry("z", "domain1-2", 1, "verified"),
+    ];
+    expect(neighborEntries(list, "domain1-1", "b")).toEqual({ prev: list[0], next: list[2] });
+    expect(neighborEntries(list, "domain1-1", "a").prev).toBeNull();
+    expect(neighborEntries(list, "domain1-1", "c").next).toBeNull();
+    expect(neighborEntries(list, "domain1-2", "zz")).toEqual({ prev: null, next: null });
   });
 
   it("目次の数_絞り込みのあとの見出しで数え_空の中分類は 0", () => {
