@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { FAKE_INVITED_PHRASE, FAKE_USER_PHRASE } from "./fake.ts";
+import { FAKE_SIGNUP_CODE, FAKE_USER_PHRASE } from "./fake.ts";
 import { getAuthProvider, getTokenVerifier, getUserAdmin } from "./index.ts";
 
 describe("getAuthProvider", () => {
@@ -56,14 +56,17 @@ describe("getUserAdmin", () => {
   it("手元の開発で AUTH_FAKE=1 のとき_代替の認証と同じ利用者の一覧を操作する", async () => {
     const env = { NODE_ENV: "development", AUTH_FAKE: "1" } as const;
     const users = getUserAdmin(env);
-    const email = "index-invited@example.com";
-    const invited = await users.inviteUser(email);
-    // 招待した利用者は、仮パスワードでログインすると、新しいパスワードを決める入力に進む
-    expect(await getAuthProvider(env).signIn(email, FAKE_INVITED_PHRASE)).toMatchObject({
-      kind: "new-password-required",
-    });
-    await users.disableUser(invited.username);
-    await expect(getAuthProvider(env).signIn(email, FAKE_INVITED_PHRASE)).rejects.toMatchObject({
+    const email = "index-signup@example.com";
+    const phrase = ["Index", "Example", "123"].join("-");
+    // 代替の認証で登録すると、利用者の管理の一覧に確認待ちで出る
+    await getAuthProvider(env).signUp(email, phrase);
+    expect(await users.getSignUpState(email)).toMatchObject({ status: "UNCONFIRMED" });
+    await getAuthProvider(env).confirmSignUp({ email, code: FAKE_SIGNUP_CODE });
+    expect(await getAuthProvider(env).signIn(email, phrase)).toMatchObject({ kind: "signed-in" });
+    const listed = (await users.listUsers()).find((u) => u.email === email);
+    if (!listed) throw new Error("unexpected");
+    await users.disableUser(listed.username);
+    await expect(getAuthProvider(env).signIn(email, phrase)).rejects.toMatchObject({
       code: "invalid-credentials",
     });
   });

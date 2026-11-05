@@ -16,6 +16,7 @@ import {
   ownedStore,
   passedStages,
   type Result,
+  removeOwnerRecords,
   removeUnownedRecords,
   type SectionProgress,
   type Session,
@@ -483,6 +484,27 @@ describe("端末の記録の持ち主の照合", () => {
     expect(keys().sort()).toEqual(
       [`mokumoku:v1:${A}:session:TEST`, "mokumoku:v1:settings", "mokumoku:v1:theme"].sort(),
     );
+  });
+
+  it("退会した持ち主の記録_その持ち主の記録だけを消し_ほかの持ち主と持ち主のない値は残す", () => {
+    const device = memoryStore({
+      [`mokumoku:v1:${A}:session:TEST`]: "{}",
+      [`mokumoku:v1:${A}:results:TEST`]: "[]",
+      [`mokumoku:v1:${B}:results:TEST`]: "[]",
+      "mokumoku:v1:settings": "{}",
+    });
+    const keys = () => [...device.data.keys()];
+    const storage = {
+      get length() {
+        return device.data.size;
+      },
+      key: (index: number) => keys()[index] ?? null,
+      removeItem: device.removeItem,
+    };
+    removeOwnerRecords(storage, "not-a-tag");
+    expect(keys()).toHaveLength(4);
+    removeOwnerRecords(storage, A);
+    expect(keys().sort()).toEqual([`mokumoku:v1:${B}:results:TEST`, "mokumoku:v1:settings"].sort());
   });
 
   it("持ち主の印_形の合わない値は_取れないもの(null)として扱う", () => {

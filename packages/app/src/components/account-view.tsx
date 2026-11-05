@@ -4,9 +4,10 @@ import Link from "next/link";
 import { type FormEvent, useEffect, useState } from "react";
 import { Notice } from "@/components/notice.tsx";
 import { postJson } from "@/lib/auth/client.ts";
+import { navigateWithReload } from "@/lib/auth/navigate.ts";
 import { PASSWORD_RULE_TEXT, passwordProblem } from "@/lib/auth/password.ts";
 import { changePrefs } from "@/lib/prefs-client.ts";
-import { browserStore, DEFAULT_SETTINGS, loadSettings } from "@/lib/storage.ts";
+import { browserStore, DEFAULT_SETTINGS, loadSettings, removeOwnerRecords, storageOwner } from "@/lib/storage.ts";
 import { Field, FormError, SubmitButton } from "./form-parts.tsx";
 import { PushSettings } from "./push-settings.tsx";
 import { useSession } from "./session-provider.tsx";
@@ -138,6 +139,94 @@ export function AccountView({ pushPublicKey = null }: { pushPublicKey?: string |
       </div>
 
       <PushSettings publicKey={pushPublicKey} canSendTest={state.isAdmin} />
+
+      <DeleteAccount onSessionExpired={reload} />
     </section>
+  );
+}
+
+const secondaryButton = "rounded-md border border-line px-5 py-3 font-bold disabled:opacity-50";
+
+/**
+ * 退会の節。「退会する…」で、消えるものと元に戻せないことを示し、パスワードを求める(管理者の画面の無効化と同じ 2 段の確認)。
+ * 退会が通ったら、この端末の学習の記録(持ち主の印で分けたもの)を消し、ログインの画面へ移る。
+ */
+function DeleteAccount({ onSessionExpired }: { onSessionExpired: () => Promise<void> }) {
+  const [confirming, setConfirming] = useState(false);
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
+
+  async function submit(event: FormEvent) {
+    event.preventDefault();
+    setBusy(true);
+    setError(null);
+    const owner = storageOwner();
+    const result = await postJson("/api/auth/delete-account", { password });
+    if (!result.ok) {
+      setBusy(false);
+      setError(result.message);
+      // ログインの期限が切れていたときは、状態を読み直してログイン画面へ戻す
+      if (result.code === "session-expired") await onSessionExpired();
+      return;
+    }
+    try {
+      if (owner) removeOwnerRecords(window.localStorage, owner);
+    } catch {
+      // 保存が禁止されているときなど。消せなくても、持ち主の違う記録は読まれない
+    }
+    // ページごと読み込み直し、ログアウトした状態から読み直す。読み込みが終わるまで、ボタンは押せないままにする
+    navigateWithReload("/login?deleted=1");
+  }
+
+  return (
+    <div className="max-w-md space-y-3">
+      <h2 className="h2">退会</h2>
+      {confirming ? (
+        <form onSubmit={submit} className="space-y-5" noValidate>
+          <p>退会すると、次のものを消します。元に戻すことはできません。</p>
+          <ul className="list-disc space-y-1 pl-6">
+            <li>アカウント</li>
+            <li>サーバーの学習の記録</li>
+            <li>通知の購読</li>
+            <li>この端末の学習の記録</li>
+          </ul>
+          <Field
+            id="delete-password"
+            label="パスワード"
+            type="password"
+            value={password}
+            onChange={setPassword}
+            autoComplete="current-password"
+          />
+          <FormError message={error} />
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="submit"
+              disabled={busy}
+              className="rounded-md border border-incorrect px-5 py-3 font-bold text-incorrect disabled:opacity-50"
+            >
+              {busy ? "処理しています…" : "退会する"}
+            </button>
+            <button
+              type="button"
+              className={secondaryButton}
+              disabled={busy}
+              onClick={() => {
+                setConfirming(false);
+                setPassword("");
+                setError(null);
+              }}
+            >
+              やめる
+            </button>
+          </div>
+        </form>
+      ) : (
+        <button type="button" className={secondaryButton} onClick={() => setConfirming(true)}>
+          退会する…
+        </button>
+      )}
+    </div>
   );
 }

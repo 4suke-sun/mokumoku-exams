@@ -78,7 +78,16 @@ export const PAGE_WIDTH_CLASSES: Record<PageWidth, string> = {
   play: "max-w-5xl xl:max-w-6xl",
 };
 
-const READ_PATHS = ["/help", "/release-notes", "/account", "/login", "/forgot-password", "/admin"];
+const READ_PATHS = [
+  "/help",
+  "/release-notes",
+  "/account",
+  "/login",
+  "/forgot-password",
+  "/signup",
+  "/privacy",
+  "/admin",
+];
 
 export function pageWidth(pathname: string): PageWidth {
   // 体系ノートは、左に目次を置くので、広い幅にする(管理者のプレビューも同じ)

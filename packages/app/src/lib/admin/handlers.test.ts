@@ -4,13 +4,7 @@ import { type ManagedUser, type UserAdmin, UserAdminError } from "@/lib/auth/use
 import type { TokenVerifier } from "@/lib/auth/verify.ts";
 import { fakeTable } from "@/lib/history/table-double.ts";
 import { type AuditLog, auditKey, createDynamoAuditLog, createMemoryAuditLog } from "./audit.ts";
-import {
-  type AdminDeps,
-  handleDisableUser,
-  handleInviteUser,
-  handleListUsers,
-  MAX_ADMIN_BODY_BYTES,
-} from "./handlers.ts";
+import { type AdminDeps, handleDisableUser, handleListUsers, MAX_ADMIN_BODY_BYTES } from "./handlers.ts";
 
 const ORIGIN = "http://localhost";
 const NOW = Date.parse("2026-10-12T00:00:00.000Z");
@@ -38,22 +32,16 @@ function memoryUsers(initial: ManagedUser[] = []) {
     async listUsers() {
       return users.map((u) => ({ ...u }));
     },
-    async inviteUser(email) {
-      if (users.some((u) => u.email === email)) throw new UserAdminError("already-exists");
-      const user = {
-        username: `user-${users.length + 1}`,
-        email,
-        status: "FORCE_CHANGE_PASSWORD",
-        enabled: true,
-        createdAt: null,
-      };
-      users.push(user);
-      return { ...user };
-    },
     async disableUser(username) {
       const user = users.find((u) => u.username === username);
       if (!user) throw new UserAdminError("not-found");
       user.enabled = false;
+    },
+    async getSignUpState() {
+      return null;
+    },
+    async deleteStaleUnconfirmed() {
+      return false;
     },
   };
   return { users, admin };
@@ -88,7 +76,6 @@ function post(path: string, value: unknown, headers: Record<string, string> = {}
     body: raw ?? JSON.stringify(value),
   });
 }
-const invite = (value: unknown, headers: Record<string, string> = {}) => post("/api/admin/users", value, headers);
 const disable = (value: unknown, headers: Record<string, string> = {}) =>
   post("/api/admin/users/disable", value, headers);
 
@@ -102,7 +89,6 @@ describe("管理者の API の認可", () => {
     for (const cookie of [undefined, "mokumoku_id=forged", asUser("learner")]) {
       const headers: Record<string, string> = cookie ? { cookie } : {};
       expect((await handleListUsers(get("", headers), deps)).status).toBe(403);
-      expect((await handleInviteUser(invite({ email: "new@example.com" }, headers), deps)).status).toBe(403);
       expect((await handleDisableUser(disable({ username: "user-9" }, headers), deps)).status).toBe(403);
     }
     expect(users).toHaveLength(1);
@@ -177,67 +163,24 @@ describe("利用者の一覧", () => {
   });
 });
 
-describe("招待", () => {
-  it("メールアドレスで招待し_結果を返す_同じアドレスは 409", async () => {
-    const { users, deps } = setup();
-    const response = await handleInviteUser(invite({ email: " new@example.com " }, { cookie: asUser(ADMIN) }), deps);
-    expect(response.status).toBe(200);
-    expect(((await response.json()) as { user: ManagedUser }).user).toMatchObject({
-      email: "new@example.com",
-      status: "FORCE_CHANGE_PASSWORD",
-    });
-    expect(users).toHaveLength(1);
-    const again = await handleInviteUser(invite({ email: "new@example.com" }, { cookie: asUser(ADMIN) }), deps);
-    expect(again.status).toBe(409);
-    expect(await again.json()).toEqual({ error: "already-exists" });
+describe("一覧のメールアドレス", () => {
+  it("確認待ちの利用者_Cognito の状態のまま一覧に返す", async () => {
+    const { deps } = setup([{ ...user("user-2", "two@example.com", null), status: "UNCONFIRMED" }]);
+    const response = await handleListUsers(get("", { cookie: asUser(ADMIN) }), deps);
+    const { users } = (await response.json()) as { users: ManagedUser[] };
+    expect(users[0]).toMatchObject({ email: "two@example.com", status: "UNCONFIRMED" });
   });
 
-  it("メールアドレスの形でない・未知の項目・大きすぎる本文・JSON でない・別サイトから_断り_招待しない", async () => {
-    const { users, deps } = setup();
-    const cookie = asUser(ADMIN);
-    for (const email of ["", "not-an-email", "a@", `${"a".repeat(250)}@example.com`, 1]) {
-      expect((await handleInviteUser(invite({ email }, { cookie }), deps)).status, String(email)).toBe(400);
-    }
-    for (const key of ["sub", "actor", "groups", "username"]) {
-      const response = await handleInviteUser(invite({ email: "new@example.com", [key]: "x" }, { cookie }), deps);
-      expect(response.status, key).toBe(400);
-    }
-    const large = await handleInviteUser(
-      invite({ email: "new@example.com", pad: "x".repeat(MAX_ADMIN_BODY_BYTES) }, { cookie }),
-      deps,
-    );
-    expect(large.status).toBe(413);
-    const broken = await handleInviteUser(post("/api/admin/users", null, { cookie }, "{"), deps);
-    expect(broken.status).toBe(400);
-    const form = await handleInviteUser(
-      new Request(`${ORIGIN}/api/admin/users`, {
-        method: "POST",
-        headers: { cookie, "content-type": "application/x-www-form-urlencoded" },
-        body: "email=new%40example.com",
-      }),
-      deps,
-    );
-    expect(form.status).toBe(415);
-    const crossSite = await handleInviteUser(
-      invite({ email: "new@example.com" }, { cookie, "sec-fetch-site": "cross-site" }),
-      deps,
-    );
-    expect(crossSite.status).toBe(403);
-    expect(users).toHaveLength(0);
-  });
-
-  it("メールアドレス_成功しても失敗しても_サーバーのログに出さない", async () => {
+  it("メールアドレス_一覧が成功しても失敗しても_サーバーのログに出さない", async () => {
     const spies = (["log", "info", "warn", "error", "debug"] as const).map((level) =>
       vi.spyOn(console, level).mockImplementation(() => undefined),
     );
-    const { deps } = setup();
+    const { deps } = setup([user("user-9", "secret@example.com", null)]);
     const cookie = asUser(ADMIN);
-    await handleInviteUser(invite({ email: "secret@example.com" }, { cookie }), deps);
-    await handleInviteUser(invite({ email: "secret@example.com" }, { cookie }), deps);
-    deps.users.inviteUser = async () => {
+    await handleListUsers(get("", { cookie }), deps);
+    deps.users.listUsers = async () => {
       throw new Error("secret@example.com");
     };
-    await handleInviteUser(invite({ email: "secret@example.com" }, { cookie }), deps);
     await handleListUsers(get("", { cookie }), deps);
     // 失敗の記録(経路・状態・例外の名前)は出るが、メールアドレスは含まない
     const output = spies.flatMap((spy) => spy.mock.calls.map((call) => call.map(String).join(" "))).join("\n");
@@ -291,6 +234,31 @@ describe("無効化と操作の記録", () => {
     }
     expect(users[0]?.enabled).toBe(true);
     expect(audit.entries).toEqual([]);
+  });
+
+  it("大きすぎる本文・JSON でない・別サイトから_断り_無効にしない", async () => {
+    const { users, deps } = setup([user("user-9", "nine@example.com", null)]);
+    const cookie = asUser(ADMIN);
+    const large = await handleDisableUser(
+      disable({ username: "user-9", pad: "x".repeat(MAX_ADMIN_BODY_BYTES) }, { cookie }),
+      deps,
+    );
+    expect(large.status).toBe(413);
+    const form = await handleDisableUser(
+      new Request(`${ORIGIN}/api/admin/users/disable`, {
+        method: "POST",
+        headers: { cookie, "content-type": "application/x-www-form-urlencoded" },
+        body: "username=user-9",
+      }),
+      deps,
+    );
+    expect(form.status).toBe(415);
+    const crossSite = await handleDisableUser(
+      disable({ username: "user-9" }, { cookie, "sec-fetch-site": "cross-site" }),
+      deps,
+    );
+    expect(crossSite.status).toBe(403);
+    expect(users[0]?.enabled).toBe(true);
   });
 
   it("記録を残せない_503 を返す", async () => {

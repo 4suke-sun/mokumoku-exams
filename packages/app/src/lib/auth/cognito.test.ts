@@ -72,6 +72,7 @@ describe("createCognitoProvider", () => {
   it.each([
     ["NotAuthorizedException", "invalid-credentials"],
     ["UserNotFoundException", "invalid-credentials"],
+    ["UserNotConfirmedException", "not-confirmed"],
     ["InvalidPasswordException", "password-policy"],
     ["CodeMismatchException", "code-invalid"],
     ["ExpiredCodeException", "code-expired"],
@@ -95,11 +96,75 @@ describe("createCognitoProvider", () => {
     expect(await codeOf(cognito.signIn("a@example.com", "pw"))).toBe("unavailable");
   });
 
-  it("再設定の依頼で利用者がいなくても_成功として扱うが_回数の制限は伝える", async () => {
+  it("再設定の依頼で利用者がいなくても_成功として扱うが_送信の上限と回数の制限は伝える", async () => {
     const missing = provider(() => ({ ok: false, body: { __type: "UserNotFoundException" } }));
     await expect(missing.cognito.requestPasswordReset("a@example.com")).resolves.toBeUndefined();
     const limited = provider(() => ({ ok: false, body: { __type: "LimitExceededException" } }));
-    expect(await codeOf(limited.cognito.requestPasswordReset("a@example.com"))).toBe("limit-exceeded");
+    expect(await codeOf(limited.cognito.requestPasswordReset("a@example.com"))).toBe("send-limit");
+    const undelivered = provider(() => ({ ok: false, body: { __type: "CodeDeliveryFailureException" } }));
+    expect(await codeOf(undelivered.cognito.requestPasswordReset("a@example.com"))).toBe("send-limit");
+    const throttled = provider(() => ({ ok: false, body: { __type: "TooManyRequestsException" } }));
+    expect(await codeOf(throttled.cognito.requestPasswordReset("a@example.com"))).toBe("limit-exceeded");
+  });
+
+  it("登録すると_メールアドレスを属性に入れて SignUp を呼ぶ", async () => {
+    const { cognito, calls } = provider(() => ({ ok: true, body: { UserConfirmed: false } }));
+    await cognito.signUp("new@example.com", "pw");
+    expect(calls[0]?.headers["x-amz-target"]).toBe("AWSCognitoIdentityProviderService.SignUp");
+    expect(calls[0]?.body).toEqual({
+      ClientId: "client-example",
+      Username: "new@example.com",
+      Password: "pw",
+      UserAttributes: [{ Name: "email", Value: "new@example.com" }],
+    });
+  });
+
+  it.each([
+    ["CodeDeliveryFailureException", "send-limit"],
+    ["LimitExceededException", "send-limit"],
+    ["UsernameExistsException", "already-exists"],
+    ["InvalidPasswordException", "password-policy"],
+    ["TooManyRequestsException", "limit-exceeded"],
+  ])("登録の失敗の種類が%sのとき_%sとして扱う", async (type, expected) => {
+    const { cognito } = provider(() => ({ ok: false, body: { __type: type } }));
+    expect(await codeOf(cognito.signUp("a@example.com", "pw"))).toBe(expected);
+  });
+
+  it("確認コードを確かめると_ConfirmSignUp を呼び_コードの誤りを伝える", async () => {
+    const ok = provider(() => ({ ok: true, body: {} }));
+    await ok.cognito.confirmSignUp({ email: "a@example.com", code: "123" });
+    expect(ok.calls[0]?.headers["x-amz-target"]).toBe("AWSCognitoIdentityProviderService.ConfirmSignUp");
+    expect(ok.calls[0]?.body).toMatchObject({ Username: "a@example.com", ConfirmationCode: "123" });
+    const wrong = provider(() => ({ ok: false, body: { __type: "CodeMismatchException" } }));
+    expect(await codeOf(wrong.cognito.confirmSignUp({ email: "a@example.com", code: "1" }))).toBe("code-invalid");
+  });
+
+  it("確認コードの送り直しで利用者がいなくても_成功として扱うが_送信の上限と回数の制限は伝える", async () => {
+    const sent = provider(() => ({ ok: true, body: {} }));
+    await sent.cognito.resendCode("a@example.com");
+    expect(sent.calls[0]?.headers["x-amz-target"]).toBe("AWSCognitoIdentityProviderService.ResendConfirmationCode");
+    expect(sent.calls[0]?.body).toMatchObject({ Username: "a@example.com" });
+    const missing = provider(() => ({ ok: false, body: { __type: "UserNotFoundException" } }));
+    await expect(missing.cognito.resendCode("a@example.com")).resolves.toBeUndefined();
+    for (const type of ["CodeDeliveryFailureException", "LimitExceededException"]) {
+      const limited = provider(() => ({ ok: false, body: { __type: type } }));
+      expect(await codeOf(limited.cognito.resendCode("a@example.com")), type).toBe("send-limit");
+    }
+    const throttled = provider(() => ({ ok: false, body: { __type: "TooManyRequestsException" } }));
+    expect(await codeOf(throttled.cognito.resendCode("a@example.com"))).toBe("limit-exceeded");
+  });
+
+  it("メールを送らない操作の回数の上限_送信の上限にせず回数の制限として扱う", async () => {
+    const { cognito } = provider(() => ({ ok: false, body: { __type: "LimitExceededException" } }));
+    expect(await codeOf(cognito.confirmSignUp({ email: "a@example.com", code: "1" }))).toBe("limit-exceeded");
+    expect(await codeOf(cognito.signIn("a@example.com", "pw"))).toBe("limit-exceeded");
+  });
+
+  it("退会で_アクセストークンで DeleteUser を呼ぶ", async () => {
+    const { cognito, calls } = provider(() => ({ ok: true, body: {} }));
+    await cognito.deleteAccount("access");
+    expect(calls[0]?.headers["x-amz-target"]).toBe("AWSCognitoIdentityProviderService.DeleteUser");
+    expect(calls[0]?.body).toMatchObject({ AccessToken: "access" });
   });
 
   it("トークンの更新で_リフレッシュトークンが返らなくてもよい", async () => {

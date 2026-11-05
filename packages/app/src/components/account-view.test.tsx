@@ -2,8 +2,11 @@
 import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { browserStore, loadSettings, saveSettings } from "@/lib/storage.ts";
+import { browserStore, loadSettings, saveSettings, setStorageOwner } from "@/lib/storage.ts";
 import { AccountView } from "./account-view.tsx";
+
+const navigate = vi.hoisted(() => vi.fn());
+vi.mock("@/lib/auth/navigate.ts", () => ({ navigateWithReload: (path: string) => navigate(path) }));
 
 const SIGNED_IN = { status: "signed-in", email: "learner@example.com", expiresAt: null, isAdmin: false };
 const session = vi.hoisted(() => ({ state: {} as Record<string, unknown>, reload: vi.fn(async () => {}) }));
@@ -27,6 +30,7 @@ afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
   localStorage.clear();
+  navigate.mockReset();
 });
 
 const prefsPuts = () =>
@@ -133,5 +137,68 @@ describe("AccountView のログインしていないとき", () => {
     expect(screen.getByText("アカウントを見るには、ログインしてください。")).toBeTruthy();
     expect(screen.getByRole("link", { name: "ログインへ" }).getAttribute("href")).toBe("/login");
     expect(screen.queryByRole("button", { name: "パスワードを変更する" })).toBeNull();
+  });
+});
+
+describe("AccountView の退会", () => {
+  const OWNER = "0123456789abcdef";
+  const OTHER = "fedcba9876543210";
+  const PHRASE = ["Example", "Leave", "123"].join("-");
+  const deleteCalls = () => fetchMock.mock.calls.filter(([url]) => url === "/api/auth/delete-account");
+
+  afterEach(() => {
+    setStorageOwner(undefined);
+  });
+
+  it("退会する…を押す_消えるものと元に戻せないことを示してパスワードを求め_やめると送らずに閉じる", async () => {
+    render(<AccountView />);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "退会する…" }));
+    expect(screen.getByText(/元に戻すことはできません/)).toBeTruthy();
+    for (const item of ["アカウント", "サーバーの学習の記録", "通知の購読", "この端末の学習の記録"]) {
+      expect(screen.getByText(item, { selector: "li" })).toBeTruthy();
+    }
+    expect(screen.getByLabelText("パスワード")).toBeTruthy();
+    await user.click(screen.getByRole("button", { name: "やめる" }));
+    expect(screen.queryByLabelText("パスワード")).toBeNull();
+    expect(deleteCalls()).toHaveLength(0);
+  });
+
+  it("パスワードを入れて退会する_送り_この端末の自分の記録だけを消して_ログインの画面へ移る", async () => {
+    setStorageOwner(OWNER);
+    localStorage.setItem(`mokumoku:v1:${OWNER}:results:TEST`, "[]");
+    localStorage.setItem(`mokumoku:v1:${OTHER}:results:TEST`, "[]");
+    fetchMock.mockImplementation(async (url: string) => ({
+      ok: true,
+      status: 200,
+      json: async () => (url === "/api/auth/delete-account" ? { status: "deleted" } : {}),
+    }));
+    render(<AccountView />);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "退会する…" }));
+    await user.type(screen.getByLabelText("パスワード"), PHRASE);
+    await user.click(screen.getByRole("button", { name: "退会する" }));
+    await waitFor(() => expect(navigate).toHaveBeenCalledWith("/login?deleted=1"));
+    expect(JSON.parse(deleteCalls()[0]?.[1]?.body ?? "{}")).toEqual({ password: PHRASE });
+    expect(localStorage.getItem(`mokumoku:v1:${OWNER}:results:TEST`)).toBeNull();
+    expect(localStorage.getItem(`mokumoku:v1:${OTHER}:results:TEST`)).toBe("[]");
+  });
+
+  it("パスワードが違う_失敗を示し_端末の記録を消さず移動しない", async () => {
+    setStorageOwner(OWNER);
+    localStorage.setItem(`mokumoku:v1:${OWNER}:results:TEST`, "[]");
+    fetchMock.mockImplementation(async () => ({
+      ok: false,
+      status: 401,
+      json: async () => ({ error: "invalid-credentials" }),
+    }));
+    render(<AccountView />);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "退会する…" }));
+    await user.type(screen.getByLabelText("パスワード"), "wrong");
+    await user.click(screen.getByRole("button", { name: "退会する" }));
+    expect((await screen.findByRole("alert")).textContent).toContain("正しくありません");
+    expect(navigate).not.toHaveBeenCalled();
+    expect(localStorage.getItem(`mokumoku:v1:${OWNER}:results:TEST`)).toBe("[]");
   });
 });

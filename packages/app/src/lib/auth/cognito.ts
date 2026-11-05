@@ -14,7 +14,8 @@ type Options = { region: string; clientId: string; fetch?: FetchLike };
 const ERROR_CODES: Record<string, AuthErrorCode> = {
   NotAuthorizedException: "invalid-credentials",
   UserNotFoundException: "invalid-credentials",
-  UserNotConfirmedException: "invalid-credentials",
+  // 確認コードの入力がまだのアカウント。ログインの画面は確認コードの入力へ移し、登録の API は登録し直しを見分ける
+  UserNotConfirmedException: "not-confirmed",
   PasswordResetRequiredException: "invalid-credentials",
   InvalidPasswordException: "password-policy",
   CodeMismatchException: "code-invalid",
@@ -22,7 +23,21 @@ const ERROR_CODES: Record<string, AuthErrorCode> = {
   LimitExceededException: "limit-exceeded",
   TooManyRequestsException: "limit-exceeded",
   TooManyFailedAttemptsException: "limit-exceeded",
+  UsernameExistsException: "already-exists",
 };
+
+/**
+ * メールを送る操作(登録・確認コードの送り直し・パスワードの再設定)だけの対応。送れなかったことと、回数の上限
+ * (同じメールアドレスへの試行の回数の上限でも返り、どちらかは見分けられない)を、送信の上限としてまとめる。
+ */
+const SEND_ERROR_CODES: Record<string, AuthErrorCode> = {
+  CodeDeliveryFailureException: "send-limit",
+  LimitExceededException: "send-limit",
+};
+
+/** 存在しない宛先でも成功として扱う操作で、それでも利用者に伝える失敗 */
+const isReportedSendFailure = (error: unknown) =>
+  error instanceof AuthError && (error.code === "send-limit" || error.code === "limit-exceeded");
 
 /**
  * Cognito の認証 API(認証情報のいらない操作)を、fetch で直接呼ぶ。
@@ -32,7 +47,11 @@ export function createCognitoProvider(options: Options): AuthProvider {
   const endpoint = `https://cognito-idp.${options.region}.amazonaws.com/`;
   const doFetch: FetchLike = options.fetch ?? ((url, init) => fetch(url, init));
 
-  async function call(target: string, body: Record<string, unknown>): Promise<Record<string, unknown>> {
+  async function call(
+    target: string,
+    body: Record<string, unknown>,
+    overrides: Record<string, AuthErrorCode> = {},
+  ): Promise<Record<string, unknown>> {
     let response: Awaited<ReturnType<FetchLike>>;
     try {
       response = await doFetch(endpoint, {
@@ -50,7 +69,7 @@ export function createCognitoProvider(options: Options): AuthProvider {
     const payload = (await response.json().catch(() => ({}))) as Record<string, unknown>;
     if (!response.ok) {
       const type = typeof payload.__type === "string" ? (payload.__type.split("#").pop() ?? "") : "";
-      throw new AuthError(ERROR_CODES[type] ?? "unavailable");
+      throw new AuthError(overrides[type] ?? ERROR_CODES[type] ?? "unavailable");
     }
     return payload;
   }
@@ -95,10 +114,10 @@ export function createCognitoProvider(options: Options): AuthProvider {
 
     async requestPasswordReset(email) {
       try {
-        await call("ForgotPassword", { Username: email });
+        await call("ForgotPassword", { Username: email }, SEND_ERROR_CODES);
       } catch (error) {
-        // 登録の有無を知らせないため、利用者がいない場合の失敗は成功と同じに扱う。回数の制限などは伝える
-        if (error instanceof AuthError && error.code === "limit-exceeded") throw error;
+        // 登録の有無を知らせないため、利用者がいない場合の失敗は成功と同じに扱う。送信の上限と回数の制限は伝える
+        if (isReportedSendFailure(error)) throw error;
       }
     },
 
@@ -124,6 +143,31 @@ export function createCognitoProvider(options: Options): AuthProvider {
 
     async signOut(refreshToken) {
       await call("RevokeToken", { Token: refreshToken });
+    },
+
+    async signUp(email, password) {
+      await call(
+        "SignUp",
+        { Username: email, Password: password, UserAttributes: [{ Name: "email", Value: email }] },
+        SEND_ERROR_CODES,
+      );
+    },
+
+    async confirmSignUp({ email, code }) {
+      await call("ConfirmSignUp", { Username: email, ConfirmationCode: code });
+    },
+
+    async resendCode(email) {
+      try {
+        await call("ResendConfirmationCode", { Username: email }, SEND_ERROR_CODES);
+      } catch (error) {
+        // 再設定の依頼と同じく、登録の有無を知らせない。送信の上限と回数の制限は伝える
+        if (isReportedSendFailure(error)) throw error;
+      }
+    },
+
+    async deleteAccount(accessToken) {
+      await call("DeleteUser", { AccessToken: accessToken });
     },
   };
 }

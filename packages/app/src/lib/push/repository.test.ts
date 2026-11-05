@@ -41,6 +41,22 @@ describe("DynamoDB の購読", () => {
     expect(await repository.listSubscriptions("user-a")).toEqual([target(1)]);
     expect(await repository.listSubscriptions("user-b")).toEqual([]);
   });
+
+  it("すべて消す_自分の購読だけが消え_ほかの種類の項目とほかの利用者は残る", async () => {
+    const { items, client } = fakeTable();
+    const repository = createDynamoPushRepository({ tableName: "table-example", client });
+    await repository.putSubscription("user-a", target(1), "t");
+    await repository.putSubscription("user-a", target(2), "t");
+    await repository.putSubscription("user-b", target(1), "t");
+    items.set("USER#user-a|BOOKMARK#EX-SMP-XX#SAMPLE-0001", {
+      PK: "USER#user-a",
+      SK: "BOOKMARK#EX-SMP-XX#SAMPLE-0001",
+    });
+    await repository.deleteAllSubscriptions("user-a");
+    expect(await repository.listSubscriptions("user-a")).toEqual([]);
+    expect(await repository.listSubscriptions("user-b")).toEqual([target(1)]);
+    expect(items.has("USER#user-a|BOOKMARK#EX-SMP-XX#SAMPLE-0001")).toBe(true);
+  });
 });
 
 describe("getPushRepository", () => {

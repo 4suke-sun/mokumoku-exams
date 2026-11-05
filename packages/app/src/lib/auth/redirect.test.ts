@@ -21,6 +21,7 @@ describe("safeNext", () => {
     ["長すぎる", `/${"a".repeat(600)}`],
     ["ログイン画面", "/login?next=%2Fexams"],
     ["再設定の画面", "/forgot-password"],
+    ["登録の画面", "/signup"],
     ["API", "/api/history/results"],
   ])("%s_トップに戻す", (_name, value) => {
     expect(safeNext(value)).toBe("/");
