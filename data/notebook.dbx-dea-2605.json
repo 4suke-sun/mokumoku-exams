@@ -2880,6 +2880,49 @@
       "term": "ブロンズ層",
       "oneLine": "ブロンズ層は、メダリオンアーキテクチャで、取り込んだ生のデータを元の形のまま追記で残しておく層です。",
       "keyPhrase": "取り込んだ生のデータを元の形のまま追記で残しておく",
+      "diagram": {
+        "type": "flow",
+        "title": "ブロンズ層の流れ(主な利用者はデータエンジニアや監査の担当者で、アナリストは直接使いません)",
+        "nodes": [
+          {
+            "id": "src",
+            "label": "ソース",
+            "note": "ストレージやメッセージバスなどです"
+          },
+          {
+            "id": "bronze",
+            "label": "ブロンズ層のテーブル",
+            "note": "元の形のまま、追記で残します"
+          },
+          {
+            "id": "proc",
+            "label": "シルバーのテーブルを作る処理",
+            "note": "ブロンズのテーブルを読みます"
+          },
+          {
+            "id": "user",
+            "label": "データエンジニアや監査の担当者",
+            "note": "主な利用者です"
+          }
+        ],
+        "edges": [
+          {
+            "from": "src",
+            "to": "bronze",
+            "label": "取り込み"
+          },
+          {
+            "from": "bronze",
+            "to": "proc",
+            "label": "読む"
+          },
+          {
+            "from": "bronze",
+            "to": "user",
+            "label": "使う"
+          }
+        ]
+      },
       "body": "ブロンズ層のソースは、クラウドのオブジェクトストレージ、メッセージバス、フェデレーションしたシステムなどです。データは追記で増やし、過去の分も消さずに残します。あとで処理し直したり、監査したりするためです。\n\nブロンズ層での検証は、最小限にとどめます。予期しないスキーマの変化で取り込みが止まらないよう、多くの列を STRING、VARIANT、バイナリのまま持ちます。来歴などのメタデータの列を足すことはあります。\n\n取り込みは、ストリーミングでもバッチでも構いません。ブロンズのテーブルを使うのは、主にデータエンジニアや監査の担当者です。ブロンズのテーブルは、アナリストやデータサイエンティストが直接使うためのものではありません。シルバーのテーブルを作る処理が、ブロンズのテーブルを読みます。",
       "examAngle": "取り込んだ生のデータを元の形のまま追記で残すのは、ブロンズ層です。ブロンズ層は、あとで処理し直したり監査したりするために、過去の分も消さずに残します。型の変換や重複の除去は、シルバー層で行います。",
       "checks": [
@@ -2916,6 +2959,71 @@
       "term": "シルバー層",
       "oneLine": "シルバー層は、ブロンズのデータを検証し、整えて、ほかのデータと結び付けた層です。",
       "keyPhrase": "検証し、整えて、ほかのデータと結び付けた",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "シルバー層の構成",
+        "root": {
+          "label": "シルバー層",
+          "note": "ブロンズのデータを検証し、整えて、結び付けます",
+          "children": [
+            {
+              "label": "置くデータ",
+              "note": "検証済みで集計していない形を、少なくとも 1 つ置きます",
+              "children": [
+                {
+                  "label": "集計したデータ",
+                  "note": "置くこともありますが、多くはゴールド層です"
+                }
+              ]
+            },
+            {
+              "label": "移すときの処理",
+              "note": "ブロンズからシルバーへ移すときの処理には、次のものがあります",
+              "children": [
+                {
+                  "label": "スキーマの強制と進化"
+                },
+                {
+                  "label": "NULL と欠けた値の扱い"
+                },
+                {
+                  "label": "重複の除去"
+                },
+                {
+                  "label": "順序の乱れ、遅れの扱い",
+                  "note": "順序の乱れたデータや遅れて届くデータです"
+                },
+                {
+                  "label": "データ品質の検査"
+                },
+                {
+                  "label": "型の変換"
+                },
+                {
+                  "label": "結合"
+                },
+                {
+                  "label": "正規化と誤りの修正"
+                }
+              ]
+            },
+            {
+              "label": "読み込み元",
+              "note": "ブロンズかシルバーのテーブルを読んで作ります",
+              "children": [
+                {
+                  "label": "ブロンズからの読み込み",
+                  "note": "多くはストリーミングです。バッチは小さいデータのときです"
+                },
+                {
+                  "label": "取り込みから直接は勧めない",
+                  "note": "Databricks は、直接書くことを勧めていません"
+                }
+              ]
+            }
+          ]
+        }
+      },
       "body": "シルバー層には、レコードごとに、検証済みで集計していない形を少なくとも 1 つ置きます。集計したデータをシルバー層に置くこともありますが、多くはゴールド層に置きます。\n\nブロンズからシルバーへ移すときに行う処理には、次のものがあります。\n\n- スキーマの強制とスキーマの進化\n- NULL と欠けた値の扱い\n- 重複の除去\n- 順序の乱れたデータや遅れて届くデータの扱い\n- データ品質の検査\n- 型の変換\n- 結合\n- 正規化と誤りの修正\n\nシルバーのテーブルは、ブロンズかシルバーのテーブルを読んで作ります。Databricks は、取り込みから直接シルバーのテーブルに書くことを勧めていません。ブロンズからの読み込みは、多くをストリーミングにします。バッチで読むのは、小さなディメンションのテーブルのような、小さいデータのときです。\n\nシルバー層は、データエンジニアのほか、細部を残した整ったデータが要るアナリストやデータサイエンティストも使います。",
       "examAngle": "重複の除去、型の変換、結合を済ませ、集計していないレコードは、シルバー層に置きます。集計したデータの多くは、ゴールド層に置きます。Databricks は、ブロンズからの読み込みの多くをストリーミングにするよう勧めています。",
       "checks": [
@@ -2968,6 +3076,71 @@
       "term": "CAST と TRY_CAST",
       "oneLine": "TRY_CAST は、CAST と同じく値の型を変換する関数で、値を変換できないときにエラーではなく NULL を返します。",
       "keyPhrase": "値を変換できないときにエラーではなく NULL を返します",
+      "diagram": {
+        "type": "decision",
+        "title": "CAST と TRY_CAST の、変換できない値の扱い",
+        "nodes": [
+          {
+            "id": "q1",
+            "question": "型の組み合わせは、変換の規則にありますか",
+            "choices": [
+              {
+                "label": "ない",
+                "to": "r1"
+              },
+              {
+                "label": "ある",
+                "to": "q2"
+              }
+            ]
+          },
+          {
+            "id": "r1",
+            "result": "型の組み合わせが規則にないと、TRY_CAST でもエラー(DATATYPE_MISMATCH)です"
+          },
+          {
+            "id": "q2",
+            "question": "ANSI モードは有効ですか",
+            "choices": [
+              {
+                "label": "無効",
+                "to": "r2"
+              },
+              {
+                "label": "有効",
+                "to": "q3"
+              }
+            ]
+          },
+          {
+            "id": "r2",
+            "result": "ANSI モードが無効なら、CAST も変換できない値に NULL を返します"
+          },
+          {
+            "id": "q3",
+            "question": "変換できない値を、どちらの関数で変換しますか",
+            "choices": [
+              {
+                "label": "CAST",
+                "to": "r3"
+              },
+              {
+                "label": "TRY_CAST",
+                "to": "r4"
+              }
+            ]
+          },
+          {
+            "id": "r3",
+            "result": "CAST は、エラーで止まります",
+            "note": "数字でない文字列は CAST_INVALID_INPUT です。変換先の型の範囲に収まらない値も、エラーです"
+          },
+          {
+            "id": "r4",
+            "result": "TRY_CAST は、NULL を返し、処理を続けます"
+          }
+        ]
+      },
       "body": "ANSI モードが有効なとき、`CAST` は、数字でない文字列を数値に変換しようとすると、エラー(`CAST_INVALID_INPUT`)で止まります。値が変換先の型の範囲に収まらないときも、エラーです。`TRY_CAST` は、このような値に NULL を返し、処理を続けます。\n\n```sql\nSELECT CAST('a' AS INT);       -- ANSI モードではエラー\nSELECT TRY_CAST('a' AS INT);   -- NULL\nSELECT TRY_CAST('10' AS INT);  -- 10\n```\n\nANSI モードは、Databricks Runtime 17.0 以上で既定で有効です。Databricks SQL では、2022 年 10 月 19 日以降に作ったアカウントで、既定が `TRUE` です。ANSI モードが無効なときは、`CAST` も、変換できない値に NULL を返します。\n\n`TRY_CAST` でも、型の組み合わせそのものが変換の規則にないときは、エラー(`DATATYPE_MISMATCH`)になります。NULL になるのは、型の組み合わせは正しく、値が合わないときです。",
       "examAngle": "ANSI モードが有効なとき、`CAST` は変換できない値でエラーになり、`TRY_CAST` は NULL を返します。ANSI モードが無効なときは、`CAST` も NULL を返します。`TRY_CAST` でも、型の組み合わせが変換の規則にないときは、エラー(`DATATYPE_MISMATCH`)になります。",
       "checks": [
@@ -3127,6 +3300,46 @@
       "term": "to_utc_timestamp",
       "oneLine": "to_utc_timestamp は、あるタイムゾーンの時刻として書かれたタイムスタンプを、UTC の時刻に直す関数です。",
       "keyPhrase": "UTC の時刻に直す",
+      "diagram": {
+        "type": "flow",
+        "title": "to_utc_timestamp('2016-08-31', 'Asia/Seoul') は 2016-08-30 15:00:00 を返す",
+        "nodes": [
+          {
+            "id": "ts",
+            "label": "タイムスタンプ",
+            "note": "1 つめの引数です"
+          },
+          {
+            "id": "tz",
+            "label": "タイムゾーン",
+            "note": "2 つめの引数です。'Asia/Seoul' のように書きます"
+          },
+          {
+            "id": "fn",
+            "label": "to_utc_timestamp",
+            "note": "タイムゾーンの時刻として値を読みます"
+          },
+          {
+            "id": "utc",
+            "label": "UTC の時刻",
+            "note": "逆向きの変換には、from_utc_timestamp を使います"
+          }
+        ],
+        "edges": [
+          {
+            "from": "ts",
+            "to": "fn"
+          },
+          {
+            "from": "tz",
+            "to": "fn"
+          },
+          {
+            "from": "fn",
+            "to": "utc"
+          }
+        ]
+      },
       "body": "1 つめの引数にタイムスタンプを、2 つめの引数にタイムゾーンを渡します。タイムゾーンは、`'Asia/Seoul'` のような名前か、`'GMT+1'` のような書き方で指定します。\n\n```sql\nSELECT to_utc_timestamp('2016-08-31', 'Asia/Seoul');\n-- 2016-08-30 15:00:00\n```\n\n逆に、UTC の時刻を、あるタイムゾーンの時刻に直すときは、`from_utc_timestamp` を使います。",
       "examAngle": "`to_utc_timestamp` は、2 つめの引数のタイムゾーンの時刻として値を読み、UTC の時刻を返します。逆に、UTC の時刻をあるタイムゾーンの時刻に直すときは、`from_utc_timestamp` を使います。",
       "checks": [
@@ -3163,6 +3376,38 @@
       "term": "INNER JOIN と外部結合",
       "oneLine": "INNER JOIN は両方の表で一致した行だけを返し、外部結合(LEFT、RIGHT、FULL)は一致しない行も残して、相手側の列を NULL で埋めます。",
       "keyPhrase": "一致しない行も残して、相手側の列を NULL で埋めます",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "結合の種類(条件を書かないと、どの種類でも CROSS JOIN と同じ結果です)",
+        "root": {
+          "label": "結合(JOIN)",
+          "note": "種類を書かない JOIN は、INNER JOIN です",
+          "children": [
+            {
+              "label": "INNER JOIN",
+              "note": "両方の表で一致した行だけを返します"
+            },
+            {
+              "label": "外部結合",
+              "note": "一致しない行も残し、相手側の列を NULL で埋めます",
+              "children": [
+                {
+                  "label": "LEFT [OUTER] JOIN",
+                  "note": "左の表の行をすべて残します"
+                },
+                {
+                  "label": "RIGHT [OUTER] JOIN",
+                  "note": "右の表の行をすべて残します"
+                },
+                {
+                  "label": "FULL [OUTER] JOIN",
+                  "note": "両方の表の行をすべて残します"
+                }
+              ]
+            }
+          ]
+        }
+      },
       "body": "結合の種類を書かずに `JOIN` と書くと、INNER JOIN になります。外部結合には、次の種類があります。\n\n- `LEFT [OUTER] JOIN`: 左の表の行をすべて残します。右の表に一致する行がなければ、右の列は NULL です。\n- `RIGHT [OUTER] JOIN`: 右の表の行をすべて残します。左の表に一致する行がなければ、左の列は NULL です。\n- `FULL [OUTER] JOIN`: 両方の表の行をすべて残し、一致しない側の列を NULL で埋めます。\n\n```sql\nSELECT o.id, o.amount, c.name\nFROM orders AS o\nLEFT JOIN customers AS c ON o.customer_id = c.id;\n```\n\nこの例では、顧客の表に一致する行がない注文も結果に残り、`c.name` は NULL になります。\n\n結合の条件は、`ON` に式で書くか、`USING (列名)` で両方の表にある同じ名前の列を指定します。結合の条件を書かないと、どの種類でも `CROSS JOIN`(すべての行の組み合わせ)と同じ結果になります。\n\nPySpark では、`df.join(other, on, how)` の `how` に、`\"inner\"`(既定)、`\"left\"`、`\"right\"`、`\"full\"` などを渡します。",
       "examAngle": "結合の種類を書かずに `JOIN` と書くと、INNER JOIN になり、両方の表で一致した行だけが残ります。一致しない行も残すときは外部結合を使い、LEFT JOIN なら左の表の行がすべて残ります。相手側に一致する行がなければ、その列は NULL です。",
       "checks": [
@@ -3219,6 +3464,44 @@
       "term": "LEFT SEMI JOIN と LEFT ANTI JOIN",
       "oneLine": "LEFT ANTI JOIN は、右の表に一致する行がない左の表の行だけを返し、LEFT SEMI JOIN は、一致する行がある左の表の行だけを返します。",
       "keyPhrase": "右の表に一致する行がない左の表の行だけを返し",
+      "diagram": {
+        "type": "compare",
+        "title": "左の表の行を返す 2 つの結合(右の表は、一致の確認だけに使います)",
+        "left": {
+          "heading": "LEFT SEMI JOIN",
+          "items": [
+            {
+              "label": "一致する行がある行",
+              "note": "左の表の行を返します"
+            },
+            {
+              "label": "左の表の列だけ",
+              "note": "結果に入る列です"
+            },
+            {
+              "label": "SEMI JOIN とも書けます",
+              "note": "LEFT は省けます"
+            }
+          ]
+        },
+        "right": {
+          "heading": "LEFT ANTI JOIN",
+          "items": [
+            {
+              "label": "一致する行がない行",
+              "note": "左の表の行を返します"
+            },
+            {
+              "label": "左の表の列だけ",
+              "note": "結果に入る列です"
+            },
+            {
+              "label": "ANTI JOIN とも書けます",
+              "note": "LEFT は省けます"
+            }
+          ]
+        }
+      },
       "body": "どちらも、結果に入るのは左の表の列だけです。右の表は、一致する行があるかを調べるためだけに使います。`LEFT` は省いて、`SEMI JOIN`、`ANTI JOIN` とも書けます。\n\n```sql\n-- 部署の表にない部署番号を持つ社員\nSELECT * FROM employees AS e\nLEFT ANTI JOIN departments AS d ON e.dept_id = d.dept_id;\n```\n\nPySpark では、`how` に `\"left_anti\"`(別名 `\"anti\"`、`\"leftanti\"`)や `\"left_semi\"`(別名 `\"semi\"`、`\"leftsemi\"`)を渡します。",
       "examAngle": "LEFT ANTI JOIN は、右の表に一致する行がない左の表の行を返します。LEFT SEMI JOIN は、一致する行がある左の表の行を返します。どちらも、結果に入るのは左の表の列だけです。",
       "checks": [
@@ -3275,6 +3558,48 @@
       "term": "ブロードキャスト結合(broadcast)",
       "oneLine": "ブロードキャスト結合は、結合する一方の小さい表を、すべてのワーカーノードに配ってから結合する方式です。",
       "keyPhrase": "小さい表を、すべてのワーカーノードに配ってから結合する",
+      "diagram": {
+        "type": "flow",
+        "title": "ブロードキャスト結合の流れ(結合の種類によっては、ヒントどおりの方式にならないことがあります)",
+        "nodes": [
+          {
+            "id": "hint",
+            "label": "ヒント付きの小さい表",
+            "note": "broadcast() か BROADCAST で示します"
+          },
+          {
+            "id": "aqe",
+            "label": "ヒントのない結合",
+            "note": "実行中の統計で、AQE が切り替えます(上限の既定は 30MB)"
+          },
+          {
+            "id": "workers",
+            "label": "すべてのワーカーノード",
+            "note": "小さい表を配ります"
+          },
+          {
+            "id": "join",
+            "label": "ブロードキャスト結合",
+            "note": "配ってから結合します"
+          }
+        ],
+        "edges": [
+          {
+            "from": "hint",
+            "to": "workers",
+            "label": "配る"
+          },
+          {
+            "from": "workers",
+            "to": "join"
+          },
+          {
+            "from": "aqe",
+            "to": "join",
+            "label": "切り替え"
+          }
+        ]
+      },
       "body": "PySpark では、`broadcast` 関数で、小さい DataFrame に、ブロードキャスト結合に使える大きさだという印を付けます。SQL では、`BROADCAST` のヒントで、配る側の表を指定します。`BROADCASTJOIN` と `MAPJOIN` は、`BROADCAST` の別名です。\n\n```python\nfrom pyspark.sql.functions import broadcast\nresult = orders.join(broadcast(countries), \"country_code\")\n```\n\n```sql\nSELECT /*+ BROADCAST(c) */ *\nFROM orders AS o JOIN countries AS c ON o.country_code = c.code;\n```\n\nヒントを付けた表は、自動でブロードキャストする大きさの上限(`spark.sql.autoBroadcastJoinThreshold`。Spark の既定は 10 MB)を超えていても、ブロードキャストの対象になります。ただし、結合の種類によっては使えない方式があるため、ヒントどおりの方式になるとは限りません。\n\nヒントがなくても、Databricks の適応型クエリ実行(AQE)は、実行中に集めた統計をもとに、ソートマージ結合をブロードキャストハッシュ結合に切り替えます。切り替えの上限(`spark.databricks.adaptive.autoBroadcastJoinThreshold`)の既定は 30MB です。",
       "examAngle": "大きい表と小さい表の結合では、小さい側を `broadcast()` で包むと、その表に、ブロードキャスト結合に使える大きさだという印が付きます。`BROADCAST` のヒントを付けた表は、`spark.sql.autoBroadcastJoinThreshold` を超えていてもブロードキャストの対象になります。ただし、結合の種類によっては、ヒントどおりの方式にならないことがあります。",
       "checks": [
@@ -3339,6 +3664,35 @@
       "term": "UNION と UNION ALL",
       "oneLine": "UNION は、2 つの問い合わせの結果を縦につなぐ集合演算子で、既定では重複した行を除き、ALL を付けると重複した行も残します。",
       "keyPhrase": "既定では重複した行を除き、ALL を付けると重複した行も残します",
+      "diagram": {
+        "type": "decision",
+        "title": "UNION の重複の扱い(2 つの問い合わせは、列の数が同じで、対応する列に共通の型が必要です)",
+        "nodes": [
+          {
+            "id": "q",
+            "question": "重複した行を、どうしますか",
+            "choices": [
+              {
+                "label": "除く",
+                "to": "r1"
+              },
+              {
+                "label": "残す",
+                "to": "r2"
+              }
+            ]
+          },
+          {
+            "id": "r1",
+            "result": "重複した行を除くときは、UNION か UNION DISTINCT を使います",
+            "note": "UNION だけ書いたときも、重複した行を除きます"
+          },
+          {
+            "id": "r2",
+            "result": "重複した行も残すときは、UNION ALL を使います"
+          }
+        ]
+      },
       "body": "`UNION` は `UNION DISTINCT` と同じです。重複した行も残したいときは、`UNION ALL` を使います。\n\n```sql\nSELECT id FROM sales_2025\nUNION ALL\nSELECT id FROM sales_2026;\n```\n\nつなぐ 2 つの問い合わせは、列の数が同じで、対応する列どうしに共通の型がなければなりません。列の数が違うと、エラー(`NUM_COLUMNS_MISMATCH`)になります。\n\n集合演算子には、ほかに、両方にある行を返す `INTERSECT` と、1 つめにあって 2 つめにない行を返す `EXCEPT`(別名 `MINUS`)があります。どちらも、既定では重複した行を除きます。",
       "examAngle": "`UNION` は `UNION DISTINCT` と同じで、重複した行を除きます。重複した行も残すときは、`UNION ALL` を使います。つなぐ 2 つの問い合わせは、列の数が同じでなければなりません。",
       "checks": [
@@ -3391,6 +3745,37 @@
       "term": "CTAS(CREATE TABLE AS SELECT)",
       "oneLine": "CTAS は、問い合わせの結果からテーブルを作って、そのデータを入れる文で、テーブルのスキーマは問い合わせの結果から決まります。",
       "keyPhrase": "テーブルのスキーマは問い合わせの結果から決まります",
+      "diagram": {
+        "type": "flow",
+        "title": "CTAS で、問い合わせの結果からテーブルができる流れ",
+        "nodes": [
+          {
+            "id": "q",
+            "label": "問い合わせの結果",
+            "note": "列の名前と型が、ここから決まります"
+          },
+          {
+            "id": "stmt",
+            "label": "CREATE TABLE … AS",
+            "note": "列の定義は書きません"
+          },
+          {
+            "id": "tbl",
+            "label": "新しいテーブル",
+            "note": "USING を書かないと、形式は Delta です"
+          }
+        ],
+        "edges": [
+          {
+            "from": "q",
+            "to": "stmt"
+          },
+          {
+            "from": "stmt",
+            "to": "tbl"
+          }
+        ]
+      },
       "body": "`CREATE TABLE … AS` の後ろに、問い合わせを書きます。`AS` で問い合わせを指定するときは、列の定義(列名と型の一覧)を書きません。\n\n```sql\nCREATE TABLE main.sales.orders_2026\nCOMMENT '2026 年の注文'\nAS SELECT * FROM main.sales.orders WHERE order_year = 2026;\n```\n\n`COMMENT` や `TBLPROPERTIES` などのテーブルの句は、CTAS でも付けられます。`USING` を書かないと、形式は Delta になります。\n\n既にあるテーブルを作り直すときは、`CREATE OR REPLACE TABLE … AS SELECT` を使えます。Databricks は、テーブルを削除して作り直すより、`REPLACE` を使うよう強く勧めています。`REPLACE` は、テーブルの履歴と、付与した権限を保ちます。",
       "examAngle": "CTAS で作ったテーブルの列の名前と型は、問い合わせの結果から決まります。既存のテーブルを作り直すとき、Databricks は `CREATE OR REPLACE TABLE … AS SELECT` を勧めています。`REPLACE` は、テーブルの履歴と付与した権限を保ちます。",
       "checks": [
@@ -3443,6 +3828,53 @@
       "term": "CREATE TABLE の USING と COMMENT",
       "oneLine": "CREATE TABLE の USING 句は、テーブルのデータの形式(CSV、JSON、Parquet など)を指定する句で、省くと形式は Delta になります。",
       "keyPhrase": "テーブルのデータの形式(CSV、JSON、Parquet など)を指定する",
+      "diagram": {
+        "type": "decision",
+        "title": "CREATE TABLE の LOCATION と USING による、テーブルの種類と形式",
+        "nodes": [
+          {
+            "id": "q1",
+            "question": "LOCATION を書きますか",
+            "choices": [
+              {
+                "label": "書く",
+                "to": "r1"
+              },
+              {
+                "label": "書かない",
+                "to": "q2"
+              }
+            ]
+          },
+          {
+            "id": "r1",
+            "result": "USING の有無にかかわらず、外部テーブルになります",
+            "note": "Unity Catalog では、パスが外部ロケーションの下になければなりません(有効なストレージ資格情報を指定したときを除く)"
+          },
+          {
+            "id": "q2",
+            "question": "USING を書きますか",
+            "choices": [
+              {
+                "label": "書かない",
+                "to": "r2"
+              },
+              {
+                "label": "書く",
+                "to": "r3"
+              }
+            ]
+          },
+          {
+            "id": "r2",
+            "result": "テーブルのデータの形式は、Delta になります"
+          },
+          {
+            "id": "r3",
+            "result": "形式が DELTA と ICEBERG 以外で AS の問い合わせもなければ、空のマネージドテーブルです"
+          }
+        ]
+      },
       "body": "`USING` には、`CSV`、`JSON`、`PARQUET`、`ORC`、`AVRO`、`TEXT`、`BINARYFILE`、`DELTA`、`ICEBERG` などのファイル形式を書きます。`LOCATION` と組み合わせると、既にあるファイルを、置き場所を変えずにテーブルとして読めます。テーブルのオプションは、`OPTIONS` 句で設定します。\n\n```sql\nCREATE TABLE main.raw.students\nUSING CSV\nLOCATION 's3://example-bucket/students/';\n```\n\n`LOCATION` を指定したテーブルは、外部テーブルです。Unity Catalog では、パスが外部ロケーションの下になければなりません(有効なストレージ資格情報を指定したときを除く)。DELTA と ICEBERG 以外の形式で、`LOCATION` も `AS` の問い合わせも書かないと、データのない空のマネージドテーブルができます。\n\nテーブルの説明は `COMMENT` 句で、列の説明は列の定義の `COMMENT` で残せます。\n\n```sql\nCREATE TABLE main.sales.customers (\n  id BIGINT COMMENT '顧客の ID',\n  name STRING\n) COMMENT '顧客のマスタ';\n```",
       "examAngle": "既にあるファイルを置き場所を変えずにテーブルとして読むときは、`USING` で形式を、`LOCATION` で場所を指定します。`USING` を省くと、形式は Delta になります。テーブルの説明は `COMMENT` 句で、列の説明は列の定義の `COMMENT` で残せます。",
       "checks": [
@@ -3495,6 +3927,28 @@
       "term": "INSERT INTO",
       "oneLine": "INSERT INTO は、値や問い合わせの結果を、既にあるテーブルに行として足す文です。",
       "keyPhrase": "既にあるテーブルに行として足す",
+      "diagram": {
+        "type": "compare",
+        "title": "INSERT INTO と INSERT OVERWRITE の、既存の行の扱い",
+        "left": {
+          "heading": "INSERT INTO",
+          "items": [
+            {
+              "label": "既存の行に加わる",
+              "note": "入れた行は、既存の行に加わります"
+            }
+          ]
+        },
+        "right": {
+          "heading": "INSERT OVERWRITE",
+          "items": [
+            {
+              "label": "入れる前に行を消す",
+              "note": "パーティションを指定すると、その行だけを消します"
+            }
+          ]
+        }
+      },
       "body": "`INSERT INTO` で入れた行は、既存の行に加わります。`INSERT OVERWRITE` は、入れる前にテーブルの行を消します。パーティションを指定したときは、そのパーティションの行だけを消します。\n\n```sql\nINSERT INTO main.sales.orders VALUES (1, 100.00), (2, 250.00);\nINSERT INTO main.sales.orders SELECT id, amount FROM main.raw.new_orders;\n```\n\n列の一覧を書かないと、テーブルの定義の順に、すべての列へ値を入れます。Databricks SQL と Databricks Runtime 12.2 LTS 以上では、列の一覧で省いた列に、既定値が入ります。既定値の定義がなければ NULL が入り、NULL を許さない列ではエラーになります。\n\n`BY NAME` を付けると、問い合わせの列名で、テーブルの列に対応させます(Databricks SQL と Databricks Runtime 13.3 LTS 以上)。\n\nDelta のテーブルに入れるときは、スキーマの強制がかかります。列のデータ型を安全に変換できないときは、実行時にエラーになります。",
       "examAngle": "`INSERT INTO` で入れた行は、既存の行に加わります。`INSERT OVERWRITE` は、入れる前にテーブルの行を消します。パーティションを指定したときは、そのパーティションの行だけを消します。",
       "checks": [
@@ -3638,6 +4092,87 @@
       "term": "SQL の UDF(CREATE FUNCTION)",
       "oneLine": "SQL の UDF は、CREATE FUNCTION で引数と戻り値の型と本体の式を定義し、組み込みの関数と同じようにクエリから呼べる関数です。",
       "keyPhrase": "組み込みの関数と同じようにクエリから呼べる",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "SQL の UDF の構成",
+        "root": {
+          "label": "SQL の UDF",
+          "note": "CREATE FUNCTION で定義します",
+          "children": [
+            {
+              "label": "定義",
+              "note": "引数、戻り値の型、本体を書きます",
+              "children": [
+                {
+                  "label": "引数の一覧"
+                },
+                {
+                  "label": "RETURNS",
+                  "note": "戻り値の型です。省くと、本体から決まります"
+                },
+                {
+                  "label": "RETURN",
+                  "note": "本体を、式か問い合わせで書きます"
+                }
+              ]
+            },
+            {
+              "label": "呼べる場所",
+              "children": [
+                {
+                  "label": "SELECT の列の式"
+                },
+                {
+                  "label": "WHERE の条件"
+                },
+                {
+                  "label": "ほかの UDF の本体"
+                }
+              ]
+            },
+            {
+              "label": "TEMPORARY",
+              "note": "作ったセッションの中だけで使え、カタログには登録されません"
+            },
+            {
+              "label": "Unity Catalog の権限",
+              "note": "関数を作るときに要ります",
+              "children": [
+                {
+                  "label": "カタログの権限",
+                  "note": "USE CATALOG です"
+                },
+                {
+                  "label": "スキーマの権限",
+                  "note": "USE SCHEMA と CREATE FUNCTION です"
+                },
+                {
+                  "label": "テーブルの権限",
+                  "note": "本体で参照するテーブルに SELECT が要ります"
+                }
+              ]
+            },
+            {
+              "label": "本体に書けないもの",
+              "children": [
+                {
+                  "label": "集計関数"
+                },
+                {
+                  "label": "ウィンドウ関数"
+                },
+                {
+                  "label": "順位の関数"
+                },
+                {
+                  "label": "行を生む関数",
+                  "note": "explode などです"
+                }
+              ]
+            }
+          ]
+        }
+      },
       "body": "本体は、`RETURN` の後ろに式か問い合わせで書きます。SQL の UDF では、`RETURNS` の戻り値の型を省くと、型は本体から決まります。\n\n```sql\nCREATE FUNCTION main.default.area(x DOUBLE, y DOUBLE)\nRETURNS DOUBLE\nRETURN x * y;\n\nSELECT area(width, height) AS area FROM main.default.shapes;\n```\n\n作った関数は、`SELECT` の列の式にも、`WHERE` の条件にも使えます。ほかの UDF の本体からも呼べます。\n\n`TEMPORARY` を付けた関数は、作ったセッションの中だけで使え、カタログには登録されません。\n\nUnity Catalog に関数を作るには、カタログの `USE CATALOG`、スキーマの `USE SCHEMA` と `CREATE FUNCTION` の権限が要ります。本体で参照するテーブルには、`SELECT` の権限も要ります。\n\n本体の式には、集計関数、ウィンドウ関数、順位の関数と、`explode` のように行を生む関数を書けません。",
       "examAngle": "SQL の UDF は、引数の一覧、`RETURNS` の戻り値の型、`RETURN` の本体で定義します。`TEMPORARY` を付けた関数は、作ったセッションの中だけで使え、カタログには登録されません。本体の式には、集計関数やウィンドウ関数を書けません。",
       "checks": [
@@ -3690,6 +4225,41 @@
       "term": "高階関数(transform と filter)",
       "oneLine": "transform と filter は、配列の要素ごとにラムダ式をかける関数で、transform は各要素を変換した配列を、filter は条件に合う要素だけの配列を返します。",
       "keyPhrase": "transform は各要素を変換した配列を、filter は条件に合う要素だけの配列を返します",
+      "diagram": {
+        "type": "compare",
+        "title": "transform と filter の、配列にかけた結果",
+        "left": {
+          "heading": "transform",
+          "items": [
+            {
+              "label": "各要素を変換した配列"
+            },
+            {
+              "label": "ラムダ式が返す値の型",
+              "note": "その型の配列になります"
+            },
+            {
+              "label": "x -> x * 10",
+              "note": "array(1, 2, 3) から [10,20,30] です"
+            }
+          ]
+        },
+        "right": {
+          "heading": "filter",
+          "items": [
+            {
+              "label": "条件に合う要素だけの配列"
+            },
+            {
+              "label": "元の配列と同じ型"
+            },
+            {
+              "label": "x % 2 == 0",
+              "note": "array(1, 2, 3, 4) から [2,4] です"
+            }
+          ]
+        }
+      },
       "body": "ラムダ式は、`x -> 式` の形で書きます。引数を 2 つにすると、2 つめの引数に要素の位置(添字)が入ります。\n\n```sql\nSELECT transform(array(1, 2, 3), x -> x * 10);         -- [10,20,30]\nSELECT filter(array(1, 2, 3, 4), x -> x % 2 == 0);      -- [2,4]\nSELECT filter(array(5, NULL, 7), x -> x IS NOT NULL);   -- [5,7]\n```\n\n`filter` の結果は、元の配列と同じ型です。`transform` の結果は、ラムダ式が返す値の型の配列です。",
       "examAngle": "`transform` は、配列の各要素にラムダ式をかけた結果の配列を返します。`filter` は、ラムダ式が真になる要素だけを残した配列を返します。`filter` の結果は、元の配列と同じ型です。",
       "checks": [
@@ -3839,6 +4409,39 @@
       "term": "STRUCT の項目の参照(ドットの記法)",
       "oneLine": "STRUCT の列の中の項目は、列名.項目名 のようにドットでつないで取り出し、入れ子の項目も同じ書き方でたどります。",
       "keyPhrase": "列名.項目名 のようにドットでつないで取り出し",
+      "diagram": {
+        "type": "flow",
+        "title": "ドットでつないだ名前の解釈",
+        "nodes": [
+          {
+            "id": "name",
+            "label": "ドットでつないだ名前",
+            "note": "例は customer.address.city です"
+          },
+          {
+            "id": "first",
+            "label": "スキーマ、テーブル、列の名前",
+            "note": "できるだけ長く解釈されます"
+          },
+          {
+            "id": "rest",
+            "label": "STRUCT の項目",
+            "note": "残った部分が、項目として解釈されます"
+          }
+        ],
+        "edges": [
+          {
+            "from": "name",
+            "to": "first",
+            "label": "まず"
+          },
+          {
+            "from": "first",
+            "to": "rest",
+            "label": "残りは"
+          }
+        ]
+      },
       "body": "```sql\nSELECT customer.address.city FROM main.sales.orders;\n```\n\nこの例では、STRUCT の列 `customer` の中の `address` の、さらに中の `city` を取り出します。\n\nドットでつないだ名前は、まずスキーマ、テーブル、列の名前として、できるだけ長く解釈されます。残った部分が、STRUCT の項目として解釈されます。STRUCT の項目に使うとき、Databricks は、文をコンパイルするときに、その項目があるかを確かめます。",
       "examAngle": "STRUCT の列の中の項目は、列名.項目名 のようにドットでつないで取り出します。入れ子の項目も、`customer.address.city` のように同じ書き方でたどります。",
       "checks": [
@@ -3875,6 +4478,32 @@
       "term": "split で列を分ける",
       "oneLine": "split は、文字列を正規表現に合う箇所で区切り、文字列の配列を返す関数です。",
       "keyPhrase": "文字列の配列を返す",
+      "diagram": {
+        "type": "stepper",
+        "title": "1 つの列を、split で複数の列に分ける手順(最後の drop は例での扱いです)",
+        "steps": [
+          {
+            "id": "split",
+            "label": "split で配列にする",
+            "note": "2 つめの引数は正規表現です。例では、full_name を空白で区切っています"
+          },
+          {
+            "id": "index",
+            "label": "添字で要素を取り出す",
+            "note": "添字は 0 から始まります。例では、getItem(0) と getItem(1) を使っています"
+          },
+          {
+            "id": "newcol",
+            "label": "新しい列にする",
+            "note": "withColumn が、列を足した新しい DataFrame を返します"
+          },
+          {
+            "id": "drop",
+            "label": "例では元の列を除く",
+            "note": "例では、drop で除いています。drop は、指定した列を除いた新しい DataFrame を返します"
+          }
+        ]
+      },
       "body": "2 つめの引数は、正規表現として扱われます。3 つめの引数 `limit` が正のとき、配列の長さは `limit` 以下になり、最後の要素に残りの文字列がすべて入ります。`limit` を省くと、区切れるだけ区切ります。\n\n```sql\nSELECT split('a,b,c', ',');     -- [a,b,c]\nSELECT split('a,b,c', ',', 2);  -- 要素は a と b,c の 2 つ\n```\n\n1 つの列を複数の列に分けるときは、`split` で配列にしてから、添字で要素を取り出し、それぞれを新しい列にします。SQL の `[ ]` の添字と、PySpark の `getItem` の添字は、0 から始まります。\n\n```python\nfrom pyspark.sql import functions as F\nparts = F.split(F.col(\"full_name\"), \" \")\ndf = (df.withColumn(\"first_name\", parts.getItem(0))\n        .withColumn(\"last_name\", parts.getItem(1))\n        .drop(\"full_name\"))\n```\n\n`withColumn` は列を足した(同じ名前の列があれば置き換えた)新しい DataFrame を、`drop` は指定した列を除いた新しい DataFrame を返します。",
       "examAngle": "1 つの列を複数の列に分けるときは、`split` で配列にしてから、添字で要素を取り出し、それぞれを新しい列にします。SQL の `[ ]` と PySpark の `getItem` の添字は、0 から始まります。元の列は、`drop` で除きます。",
       "checks": [
@@ -3947,6 +4576,47 @@
       "term": "withColumnRenamed と alias",
       "oneLine": "withColumnRenamed は列の名前を変えた新しい DataFrame を返すメソッドで、alias は select などの中で列に別名を付けるメソッドです。",
       "keyPhrase": "列の名前を変えた新しい DataFrame を返す",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "withColumnRenamed と alias",
+        "root": {
+          "label": "列の名前の付け替え",
+          "children": [
+            {
+              "label": "withColumnRenamed",
+              "note": "列の名前を変えた新しい DataFrame を返します",
+              "children": [
+                {
+                  "label": "元の DataFrame",
+                  "note": "変わりません"
+                },
+                {
+                  "label": "戻り値",
+                  "note": "使うには、変数に入れ直します"
+                },
+                {
+                  "label": "スキーマにない列名",
+                  "note": "エラーにならず、何も変わりません"
+                },
+                {
+                  "label": "複数の列",
+                  "note": "withColumnRenamed をつなげて書けます"
+                }
+              ]
+            },
+            {
+              "label": "alias",
+              "note": "列(Column)に別名を付けます",
+              "children": [
+                {
+                  "label": "select の中",
+                  "note": "出力の列にだけ別名が付きます"
+                }
+              ]
+            }
+          ]
+        }
+      },
       "body": "`withColumnRenamed` は、元の DataFrame を変えずに、新しい DataFrame を返します。名前を変えた結果を使うには、戻り値を変数に入れ直します。\n\n```python\ndf = df.withColumnRenamed(\"cust_id\", \"customer_id\")\n```\n\nスキーマにない列の名前を渡しても、エラーにはならず、何も変わりません。複数の列の名前を変えるときは、`withColumnRenamed` をつなげて書けます。\n\n`alias` は、列(Column)に付けるメソッドです。`select` の中で使うと、出力の列にだけ別名が付きます。\n\n```python\ndf.select(df.amount.alias(\"total_amount\"))\n```",
       "examAngle": "`withColumnRenamed` は、元の DataFrame を変えずに、新しい DataFrame を返します。結果を使うには、`df = df.withColumnRenamed(\"a\", \"b\")` のように戻り値を代入し直します。スキーマにない列の名前を渡しても、エラーにはならず、何も変わりません。",
       "checks": [
@@ -4003,6 +4673,36 @@
       "term": "名前付きのパラメータマーカー",
       "oneLine": "名前付きのパラメータマーカーは、SQL の文の中に :名前 の形で置く、型を持つ値の差し込み口で、値は文を実行する API から渡します。",
       "keyPhrase": ":名前 の形で置く",
+      "diagram": {
+        "type": "compare",
+        "title": "マーカーを置ける場所(:名前 と ? で同じ。1 つの文の中では混ぜられません)",
+        "left": {
+          "heading": "17.3 LTS 以前",
+          "items": [
+            {
+              "label": "式の中",
+              "note": "式の中でだけ使えます"
+            },
+            {
+              "label": "DDL など",
+              "note": "生成列、DEFAULT、ビュー、SQL の関数には書けません"
+            },
+            {
+              "label": "IDENTIFIER 句の中",
+              "note": "例外として書けます"
+            }
+          ]
+        },
+        "right": {
+          "heading": "18.0 以上",
+          "items": [
+            {
+              "label": "リテラルを書ける場所",
+              "note": "その型のリテラルを書ける場所なら、どこにでも書けます"
+            }
+          ]
+        }
+      },
       "body": "```python\nspark.sql(\n    \"SELECT * FROM main.sales.orders WHERE amount > :min_amount\",\n    args={\"min_amount\": 1000},\n)\n```\n\nパラメータマーカーを使うと、値が文の構造と分けて渡されるため、SQL インジェクションを防げます。\n\n同じマーカーは、1 つの文の中で何度でも参照できます。値を渡していないマーカーがあると、エラー(`UNBOUND_SQL_PARAMETER`)になります。渡した値を、すべて使う必要はありません。\n\n名前のないマーカー `?` もあります。`?` は、渡した値の配列を、出てくる順に 1 つずつ使います。1 つの文の中で、名前付きと名前なしのマーカーを混ぜられません。\n\n値を渡せるのは、Databricks SQL の Statement Execution API と、PySpark、Scala、Java の `SparkSession.sql()` です。SQL の中では、`EXECUTE IMMEDIATE … USING` でも渡せます。\n\nDatabricks Runtime 17.3 LTS 以前では、マーカーは式の中でだけ使えます。生成列や `DEFAULT` の定義、ビュー、SQL の関数などの DDL には、マーカーを書けません(`IDENTIFIER` 句の中は例外)。Databricks Runtime 18.0 以上では、その型のリテラルを書ける場所なら、どこにでも書けます。",
       "examAngle": "名前付きのパラメータマーカーは、文の中に :名前 の形で置き、値は `args` の辞書で名前と組にして渡します。値を渡していないマーカーがあると、エラー(`UNBOUND_SQL_PARAMETER`)になります。1 つの文の中で、名前付きのマーカーと名前のないマーカー `?` は混ぜられません。",
       "checks": [
@@ -4054,6 +4754,36 @@
       "term": "dropDuplicates と distinct",
       "oneLine": "dropDuplicates は、重複した行を除いた新しい DataFrame を返すメソッドで、比べる列を指定すると、その列の値が同じ行を 1 つにします。",
       "keyPhrase": "比べる列を指定すると、その列の値が同じ行を 1 つにします",
+      "diagram": {
+        "type": "decision",
+        "title": "dropDuplicates の、比べる列の指定",
+        "nodes": [
+          {
+            "id": "q",
+            "question": "比べる列を、指定しますか",
+            "choices": [
+              {
+                "label": "列名のリストを渡す",
+                "to": "r1"
+              },
+              {
+                "label": "指定しない",
+                "to": "r2"
+              }
+            ]
+          },
+          {
+            "id": "r1",
+            "result": "渡した列の値が同じ行を、1 つにします",
+            "note": "例は、order_id が同じ行を 1 つにする書き方です"
+          },
+          {
+            "id": "r2",
+            "result": "すべての列で比べ、distinct() と同じ行が残ります",
+            "note": "distinct() には、列を指定できません"
+          }
+        ]
+      },
       "body": "```python\ndf.dropDuplicates()               # すべての列の値が同じ行を 1 つにする\ndf.dropDuplicates([\"order_id\"])   # order_id が同じ行を 1 つにする\n```\n\n列を指定しないと、すべての列で比べます。`distinct()` も重複した行を除きますが、列は指定できず、すべての列で比べます。`drop_duplicates()` は、`dropDuplicates()` の別名です。\n\nストリーミングの DataFrame で `dropDuplicates` を使うと、重複を見分けるため、Spark はトリガーをまたいでデータを状態として持ち続けます。`withWatermark()` で、どこまで遅れて届く重複を見るかを限ると、持つ状態も限られます。ウォーターマークより古いデータは捨てられます。",
       "examAngle": "`dropDuplicates` に列名のリストを渡すと、その列だけで重複を判定します。列を指定しないと、すべての列で比べ、`distinct()` と同じ行が残ります。`distinct()` には、列を指定できません。",
       "checks": [
@@ -4110,6 +4840,36 @@
       "term": "groupBy と agg",
       "oneLine": "groupBy は行を列の値でグループに分け、agg はグループごとに 1 つ以上の集計を求めて、結果を DataFrame で返します。",
       "keyPhrase": "グループごとに 1 つ以上の集計を求めて",
+      "diagram": {
+        "type": "compare",
+        "title": "agg に渡す形の違い",
+        "left": {
+          "heading": "辞書で渡す",
+          "items": [
+            {
+              "label": "キーが列名、値が関数名",
+              "note": "集計関数は、名前で書きます"
+            },
+            {
+              "label": "同じ列への集計は 1 つ",
+              "note": "辞書のキーは重複できません"
+            }
+          ]
+        },
+        "right": {
+          "heading": "式で渡す",
+          "items": [
+            {
+              "label": "集計の式(Column)",
+              "note": "F.sum(\"amount\") のような式です"
+            },
+            {
+              "label": "2 種類以上も書ける",
+              "note": "同じ列にかけるときは、この形で渡します"
+            }
+          ]
+        }
+      },
       "body": "`agg` には、集計の式(Column)を並べて渡すか、列名と集計関数の名前を組にした辞書を渡します。\n\n```python\nfrom pyspark.sql import functions as F\n(df.groupBy(\"region\")\n   .agg(F.sum(\"amount\").alias(\"total\"),\n        F.avg(\"amount\").alias(\"average\"),\n        F.count(\"*\").alias(\"orders\")))\n```\n\n辞書で渡すときは、キーが列名、値が集計関数の名前です。辞書のキーは重複できないため、1 つの列に対して集計を 1 つしか書けません。同じ列に 2 種類以上の集計をかけるときは、式で渡します。\n\n```python\ndf.groupBy(\"region\").agg({\"amount\": \"sum\", \"quantity\": \"max\"})\n```\n\nSQL では、`GROUP BY` で同じ集計を書きます。Databricks SQL と Databricks Runtime 12.2 LTS 以上では、`GROUP BY ALL` と書くと、`SELECT` の中で集計関数を含まない式が、すべてグループ分けの列になります。\n\n```sql\nSELECT region, sum(amount) AS total\nFROM main.sales.orders\nGROUP BY region;\n```\n\n集計関数に `FILTER (WHERE …)` を付けると、条件に合う行だけが、その集計に渡されます。",
       "examAngle": "`agg` に辞書を渡すと、辞書のキーは重複できないため、1 つの列に集計を 1 つしか書けません。同じ列に 2 種類以上の集計をかけるときは、`F.sum(\"amount\")` のような式で渡します。",
       "checks": [
@@ -4269,6 +5029,24 @@
       "term": "describe と summary",
       "oneLine": "describe と summary は、DataFrame の数値と文字列の列の統計を求めるメソッドで、summary は describe の統計に近似の四分位数を加えます。",
       "keyPhrase": "summary は describe の統計に近似の四分位数を加えます",
+      "diagram": {
+        "type": "layers",
+        "title": "summary は、describe の 5 つの統計に、近似の四分位数を加えます",
+        "layers": [
+          {
+            "id": "describe",
+            "label": "describe の統計",
+            "note": "列を指定しないと、数値と文字列のすべての列が対象です",
+            "items": ["count", "mean", "stddev", "min", "max"]
+          },
+          {
+            "id": "summary",
+            "label": "summary が加える統計",
+            "note": "統計を指定しないときは、describe の 5 つに加えて返します。引数で、求める統計を選べます",
+            "items": ["25%", "50%", "75%"]
+          }
+        ]
+      },
       "body": "`describe` は、件数(count)、平均(mean)、標準偏差(stddev)、最小(min)、最大(max)を返します。列を指定しないと、数値と文字列のすべての列が対象です。\n\n`summary` は、統計を指定しないと、`describe` の 5 つに加えて、25%、50%、75% の近似のパーセンタイル(四分位数)を返します。引数で、求める統計を選べます。\n\n```python\ndf.describe(\"amount\").show()\ndf.summary(\"count\", \"min\", \"25%\", \"75%\", \"max\").show()\n```\n\nどちらも、データを調べるためのメソッドです。結果の DataFrame のスキーマは、版をまたいで同じになる保証がありません。",
       "examAngle": "`describe` は、count、mean、stddev、min、max を返します。引数なしの `summary` は、これに 25%、50%、75% の近似のパーセンタイル(四分位数)を加えます。`summary` は、引数で求める統計を選べます。",
       "checks": [
