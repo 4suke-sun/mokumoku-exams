@@ -3,9 +3,9 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import { CurriculumFileSchema } from "@mokumoku-exams/data-schema/curriculum-data/schema";
-import { render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { Diagram, FlowDiagram } from "@/lib/diagram-layout.ts";
 import { DiagramView, describeDiagram } from "./diagram.tsx";
 
@@ -582,6 +582,300 @@ describe("操作で動く図の共通の決まり", () => {
 
   it("3 種類_有効なボタンに tabindex を付けない", () => {
     for (const d of all) {
+      const { container, unmount } = render(<DiagramView diagram={d} id={d.type} />);
+      const operable = container.querySelectorAll("button:not([disabled])");
+      expect(operable.length).toBeGreaterThan(0);
+      for (const element of operable) expect(element.getAttribute("tabindex")).toBeNull();
+      unmount();
+    }
+  });
+});
+
+describe("データの流れの図", () => {
+  const dataflow: Diagram = {
+    type: "dataflow",
+    title: "取り込みの流れ",
+    nodes: [
+      { id: "src", label: "取り込み", note: "ファイルが届く" },
+      { id: "flt", label: "フィルター", filter: true },
+      { id: "out", label: "保存" },
+    ],
+    edges: [
+      { from: "src", to: "flt" },
+      { from: "flt", to: "out" },
+    ],
+  };
+  const reached = (container: HTMLElement) =>
+    [...container.querySelectorAll("li[data-reached]")].map((li) => li.getAttribute("data-reached"));
+  const setup = (reduce: boolean, style: "rich" | "simple") => {
+    vi.stubGlobal("matchMedia", (query: string) => ({ matches: reduce && query.includes("reduce"), media: query }));
+    document.documentElement.setAttribute("data-style", style);
+  };
+
+  afterEach(() => {
+    cleanup();
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+    document.documentElement.removeAttribute("data-style");
+  });
+
+  it("最初の表示_再生を押すまで粒は流れず_どの箱にも粒がなく_再生のボタンがある", () => {
+    vi.useFakeTimers();
+    setup(false, "rich");
+    const { container } = render(<DiagramView diagram={dataflow} id="df" />);
+    act(() => {
+      vi.advanceTimersByTime(10_000);
+    });
+    expect(reached(container)).toEqual(["false", "false", "false"]);
+    expect(screen.getByRole("button", { name: "再生" })).toBeTruthy();
+    expect(screen.getByText("まだ流れていません。再生を押すと、粒が流れます。")).toBeTruthy();
+  });
+
+  it("再生を押す_箱から箱へ1段ずつ粒が届き_絞り込みの箱で粒が落ち_最後の段で止まる", () => {
+    vi.useFakeTimers();
+    setup(false, "rich");
+    const { container } = render(<DiagramView diagram={dataflow} id="df" />);
+    fireEvent.click(screen.getByRole("button", { name: "再生" }));
+    expect(reached(container)).toEqual(["true", "false", "false"]);
+    expect(screen.getByText("6 個が通る")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "一時停止" })).toBeTruthy();
+    act(() => {
+      vi.advanceTimersByTime(900);
+    });
+    expect(reached(container)).toEqual(["true", "true", "false"]);
+    expect(screen.getByText("6 個のうち 3 個が通り、3 個が落ちる")).toBeTruthy();
+    expect(container.querySelector("li[data-filter] .text-incorrect")?.textContent).toBe("×××");
+    act(() => {
+      vi.advanceTimersByTime(900);
+    });
+    expect(reached(container)).toEqual(["true", "true", "true"]);
+    expect(screen.getByRole("button", { name: "もう一度再生" })).toBeTruthy();
+    expect(screen.getByText("■ 流れ終わり")).toBeTruthy();
+    // 1 周したら止まる: 時間が経っても変わらない
+    act(() => {
+      vi.advanceTimersByTime(10_000);
+    });
+    expect(reached(container)).toEqual(["true", "true", "true"]);
+    expect(screen.getByText(/^流れ終わりました。/)).toBeTruthy();
+  });
+
+  it("一時停止を押す_その段で止まり_再生で続きから流れる", () => {
+    vi.useFakeTimers();
+    setup(false, "rich");
+    const { container } = render(<DiagramView diagram={dataflow} id="df" />);
+    fireEvent.click(screen.getByRole("button", { name: "再生" }));
+    fireEvent.click(screen.getByRole("button", { name: "一時停止" }));
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+    expect(reached(container)).toEqual(["true", "false", "false"]);
+    fireEvent.click(screen.getByRole("button", { name: "再生" }));
+    act(() => {
+      vi.advanceTimersByTime(900);
+    });
+    expect(reached(container)).toEqual(["true", "true", "false"]);
+  });
+
+  it("もう一度再生を押す_先頭の段から流れ直す", () => {
+    vi.useFakeTimers();
+    setup(false, "rich");
+    const { container } = render(<DiagramView diagram={dataflow} id="df" />);
+    fireEvent.click(screen.getByRole("button", { name: "再生" }));
+    for (let i = 0; i < 2; i++) {
+      act(() => {
+        vi.advanceTimersByTime(900);
+      });
+    }
+    fireEvent.click(screen.getByRole("button", { name: "もう一度再生" }));
+    expect(reached(container)).toEqual(["true", "false", "false"]);
+  });
+
+  it("再生中_読み上げの領域に段の進みを伝え_絞り込みと次の箱を文字で示す", () => {
+    vi.useFakeTimers();
+    setup(false, "rich");
+    const { container } = render(<DiagramView diagram={dataflow} id="df" />);
+    fireEvent.click(screen.getByRole("button", { name: "再生" }));
+    act(() => {
+      vi.advanceTimersByTime(900);
+    });
+    expect(container.querySelector('[aria-live="polite"]')?.textContent).toBe(
+      "2 / 3 段目: 「フィルター」に粒が届きました。",
+    );
+    expect(screen.getByText("(絞り込み)")).toBeTruthy();
+    expect(screen.getByText("次: フィルター")).toBeTruthy();
+  });
+
+  it("動きを減らす設定_再生のボタンがなく_最終の状態で全部の粒が流れ終わっている", () => {
+    setup(true, "rich");
+    const { container } = render(<DiagramView diagram={dataflow} id="df" />);
+    expect(screen.queryByRole("button")).toBeNull();
+    expect(reached(container)).toEqual(["true", "true", "true"]);
+    expect(screen.getByText("6 個のうち 3 個が通り、3 個が落ちる")).toBeTruthy();
+    expect(screen.getByText("■ 動きを止めています。流れ終わった状態を表示しています。")).toBeTruthy();
+  });
+
+  it("シンプルな画面スタイル_再生のボタンがなく_最終の状態で全部の粒が流れ終わっている", () => {
+    setup(false, "simple");
+    const { container } = render(<DiagramView diagram={dataflow} id="df" />);
+    expect(screen.queryByRole("button")).toBeNull();
+    expect(reached(container)).toEqual(["true", "true", "true"]);
+  });
+
+  it("分かれ道と合流_段の形は 1・2・1 で_合流の箱に 9 個が通ると出る", () => {
+    const branch: Diagram = {
+      type: "dataflow",
+      title: "分岐",
+      nodes: [
+        { id: "a", label: "入口" },
+        { id: "b", label: "左" },
+        { id: "c", label: "右", filter: true },
+        { id: "d", label: "合流" },
+      ],
+      edges: [
+        { from: "a", to: "b" },
+        { from: "a", to: "c" },
+        { from: "b", to: "d" },
+        { from: "c", to: "d" },
+      ],
+    };
+    setup(true, "rich");
+    const { container } = render(<DiagramView diagram={branch} id="br" />);
+    const rows = [...container.querySelectorAll("ol > li")].map((li) => li.querySelectorAll("li").length);
+    expect(rows).toEqual([1, 2, 1]);
+    // 合流の箱: 左から 6 個、右から 3 個
+    expect(screen.getByText("9 個が通る")).toBeTruthy();
+  });
+
+  it("読み上げ用に_図の題を名前に_矢印と絞り込みの箱を説明にする", () => {
+    setup(true, "rich");
+    render(<DiagramView diagram={dataflow} id="df" />);
+    const figure = screen.getByRole("figure", { name: "取り込みの流れ" });
+    expect(figure.getAttribute("data-diagram-type")).toBe("dataflow");
+    expect(document.getElementById("df-desc")?.textContent).toBe(
+      "データの流れの図。「取り込み」から「フィルター」へ。「フィルター」から「保存」へ。「フィルター」は絞り込みで、粒の一部が落ちる。「取り込み」: ファイルが届く。",
+    );
+  });
+});
+
+describe("層の図", () => {
+  const layers: Diagram = {
+    type: "layers",
+    title: "三つの層",
+    layers: [
+      { id: "base", label: "基盤", note: "いちばん下", items: ["保管", "計算"] },
+      { id: "mid", label: "中間", items: ["変換"] },
+      { id: "top", label: "利用" },
+    ],
+  };
+  const panel = (name: RegExp) =>
+    document.getElementById(screen.getByRole("button", { name }).getAttribute("aria-controls") ?? "");
+
+  it("最初の表示_上の層から並び_下の層が最後で_中身はどの層も閉じている", () => {
+    const { container } = render(<DiagramView diagram={layers} id="ly" />);
+    const order = [...container.querySelectorAll("ol > li")].map((li) => li.getAttribute("data-open"));
+    expect(order).toEqual([null, "false", "false"]);
+    expect(screen.getByRole("button", { name: /基盤/ }).getAttribute("aria-expanded")).toBe("false");
+    expect(screen.getByRole("button", { name: /中間/ }).getAttribute("aria-expanded")).toBe("false");
+    expect(panel(/基盤/)?.hidden).toBe(true);
+    expect(panel(/中間/)?.hidden).toBe(true);
+  });
+
+  it("層を選ぶ_その層の中身と説明が開き_ほかの層は閉じたまま_もう一度選ぶと閉じる", () => {
+    render(<DiagramView diagram={layers} id="ly" />);
+    const base = screen.getByRole("button", { name: /基盤/ });
+    fireEvent.click(base);
+    expect(base.getAttribute("aria-expanded")).toBe("true");
+    expect(panel(/基盤/)?.hidden).toBe(false);
+    expect(panel(/基盤/)?.textContent).toBe("保管計算いちばん下");
+    expect(panel(/中間/)?.hidden).toBe(true);
+    fireEvent.click(screen.getByRole("button", { name: /中間/ }));
+    expect(base.getAttribute("aria-expanded")).toBe("false");
+    expect(panel(/基盤/)?.hidden).toBe(true);
+    expect(panel(/中間/)?.hidden).toBe(false);
+    expect(panel(/中間/)?.textContent).toBe("変換");
+    fireEvent.click(screen.getByRole("button", { name: /中間/ }));
+    expect(panel(/中間/)?.hidden).toBe(true);
+  });
+
+  it("キーボードで開く_Tab で層のボタンへ移り_Enter で中身が開く", async () => {
+    const user = userEvent.setup();
+    render(<DiagramView diagram={layers} id="ly" />);
+    await user.tab();
+    const first = document.activeElement as HTMLElement;
+    expect(first.tagName).toBe("BUTTON");
+    await user.keyboard("{Enter}");
+    expect(first.getAttribute("aria-expanded")).toBe("true");
+  });
+
+  it("状態を示す_色だけでなく記号と文字で開閉を出し_読み上げの領域に伝える", () => {
+    const { container } = render(<DiagramView diagram={layers} id="ly" />);
+    const live = () => container.querySelector('[aria-live="polite"]')?.textContent;
+    expect(live()).toBe("層の中身は閉じています。");
+    fireEvent.click(screen.getByRole("button", { name: /基盤/ }));
+    expect(live()).toBe("「基盤」の中身を開きました。保管、計算、いちばん下。");
+    expect(screen.getByRole("button", { name: /基盤/ }).textContent).toContain("▾");
+    expect(screen.getByRole("button", { name: /基盤/ }).textContent).toContain("中身を閉じる");
+  });
+
+  it("中身のない層_ボタンにならず_層の名前だけを出す", () => {
+    render(<DiagramView diagram={layers} id="ly" />);
+    expect(screen.queryByRole("button", { name: /利用/ })).toBeNull();
+    expect(screen.getByText("利用")).toBeTruthy();
+  });
+
+  it("積み上げる動き_層ごとに遅れを付ける動きのクラスで描く", () => {
+    const { container } = render(<DiagramView diagram={layers} id="ly" />);
+    const items = [...container.querySelectorAll<HTMLElement>("li.motion-stack")];
+    // 上の層から並ぶので、いちばん下の層(先頭)の遅れが最も小さく、最後に並ぶ
+    expect(items.map((li) => li.style.animationDelay)).toEqual(["0.24s", "0.12s", "0s"]);
+  });
+
+  it("読み上げ用に_図の題を名前に_下から順の層と中身を説明にする", () => {
+    render(<DiagramView diagram={layers} id="ly" />);
+    expect(screen.getByRole("figure", { name: "三つの層" }).getAttribute("data-diagram-type")).toBe("layers");
+    expect(document.getElementById("ly-desc")?.textContent).toBe(
+      "層の図。下から順に「基盤」、「中間」、「利用」。「基盤」の中身: 保管、計算、いちばん下。「中間」の中身: 変換。",
+    );
+  });
+});
+
+describe("データの流れと層の図の共通の決まり", () => {
+  const both: Diagram[] = [
+    {
+      type: "dataflow",
+      title: "流",
+      nodes: [
+        { id: "a", label: "A" },
+        { id: "b", label: "B", filter: true },
+      ],
+      edges: [{ from: "a", to: "b" }],
+    },
+    {
+      type: "layers",
+      title: "層",
+      layers: [
+        { id: "a", label: "A", items: ["x"] },
+        { id: "b", label: "B", items: ["y"] },
+      ],
+    },
+  ];
+
+  it("2 種類_色の直書きと fill・stroke の値を持たず_animate 要素を持たない", () => {
+    const { container } = render(
+      <div>
+        {both.map((d) => (
+          <DiagramView key={d.type} diagram={d} id={d.type} />
+        ))}
+      </div>,
+    );
+    expect(container.innerHTML).not.toMatch(/#[0-9a-f]{3,8}\b/i);
+    expect(container.innerHTML).not.toMatch(/(fill|stroke)="(?!none)/);
+    expect(container.innerHTML).not.toMatch(/<animate/);
+    expect(container.querySelectorAll("[data-diagram-type]")).toHaveLength(2);
+  });
+
+  it("2 種類_有効なボタンに tabindex を付けない", () => {
+    for (const d of both) {
       const { container, unmount } = render(<DiagramView diagram={d} id={d.type} />);
       const operable = container.querySelectorAll("button:not([disabled])");
       expect(operable.length).toBeGreaterThan(0);

@@ -1,6 +1,7 @@
 import type {
   CompareDiagram,
   CompareItemState,
+  DataflowDiagram,
   Diagram,
   FlowDiagram,
   HierarchyDiagram,
@@ -28,8 +29,8 @@ import type {
 
 export type { CompareDiagram, Diagram, FlowDiagram, HierarchyDiagram, TableChangeDiagram, TimelineDiagram };
 
-/** 利用者の操作で動く図の種類。SVG に配置せず、HTML で描く(components/diagram.tsx) */
-export const INTERACTIVE_TYPES = ["stepper", "toggle", "decision"] as const;
+/** 利用者の操作で動く図の種類(データの流れは「再生」で動く)。SVG に配置せず、HTML で描く(components/diagram.tsx) */
+export const INTERACTIVE_TYPES = ["stepper", "toggle", "decision", "dataflow", "layers"] as const;
 
 /** 配置して SVG で描く(静止した)図 */
 export type StaticDiagram = Exclude<Diagram, { type: (typeof INTERACTIVE_TYPES)[number] }>;
@@ -818,4 +819,64 @@ export function diagramProblems(layout: AnyLayout): string[] {
     );
   }
   return [...new Set(problems)];
+}
+
+/** データの流れの図で、入口の箱に入る粒の数 */
+export const DATAFLOW_PARTICLES = 6;
+
+export type DataflowStats = {
+  /** 箱に届く粒の数 */
+  arrived: number;
+  /** 絞り込みの箱で落ちる粒の数(絞り込みでない箱は 0) */
+  dropped: number;
+  /** 箱から次の箱へ出ていく粒の数(矢印ごとに同じ数が流れる) */
+  passed: number;
+};
+
+export type DataflowPlan = {
+  /** 段ごとの箱(上から下)。段は、入口の箱からの最も長い道のりの長さ */
+  levels: DataflowDiagram["nodes"][number][][];
+  stats: Map<string, DataflowStats>;
+  /** 箱ごとの、矢印の先の箱の題 */
+  next: Map<string, string[]>;
+};
+
+/**
+ * データの流れの図の、段と粒の数。矢印の入らない箱(入口)に粒が `DATAFLOW_PARTICLES` 個入る。
+ * 箱に届く粒は、入ってくる矢印の分の合計。絞り込みの箱は、届いた粒の半分(切り捨て)だけを通し、残りを落とす。
+ * 矢印が複数出る箱は、出る粒を矢印ごとに同じ数ずつ流す(分かれ道)。
+ */
+export function planDataflow(diagram: DataflowDiagram): DataflowPlan {
+  const byId = new Map(diagram.nodes.map((n) => [n.id, n]));
+  const level = new Map<string, number>();
+  const levelOf = (id: string): number => {
+    const known = level.get(id);
+    if (known !== undefined) return known;
+    const parents = diagram.edges.filter((e) => e.to === id).map((e) => levelOf(e.from));
+    const value = parents.length === 0 ? 0 : Math.max(...parents) + 1;
+    level.set(id, value);
+    return value;
+  };
+  for (const n of diagram.nodes) levelOf(n.id);
+  const depth = Math.max(...level.values());
+  const levels = Array.from({ length: depth + 1 }, (_, l) => diagram.nodes.filter((n) => level.get(n.id) === l));
+  const stats = new Map<string, DataflowStats>();
+  for (const row of levels) {
+    for (const n of row) {
+      const incoming = diagram.edges.filter((e) => e.to === n.id);
+      const arrived =
+        incoming.length === 0
+          ? DATAFLOW_PARTICLES
+          : incoming.reduce((sum, e) => sum + (stats.get(e.from)?.passed ?? 0), 0);
+      const passed = n.filter ? Math.floor(arrived / 2) : arrived;
+      stats.set(n.id, { arrived, dropped: arrived - passed, passed });
+    }
+  }
+  const next = new Map(
+    diagram.nodes.map((n) => [
+      n.id,
+      diagram.edges.filter((e) => e.from === n.id).map((e) => byId.get(e.to)?.label ?? ""),
+    ]),
+  );
+  return { levels, stats, next };
 }

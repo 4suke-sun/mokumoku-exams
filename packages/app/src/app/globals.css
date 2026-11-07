@@ -950,6 +950,29 @@ body {
     left 0.2s ease;
 }
 
+/* データの流れの図の粒が、箱に届く。層の図の層が、下から積み上がる */
+@keyframes particle-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+.motion-particle {
+  animation: particle-in 0.4s ease-out backwards;
+}
+
+@keyframes layer-rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+.motion-stack {
+  animation: layer-rise 0.4s ease-out backwards;
+}
+
 /* 体系ノートの目次が、左から出る(狭い画面) */
 @keyframes drawer-in {
   from {
@@ -990,6 +1013,8 @@ body {
   .drawer-panel,
   .motion-marker,
   .motion-strike,
+  .motion-particle,
+  .motion-stack,
   .spinner::before,
   .spinner::after {
     animation: none;
@@ -1037,7 +1062,9 @@ body {
     .sheet-panel,
     .drawer-panel,
     .motion-marker,
-    .motion-strike
+    .motion-strike,
+    .motion-particle,
+    .motion-stack
   ),
 :root[data-style="simple"] .motion-shine::after {
   animation: none;

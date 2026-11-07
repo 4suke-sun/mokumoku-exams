@@ -39,7 +39,8 @@ export const DiagramEdgeSchema = z.strictObject({
 
 /**
  * 図の種類。流れ(箱と矢印)、左右の比較、入れ子の階層、時系列、表の変化(操作の前後)に、
- * 利用者の操作で動く 3 種類(手順を進める `stepper`、状態を切り替える `toggle`、条件を選んで進む `decision`)。
+ * 利用者の操作で動く 3 種類(手順を進める `stepper`、状態を切り替える `toggle`、条件を選んで進む `decision`)と、
+ * データの粒が流れる `dataflow`(「再生」を押したときだけ動く)、積み上げた層の中身を開く `layers`。
  */
 export const DIAGRAM_TYPES = [
   "flow",
@@ -50,6 +51,8 @@ export const DIAGRAM_TYPES = [
   "stepper",
   "toggle",
   "decision",
+  "dataflow",
+  "layers",
 ] as const;
 
 /**
@@ -474,8 +477,99 @@ const DecisionDiagramSchema = z
     });
   });
 
+/** データの流れの図の箱の数・矢印の数の上限 */
+export const DATAFLOW_MAX_NODES = 8;
+export const DATAFLOW_MAX_EDGES = 16;
+
+/** データの流れの図の箱。`filter: true` の箱では、流れてきた粒の一部が落ちる(絞り込み) */
+const DataflowNodeSchema = z.strictObject({
+  id: z.string().regex(ID, ID_MESSAGE),
+  label: BOX_LABEL,
+  note: BOX_NOTE.optional(),
+  filter: z.boolean().optional(),
+});
+
+const DataflowEdgeSchema = z.strictObject({
+  from: z.string().regex(ID, ID_MESSAGE),
+  to: z.string().regex(ID, ID_MESSAGE),
+});
+
 /**
- * 図解: `type` で 8 種類(`flow`・`compare`・`hierarchy`・`timeline`・`table-change`・`stepper`・`toggle`・`decision`)を分ける判別ユニオン。
+ * データの流れの図: 箱と矢印を上から下へ並べ、「再生」で粒が箱から箱へ流れる。
+ * 矢印が一周して戻る形(閉路)と、自分自身への矢印は置けない(流れの図と同じ)。
+ */
+const DataflowDiagramSchema = z
+  .strictObject({
+    type: z.literal("dataflow"),
+    title: text.max(80),
+    nodes: z.array(DataflowNodeSchema).min(2).max(DATAFLOW_MAX_NODES),
+    edges: z.array(DataflowEdgeSchema).min(1).max(DATAFLOW_MAX_EDGES),
+  })
+  .superRefine((diagram, ctx) => {
+    // 参照の誤りがあるときは、閉路の検査を省く(誤りの報告を重ねない)
+    let valid = true;
+    const nodes = new Set<string>();
+    diagram.nodes.forEach((node, i) => {
+      if (nodes.has(node.id)) {
+        valid = false;
+        ctx.addIssue({ code: "custom", path: ["nodes", i, "id"], message: "図の箱の ID が重複しています" });
+      }
+      nodes.add(node.id);
+    });
+    const pairs = new Set<string>();
+    diagram.edges.forEach((edge, i) => {
+      for (const end of ["from", "to"] as const) {
+        if (!nodes.has(edge[end])) {
+          valid = false;
+          ctx.addIssue({ code: "custom", path: ["edges", i, end], message: "図にない箱を指しています" });
+        }
+      }
+      if (edge.from === edge.to) {
+        valid = false;
+        ctx.addIssue({ code: "custom", path: ["edges", i], message: "自分自身への矢印は置けません" });
+      }
+      const pair = `${edge.from}>${edge.to}`;
+      if (pairs.has(pair)) {
+        ctx.addIssue({ code: "custom", path: ["edges", i], message: "同じ向きの矢印が重複しています" });
+      }
+      pairs.add(pair);
+    });
+    if (valid && hasCycle(diagram.nodes, diagram.edges)) {
+      ctx.addIssue({ code: "custom", path: ["edges"], message: "矢印が一周して戻る形(閉路)になっています" });
+    }
+  });
+
+/** 層の図の層の数の上限と、層の中身(語句)の数の上限 */
+export const LAYERS_MAX_LAYERS = 6;
+export const LAYERS_MAX_ITEMS = 8;
+
+/** 層の図の 1 層。選ぶと、`items`(中身の語句)と `note` が開く */
+const LayerSchema = z.strictObject({
+  id: z.string().regex(ID, ID_MESSAGE),
+  label: BOX_LABEL,
+  note: STEP_NOTE.optional(),
+  items: z.array(BOX_LABEL).min(1).max(LAYERS_MAX_ITEMS).optional(),
+});
+
+/** 層の図: 層を下から積み、層を選ぶと中身が開く。`layers` の先頭が、いちばん下の層。 */
+const LayersDiagramSchema = z
+  .strictObject({
+    type: z.literal("layers"),
+    title: text.max(80),
+    layers: z.array(LayerSchema).min(2).max(LAYERS_MAX_LAYERS),
+  })
+  .superRefine((diagram, ctx) => {
+    const ids = new Set<string>();
+    diagram.layers.forEach((layer, i) => {
+      if (ids.has(layer.id)) {
+        ctx.addIssue({ code: "custom", path: ["layers", i, "id"], message: "層の ID が重複しています" });
+      }
+      ids.add(layer.id);
+    });
+  });
+
+/**
+ * 図解: `type` で 10 種類(`flow`・`compare`・`hierarchy`・`timeline`・`table-change`・`stepper`・`toggle`・`decision`・`dataflow`・`layers`)を分ける判別ユニオン。
  * `type` のない図は、流れの図として読む(`type` は省略できる)。
  */
 export const DiagramSchema = z.preprocess(
@@ -492,6 +586,8 @@ export const DiagramSchema = z.preprocess(
     StepperDiagramSchema,
     ToggleDiagramSchema,
     DecisionDiagramSchema,
+    DataflowDiagramSchema,
+    LayersDiagramSchema,
   ]),
 );
 
@@ -647,6 +743,8 @@ export type TableChangeDiagram = Extract<Diagram, { type: "table-change" }>;
 export type StepperDiagram = Extract<Diagram, { type: "stepper" }>;
 export type ToggleDiagram = Extract<Diagram, { type: "toggle" }>;
 export type DecisionDiagram = Extract<Diagram, { type: "decision" }>;
+export type DataflowDiagram = Extract<Diagram, { type: "dataflow" }>;
+export type LayersDiagram = Extract<Diagram, { type: "layers" }>;
 export type CompareItemState = (typeof COMPARE_ITEM_STATES)[number];
 export type HierarchyNodeState = (typeof HIERARCHY_NODE_STATES)[number];
 export type TableChangeState = (typeof TABLE_CHANGE_STATES)[number];

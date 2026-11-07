@@ -1,8 +1,10 @@
 "use client";
 
 import type {
+  DataflowDiagram,
   DecisionDiagram,
   HierarchyNode,
+  LayersDiagram,
   StepperDiagram,
   TableChangeDiagram,
   ToggleDiagram,
@@ -17,9 +19,12 @@ import {
   LABEL_FONT_SIZE,
   layoutAny,
   type PlacedText,
+  planDataflow,
   STACKABLE_TYPES,
   type StaticDiagram,
 } from "@/lib/diagram-layout.ts";
+import { usePrefersReducedMotion, useVisualStyle } from "@/lib/use-visual-style.ts";
+import { effectsEnabled } from "@/lib/visual-style.ts";
 
 type Props = {
   diagram: Diagram;
@@ -71,8 +76,32 @@ function describeTable(name: string, table: TableChangeDiagram["before"]): strin
  * - 手順: 「手順の図。順に「A(説明)」、「B」。」
  * - 切り替え: 「2 つの状態「X」と「Y」を切り替える。」のあと、状態ごとに、項目と「【残る】」「【消える】」
  * - 判断: 質問ごとに「質問「Q」: 「選択肢」なら「行き先」へ。」、結論ごとに「結論「R(説明)」。」
+ * - データの流れ: 矢印ごとに「「A」から「B」へ。」のあと、絞り込みの箱ごとに「「X」は絞り込みで、粒の一部が落ちる。」
+ * - 層: 「層の図。下から順に「A」、「B」。」のあと、中身のある層ごとに「「A」の中身: 語句、語句。」
  */
 export function describeDiagram(diagram: Diagram): string {
+  if (diagram.type === "dataflow") {
+    const labels = new Map(diagram.nodes.map((n) => [n.id, n.label]));
+    const edges = diagram.edges
+      .map((e) => `「${labels.get(e.from) ?? ""}」から「${labels.get(e.to) ?? ""}」へ。`)
+      .join("");
+    const filters = diagram.nodes
+      .filter((n) => n.filter)
+      .map((n) => `「${n.label}」は絞り込みで、粒の一部が落ちる。`)
+      .join("");
+    const notes = diagram.nodes
+      .filter((n) => n.note)
+      .map((n) => `「${n.label}」: ${n.note}。`)
+      .join("");
+    return `データの流れの図。${edges}${filters}${notes}`;
+  }
+  if (diagram.type === "layers") {
+    const contents = diagram.layers
+      .filter((l) => l.items || l.note)
+      .map((l) => `「${l.label}」の中身: ${[...(l.items ?? []), ...(l.note ? [l.note] : [])].join("、")}。`)
+      .join("");
+    return `層の図。下から順に${diagram.layers.map((l) => `「${l.label}」`).join("、")}。${contents}`;
+  }
   if (diagram.type === "stepper") {
     return `手順の図。順に${diagram.steps.map((s) => `「${withNote(s.label, s.note)}」`).join("、")}。`;
   }
@@ -632,8 +661,214 @@ function DecisionView({ diagram, id }: { diagram: DecisionDiagram; id: string })
   );
 }
 
+/** 粒の流れの 1 段ごとの間隔(ミリ秒) */
+const FLOW_TICK_MS = 900;
+/** 箱の中に描く粒の数の上限(それ以上は数字だけで伝える) */
+const MAX_DOTS = 10;
+
+function Dots({ count, mark: symbol, className }: { count: number; mark: string; className: string }) {
+  return (
+    <span aria-hidden="true" className={["motion-particle inline-block tracking-widest", className].join(" ")}>
+      {symbol.repeat(Math.min(count, MAX_DOTS))}
+    </span>
+  );
+}
+
 /**
- * 流れ・比較・階層・時系列・表の変化の図(SVG)と、手順・切り替え・判断の図(HTML。利用者の操作で動く)。
+ * データの流れの図: 箱を上から下へ並べ、「再生」で粒が箱から箱へ流れる。絞り込みの箱では、粒の一部が落ちる。
+ * 自動では動かず、「再生」を押したときだけ、1 段ずつ流れて 1 周で止まる。
+ * 「動きを減らす」設定とシンプルな画面スタイルでは、再生せず、流れ終わった状態を出す。
+ */
+function DataflowView({ diagram, id }: { diagram: DataflowDiagram; id: string }) {
+  const style = useVisualStyle();
+  const reduced = usePrefersReducedMotion();
+  const animated = effectsEnabled(style, reduced);
+  const plan = planDataflow(diagram);
+  const last = plan.levels.length - 1;
+  // -1: まだ流れていない。0 以上: その段まで粒が届いている
+  const [started, setStarted] = useState(-1);
+  const [playing, setPlaying] = useState(false);
+  const step = animated ? started : last;
+  useEffect(() => {
+    if (!animated || !playing) return;
+    const timer = setTimeout(() => {
+      if (started + 1 >= last) setPlaying(false);
+      setStarted(started + 1);
+    }, FLOW_TICK_MS);
+    return () => clearTimeout(timer);
+  }, [animated, playing, started, last]);
+  const play = () => {
+    if (playing) {
+      setPlaying(false);
+      return;
+    }
+    if (started < 0 || started >= last) setStarted(0);
+    if (started < 0 && last === 0) return;
+    setPlaying(true);
+  };
+  const finished = step >= last;
+  const live = (() => {
+    if (step < 0) return "まだ流れていません。再生を押すと、粒が流れます。";
+    const names = plan.levels[Math.min(step, last)]?.map((n) => n.label).join("、") ?? "";
+    return finished
+      ? `流れ終わりました。最後は「${names}」です。`
+      : `${step + 1} / ${plan.levels.length} 段目: 「${names}」に粒が届きました。`;
+  })();
+  return (
+    <InteractiveFrame diagram={diagram} id={id}>
+      {animated ? (
+        <div className="flex flex-wrap items-center gap-2">
+          <button type="button" className={BUTTON} onClick={play}>
+            {playing ? "一時停止" : finished ? "もう一度再生" : "再生"}
+          </button>
+          <span className="text-sm text-muted">
+            {playing ? "▶ 流れています" : finished ? "■ 流れ終わり" : "■ 止まっています"}
+          </span>
+        </div>
+      ) : (
+        <p className="text-sm text-muted">■ 動きを止めています。流れ終わった状態を表示しています。</p>
+      )}
+      <ol className="space-y-2">
+        {plan.levels.map((row, level) => (
+          <li key={row.map((n) => n.id).join("+")} className="space-y-2">
+            {level > 0 ? (
+              <p aria-hidden="true" className="text-center text-muted">
+                ↓
+              </p>
+            ) : null}
+            <ul className="flex flex-wrap gap-2">
+              {row.map((n) => {
+                const reached = level <= step;
+                const stat = plan.stats.get(n.id);
+                const next = plan.next.get(n.id) ?? [];
+                return (
+                  <li
+                    key={n.id}
+                    data-reached={reached ? "true" : "false"}
+                    data-filter={n.filter ? "true" : undefined}
+                    className={[
+                      "motion-lit min-w-0 flex-1 basis-40 rounded-md border px-3 py-2",
+                      reached ? "border-2 border-primary bg-soft" : "border-dashed border-line bg-bg",
+                    ].join(" ")}
+                  >
+                    <p className="break-words font-bold text-fg">
+                      {n.filter ? <span aria-hidden="true">▽ </span> : null}
+                      {n.label}
+                      {n.filter ? <span className="ml-1 text-xs font-normal text-muted">(絞り込み)</span> : null}
+                    </p>
+                    {n.note ? <p className="break-words text-sm text-muted">{n.note}</p> : null}
+                    {reached && stat ? (
+                      <div className="mt-1 text-sm">
+                        <p className="break-all leading-6">
+                          <Dots count={stat.passed} mark="●" className="text-primary" />
+                          {stat.dropped > 0 ? <Dots count={stat.dropped} mark="×" className="text-incorrect" /> : null}
+                        </p>
+                        <p className="text-xs text-muted">
+                          {n.filter
+                            ? `${stat.arrived} 個のうち ${stat.passed} 個が通り、${stat.dropped} 個が落ちる`
+                            : `${stat.arrived} 個が通る`}
+                        </p>
+                      </div>
+                    ) : null}
+                    {next.length > 0 ? (
+                      <p className="mt-1 break-words text-xs text-muted">次: {next.join("、")}</p>
+                    ) : null}
+                  </li>
+                );
+              })}
+            </ul>
+          </li>
+        ))}
+      </ol>
+      <LiveText>{live}</LiveText>
+    </InteractiveFrame>
+  );
+}
+
+/**
+ * 層の図: 層が下から積み上がる(積み上がる動きは、動きを減らす設定とシンプルな画面スタイルでは出ない)。
+ * 層を選ぶと、その層の中身(語句と説明)が開く。開くのは 1 つの層だけで、開いている層を選ぶと閉じる。
+ */
+function LayersView({ diagram, id }: { diagram: LayersDiagram; id: string }) {
+  const [open, setOpen] = useState<string | null>(null);
+  const total = diagram.layers.length;
+  const openLayer = diagram.layers.find((l) => l.id === open);
+  const live = openLayer
+    ? `「${openLayer.label}」の中身を開きました。${[...(openLayer.items ?? []), ...(openLayer.note ? [openLayer.note] : [])].join("、")}。`
+    : "層の中身は閉じています。";
+  return (
+    <InteractiveFrame diagram={diagram} id={id}>
+      {/* 先頭の層がいちばん下。画面にも読み上げにも、上の層から順に並べる(見た目の順と、キーボードの順を合わせる) */}
+      <ol className="flex flex-col gap-2">
+        {diagram.layers
+          .map((layer, i) => ({ layer, i }))
+          .reverse()
+          .map(({ layer, i }) => {
+            const hasContent = Boolean(layer.items?.length || layer.note);
+            const isOpen = open === layer.id;
+            const panelId = `${id}-layer-${layer.id}`;
+            return (
+              <li
+                key={layer.id}
+                data-open={hasContent ? String(isOpen) : undefined}
+                style={{ animationDelay: `${i * 0.12}s` }}
+                className={[
+                  "motion-stack motion-lit min-w-0 rounded-md border px-3 py-2",
+                  isOpen ? "border-2 border-primary bg-soft" : "border-line bg-surface",
+                ].join(" ")}
+              >
+                {hasContent ? (
+                  <button
+                    type="button"
+                    aria-expanded={isOpen}
+                    aria-controls={panelId}
+                    onClick={() => setOpen(isOpen ? null : layer.id)}
+                    className="flex w-full min-w-0 items-baseline gap-2 text-left"
+                  >
+                    <span aria-hidden="true" className="text-primary">
+                      {isOpen ? "▾" : "▸"}
+                    </span>
+                    <span className="min-w-0 break-words font-bold text-fg">{layer.label}</span>
+                    <span className="ml-auto shrink-0 text-xs text-muted">
+                      {i + 1} / {total} 層目・{isOpen ? "中身を閉じる" : "中身を開く"}
+                    </span>
+                  </button>
+                ) : (
+                  <div className="flex w-full min-w-0 items-baseline gap-2">
+                    <span className="min-w-0 break-words font-bold text-fg">{layer.label}</span>
+                    <span className="ml-auto shrink-0 text-xs text-muted">
+                      {i + 1} / {total} 層目
+                    </span>
+                  </div>
+                )}
+                {hasContent ? (
+                  <div id={panelId} hidden={!isOpen} className="mt-2 space-y-1">
+                    {layer.items ? (
+                      <ul className="flex flex-wrap gap-1.5">
+                        {layer.items.map((item) => (
+                          <li
+                            key={item}
+                            className="min-w-0 break-words rounded-md border border-line bg-bg px-2 py-0.5 text-sm text-fg"
+                          >
+                            {item}
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                    {layer.note ? <p className="break-words text-sm text-fg">{layer.note}</p> : null}
+                  </div>
+                ) : null}
+              </li>
+            );
+          })}
+      </ol>
+      <LiveText>{live}</LiveText>
+    </InteractiveFrame>
+  );
+}
+
+/**
+ * 流れ・比較・階層・時系列・表の変化の図(SVG)と、手順・切り替え・判断・データの流れ・層の図(HTML。利用者の操作で動く)。
  * 色はテーマの役割の色だけを使い、ライトとダークの両方で読めるようにする。
  * 体系ノートなど、特定の画面に依存しない(どの画面からも使える)。
  * `stackOnNarrow` の比較・時系列・表の変化の図は、左右に並べた図と、上下に積んだ図を描き、画面の幅で片方だけを出す(CSS の `sm`)。
@@ -644,6 +879,8 @@ export function DiagramView({ diagram, id, stackOnNarrow = false }: Props) {
   if (diagram.type === "stepper") return <StepperView diagram={diagram} id={id} />;
   if (diagram.type === "toggle") return <ToggleView diagram={diagram} id={id} />;
   if (diagram.type === "decision") return <DecisionView diagram={diagram} id={id} />;
+  if (diagram.type === "dataflow") return <DataflowView diagram={diagram} id={id} />;
+  if (diagram.type === "layers") return <LayersView diagram={diagram} id={id} />;
   const stack = stackOnNarrow && STACKABLE_TYPES.includes(diagram.type);
   return (
     <figure className="space-y-2">
