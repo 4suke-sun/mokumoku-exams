@@ -5029,6 +5029,40 @@
       "term": "バッチ処理とストリーミング処理",
       "oneLine": "バッチ処理は実行のたびにソースのデータ全体を処理し、ストリーミング処理は処理済みのデータを記録して、次の実行で新しいデータだけを処理します。",
       "keyPhrase": "処理済みのデータを記録して、次の実行で新しいデータだけを処理します",
+      "diagram": {
+        "type": "compare",
+        "title": "バッチ処理とストリーミング処理の、処理済みのデータの扱い",
+        "left": {
+          "heading": "バッチ処理",
+          "items": [
+            {
+              "label": "処理済みを記録しない"
+            },
+            {
+              "label": "ソースを全部読む",
+              "note": "実行のたびに読みます"
+            },
+            {
+              "label": "前の結果を上書き"
+            }
+          ]
+        },
+        "right": {
+          "heading": "ストリーミング処理",
+          "items": [
+            {
+              "label": "処理済みの範囲を記録"
+            },
+            {
+              "label": "新しいデータだけ読む",
+              "note": "次の実行で処理します"
+            },
+            {
+              "label": "前の結果に追記"
+            }
+          ]
+        }
+      },
       "body": "バッチ処理では、エンジンはどのデータを処理したかを記録しません。実行のたびにソースにあるデータをすべて読み、前の結果を上書きします。読み直す量を抑えるために、日付や地域でデータを区切る使い方がよくあります。バッチ処理は、書き方が単純な一方で、効率が低く、処理に時間がかかります。\n\nストリーミング処理では、エンジンが処理済みの範囲を記録します。次の実行では新しく届いたデータだけを処理し、結果を前の結果に追記します。Databricks では、Kafka のようなメッセージバスのほかに、クラウドオブジェクトストレージのファイルや Delta Lake のテーブルも、ストリーミングのソースとして増分で読めます。\n\nストリーミング処理は、動かし続けるだけでなく、トリガーで起動し、届いた分だけを処理して止める形でも動かせます。定期的な増分のロードには、この形(`availableNow` のトリガー)を使います。\n\nメダリオンアーキテクチャでは、Databricks はブロンズ層の取り込みにストリーミング処理を勧めています。シルバー層とゴールド層には、増分で更新するマテリアライズドビューを勧めています。",
       "examAngle": "バッチ処理は、処理済みのデータを記録せず、実行のたびにソースのデータをすべて読み直します。ストリーミング処理は、処理済みの範囲を記録し、次の実行では新しく届いたデータだけを読みます。定期的な増分のロードでは、ストリーミング処理を `availableNow` のトリガーで起動し、届いた分だけを処理して止めます。",
       "checks": [
@@ -5085,6 +5119,44 @@
       "term": "Structured Streaming のトリガー",
       "oneLine": "トリガーは、Structured Streaming のクエリが、いつ新しいデータを確かめて処理するかを決める設定です。",
       "keyPhrase": "いつ新しいデータを確かめて処理するかを決める",
+      "diagram": {
+        "type": "decision",
+        "title": "トリガーの指定ごとの、クエリの動き",
+        "nodes": [
+          {
+            "id": "q",
+            "question": "トリガーをどう指定しますか",
+            "choices": [
+              {
+                "label": "指定しない",
+                "to": "r1"
+              },
+              {
+                "label": "processingTime に間隔",
+                "to": "r2"
+              },
+              {
+                "label": "availableNow=True",
+                "to": "r3"
+              }
+            ]
+          },
+          {
+            "id": "r1",
+            "result": "間隔 0 ms の processingTime と同じく、前のマイクロバッチが終わるとすぐ次を始めます",
+            "note": "クラウドストレージの API の呼び出しが増え、思わぬ費用がかかることがあります"
+          },
+          {
+            "id": "r2",
+            "result": "processingTime に '10 seconds' のような間隔を書くと、その間隔ごとにマイクロバッチを始めます"
+          },
+          {
+            "id": "r3",
+            "result": "起動の時点で読めるデータをすべて処理して、止まります",
+            "note": "ジョブで定期的に起動すれば、増分のバッチになります"
+          }
+        ]
+      },
       "body": "トリガーは、`writeStream` の `trigger` で指定します。\n\n```python\n(df.writeStream\n  .option(\"checkpointLocation\", checkpoint_path)\n  .trigger(availableNow=True)\n  .toTable(\"main.bronze.events\"))\n```\n\nトリガーを指定しないと、間隔 0 ms の `processingTime` と同じ動きになります。クエリは、前のマイクロバッチが終わるとすぐに次のマイクロバッチを始めます。遅延は 3〜5 秒ほどです。ただし、新しいデータを数ミリ秒ごとに確かめるため、クラウドストレージの API の呼び出しが増えます。その結果、思わぬ費用がかかることがあります。\n\n`processingTime` に `'10 seconds'` のような間隔を書くと、クエリはその間隔ごとにマイクロバッチを始めます。\n\n`availableNow=True` を指定すると、クエリは起動の時点で読めるデータを、いくつかのマイクロバッチに分けてすべて処理し、止まります。ジョブで定期的に起動すれば、増分のバッチになります。1 回のマイクロバッチの量は、`maxBytesPerTrigger` などのソースのオプションで抑えられます。\n\n`Trigger.Once` は、Databricks Runtime 11.3 LTS 以降で非推奨です。増分のバッチには `availableNow` を使います。Spark の `continuous` のトリガーは、Databricks では使えません。1 秒未満の遅延が要る処理には、リアルタイムモード(`realTime`)を使います。",
       "examAngle": "トリガーを指定しないクエリは、間隔 0 ms の `processingTime` と同じく、前のマイクロバッチが終わるとすぐに次を始めます。`availableNow=True` のクエリは、起動の時点で読めるデータをすべて処理してから止まります。増分のバッチには、非推奨の `Trigger.Once` ではなく `availableNow` を使います。",
       "checks": [
@@ -5210,6 +5282,48 @@
       "term": "Kafka からの読み取り",
       "oneLine": "Structured Streaming は、`format(\"kafka\")` のソースで Apache Kafka のトピックを読み、メッセージのキーと値をバイナリの列として受け取ります。",
       "keyPhrase": "メッセージのキーと値をバイナリの列として受け取ります",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "Kafka のソースの構成",
+        "root": {
+          "label": "Kafka のソース",
+          "note": "format(\"kafka\") で読みます",
+          "children": [
+            {
+              "label": "接続先",
+              "note": "kafka.bootstrap.servers にブローカーを書きます"
+            },
+            {
+              "label": "読むトピックの指定",
+              "note": "次のどれか 1 つで指定します",
+              "children": [
+                {
+                  "label": "subscribe",
+                  "note": "トピックの名前をカンマで区切ります"
+                },
+                {
+                  "label": "subscribePattern",
+                  "note": "Java の正規表現を書きます"
+                },
+                {
+                  "label": "assign",
+                  "note": "パーティションを JSON の文字列で指定します"
+                }
+              ]
+            },
+            {
+              "label": "読んだ列",
+              "note": "key と value はバイナリの列です",
+              "children": [
+                {
+                  "label": "使う前に変換",
+                  "note": "cast(\"string\") や from_avro などを使います"
+                }
+              ]
+            }
+          ]
+        }
+      },
       "body": "Kafka を読むときは、`kafka.bootstrap.servers` にブローカーの `ホスト:ポート` を書きます。読むトピックは、`subscribe`、`subscribePattern`、`assign` のどれか 1 つで指定します。`subscribe` にはトピックの名前をカンマで区切って並べ、`subscribePattern` には Java の正規表現を書きます。`assign` では、読むトピックのパーティションを JSON の文字列で指定します。\n\n```python\nraw = (spark.readStream\n  .format(\"kafka\")\n  .option(\"kafka.bootstrap.servers\", \"broker1.example.com:9092\")\n  .option(\"subscribe\", \"orders\")\n  .load())\n\norders = raw.selectExpr(\"CAST(value AS STRING) AS json\")\n```\n\n読んだ DataFrame の列は、`key`、`value`、`topic`、`partition`、`offset`、`timestamp`、`timestampType` です。`key` と `value` はバイト列のまま届くため、`cast(\"string\")` や `from_avro` などで変換してから使います。\n\n`startingOffsets` の既定は、ストリーミングのクエリでは `latest`、バッチのクエリでは `earliest` です。ストリーミングのクエリでこの値が効くのは、新しいクエリを始めるときだけです。再開したクエリは、前回に処理を終えた位置から続けて読みます。",
       "examAngle": "Kafka のソースは、`key` と `value` をバイト列のまま返します。文字列として扱うには、先に `cast(\"string\")` などで変換します。読むトピックは、`subscribe`、`subscribePattern`、`assign` のどれか 1 つで指定します。",
       "checks": [
@@ -5266,6 +5380,35 @@
       "term": "COPY INTO",
       "oneLine": "COPY INTO は、指定した場所のファイルを Delta テーブルに読み込む SQL のコマンドで、読み込み済みのファイルを次の実行で飛ばします。",
       "keyPhrase": "読み込み済みのファイルを次の実行で飛ばします",
+      "diagram": {
+        "type": "decision",
+        "title": "COPY INTO を再実行したときの、読み込み済みのファイルの扱い",
+        "nodes": [
+          {
+            "id": "q",
+            "question": "COPY_OPTIONS で force を指定しますか",
+            "choices": [
+              {
+                "label": "指定しない",
+                "to": "r1"
+              },
+              {
+                "label": "true にする",
+                "to": "r2"
+              }
+            ]
+          },
+          {
+            "id": "r1",
+            "result": "読み込み済みのファイルを飛ばして、新しいファイルだけを読み込みます",
+            "note": "force の既定は false です"
+          },
+          {
+            "id": "r2",
+            "result": "読み込み済みのファイルも含めて、読み込み直します"
+          }
+        ]
+      },
       "body": "```sql\nCOPY INTO main.bronze.orders\nFROM 's3://example-bucket/landing/orders/'\nFILEFORMAT = JSON\nPATTERN = '2026-*/*.json';\n```\n\n`FROM` には読み込むファイルの場所を、`FILEFORMAT` にはファイルの形式を書きます。形式は `CSV`、`JSON`、`AVRO`、`ORC`、`PARQUET`、`TEXT`、`BINARYFILE` から選びます。読み込み先は、既にある Delta テーブルです。\n\nCOPY INTO は、読み込み済みのファイルを飛ばします。同じ文を何度実行しても、読み込むのは新しいファイルだけです。そのため、失敗したときはそのまま再実行でき、定期的に実行する増分の読み込みにも使えます。読み込んだあとに中身が変わったファイルも、飛ばす対象です。\n\n読み込み済みのファイルも含めて読み込み直すときは、`COPY_OPTIONS` で `force` を `true` にします。`force` の既定は `false` です。\n\n読み込むファイルを絞るには、`FILES` でファイルの名前を並べるか、`PATTERN` で glob の形を書きます。`FILES` に並べられるのは 1000 件までで、`FILES` と `PATTERN` は同時に使えません。`VALIDATE` を付けると、COPY INTO はデータを書き込みません。確かめるのは、解析できるか、スキーマが合うか、制約を満たすかだけです。\n\nファイルの数がとても多いディレクトリを取り込むときは、Databricks は Auto Loader を勧めています。",
       "examAngle": "COPY INTO は読み込み済みのファイルを飛ばすため、同じ文を再実行しても、新しいファイルだけを読み込みます。`FILES` はファイルの名前を並べて絞り、`PATTERN` は glob の形で絞ります。`FILES` と `PATTERN` は、同時に使えません。",
       "checks": [
@@ -5322,6 +5465,28 @@
       "term": "COPY INTO のスキーマの推測と進化(inferSchema と mergeSchema)",
       "oneLine": "COPY INTO では、FORMAT_OPTIONS の inferSchema でファイルの列の型を推測し、COPY_OPTIONS の mergeSchema で読み込み先のテーブルのスキーマを届いたデータに合わせて変えます。",
       "keyPhrase": "COPY_OPTIONS の mergeSchema で読み込み先のテーブルのスキーマを届いたデータに合わせて変えます",
+      "diagram": {
+        "type": "compare",
+        "title": "mergeSchema は、置く欄で意味が変わります(どちらも既定は false)",
+        "left": {
+          "heading": "FORMAT_OPTIONS",
+          "items": [
+            {
+              "label": "ソースのスキーマをまとめる",
+              "note": "複数のファイルから推測してまとめます"
+            }
+          ]
+        },
+        "right": {
+          "heading": "COPY_OPTIONS",
+          "items": [
+            {
+              "label": "テーブルのスキーマを変える",
+              "note": "届いたデータに合わせて変えます"
+            }
+          ]
+        }
+      },
       "body": "Databricks Runtime 11.3 LTS 以降では、列を定義しない空の Delta テーブルを作り、COPY INTO で最初に読み込むときにスキーマを決められます。このとき、`COPY_OPTIONS` で `mergeSchema` を `true` にします。\n\n```sql\nCREATE TABLE IF NOT EXISTS main.bronze.raw_orders;\n\nCOPY INTO main.bronze.raw_orders\nFROM '/Volumes/main/landing/orders/'\nFILEFORMAT = CSV\nFORMAT_OPTIONS ('header' = 'true', 'inferSchema' = 'true', 'mergeSchema' = 'true')\nCOPY_OPTIONS ('mergeSchema' = 'true');\n```\n\n`mergeSchema` は、置く欄で意味が変わります。`FORMAT_OPTIONS` の `mergeSchema` は、複数のソースのファイルからスキーマを推測してまとめます。`COPY_OPTIONS` の `mergeSchema` は、読み込み先の Delta テーブルのスキーマを、届いたデータに合わせて変えます。どちらも既定は `false` です。ソースのファイルがすべて同じスキーマなら、公式の文書は `FORMAT_OPTIONS` の `mergeSchema` を既定のままにするよう勧めています。\n\n`FORMAT_OPTIONS` の `inferSchema` は、解析した値の型を推測するかどうかを決めます。推測しないときは、すべての列を文字列(`StringType`)として読みます。\n\n列を定義していないテーブルには、COPY INTO でデータを読み込むまで、`INSERT INTO` や `MERGE INTO` で書き込めません。",
       "examAngle": "`mergeSchema` は、置く欄で意味が変わります。`COPY_OPTIONS` の `mergeSchema` は、読み込み先のテーブルのスキーマを届いたデータに合わせて変えます。`FORMAT_OPTIONS` の `mergeSchema` は、ソースのファイルどうしのスキーマをまとめる設定で、テーブルに列を足すのは `COPY_OPTIONS` の側です。",
       "checks": [
@@ -5478,6 +5643,32 @@
       "term": "Auto Loader(cloudFiles)",
       "oneLine": "Auto Loader は、クラウドストレージに届いた新しいファイルを増分で取り込む、cloudFiles という名前の Structured Streaming のソースです。",
       "keyPhrase": "届いた新しいファイルを増分で取り込む",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "Auto Loader の構成",
+        "root": {
+          "label": "Auto Loader",
+          "note": "cloudFiles という名前のソースです",
+          "children": [
+            {
+              "label": "readStream の format",
+              "note": "cloudFiles を指定します"
+            },
+            {
+              "label": "cloudFiles.format",
+              "note": "ファイルの形式を別に指定します"
+            },
+            {
+              "label": "チェックポイント",
+              "note": "書き込み側の checkpointLocation で指定します"
+            },
+            {
+              "label": "最初の起動",
+              "note": "既定では、場所にある既存のファイルも取り込みます"
+            }
+          ]
+        }
+      },
       "body": "Auto Loader は、`format(\"cloudFiles\")` で使います。ファイルの形式は `cloudFiles.format` で指定し、`json`、`csv`、`xml`、`parquet`、`avro`、`orc`、`text`、`binaryFile` から選びます。\n\n```python\n(spark.readStream\n  .format(\"cloudFiles\")\n  .option(\"cloudFiles.format\", \"json\")\n  .option(\"cloudFiles.schemaLocation\", schema_path)\n  .load(\"/Volumes/main/landing/events/\")\n  .writeStream\n  .option(\"checkpointLocation\", checkpoint_path)\n  .trigger(availableNow=True)\n  .toTable(\"main.bronze.events\"))\n```\n\nAuto Loader は、見つけたファイルをチェックポイントに記録し、それぞれのファイルを 1 回だけ処理します。既定では、最初の起動のときに、場所に既にあるファイルも取り込みます(`cloudFiles.includeExistingFiles` の既定は `true`)。\n\nAuto Loader のクエリは、動かし続けるほかに、`availableNow` のトリガーで定期的に起動し、届いた分だけを取り込んで止めることもできます。1 時間に数百万個のファイルを取り込む処理や、数十億個のファイルでテーブルを移行したり埋め戻したりする処理にも使えます。\n\nDatabricks は、増分の取り込みには、Lakeflow のパイプラインで Auto Loader を使うことを勧めています。パイプラインでは、スキーマとチェックポイントの場所をパイプラインが管理するため、利用者が指定する必要はありません。",
       "examAngle": "Auto Loader を使うときは、readStream の format に `cloudFiles` を指定します。ファイルの形式は、`cloudFiles.format` で別に指定します。Auto Loader は見つけたファイルをチェックポイントに記録し、それぞれのファイルを 1 回だけ処理します。",
       "checks": [
@@ -5544,6 +5735,35 @@
       "term": "チェックポイント(Auto Loader)",
       "oneLine": "Auto Loader のチェックポイントは、取り込んだファイルの情報と処理の進み具合を記録する場所で、障害のあとの再開と、ファイルを 1 回だけ処理することに使われます。",
       "keyPhrase": "取り込んだファイルの情報と処理の進み具合を記録する場所",
+      "diagram": {
+        "type": "decision",
+        "title": "障害で止まったクエリを、再起動するとき",
+        "nodes": [
+          {
+            "id": "q",
+            "question": "再起動するときの、チェックポイントの場所はどちらですか",
+            "choices": [
+              {
+                "label": "同じ場所",
+                "to": "r1"
+              },
+              {
+                "label": "別の場所に変える",
+                "to": "r2"
+              }
+            ]
+          },
+          {
+            "id": "r1",
+            "result": "記録した位置から再開します",
+            "note": "Delta Lake に書き込むときは、障害のあとも各ファイルを 1 回だけ処理します"
+          },
+          {
+            "id": "r2",
+            "result": "前のストリームを捨てて、新しいストリームを始めることになります"
+          }
+        ]
+      },
       "body": "チェックポイントの場所は、書き込み側の `checkpointLocation` で指定します。Auto Loader は、見つけたファイルの情報を、チェックポイントの場所にあるキーと値の保存先(RocksDB)に記録します。利用者がこの状態を管理する必要はありません。\n\nクエリが障害で止まったときは、同じチェックポイントの場所で再起動します。Auto Loader は記録した位置から再開し、Delta Lake に書き込むときは、障害のあとも各ファイルを 1 回だけ処理します。\n\nチェックポイントの場所を変えると、前のストリームを捨てて、新しいストリームを始めることになります。",
       "examAngle": "Auto Loader は、見つけたファイルの情報をチェックポイントの場所に記録します。同じチェックポイントの場所で再起動すると、Auto Loader は記録した位置から再開し、Delta Lake に書き込むときは、障害のあとも各ファイルを 1 回だけ処理します。チェックポイントの場所を変えると、新しいストリームを始めることになります。",
       "checks": [
@@ -5686,6 +5906,46 @@
       "term": "スキーマの推測(cloudFiles.schemaLocation)",
       "oneLine": "Auto Loader は、cloudFiles.schemaLocation を指定すると、最初に見つけたファイルからスキーマを推測し、その場所にスキーマとその後の変化を保存します。",
       "keyPhrase": "最初に見つけたファイルからスキーマを推測し",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "cloudFiles.schemaLocation を指定したときのスキーマの推測",
+        "root": {
+          "label": "schemaLocation を指定",
+          "note": "スキーマの推測と進化が使えるようになります",
+          "children": [
+            {
+              "label": "保存先",
+              "note": "その場所の _schemas ディレクトリに保存します"
+            },
+            {
+              "label": "推測に使うファイル",
+              "note": "最初に見つけたファイルのうち、50 GB か 1000 個まで使います"
+            },
+            {
+              "label": "JSON、CSV、XML",
+              "note": "型の情報を持たない形式です",
+              "children": [
+                {
+                  "label": "既定の推測",
+                  "note": "すべての列を文字列として推測します"
+                },
+                {
+                  "label": "inferColumnTypes",
+                  "note": "true にすると、サンプルから型を推測します"
+                }
+              ]
+            },
+            {
+              "label": "Parquet、Avro",
+              "note": "ファイルのスキーマに書かれた型を使います"
+            },
+            {
+              "label": "schemaHints",
+              "note": "特定の列の型を決めます(スキーマ未指定のときだけ)"
+            }
+          ]
+        }
+      },
       "body": "`cloudFiles.schemaLocation` に場所を指定すると、スキーマの推測と進化が使えるようになります。Auto Loader は、その場所の `_schemas` ディレクトリにスキーマの情報を保存します。\n\n推測には、最初に見つけたファイルのうち、50 GB か 1000 個のどちらか先に達した分を使います。JSON、CSV、XML のように型の情報を持たない形式では、Auto Loader はすべての列を文字列として推測します。サンプルのデータから型を推測させるには、`cloudFiles.inferColumnTypes` を `true` にします。Parquet と Avro では、ファイルのスキーマに書かれた型を使います。\n\n特定の列の型を決めておきたいときは、`cloudFiles.schemaHints` に SQL のスキーマの形で書きます。\n\n```python\n.option(\"cloudFiles.schemaHints\", \"amount DECIMAL(10,2), order_date DATE\")\n```\n\nスキーマのヒントが使われるのは、スキーマを指定しないときだけです。",
       "examAngle": "JSON、CSV、XML は型の情報を持たないため、Auto Loader は既定ですべての列を文字列として推測します。型を推測させるには、`cloudFiles.inferColumnTypes` を `true` にします。Parquet と Avro では、Auto Loader はファイルのスキーマに書かれた型を使います。",
       "checks": [
@@ -5815,6 +6075,36 @@
       "term": "スキーマ進化モード rescue",
       "oneLine": "rescue は、スキーマを変えずにストリームを続け、スキーマにない列の値を救済データの列(_rescued_data)に入れる、Auto Loader のスキーマ進化モードです。",
       "keyPhrase": "スキーマにない列の値を救済データの列(_rescued_data)に入れる",
+      "diagram": {
+        "type": "compare",
+        "title": "スキーマ進化モード rescue と none(どちらも、スキーマを変えず、ストリームも止めません)",
+        "left": {
+          "heading": "rescue",
+          "items": [
+            {
+              "label": "新しい列の値",
+              "note": "救済データの列に入ります"
+            },
+            {
+              "label": "救済データの列",
+              "note": "既定は _rescued_data という名前です"
+            }
+          ]
+        },
+        "right": {
+          "heading": "none",
+          "items": [
+            {
+              "label": "新しい列の値",
+              "note": "捨てられます"
+            },
+            {
+              "label": "救済データの列",
+              "note": "rescuedDataColumn を設定したときだけ残ります"
+            }
+          ]
+        }
+      },
       "body": "`rescue` では、新しい列が届いても、スキーマは変わらず、ストリームも止まりません。スキーマにない列の値は、救済データの列に JSON の形でまとめて入ります。\n\n```python\n.option(\"cloudFiles.schemaEvolutionMode\", \"rescue\")\n```\n\nAuto Loader は、救済データの列を既定で `_rescued_data` という名前で足します。名前は `rescuedDataColumn` のオプションで変えられます。この列には、スキーマにない列のほか、型が合わない値や、列の名前の大文字と小文字が合わない値も入ります。値と一緒に、そのレコードの元のファイルのパスも記録されます。\n\n`none` も、ストリームを止めずにスキーマを変えないモードです。`none` では、新しい列の値は捨てられます。救済データの列に残るのは、`rescuedDataColumn` を設定したときだけです。",
       "examAngle": "`rescue` と `none` は、どちらもスキーマを変えず、ストリームを止めません。`rescue` では、スキーマにない列の値が救済データの列(既定は `_rescued_data`)に残ります。`none` では、`rescuedDataColumn` を設定しない限り、新しい列の値は捨てられます。",
       "checks": [
@@ -5871,6 +6161,32 @@
       "term": "スキーマ進化モード failOnNewColumns",
       "oneLine": "failOnNewColumns は、新しい列が届くとストリームを止め、スキーマを自動では更新しない、Auto Loader のスキーマ進化モードです。",
       "keyPhrase": "スキーマを自動では更新しない",
+      "diagram": {
+        "type": "stepper",
+        "title": "failOnNewColumns で新しい列が届いたときの流れ",
+        "steps": [
+          {
+            "id": "arrive",
+            "label": "新しい列が届く",
+            "note": "Auto Loader が新しい列を見つけます。"
+          },
+          {
+            "id": "stop",
+            "label": "ストリームが止まる",
+            "note": "addNewColumns と違い、スキーマは自動では更新されません。"
+          },
+          {
+            "id": "fix",
+            "label": "利用者が対処する",
+            "note": "指定したスキーマを直すか、新しい列を含むファイルを取り除きます(どちらか)。"
+          },
+          {
+            "id": "resume",
+            "label": "ストリームを再開",
+            "note": "どちらかをするまで、ストリームは再開しません。"
+          }
+        ]
+      },
       "body": "`failOnNewColumns` では、Auto Loader が新しい列を見つけると、ストリームが止まります。`addNewColumns` と違い、Auto Loader はスキーマを自動では更新しません。\n\nストリームを再開するには、利用者が指定したスキーマを直すか、新しい列を含むファイルを取り除きます。どちらかをするまで、ストリームは再開しません。\n\n```python\n.option(\"cloudFiles.schemaEvolutionMode\", \"failOnNewColumns\")\n```",
       "examAngle": "`failOnNewColumns` と `addNewColumns` は、どちらも新しい列が届くとストリームを止めます。`addNewColumns` はスキーマを自動で更新するため、再起動するだけで続けられます。`failOnNewColumns` は自動で更新しないため、利用者がスキーマを直すか、新しい列を含むファイルを取り除くまで再開しません。",
       "checks": [
@@ -5923,6 +6239,37 @@
       "term": "pathGlobFilter",
       "oneLine": "pathGlobFilter は、ファイルの名前を glob の形で指定し、名前が合うファイルだけを読み込むオプションです。",
       "keyPhrase": "名前が合うファイルだけを読み込む",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "pathGlobFilter の役目と、同じ役目のオプション",
+        "root": {
+          "label": "pathGlobFilter",
+          "note": "名前が glob の形に合うファイルだけ読み込みます",
+          "children": [
+            {
+              "label": "全形式に共通",
+              "note": "Auto Loader でも使えます"
+            },
+            {
+              "label": "ファイルの名前に合わせる",
+              "note": "Spark の文書では、パーティションの検出の動きは変えません"
+            },
+            {
+              "label": "同じ役目のオプション",
+              "children": [
+                {
+                  "label": "COPY INTO",
+                  "note": "PATTERN のオプションです"
+                },
+                {
+                  "label": "read_files",
+                  "note": "fileNamePattern のオプションです"
+                }
+              ]
+            }
+          ]
+        }
+      },
       "body": "`pathGlobFilter` は、すべてのファイルの形式に共通する読み取りのオプションで、Auto Loader でも使えます。たとえば、同じ場所に CSV と JSON が混ざっているとき、JSON のファイルだけを読み込めます。\n\n```python\n(spark.readStream\n  .format(\"cloudFiles\")\n  .option(\"cloudFiles.format\", \"json\")\n  .option(\"pathGlobFilter\", \"*.json\")\n  .load(\"/Volumes/main/landing/events/\"))\n```\n\nSpark の文書では、`pathGlobFilter` はファイルの名前に合わせる設定で、パーティションの検出の動きは変えません。\n\n同じ役目のオプションは、COPY INTO では `PATTERN`、`read_files` では `fileNamePattern` です。",
       "examAngle": "`pathGlobFilter` は、ファイルの名前を glob の形で指定して、読み込むファイルを絞るオプションです。同じ役目のオプションは、COPY INTO では `PATTERN`、`read_files` では `fileNamePattern` です。",
       "checks": [
@@ -6068,6 +6415,70 @@
       "term": "マネージドコネクタ(Lakeflow Connect)",
       "oneLine": "マネージドコネクタは、Lakeflow Connect の組み込みのコネクタで、ソースごとの取り込みのパイプラインを作り、Unity Catalog の管理の下で増分に読み書きします。",
       "keyPhrase": "ソースごとの取り込みのパイプラインを作り",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "マネージドコネクタの種類と、設定するとできるもの",
+        "root": {
+          "label": "マネージドコネクタ",
+          "note": "ソースの種類ごとに用意されています",
+          "children": [
+            {
+              "label": "ソースの種類",
+              "note": "公式の文書の分け方です",
+              "children": [
+                {
+                  "label": "データベース(CDC)",
+                  "note": "MySQL、PostgreSQL、SQL Server などがあります"
+                },
+                {
+                  "label": "クエリベース",
+                  "note": "CDC の設定をせず、データベースに直接問い合わせます"
+                },
+                {
+                  "label": "ファイルのソース",
+                  "note": "Google Drive、SharePoint などがあります"
+                },
+                {
+                  "label": "SaaS",
+                  "note": "Salesforce、HubSpot、Jira、Workday などがあります"
+                },
+                {
+                  "label": "ストリーミング",
+                  "note": "RabbitMQ などのメッセージバスがあります"
+                }
+              ]
+            },
+            {
+              "label": "設定するとできるもの",
+              "children": [
+                {
+                  "label": "Unity Catalog の接続",
+                  "note": "ソースの認証の情報を持ちます"
+                },
+                {
+                  "label": "取り込みのパイプライン"
+                },
+                {
+                  "label": "格納先のテーブル"
+                }
+              ]
+            },
+            {
+              "label": "取り込む範囲",
+              "children": [
+                {
+                  "label": "最初の実行",
+                  "note": "選んだデータをすべて取り込みます"
+                },
+                {
+                  "label": "2 回目以降",
+                  "note": "ソースが対応していれば、変わった分だけです"
+                }
+              ]
+            }
+          ]
+        }
+      },
       "body": "マネージドコネクタは、ソースの種類ごとに用意されています。公式の文書は、次の種類に分けています。\n\n- データベース(CDC): MySQL、PostgreSQL、SQL Server など\n- クエリベース: CDC の設定をせず、データベースに直接問い合わせる\n- ファイルのソース: Google Drive、SharePoint など\n- SaaS: Salesforce、HubSpot、Jira、Workday など\n- ストリーミング: RabbitMQ などのメッセージバス\n\nコネクタを設定すると、Unity Catalog の接続(connection)、取り込みのパイプライン、格納先のテーブルができます。接続は、ソースの認証の情報を持つ、Unity Catalog のセキュリティ保護可能なオブジェクトです。パイプラインのスケジュールごとに、ジョブが 1 つ作られます。\n\nコネクタは、最初の実行では、選んだデータをすべて取り込みます。2 回目以降は、ソースが対応していれば、変わったデータだけを取り込みます。増分の方法はソースで違い、SQL Server は変更の追跡か CDC を、Salesforce はカーソル列を使います。増分に対応していないソースやテーブルもあります。\n\nマネージドコネクタがないソースには、利用者がコミュニティのコネクタ、自作のカスタムコネクタ、SQL と Spark の API を使います。SQL と Spark の API は、扱えるソースが広い代わりに、自動化される範囲が狭くなります。",
       "examAngle": "マネージドコネクタは、最初の実行では選んだデータをすべて取り込みます。2 回目以降は、ソースが対応していれば、変わったデータだけを取り込みます。マネージドコネクタがないソースには、利用者がコミュニティのコネクタ、カスタムコネクタ、SQL と Spark の API を使います。",
       "checks": [
@@ -6128,6 +6539,58 @@
       "term": "インジェスチョンゲートウェイ",
       "oneLine": "インジェスチョンゲートウェイは、データベースのマネージドコネクタで、ソースのスナップショットと変更のログを取り出し、ステージングのボリュームに置く部品です。",
       "keyPhrase": "スナップショットと変更のログを取り出し",
+      "diagram": {
+        "type": "flow",
+        "title": "データベースのコネクタの流れ(ゲートウェイは、パイプラインが動かない間も料金がかかります)",
+        "nodes": [
+          {
+            "id": "src",
+            "label": "データベース",
+            "note": "スナップショットと変更のログがあります"
+          },
+          {
+            "id": "gw",
+            "label": "ゲートウェイ",
+            "note": "クラシックのコンピュートで常時動きます"
+          },
+          {
+            "id": "stage",
+            "label": "ステージングのボリューム",
+            "note": "データは一時的に置かれ、30 日後に自動で消えます"
+          },
+          {
+            "id": "pipe",
+            "label": "取り込みのパイプライン",
+            "note": "サーバーレスで動き、ゲートウェイとは別のスケジュールで動かせます"
+          },
+          {
+            "id": "tbl",
+            "label": "ストリーミングテーブル",
+            "note": "格納先です"
+          }
+        ],
+        "edges": [
+          {
+            "from": "src",
+            "to": "gw",
+            "label": "取り出す"
+          },
+          {
+            "from": "gw",
+            "to": "stage",
+            "label": "置く"
+          },
+          {
+            "from": "stage",
+            "to": "pipe"
+          },
+          {
+            "from": "pipe",
+            "to": "tbl",
+            "label": "反映"
+          }
+        ]
+      },
       "body": "データベースのコネクタは、インジェスチョンゲートウェイと取り込みのパイプラインの 2 段で動きます。ゲートウェイは、クラシックのコンピュートで常時動きます。ソースが変更のログを切り詰める前に、変更を捉えるためです。取り込みのパイプラインが動いていない間も、ゲートウェイのコンピュートの料金はかかります。\n\nゲートウェイが取り出したデータは、ステージングのボリューム(Unity Catalog のボリューム)に一時的に置かれます。このボリュームは、ゲートウェイを配置したときに自動で作られ、置き場所のカタログとスキーマは変えられます。ステージングのデータは、30 日後に自動で消えます。\n\n取り込みのパイプラインは、サーバーレスのコンピュートで、ステージングのデータを格納先のストリーミングテーブルに反映します。パイプラインは、ゲートウェイとは別に、好きなスケジュールで動かせます。ゲートウェイは、専用のジョブの中で、継続のタスクとして動きます。\n\n公式の文書が挙げる対象のデータベースは、MySQL、PostgreSQL、SQL Server、Oracle です。",
       "examAngle": "データベースのコネクタでは、インジェスチョンゲートウェイがクラシックのコンピュートで常時動き、変更を捉えます。取り込みのパイプラインは、サーバーレスのコンピュートで、ゲートウェイとは別のスケジュールで動きます。パイプラインが動いていない間も、ゲートウェイのコンピュートの料金はかかります。",
       "checks": [
@@ -6262,6 +6725,35 @@
       "term": "Spark の JDBC での読み取り",
       "oneLine": "Spark の JDBC での読み取りは、spark.read.format(\"jdbc\") で、外部のデータベースのテーブルや問い合わせの結果を DataFrame としてバッチで読む方法です。",
       "keyPhrase": "DataFrame としてバッチで読む",
+      "diagram": {
+        "type": "decision",
+        "title": "Spark の JDBC での読み取りを、並列にするかどうか",
+        "nodes": [
+          {
+            "id": "q",
+            "question": "並列に読むための分割の設定を指定しますか",
+            "choices": [
+              {
+                "label": "指定しない(既定)",
+                "to": "r1"
+              },
+              {
+                "label": "指定する",
+                "to": "r2"
+              }
+            ]
+          },
+          {
+            "id": "r1",
+            "result": "1 本のスレッドでソースに問い合わせます"
+          },
+          {
+            "id": "r2",
+            "result": "partitionColumn、lowerBound、upperBound で範囲を決めて、並列に読みます",
+            "note": "問い合わせの数は numPartitions で指定します。公式の文書は、50 より大きくしないよう注意しています"
+          }
+        ]
+      },
       "body": "接続先は url で、読むテーブルは dbtable で指定します。dbtable には、括弧で囲んで別名を付けた副問い合わせも書けます。この副問い合わせは、データベースの側で実行されます。\n\n```python\ndf = (spark.read.format(\"jdbc\")\n  .option(\"url\", jdbc_url)\n  .option(\"dbtable\", \"sales.orders\")\n  .option(\"user\", user)\n  .option(\"password\", password)\n  .load())\n```\n\n既定では、JDBC のドライバーは 1 本のスレッドでソースに問い合わせます。並列に読むには、partitionColumn、lowerBound、upperBound で分割する範囲を指定します。並列の問い合わせの数は、numPartitions で指定します。partitionColumn には索引のある列を選びます。公式の文書は、numPartitions を 50 より大きくしないよう注意しています。\n\nfetchSize は、1 回の往復で取る行の数です。小さすぎると遅延が増え、大きすぎるとメモリ不足になることがあります。\n\n利用者名とパスワードは JDBC の URL に書かず、シークレットに置いて dbutils.secrets.get で読みます。\n\nJDBC は、Structured Streaming の組み込みの入力のソースに含まれません。データベースの変更を続けて増分に取り込むときは、Lakeflow Connect のデータベースのコネクタを使います。外部のデータベースを問い合わせるだけなら、対応するデータベースについて、公式の文書は Lakehouse Federation を勧めています。",
       "examAngle": "Spark の JDBC での読み取りは、既定では 1 本のスレッドで問い合わせます。並列に読むには、partitionColumn、lowerBound、upperBound で範囲を決め、numPartitions で問い合わせの数を決めます。JDBC は Structured Streaming の組み込みの入力のソースに含まれないため、データベースの変更を続けて増分に取り込むときは Lakeflow Connect のデータベースのコネクタを使います。",
       "checks": [
@@ -6321,6 +6813,46 @@
       "order": 2,
       "term": "REST API からの取り込み",
       "oneLine": "REST API からの取り込みは、組み込みの汎用の REST のソースがないため、認証とページ送りと呼び出しの制限を利用者のコードで扱い、API の応答をテーブルに入れる方法です。",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "REST API の取り込みの 3 つの型(どの型でも、トークンはシークレットに置きます)",
+        "root": {
+          "label": "REST API の取り込み",
+          "note": "ソースにマネージドコネクタがないときの型です",
+          "children": [
+            {
+              "label": "Python の関数の型",
+              "note": "関数の結果をマテリアライズドビューにします",
+              "children": [
+                {
+                  "label": "向く場面",
+                  "note": "量に上限のあるデータに向きます。毎回すべて読み直します"
+                }
+              ]
+            },
+            {
+              "label": "データソース API の型",
+              "note": "spark.readStream で読み、位置を記録します",
+              "children": [
+                {
+                  "label": "向く場面",
+                  "note": "量の多い API からの増分に向きます。再起動しても続きから読めます"
+                }
+              ]
+            },
+            {
+              "label": "ボリュームと Auto Loader",
+              "note": "Lakeflow Jobs で定期実行するノートブックが JSON を書きます",
+              "children": [
+                {
+                  "label": "特長",
+                  "note": "ボリュームに置き、ファイルごとに 1 回だけ処理します"
+                }
+              ]
+            }
+          ]
+        }
+      },
       "body": "まず、ソースに Lakeflow Connect のマネージドコネクタがあるかを確かめます。コネクタがあれば、認証やページ送りはコネクタが扱います。ないときは、公式の文書が示す 3 つの型から選びます。\n\n1 つ目は、Python の関数が requests で API を呼んで DataFrame を返し、それをマテリアライズドビューにする型です。更新のたびに応答をすべて読み直すため、量に上限のあるデータに向きます。\n\n2 つ目は、Python のデータソース API で DataSource と DataSourceStreamReader を実装し、spark.readStream で読む型です。読んだ位置(オフセット)を記録するので、再起動しても続きから読めます。量の多い API から増分に取るときに向きます。\n\n3 つ目は、Lakeflow Jobs で定期実行するノートブックが API の生の JSON の応答を Unity Catalog のボリュームに書き、パイプラインがそのファイルを Auto Loader でストリーミングテーブルに取り込む型です。API の扱いと変換を分けられ、ファイルごとに 1 回だけ処理されます。\n\nどの型でも、API のトークンはコードに書かず、シークレットに置きます。一時的な失敗で更新全体が落ちないよう、再試行と、待ち時間を伸ばしながらのやり直し(バックオフ)を入れます。",
       "examAngle": "汎用の REST のソースは組み込みにないため、まずソースに Lakeflow Connect のマネージドコネクタがあるかを確かめます。応答をボリュームに書いて Auto Loader で取り込む型では、ノートブックの定期実行を Lakeflow Jobs が受け持ちます。量の多い API から増分に取り、再起動しても続きから読むときは、Python のデータソース API の型を使います。",
       "checks": [
@@ -6372,6 +6904,28 @@
       "order": 3,
       "term": "シークレット(dbutils.secrets.get)",
       "oneLine": "シークレットは、パスワードや API キー、トークンなどの資格情報をノートブックや平文に書かずに保管し、ノートブックとジョブから名前で読むための仕組みです。",
+      "diagram": {
+        "type": "compare",
+        "title": "dbutils.secrets.get で読んだ値を表示したとき",
+        "left": {
+          "heading": "値そのもの",
+          "items": [
+            {
+              "label": "表示した結果",
+              "note": "[REDACTED] に置き換わります"
+            }
+          ]
+        },
+        "right": {
+          "heading": "加工した値",
+          "items": [
+            {
+              "label": "表示した結果",
+              "note": "置き換えがかかりません"
+            }
+          ]
+        }
+      },
       "body": "シークレットは、シークレットのスコープ(名前の付いたシークレットの集まり)の中に、キーと値の組で置きます。スコープの名前はワークスペースの中で一意で、ワークスペースのすべての利用者から見えます。公式の文書は、スコープを個人の単位ではなく、役割やアプリケーションの単位で作るよう勧めています。\n\nノートブックとジョブでは、dbutils.secrets.get で値を読みます。\n\n```python\npassword = dbutils.secrets.get(scope=\"jdbc\", key=\"password\")\n```\n\ndbutils.secrets.get で読んだ値を表示すると、[REDACTED] に置き換わります。この置き換えは値そのものだけにかかり、加工した値にはかかりません。ワークスペースの管理者や、読む権限を持つ利用者は値を読めるため、権限は絞って渡します。\n\nスコープを作った利用者には、既定で MANAGE の権限が付きます。MANAGE を持つ利用者は、シークレットの読み書きと、権限の付与ができます。",
       "examAngle": "JDBC のパスワードなどの資格情報は、ノートブックに書かず、シークレットに置いて dbutils.secrets.get で読みます。dbutils.secrets.get で読んだ値を表示すると、[REDACTED] に置き換わります。この置き換えは値そのものだけにかかり、加工した値にはかかりません。",
       "checks": [
@@ -6424,6 +6978,30 @@
       "term": "取り込みの 3 つの層",
       "oneLine": "取り込みの 3 つの層は、Structured Streaming、Lakeflow のパイプライン、マネージドコネクタの順に、Databricks が受け持つ範囲が広がる、取り込みの方法の分け方です。",
       "keyPhrase": "Databricks が受け持つ範囲が広がる",
+      "diagram": {
+        "type": "layers",
+        "title": "取り込みの 3 つの層(公式の文書は、最も管理された層から始めるよう勧めています)",
+        "layers": [
+          {
+            "id": "ss",
+            "label": "Structured Streaming",
+            "note": "Spark のストリーミングの処理系です。",
+            "items": ["障害からの回復", "1 回だけの処理"]
+          },
+          {
+            "id": "lp",
+            "label": "Lakeflow のパイプライン",
+            "note": "Structured Streaming の上に作られた宣言型の仕組みです。",
+            "items": ["実行の順序", "監視", "データ品質", "エラーの扱い"]
+          },
+          {
+            "id": "mc",
+            "label": "マネージドコネクタ",
+            "note": "さらに、ソースごとの認証などを受け持ちます。公式の文書は、この層から始め、要件を満たさないときだけ下の層へ下りるよう勧めています。",
+            "items": ["ソースごとの認証", "CDC", "スキーマの変化への対応", "自動の再試行"]
+          }
+        ]
+      },
       "body": "Structured Streaming は Spark のストリーミングの処理系で、障害からの回復と、1 回だけの処理を受け持ちます。Lakeflow のパイプラインは、Structured Streaming の上に作られた宣言型の仕組みです。この仕組みは、実行の順序、監視、データ品質、エラーの扱いを受け持ちます。マネージドコネクタは、さらに、ソースごとの認証、CDC、スキーマの変化への対応、自動の再試行を受け持ちます。\n\n公式の文書は、最も管理された層から始め、要件を満たさないとき(ソースに対応していないときなど)だけ下の層へ下りるよう勧めています。\n\n利用者は、クラウドのオブジェクトストレージのファイルには Auto Loader を、Kafka や Kinesis のイベントにはそれぞれのソースを使います。これらは、Structured Streaming、パイプライン、Databricks SQL のどれからでも使えます。",
       "examAngle": "取り込みの層は、Structured Streaming、Lakeflow のパイプライン、マネージドコネクタの順に、Databricks が受け持つ範囲が広がります。公式の文書は、最も管理された層から始め、要件を満たさないときだけ下の層へ下りるよう勧めています。",
       "checks": [
@@ -6475,6 +7053,35 @@
       "order": 3,
       "term": "Partner Connect",
       "oneLine": "Partner Connect は、選ばれた技術パートナーの試用のアカウントを作り、ワークスペースとパートナーの製品をつなぐ、Databricks の画面の機能です。",
+      "diagram": {
+        "type": "decision",
+        "title": "Partner Connect でつなぐかどうか(Premium 以上のプランが要り、新しい接続は管理者が作ります)",
+        "nodes": [
+          {
+            "id": "q",
+            "question": "パートナーの製品とつなぐとき、どれに当てはまりますか",
+            "choices": [
+              {
+                "label": "すでにアカウントがある",
+                "to": "r1"
+              },
+              {
+                "label": "Partner Connect でつなぐ",
+                "to": "r2"
+              }
+            ]
+          },
+          {
+            "id": "r1",
+            "result": "Partner Connect を使わず、パートナーの接続の手順に沿って手でつなぎます"
+          },
+          {
+            "id": "r2",
+            "result": "パートナーの試用のアカウントを作り、ワークスペースとパートナーの製品をつなぎます",
+            "note": "Databricks が、SQL ウェアハウス、サービスプリンシパル、個人用アクセストークンを用意します"
+          }
+        ]
+      },
       "body": "Partner Connect でつなぐと、Databricks は、パートナーの製品が使う資源(SQL ウェアハウス、サービスプリンシパル、個人用アクセストークン)を用意します。Databricks は、その情報をパートナーに渡します。データの取り込み(Data Ingestion)の分類には Fivetran などがあり、パートナーの製品がワークスペースにデータベースとテーブルを作ります。作られたデータベースとテーブルは、パートナーのサービスプリンシパルが所有します。\n\n利用者がすでにパートナーのアカウントを持っているときは、Partner Connect を使わず、パートナーの接続の手順に沿って手でつなぎます。Partner Connect を使うには Premium 以上のプランが要り、新しい接続を作るのはワークスペースの管理者です。",
       "examAngle": "Partner Connect は、パートナーの試用のアカウントを作り、ワークスペースとパートナーの製品をつなぐ機能です。利用者がすでにパートナーのアカウントを持っているときは、Partner Connect を使わず、パートナーの接続の手順に沿って手でつなぎます。",
       "checks": [
@@ -6609,6 +7216,38 @@
       "term": "JSON の文字列のコロンの記法",
       "oneLine": "コロンの記法は、JSON を入れた文字列の列から、列名:パス の形で項目の値を取り出す SQL の書き方です。",
       "keyPhrase": "列名:パス の形で項目の値を取り出す",
+      "diagram": {
+        "type": "flow",
+        "title": "コロンの記法で取り出した値の変換",
+        "nodes": [
+          {
+            "id": "raw",
+            "label": "列名:パス",
+            "note": "JSON の文字列の列から取り出した値は、文字列です"
+          },
+          {
+            "id": "basic",
+            "label": "基本の型",
+            "note": "数値などです"
+          },
+          {
+            "id": "cplx",
+            "label": "配列や構造体"
+          }
+        ],
+        "edges": [
+          {
+            "from": "raw",
+            "to": "basic",
+            "label": "::で変換"
+          },
+          {
+            "from": "raw",
+            "to": "cplx",
+            "label": "from_json"
+          }
+        ]
+      },
       "body": "入れ子の項目は、ドット(raw:store.bicycle)か括弧(raw:store['bicycle'])でたどります。配列の要素は 0 から数える添字で指定し、[*] で全要素の項目をまとめて取り出せます。括弧なしの名前は大文字と小文字を区別せず、括弧の中の名前は区別します。空白や記号を含む名前は、バッククォートで囲みます。\n\n```sql\nSELECT raw:owner,\n       raw:store.bicycle.price::double,\n       from_json(raw:store.bicycle, 'price double, color string')\nFROM store_data;\n```\n\n取り出した値は文字列です。数値などの基本の型には :: で変換し、配列や構造体には from_json を使います。JSON の null の値は、SQL の NULL になります(文字列の \"null\" にはなりません)。",
       "examAngle": "コロンの記法で取り出した値は、文字列です。数値などの基本の型には :: で、配列や構造体には from_json で変換します。括弧なしの名前は大文字と小文字を区別せず、括弧の中の名前は区別します。",
       "checks": [
@@ -6661,6 +7300,47 @@
       "term": "VARIANT 型",
       "oneLine": "VARIANT 型は、JSON などの半構造化データを、決まったスキーマなしで 1 つの列に持つためのデータ型です。",
       "keyPhrase": "決まったスキーマなしで 1 つの列に持つ",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "VARIANT 型の列でできることと、できないこと",
+        "root": {
+          "label": "VARIANT 型",
+          "note": "Databricks Runtime 15.4 以降で使えます",
+          "children": [
+            {
+              "label": "作る",
+              "note": "parse_json で文字列の JSON から変えます"
+            },
+            {
+              "label": "値を取り出す",
+              "note": "コロンの記法か variant_get を使います",
+              "children": [
+                {
+                  "label": "項目の名前",
+                  "note": "大文字と小文字を区別します"
+                },
+                {
+                  "label": "型を変える",
+                  "note": ":: か cast です。失敗しうるときは try_variant_get です"
+                }
+              ]
+            },
+            {
+              "label": "使えないところ",
+              "children": [
+                {
+                  "label": "キーに使えない",
+                  "note": "クラスタリング、パーティション、Z-order のキーに使えません"
+                },
+                {
+                  "label": "演算に使えない",
+                  "note": "比較、グループ化、並べ替え、集合演算に使えません"
+                }
+              ]
+            }
+          ]
+        }
+      },
       "body": "文字列の JSON は、parse_json で VARIANT に変えます。\n\n```sql\nSELECT parse_json(json_str) AS v FROM raw_events;\n```\n\nVARIANT の列からは、JSON の文字列と同じコロンの記法か、variant_get で値を取り出します。VARIANT の項目の名前は、大文字と小文字を区別します。型は :: か cast で変え、変換に失敗しうるときは try_variant_get を使います。値の構造は schema_of_variant で、複数の行をまとめた構造は schema_of_variant_agg で確かめます。\n\nVARIANT の列は、クラスタリングのキー、パーティションのキー、Z-order のキーに使えません。比較、グループ化、並べ替え、集合演算にも使えません。\n\nVARIANT 型は、Databricks Runtime 15.4 以降で使えます。公式の文書は、半構造化データに、JSON の文字列より VARIANT を使うよう勧めています。",
       "examAngle": "文字列の JSON を VARIANT 型に変えるには、parse_json を使います。VARIANT の列は、クラスタリング、パーティション、Z-order のキーに使えません。比較、グループ化、並べ替え、集合演算にも、VARIANT の列は使えません。",
       "checks": [
@@ -6713,6 +7393,34 @@
       "term": "singleVariantColumn",
       "oneLine": "singleVariantColumn は、Auto Loader や COPY INTO で、ファイルの 1 レコードを丸ごと VARIANT の列 1 つに入れて取り込むためのオプションです。",
       "keyPhrase": "ファイルの 1 レコードを丸ごと VARIANT の列 1 つに入れて",
+      "diagram": {
+        "type": "decision",
+        "title": "singleVariantColumn で取り込むときの制限",
+        "nodes": [
+          {
+            "id": "q",
+            "question": "singleVariantColumn で取り込むとき、次はどうなりますか",
+            "choices": [
+              {
+                "label": "スキーマの進化",
+                "to": "r1"
+              },
+              {
+                "label": "rescuedDataColumn",
+                "to": "r2"
+              }
+            ]
+          },
+          {
+            "id": "r1",
+            "result": "スキーマの進化は起きません。1 レコードを 1 つの列に入れるためです"
+          },
+          {
+            "id": "r2",
+            "result": "rescuedDataColumn は使えません。1 レコードを 1 つの列に入れるためです"
+          }
+        ]
+      },
       "body": "このオプションには、格納先の VARIANT の列の名前を渡します。格納先には、VARIANT の列を 1 つだけ持つテーブルを先に作っておきます。\n\n```python\n(spark.readStream.format(\"cloudFiles\")\n  .option(\"cloudFiles.format\", \"json\")\n  .option(\"singleVariantColumn\", \"v\")\n  .load(source_path)\n  .writeStream\n  .option(\"checkpointLocation\", checkpoint_path)\n  .toTable(\"main.bronze.events\"))\n```\n\nCOPY INTO では、FORMAT_OPTIONS に 'singleVariantColumn' = 'v' を書きます。公式の文書は、使えるときは COPY INTO より Auto Loader を勧めています。JSON の取り込みには Databricks Runtime 15.3 以降が、XML と CSV には 16.4 以降が要ります。\n\nこのオプションでは、レコードを 1 つの列に入れるため、スキーマの進化は起きず、rescuedDataColumn も使えません。形の崩れたレコードは、VARIANT に入れられません。よく問い合わせる項目は、VARIANT でない列に取り出しておくと、クエリが速くなり、保存の量も減ります。",
       "examAngle": "singleVariantColumn は、1 レコードを丸ごと VARIANT の列 1 つに入れるため、スキーマの進化が起きません。このオプションでは、rescuedDataColumn も使えません。COPY INTO では、FORMAT_OPTIONS の中に singleVariantColumn を書きます。",
       "checks": [
