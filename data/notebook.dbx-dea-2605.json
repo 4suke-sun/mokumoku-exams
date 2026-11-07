@@ -11097,6 +11097,77 @@
       "term": "ABAC ポリシー",
       "oneLine": "ABAC ポリシーは、ガバナンスタグを条件に、行フィルターや列マスクをカタログ、スキーマ、テーブルに付けて、配下の条件に合う表にまとめてかける Unity Catalog の仕組みです。",
       "keyPhrase": "配下の条件に合う表にまとめてかける",
+      "diagram": {
+        "type": "decision",
+        "title": "ABAC ポリシーが、ある利用者のある表にかかるか",
+        "nodes": [
+          {
+            "id": "scope",
+            "question": "表は、ポリシーを付けた範囲(カタログ、スキーマ、表)の中にありますか",
+            "choices": [
+              {
+                "label": "ある",
+                "to": "tag"
+              },
+              {
+                "label": "ない",
+                "to": "none"
+              }
+            ]
+          },
+          {
+            "id": "tag",
+            "question": "表に、ポリシーの条件に合うタグが付いていますか",
+            "choices": [
+              {
+                "label": "付いている",
+                "to": "to"
+              },
+              {
+                "label": "付いていない",
+                "to": "none"
+              }
+            ]
+          },
+          {
+            "id": "to",
+            "question": "その利用者は、TO で指定した対象ですか",
+            "choices": [
+              {
+                "label": "対象",
+                "to": "except"
+              },
+              {
+                "label": "対象ではない",
+                "to": "none"
+              }
+            ]
+          },
+          {
+            "id": "except",
+            "question": "その利用者は、EXCEPT で外す指定に入っていますか",
+            "choices": [
+              {
+                "label": "入っている",
+                "to": "none"
+              },
+              {
+                "label": "入っていない",
+                "to": "applied"
+              }
+            ]
+          },
+          {
+            "id": "applied",
+            "result": "ポリシーがかかります",
+            "note": "あとで作った表も、範囲の中でタグが付けば対象になります"
+          },
+          {
+            "id": "none",
+            "result": "ポリシーはかかりません"
+          }
+        ]
+      },
       "body": "ABAC は、属性に基づくアクセス制御です。属性には、オブジェクトに付けたガバナンスタグを使います。ポリシーを付けたカタログやスキーマの配下で、タグの条件に合う表には、ポリシーが自動でかかります。あとで作った表も、範囲の中でタグが付けば対象になります。\n\n```sql\nCREATE POLICY ssn_mask\nON CATALOG employees\nCOLUMN MASK ssn_to_last_nr\nTO 'analysts' EXCEPT 'hr_admins'\nFOR TABLES\nMATCH COLUMNS has_tag('ssn') AS ssn\nON COLUMN ssn\nUSING COLUMNS (4);\n```\n\n`TO` で対象の利用者、`EXCEPT` で外す利用者を指定します。ポリシーの関数自体は、テーブルごとの行フィルターや列マスクと同じ SQL の関数です。\n\nポリシーを作るには、付ける先のオブジェクトの `MANAGE` を持つか、その所有者であることが要ります。関数の `EXECUTE` も要ります。画面では、Catalog Explorer の Policies のタブで作ります。行フィルターと列マスクのポリシーには、Databricks Runtime 16.4 以降か、サーバーレスのコンピュートが要ります。\n\n上の階層に付けたポリシーは、テーブルの所有者が外したり変えたりできません。テーブルごとの行フィルターや列マスクと同じ表で重なり、利用者ごとに違う関数がかかると、Databricks はアクセスを止めてエラーを返します。",
       "examAngle": "ABAC ポリシーは、カタログやスキーマに付けると、配下でタグの条件に合う表に自動でかかります。あとで作った表も、範囲の中でタグが付けば対象になります。上の階層に付けたポリシーは、テーブルの所有者が外したり変えたりできません。",
       "checks": [
