@@ -44,7 +44,7 @@ describe("SignupForm", () => {
     render(<SignupForm />);
     expect(screen.getByRole("heading", { level: 1, name: "新規登録" })).toBeTruthy();
     expect(screen.getByRole("status").textContent).toContain(SEND_LIMIT_NOTE);
-    expect(screen.getByRole("link", { name: "プライバシーと利用条件" }).getAttribute("href")).toBe("/privacy");
+    expect(screen.getByRole("link", { name: "利用規約とプライバシーポリシー" }).getAttribute("href")).toBe("/privacy");
     expect(screen.getByRole("link", { name: "ログインへ戻る" }).getAttribute("href")).toBe("/login");
     // 同意のチェックボックスは置かない
     expect(screen.queryByRole("checkbox")).toBeNull();

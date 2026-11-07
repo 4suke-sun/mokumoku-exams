@@ -83,7 +83,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                 <p>
                   学習用の問題集です。
                   <Link href="/privacy" className="ml-3 underline">
-                    プライバシーと利用条件
+                    利用規約とプライバシーポリシー
                   </Link>
                 </p>
               </PageFooter>

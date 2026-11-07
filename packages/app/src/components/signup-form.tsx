@@ -143,7 +143,7 @@ export function SignupForm() {
       <p className="text-sm">
         登録すると、
         <Link href="/privacy" className="text-primary underline">
-          プライバシーと利用条件
+          利用規約とプライバシーポリシー
         </Link>
         に同意したものとします。
       </p>
