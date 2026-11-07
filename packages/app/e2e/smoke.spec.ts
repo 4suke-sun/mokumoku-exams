@@ -160,8 +160,8 @@ test("主要な画面_WCAG 2.1 AA の自動検査で違反がない", async ({ p
   await openPage(page, "/signup");
   await expectAccessible(page, "新規登録");
   await page.goto("/privacy");
-  await expect(page.getByRole("heading", { level: 1, name: "プライバシーと利用条件" })).toBeVisible();
-  await expectAccessible(page, "プライバシーと利用条件");
+  await expect(page.getByRole("heading", { level: 1, name: "利用規約とプライバシーポリシー" })).toBeVisible();
+  await expectAccessible(page, "利用規約とプライバシーポリシー");
   await login(page);
 
   await page.goto("/exams");

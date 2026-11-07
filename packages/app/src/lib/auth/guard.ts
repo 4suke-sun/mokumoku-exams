@@ -77,7 +77,7 @@ export const PUBLIC_FILE_PATHS: ReadonlySet<string> = new Set([
 ]);
 
 /**
- * ログインなしで開けるか。公開する経路は、ログインと登録に必要な画面と、プライバシーと利用条件の画面、認証の API(列挙したものだけ)、
+ * ログインなしで開けるか。公開する経路は、ログインと登録に必要な画面と、利用規約とプライバシーポリシーの画面、認証の API(列挙したものだけ)、
  * 列挙したファイル、Next の静的ファイル(`/_next/`)に限る。大文字小文字は区別し、末尾のスラッシュや `..`・`%`・`\` を含むものは公開しない。
  */
 export function isPublicPath(pathname: string): boolean {
