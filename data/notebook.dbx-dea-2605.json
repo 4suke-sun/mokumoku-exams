@@ -10282,6 +10282,52 @@
       "term": "Git フォルダー",
       "oneLine": "Git フォルダーは、Git のリポジトリをワークスペースに複製し、ノートブックやファイルを Git で版の管理をするための、画面と API の Git のクライアントです。",
       "keyPhrase": "Git のリポジトリをワークスペースに複製し",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "Git の操作と、それを行う場所",
+        "root": {
+          "label": "Git の操作",
+          "note": "行う場所で分かれます",
+          "children": [
+            {
+              "label": "Git フォルダー",
+              "note": "Git のダイアログでできる操作",
+              "children": [
+                {
+                  "label": "ブランチの作成と切り替え"
+                },
+                {
+                  "label": "コミットと push"
+                },
+                {
+                  "label": "Pull"
+                },
+                {
+                  "label": "マージ"
+                },
+                {
+                  "label": "リベース"
+                },
+                {
+                  "label": "競合の解消"
+                }
+              ]
+            },
+            {
+              "label": "Git のプロバイダー",
+              "note": "GitHub などの画面で行う操作",
+              "children": [
+                {
+                  "label": "プルリクエストの作成とマージ"
+                },
+                {
+                  "label": "リモートのブランチの削除"
+                }
+              ]
+            }
+          ]
+        }
+      },
       "body": "Git フォルダーは、以前は Repos と呼ばれていた機能です。リモートのリポジトリを複製(クローン)して作り、その中のノートブックやファイルを編集します。\n\nGit フォルダーの Git のダイアログでは、ブランチの作成と切り替え、コミットと push、Pull、マージ、リベース、競合の解消ができます。プルリクエストの作成とマージ、リモートのブランチの削除は、Git のプロバイダー(GitHub など)の画面で行います。\n\nGit フォルダーを使うと、ブランチを分けて開発し、変更をリモートのリポジトリに記録できます。記録した変更は、チームで共有したり CI/CD の流れにつないだりできます。\n\n作業中のブランチの大きさは 1 GB まで、ワークスペースの資産とファイルの数は 20,000 未満が推奨です。",
       "examAngle": "Git フォルダーでは、ブランチの作成と切り替え、コミットと push、Pull、マージができます。プルリクエストの作成とマージ、リモートのブランチの削除は、Git のプロバイダーの画面で行います。Git フォルダーは、以前は Repos と呼ばれていた機能です。",
       "checks": [
@@ -10326,6 +10372,30 @@
       "term": "ブランチの作成と切り替え(Git フォルダー)",
       "oneLine": "Git フォルダーでは、Git のダイアログの Create Branch で元のブランチを選んで新しいブランチを作り、Git のダイアログのブランチのドロップダウンで切り替えます。",
       "keyPhrase": "元のブランチを選んで新しいブランチを作り",
+      "diagram": {
+        "type": "compare",
+        "title": "ブランチを切り替えたときの扱い(戻すと作り直されますが、ID は新しくなります)",
+        "left": {
+          "heading": "残るもの",
+          "items": [
+            {
+              "label": "コミットしていない変更",
+              "note": "切り替え先のコードとぶつからなければ残ります",
+              "state": "kept"
+            }
+          ]
+        },
+        "right": {
+          "heading": "消えるもの",
+          "items": [
+            {
+              "label": "切り替え先にないもの",
+              "note": "ノートブックやファイルが消えます。取り消せません",
+              "state": "removed"
+            }
+          ]
+        }
+      },
       "body": "新しいブランチは、名前を入れ、元にするブランチを選んで作ります。ブランチを切り替えたとき、コミットしていない変更は、切り替え先のコードとぶつからなければ、切り替え先のブランチでもコミットしていない変更として残ります。\n\n切り替え先のブランチにないノートブックやファイルは、ワークスペースから消えます。元のブランチに戻すと作り直されますが、ID は新しくなります。この挙動は取り消せません。",
       "examAngle": "Git フォルダーでは、利用者は Git のダイアログの Create Branch で、元にするブランチを選んで新しいブランチを作ります。既存のブランチへの切り替えは、ブランチのドロップダウンで行います。切り替え先のブランチにないノートブックやファイルは、ワークスペースから消えます。",
       "checks": [
@@ -10362,6 +10432,44 @@
       "term": "Commit & Push と Pull",
       "oneLine": "Commit & Push は、Git フォルダーの変更を 1 回の操作でコミットしてリモートのリポジトリへ送るボタンで、Pull はリモートの変更を Git フォルダーへ取り込むボタンです。",
       "keyPhrase": "1 回の操作でコミットしてリモートのリポジトリへ送る",
+      "diagram": {
+        "type": "decision",
+        "title": "Pull で競合したときの解消の方法",
+        "nodes": [
+          {
+            "id": "q",
+            "question": "Pull で、手元の変更とぶつかりました。どう解消しますか",
+            "choices": [
+              {
+                "label": "ファイルを手で直す",
+                "to": "r1"
+              },
+              {
+                "label": "手元の変更を残す",
+                "to": "r2"
+              },
+              {
+                "label": "取り込む側の変更を採る",
+                "to": "r3"
+              }
+            ]
+          },
+          {
+            "id": "r1",
+            "result": "競合したファイルを手で直します"
+          },
+          {
+            "id": "r2",
+            "result": "Keep all current changes を選びます",
+            "note": "手元の変更を残して、競合を解消します"
+          },
+          {
+            "id": "r3",
+            "result": "Take all incoming changes を選びます",
+            "note": "取り込む側の変更を採って、競合を解消します"
+          }
+        ]
+      },
       "body": "利用者は、Git のダイアログで、変更したファイルを選び、コミットのメッセージ(必須)を入れて **Commit & Push** を押します。コミットと push が続けて行われます。\n\n**Pull** を押すと、ノートブックやファイルが、リモートのリポジトリの最新の版に更新されます。手元の変更とぶつかったときは、競合を解消します。\n\n競合は、ファイルを手で直すか、Keep all current changes(手元の変更を残す)か Take all incoming changes(取り込む側の変更を採る)を選んで解消します。\n\n**Reset** は、`git reset --hard` と `git push --force` に当たる操作です。手元とリモートの両方で、そのブランチのコミット済みの変更とコミット前の変更が消えます。",
       "examAngle": "Commit & Push は、手元の変更をコミットして、リモートのリポジトリへ送ります。Pull は、リモートの変更を Git フォルダーへ取り込みます。Reset は、そのブランチのコミット済みの変更とコミット前の変更を、手元とリモートの両方で消します。",
       "checks": [
@@ -10414,6 +10522,32 @@
       "term": "Git のプロバイダーで行う操作(プルリクエスト)",
       "oneLine": "プルリクエストの作成とマージ、リモートのブランチの削除は、Git フォルダーではなく、GitHub などの Git のプロバイダーの画面で行います。",
       "keyPhrase": "Git のプロバイダーの画面で行います",
+      "diagram": {
+        "type": "stepper",
+        "title": "既定のブランチに直接コミットできないときの手順",
+        "steps": [
+          {
+            "id": "push",
+            "label": "作業用のブランチを push",
+            "note": "作業用のブランチを push します"
+          },
+          {
+            "id": "pr",
+            "label": "プルリクエストを作る",
+            "note": "Git のプロバイダーの画面で作ります"
+          },
+          {
+            "id": "review",
+            "label": "レビューを受ける",
+            "note": "プルリクエストは、レビューを経てマージします"
+          },
+          {
+            "id": "merge",
+            "label": "マージする",
+            "note": "プルリクエストのマージです。マージそのものは Git フォルダーでもできます"
+          }
+        ]
+      },
       "body": "Git フォルダーの Git のダイアログには、プルリクエストを作る操作がありません。既定のブランチに直接コミットできないリポジトリでは、作業用のブランチを push します。そのあと、Git のプロバイダーでプルリクエストを作り、レビューを経てマージします。\n\nブランチの削除も、Git のプロバイダーで行います。リモートのブランチを消しても、Git フォルダーの手元のブランチは最大 30 日残ることがあります。\n\nマージそのものは、Git フォルダーでもできます。競合がなければ、Git フォルダーはマージの結果をリモートへ push します。",
       "examAngle": "プルリクエストの作成とマージは、GitHub などの Git のプロバイダーの画面で行います。Git フォルダーの Git のダイアログには、プルリクエストを作る操作がありません。ブランチどうしのマージそのものは、Git フォルダーでもできます。",
       "checks": [
@@ -10454,6 +10588,36 @@
       "term": "targets(ターゲット)",
       "oneLine": "targets は、databricks.yml で、開発や本番などの配布先の環境を並べ、環境ごとにワークスペースや設定の上書きを書く項目です。",
       "keyPhrase": "配布先の環境を並べ、環境ごとにワークスペースや設定の上書きを書く",
+      "diagram": {
+        "type": "decision",
+        "title": "コマンドが使うターゲットの決まり方",
+        "nodes": [
+          {
+            "id": "q",
+            "question": "bundle deploy などのコマンドに、-t を付けましたか",
+            "choices": [
+              {
+                "label": "付けた",
+                "to": "r1"
+              },
+              {
+                "label": "付けない",
+                "to": "r2"
+              }
+            ]
+          },
+          {
+            "id": "r1",
+            "result": "指定したターゲットを使います",
+            "note": "例: -t prod のように指定します"
+          },
+          {
+            "id": "r2",
+            "result": "default: true を付けたターゲットを使います",
+            "note": "default: true を付けられるターゲットは 1 つだけです"
+          }
+        ]
+      },
       "body": "各ターゲットには、使うワークスペース、デプロイのモード、変数の値、リソースの設定の上書きなどを書きます。トップレベルの設定が既定値になり、ターゲットに書いた設定がそれを上書きします。ターゲットに書いていない項目は、トップレベルの設定がそのまま使われます。\n\n```yaml\ntargets:\n  dev:\n    mode: development\n    default: true\n    variables:\n      catalog: dev_catalog\n  prod:\n    mode: production\n    variables:\n      catalog: prod_catalog\n```\n\n`default: true` を付けられるターゲットは 1 つだけです。`bundle deploy` などのコマンドは、`-t` を付けないと既定のターゲットを使い、ほかのターゲットには `-t prod` のように指定します。",
       "examAngle": "環境ごとのワークスペースや設定は、`databricks.yml` の `targets` に書きます。ターゲットに書いた設定はトップレベルの設定を上書きし、書いていない項目にはトップレベルの設定が使われます。`-t` を付けないコマンドは、`default: true` を付けたターゲットを使います。",
       "checks": [
@@ -10510,6 +10674,37 @@
       "term": "バンドルの変数(variables)",
       "oneLine": "バンドルの変数は、トップレベルの variables で宣言し、`${var.<名前>}` で参照する値で、ターゲットごとに別の値を与えられます。",
       "keyPhrase": "ターゲットごとに別の値を与えられます",
+      "diagram": {
+        "type": "layers",
+        "title": "変数の値の強さ(上の層ほど強く効く)",
+        "layers": [
+          {
+            "id": "top",
+            "label": "トップレベルの default",
+            "note": "トップレベルの variables に書く、既定値です"
+          },
+          {
+            "id": "target",
+            "label": "ターゲットの variables",
+            "note": "ターゲットの下の variables に書いた値です。default より強く効きます"
+          },
+          {
+            "id": "file",
+            "label": "上書きのファイル",
+            "note": ".databricks/bundle/<ターゲット>/variable-overrides.json のファイルです"
+          },
+          {
+            "id": "env",
+            "label": "BUNDLE_VAR_ の環境変数",
+            "note": "BUNDLE_VAR_ で始まる環境変数です"
+          },
+          {
+            "id": "cli",
+            "label": "--var の指定",
+            "note": "コマンドの --var の指定です。いちばん強く効きます"
+          }
+        ]
+      },
       "body": "変数は、トップレベルの `variables` で、説明と既定値を付けて宣言します。環境ごとに値を変えるときは、ターゲットの下の `variables` に値を書きます。\n\n```yaml\nvariables:\n  catalog:\n    description: 書き込み先のカタログ\n    default: dev_catalog\n\ntargets:\n  prod:\n    variables:\n      catalog: prod_catalog\n```\n\n設定の中では `${var.catalog}` で参照します。値は、次の順に強く効きます。\n\n- コマンドの `--var` の指定\n- `BUNDLE_VAR_` で始まる環境変数\n- `.databricks/bundle/<ターゲット>/variable-overrides.json` のファイル\n- ターゲットの下の `variables` の値\n- トップレベルの `default`\n\n既定値のない変数には、上のどれかで値を与えます。`type: complex` を付けると、クラスターの設定のような構造のある値も持てます。\n\n宣言しなくても使える置換もあります。`${bundle.target}` は配布中のターゲットの名前、`${workspace.current_user.userName}` は配布した利用者の名前になります。",
       "examAngle": "利用者は、変数をトップレベルの `variables` で宣言し、環境ごとの値をターゲットの下の `variables` に書きます。ターゲットの下の値は、トップレベルの `default` より強く効きます。コマンドの `--var` の指定は、ターゲットの下の値よりさらに強く効きます。",
       "checks": [
@@ -10562,6 +10757,56 @@
       "term": "デプロイのモード(development と production)",
       "oneLine": "デプロイのモードは、ターゲットの `mode` に development か production を書き、開発用と本番用で配布の挙動を切り替える設定です。",
       "keyPhrase": "開発用と本番用で配布の挙動を切り替える",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "mode ごとの配布の挙動",
+        "root": {
+          "label": "mode",
+          "note": "development か production を書きます",
+          "children": [
+            {
+              "label": "development",
+              "note": "開発用の挙動",
+              "children": [
+                {
+                  "label": "名前の接頭辞",
+                  "note": "[dev <ユーザー名>] が付きます"
+                },
+                {
+                  "label": "スケジュールとトリガー",
+                  "note": "一時停止の状態で配布されます"
+                },
+                {
+                  "label": "同時実行",
+                  "note": "許されます"
+                }
+              ]
+            },
+            {
+              "label": "production",
+              "note": "本番用の挙動",
+              "children": [
+                {
+                  "label": "配布前の確認",
+                  "note": "例: Git のブランチが今のブランチと一致するか"
+                },
+                {
+                  "label": "パイプラインの印",
+                  "note": "development: true でないかも確かめます"
+                },
+                {
+                  "label": "既存のクラスター",
+                  "note": "差し替えはできません"
+                },
+                {
+                  "label": "run_as",
+                  "note": "サービスプリンシパルでの実行を Databricks は勧めています"
+                }
+              ]
+            }
+          ]
+        }
+      },
       "body": "`mode: development` のターゲットでは、Databricks は配布するジョブやパイプラインの名前に `[dev <ユーザー名>]` の接頭辞を付けます。ジョブのスケジュールとトリガーは一時停止の状態で配布され、同時実行も許されます。開発者どうしが同じワークスペースに配布しても、名前がぶつからず、本番のように定期実行もされません。\n\n`mode: production` のターゲットでは、Databricks は配布の前に設定を確かめます。たとえば、ターゲットに Git のブランチを書いていれば、今のブランチと一致するかを確かめます。パイプラインが開発用の印(`development: true`)になっていないことも確かめます。既存のクラスターへの差し替えはできません。\n\n本番の配布では、ジョブを利用者でなくサービスプリンシパルで動かすことを Databricks は勧めています。`run_as` にサービスプリンシパルを指定すると、そのように動きます。\n\nモードの既定の挙動は、`presets` で個別に変えられます。`mode` と `presets` の両方があるときは、`presets` が優先され、リソースごとの設定はさらに `presets` より優先されます。",
       "examAngle": "`mode: development` では、Databricks がジョブの名前に `[dev <ユーザー名>]` を付け、スケジュールとトリガーを一時停止の状態で配布します。`mode: production` では、Databricks が配布の前に設定を確かめます。たとえば、ターゲットに書いた Git のブランチが今のブランチと一致するかを確かめます。",
       "checks": [
@@ -10598,6 +10843,32 @@
       "term": "Declarative Automation Bundles(バンドル)",
       "oneLine": "Declarative Automation Bundles は、ジョブやパイプラインなどの Databricks のリソースを YAML のソースのファイルで定義し、Git で管理して、環境ごとに同じ形で配布する仕組みです。",
       "keyPhrase": "YAML のソースのファイルで定義し、Git で管理して",
+      "diagram": {
+        "type": "stepper",
+        "title": "バンドルの作業の進め方",
+        "steps": [
+          {
+            "id": "init",
+            "label": "bundle init",
+            "note": "ひな形からプロジェクトを作ります"
+          },
+          {
+            "id": "validate",
+            "label": "bundle validate",
+            "note": "設定を確かめます"
+          },
+          {
+            "id": "deploy",
+            "label": "bundle deploy",
+            "note": "例では、-t dev でターゲットを指定します"
+          },
+          {
+            "id": "run",
+            "label": "bundle run",
+            "note": "例では、-t dev と my_job を指定します"
+          }
+        ]
+      },
       "body": "Declarative Automation Bundles は、以前は Databricks Asset Bundles と呼ばれていました。公式の文書は今の名前を使い、旧称を併記しています。試験の問題や古い記事で Databricks Asset Bundles とあれば、同じ仕組みを指します。\n\nバンドルには、ノートブックや Python のファイルなどのソースのファイルと、リソースの定義と設定、テストを入れます。設定は YAML で書き、入口のファイルは `databricks.yml` です。\n\n作業は、次の順に進めます。\n\n```bash\ndatabricks bundle init        # ひな形からプロジェクトを作る\ndatabricks bundle validate    # 設定を確かめる\ndatabricks bundle deploy -t dev\ndatabricks bundle run -t dev my_job\n```\n\n配布できるリソースには、Lakeflow Jobs のジョブ、パイプライン、ダッシュボード、モデルサービングのエンドポイント、MLflow の実験などがあります。Databricks は、CI/CD の方法としてバンドルを勧めています。\n\nバンドルを使うには、Databricks CLI の v0.218.0 以降が要ります。",
       "examAngle": "Declarative Automation Bundles と Databricks Asset Bundles は、同じ仕組みです。Databricks Asset Bundles は旧称です。バンドルでは、ジョブやパイプラインの定義を YAML で書き、Git で管理して、環境ごとに同じ形で配布します。",
       "checks": [
@@ -10654,6 +10925,31 @@
       "term": "databricks.yml",
       "oneLine": "databricks.yml は、バンドルの名前、変数、リソース、ターゲットなどを書く、バンドルの設定の入口のファイルです。",
       "keyPhrase": "バンドルの設定の入口のファイル",
+      "diagram": {
+        "type": "layers",
+        "title": "databricks.yml のトップレベルの主な項目と上書き",
+        "layers": [
+          {
+            "id": "top",
+            "label": "トップレベルの設定",
+            "note": "既定値になります。リソースが多いときは、include でファイルを分けます",
+            "items": [
+              "bundle(名前は必須)",
+              "include(別ファイルの取り込み)",
+              "variables(変数の宣言)",
+              "workspace(接続先とパス)",
+              "permissions(権限)",
+              "resources(ジョブなど)",
+              "targets(配布先の環境)"
+            ]
+          },
+          {
+            "id": "targets",
+            "label": "targets の中の設定",
+            "note": "環境ごとに、トップレベルの設定を上書きします"
+          }
+        ]
+      },
       "body": "`databricks.yml` のトップレベルに書く主な項目は、次のとおりです。\n\n- `bundle`: バンドルの名前(必須)など\n- `include`: リソースの設定を書いた別のファイルを取り込む\n- `variables`: 変数の宣言\n- `workspace`: ワークスペースの接続先とパス\n- `permissions`: リソースにかける権限\n- `resources`: 配布するジョブやパイプラインなど\n- `targets`: 配布先の環境\n\n```yaml\nbundle:\n  name: sales_pipeline\n\ninclude:\n  - resources/*.yml\n\ntargets:\n  dev:\n    default: true\n```\n\nリソースが多いときは、`include` でファイルを分けます。トップレベルに書いた設定は既定値になり、`targets` の中の設定で環境ごとに上書きされます。",
       "examAngle": "`databricks.yml` は、バンドルの設定の入口のファイルです。トップレベルの `bundle` に書くバンドルの名前は必須です。配布先の環境は `targets` に、配布するジョブは `resources` に書きます。",
       "checks": [
@@ -10690,6 +10986,28 @@
       "term": "resources(リソース)",
       "oneLine": "resources は、バンドルが配布するジョブやパイプラインなどを、種類ごとにキーを付けて定義する項目です。",
       "keyPhrase": "種類ごとにキーを付けて定義する",
+      "diagram": {
+        "type": "compare",
+        "title": "リソースのキーの使いどころ",
+        "left": {
+          "heading": "コマンドで実行するとき",
+          "items": [
+            {
+              "label": "キーを引数にする",
+              "note": "databricks bundle run daily_sales"
+            }
+          ]
+        },
+        "right": {
+          "heading": "設定の中で参照するとき",
+          "items": [
+            {
+              "label": "キーで参照する",
+              "note": "${resources.jobs.daily_sales.id}"
+            }
+          ]
+        }
+      },
       "body": "`resources` の下に、`jobs` や `pipelines` のようなリソースの種類を書き、その下に各リソースのキーと設定を書きます。設定の項目は、各リソースの REST API の形に沿います。\n\n```yaml\nresources:\n  jobs:\n    daily_sales:\n      name: daily_sales\n      tasks:\n        - task_key: load\n          notebook_task:\n            notebook_path: ../src/load.ipynb\n```\n\nキー(上の例では `daily_sales`)は、バンドルの中でリソースを指す名前です。`databricks bundle run daily_sales` のようにコマンドで実行するときや、`${resources.jobs.daily_sales.id}` のように設定の中で参照するときに使います。\n\nジョブとパイプラインのほか、ダッシュボード、スキーマ、ボリューム、アプリ、SQL ウェアハウスなども定義できます。",
       "examAngle": "配布するジョブは、`resources` の下の `jobs` に、キーを付けて書きます。キーはバンドルの中でリソースを指す名前です。キーは、`databricks bundle run` の引数や、`${resources.jobs.daily_sales.id}` のような参照に使います。",
       "checks": [
@@ -10814,6 +11132,36 @@
       "term": "databricks bundle validate",
       "oneLine": "`databricks bundle validate` は、バンドルの設定のファイルに構文の誤りがないかを、配布せずに確かめるコマンドです。",
       "keyPhrase": "配布せずに確かめる",
+      "diagram": {
+        "type": "compare",
+        "title": "bundle validate と bundle plan の違い",
+        "left": {
+          "heading": "bundle validate",
+          "items": [
+            {
+              "label": "構文を確かめる",
+              "note": "設定のファイルの構文を確かめ、要約を表示します"
+            },
+            {
+              "label": "配布しない",
+              "note": "配布せずに確かめます"
+            }
+          ]
+        },
+        "right": {
+          "heading": "bundle plan",
+          "items": [
+            {
+              "label": "配布で何が変わるかを見る",
+              "note": "配布の操作の一覧を見られます"
+            },
+            {
+              "label": "変更を加えない",
+              "note": "変更を加えずに見られます"
+            }
+          ]
+        }
+      },
       "body": "`bundle validate` は、設定のファイルの構文を確かめ、バンドルの名前、ターゲット、配布先のワークスペースなどの要約を表示します。リソースの設定に知らない項目があれば、警告を出します。\n\n```bash\ndatabricks bundle validate -t prod\n```\n\nCI/CD の流れでは、配布の前に `validate` を置き、設定の誤りを早く見つけます。配布で何が変わるかを確かめたいときは、`databricks bundle plan` で、変更を加えずに配布の操作の一覧を見られます。",
       "examAngle": "`databricks bundle validate` は、設定のファイルの構文を確かめて要約を表示するだけで、配布はしません。配布で何が変わるかを、変更を加えずに見るには、`databricks bundle plan` を使います。",
       "checks": [
@@ -10854,6 +11202,45 @@
       "term": "databricks bundle deploy",
       "oneLine": "`databricks bundle deploy` は、バンドルのファイルとリソースを、指定したターゲットのワークスペースへ配布するコマンドです。",
       "keyPhrase": "指定したターゲットのワークスペースへ配布する",
+      "diagram": {
+        "type": "decision",
+        "title": "bundle deploy で行うことと、行わないこと",
+        "nodes": [
+          {
+            "id": "q",
+            "question": "バンドルのリソースを、どうしたいですか",
+            "choices": [
+              {
+                "label": "ターゲットへ配布する",
+                "to": "r1"
+              },
+              {
+                "label": "ジョブを実行する",
+                "to": "r2"
+              },
+              {
+                "label": "配布したものを消す",
+                "to": "r3"
+              }
+            ]
+          },
+          {
+            "id": "r1",
+            "result": "bundle deploy を使います",
+            "note": "ジョブやパイプラインが作られるか更新されます。実行はされません"
+          },
+          {
+            "id": "r2",
+            "result": "bundle run を使います",
+            "note": "配布するだけでは、ジョブは実行されません"
+          },
+          {
+            "id": "r3",
+            "result": "bundle destroy を使います",
+            "note": "配布したリソースとファイルを消します。消したものは戻せません"
+          }
+        ]
+      },
       "body": "`bundle deploy` では、`-t`(`--target`)でターゲットを指定します。指定しなければ、`default: true` を付けたターゲットに配布します。\n\n```bash\ndatabricks bundle deploy -t prod\n```\n\n配布すると、ジョブやパイプラインが作られるか、前の配布から更新されます。配布するだけで、ジョブは実行されません。実行は `bundle run` で行います。\n\n配布したリソースとファイルを消すときは `databricks bundle destroy` を使います。消したものは戻せません。",
       "examAngle": "`bundle validate` は設定を確かめるだけで、配布しません。`bundle deploy` はリソースを配布しますが、ジョブは実行しません。ジョブの実行は `bundle run` で行います。",
       "checks": [
@@ -10890,6 +11277,22 @@
       "term": "databricks bundle run",
       "oneLine": "`databricks bundle run` は、配布済みのバンドルにあるジョブやパイプラインを、リソースのキーで指定して実行するコマンドです。",
       "keyPhrase": "リソースのキーで指定して実行する",
+      "diagram": {
+        "type": "stepper",
+        "title": "設定を変えたときの手順",
+        "steps": [
+          {
+            "id": "deploy",
+            "label": "bundle deploy",
+            "note": "先に、変えた設定を配布します"
+          },
+          {
+            "id": "run",
+            "label": "bundle run",
+            "note": "リソースのキーを指定して実行します"
+          }
+        ]
+      },
       "body": "引数には、`resources` の下で付けたジョブやパイプラインのキーを指定します。ジョブの名前やジョブの ID ではありません。\n\n```bash\ndatabricks bundle run -t dev daily_sales\n```\n\nジョブにパラメータを渡すときは `--params`、パイプラインの表を指定してリセットし、計算し直すときは `--full-refresh` を付けます。`--no-wait` を付けると、実行の完了を待たずにコマンドが終わります。\n\n設定を変えたときは、先に `bundle deploy` で配布してから実行します。",
       "examAngle": "`databricks bundle run` の引数には、`resources` の下で付けたリソースのキーを指定します。ジョブの名前やジョブの ID は、引数になりません。設定を変えたときは、先に `bundle deploy` で配布してから実行します。",
       "checks": [
@@ -11007,6 +11410,38 @@
       "term": "Databricks CLI の認証(統合認証)",
       "oneLine": "Databricks CLI は、統合認証の環境変数か、`.databrickscfg` の構成プロファイルから、接続先のワークスペースと認証情報を読みます。",
       "keyPhrase": "統合認証の環境変数か、`.databrickscfg` の構成プロファイルから",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "CLI が読む接続先と認証情報の環境変数",
+        "root": {
+          "label": "Databricks CLI の認証",
+          "note": "環境変数か、.databrickscfg から読みます",
+          "children": [
+            {
+              "label": "接続先",
+              "note": "DATABRICKS_HOST"
+            },
+            {
+              "label": "個人用アクセストークン",
+              "note": "DATABRICKS_TOKEN。旧来(legacy)の方式です"
+            },
+            {
+              "label": "サービスプリンシパルの OAuth",
+              "note": "マシン間の認証です",
+              "children": [
+                {
+                  "label": "クライアント ID",
+                  "note": "DATABRICKS_CLIENT_ID"
+                },
+                {
+                  "label": "クライアントシークレット",
+                  "note": "DATABRICKS_CLIENT_SECRET"
+                }
+              ]
+            }
+          ]
+        }
+      },
       "body": "接続先は `DATABRICKS_HOST` に書きます。認証の情報は、方式ごとに環境変数が違います。\n\n- 個人用アクセストークン(PAT): `DATABRICKS_TOKEN`\n- サービスプリンシパルの OAuth(マシン間): `DATABRICKS_CLIENT_ID` と `DATABRICKS_CLIENT_SECRET`\n\n同じ値は、`.databrickscfg` のプロファイルにも書けます。`databricks configure` は、ホストとトークンを尋ねてプロファイルを作ります。名前を指定しなければ `DEFAULT` のプロファイルを上書きします。\n\nPAT は、公式の文書で旧来(legacy)の方式とされています。Databricks は、利用者の認証には PAT より OAuth を勧めています。CI/CD のような無人の処理では、サービスプリンシパルの OAuth か、秘密情報を保存せずに済むトークンのフェデレーションを使います。",
       "examAngle": "利用者は、PAT で認証するとき、`DATABRICKS_HOST` にワークスペースの URL を、`DATABRICKS_TOKEN` に PAT を設定します。サービスプリンシパルの OAuth では、`DATABRICKS_CLIENT_ID` と `DATABRICKS_CLIENT_SECRET` を使います。CI/CD では、Databricks は利用者のアカウントでなくサービスプリンシパルを勧めています。",
       "checks": [
