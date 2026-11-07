@@ -26,6 +26,15 @@ const entry = (over: Record<string, unknown> = {}) => ({
   term: "用語 1",
   oneLine: "用語 1 は、決まった場所にデータを置くしくみ。",
   keyPhrase: "決まった場所にデータを置く",
+  diagram: {
+    type: "flow",
+    title: "流れ",
+    nodes: [
+      { id: "a", label: "入力" },
+      { id: "b", label: "出力" },
+    ],
+    edges: [{ from: "a", to: "b" }],
+  },
   body: "解説です。`CREATE TABLE` を使います。",
   checks: [check()],
   references: [{ title: "出典", url: "https://docs.databricks.com/" }],
@@ -50,6 +59,10 @@ describe("validateNotebookData", () => {
       ],
     );
     expect(run(data)).toEqual([]);
+  });
+
+  it("見出しに図がない_指摘する(図は必須)", () => {
+    expect(run(notebook([unit()], [entry({ diagram: undefined })]))).toHaveLength(1);
   });
 
   it("ノートのファイルがない_指摘なし(体系ノートは任意)", () => {

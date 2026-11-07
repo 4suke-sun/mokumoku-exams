@@ -44,6 +44,15 @@ const entry = (over: Partial<NotebookEntry>): NotebookEntry => ({
   term: "外部テーブル",
   oneLine: "外部の場所にデータを置くテーブル。DROP してもファイルは残る。",
   keyPhrase: "DROP してもファイルは残る",
+  diagram: {
+    type: "flow",
+    title: "図",
+    nodes: [
+      { id: "a", label: "入力" },
+      { id: "b", label: "出力" },
+    ],
+    edges: [{ from: "a", to: "b" }],
+  },
   body: "解説です。\n\n```\nDROP TABLE sales;\n```",
   examAngle: "ファイルが残る理由を、テーブルの種類と結びつけて覚える。",
   checks: [
@@ -178,7 +187,8 @@ describe("NotebookUnitView", () => {
     const position = (el: Element | null | undefined) => (el ? [...section.querySelectorAll("*")].indexOf(el) : -1);
     expect(position(figure)).toBeGreaterThan(position(section.querySelector("mark")));
     expect(position(figure)).toBeLessThan(position(within(section).getByText("解説")));
-    expect(container.querySelector("#managed-table figure")).toBeNull();
+    // 図は必須: どの見出しにも 1 つある
+    expect(container.querySelectorAll("#managed-table figure")).toHaveLength(1);
     const ids = [...container.querySelectorAll("svg title")].map((t) => t.id);
     expect(new Set(ids).size).toBe(ids.length);
   });

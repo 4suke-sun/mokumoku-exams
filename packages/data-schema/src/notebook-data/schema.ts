@@ -116,8 +116,8 @@ export const NotebookEntrySchema = z
     oneLine: text.max(200),
     /** 一言の中で、マーカーを引く箇所(一言の部分文字列) */
     keyPhrase: text.max(200).optional(),
-    /** 見出しの図(0〜1 個。一言の直後に出す)。検証の状態は、見出しの `status` が覆う */
-    diagram: DiagramSchema.optional(),
+    /** 見出しの図(必須。1 つの見出しに置く図は 1 つ。一言の直後に出す)。検証の状態は、見出しの `status` が覆う */
+    diagram: DiagramSchema,
     /** 解説 */
     body: text.max(10000),
     /** ここを押さえる(取り違えやすい点と、区別して覚える点。表示の名前は「ここを押さえる」) */
