@@ -5087,6 +5087,60 @@
       "term": "OPTIMIZE",
       "oneLine": "OPTIMIZE は、テーブルのデータファイルを書き直して、読み取りに向いた配置にするコマンドです。",
       "keyPhrase": "データファイルを書き直して",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "OPTIMIZE の構成(Databricks は、ZORDER BY よりも Liquid Clustering を勧めています)",
+        "root": {
+          "label": "OPTIMIZE",
+          "note": "データファイルを書き直して、読み取りに向いた配置にします",
+          "children": [
+            {
+              "label": "まとめる単位",
+              "note": "テーブルの種類で変わります",
+              "children": [
+                {
+                  "label": "パーティションのあるテーブル",
+                  "note": "パーティションごとにまとめます"
+                },
+                {
+                  "label": "Liquid Clustering",
+                  "note": "クラスタリングのキーでデータを寄せます"
+                }
+              ]
+            },
+            {
+              "label": "対象と寄せ方",
+              "children": [
+                {
+                  "label": "WHERE",
+                  "note": "パーティションの条件を書くと、その範囲だけを対象にできます"
+                },
+                {
+                  "label": "ZORDER BY",
+                  "note": "Liquid Clustering なしの Delta で、列の近い値を寄せます"
+                }
+              ]
+            },
+            {
+              "label": "実行したとき",
+              "children": [
+                {
+                  "label": "データの中身は変わらない",
+                  "note": "実行中も読み手は止まらず、前後で同じ結果を読めます"
+                },
+                {
+                  "label": "ファイルをまとめる処理",
+                  "note": "冪等です。同じデータに 2 回目を実行しても、何も変わりません"
+                }
+              ]
+            },
+            {
+              "label": "予測的最適化",
+              "note": "マネージドテーブルで、OPTIMIZE を自動で実行します"
+            }
+          ]
+        }
+      },
       "body": "書き込みを重ねたテーブルには、小さなファイルがたまります。`OPTIMIZE` を実行すると、Databricks はファイルを書き直してまとめます。パーティションのあるテーブルでは、パーティションごとにまとめます。Liquid Clustering を使うテーブルでは、クラスタリングのキーでデータを寄せます。\n\n```sql\nOPTIMIZE main.sales.orders;\nOPTIMIZE main.sales.events WHERE event_date >= '2026-01-01';\n```\n\n`WHERE` にパーティションの条件を書くと、その範囲だけを対象にできます。Liquid Clustering を使わない Delta のテーブルでは、`ZORDER BY` を付けて、指定した列で近い値を同じファイルに寄せられます。Databricks は、`ZORDER` よりも Liquid Clustering を勧めています。\n\nファイルをまとめる処理(bin-packing)は冪等です。同じデータに 2 回目を実行しても、何も変わりません。`OPTIMIZE` はデータの中身を変えないので、実行中も読み手は止まらず、前後で同じ結果を読めます。\n\nUnity Catalog のマネージドテーブルでは、予測的最適化が `OPTIMIZE` を自動で実行します。Databricks は、マネージドテーブルで予測的最適化を有効にするよう勧めています。",
       "examAngle": "小さなファイルがたまったテーブルでは、`OPTIMIZE` がデータファイルを書き直してまとめます。`OPTIMIZE` はデータの中身を変えないので、実行中も読み手は止まりません。Unity Catalog のマネージドテーブルでは、予測的最適化が `OPTIMIZE` を自動で実行します。",
       "checks": [
@@ -5139,6 +5193,65 @@
       "term": "AQE(アダプティブクエリ実行)",
       "oneLine": "AQE は、クエリの実行中に、終わった段階の実際のデータの大きさを見て、残りの実行計画を立て直す仕組みです。",
       "keyPhrase": "実際のデータの大きさを見て",
+      "diagram": {
+        "type": "flow",
+        "title": "AQE の流れ(Databricks では既定で有効です。偏りの扱いは、ブロードキャスト結合にはかかりません)",
+        "nodes": [
+          {
+            "id": "stage",
+            "label": "シャッフルやブロードキャスト",
+            "note": "この段階が終わるたびに、結果の大きさを使います"
+          },
+          {
+            "id": "aqe",
+            "label": "AQE",
+            "note": "実際のデータの大きさを見て、残りの実行計画を立て直します"
+          },
+          {
+            "id": "join",
+            "label": "結合の方式を変える",
+            "note": "ソートマージ結合を、ブロードキャストハッシュ結合に変えます"
+          },
+          {
+            "id": "part",
+            "label": "小さな区分をまとめる",
+            "note": "シャッフルのあとの小さなパーティションをまとめます"
+          },
+          {
+            "id": "skew",
+            "label": "偏ったタスクを分ける",
+            "note": "中央値の 5 倍超かつ 256 MB 超が対象です。既定で有効"
+          },
+          {
+            "id": "empty",
+            "label": "その先の処理を省く",
+            "note": "空の結果を見つけたときです"
+          }
+        ],
+        "edges": [
+          {
+            "from": "stage",
+            "to": "aqe",
+            "label": "結果の大きさ"
+          },
+          {
+            "from": "aqe",
+            "to": "join"
+          },
+          {
+            "from": "aqe",
+            "to": "part"
+          },
+          {
+            "from": "aqe",
+            "to": "skew"
+          },
+          {
+            "from": "aqe",
+            "to": "empty"
+          }
+        ]
+      },
       "body": "AQE は、Databricks では既定で有効です。シャッフルやブロードキャストの段階が終わるたびに、その結果の大きさを使って、次の 4 つの調整をします。\n\n- ソートマージ結合を、ブロードキャストハッシュ結合に変える\n- シャッフルのあとの小さなパーティションをまとめる\n- ソートマージ結合とシャッフルハッシュ結合で、偏ったパーティションのタスクを分ける\n- 空の結果を見つけて、その先の処理を省く\n\n偏りの扱いは、`spark.sql.adaptive.skewJoin.enabled`(既定で `true`)で決まります。パーティションが偏っているとみなされるのは、大きさが中央値の 5 倍(`skewedPartitionFactor`)を超え、しかも 256 MB(`skewedPartitionThresholdInBytes`)を超えるときです。ブロードキャスト結合には、この偏りの扱いはかかりません。\n\n実行中にブロードキャスト結合へ変えるしきい値は、`spark.databricks.adaptive.autoBroadcastJoinThreshold` で、既定は 30 MB です。AQE そのものは `spark.databricks.optimizer.adaptive.enabled` で切り替えます。",
       "examAngle": "AQE は、実行中に、偏ったパーティションのタスクを分けます。偏りの扱いがかかるのはソートマージ結合とシャッフルハッシュ結合で、ブロードキャスト結合にはかかりません。AQE は、Databricks では既定で有効です。",
       "checks": [
@@ -5175,6 +5288,36 @@
       "term": "spark.sql.autoBroadcastJoinThreshold",
       "oneLine": "spark.sql.autoBroadcastJoinThreshold は、結合のときに全てのワーカーへ配る(ブロードキャストする)表の大きさの上限を、バイト数で決める設定です。",
       "keyPhrase": "表の大きさの上限を、バイト数で決める",
+      "diagram": {
+        "type": "compare",
+        "title": "ブロードキャストのしきい値の違い(計画用の spark.sql.autoBroadcastJoinThreshold と、AQE 用の別の設定)",
+        "left": {
+          "heading": "計画用の設定",
+          "items": [
+            {
+              "label": "計画を立てるとき",
+              "note": "自動でブロードキャストする表の上限です"
+            },
+            {
+              "label": "10 MB",
+              "note": "Spark の既定です。-1 にすると、自動を止めます"
+            }
+          ]
+        },
+        "right": {
+          "heading": "AQE 用の設定",
+          "items": [
+            {
+              "label": "実行中に切り替えるとき",
+              "note": "AQE が、ブロードキャストへ切り替えるときに使います"
+            },
+            {
+              "label": "30 MB",
+              "note": "Databricks の既定です"
+            }
+          ]
+        }
+      },
       "body": "結合の片側の表がこの値より小さいと、Spark はその表を全てのワーカーノードへ配って結合します。既定は 10 MB(10485760 バイト)です。`-1` にすると、自動のブロードキャストを止めます。\n\n```python\nspark.conf.set(\"spark.sql.autoBroadcastJoinThreshold\", 50 * 1024 * 1024)\n```\n\nしきい値を超える表でもブロードキャストしたいときは、`BROADCAST` のヒントを書きます。ヒントがあると、Spark は統計上の大きさがしきい値を超えていても、その表をブロードキャストする結合を優先します。ただし、結合の種類によっては、ヒントの方式が使えないこともあります。\n\n```sql\nSELECT /*+ BROADCAST(d) */ * FROM sales s JOIN dim_store d ON s.store_id = d.store_id;\n```\n\nこの設定は、計画を立てるときに使われます。AQE が実行中にブロードキャストへ切り替えるときは、別の設定(Databricks では `spark.databricks.adaptive.autoBroadcastJoinThreshold`、既定は 30 MB)を使います。",
       "examAngle": "`spark.sql.autoBroadcastJoinThreshold` は、自動でブロードキャストする表の大きさの上限で、Spark の既定は 10 MB です。`-1` にすると、自動のブロードキャストを止めます。AQE が実行中にブロードキャストへ切り替えるときは、別の設定 `spark.databricks.adaptive.autoBroadcastJoinThreshold`(既定は 30 MB)を使います。",
       "checks": [
@@ -5231,6 +5374,56 @@
       "term": "ゴールド層",
       "oneLine": "ゴールド層は、メダリオンアーキテクチャの最後の層で、業務の用途に合わせて集計し、分析やダッシュボードがすぐ使える形にしたデータを置く層です。",
       "keyPhrase": "業務の用途に合わせて集計し",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "ゴールド層の構成",
+        "root": {
+          "label": "ゴールド層",
+          "note": "最後の層で、業務の用途に合わせて集計したデータを置きます",
+          "children": [
+            {
+              "label": "置くデータ",
+              "note": "シルバー層で検証し整えたデータから作ります",
+              "children": [
+                {
+                  "label": "集計",
+                  "note": "平均、件数、最大、最小などです"
+                },
+                {
+                  "label": "絞った結果",
+                  "note": "期間や地域で絞ったものです"
+                },
+                {
+                  "label": "次元モデル",
+                  "note": "報告のために、指標と関係を定めて形を作ります"
+                }
+              ]
+            },
+            {
+              "label": "使う人の例",
+              "note": "これらの人などが使います",
+              "children": [
+                {
+                  "label": "分析担当と BI の開発者"
+                },
+                {
+                  "label": "データサイエンティスト"
+                },
+                {
+                  "label": "機械学習のエンジニア"
+                },
+                {
+                  "label": "経営層"
+                }
+              ]
+            },
+            {
+              "label": "分け方",
+              "note": "業務の領域ごとに分ける組織もあります(人事、財務など)"
+            }
+          ]
+        }
+      },
       "body": "ゴールド層のデータは、シルバー層で検証し整えたデータから作ります。平均、件数、最大、最小などの集計や、期間や地域で絞った結果を置きます。報告のためには、指標と関係を定めた次元モデルで形を作ります。\n\n```sql\nCREATE OR REPLACE MATERIALIZED VIEW main.gold.weekly_sales AS\nSELECT date_trunc('week', order_date) AS week, SUM(amount) AS total\nFROM main.silver.orders\nGROUP BY 1;\n```\n\nゴールド層のデータを使うのは、業務の分析担当や BI の開発者、データサイエンティストと機械学習のエンジニア、経営層などです。業務の領域ごとにゴールド層を分ける組織もあります(人事、財務など)。\n\nシルバー層には、集計していない、検証済みのレコードを少なくとも 1 つの形で残します。大量の過去のデータを読むときは、ゴールド層に実体化せず、シルバー層を読むのが普通です。ゴールド層のデータセットの数は、ブロンズ層やシルバー層より少なくなります。",
       "examAngle": "業務の用途に合わせて集計し、ダッシュボードが読むデータは、ゴールド層に置きます。検証と重複の除去を済ませ、集計していないレコードは、シルバー層に置きます。",
       "checks": [
@@ -5283,6 +5476,45 @@
       "term": "一時ビュー",
       "oneLine": "一時ビューは、カタログにもスキーマにも登録せず、作った場所の中だけで使えるビューです。",
       "keyPhrase": "作った場所の中だけで使える",
+      "diagram": {
+        "type": "decision",
+        "title": "一時ビューを使える範囲(作った場所で決まります)",
+        "nodes": [
+          {
+            "id": "q1",
+            "question": "一時ビューを、どこで作りましたか",
+            "choices": [
+              {
+                "label": "ノートブックやジョブ",
+                "to": "r1"
+              },
+              {
+                "label": "Databricks SQL",
+                "to": "r2"
+              },
+              {
+                "label": "宣言型パイプライン",
+                "to": "r3"
+              }
+            ]
+          },
+          {
+            "id": "r1",
+            "result": "ノートブックやジョブで作った一時ビューは、そのノートブックかスクリプトの中だけで使えます",
+            "note": "クラスターから切り離すと、一時ビューは消えます"
+          },
+          {
+            "id": "r2",
+            "result": "Databricks SQL で作った一時ビューは、1 つのクエリの中だけで使えます",
+            "note": "同じダッシュボードのほかのクエリからも、使えません"
+          },
+          {
+            "id": "r3",
+            "result": "宣言型パイプラインの一時ビューは、パイプラインの中の中間の結果を定義します",
+            "note": "CREATE TEMPORARY VIEW か @dp.temporary_view で定義します。expectation も付けられます"
+          }
+        ]
+      },
       "body": "ビューは、クエリの文だけを持ち、データを複製しません。Unity Catalog のビューは `カタログ.スキーマ.ビュー` の名前で登録され、権限があればどこからでも読めます。一時ビューは登録されないので、残りません。\n\n```sql\nCREATE TEMPORARY VIEW recent_orders AS\nSELECT * FROM main.silver.orders WHERE order_date >= current_date() - 7;\n```\n\n一時ビューを使える範囲は、どこで作ったかで決まります。ノートブックやジョブで作ると、そのノートブックかスクリプトの中だけで使え、クラスターから切り離すと消えます。Databricks SQL では 1 つのクエリの中だけで使え、同じダッシュボードのほかのクエリからも使えません。\n\n宣言型パイプラインでは、`CREATE TEMPORARY VIEW` か Python の `@dp.temporary_view` で、パイプラインの中の中間の結果を定義します。expectation は一時ビューにも付けられます。",
       "examAngle": "一時ビューは、カタログにもスキーマにも登録されず、作った場所の中だけで使えます。ビューはクエリの文だけを持ち、データを複製しません。ノートブックで作った一時ビューは、クラスターから切り離すと消えます。",
       "checks": [
@@ -5339,6 +5571,32 @@
       "term": "マテリアライズドビュー",
       "oneLine": "マテリアライズドビューは、クエリの結果を前もって計算して保存し、更新のたびに上流の変更を反映するビューです。",
       "keyPhrase": "クエリの結果を前もって計算して保存し",
+      "diagram": {
+        "type": "compare",
+        "title": "通常のビューとマテリアライズドビューの、読むときの違い",
+        "left": {
+          "heading": "通常のビュー",
+          "items": [
+            {
+              "label": "読むたびに実行",
+              "note": "読むたびに、クエリを実行します"
+            }
+          ]
+        },
+        "right": {
+          "heading": "マテリアライズドビュー",
+          "items": [
+            {
+              "label": "保存した結果を返す",
+              "note": "結果を Delta のテーブルとして持ちます"
+            },
+            {
+              "label": "遅延は数秒から数分",
+              "note": "低い遅延が要る処理には向きません"
+            }
+          ]
+        }
+      },
       "body": "通常のビューは、読むたびにクエリを実行します。マテリアライズドビューは、結果を Delta のテーブルとして持ち、読むときは保存した結果を返します。メタデータは Unity Catalog に、データはクラウドストレージに置かれます。\n\n```sql\nCREATE OR REPLACE MATERIALIZED VIEW main.gold.regional_sales AS\nSELECT p.region, SUM(s.amount) AS total\nFROM main.silver.sales s JOIN main.silver.partners p USING (partner_id)\nGROUP BY p.region;\n```\n\n更新のたびに、Databricks は上流の変わったデータを処理し、遅れて届いたデータも含めて結果を正しく保ちます。多くの場合は変わった分だけを反映し(増分の更新)、入力の変わり方によっては全体を計算し直します。結合の相手の表が変わったときも結果を計算し直すので、次元の表が変わっても正しい結果が必要なときに向きます。\n\nパイプラインの中では、SQL の `CREATE MATERIALIZED VIEW` か、Python の `@dp.materialized_view` で定義します。パイプラインの外で SQL で作ると、Databricks は更新用のパイプライン(種類は `MV/ST`)を自動で作ります。マテリアライズドビューを更新できるのは、それを定義したパイプラインだけです。\n\n遅延は数秒から数分なので、低い遅延が要る処理には向きません。",
       "examAngle": "マテリアライズドビューは、結果を Delta のテーブルとして持ち、読むときは保存した結果を返します。結合の相手の表が変わると、マテリアライズドビューは結果を計算し直します。ストリーミングテーブルは、追記済みの行を計算し直しません。",
       "checks": [
@@ -5383,6 +5641,62 @@
       "term": "ストリーミングテーブル",
       "oneLine": "ストリーミングテーブルは、追記型のソースから届いた新しい行だけを、更新のたびに追記していく Delta のテーブルです。",
       "keyPhrase": "新しい行だけを、更新のたびに追記していく",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "ストリーミングテーブルの構成",
+        "root": {
+          "label": "ストリーミングテーブル",
+          "note": "新しい行だけを、更新のたびに追記していく Delta のテーブルです",
+          "children": [
+            {
+              "label": "ソース",
+              "note": "追記だけか、変わらないものにします",
+              "children": [
+                {
+                  "label": "更新や削除がある",
+                  "note": "エラーになります。変更の反映には AUTO CDC を使います"
+                }
+              ]
+            },
+            {
+              "label": "SQL での読み方",
+              "note": "AS のあとのクエリを、ストリーミングの読み取りにします",
+              "children": [
+                {
+                  "label": "ほかのテーブル",
+                  "note": "STREAM(…) で囲みます"
+                },
+                {
+                  "label": "ファイル",
+                  "note": "STREAM read_files(…) と書きます"
+                }
+              ]
+            },
+            {
+              "label": "追記済みの行",
+              "note": "あとで計算し直されません",
+              "children": [
+                {
+                  "label": "クエリを変える",
+                  "note": "変えたあとに届く行にだけ効きます"
+                },
+                {
+                  "label": "既存の行に反映する",
+                  "note": "完全な更新(full refresh)をします"
+                },
+                {
+                  "label": "結合の相手の表が変わる",
+                  "note": "結合の結果は計算し直されません"
+                }
+              ]
+            },
+            {
+              "label": "更新するもの",
+              "note": "それを持つ 1 つのパイプラインだけです"
+            }
+          ]
+        }
+      },
       "body": "ストリーミングテーブルは、入力の各行を 1 回だけ処理します。Auto Loader でクラウドストレージから読む取り込みや、Kafka などのメッセージバスからの取り込みに向きます。ストリーミングテーブルを更新するのは、それを持つ 1 つのパイプラインだけです。\n\nSQL では、`AS` のあとのクエリをストリーミングの読み取りにします。ほかのテーブルを読むときは `STREAM(…)` で囲み、ファイルを読むときは `STREAM read_files(…)` と書きます。\n\n```sql\nCREATE OR REFRESH STREAMING TABLE customers_silver\nAS SELECT * FROM STREAM(customers_bronze);\n```\n\nソースは、追記だけか、変わらないものにします。既存の行の更新や削除がソースにあると、エラーになります。更新や削除を含む変更を反映するときは、AUTO CDC を使います。\n\n追記済みの行は、あとで計算し直されません。クエリを変えても、変えたあとに届く行にだけ効きます。既存の行に反映するには、完全な更新(full refresh)をします。結合の相手の表が変わっても結合の結果は計算し直されないので、いつも正しい結合の結果が必要なときは、マテリアライズドビューを使います。",
       "examAngle": "ストリーミングテーブルのクエリで、ほかのテーブルを読むときは `STREAM(…)` で囲みます。ストリーミングテーブルは追記済みの行を計算し直さず、クエリの変更は変えたあとに届く行にだけ効きます。既存の行に反映するには、完全な更新(full refresh)をします。",
       "checks": [
@@ -5439,6 +5753,43 @@
       "term": "パイプラインの Python のデコレーター",
       "oneLine": "パイプラインの Python のデコレーターは、DataFrame を返す関数に付けて、その結果をストリーミングテーブルやマテリアライズドビューとして定義する書き方です。",
       "keyPhrase": "DataFrame を返す関数に付けて",
+      "diagram": {
+        "type": "decision",
+        "title": "定義したいものとデコレーター(pyspark.pipelines の dp を使います。Databricks は dlt よりこちらを勧めています)",
+        "nodes": [
+          {
+            "id": "q1",
+            "question": "パイプラインの Python で、定義したいものはどれですか",
+            "choices": [
+              {
+                "label": "ストリーミングテーブル",
+                "to": "r1"
+              },
+              {
+                "label": "マテリアライズドビュー",
+                "to": "r2"
+              },
+              {
+                "label": "パイプライン内の一時ビュー",
+                "to": "r3"
+              }
+            ]
+          },
+          {
+            "id": "r1",
+            "result": "@dp.table を関数に付けると、ストリーミングテーブルを定義します",
+            "note": "関数はストリーミングの DataFrame を返します。name を省くと、関数の名前がテーブルの名前になります"
+          },
+          {
+            "id": "r2",
+            "result": "@dp.materialized_view を関数に付けると、マテリアライズドビューを定義します"
+          },
+          {
+            "id": "r3",
+            "result": "@dp.temporary_view を関数に付けると、パイプラインの中だけで使う一時ビューを定義します"
+          }
+        ]
+      },
       "body": "パイプラインの Python のコードは、`from pyspark import pipelines as dp` で読み込んだモジュールを使います。デコレーターの種類で、作るものが決まります。\n\n- `@dp.table`: ストリーミングテーブル。関数はストリーミングの DataFrame を返す\n- `@dp.materialized_view`: マテリアライズドビュー\n- `@dp.temporary_view`: パイプラインの中だけで使う一時ビュー\n\n```python\nfrom pyspark import pipelines as dp\n\n@dp.table(comment=\"取り込んだ注文\")\ndef orders_bronze():\n    return spark.readStream.table(\"main.raw.orders\")\n```\n\n`@dp.table` の `name` を省くと、関数の名前がテーブルの名前になります。expectation のデコレーター(`@dp.expect` など)は、`@dp.table` などの下、関数の定義の上に重ねます。\n\n古い `dlt` のモジュールの `@dlt.table` は、ストリーミングの DataFrame を返せばストリーミングテーブルを、バッチの DataFrame を返せばマテリアライズドビューを作りました。`dlt` はいまも使えますが、Databricks は `pyspark.pipelines` を勧めています。",
       "examAngle": "`@dp.table` はストリーミングテーブルを、`@dp.materialized_view` はマテリアライズドビューを、`@dp.temporary_view` は一時ビューを定義します。`@dp.table` の `name` を省くと、関数の名前がテーブルの名前になります。古い `@dlt.table` は、返す DataFrame がストリーミングかバッチかで、作るものが変わりました。",
       "checks": [
@@ -5479,6 +5830,39 @@
       "term": "AUTO CDC(APPLY CHANGES)",
       "oneLine": "AUTO CDC は、挿入、更新、削除を含む変更のフィードを、順序の列に従ってストリーミングテーブルに反映する、パイプラインの API です。",
       "keyPhrase": "順序の列に従ってストリーミングテーブルに反映する",
+      "diagram": {
+        "type": "flow",
+        "title": "AUTO CDC の流れ(サーバーレスのパイプラインか、Pro か Advanced のエディションで使えます)",
+        "nodes": [
+          {
+            "id": "feed",
+            "label": "変更のフィード",
+            "note": "挿入、更新、削除を含みます"
+          },
+          {
+            "id": "cdc",
+            "label": "AUTO CDC",
+            "note": "KEYS で行を見分け、SEQUENCE BY の順序の列に従います"
+          },
+          {
+            "id": "target",
+            "label": "ストリーミングテーブル",
+            "note": "反映先です。先に作っておきます"
+          }
+        ],
+        "edges": [
+          {
+            "from": "feed",
+            "to": "cdc",
+            "label": "読む"
+          },
+          {
+            "from": "cdc",
+            "to": "target",
+            "label": "反映"
+          }
+        ]
+      },
       "body": "AUTO CDC は、以前の APPLY CHANGES の API を置き換えたもので、構文は同じです。反映先は、先に作っておいたストリーミングテーブルです(SQL では `CREATE OR REFRESH STREAMING TABLE`、Python では `dp.create_streaming_table()`)。\n\n```sql\nCREATE OR REFRESH STREAMING TABLE customers_current;\n\nCREATE FLOW customers_cdc AS AUTO CDC INTO customers_current\nFROM stream(main.raw.customers_changes)\nKEYS (customer_id)\nAPPLY AS DELETE WHEN operation = 'DELETE'\nSEQUENCE BY seq\nCOLUMNS * EXCEPT (operation, seq)\nSTORED AS SCD TYPE 1;\n```\n\n`KEYS` は行を見分けるキー、`SEQUENCE BY` は変更の順序を決める列です。順序の列は並べ替えられる型にし、NULL は使えません。順序の遅い変更が先に届いていれば、あとから届いた古い変更は捨てられます。`APPLY AS DELETE WHEN` には、削除を表す条件を書きます。\n\n`STORED AS SCD TYPE 1` は最新の値だけを持ち、履歴を残しません。`SCD TYPE 2` は、`__START_AT` と `__END_AT` の列で履歴を残します。\n\nAUTO CDC を使うには、サーバーレスのパイプラインか、Pro か Advanced のエディションが要ります。",
       "examAngle": "AUTO CDC では、`KEYS` で行を見分けるキーを、`SEQUENCE BY` で変更の順序を決める列を指定します。順序の古い変更があとから届いても、新しい変更は上書きされません。履歴を残すときは `STORED AS SCD TYPE 2`、最新の値だけを持つときは `STORED AS SCD TYPE 1` にします。",
       "checks": [
@@ -5531,6 +5915,44 @@
       "term": "パイプラインのモード(トリガーと継続)",
       "oneLine": "パイプラインのモードは、更新を 1 回ずつ実行して止めるトリガーのモードと、止めるまで処理を続ける継続のモードのどちらで、パイプラインを動かすかの設定です。",
       "keyPhrase": "1 回ずつ実行して止める",
+      "diagram": {
+        "type": "compare",
+        "title": "トリガーのモードと継続のモード(既定はトリガーのモードです)",
+        "left": {
+          "heading": "トリガーのモード",
+          "items": [
+            {
+              "label": "1 回ずつ実行して止める",
+              "note": "更新を始めた時点にあったデータで、全ての表を更新します"
+            },
+            {
+              "label": "10 分、1 時間、1 日",
+              "note": "更新の間隔がこの程度の処理に向きます"
+            },
+            {
+              "label": "更新の間だけ動く",
+              "note": "クラスターが更新の間だけ動くので、費用を抑えられます"
+            }
+          ]
+        },
+        "right": {
+          "heading": "継続のモード",
+          "items": [
+            {
+              "label": "止めるまで処理を続ける",
+              "note": "データが届くたびに処理し、手で止めるまで動きます"
+            },
+            {
+              "label": "10 秒から数分",
+              "note": "間隔がこの程度の処理に向きます"
+            },
+            {
+              "label": "動き続ける",
+              "note": "クラスターが動き続けるので費用は増えますが、遅延は短くなります"
+            }
+          ]
+        }
+      },
       "body": "既定は、トリガーのモードです。トリガーのモードでは、更新を始めた時点にあったデータで全ての表を更新し、終わると止まります。そのあとに届いたデータは、次の更新まで処理されません。クラスターは更新の間だけ動くので、費用を抑えられます。更新の間隔が 10 分、1 時間、1 日といった処理に向きます。\n\n継続のモードでは、データが届くたびに処理し、手で止めるまで動き続けます。クラスターが動き続けるので費用は増えますが、遅延は短くなります。間隔が 10 秒から数分の処理に向きます。Databricks は、継続で動かしたいときは、パイプラインの設定ではなく、継続のジョブからパイプラインを動かすことを勧めています。\n\n更新の動き方は、起動のしかたでも変わります。\n\n- UI の「Run now」などで、手でトリガーのパイプラインを動かしたとき: クラスターを使い回して起動の時間を省き、再試行をしないので、エラーにすぐ気づけます。\n- ジョブや API から動かしたときと、継続のパイプライン: 回復できるエラーでクラスターを再起動します。特定のエラーで再試行します。実行が終わるとすぐクラスターを止めます。",
       "examAngle": "トリガーのモードは、更新を始めた時点にあったデータで全ての表を更新し、終わると止まります。継続のモードは、データが届くたびに処理し、手で止めるまで動き続けます。既定は、トリガーのモードです。",
       "checks": [
@@ -5587,6 +6009,50 @@
       "term": "expectation(EXPECT)",
       "oneLine": "expectation は、宣言型パイプラインの表やビューを通る各行に、真か偽になる SQL の条件を当てて、データの品質を確かめる仕組みです。",
       "keyPhrase": "真か偽になる SQL の条件を当てて",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "expectation の構成",
+        "root": {
+          "label": "expectation",
+          "note": "表やビューの各行に、真か偽になる SQL の条件を当てます",
+          "children": [
+            {
+              "label": "名前",
+              "note": "同じデータセットの中で重ならないようにします"
+            },
+            {
+              "label": "条件",
+              "note": "SQL の真偽の式です",
+              "children": [
+                {
+                  "label": "使えないもの",
+                  "note": "Python の独自の関数と、ほかの表を参照する副問い合わせです"
+                }
+              ]
+            },
+            {
+              "label": "アクション",
+              "note": "合わない行の扱いで、ON VIOLATION で指定します",
+              "children": [
+                {
+                  "label": "指定しないとき",
+                  "note": "既定の warn で、合わない行もそのまま書き込まれます",
+                  "children": [
+                    {
+                      "label": "件数の記録",
+                      "note": "合う行と合わない行の件数を記録します"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "label": "付けられるもの",
+              "note": "ストリーミングテーブル、マテリアライズドビュー、一時ビューです"
+            }
+          ]
+        }
+      },
       "body": "expectation は、名前、条件、条件に合わない行の扱い(アクション)の 3 つからなります。名前は、同じデータセットの中で重ならないようにします。条件は SQL の真偽の式で、Python の独自の関数や、ほかの表を参照する副問い合わせは使えません。\n\n```sql\nCREATE OR REFRESH STREAMING TABLE orders_silver (\n  CONSTRAINT valid_amount EXPECT (amount >= 0)\n)\nAS SELECT * FROM STREAM(orders_bronze);\n```\n\n`ON VIOLATION` を書かないと、アクションは既定の warn になります。条件に合わない行も、そのまま表に書き込まれます。パイプラインは、条件に合う行と合わない行の件数を記録します。件数は、パイプラインの UI の「Data quality」タブや、イベントログで確かめられます。\n\nexpectation を付けられるのは、ストリーミングテーブル、マテリアライズドビュー、一時ビューです。1 つのデータセットに、複数の expectation を付けられます。",
       "examAngle": "`ON VIOLATION` を書かない expectation のアクションは、既定の warn です。warn では、条件に合わない行も表に書き込まれ、その件数が記録されます。",
       "checks": [
@@ -5627,6 +6093,48 @@
       "term": "ON VIOLATION DROP ROW",
       "oneLine": "ON VIOLATION DROP ROW は、expectation の条件に合わない行を、表に書き込む前に捨てるアクションです。",
       "keyPhrase": "表に書き込む前に捨てる",
+      "diagram": {
+        "type": "flow",
+        "title": "ON VIOLATION DROP ROW の動き",
+        "nodes": [
+          {
+            "id": "viol",
+            "label": "条件に合わない行",
+            "note": "expectation の条件に合いません"
+          },
+          {
+            "id": "drop",
+            "label": "書き込む前に捨てる",
+            "note": "Python では @dp.expect_or_drop です"
+          },
+          {
+            "id": "upd",
+            "label": "更新そのもの",
+            "note": "続きます"
+          },
+          {
+            "id": "metric",
+            "label": "捨てた行の件数",
+            "note": "品質の指標として記録されます"
+          }
+        ],
+        "edges": [
+          {
+            "from": "viol",
+            "to": "drop",
+            "label": "捨てる"
+          },
+          {
+            "from": "drop",
+            "to": "upd"
+          },
+          {
+            "from": "drop",
+            "to": "metric",
+            "label": "記録"
+          }
+        ]
+      },
       "body": "条件に合わない行は捨てられ、更新そのものは続きます。捨てた行の件数は、データセットの品質の指標として記録されます。\n\n```sql\nCONSTRAINT valid_email EXPECT (email IS NOT NULL) ON VIOLATION DROP ROW\n```\n\nPython では `@dp.expect_or_drop(\"valid_email\", \"email IS NOT NULL\")` と書きます。\n\nシルバー層やゴールド層に、条件に合わない行を入れたくないが、パイプラインは止めたくないときに使います。",
       "examAngle": "`DROP ROW` では、条件に合わない行だけが、表に書き込む前に捨てられます。パイプラインの更新は失敗せず、捨てた行の件数が品質の指標として記録されます。",
       "checks": [
@@ -5663,6 +6171,34 @@
       "term": "ON VIOLATION FAIL UPDATE",
       "oneLine": "ON VIOLATION FAIL UPDATE は、expectation の条件に合わない行が 1 行でもあれば、その更新を失敗させるアクションです。",
       "keyPhrase": "その更新を失敗させる",
+      "diagram": {
+        "type": "decision",
+        "title": "FAIL UPDATE で更新が失敗したあとの、ほかのフロー(更新が失敗するので、品質の指標は記録されません)",
+        "nodes": [
+          {
+            "id": "q1",
+            "question": "条件に合わない行があって更新が失敗したパイプラインは、どちらのモードですか",
+            "choices": [
+              {
+                "label": "トリガー",
+                "to": "r1"
+              },
+              {
+                "label": "継続",
+                "to": "r2"
+              }
+            ]
+          },
+          {
+            "id": "r1",
+            "result": "トリガーのパイプラインでは、失敗したフローのほかに、並行して動くフローは失敗しません"
+          },
+          {
+            "id": "r2",
+            "result": "継続のパイプラインでは、失敗したフローと、それに依存するフローが止まります"
+          }
+        ]
+      },
       "body": "表の更新の途中で条件に合わない行があると、パイプラインはその更新のトランザクションを不可分に取り消します。エラーの文には、どの expectation に反したかが書かれます。\n\n```sql\nCONSTRAINT valid_amount EXPECT (amount >= 0) ON VIOLATION FAIL UPDATE\n```\n\nPython では `@dp.expect_or_fail(\"valid_amount\", \"amount >= 0\")` と書きます。\n\n失敗したあとは、条件に合わないデータを扱えるようにパイプラインのコードを直してから、処理し直します。トリガーのパイプラインでは、失敗したフローのほかに並行して動くフローは失敗しません。継続のパイプラインでは、失敗したフローと、それに依存するフローが止まります。更新が失敗するので、品質の指標は記録されません。",
       "examAngle": "`FAIL UPDATE` では、条件に合わない行が 1 行でもあると、更新そのものが失敗し、パイプラインは表の更新のトランザクションを取り消します。更新が失敗するので、品質の指標は記録されません。",
       "checks": [
@@ -5699,6 +6235,47 @@
       "term": "expect_all",
       "oneLine": "expect_all は、Python のパイプラインで、名前と条件の組を辞書で渡して、複数の expectation をまとめて当てるデコレーターです。",
       "keyPhrase": "辞書で渡して、複数の expectation をまとめて当てる",
+      "diagram": {
+        "type": "hierarchy",
+        "title": "Python の expectation の関数 6 つ(辞書でまとめる書き方は Python だけです)",
+        "root": {
+          "label": "expectation の関数",
+          "note": "Python では、全部で 6 つです",
+          "children": [
+            {
+              "label": "まとめて当てる 3 つ",
+              "children": [
+                {
+                  "label": "expect_all",
+                  "note": "辞書で渡します。各条件は warn です"
+                },
+                {
+                  "label": "expect_all_or_drop",
+                  "note": "行を捨てたいときに使います"
+                },
+                {
+                  "label": "expect_all_or_fail",
+                  "note": "更新を失敗させたいときに使います"
+                }
+              ]
+            },
+            {
+              "label": "1 件ずつ当てる 3 つ",
+              "children": [
+                {
+                  "label": "expect"
+                },
+                {
+                  "label": "expect_or_drop"
+                },
+                {
+                  "label": "expect_or_fail"
+                }
+              ]
+            }
+          ]
+        }
+      },
       "body": "`@dp.expect_all` に渡した各条件は、`@dp.expect` と同じく warn として動きます。条件に合わない行も表に残り、件数は条件ごとに記録されます。\n\n```python\nfrom pyspark import pipelines as dp\n\nrules = {\"valid_id\": \"id IS NOT NULL\", \"valid_amount\": \"amount >= 0\"}\n\n@dp.table()\n@dp.expect_all(rules)\ndef orders_silver():\n    return spark.readStream.table(\"orders_bronze\")\n```\n\n行を捨てたいときは `expect_all_or_drop`、更新を失敗させたいときは `expect_all_or_fail` を使います。Python の expectation の関数は 6 つです。まとめて当てる 3 つは `expect_all`、`expect_all_or_drop`、`expect_all_or_fail` です。1 件ずつ当てる 3 つは `expect`、`expect_or_drop`、`expect_or_fail` です。\n\n辞書でまとめる書き方は Python だけにあります。SQL では、`CONSTRAINT … EXPECT` をカンマで区切って並べます。",
       "examAngle": "`@dp.expect_all` に渡した各条件は、`@dp.expect` と同じ warn で当たり、条件に合わない行も表に残ります。行を捨てるときは `expect_all_or_drop` を、更新を失敗させるときは `expect_all_or_fail` を使います。",
       "checks": [
@@ -5755,6 +6332,32 @@
       "term": "CHECK 制約",
       "oneLine": "CHECK 制約は、Delta のテーブルに付けて、条件に合わない値の書き込みをエラーにする制約です。",
       "keyPhrase": "条件に合わない値の書き込みをエラーにする",
+      "diagram": {
+        "type": "stepper",
+        "title": "CHECK 制約を付けたときの動き(既存の Delta のテーブル)",
+        "steps": [
+          {
+            "id": "add",
+            "label": "制約を付ける",
+            "note": "既存のテーブルには、ALTER TABLE … ADD CONSTRAINT で付けます"
+          },
+          {
+            "id": "verify",
+            "label": "既存の行の確認",
+            "note": "付けるとき、Databricks は既存の全ての行が条件に合うかを確かめます"
+          },
+          {
+            "id": "reject",
+            "label": "合わない行があるとき",
+            "note": "既存の行に条件に合わないものがあると、制約を付けられません"
+          },
+          {
+            "id": "write",
+            "label": "付けたあとの書き込み",
+            "note": "条件に合わない書き込みがあると、トランザクションがエラーで失敗します"
+          }
+        ]
+      },
       "body": "既存のテーブルには、`ALTER TABLE … ADD CONSTRAINT` で付けます。\n\n```sql\nALTER TABLE main.silver.orders ADD CONSTRAINT valid_amount CHECK (amount >= 0);\n```\n\n付けるとき、Databricks は既存の全ての行が条件に合うかを確かめます。合わない行があると、制約を付けられません。付けたあとは、条件に合わない書き込みがあると、トランザクションがエラーで失敗します。\n\n条件の式は、決定的なものにします。ユーザー定義の関数、集計の関数、ウィンドウの関数は使えません。付いている制約は、`DESCRIBE DETAIL` か `SHOW TBLPROPERTIES` で確かめ、`ALTER TABLE … DROP CONSTRAINT` で外します。\n\n制約は、Delta Lake のテーブルでだけ使えます。主キー、外部キー、一意の制約は情報として持つだけで、強制されません。強制されるのは、CHECK 制約と NOT NULL 制約です。",
       "examAngle": "既存の Delta のテーブルに CHECK 制約を付けるときは、`ALTER TABLE … ADD CONSTRAINT` を使います。既存の行に条件に合わないものがあると、制約は付けられません。付けたあとに条件に反する書き込みは、expectation の warn と違って行を残さず、トランザクションごと失敗します。",
       "checks": [
