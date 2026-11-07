@@ -2576,6 +2576,53 @@
       "term": "マネージドテーブル",
       "oneLine": "マネージドテーブルは、データファイルの置き場所と管理を Unity Catalog に任せるテーブルで、Databricks で既定の種類です。",
       "keyPhrase": "データファイルの置き場所と管理を Unity Catalog に任せる",
+      "diagram": {
+        "type": "decision",
+        "title": "マネージドテーブルのデータファイルが置かれる場所の決まり方",
+        "nodes": [
+          {
+            "id": "schema",
+            "question": "スキーマに、場所の設定がありますか",
+            "choices": [
+              {
+                "label": "ある",
+                "to": "in-schema"
+              },
+              {
+                "label": "ない",
+                "to": "catalog"
+              }
+            ]
+          },
+          {
+            "id": "catalog",
+            "question": "カタログに、場所の設定がありますか",
+            "choices": [
+              {
+                "label": "ある",
+                "to": "in-catalog"
+              },
+              {
+                "label": "ない",
+                "to": "in-metastore"
+              }
+            ]
+          },
+          {
+            "id": "in-schema",
+            "result": "スキーマの場所に置かれます",
+            "note": "最も細かい設定が使われます"
+          },
+          {
+            "id": "in-catalog",
+            "result": "カタログの場所に置かれます"
+          },
+          {
+            "id": "in-metastore",
+            "result": "メタストアの場所に置かれます"
+          }
+        ]
+      },
       "body": "`CREATE TABLE` で `LOCATION` を書かずに作ると、マネージドテーブルになります。\n\n```sql\nCREATE TABLE main.sales.orders (id BIGINT, amount DECIMAL(10, 2));\n```\n\nデータファイルは、Unity Catalog の管理ストレージの場所に置かれます。どの場所を使うかは、最も細かい設定で決まります。スキーマに設定があればスキーマの場所、なければカタログの場所、どちらにもなければメタストアの場所です。\n\n形式は、既定で Delta Lake です。`USING iceberg` を付けると、Apache Iceberg のテーブルになります。読み書き、置き場所、最適化(予測的最適化など)は Unity Catalog が受け持ちます。Databricks は、外部テーブルを使う理由がなければ、マネージドテーブルを使うよう勧めています。\n\n`DROP TABLE` を実行すると、メタデータはすぐに消えます。データファイルは、復元の期間(既定で 7 日)が過ぎてからクラウドストレージから消されます。期間のうちは `UNDROP TABLE` で戻せます。",
       "examAngle": "`LOCATION` を書かずに作ったテーブルは、マネージドテーブルです。マネージドテーブルを `DROP TABLE` で消すと、データファイルは復元の期間(既定で 7 日)が過ぎてから消されます。期間を過ぎたテーブルは、`UNDROP TABLE` で戻せません。",
       "checks": [
@@ -2620,6 +2667,27 @@
       "term": "外部テーブル",
       "oneLine": "外部テーブルは、データファイルを利用者のクラウドストレージに置き、Unity Catalog にはメタデータと権限の管理だけを任せるテーブルです。",
       "keyPhrase": "メタデータと権限の管理だけを任せる",
+      "diagram": {
+        "type": "compare",
+        "title": "外部テーブルを DROP TABLE したとき",
+        "left": {
+          "heading": "消えるもの",
+          "items": [
+            {
+              "label": "Unity Catalog のメタデータ"
+            }
+          ]
+        },
+        "right": {
+          "heading": "残るもの",
+          "items": [
+            {
+              "label": "クラウドストレージのデータファイル",
+              "note": "要らなければ、利用者がストレージから直接消します"
+            }
+          ]
+        }
+      },
       "body": "外部テーブルを作るときは、`LOCATION` でパスを指定します。パスは、Unity Catalog に登録した外部ロケーションの下でなければなりません。作る人には、親のカタログとスキーマの権限(`USE CATALOG`、`USE SCHEMA`、`CREATE TABLE`)に加えて、その外部ロケーションの `CREATE EXTERNAL TABLE` の権限が要ります。\n\n```sql\nCREATE TABLE main.sales.raw_events (id BIGINT, payload STRING)\nLOCATION 's3://example-bucket/raw_events';\n```\n\n形式は、Delta のほかに CSV、JSON、Avro、Parquet、ORC、テキストを使えます。データファイルの最適化と、いつ消すかは、利用者が決めます。\n\n`DROP TABLE` で消えるのは、Unity Catalog のメタデータだけです。データファイルはクラウドストレージに残ります。要らなければ、利用者がストレージから直接消します。\n\n外部テーブルを選ぶのは、マネージドテーブルで扱えない形式の既存のデータを登録するときと、Databricks 以外のツールがファイルを直接読み書きするときです。ファイルを直接読み書きする経路には、Unity Catalog の権限がかかりません。",
       "examAngle": "外部テーブルを `DROP TABLE` で消しても、データファイルはクラウドストレージに残ります。消えるのは、Unity Catalog のメタデータだけです。JSON のままの既存のデータは、マネージドテーブルの形式(Delta Lake と Apache Iceberg)に当たらないので、外部テーブルとして登録します。",
       "checks": [
@@ -10442,6 +10510,27 @@
       "term": "GRANT と REVOKE",
       "oneLine": "GRANT は、Unity Catalog のオブジェクトの権限を、ユーザー、グループ、サービスプリンシパルに与える SQL の文で、REVOKE はその権限を取り消す文です。",
       "keyPhrase": "ユーザー、グループ、サービスプリンシパルに与える",
+      "diagram": {
+        "type": "stepper",
+        "title": "GRANT と REVOKE の文を書く順",
+        "steps": [
+          {
+            "id": "priv",
+            "label": "権限",
+            "note": "SELECT のような権限を書きます。カンマで区切って、複数を一度に書けます"
+          },
+          {
+            "id": "object",
+            "label": "オブジェクトの種類と名前",
+            "note": "ON TABLE main.sales.orders のように書きます"
+          },
+          {
+            "id": "who",
+            "label": "相手",
+            "note": "GRANT は TO、REVOKE は FROM で書きます。特殊な文字を含む名前は、バッククォートで囲みます"
+          }
+        ]
+      },
       "body": "構文は、権限、オブジェクトの種類と名前、相手の順に書きます。\n\n```sql\nGRANT SELECT ON TABLE main.sales.orders TO `analysts`;\nREVOKE SELECT ON TABLE main.sales.orders FROM `analysts`;\n```\n\n相手には、ユーザー(メールアドレス)、グループの名前、サービスプリンシパル(アプリケーション ID)を書きます。特殊な文字を含む名前は、バッククォートで囲みます。権限は、カンマで区切って複数を一度に書けます。\n\n画面で操作するときは、Catalog Explorer でオブジェクトを開き、Permissions のタブで Grant を押して相手と権限を選びます。取り消しは、同じタブで権限を選んで Revoke を押します。\n\n権限を与えられるのは、オブジェクトの所有者、親のカタログやスキーマの所有者、オブジェクトの `MANAGE` を持つ利用者、メタストアの管理者です。`REVOKE` は、与えていない権限を指定しても成功します。\n\n今の付与は `SHOW GRANTS ON TABLE main.sales.orders` で確かめます。",
       "examAngle": "`GRANT` の文は `TO` で相手を書き、`REVOKE` の文は `FROM` で相手を書きます。`REVOKE` は、与えていない権限を指定しても成功します。画面では、Catalog Explorer の Permissions のタブで Grant と Revoke を操作します。",
       "checks": [
@@ -10502,6 +10591,32 @@
       "term": "DENY",
       "oneLine": "DENY は、権限を明示的に拒否して、どの付与よりも優先させる SQL の文で、`hive_metastore` のカタログだけで使え、Unity Catalog では使えません。",
       "keyPhrase": "`hive_metastore` のカタログだけで使え、Unity Catalog では使えません",
+      "diagram": {
+        "type": "compare",
+        "title": "DENY と REVOKE を使えるカタログ",
+        "left": {
+          "heading": "hive_metastore",
+          "items": [
+            {
+              "label": "DENY で権限を拒否できます"
+            },
+            {
+              "label": "REVOKE で権限を取り消せます"
+            }
+          ]
+        },
+        "right": {
+          "heading": "Unity Catalog",
+          "items": [
+            {
+              "label": "DENY の文は使えません"
+            },
+            {
+              "label": "REVOKE で権限を取り消せます"
+            }
+          ]
+        }
+      },
       "body": "DENY は、旧来のテーブルのアクセス制御(`hive_metastore`)の文です。拒否した権限は、明示の付与にも暗黙の付与にも優先します。スキーマで拒否すれば、その中のすべてのオブジェクトでも拒否されます。\n\n```sql\nDENY SELECT ON TABLE t TO `user@example.com`;\nREVOKE SELECT ON TABLE t FROM `user@example.com`;  -- DENY を取り消す\n```\n\nDENY を取り消すときは、同じ権限を同じ相手から `REVOKE` します。\n\nUnity Catalog には、権限を拒否する文がありません。利用者に権限を持たせたくないときは、与えた権限を `REVOKE` で取り消し、どの階層で与えているか(継承)も確かめます。\n\nUnity Catalog には、ABAC の DENY ポリシー(ベータ)があります。拒否できる権限は `MANAGE ACCESS CONTROL`(権限を管理する権限)だけで、`SELECT` や `MODIFY` は拒否できません。",
       "examAngle": "`DENY` は `hive_metastore` のカタログだけで使え、Unity Catalog では使えません。Unity Catalog で利用者に権限を持たせたくないときは、与えた権限を `REVOKE` で取り消します。そのとき、どの階層で権限を与えているか(継承)も確かめます。",
       "checks": [
@@ -10562,6 +10677,30 @@
       "term": "USE CATALOG と USE SCHEMA",
       "oneLine": "USE CATALOG と USE SCHEMA は、カタログとスキーマの中のオブジェクトを使うための前提の権限で、それだけではデータを読めません。",
       "keyPhrase": "それだけではデータを読めません",
+      "diagram": {
+        "type": "layers",
+        "title": "表を読むために要る 3 つの権限",
+        "layers": [
+          {
+            "id": "catalog",
+            "label": "USE CATALOG",
+            "note": "カタログの中のオブジェクトを使うための前提の権限",
+            "items": ["親のカタログに付けます", "これだけでは読めません"]
+          },
+          {
+            "id": "schema",
+            "label": "USE SCHEMA",
+            "note": "スキーマの中のオブジェクトを使うための前提の権限",
+            "items": ["親のスキーマに付けます", "これだけでは読めません"]
+          },
+          {
+            "id": "select",
+            "label": "SELECT",
+            "note": "表のデータを読む権限",
+            "items": ["表に付けます", "これだけでも読めません"]
+          }
+        ]
+      },
       "body": "表を読むには、次の 3 つの権限がそろっている必要があります。\n\n- 親のカタログの `USE CATALOG`\n- 親のスキーマの `USE SCHEMA`\n- 表の `SELECT`\n\n```sql\nGRANT USE CATALOG ON CATALOG main TO `analysts`;\nGRANT USE SCHEMA ON SCHEMA main.sales TO `analysts`;\nGRANT SELECT ON TABLE main.sales.orders TO `analysts`;\n```\n\n`USE CATALOG` と `USE SCHEMA` だけを持つ利用者は、中の表のデータを読めません。逆に、表の `SELECT` だけがあっても、親の `USE CATALOG` と `USE SCHEMA` がなければ読めません。\n\nオブジェクトがあることとメタデータだけを見せたいときは、`BROWSE` を使います。`BROWSE` は、`USE CATALOG` と `USE SCHEMA` がなくても、オブジェクトを見つけてメタデータを見られる権限です。",
       "examAngle": "利用者が表を読むには、親のカタログの `USE CATALOG`、親のスキーマの `USE SCHEMA`、表の `SELECT` の 3 つが要ります。`USE CATALOG` と `USE SCHEMA` だけでは、表のデータを読めません。表の `SELECT` だけでも、親の 2 つの権限がなければ読めません。",
       "checks": [
@@ -10618,6 +10757,44 @@
       "term": "SELECT と MODIFY",
       "oneLine": "SELECT は表やビューを読む権限で、MODIFY は表にデータを追加、更新、削除する権限です。",
       "keyPhrase": "表にデータを追加、更新、削除する権限",
+      "diagram": {
+        "type": "decision",
+        "title": "データを変える、表を作る、関数を呼ぶときに、どの権限が要るか",
+        "nodes": [
+          {
+            "id": "op",
+            "question": "どの操作をしますか",
+            "choices": [
+              {
+                "label": "データを追加、更新、削除",
+                "to": "r-modify"
+              },
+              {
+                "label": "新しい表を作る",
+                "to": "r-create"
+              },
+              {
+                "label": "関数を呼ぶ",
+                "to": "r-execute"
+              }
+            ]
+          },
+          {
+            "id": "r-modify",
+            "result": "MODIFY が要ります",
+            "note": "表の SELECT と、親の USE SCHEMA、USE CATALOG も要ります"
+          },
+          {
+            "id": "r-create",
+            "result": "スキーマの CREATE TABLE が要ります",
+            "note": "Databricks は、スキーマの単位で与えることを勧めています"
+          },
+          {
+            "id": "r-execute",
+            "result": "関数の EXECUTE が要ります"
+          }
+        ]
+      },
       "body": "`MODIFY` は、`INSERT`、`UPDATE`、`DELETE` のようにデータを変える操作に要ります。`MODIFY` を使うときも、表の `SELECT` と、親の `USE SCHEMA` と `USE CATALOG` が要ります。\n\n```sql\nGRANT SELECT, MODIFY ON TABLE main.sales.orders TO `etl_team`;\n```\n\n新しい表を作るのは別の権限です。スキーマの `CREATE TABLE` が要り、Databricks はスキーマの単位で与えることを勧めています。関数を呼ぶには、関数の `EXECUTE` が要ります。",
       "examAngle": "`SELECT` は表を読む権限で、`MODIFY` は表のデータを追加、更新、削除する権限です。`MODIFY` を使うときも、表の `SELECT` と、親の `USE SCHEMA` と `USE CATALOG` が要ります。新しい表を作るには、スキーマの `CREATE TABLE` が要ります。",
       "checks": [
@@ -10654,6 +10831,41 @@
       "term": "ALL PRIVILEGES",
       "oneLine": "ALL PRIVILEGES は、オブジェクトとその子のオブジェクトで使える権限をまとめて与える指定で、`MANAGE` などの一部の権限は含みません。",
       "keyPhrase": "`MANAGE` などの一部の権限は含みません",
+      "diagram": {
+        "type": "compare",
+        "title": "ALL PRIVILEGES に含まれる権限と、含まれない権限",
+        "left": {
+          "heading": "含まれる",
+          "items": [
+            {
+              "label": "使えるすべての権限",
+              "note": "確かめる時点で展開されます"
+            },
+            {
+              "label": "あとで足された権限",
+              "note": "既存の付与にも含まれます"
+            }
+          ]
+        },
+        "right": {
+          "heading": "含まれない",
+          "items": [
+            {
+              "label": "MANAGE"
+            },
+            {
+              "label": "READ METADATA"
+            },
+            {
+              "label": "EXTERNAL USE SCHEMA"
+            },
+            {
+              "label": "ほかの権限",
+              "note": "EXTERNAL USE LOCATION"
+            }
+          ]
+        }
+      },
       "body": "`ALL PRIVILEGES` は、権限を確かめる時点で、使えるすべての権限に展開されます。あとで Databricks が新しい権限を足したときも、既存の `ALL PRIVILEGES` の付与に含まれます。\n\n```sql\nGRANT ALL PRIVILEGES ON SCHEMA main.sales TO `data_engineers`;\n```\n\n含まれない権限は、`MANAGE`、`READ METADATA`、`EXTERNAL USE SCHEMA`、`EXTERNAL USE LOCATION` です。\n\n`REVOKE ALL PRIVILEGES` で取り消すと、`ALL PRIVILEGES` に含まれる個別の権限もまとめて取り消されます。含まれない上の権限は、そのまま残ります。",
       "examAngle": "`ALL PRIVILEGES` には、`MANAGE`、`READ METADATA`、`EXTERNAL USE SCHEMA`、`EXTERNAL USE LOCATION` が含まれません。あとで Databricks が足した権限は、既存の `ALL PRIVILEGES` の付与に含まれます。",
       "checks": [
@@ -10777,6 +10989,46 @@
       "term": "所有者と MANAGE",
       "oneLine": "所有者は、オブジェクトのすべての操作と権限の付与ができる主体で、MANAGE は所有者でなくても権限の管理、所有者の変更、削除をさせる権限です。",
       "keyPhrase": "所有者でなくても権限の管理、所有者の変更、削除をさせる権限",
+      "diagram": {
+        "type": "compare",
+        "title": "所有者と MANAGE を持つ利用者にできること",
+        "left": {
+          "heading": "所有者",
+          "items": [
+            {
+              "label": "権限の管理"
+            },
+            {
+              "label": "所有者の変更"
+            },
+            {
+              "label": "オブジェクトの削除"
+            },
+            {
+              "label": "ほかの操作もすべて行えます",
+              "note": "自分のオブジェクトの操作をすべて行えます"
+            }
+          ]
+        },
+        "right": {
+          "heading": "MANAGE を持つ利用者",
+          "items": [
+            {
+              "label": "権限の管理"
+            },
+            {
+              "label": "所有者の変更"
+            },
+            {
+              "label": "オブジェクトの削除"
+            },
+            {
+              "label": "ほかの権限は自動では付きません",
+              "note": "自分に与えることはできます"
+            }
+          ]
+        }
+      },
       "body": "Unity Catalog のオブジェクトには、必ず所有者が 1 つあります。所有者は、ユーザー、サービスプリンシパル、グループのどれでもかまいません。所有者は、自分のオブジェクトの操作をすべて行え、ほかの主体に権限を与えられます。所有権は、子のオブジェクトには引き継がれません。\n\n所有者は、SQL か Catalog Explorer で変えます。\n\n```sql\nALTER TABLE main.sales.orders OWNER TO `data_engineers`;\n```\n\nCatalog Explorer では、オブジェクトのページの Owner の横の編集のアイコンから、新しい所有者を選びます。\n\n`MANAGE` を持つ利用者は、所有者でなくても、権限の管理、所有者の変更、オブジェクトの削除ができます。ほかの権限が自動で付くわけではありませんが、自分に与えることはできます。",
       "examAngle": "所有者は、`ALTER TABLE … OWNER TO …` の文か、Catalog Explorer の Owner の横の編集のアイコンで変えます。所有権は、子のオブジェクトに引き継がれません。`MANAGE` を持つ利用者は、所有者でなくても所有者を変えられます。",
       "checks": [
@@ -11013,6 +11265,36 @@
       "term": "is_account_group_member",
       "oneLine": "`is_account_group_member` は、クエリを実行した利用者が、アカウントの単位のグループに直接か間接に属するかを、真偽値で返す関数です。",
       "keyPhrase": "アカウントの単位のグループに直接か間接に属するか",
+      "diagram": {
+        "type": "compare",
+        "title": "is_account_group_member と is_member の違い",
+        "left": {
+          "heading": "アカウントの単位",
+          "items": [
+            {
+              "label": "アカウントの単位のグループ",
+              "note": "is_account_group_member。直接か間接の所属を返します"
+            },
+            {
+              "label": "Databricks が勧めています",
+              "note": "Unity Catalog のデータでは、こちらを使います"
+            }
+          ]
+        },
+        "right": {
+          "heading": "ワークスペースの単位",
+          "items": [
+            {
+              "label": "ワークスペースの単位のグループ",
+              "note": "is_member。アカウントの単位のグループは調べません"
+            },
+            {
+              "label": "Hive メタストア互換で残ります",
+              "note": "Unity Catalog のデータでは避けます"
+            }
+          ]
+        }
+      },
       "body": "この関数は、行フィルターや列マスクの関数、動的ビューの中で、グループの所属で結果を変えるために使います。\n\n```sql\nSELECT is_account_group_member('auditors');  -- true か false\n```\n\n似た関数に `is_member` があります。`is_member` はワークスペースの単位のグループを調べる関数で、Hive メタストアとの互換のために残っています。Unity Catalog のデータでは、アカウントの単位のグループを調べない `is_member` を避け、`is_account_group_member` を使うよう、Databricks は勧めています。\n\n利用者の名前そのものは `session_user()` で得られます。",
       "examAngle": "`is_account_group_member` はアカウントの単位のグループを調べ、`is_member` はワークスペースの単位のグループを調べます。Unity Catalog のデータでは、Databricks は `is_account_group_member` を使うよう勧めています。",
       "checks": [
@@ -11057,6 +11339,34 @@
       "term": "動的ビュー",
       "oneLine": "動的ビューは、ビューの定義の中でグループの所属などを調べ、利用者に応じて見える列の値と行を変えるビューです。",
       "keyPhrase": "利用者に応じて見える列の値と行を変えるビュー",
+      "diagram": {
+        "type": "compare",
+        "title": "動的ビューで、列を隠すときと行を絞るとき(利用者に与えるのはビューの権限です)",
+        "left": {
+          "heading": "列を隠すとき",
+          "items": [
+            {
+              "label": "CASE を使います"
+            },
+            {
+              "label": "条件に所属の判定を使います",
+              "note": "is_account_group_member の結果"
+            }
+          ]
+        },
+        "right": {
+          "heading": "行を絞るとき",
+          "items": [
+            {
+              "label": "WHERE を使います"
+            },
+            {
+              "label": "条件に所属の判定を使います",
+              "note": "is_account_group_member の結果"
+            }
+          ]
+        }
+      },
       "body": "列を隠すときは `CASE` で、行を絞るときは `WHERE` で、`is_account_group_member` の結果を使います。\n\n```sql\nCREATE VIEW main.sales.orders_v AS\nSELECT\n  id,\n  CASE WHEN is_account_group_member('auditors') THEN email\n       ELSE 'REDACTED' END AS email,\n  total\nFROM main.sales.orders\nWHERE is_account_group_member('managers') OR total <= 1000000;\n```\n\n利用者にはビューの権限を与え、元のテーブルを読む権限は与えません。\n\n動的ビューは、結合や加工をした結果を見せたいときに向きます。元のテーブルそのものを守るときは、テーブルにかける行フィルターと列マスクを使います。多くのテーブルに同じ規則をかけるときは、Databricks は ABAC ポリシーを勧めています。\n\n動的ビューは、SQL ウェアハウスと、標準のアクセスモードのコンピュートで読めます。専用のアクセスモードでは、Databricks Runtime 15.4 LTS 以降が要ります。",
       "examAngle": "動的ビューでは、列を隠すときに `CASE` を、行を絞るときに `WHERE` を使います。どちらも、条件に `is_account_group_member` の結果を使います。利用者にはビューの権限を与え、元のテーブルを読む権限は与えません。",
       "checks": [
