@@ -103,6 +103,7 @@ const PROTECTED_PAGES = [
   "/admin/preview/sample/code-drill/sample",
   "/admin/preview/sample/notebook",
   "/admin/preview/sample/notebook/sample",
+  "/admin/preview/sample/notebook/sample/sample",
   "/bookmarks",
   "/exams",
   "/exams/sample",
@@ -113,6 +114,7 @@ const PROTECTED_PAGES = [
   "/exams/sample/info",
   "/exams/sample/notebook",
   "/exams/sample/notebook/sample",
+  "/exams/sample/notebook/sample/sample",
   "/exams/sample/play",
   "/exams/sample/result",
   "/exams/sample/sections",
@@ -132,6 +134,7 @@ const ADMIN_PAGES = [
   "/admin/preview/sample/code-drill/sample",
   "/admin/preview/sample/notebook",
   "/admin/preview/sample/notebook/sample",
+  "/admin/preview/sample/notebook/sample/sample",
 ];
 /** 保護される API のうち、管理者だけが呼べるもの */
 const ADMIN_APIS = ["/api/admin/users", "/api/admin/users/disable"];

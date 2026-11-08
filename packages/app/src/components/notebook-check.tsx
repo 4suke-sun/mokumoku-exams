@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useId, useRef, useState } from "react";
+import { createContext, type ReactNode, useCallback, useContext, useEffect, useId, useRef, useState } from "react";
 import { ChoiceChip } from "@/components/choice-review.tsx";
 import { useNotebookProgress } from "@/components/notebook-progress.tsx";
 import { InlineText } from "@/components/rich-text.tsx";
@@ -9,15 +9,19 @@ import type { TocDomain } from "@/lib/notebook-data.ts";
 import {
   arrangeReview,
   choiceOrderOf,
-  completableUnits,
-  completedCount,
   completedDateLabel,
-  continueUnit,
+  continueSection,
+  domainProgress,
   gradeReview,
+  hasEntryRecord,
+  isEntryDone,
   type NotebookCheck,
   type NotebookCheckKey,
+  overallProgress,
   type ReviewArrangement,
   type ReviewItem,
+  type SectionUnit,
+  unitProgress,
 } from "@/lib/notebook-review.ts";
 import { browserStore, loadSettings } from "@/lib/storage.ts";
 
@@ -139,7 +143,16 @@ function useShuffleChoices(): boolean | null {
  * 見出しの確認の問い(2 択)。選んで「回答する」を押すと確定し、正誤と選択肢ごとの理由を出す。「もう一度」で未回答に戻る。
  * 選択肢の並びは、表示の設定の「選択肢の並びをシャッフルする」に従う。結果は保存しない。
  */
-export function NotebookCheckItem({ id, check }: { id: string; check: NotebookCheck }) {
+export function NotebookCheckItem({
+  id,
+  check,
+  onResult,
+}: {
+  id: string;
+  check: NotebookCheck;
+  /** 回答を確定したとき、正解かどうかを伝える */
+  onResult?: (correct: boolean) => void;
+}) {
   const shuffled = useShuffleChoices();
   const [order, setOrder] = useState<NotebookCheckKey[]>(["A", "B"]);
   const [selected, setSelected] = useState<NotebookCheckKey | undefined>();
@@ -190,6 +203,7 @@ export function NotebookCheckItem({ id, check }: { id: string; check: NotebookCh
           onClick={() => {
             setRevealed(true);
             setFocus((n) => n + 1);
+            onResult?.(correct);
           }}
           className="rounded-md bg-primary px-4 py-2 text-sm font-bold text-on-primary hover:opacity-90 disabled:opacity-50"
         >
@@ -202,13 +216,164 @@ export function NotebookCheckItem({ id, check }: { id: string; check: NotebookCh
 
 type RecordState = "idle" | "saving" | "saved" | "failed" | "preview";
 
+type SectionScope = {
+  /** この画面で、節のすべての問いに正解した(一度正解した問いは、もう一度で解き直しても、正解のまま数える) */
+  allPassed: boolean;
+  /** アカウントから読んだ記録で、この節が完了している(読み込み中と、読めないときは false) */
+  done: boolean;
+  state: RecordState;
+  report: (index: number) => void;
+  retry: () => void;
+};
+
+const ScopeContext = createContext<SectionScope | null>(null);
+
+function useSectionScope(): SectionScope {
+  const scope = useContext(ScopeContext);
+  if (!scope) throw new Error("NotebookSectionScope の中で使う");
+  return scope;
+}
+
 /**
- * 中分類の末尾の「ここまでのおさらい」。その中分類の確認の問いをすべて並べ、全問を選んだら 1 つの「回答する」で確定する。
- * 1 回の通しで全問正解したときだけ、中分類を履修済みとして記録する(管理者のプレビューでは記録しない)。
- * やり直しでは、問いの並びと選択肢の並びを入れ替える(表示の設定によらない)。
+ * 節 1 つの確認の状態を持つ(節ごとに作り直す: 呼び出し側で `key` を節の ID にする)。
+ * 節のすべての問いに正解したら、節の完了を記録する(管理者のプレビューでは記録しない)。
+ * すでに完了している節(旧い中分類の記録による完了を含む)は、記録の状態を「完了として記録しています」にし、
+ * `PUT` の結果によらない。旧い中分類の記録だけで完了している節は、節の記録を書く。
  */
-export function NotebookReview({ unitId, items }: { unitId: string; items: ReviewItem[] }) {
-  const { preview, completed, record } = useNotebookProgress();
+export function NotebookSectionScope({
+  unitId,
+  entryId,
+  total,
+  children,
+}: {
+  unitId: string;
+  entryId: string;
+  /** 節の確認の問いの数 */
+  total: number;
+  children: ReactNode;
+}) {
+  const { preview, records, record } = useNotebookProgress();
+  const [passed, setPassed] = useState<ReadonlySet<number>>(new Set());
+  const [state, setState] = useState<RecordState>("idle");
+  const allPassed = total > 0 && passed.size >= total;
+  const done = records ? isEntryDone(records, unitId, entryId) : false;
+
+  const save = useCallback(async () => {
+    setState("saving");
+    setState((await record(unitId, entryId)) ? "saved" : "failed");
+  }, [record, unitId, entryId]);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: 全問に正解した、その一度だけ記録する
+  useEffect(() => {
+    if (!allPassed) return;
+    if (preview) {
+      setState("preview");
+      return;
+    }
+    if (records && hasEntryRecord(records, unitId, entryId)) return;
+    if (done) {
+      void record(unitId, entryId);
+      return;
+    }
+    void save();
+  }, [allPassed]);
+
+  const report = useCallback((index: number) => setPassed((current) => new Set(current).add(index)), []);
+  const retry = useCallback(() => void save(), [save]);
+
+  return <ScopeContext.Provider value={{ allPassed, done, state, report, retry }}>{children}</ScopeContext.Provider>;
+}
+
+/** 節の確認の問い(すべて)と、記録の状態 */
+export function NotebookSectionChecks({ entryId, checks }: { entryId: string; checks: NotebookCheck[] }) {
+  const scope = useSectionScope();
+  return (
+    <>
+      {checks.map((check, i) => (
+        <NotebookCheckItem
+          // biome-ignore lint/suspicious/noArrayIndexKey: 見出しの中の問いの並びは固定(問いの番号が識別子)
+          key={`${entryId}-${i + 1}`}
+          id={`${entryId}-${i + 1}`}
+          check={check}
+          onResult={(correct) => {
+            if (correct) scope.report(i);
+          }}
+        />
+      ))}
+      <RecordStatus />
+    </>
+  );
+}
+
+/** 記録の状態。記録できなかったときは、もう一度記録できる。読み込み中と読めないときは、正解のあとの記録の結果だけを出す */
+function RecordStatus() {
+  const { state, done, retry } = useSectionScope();
+  return (
+    <div aria-live="polite" className="text-sm">
+      {state === "saving" ? <p className="text-muted">記録しています…</p> : null}
+      {state === "saved" ? <p className="font-bold text-correct">完了として記録しました</p> : null}
+      {state === "preview" ? <p className="text-muted">プレビューでは記録しません。</p> : null}
+      {state === "failed" ? (
+        <div className="flex flex-wrap items-center gap-3">
+          <p className="font-bold text-incorrect">記録できませんでした。通信の状態を確かめてください。</p>
+          <button type="button" onClick={retry} className="rounded-md border border-line px-3 py-1 font-bold">
+            もう一度記録する
+          </button>
+        </div>
+      ) : null}
+      {state === "idle" && done ? <p className="font-bold text-correct">完了として記録しています</p> : null}
+    </div>
+  );
+}
+
+type SectionLink = { id: string; term: string };
+
+/**
+ * 節の前後への移動。前の節へは、いつでも戻れる。「次の節へ」は、この節の確認に正解したあと(すでに完了している節では、最初から)。
+ * 最後の節には、次の節がないので出さない(比較の表とおさらいが続く)。
+ */
+export function NotebookSectionPager({
+  basePath,
+  unitId,
+  prev,
+  next,
+}: {
+  basePath: string;
+  unitId: string;
+  prev: SectionLink | null;
+  next: SectionLink | null;
+}) {
+  const { allPassed, done } = useSectionScope();
+  const showNext = next !== null && (allPassed || done);
+  if (!prev && !showNext) return null;
+  return (
+    <nav aria-label="節の移動" className="grid gap-3 sm:grid-cols-2">
+      {prev ? (
+        <Link href={`${basePath}/${unitId}/${prev.id}`} className="card p-3 text-sm">
+          <span className="block text-muted">← 前の節</span>
+          <span className="block font-bold text-primary">{prev.term}</span>
+        </Link>
+      ) : (
+        <span />
+      )}
+      {showNext && next ? (
+        <Link href={`${basePath}/${unitId}/${next.id}`} className="card p-3 text-right text-sm">
+          <span className="block text-muted">次の節へ →</span>
+          <span className="block font-bold text-primary">{next.term}</span>
+        </Link>
+      ) : null}
+    </nav>
+  );
+}
+
+/**
+ * 中分類の末尾の「ここまでのおさらい」(任意の総復習)。中分類のすべての節が完了したあとに出す。
+ * その中分類の確認の問いをすべて並べ、全問を選んだら 1 つの「回答する」で確定する。結果は保存せず、履修済みの記録もしない。
+ * やり直しでは、問いの並びと選択肢の並びを入れ替える(表示の設定によらない)。
+ * 管理者のプレビューは、完了を読まないので、いつでも出す。
+ */
+export function NotebookReview({ unit, items }: { unit: SectionUnit; items: ReviewItem[] }) {
+  const { preview, records } = useNotebookProgress();
   // 最初の通しは、見出しの並び順のまま、選択肢の並びだけを入れ替える(描いたあとに決める。サーバーの描画と食い違わないように)
   const [arrangement, setArrangement] = useState<ReviewArrangement>(() => ({
     items,
@@ -217,7 +382,6 @@ export function NotebookReview({ unitId, items }: { unitId: string; items: Revie
   const [answers, setAnswers] = useState<Record<string, NotebookCheckKey | undefined>>({});
   const [revealed, setRevealed] = useState(false);
   const [focus, setFocus] = useState(0);
-  const [recordState, setRecordState] = useState<RecordState>("idle");
   const headingId = useId();
 
   useEffect(() => {
@@ -225,30 +389,19 @@ export function NotebookReview({ unitId, items }: { unitId: string; items: Revie
   }, [items]);
 
   if (items.length === 0) return null;
+  if (!preview && !(records && unitProgress(unit, records).completed)) return null;
   const unanswered = arrangement.items.filter((item) => answers[item.id] === undefined).length;
   const grade = gradeReview(arrangement.items, answers);
-  const completedAt = completed?.get(unitId);
-
-  async function save() {
-    if (preview) {
-      setRecordState("preview");
-      return;
-    }
-    setRecordState("saving");
-    setRecordState((await record(unitId)) ? "saved" : "failed");
-  }
 
   function submit() {
     setRevealed(true);
     setFocus((n) => n + 1);
-    if (gradeReview(arrangement.items, answers).allCorrect) void save();
   }
 
   function retry() {
     setArrangement(arrangeReview(items, Math.random, true));
     setAnswers({});
     setRevealed(false);
-    setRecordState("idle");
   }
 
   return (
@@ -258,8 +411,8 @@ export function NotebookReview({ unitId, items }: { unitId: string; items: Revie
           ここまでのおさらい
         </h2>
         <p className="text-sm text-muted">
-          この中分類の確認の問い {items.length} 問です。1 回の通しで全問に正解すると、履修済みとして記録します。
-          {completedAt ? ` 履修済みです(${completedDateLabel(completedAt)})。何度でも解けます。` : ""}
+          この中分類の確認の問い {items.length}{" "}
+          問を通して解く、任意の総復習です。解かなくても、すべての節の完了で履修済みになります。結果は保存しません。
         </p>
       </div>
       <ol className="space-y-4">
@@ -305,7 +458,6 @@ export function NotebookReview({ unitId, items }: { unitId: string; items: Revie
             }
             focus={focus}
           />
-          {grade.allCorrect ? <RecordStatus state={recordState} onRetry={() => void save()} /> : null}
           <button type="button" onClick={retry} className="rounded-md border border-line px-4 py-2 text-sm font-bold">
             もう一度通す
           </button>
@@ -327,90 +479,83 @@ export function NotebookReview({ unitId, items }: { unitId: string; items: Revie
   );
 }
 
-/** 履修済みの記録の状態。記録できなかったときは、もう一度記録できる */
-function RecordStatus({ state, onRetry }: { state: RecordState; onRetry: () => void }) {
+/**
+ * パンくずの下の行(どの節のページにも出る)の「✓ 完了」と「✓ 履修済み(日付)」。
+ * 読み込み中と、読めないときと、管理者のプレビューでは出さない。
+ */
+export function NotebookSectionStatus({
+  unitId,
+  entryId,
+  entryIds,
+}: {
+  unitId: string;
+  entryId: string;
+  /** 中分類の、画面に出す節の ID(目次の並び) */
+  entryIds: readonly string[];
+}) {
+  const { records, lastRecorded } = useNotebookProgress();
+  if (!records) return null;
+  const entryDone = isEntryDone(records, unitId, entryId);
+  const unit = unitProgress({ id: unitId, entries: entryIds.map((id) => ({ id })) }, records);
+  if (!entryDone && !unit.completed) return null;
+  // 押印の動きは、この画面で完了にした節のページだけで出す
+  const stamp = lastRecorded?.unit === unitId && lastRecorded.entry === entryId ? "motion-stamp" : undefined;
   return (
-    <div aria-live="polite" className="text-sm">
-      {state === "saving" ? <p className="text-muted">履修済みとして記録しています…</p> : null}
-      {state === "saved" ? (
-        <p className="font-bold text-correct">
-          <span className="motion-stamp">✓</span> 履修済みとして記録しました
-        </p>
+    <p className="flex flex-wrap items-center gap-2">
+      {entryDone ? (
+        <span className="chip tone-correct">
+          <span className={stamp}>✓</span> 完了
+        </span>
       ) : null}
-      {state === "preview" ? <p className="text-muted">プレビューでは記録しません。</p> : null}
-      {state === "failed" ? (
-        <div className="flex flex-wrap items-center gap-3">
-          <p className="font-bold text-incorrect">記録できませんでした。通信の状態を確かめてください。</p>
-          <button type="button" onClick={onRetry} className="rounded-md border border-line px-3 py-1 font-bold">
-            もう一度記録する
-          </button>
-        </div>
+      {unit.completed ? (
+        <span className="chip tone-correct">
+          <span className={stamp}>✓</span> 履修済み{unit.completedAt ? `(${completedDateLabel(unit.completedAt)})` : ""}
+        </span>
       ) : null}
-    </div>
-  );
-}
-
-/** 中分類のページの題の近くに出す「✓ 履修済み(日付)」。読めないとき・履修していないときは出さない */
-export function NotebookUnitCompleted({ unitId }: { unitId: string }) {
-  const { completed } = useNotebookProgress();
-  const at = completed?.get(unitId);
-  if (!at) return null;
-  return (
-    <p>
-      <span className="chip tone-correct">
-        <span className="motion-stamp">✓</span> 履修済み({completedDateLabel(at)})
-      </span>
     </p>
   );
 }
 
-/** 目次の中分類の「✓」。読み上げでは「履修済み」と読む */
-export function NotebookTocMark({ unitId }: { unitId: string }) {
-  const { completed } = useNotebookProgress();
-  if (!completed?.has(unitId)) return null;
-  return (
-    <span className="text-correct">
-      <span aria-hidden="true">✓</span>
-      <span className="sr-only">(履修済み)</span>
-    </span>
-  );
-}
-
-/** 表紙の、全体の履修済みの数と「続きから」。読めないときは出さない */
+/** 表紙の、全体の完了した節の数と履修済みの中分類の数、「続きから」。読み込み中と読めないときは出さない */
 export function NotebookCoverProgress({ toc, basePath }: { toc: TocDomain[]; basePath: string }) {
-  const { completed } = useNotebookProgress();
-  if (!completed) return null;
-  const units = completableUnits(toc);
-  if (units.length === 0) return null;
-  const target = continueUnit(toc, completed);
+  const { records } = useNotebookProgress();
+  if (!records) return null;
+  const overall = overallProgress(toc, records);
+  if (overall.totalEntries === 0) return null;
+  const target = continueSection(toc, records);
   return (
     <div className="card flex flex-wrap items-center justify-between gap-3 p-4">
-      <p className="font-bold">
-        履修済み {completedCount(units, completed)} / {units.length}
+      <p className="flex flex-wrap items-baseline gap-x-4 gap-y-1 font-bold">
+        <span>
+          {overall.doneEntries} / {overall.totalEntries} 節
+        </span>
+        <span>
+          履修済み {overall.doneUnits} / {overall.totalUnits} 中分類
+        </span>
       </p>
       {target === "all-done" ? (
-        <p className="font-bold text-correct">✓ すべての中分類を履修しました</p>
+        <p className="font-bold text-correct">✓ すべての節を完了しました</p>
       ) : target ? (
         <Link
-          href={`${basePath}/${target.id}`}
+          href={`${basePath}/${target.unit.id}/${target.entry.id}`}
           className="rounded-md bg-primary px-4 py-2 text-sm font-bold text-on-primary hover:opacity-90"
         >
-          続きから: {target.number} {target.title}
+          続きから: {target.unit.number} {target.unit.title} › {target.entry.term}
         </Link>
       ) : null}
     </div>
   );
 }
 
-/** 表紙の分野のタイルの、分野の中の履修済みの数。読めないときは出さない */
+/** 表紙の分野のタイルの、分野の中の履修済みの数。読み込み中と読めないときは出さない */
 export function NotebookDomainProgress({ domain }: { domain: TocDomain }) {
-  const { completed } = useNotebookProgress();
-  if (!completed) return null;
-  const units = completableUnits([domain]);
-  if (units.length === 0) return null;
+  const { records } = useNotebookProgress();
+  if (!records) return null;
+  const { doneUnits, totalUnits } = domainProgress(domain, records);
+  if (totalUnits === 0) return null;
   return (
     <span className="block text-sm text-muted">
-      履修済み {completedCount(units, completed)} / {units.length}
+      履修済み {doneUnits} / {totalUnits}
     </span>
   );
 }

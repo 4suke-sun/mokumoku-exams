@@ -70,7 +70,17 @@ export function unitNumber(domains: readonly { code: string }[], unit: Pick<Note
   return `${index < 0 ? "?" : index + 1}-${unit.order}`;
 }
 
-export type TocUnit = { id: string; number: string; title: string; count: number };
+/** 目次の節(見出し)。並びは、画面に出す見出し(`visibleEntries`)の並び */
+export type TocEntry = { id: string; term: string };
+export type TocUnit = {
+  id: string;
+  number: string;
+  title: string;
+  /** 画面に出す見出しの数(`entries` の数) */
+  count: number;
+  /** 節。見出しのない中分類は空(目次で薄く出し、開けない) */
+  entries: TocEntry[];
+};
 export type TocDomain = {
   code: string;
   /** 分野の番号(資格マスタの並び。1 から) */
@@ -85,23 +95,31 @@ export type TocDomain = {
   filled: number;
 };
 
-/** 目次: 分野 → 中分類の 2 段。数は、渡した見出し(絞り込みのあと)で数える。中分類のない分野は出さない */
+/** 目次: 分野 → 中分類 → 節(見出し)の 3 段。数と節は、渡した見出し(絞り込みのあと)で数える。中分類のない分野は出さない */
 export function buildToc(
   domains: readonly { code: string; name: string; weight?: number }[],
   units: readonly NotebookUnit[],
   entries: readonly NotebookEntry[],
 ): TocDomain[] {
-  const counts = new Map<string, number>();
-  for (const entry of entries) counts.set(entry.unit, (counts.get(entry.unit) ?? 0) + 1);
+  const byUnit = new Map<string, TocEntry[]>();
+  for (const entry of entries) {
+    const list = byUnit.get(entry.unit) ?? [];
+    list.push({ id: entry.id, term: entry.term });
+    byUnit.set(entry.unit, list);
+  }
   return domains.flatMap((domain, i) => {
     const own = units.filter((unit) => unit.domain === domain.code);
     if (own.length === 0) return [];
-    const tocUnits = own.map((unit) => ({
-      id: unit.id,
-      number: unitNumber(domains, unit),
-      title: unit.title,
-      count: counts.get(unit.id) ?? 0,
-    }));
+    const tocUnits = own.map((unit) => {
+      const tocEntries = byUnit.get(unit.id) ?? [];
+      return {
+        id: unit.id,
+        number: unitNumber(domains, unit),
+        title: unit.title,
+        count: tocEntries.length,
+        entries: tocEntries,
+      };
+    });
     return [
       {
         code: domain.code,
@@ -114,6 +132,18 @@ export function buildToc(
       },
     ];
   });
+}
+
+/** 節の前後(同じ中分類の中。`entries` の並び)。端では null。前後の中分類へは、`neighborUnits` で移る */
+export function neighborEntries(
+  entries: readonly NotebookEntry[],
+  unitId: string,
+  entryId: string,
+): { prev: NotebookEntry | null; next: NotebookEntry | null } {
+  const own = entries.filter((entry) => entry.unit === unitId);
+  const index = own.findIndex((entry) => entry.id === entryId);
+  if (index < 0) return { prev: null, next: null };
+  return { prev: own[index - 1] ?? null, next: own[index + 1] ?? null };
 }
 
 /** 前後の中分類(目次の並び)。端では null */

@@ -25,7 +25,13 @@ import {
   reviewChangeOf,
   tallyOf,
 } from "./handlers.ts";
-import { createMemoryRepository, type HistoryRepository, RESULTS_PAGE_SIZE } from "./repository.ts";
+import {
+  createDynamoRepository,
+  createMemoryRepository,
+  type HistoryRepository,
+  RESULTS_PAGE_SIZE,
+} from "./repository.ts";
+import { fakeTable } from "./table-double.ts";
 
 const ORIGIN = "http://localhost";
 /** 完了時刻の範囲の検査を、時計に頼らず確かめるための「いま」 */
@@ -438,10 +444,10 @@ const failing: HistoryRepository = {
   async setPrefs() {
     throw new Error("unavailable");
   },
-  async listNotebookUnits() {
+  async listNotebook() {
     throw new Error("unavailable");
   },
-  async completeNotebookUnit() {
+  async completeNotebookEntry() {
     throw new Error("unavailable");
   },
 };
@@ -974,13 +980,20 @@ describe("表示の設定の API", () => {
   });
 });
 
-describe("体系ノートの履修済みの API", () => {
-  const notebookUnits = async (examCode: string) =>
-    examCode === "EX-SMP-XX" ? new Set(["domain1-1", "domain1-2"]) : null;
+describe("体系ノートの節の完了の API", () => {
+  // 検証済みの見出し(見出しの ID から、属する中分類の ID)
+  const notebookEntries = async (examCode: string) =>
+    examCode === "EX-SMP-XX"
+      ? new Map([
+          ["term-a", "domain1-1"],
+          ["term-b", "domain1-1"],
+          ["term-c", "domain1-2"],
+        ])
+      : null;
   const withNotebook = (repository: HistoryRepository = createMemoryRepository(), now = NOW): HistoryDeps => ({
     ...deps(repository),
     now: () => now,
-    notebookUnits,
+    notebookEntries,
   });
   const put = (value: unknown, headers: Record<string, string> = {}, raw?: string) =>
     new Request(`${ORIGIN}/api/history/notebook`, {
@@ -993,43 +1006,70 @@ describe("体系ノートの履修済みの API", () => {
       new Request(`${ORIGIN}/api/history/notebook?${query}`, { headers: sub ? { cookie: asUser(sub) } : {} }),
       d,
     );
+  const change = { examCode: "EX-SMP-XX", unit: "domain1-2", entry: "term-c" };
 
   it("記録して取得する_自分の分だけを_サーバーの時刻で返す", async () => {
     const d = withNotebook();
-    expect(await (await read(d, "a")).json()).toEqual({ units: [] });
-    const saved = await handlePutNotebook(
-      put({ examCode: "EX-SMP-XX", unit: "domain1-2" }, { cookie: asUser("a") }),
-      d,
-    );
+    expect(await (await read(d, "a")).json()).toEqual({ units: [], entries: [] });
+    const saved = await handlePutNotebook(put(change, { cookie: asUser("a") }), d);
     expect(saved.status).toBe(200);
     expect(await (await read(d, "a")).json()).toEqual({
-      units: [{ unit: "domain1-2", completedAt: new Date(NOW).toISOString() }],
+      units: [],
+      entries: [{ unit: "domain1-2", entry: "term-c", completedAt: new Date(NOW).toISOString() }],
     });
-    expect(await (await read(d, "b")).json()).toEqual({ units: [] });
+    expect(await (await read(d, "b")).json()).toEqual({ units: [], entries: [] });
   });
 
-  it("同じ中分類を後から記録し直す_最初の時刻を残す", async () => {
+  it("同じ節を後から記録し直す_最初の時刻を残す", async () => {
     const repository = createMemoryRepository();
-    const first = { examCode: "EX-SMP-XX", unit: "domain1-1" };
+    const first = { examCode: "EX-SMP-XX", unit: "domain1-1", entry: "term-a" };
     await handlePutNotebook(put(first, { cookie: asUser("a") }), withNotebook(repository, NOW));
     const again = await handlePutNotebook(put(first, { cookie: asUser("a") }), withNotebook(repository, NOW + 60_000));
     expect(again.status).toBe(200);
     expect(await (await read(withNotebook(repository), "a")).json()).toEqual({
-      units: [{ unit: "domain1-1", completedAt: new Date(NOW).toISOString() }],
+      units: [],
+      entries: [{ unit: "domain1-1", entry: "term-a", completedAt: new Date(NOW).toISOString() }],
     });
   });
 
-  it("本文が正しくない・ノートにない中分類・ノートのない資格・時刻や sub を含む_400 を返し_保存しない", async () => {
+  it("中分類の旧い記録がある_応答の units に返し_節の完了も普通に書く", async () => {
+    const { items, client } = fakeTable();
+    const at = "2026-10-01T00:00:00.000Z";
+    items.set("USER#a|NOTEBOOK#EX-SMP-XX#domain1-1", {
+      PK: "USER#a",
+      SK: "NOTEBOOK#EX-SMP-XX#domain1-1",
+      type: "notebook",
+      examCode: "EX-SMP-XX",
+      unit: "domain1-1",
+      completedAt: at,
+    });
+    const d = withNotebook(createDynamoRepository({ tableName: "table-example", client }));
+    const saved = await handlePutNotebook(
+      put({ examCode: "EX-SMP-XX", unit: "domain1-1", entry: "term-a" }, { cookie: asUser("a") }),
+      d,
+    );
+    expect(saved.status).toBe(200);
+    expect(await (await read(d, "a")).json()).toEqual({
+      units: [{ unit: "domain1-1", completedAt: at }],
+      entries: [{ unit: "domain1-1", entry: "term-a", completedAt: new Date(NOW).toISOString() }],
+    });
+  });
+
+  it("本文が正しくない_ノートにない・属さない・旧い本文・時刻や sub を含む_400 を返し_保存しない", async () => {
     const d = withNotebook();
     const cases: unknown[] = [
-      { examCode: "EX-SMP-XX", unit: "domain9-9" }, // ノートにない(見出しのない)中分類
-      { examCode: "EX-OTH-XX", unit: "domain1-1" }, // ノートのない資格
-      { examCode: "EX-SMP-XX", unit: "domain1" },
-      { examCode: "EX-SMP-XX", unit: "" },
-      { examCode: "EX-SMP-XX" },
-      { examCode: "sample", unit: "domain1-1" },
-      { examCode: "EX-SMP-XX", unit: "domain1-1", completedAt: "2026-01-01T00:00:00.000Z" },
-      { examCode: "EX-SMP-XX", unit: "domain1-1", sub: "other-user" },
+      { examCode: "EX-SMP-XX", unit: "domain1-1", entry: "no-such-term" }, // ノートにない(または未検証の)見出し
+      { examCode: "EX-SMP-XX", unit: "domain9-9", entry: "term-a" }, // ノートにない中分類
+      { examCode: "EX-SMP-XX", unit: "domain1-2", entry: "term-a" }, // 見出しがその中分類に属さない
+      { examCode: "EX-OTH-XX", unit: "domain1-1", entry: "term-a" }, // ノートのない資格
+      { examCode: "EX-SMP-XX", unit: "domain1-1" }, // entry のない旧い本文
+      { examCode: "EX-SMP-XX", unit: "domain1", entry: "term-a" },
+      { examCode: "EX-SMP-XX", unit: "domain1-1", entry: "" },
+      { examCode: "EX-SMP-XX", unit: "domain1-1", entry: "Term A" },
+      { examCode: "EX-SMP-XX", entry: "term-a" },
+      { examCode: "sample", unit: "domain1-1", entry: "term-a" },
+      { examCode: "EX-SMP-XX", unit: "domain1-1", entry: "term-a", completedAt: "2026-01-01T00:00:00.000Z" },
+      { examCode: "EX-SMP-XX", unit: "domain1-1", entry: "term-a", sub: "other-user" },
       [],
       null,
     ];
@@ -1038,12 +1078,11 @@ describe("体系ノートの履修済みの API", () => {
       expect(response.status, JSON.stringify(value)).toBe(400);
       expect(await response.json()).toEqual({ error: "bad-request" });
     }
-    expect(await (await read(d, "a")).json()).toEqual({ units: [] });
+    expect(await (await read(d, "a")).json()).toEqual({ units: [], entries: [] });
   });
 
   it("未ログイン・別サイト・JSON でない・大きすぎる・未知の問い合わせ・保存先の失敗_それぞれの種類で断る", async () => {
     const d = withNotebook();
-    const change = { examCode: "EX-SMP-XX", unit: "domain1-1" };
     expect((await handlePutNotebook(put(change), d)).status).toBe(401);
     expect((await read(d, null)).status).toBe(401);
     expect(
