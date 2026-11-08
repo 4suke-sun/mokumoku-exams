@@ -104,21 +104,36 @@ export async function putGoal(examCode: string, date: string | null): Promise<bo
   return (await requestJson("/api/history/goal", { method: "PUT", body: { examCode, date } })).ok;
 }
 
-const NotebookUnitsSchema = z.object({
+const NotebookSchema = z.object({
   units: z.array(z.object({ unit: z.string().max(16), completedAt: z.string().max(40) })).max(1000),
+  entries: z
+    .array(z.object({ unit: z.string().max(16), entry: z.string().max(64), completedAt: z.string().max(40) }))
+    .max(5000),
 });
 
-/** 体系ノートの、履修済みの中分類と最初に履修した時刻(中分類の ID から時刻)。取得できなければ null(ログイン切れ・通信の失敗など)。 */
-export async function fetchNotebookUnits(examCode: string): Promise<Map<string, string> | null> {
+/** 体系ノートの完了の記録(節ごとと、旧い中分類の履修済み)。 */
+export type NotebookProgressData = {
+  /** 旧い中分類の履修済み(中分類の ID から、最初に履修した時刻) */
+  units: Map<string, string>;
+  /** 完了した節(`<中分類の ID>#<見出しの ID>` から、最初に完了した時刻) */
+  entries: Map<string, string>;
+};
+
+/** 体系ノートの、完了した節と、旧い中分類の履修済み。取得できなければ null(ログイン切れ・通信の失敗など)。 */
+export async function fetchNotebook(examCode: string): Promise<NotebookProgressData | null> {
   const result = await requestJson(`/api/history/notebook?examCode=${encodeURIComponent(examCode)}`, {
-    schema: NotebookUnitsSchema,
+    schema: NotebookSchema,
   });
-  return result.ok ? new Map(result.data.units.map((u) => [u.unit, u.completedAt])) : null;
+  if (!result.ok) return null;
+  return {
+    units: new Map(result.data.units.map((u) => [u.unit, u.completedAt])),
+    entries: new Map(result.data.entries.map((e) => [`${e.unit}#${e.entry}`, e.completedAt])),
+  };
 }
 
-/** 体系ノートの中分類を、履修済みとして記録する。記録できたら true。 */
-export async function putNotebookUnit(examCode: string, unit: string): Promise<boolean> {
-  return (await requestJson("/api/history/notebook", { method: "PUT", body: { examCode, unit } })).ok;
+/** 体系ノートの節を、完了として記録する。記録できたら true。 */
+export async function putNotebookEntry(examCode: string, unit: string, entry: string): Promise<boolean> {
+  return (await requestJson("/api/history/notebook", { method: "PUT", body: { examCode, unit, entry } })).ok;
 }
 
 const SectionsSchema = z.object({ progress: SectionProgressSchema });

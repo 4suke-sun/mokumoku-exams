@@ -1,8 +1,28 @@
 // @vitest-environment jsdom
-import { render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { act, render, screen, within } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { buildToc, type NotebookEntry, type NotebookUnit, visibleEntries } from "@/lib/notebook-data.ts";
-import { NotebookCover, NotebookUnitView } from "./notebook-view.tsx";
+import { NotebookProgressProvider } from "./notebook-progress.tsx";
+import { NotebookCover, NotebookSectionView } from "./notebook-view.tsx";
+
+type Data = { units: Map<string, string>; entries: Map<string, string> };
+const client = vi.hoisted(() => ({
+  fetchNotebook: vi.fn<(examCode: string) => Promise<Data | null>>(),
+  putNotebookEntry: vi.fn<(examCode: string, unit: string, entry: string) => Promise<boolean>>(),
+}));
+vi.mock("@/lib/history/client.ts", () => client);
+
+const AT = "2026-10-11T15:30:00.000Z";
+const done = (entries: string[] = []): Data => ({
+  units: new Map(),
+  entries: new Map(entries.map((id) => [`domain1-1#${id}`, AT])),
+});
+
+beforeEach(() => {
+  client.fetchNotebook.mockReset();
+  client.fetchNotebook.mockResolvedValue(done());
+  client.putNotebookEntry.mockReset();
+});
 
 const exam = {
   examCode: "TEST",
@@ -76,53 +96,107 @@ const entries = [
   entry({ id: "draft-term", order: 3, term: "書きかけの用語", status: "unverified", related: undefined }),
 ];
 
-function renderUnit(unitId: string, preview: boolean) {
+/** 節のページを描く。`entryId` が null のときは、見出しのない中分類 */
+async function renderSection(unitId: string, entryId: string | null, preview: boolean, withEntries = entries) {
   const unit = units.find((u) => u.id === unitId);
   if (!unit) throw new Error("中分類がありません");
-  return render(
-    <NotebookUnitView
-      exam={exam}
-      units={units}
-      unit={unit}
-      entries={visibleEntries(entries, preview)}
-      basePath="/exams/TEST/notebook"
-      preview={preview}
-    />,
+  const visible = visibleEntries(withEntries, preview);
+  const entry = entryId === null ? null : (visible.find((e) => e.id === entryId) ?? null);
+  const view = render(
+    <NotebookProgressProvider examCode="TEST" preview={preview}>
+      <NotebookSectionView
+        exam={exam}
+        units={units}
+        unit={unit}
+        entry={entry}
+        entries={visible}
+        basePath="/exams/TEST/notebook"
+        preview={preview}
+      />
+    </NotebookProgressProvider>,
   );
+  await act(async () => {});
+  return view;
 }
 
-describe("NotebookUnitView", () => {
-  it("中分類のページ_パンくず・題・導入・図・見出し・比較の表・前後のリンクの順に出す", () => {
-    const { container } = renderUnit("domain1-1", false);
+describe("NotebookSectionView", () => {
+  it("中分類の最初の節_パンくず・完了の行・題・導入・図・見出しの順に出し_比較の表とおさらいは出さない", async () => {
+    const { container } = await renderSection("domain1-1", "external-table", false);
     const breadcrumb = screen.getByRole("navigation", { name: "パンくずリスト" });
     expect(breadcrumb.textContent).toContain("1. 分野 1");
+    expect(breadcrumb.textContent).toContain("1-1 テーブルの種類");
+    expect(within(breadcrumb).getByText("外部テーブル").getAttribute("aria-current")).toBe("page");
     expect(screen.getByRole("heading", { level: 1 }).textContent).toBe("1-1 テーブルの種類");
-    const order = [...container.querySelectorAll("h1, p, figure, h2, table")].map((el) =>
+    expect(screen.getByText("導入の文です。")).toBeTruthy();
+    const order = [...container.querySelectorAll("h1, p, figure, h2")].map((el) =>
       el.tagName === "H2" ? `h2:${el.textContent}` : el.tagName.toLowerCase(),
     );
     const at = (item: string) => order.indexOf(item);
     expect(at("figure")).toBeGreaterThan(at("h1"));
     expect(at("h2:外部テーブル")).toBeGreaterThan(at("figure"));
-    expect(at("h2:比べる")).toBeGreaterThan(at("h2:マネージドテーブル"));
-    expect(at("h2:ここまでのおさらい")).toBeGreaterThan(at("h2:比べる"));
-    const pager = screen.getByRole("navigation", { name: "前後の中分類" });
-    expect(within(pager).getByRole("link").getAttribute("href")).toBe("/exams/TEST/notebook/domain1-2");
+    expect(screen.queryByRole("table")).toBeNull();
+    expect(screen.queryByRole("heading", { name: "ここまでのおさらい" })).toBeNull();
+    expect(screen.queryByText("マネージドテーブル", { selector: "h2" })).toBeNull();
   });
 
-  it("おさらい_画面に出す見出しの確認の問いだけを集め_見出しのない中分類には出さない", () => {
-    renderUnit("domain1-1", false);
+  it("中分類の最後の節_題と導入と中分類の図は出さず_下に比較の表とおさらい_前後の中分類のリンクの順", async () => {
+    client.fetchNotebook.mockResolvedValue(done(["external-table", "managed-table"]));
+    const { container } = await renderSection("domain1-1", "managed-table", false);
+    expect(screen.queryByText("導入の文です。")).toBeNull();
+    expect(screen.getByRole("heading", { level: 1, hidden: true }).textContent).toBe("1-1 テーブルの種類");
+    expect(screen.getByRole("heading", { level: 1, hidden: true }).getAttribute("class")).toContain("sr-only");
+    const order = [...container.querySelectorAll("h2, nav")].map((el) =>
+      el.tagName === "H2" ? `h2:${el.textContent}` : `nav:${el.getAttribute("aria-label")}`,
+    );
+    const at = (item: string) => order.indexOf(item);
+    expect(at("h2:マネージドテーブル")).toBeGreaterThanOrEqual(0);
+    expect(at("h2:比べる")).toBeGreaterThan(at("h2:マネージドテーブル"));
+    expect(at("h2:ここまでのおさらい")).toBeGreaterThan(at("h2:比べる"));
+    expect(at("nav:前後の中分類")).toBeGreaterThan(at("h2:ここまでのおさらい"));
+    const pager = screen.getByRole("navigation", { name: "前後の中分類" });
+    expect(within(pager).getByRole("link").getAttribute("href")).toBe("/exams/TEST/notebook/domain1-2");
+    // 最後の節には「次の節へ」がない。前の節へは戻れる
+    expect(screen.queryByRole("link", { name: /次の節へ/ })).toBeNull();
+    expect(screen.getByRole("link", { name: /前の節/ }).getAttribute("href")).toBe(
+      "/exams/TEST/notebook/domain1-1/external-table",
+    );
+  });
+
+  it("次の節へ_確認に正解するまで出さず_すでに完了している節では最初から出す", async () => {
+    await renderSection("domain1-1", "external-table", false);
+    expect(screen.queryByRole("link", { name: /次の節へ/ })).toBeNull();
+    document.body.innerHTML = "";
+    client.fetchNotebook.mockResolvedValue(done(["external-table"]));
+    await renderSection("domain1-1", "external-table", false);
+    expect(screen.getByRole("link", { name: /次の節へ/ }).getAttribute("href")).toBe(
+      "/exams/TEST/notebook/domain1-1/managed-table",
+    );
+  });
+
+  it("おさらい_中分類の節がすべて完了するまで出さず_完了したら画面に出す見出しの確認の問いだけを集める", async () => {
+    await renderSection("domain1-1", "managed-table", false);
+    expect(screen.queryByRole("region", { name: "ここまでのおさらい" })).toBeNull();
+    document.body.innerHTML = "";
+    client.fetchNotebook.mockResolvedValue(done(["external-table", "managed-table"]));
+    await renderSection("domain1-1", "managed-table", false);
     const review = screen.getByRole("region", { name: "ここまでのおさらい" });
     expect(within(review).getAllByRole("group")).toHaveLength(2);
     expect(review.textContent).not.toContain("書きかけの用語");
   });
 
-  it("おさらい_見出しのない中分類_出さない", () => {
-    renderUnit("domain1-2", false);
+  it("見出しのない中分類_まだ見出しがありませんを出し_おさらいは出さず_前後の中分類へ移れる", async () => {
+    await renderSection("domain1-2", null, false);
+    expect(screen.getByRole("heading", { name: "まだ見出しがありません" })).toBeTruthy();
     expect(screen.queryByRole("region", { name: "ここまでのおさらい" })).toBeNull();
+    const links = within(screen.getByRole("navigation", { name: "前後の中分類" })).getAllByRole("link");
+    expect(links.map((a) => a.getAttribute("href"))).toEqual([
+      "/exams/TEST/notebook/domain1-1",
+      "/exams/TEST/notebook/domain2-1",
+    ]);
   });
 
-  it("見出し_一言の要点にマーカー_ここを押さえるの囲み_確認は 2 択の問いで回答の前は理由を出さない", () => {
-    const { container } = renderUnit("domain1-1", false);
+  it("見出し_一言の要点にマーカー_ここを押さえるの囲み_確認は 2 択の問いで回答の前は理由を出さない", async () => {
+    const { container } = await renderSection("domain1-1", "external-table", false);
     const section = container.querySelector("#external-table");
     expect(section?.querySelector("mark")?.textContent).toBe("DROP してもファイルは残る");
     expect(section?.querySelector("mark")?.getAttribute("class")).toContain("motion-marker");
@@ -134,27 +208,39 @@ describe("NotebookUnitView", () => {
     expect(within(check).getByRole("button", { name: "回答する" }).hasAttribute("disabled")).toBe(true);
     expect(check.textContent).not.toContain("持ち主がストレージだから。");
     expect(section?.textContent).toContain("✓ 検証済み");
-    expect(
-      within(section as HTMLElement)
-        .getByRole("link", { name: "マネージドテーブル" })
-        .getAttribute("href"),
-    ).toBe("#managed-table");
   });
 
-  it("利用者の画面_未検証の見出しを出さない", () => {
-    renderUnit("domain1-1", false);
+  it("関連する見出し_節のページへのリンクにする", async () => {
+    await renderSection("domain1-1", "external-table", false);
+    expect(screen.getByRole("link", { name: "マネージドテーブル" }).getAttribute("href")).toBe(
+      "/exams/TEST/notebook/domain1-1/managed-table",
+    );
+  });
+
+  it("完了した節_パンくずの下の行に完了を出し_履修済みの中分類は日付つきの履修済みも出す", async () => {
+    client.fetchNotebook.mockResolvedValue(done(["external-table", "managed-table"]));
+    await renderSection("domain1-1", "external-table", false);
+    const labels = [...document.querySelectorAll("article > div:first-child .chip")].map((el) => el.textContent);
+    expect(labels).toEqual(["✓ 完了", "✓ 履修済み(2026/10/12)"]);
+  });
+
+  it("利用者の画面_未検証の見出しを出さない", async () => {
+    await renderSection("domain1-1", "managed-table", false);
     expect(screen.queryByText("書きかけの用語")).toBeNull();
     expect(screen.queryByText(/未検証/)).toBeNull();
   });
 
-  it("管理者のプレビュー_未検証の見出しも出し_未検証と示す", () => {
-    renderUnit("domain1-1", true);
+  it("管理者のプレビュー_未検証の見出しも出し_未検証と示し_完了を読まない", async () => {
+    await renderSection("domain1-1", "draft-term", true);
     expect(screen.getByRole("heading", { name: "書きかけの用語" })).toBeTruthy();
     expect(screen.getByText("! 未検証")).toBeTruthy();
     expect(screen.getByText(/管理者のプレビューです/)).toBeTruthy();
+    expect(client.fetchNotebook).not.toHaveBeenCalled();
+    // 最後の節なので、完了を読まなくても、比較の表とおさらいが出る
+    expect(screen.getByRole("region", { name: "ここまでのおさらい" })).toBeTruthy();
   });
 
-  it("見出しの図_一言の直後_解説の前に描き_図の ID は見出しごとに一意", () => {
+  it("見出しの図_一言の直後_解説の前に描き_図の ID は見出しごとに一意", async () => {
     const withDiagram = [
       entry({
         diagram: {
@@ -168,18 +254,7 @@ describe("NotebookUnitView", () => {
       }),
       entry({ id: "managed-table", order: 2, term: "マネージドテーブル", related: undefined }),
     ];
-    const unit = units[0];
-    if (!unit) throw new Error("中分類がありません");
-    const { container } = render(
-      <NotebookUnitView
-        exam={exam}
-        units={units}
-        unit={unit}
-        entries={withDiagram}
-        basePath="/exams/TEST/notebook"
-        preview={false}
-      />,
-    );
+    const { container } = await renderSection("domain1-1", "external-table", false, withDiagram);
     const section = container.querySelector("#external-table") as HTMLElement;
     const figure = section.querySelector("figure");
     // 狭い画面で積む形と、左右に並べる形の 2 つを描き、CSS で片方だけを出す
@@ -187,19 +262,17 @@ describe("NotebookUnitView", () => {
     const position = (el: Element | null | undefined) => (el ? [...section.querySelectorAll("*")].indexOf(el) : -1);
     expect(position(figure)).toBeGreaterThan(position(section.querySelector("mark")));
     expect(position(figure)).toBeLessThan(position(within(section).getByText("解説")));
-    // 図は必須: どの見出しにも 1 つある
-    expect(container.querySelectorAll("#managed-table figure")).toHaveLength(1);
     const ids = [...container.querySelectorAll("svg title")].map((t) => t.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
 
-  it("管理者のプレビュー_中分類の導入・図・表の検証の状態を示す", () => {
-    renderUnit("domain1-1", true);
+  it("管理者のプレビュー_中分類の最初の節に導入・図・表の検証の状態を示す", async () => {
+    await renderSection("domain1-1", "external-table", true);
     expect(screen.getByText(/中分類の導入・図・表/).textContent).toContain("✓ 検証済み");
   });
 
-  it("比較の表_列の見出しと値を並べ_要注意の行に文字のラベルを添える", () => {
-    renderUnit("domain1-1", false);
+  it("比較の表_最後の節に列の見出しと値を並べ_要注意の行に文字のラベルを添える", async () => {
+    await renderSection("domain1-1", "managed-table", false);
     const table = screen.getByRole("table");
     expect(
       within(table)
@@ -208,16 +281,6 @@ describe("NotebookUnitView", () => {
     ).toEqual(["観点", "管理", "外部"]);
     expect(within(table).getByRole("rowheader", { name: /DROP/ }).textContent).toContain("要注意");
     expect(table.getAttribute("class")).toContain("table-fixed");
-  });
-
-  it("空の中分類_まだ見出しがありませんを出し_前後の中分類へ移れる", () => {
-    renderUnit("domain1-2", false);
-    expect(screen.getByRole("heading", { name: "まだ見出しがありません" })).toBeTruthy();
-    const links = within(screen.getByRole("navigation", { name: "前後の中分類" })).getAllByRole("link");
-    expect(links.map((a) => a.getAttribute("href"))).toEqual([
-      "/exams/TEST/notebook/domain1-1",
-      "/exams/TEST/notebook/domain2-1",
-    ]);
   });
 });
 

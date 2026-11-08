@@ -17,8 +17,9 @@ const DOMAIN_CODE = /^domain\d{1,2}$/;
 /** 中分類の ID: `<分野のコード>-<分野の中の番号>`。URL の一部(`/exams/<資格コード>/notebook/<ID>`)になる */
 export const NOTEBOOK_UNIT_ID = /^domain\d{1,2}-\d{1,2}$/;
 const UNIT_ID = NOTEBOOK_UNIT_ID;
-/** 見出しの ID: 英小文字・数字・ハイフンで、英字から始める。ページの中の位置(`#<ID>`)になる */
-const ENTRY_ID = /^[a-z][a-z0-9-]{0,63}$/;
+/** 見出しの ID: 英小文字・数字・ハイフンで、英字から始める。節の URL の一部と、節の完了の記録のキーになる */
+export const NOTEBOOK_ENTRY_ID = /^[a-z][a-z0-9-]{0,63}$/;
+const ENTRY_ID = NOTEBOOK_ENTRY_ID;
 const ENTRY_ID_MESSAGE = "ID は英小文字・数字・ハイフンで、英字から始めます";
 
 /**
@@ -83,7 +84,7 @@ export const NotebookCheckChoiceSchema = z.strictObject({
 
 /**
  * 確認の問い: 2 択(A・B)の問いと、選択肢ごとの理由と、正解のキー。
- * 個々の問いの結果は保存しない(中分類の末尾のおさらいで全問正解したときだけ、中分類の履修済みを記録する)。
+ * 個々の問いの結果は保存しない(節のすべての確認の問いに正解したときだけ、節の完了を記録する。中分類の履修済みは、節の完了から求める)。
  */
 export const NotebookCheckSchema = z
   .strictObject({

@@ -5,7 +5,7 @@ import { MAX_PREFS_BODY_BYTES, PrefsSchema } from "@/lib/prefs.ts";
 import { prefsSetCookie } from "@/lib/prefs-cookie.ts";
 import { type GradableQuestion, isQuestionCorrect } from "@/lib/quiz.ts";
 import type { Result } from "@/lib/storage.ts";
-import { examNotebookUnits } from "./notebook-units.ts";
+import { examNotebookEntries } from "./notebook-units.ts";
 import { examQuestions } from "./questions.ts";
 import {
   type DayTally,
@@ -26,7 +26,7 @@ import {
   MAX_NOTEBOOK_BODY_BYTES,
   MAX_REVIEW_BODY_BYTES,
   MAX_SECTIONS_BODY_BYTES,
-  NotebookCompletionChangeSchema,
+  NotebookEntryChangeSchema,
   ResultQuerySchema,
   ResultsQuerySchema,
   ReviewRemovalSchema,
@@ -36,8 +36,8 @@ import {
 /** 採点に使う、問題の正解と採点基準。公開中の資格でなければ null。 */
 export type QuestionSource = (examCode: string) => Promise<readonly GradableQuestion[] | null>;
 
-/** 体系ノートで履修済みにできる中分類(利用者の画面に出す見出しのある中分類)の ID。ノートのない資格は null。 */
-export type NotebookUnitSource = (examCode: string) => Promise<ReadonlySet<string> | null>;
+/** 資格の、完了にできる節(見出しの ID から、属する中分類の ID)。ノートのない資格は null。 */
+export type NotebookEntrySource = (examCode: string) => Promise<ReadonlyMap<string, string> | null>;
 
 export type HistoryDeps = {
   auth: GuardDeps;
@@ -46,7 +46,7 @@ export type HistoryDeps = {
   /** 既定は data/ の問題データ */
   questions?: QuestionSource;
   /** 既定は data/ の体系ノート */
-  notebookUnits?: NotebookUnitSource;
+  notebookEntries?: NotebookEntrySource;
 };
 
 /**
@@ -337,31 +337,29 @@ export async function handlePutPrefs(request: Request, deps: HistoryDeps): Promi
   }
 }
 
-/** 自分の、体系ノートの履修済みの中分類と、最初に履修した時刻を返す。 */
+/** 自分の、体系ノートの完了した節と、旧い中分類の履修済みの記録を、最初の時刻とともに返す。 */
 export function handleGetNotebook(request: Request, deps: HistoryDeps): Promise<Response> {
-  return listByExam(request, deps, async (sub, examCode) => ({
-    units: await deps.repository.listNotebookUnits(sub, examCode),
-  }));
+  return listByExam(request, deps, (sub, examCode) => deps.repository.listNotebook(sub, examCode));
 }
 
 /**
- * 体系ノートの中分類を、履修済みとして記録する。資格にノートがないか、中分類が、利用者の画面に出す見出しのある中分類でなければ 400。
- * 時刻はサーバーで付ける。すでに記録があれば、最初の時刻を残す。
+ * 体系ノートの節を、完了として記録する。資格にノートがないか、見出しが、利用者の画面に出す見出し(検証済み)でないか、
+ * その中分類に属さなければ 400。時刻はサーバーで付ける。すでに記録があれば、最初の時刻を残す。
  */
 export async function handlePutNotebook(request: Request, deps: HistoryDeps): Promise<Response> {
   const accepted = await acceptBody(request, deps, {
     access: "user",
     maxBytes: MAX_NOTEBOOK_BODY_BYTES,
-    body: NotebookCompletionChangeSchema,
+    body: NotebookEntryChangeSchema,
   });
   if (accepted instanceof Response) return accepted;
   const { auth, body: change } = accepted;
 
   try {
-    const units = await (deps.notebookUnits ?? examNotebookUnits)(change.examCode);
-    if (!units?.has(change.unit)) return fail("bad-request", 400, auth.setCookies);
+    const entries = await (deps.notebookEntries ?? examNotebookEntries)(change.examCode);
+    if (entries?.get(change.entry) !== change.unit) return fail("bad-request", 400, auth.setCookies);
     const at = new Date((deps.now ?? Date.now)()).toISOString();
-    await deps.repository.completeNotebookUnit(auth.user.sub, change.examCode, change.unit, at);
+    await deps.repository.completeNotebookEntry(auth.user.sub, change.examCode, change.unit, change.entry, at);
     return json({ status: "saved" }, 200, auth.setCookies);
   } catch (error) {
     return unavailable(request, error);
