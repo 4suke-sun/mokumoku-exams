@@ -1,7 +1,7 @@
 import { EXAM_LEVELS } from "@mokumoku-exams/data-schema/exam-data/schema";
 import type { Exam } from "./types.ts";
 
-// 資格の一覧の整理: ベンダーごとに分け、その中をレベルの順に並べる。画面から切り離した純粋な関数にして、単体テストする。
+// 資格の一覧の整理: ベンダーごとに分け、その中を公開中・近日公開の順に、それぞれをレベルの順に並べる。画面から切り離した純粋な関数にして、単体テストする。
 
 export type ExamLevel = (typeof EXAM_LEVELS)[number];
 
@@ -18,9 +18,15 @@ export function levelRank(level: ExamLevel | undefined): number {
   return index < 0 ? EXAM_LEVELS.length : index;
 }
 
+/** 公開の状態の順位(小さいほど上)。公開中を先に、近日公開をあとに置く */
+function statusRank(exam: Pick<Exam, "status">): number {
+  return exam.status === "published" ? 0 : 1;
+}
+
 /**
  * 資格を、ベンダーごとに分ける。ベンダーは、資格マスタに現れた順。
- * ベンダーの中は、レベルの順(同じレベルや、レベルを持たない資格は、資格マスタの並びのまま)。
+ * ベンダーの中は、公開中を先に、近日公開をあとに置き、それぞれをレベルの順にする
+ * (同じレベルや、レベルを持たない資格は、資格マスタの並びのまま)。
  */
 export function groupByVendor(exams: readonly Exam[], colorCount = 6): VendorGroup[] {
   const groups: VendorGroup[] = [];
@@ -34,7 +40,9 @@ export function groupByVendor(exams: readonly Exam[], colorCount = 6): VendorGro
   }
   for (const group of groups) {
     // Array.prototype.sort は安定なので、同じ順位は元の並びを保つ
-    group.exams = [...group.exams].sort((a, b) => levelRank(a.level) - levelRank(b.level));
+    group.exams = [...group.exams].sort(
+      (a, b) => statusRank(a) - statusRank(b) || levelRank(a.level) - levelRank(b.level),
+    );
   }
   return groups;
 }

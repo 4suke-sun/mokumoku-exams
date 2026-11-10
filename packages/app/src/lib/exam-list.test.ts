@@ -34,12 +34,15 @@ describe("groupByVendor", () => {
     expect(groups[0]?.exams.map((e) => e.examCode)).toEqual(["F1", "F2", "P1", "S1", "N1", "N2"]);
   });
 
-  it("近日公開の資格_公開中と同じ規則で並べる(レベルを持てる)", () => {
+  it("近日公開の資格_公開中のすべてのあとに_レベルの順で並べる", () => {
     const groups = groupByVendor([
-      exam("L1", "AWS", { status: "coming-soon", level: "Associate" }),
-      exam("F1", "AWS", { level: "Foundational" }),
+      exam("CF", "AWS", { status: "coming-soon", level: "Foundational" }),
+      exam("PA", "AWS", { level: "Associate" }),
+      exam("CP", "AWS", { status: "coming-soon", level: "Professional" }),
+      exam("PN", "AWS"),
+      exam("CA", "AWS", { status: "coming-soon", level: "Associate" }),
     ]);
-    expect(groups[0]?.exams.map((e) => e.examCode)).toEqual(["F1", "L1"]);
+    expect(groups[0]?.exams.map((e) => e.examCode)).toEqual(["PA", "PN", "CF", "CA", "CP"]);
   });
 
   it("ベンダーの色の番号_現れた順に振り_色の数で繰り返す", () => {
