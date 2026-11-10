@@ -342,6 +342,7 @@ describe("手順の図", () => {
     const doneClass = container.querySelector('li[data-phase="done"]')?.getAttribute("class") ?? "";
     expect(doneClass).not.toContain("opacity");
     expect(doneClass).not.toContain("border-dashed");
+    expect(doneClass).toContain("border-line");
     expect(container.querySelector('li[data-phase="done"]')?.textContent).toContain("済み");
   });
 

@@ -387,7 +387,7 @@ function LiveText({ children }: { children: string }) {
   );
 }
 
-/** 手順の図: 「次へ」「前へ」「最初から」で 1 段ずつ点灯する。点灯した段に説明が出て、前の段は薄くなる。 */
+/** 手順の図: 「次へ」「前へ」「最初から」で 1 段ずつ点灯する。点灯した段に説明が出て、前の段は実線の枠の「済み」になる。 */
 function StepperView({ diagram, id }: { diagram: StepperDiagram; id: string }) {
   const [current, setCurrent] = useState(0);
   const last = diagram.steps.length - 1;
