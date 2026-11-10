@@ -527,4 +527,465 @@ describe("分野と図の種類", () => {
       "curriculum.ex-smp-xx.json: units[0].sections[0].diagram.root.note: 本文に URL が含まれています",
     ]);
   });
+
+  const stepper = (over: Record<string, unknown> = {}) => ({
+    type: "stepper",
+    title: "手順",
+    steps: [
+      { id: "one", label: "最初", note: "はじめに行う" },
+      { id: "two", label: "次" },
+    ],
+    ...over,
+  });
+  const toggle = (over: Record<string, unknown> = {}) => ({
+    type: "toggle",
+    title: "切り替え",
+    states: [
+      { id: "before", label: "操作の前" },
+      { id: "after", label: "操作の後" },
+    ],
+    items: [
+      { id: "a", label: "項目 A", note: "説明", result: { before: "kept", after: "removed" } },
+      { id: "b", label: "項目 B", result: { before: "kept", after: "kept" } },
+    ],
+    ...over,
+  });
+  const decision = (over: Record<string, unknown> = {}) => ({
+    type: "decision",
+    title: "判断",
+    nodes: [
+      {
+        id: "q1",
+        question: "どちらですか",
+        choices: [
+          { label: "はい", to: "yes" },
+          { label: "いいえ", to: "q2" },
+        ],
+      },
+      { id: "yes", result: "結論 A", note: "理由" },
+      {
+        id: "q2",
+        question: "さらに",
+        choices: [
+          { label: "はい", to: "yes" },
+          { label: "いいえ", to: "no" },
+        ],
+      },
+      { id: "no", result: "結論 B" },
+    ],
+    ...over,
+  });
+
+  it("手順・切り替え・判断の図_指摘なし", () => {
+    expect(validateCurriculumData(diagramFile(stepper()), context)).toEqual([]);
+    expect(validateCurriculumData(diagramFile(toggle()), context)).toEqual([]);
+    expect(validateCurriculumData(diagramFile(decision()), context)).toEqual([]);
+  });
+
+  it("手順の図の段が 1 つ・9 つ_指摘する_2 つと 8 つは通る", () => {
+    const steps = (n: number) => Array.from({ length: n }, (_, i) => ({ id: `s${i}`, label: `段${i}` }));
+    expect(validateCurriculumData(diagramFile(stepper({ steps: steps(1) })), context)).toHaveLength(1);
+    expect(validateCurriculumData(diagramFile(stepper({ steps: steps(2) })), context)).toEqual([]);
+    expect(validateCurriculumData(diagramFile(stepper({ steps: steps(8) })), context)).toEqual([]);
+    expect(validateCurriculumData(diagramFile(stepper({ steps: steps(9) })), context)).toHaveLength(1);
+  });
+
+  it("手順の段の説明と見出しの文字数_上限ちょうどは通り_超えると指摘する", () => {
+    const steps = (note: string, label: string) => [
+      { id: "a", label, note },
+      { id: "b", label: "次" },
+    ];
+    expect(
+      validateCurriculumData(diagramFile(stepper({ steps: steps("あ".repeat(80), "あ".repeat(20)) })), context),
+    ).toEqual([]);
+    expect(validateCurriculumData(diagramFile(stepper({ steps: steps("あ".repeat(81), "段") })), context)).toHaveLength(
+      1,
+    );
+    expect(
+      validateCurriculumData(diagramFile(stepper({ steps: steps("説明", "あ".repeat(21)) })), context),
+    ).toHaveLength(1);
+  });
+
+  it("手順の ID が重複・形式が違う_指摘する", () => {
+    const dup = [
+      { id: "a", label: "一" },
+      { id: "a", label: "二" },
+    ];
+    expect(validateCurriculumData(diagramFile(stepper({ steps: dup })), context)).toEqual([
+      `${where}.steps[1].id: 手順の ID が重複しています`,
+    ]);
+    const bad = [
+      { id: "A", label: "一" },
+      { id: "b", label: "二" },
+    ];
+    expect(validateCurriculumData(diagramFile(stepper({ steps: bad })), context)).toEqual([
+      `${where}.steps[0].id: 形式が違います`,
+    ]);
+  });
+
+  it("切り替えの図の項目が 0 件・9 件_指摘する_8 件は通る", () => {
+    const items = (n: number) =>
+      Array.from({ length: n }, (_, i) => ({
+        id: `i${i}`,
+        label: `項目${i}`,
+        result: { before: "kept", after: "removed" },
+      }));
+    expect(validateCurriculumData(diagramFile(toggle({ items: items(0) })), context)).toHaveLength(1);
+    expect(validateCurriculumData(diagramFile(toggle({ items: items(8) })), context)).toEqual([]);
+    expect(validateCurriculumData(diagramFile(toggle({ items: items(9) })), context)).toHaveLength(1);
+  });
+
+  it("切り替えの図の状態が 1 つ・3 つ_指摘する", () => {
+    const state = (id: string) => ({ id, label: id });
+    expect(validateCurriculumData(diagramFile(toggle({ states: [state("before")] })), context).length).toBeGreaterThan(
+      0,
+    );
+    expect(
+      validateCurriculumData(
+        diagramFile(toggle({ states: [state("before"), state("after"), state("third")] })),
+        context,
+      ).length,
+    ).toBeGreaterThan(0);
+  });
+
+  it("切り替えの図の結果が、図にない状態・状態の不足・知らない値_指摘する", () => {
+    const withResult = (result: unknown) => toggle({ items: [{ id: "a", label: "項目", result }] });
+    expect(
+      validateCurriculumData(diagramFile(withResult({ before: "kept", after: "kept", other: "removed" })), context),
+    ).toEqual([`${where}.items[0].result: 図にない状態を指しています`]);
+    expect(validateCurriculumData(diagramFile(withResult({ before: "kept" })), context)).toEqual([
+      `${where}.items[0].result: 状態ごとの結果がそろっていません`,
+    ]);
+    expect(
+      validateCurriculumData(diagramFile(withResult({ before: "kept", after: "gone" })), context).length,
+    ).toBeGreaterThan(0);
+  });
+
+  it("切り替えの図の状態と項目の ID が重複_指摘する", () => {
+    const states = [
+      { id: "same", label: "一" },
+      { id: "same", label: "二" },
+    ];
+    const items = [
+      { id: "a", label: "項目", result: { same: "kept" } },
+      { id: "a", label: "項目", result: { same: "kept" } },
+    ];
+    expect(validateCurriculumData(diagramFile(toggle({ states, items })), context)).toEqual([
+      `${where}.states[1].id: 状態の ID が重複しています`,
+      `${where}.items[1].id: 項目の ID が重複しています`,
+    ]);
+  });
+
+  it("判断の図の選択肢が 1 つ・5 つ_指摘する", () => {
+    const nodes = (n: number) => [
+      { id: "q", question: "質問", choices: Array.from({ length: n }, (_, i) => ({ label: `選${i}`, to: "r" })) },
+      { id: "r", result: "結論" },
+    ];
+    expect(validateCurriculumData(diagramFile(decision({ nodes: nodes(1) })), context)).toHaveLength(1);
+    expect(validateCurriculumData(diagramFile(decision({ nodes: nodes(2) })), context)).toEqual([]);
+    expect(validateCurriculumData(diagramFile(decision({ nodes: nodes(4) })), context)).toEqual([]);
+    expect(validateCurriculumData(diagramFile(decision({ nodes: nodes(5) })), context)).toHaveLength(1);
+  });
+
+  it("判断の図の節が 13 個_指摘する", () => {
+    const chain = Array.from({ length: 13 }, (_, i) =>
+      i < 12
+        ? {
+            id: `n${i}`,
+            question: "質問",
+            choices: [
+              { label: "進む", to: `n${i + 1}` },
+              { label: "戻る", to: `n${i + 1}` },
+            ],
+          }
+        : { id: "n12", result: "結論" },
+    );
+    expect(validateCurriculumData(diagramFile(decision({ nodes: chain })), context)).toHaveLength(1);
+    expect(validateCurriculumData(diagramFile(decision({ nodes: chain.slice(1) })), context)).toEqual([]);
+  });
+
+  it("判断の図の質問と結論の文字数_上限ちょうどは通り_超えると指摘する", () => {
+    const nodes = (question: string, result: string) => [
+      {
+        id: "q",
+        question,
+        choices: [
+          { label: "あ".repeat(20), to: "r" },
+          { label: "い", to: "r" },
+        ],
+      },
+      { id: "r", result },
+    ];
+    expect(
+      validateCurriculumData(diagramFile(decision({ nodes: nodes("あ".repeat(60), "い".repeat(60)) })), context),
+    ).toEqual([]);
+    expect(
+      validateCurriculumData(diagramFile(decision({ nodes: nodes("あ".repeat(61), "結論") })), context),
+    ).toHaveLength(1);
+    expect(
+      validateCurriculumData(diagramFile(decision({ nodes: nodes("質問", "い".repeat(61)) })), context),
+    ).toHaveLength(1);
+  });
+
+  it("判断の図の行き先が図にない・自分自身_指摘する", () => {
+    const missing = decision().nodes.map((n) =>
+      n.id === "q1"
+        ? {
+            ...n,
+            choices: [
+              { label: "はい", to: "none" },
+              { label: "いいえ", to: "q2" },
+            ],
+          }
+        : n,
+    );
+    expect(validateCurriculumData(diagramFile(decision({ nodes: missing })), context)).toEqual([
+      `${where}.nodes[0].choices[0].to: 図にない節を指しています`,
+    ]);
+    const self = decision().nodes.map((n) =>
+      n.id === "q2"
+        ? {
+            ...n,
+            choices: [
+              { label: "はい", to: "q2" },
+              { label: "いいえ", to: "no" },
+            ],
+          }
+        : n,
+    );
+    expect(validateCurriculumData(diagramFile(decision({ nodes: self })), context)).toEqual([
+      `${where}.nodes[2].choices[0]: 自分自身へは進めません`,
+    ]);
+  });
+
+  it("判断の図の節の ID が重複・結論がない_指摘する", () => {
+    const dup = [...decision().nodes, { id: "no", result: "重複" }];
+    expect(validateCurriculumData(diagramFile(decision({ nodes: dup })), context)).toEqual([
+      `${where}.nodes[4].id: 判断の節の ID が重複しています`,
+    ]);
+    const noResult = [
+      {
+        id: "q",
+        question: "質問",
+        choices: [
+          { label: "a", to: "p" },
+          { label: "b", to: "p" },
+        ],
+      },
+      {
+        id: "p",
+        question: "質問",
+        choices: [
+          { label: "a", to: "q" },
+          { label: "b", to: "q" },
+        ],
+      },
+    ];
+    expect(validateCurriculumData(diagramFile(decision({ nodes: noResult })), context)).toContain(
+      `${where}.nodes: 結論の節が 1 つもありません`,
+    );
+  });
+
+  it("判断の図に閉路・行き着けない節_指摘する", () => {
+    const cycle = [
+      {
+        id: "q",
+        question: "質問",
+        choices: [
+          { label: "a", to: "p" },
+          { label: "b", to: "r" },
+        ],
+      },
+      {
+        id: "p",
+        question: "質問",
+        choices: [
+          { label: "a", to: "q" },
+          { label: "b", to: "r" },
+        ],
+      },
+      { id: "r", result: "結論" },
+    ];
+    expect(validateCurriculumData(diagramFile(decision({ nodes: cycle })), context)).toEqual([
+      `${where}.nodes: 選択肢が一周して戻る形(閉路)になっています`,
+    ]);
+    const orphan = [...decision().nodes, { id: "lost", result: "孤立" }];
+    expect(validateCurriculumData(diagramFile(decision({ nodes: orphan })), context)).toEqual([
+      `${where}.nodes[4]: 先頭の節から行き着けない節があります`,
+    ]);
+  });
+
+  it("新しい 3 種類の図に未知の項目_指摘する", () => {
+    expect(validateCurriculumData(diagramFile(stepper({ extra: 1 })), context).length).toBeGreaterThan(0);
+    expect(validateCurriculumData(diagramFile(toggle({ extra: 1 })), context).length).toBeGreaterThan(0);
+    expect(validateCurriculumData(diagramFile(decision({ extra: 1 })), context).length).toBeGreaterThan(0);
+  });
+
+  const dataflow = (over: Record<string, unknown> = {}) => ({
+    type: "dataflow",
+    title: "取り込みの流れ",
+    nodes: [
+      { id: "src", label: "取り込み", note: "ファイルが届く" },
+      { id: "flt", label: "フィルター", filter: true },
+      { id: "out", label: "保存" },
+    ],
+    edges: [
+      { from: "src", to: "flt" },
+      { from: "flt", to: "out" },
+    ],
+    ...over,
+  });
+  const layers = (over: Record<string, unknown> = {}) => ({
+    type: "layers",
+    title: "層",
+    layers: [
+      { id: "base", label: "基盤", note: "いちばん下", items: ["保管", "計算"] },
+      { id: "top", label: "利用" },
+    ],
+    ...over,
+  });
+
+  it("データの流れ・層の図_指摘なし", () => {
+    expect(validateCurriculumData(diagramFile(dataflow()), context)).toEqual([]);
+    expect(validateCurriculumData(diagramFile(layers()), context)).toEqual([]);
+  });
+
+  it("データの流れの箱が 1 つ・9 つ_指摘する_2 つと 8 つは通る", () => {
+    const nodes = (n: number) => Array.from({ length: n }, (_, i) => ({ id: `n${i}`, label: `箱${i}` }));
+    const chain = (n: number) => Array.from({ length: n - 1 }, (_, i) => ({ from: `n${i}`, to: `n${i + 1}` }));
+    const run = (n: number) =>
+      validateCurriculumData(diagramFile(dataflow({ nodes: nodes(n), edges: chain(n) })), context);
+    expect(run(2)).toEqual([]);
+    expect(run(8)).toEqual([]);
+    expect(run(9)).toHaveLength(1);
+    expect(
+      validateCurriculumData(diagramFile(dataflow({ nodes: nodes(1), edges: [{ from: "n0", to: "n0" }] })), context)
+        .length,
+    ).toBeGreaterThan(0);
+  });
+
+  it("データの流れの矢印が 0 件・17 件_指摘する", () => {
+    expect(validateCurriculumData(diagramFile(dataflow({ edges: [] })), context)).toHaveLength(1);
+    const nodes = Array.from({ length: 8 }, (_, i) => ({ id: `n${i}`, label: `箱${i}` }));
+    const edges = nodes.flatMap((a, i) => nodes.slice(i + 1).map((b) => ({ from: a.id, to: b.id })));
+    expect(edges.length).toBeGreaterThan(16);
+    expect(validateCurriculumData(diagramFile(dataflow({ nodes, edges: edges.slice(0, 16) })), context)).toEqual([]);
+    expect(validateCurriculumData(diagramFile(dataflow({ nodes, edges: edges.slice(0, 17) })), context)).toHaveLength(
+      1,
+    );
+  });
+
+  it("データの流れの矢印が図にない箱・自分自身_指摘する", () => {
+    expect(validateCurriculumData(diagramFile(dataflow({ edges: [{ from: "src", to: "nothing" }] })), context)).toEqual(
+      [`${where}.edges[0].to: 図にない箱を指しています`],
+    );
+    expect(validateCurriculumData(diagramFile(dataflow({ edges: [{ from: "src", to: "src" }] })), context)).toEqual([
+      `${where}.edges[0]: 自分自身への矢印は置けません`,
+    ]);
+  });
+
+  it("データの流れの箱の ID と矢印が重複_指摘する", () => {
+    const nodes = [
+      { id: "a", label: "一" },
+      { id: "a", label: "二" },
+    ];
+    expect(
+      validateCurriculumData(diagramFile(dataflow({ nodes, edges: [{ from: "a", to: "a" }] })), context),
+    ).toContain(`${where}.nodes[1].id: 図の箱の ID が重複しています`);
+    const edges = [
+      { from: "src", to: "flt" },
+      { from: "src", to: "flt" },
+    ];
+    expect(validateCurriculumData(diagramFile(dataflow({ edges })), context)).toEqual([
+      `${where}.edges[1]: 同じ向きの矢印が重複しています`,
+    ]);
+  });
+
+  it("データの流れの矢印が閉路_指摘する", () => {
+    const edges = [
+      { from: "src", to: "flt" },
+      { from: "flt", to: "out" },
+      { from: "out", to: "src" },
+    ];
+    expect(validateCurriculumData(diagramFile(dataflow({ edges })), context)).toEqual([
+      `${where}.edges: 矢印が一周して戻る形(閉路)になっています`,
+    ]);
+  });
+
+  it("データの流れの箱の文字数と絞り込みの値_上限ちょうどは通り_超える・真偽値でないは指摘する", () => {
+    const node = (over: Record<string, unknown>) => [
+      { id: "a", label: "あ".repeat(20), note: "い".repeat(40), ...over },
+      { id: "b", label: "次" },
+    ];
+    const edges = [{ from: "a", to: "b" }];
+    expect(validateCurriculumData(diagramFile(dataflow({ nodes: node({}), edges })), context)).toEqual([]);
+    expect(
+      validateCurriculumData(diagramFile(dataflow({ nodes: node({ label: "あ".repeat(21) }), edges })), context),
+    ).toHaveLength(1);
+    expect(
+      validateCurriculumData(diagramFile(dataflow({ nodes: node({ note: "い".repeat(41) }), edges })), context),
+    ).toHaveLength(1);
+    expect(
+      validateCurriculumData(diagramFile(dataflow({ nodes: node({ filter: "yes" }), edges })), context).length,
+    ).toBeGreaterThan(0);
+  });
+
+  it("層の図の層が 1 つ・7 つ_指摘する_2 つと 6 つは通る", () => {
+    const list = (n: number) => Array.from({ length: n }, (_, i) => ({ id: `l${i}`, label: `層${i}` }));
+    expect(validateCurriculumData(diagramFile(layers({ layers: list(1) })), context)).toHaveLength(1);
+    expect(validateCurriculumData(diagramFile(layers({ layers: list(2) })), context)).toEqual([]);
+    expect(validateCurriculumData(diagramFile(layers({ layers: list(6) })), context)).toEqual([]);
+    expect(validateCurriculumData(diagramFile(layers({ layers: list(7) })), context)).toHaveLength(1);
+  });
+
+  it("層の図の中身の語句が 0 件・9 件_指摘する_8 件と省略は通る", () => {
+    const withItems = (items: unknown) =>
+      layers({
+        layers: [
+          { id: "a", label: "一", items },
+          { id: "b", label: "二" },
+        ],
+      });
+    const words = (n: number) => Array.from({ length: n }, (_, i) => `語${i}`);
+    expect(validateCurriculumData(diagramFile(withItems(words(8))), context)).toEqual([]);
+    expect(validateCurriculumData(diagramFile(withItems(undefined)), context)).toEqual([]);
+    expect(validateCurriculumData(diagramFile(withItems(words(0))), context)).toHaveLength(1);
+    expect(validateCurriculumData(diagramFile(withItems(words(9))), context)).toHaveLength(1);
+  });
+
+  it("層の図の文字数_上限ちょうどは通り_超えると指摘する", () => {
+    const layer = (over: Record<string, unknown>) =>
+      layers({
+        layers: [
+          { id: "a", label: "あ".repeat(20), note: "い".repeat(80), items: ["う".repeat(20)], ...over },
+          { id: "b", label: "二" },
+        ],
+      });
+    expect(validateCurriculumData(diagramFile(layer({})), context)).toEqual([]);
+    expect(validateCurriculumData(diagramFile(layer({ label: "あ".repeat(21) })), context)).toHaveLength(1);
+    expect(validateCurriculumData(diagramFile(layer({ note: "い".repeat(81) })), context)).toHaveLength(1);
+    expect(validateCurriculumData(diagramFile(layer({ items: ["う".repeat(21)] })), context)).toHaveLength(1);
+  });
+
+  it("層の図の ID が重複・形式が違う_指摘する", () => {
+    const dup = [
+      { id: "a", label: "一" },
+      { id: "a", label: "二" },
+    ];
+    expect(validateCurriculumData(diagramFile(layers({ layers: dup })), context)).toEqual([
+      `${where}.layers[1].id: 層の ID が重複しています`,
+    ]);
+    const bad = [
+      { id: "A", label: "一" },
+      { id: "b", label: "二" },
+    ];
+    expect(validateCurriculumData(diagramFile(layers({ layers: bad })), context)).toEqual([
+      `${where}.layers[0].id: 形式が違います`,
+    ]);
+  });
+
+  it("データの流れと層の図に未知の項目_指摘する", () => {
+    expect(validateCurriculumData(diagramFile(dataflow({ extra: 1 })), context).length).toBeGreaterThan(0);
+    expect(validateCurriculumData(diagramFile(layers({ extra: 1 })), context).length).toBeGreaterThan(0);
+  });
 });

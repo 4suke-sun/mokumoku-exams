@@ -64,6 +64,15 @@ const entry = (over: Partial<NotebookEntry>): NotebookEntry => ({
   term: "外部テーブル",
   oneLine: "外部の場所にデータを置くテーブル。DROP してもファイルは残る。",
   keyPhrase: "DROP してもファイルは残る",
+  diagram: {
+    type: "flow",
+    title: "図",
+    nodes: [
+      { id: "a", label: "入力" },
+      { id: "b", label: "出力" },
+    ],
+    edges: [{ from: "a", to: "b" }],
+  },
   body: "解説です。\n\n```\nDROP TABLE sales;\n```",
   examAngle: "ファイルが残る理由を、テーブルの種類と結びつけて覚える。",
   checks: [

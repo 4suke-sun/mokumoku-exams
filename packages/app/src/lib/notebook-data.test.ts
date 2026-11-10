@@ -31,6 +31,15 @@ const entry = (id: string, unitId: string, order: number, status: NotebookEntry[
   order,
   term: id,
   oneLine: "一言です。",
+  diagram: {
+    type: "flow",
+    title: "図",
+    nodes: [
+      { id: "a", label: "入力" },
+      { id: "b", label: "出力" },
+    ],
+    edges: [{ from: "a", to: "b" }],
+  },
   body: "解説です。",
   checks: [
     {
