@@ -338,7 +338,10 @@ describe("手順の図", () => {
     expect(phases(container)).toEqual(["done", "now", "next"]);
     expect(screen.getByText("次の説明")).toBeTruthy();
     expect(screen.queryByText("最初の説明")).toBeNull();
-    expect(container.querySelector('li[data-phase="done"]')?.getAttribute("class")).toContain("opacity-60");
+    // 済みの段は、薄くせず(コントラストの基準を保つ)、実線の枠で示す
+    const doneClass = container.querySelector('li[data-phase="done"]')?.getAttribute("class") ?? "";
+    expect(doneClass).not.toContain("opacity");
+    expect(doneClass).not.toContain("border-dashed");
     expect(container.querySelector('li[data-phase="done"]')?.textContent).toContain("済み");
   });
 

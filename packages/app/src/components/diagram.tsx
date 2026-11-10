@@ -407,7 +407,7 @@ function StepperView({ diagram, id }: { diagram: StepperDiagram; id: string }) {
                 phase === "now"
                   ? "border-2 border-primary bg-soft"
                   : phase === "done"
-                    ? "border-line bg-surface opacity-60"
+                    ? "border-line bg-surface"
                     : "border-dashed border-line bg-bg",
               ].join(" ")}
             >
@@ -605,7 +605,7 @@ function DecisionView({ diagram, id }: { diagram: DecisionDiagram; id: string })
                       "min-w-0 break-words rounded-md border px-2 py-0.5 text-sm",
                       i === pick
                         ? "border-2 border-primary font-bold text-primary"
-                        : "border-line text-muted opacity-60",
+                        : "border-dashed border-line text-muted",
                     ].join(" ")}
                   >
                     {i === pick ? "▶ 選んだ: " : ""}
