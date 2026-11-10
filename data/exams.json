@@ -53,6 +53,7 @@
       "totalScore": 1000,
       "officialQuestionCount": 85,
       "officialTimeMinutes": 170,
+      "beta": true,
       "domains": [
         {
           "code": "domain1",
@@ -187,6 +188,97 @@
         "guideUrl": "https://docs.aws.amazon.com/aws-certification/latest/developer-associate-02/developer-associate-02.html"
       },
       "idPrefix": "DVA"
+    },
+    {
+      "examCode": "AWS-AIF-C01",
+      "status": "coming-soon",
+      "vendor": "AWS",
+      "name": "AWS Certified AI Practitioner",
+      "shortName": "AI Practitioner",
+      "level": "Foundational",
+      "abbr": "AIF"
+    },
+    {
+      "examCode": "AWS-DVA-C03",
+      "status": "coming-soon",
+      "vendor": "AWS",
+      "name": "AWS Certified Developer - Associate",
+      "shortName": "Developer",
+      "level": "Associate",
+      "abbr": "DVA",
+      "note": "DVA-C02 の後継の版です。近日公開予定です。"
+    },
+    {
+      "examCode": "AWS-SAA-C03",
+      "status": "coming-soon",
+      "vendor": "AWS",
+      "name": "AWS Certified Solutions Architect - Associate",
+      "shortName": "Solutions Architect - Associate",
+      "level": "Associate",
+      "abbr": "SAA"
+    },
+    {
+      "examCode": "AWS-SOA-C03",
+      "status": "coming-soon",
+      "vendor": "AWS",
+      "name": "AWS Certified CloudOps Engineer - Associate",
+      "shortName": "CloudOps Engineer",
+      "level": "Associate",
+      "abbr": "SOA"
+    },
+    {
+      "examCode": "AWS-DEA-C01",
+      "status": "coming-soon",
+      "vendor": "AWS",
+      "name": "AWS Certified Data Engineer - Associate",
+      "shortName": "Data Engineer",
+      "level": "Associate",
+      "abbr": "DEA"
+    },
+    {
+      "examCode": "AWS-MLA-C02",
+      "status": "coming-soon",
+      "vendor": "AWS",
+      "name": "AWS Certified Machine Learning Engineer - Associate",
+      "shortName": "Machine Learning Engineer",
+      "level": "Associate",
+      "abbr": "MLA"
+    },
+    {
+      "examCode": "AWS-SAP-C03",
+      "status": "coming-soon",
+      "vendor": "AWS",
+      "name": "AWS Certified Solutions Architect - Professional",
+      "shortName": "Solutions Architect - Professional",
+      "level": "Professional",
+      "abbr": "SAP"
+    },
+    {
+      "examCode": "AWS-DOP-C02",
+      "status": "coming-soon",
+      "vendor": "AWS",
+      "name": "AWS Certified DevOps Engineer - Professional",
+      "shortName": "DevOps Engineer",
+      "level": "Professional",
+      "abbr": "DOP"
+    },
+    {
+      "examCode": "AWS-AIP-C01",
+      "status": "coming-soon",
+      "vendor": "AWS",
+      "name": "AWS Certified Generative AI Developer - Professional",
+      "shortName": "Generative AI Developer",
+      "level": "Professional",
+      "abbr": "AIP"
+    },
+    {
+      "examCode": "AWS-SCS-C03",
+      "status": "coming-soon",
+      "vendor": "AWS",
+      "name": "AWS Certified Security - Specialty",
+      "shortName": "Security",
+      "level": "Specialty",
+      "abbr": "SCS"
     },
     {
       "examCode": "DBX-DEA-2605",

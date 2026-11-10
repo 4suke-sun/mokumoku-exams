@@ -1,6 +1,25 @@
 {
   "releases": [
     {
+      "version": "v0.79.0",
+      "date": "2026-11-10",
+      "title": "これから問題を用意する AWS の資格を、資格の一覧に「近日公開」として並べました",
+      "items": [
+        {
+          "type": "feat",
+          "text": "資格の一覧に、いま受験できる AWS の資格のうち、まだ問題のないもの(AI Practitioner、Solutions Architect - Associate、CloudOps Engineer、Data Engineer、Machine Learning Engineer、Solutions Architect - Professional、DevOps Engineer、Generative AI Developer、Security)と、Developer - Associate の新しい版(DVA-C03)を、「近日公開」として並べました。選んで出題することは、まだできません。"
+        },
+        {
+          "type": "feat",
+          "text": "資格の一覧で、ベンダーの中を、公開中の資格を先に、近日公開の資格をあとに並べるようにしました。それぞれの中は、これまでどおりレベルの順です。"
+        },
+        {
+          "type": "feat",
+          "text": "ベータ試験の期間中の資格(AI Business Strategist)は、資格の一覧のカードで、出題数・時間・合格点・満点のあとに「(ベータ)」と示すようにしました。これらの値は、ベータ試験のものです。"
+        }
+      ]
+    },
+    {
       "version": "v0.78.0",
       "date": "2026-11-08",
       "title": "体系ノートのすべての用語に図を入れ、操作で動く図を 5 種類足しました",

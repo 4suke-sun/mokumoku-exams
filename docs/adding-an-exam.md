@@ -45,7 +45,7 @@
    出典の URL は `references` に書き、本文には書きません。
 4. **公開にする**。資格マスタの 1 件を `status: "published"` にし、`edition`・`category`・`passingScore`・`totalScore`・
    `officialQuestionCount`・`officialTimeMinutes`・`domains`・`idPrefix` のうち、手順 1 でまだ持たせていないものを足します。公式の情報があれば、`level`・`abbr`・`info` も足します
-   (`info.guideUrl` のドメインも、手順 2 の許可の一覧に足します)。
+   (`info.guideUrl` のドメインも、手順 2 の許可の一覧に足します)。ベータ試験の期間中は、`beta: true` を足し、ベータが終わったら外します。
 5. **カリキュラムと体系ノートを書く**(任意)。`data/curriculum.<コード>.json` を、仕様の「11. カリキュラムのデータ」の形で作ります。
    体系ノートを置くときは、`data/notebook.<コード>.json` を、仕様の「14. 体系ノートのデータ」の形で作ります(本文は[体系ノートの文体の規則](./notebook-style.md)に従います)。
    コードドリルを置くときは、`data/code-drill.<コード>.json` を、仕様の「15. コードドリルのデータ」の形で作ります。

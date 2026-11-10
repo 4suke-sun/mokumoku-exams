@@ -42,7 +42,7 @@ export const DomainSchema = z.strictObject({
 });
 
 /**
- * 資格のレベル(段階)。一覧で、ベンダーの中をこの順に並べる(上が易しい)。
+ * 資格のレベル(段階)。一覧で、ベンダーの中の公開中・近日公開のそれぞれを、この順に並べる(上が易しい)。
  * `category`(区分)は、資格の領域を表す自由な文字列で、レベルとは別の項目。
  */
 export const EXAM_LEVELS = ["Foundational", "Associate", "Professional", "Expert", "Specialty"] as const;
@@ -139,6 +139,8 @@ export const PublishedExamSchema = z
     totalScore: z.number().positive(),
     officialQuestionCount: z.int().positive(),
     officialTimeMinutes: z.int().positive(),
+    /** ベータ試験の期間中の資格だけが持つ。本番の値(出題数・制限時間など)は、ベータ試験のもの */
+    beta: z.literal(true).optional(),
     domains: z.array(DomainSchema).min(1),
     info: ExamInfoSchema.optional(),
   })

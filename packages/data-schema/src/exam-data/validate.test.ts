@@ -335,6 +335,12 @@ describe("資格マスタのレベル・略称・資格の情報", () => {
     ).not.toEqual([]);
   });
 
+  it("ベータ_公開中は true だけを持て_近日公開は持てない", () => {
+    expect(errors([published({ beta: true })])).toEqual([]);
+    expect(errors([published({ beta: false })])).not.toEqual([]);
+    expect(errors([comingSoon({ beta: true })])).not.toEqual([]);
+  });
+
   it("近日公開の資格_情報(info)は持てない", () => {
     expect(errors([comingSoon({ info: info() })])).not.toEqual([]);
   });

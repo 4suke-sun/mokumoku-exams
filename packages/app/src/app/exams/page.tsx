@@ -66,7 +66,9 @@ export default async function ExamsPage({ searchParams }: { searchParams: Promis
     <section className="space-y-8">
       <div className="space-y-2">
         <h1 className="h1">資格を選ぶ</h1>
-        <p className="text-muted">学習する資格を選んでください。ベンダーごとに、レベルの順に並べています。</p>
+        <p className="text-muted">
+          学習する資格を選んでください。ベンダーごとに、公開中の資格を先に、それぞれレベルの順に並べています。
+        </p>
       </div>
 
       {all.length > 1 ? <VendorFilter vendors={all.map((g) => g.vendor)} current={current} /> : null}
@@ -93,7 +95,7 @@ export default async function ExamsPage({ searchParams }: { searchParams: Promis
                           </span>
                           <span className="mt-1 block text-sm text-muted">
                             {exam.officialQuestionCount} 問 / {exam.officialTimeMinutes} 分 / 合格 {exam.passingScore}{" "}
-                            点 (満点 {exam.totalScore} 点)
+                            点 (満点 {exam.totalScore} 点){exam.beta ? "(ベータ)" : null}
                           </span>
                         </Link>
                         {exam.level ? <span className="chip tone-primary">{exam.level}</span> : null}

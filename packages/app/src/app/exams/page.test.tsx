@@ -18,6 +18,7 @@ const exams = [
     totalScore: 1000,
     officialQuestionCount: 75,
     officialTimeMinutes: 180,
+    beta: true,
     domains: [{ code: "domain1", name: "分野 1", weight: 1 }],
   },
   {
@@ -104,6 +105,12 @@ describe("資格の一覧", () => {
     expect(screen.getByText("Foundational")).toBeTruthy();
     const tile = screen.getByText("FND");
     expect(tile.getAttribute("aria-hidden")).toBe("true");
+  });
+
+  it("ベータの資格_本番の値のあとに(ベータ)を添え_ほかの資格には出さない", async () => {
+    await renderPage();
+    expect(screen.getByRole("link", { name: /プロの資格/ }).textContent).toContain("(満点 1000 点)(ベータ)");
+    expect(screen.getByRole("link", { name: /基礎の資格/ }).textContent).not.toContain("ベータ");
   });
 
   it("公開中の資格_試験の情報と分野のメニューへ行ける", async () => {
