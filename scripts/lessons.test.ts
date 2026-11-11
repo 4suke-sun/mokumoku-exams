@@ -37,7 +37,7 @@ const add = (dir: string, key: string, what: string) =>
     "確かめる",
   );
 
-// 子プロセスと一時のリポジトリを多く作るので、負荷の高い環境でも既定の 30 秒を超えないよう、上限を広げる
+// 子プロセスと一時のリポジトリを多く作るので、負荷の高い環境でも、ルートの設定の上限(`SCRIPTS_TEST_TIMEOUT_MS`)を超えないよう、上限を広げる
 describe("lessons コマンド", { timeout: 120_000 }, () => {
   it("同じキーを 2 回足す_繰り返しに出て、下書きを作る", () => {
     const dir = makeRepo();
