@@ -12,7 +12,7 @@
     "destroy": "node ../../scripts/with-env.ts cdkd destroy"
   },
   "dependencies": {
-    "aws-cdk-lib": "2.274.0",
+    "aws-cdk-lib": "2.275.0",
     "constructs": "10.8.1"
   },
   "devDependencies": {
