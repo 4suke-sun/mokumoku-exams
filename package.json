@@ -22,6 +22,7 @@
     "lessons": "node scripts/lessons.ts",
     "mask": "node scripts/mask-output.ts",
     "metrics": "node scripts/metrics.ts",
+    "agent-cost": "node scripts/agent-cost.ts",
     "check:branch": "node scripts/check-branch.ts",
     "check:commit": "node scripts/check-commit-secrets.ts",
     "check:release-notes": "node scripts/check-release-notes.ts",
