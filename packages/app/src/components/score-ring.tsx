@@ -48,7 +48,10 @@ export function ScoreRing({ percent, reached }: Props) {
 
   return (
     <div className="shrink-0" role="img" aria-label={`正答率 ${percent}%`}>
-      <p aria-hidden="true" className={`simple-only text-4xl font-bold ${reached ? "text-correct" : "text-warn"}`}>
+      <p
+        aria-hidden="true"
+        className={`simple-only text-4xl font-bold tabular-nums ${reached ? "text-correct" : "text-warn"}`}
+      >
         {percent}%
       </p>
       <div data-ring="" className="rich-only relative size-36">
@@ -66,7 +69,10 @@ export function ScoreRing({ percent, reached }: Props) {
             className={reached ? "stroke-correct" : "stroke-warn"}
           />
         </svg>
-        <span aria-hidden="true" className="absolute inset-0 flex items-center justify-center text-3xl font-bold">
+        <span
+          aria-hidden="true"
+          className="absolute inset-0 flex items-center justify-center text-3xl font-bold tabular-nums"
+        >
           {shown}%
         </span>
       </div>

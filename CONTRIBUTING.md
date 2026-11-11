@@ -33,13 +33,14 @@ npm install   # 依存を入れ、検査フック(.githooks)を有効にしま�
 | `npm run check:test-titles` | テストの題(`it` / `test`)の形の検査。`-- --write` で、直した題を基準から消す |
 | `npm run check:docs` | 文書の相対リンクの先と、`npm run <名前>` のスクリプトが実在することの検査(対象: `README.md`、`CLAUDE.md`、`CONTRIBUTING.md`、`docs/`、`.claude/skills/`、`packages/*/README.md`) |
 | `npm run check:env` | アプリ(`packages/app`)が読む環境変数が、CDK(`packages/infra/lib/web-stack.ts`)から Lambda へ渡されることの検査。Lambda が自動で与える変数と開発用の変数は、`scripts/lib/env-contract-check.ts` の一覧で除く。通知の送信の Lambda と、動的な参照(`env[変数]` など)は対象にしない |
+| `npm run check:ui-patterns` | 画面の書き方の型の検査(アプリの画面の部品と CSS。`transition: all`、ホバーの拡大、無限に繰り返す動き、極太・斜体・英字の大文字と字間、全角の「！」、グラデーション、半端な余白、待機メッセージの文型、絵文字、1 辺だけの太い色線、丸い錠剤形、色の直書き、本文の行間など。決まりは `docs/app/design-tone.md` の「型を除く決まり」)。意図して残す箇所は、`scripts/lib/ui-patterns-check.ts` の許可の一覧に、理由つきで置く(件数が合わないと止める)。報告は場所と種類だけ |
 | `npm run check:pr-closes -- --pr <番号>` | PR の `Closes` の Issue が同じ版のマイルストーンで、リリースノートの最新の版がそのマイルストーンの名前(`vX.Y.Z`)と同じで、マイルストーンに `Closes` にない未完了の Issue がないことの検査(`gh` で読む)。`--body-file <下書き>` で、投稿の前に下書きを検査できる。CI の PR で実行する |
 
 ### 手元の検査(PR の前)
 
 PR を出す前に、`npm run verify` を通します。`verify` の各検査は、CI でもそれぞれ実行されます(`check:*` は CI の `check` ジョブのステップ(build のあとの `check:unpublished-bundle` だけは `app` ジョブのステップ)、ワークスペースごとのテストは `app`・`infra`・`pipeline` のジョブ(`data-schema` のテストは `check` ジョブ)、build は `app` のジョブ。`verify` 自体は CI で動きません)。
 
-- `verify` が順に実行するもの: `lint`、`typecheck`、`check:release-notes`・`check:lessons`・`check:test-titles`・`check:docs`・`check:env`・`check:boundary`・`check:retired-ids`(CI の `check` ジョブが実行するもの。フック用の `check:branch`・`check:commit` と、`check:pr-closes` は含まない)、`validate:data`、関係するテスト、関係するワークスペースの `build`、アプリを選んだときは、build のあとの `check:unpublished-bundle`(非公開の問題がビルド成果物に含まれないこと)。失敗した段階の名前を示して、終了コード 1 で止まります。段階ごとの時間も表示します。
+- `verify` が順に実行するもの: `lint`、`typecheck`、`check:release-notes`・`check:lessons`・`check:test-titles`・`check:docs`・`check:env`・`check:boundary`・`check:retired-ids`・`check:ui-patterns`(CI の `check` ジョブが実行するもの。フック用の `check:branch`・`check:commit` と、`check:pr-closes` は含まない)、`validate:data`、関係するテスト、関係するワークスペースの `build`、アプリを選んだときは、build のあとの `check:unpublished-bundle`(非公開の問題がビルド成果物に含まれないこと)。失敗した段階の名前を示して、終了コード 1 で止まります。段階ごとの時間も表示します。
 - 関係するワークスペース(app / infra / pipeline)は、`origin/main` との差分と、未コミット・未追跡の変更から選びます。`origin/main` がないなど、変更が分からないときは、すべて選びます。選び方は、CI の `changes` ジョブと同じです(指定の文字列が CI とずれないことは、テストが確かめます)。契約(`packages/data-schema`)、ルートの設定、`scripts/`、CI の定義が変わったときは、すべて選びます。`scripts/` のテストと `packages/data-schema` のテストは、常に実行します。
 - テストが途中で止まったとき(失敗や、時間の上限による中断)は、止まった 1 件だけを流し直して通っても、後ろのテストの結果は分かりません。ワークスペースごとにすべて流し直して、全件の結果を確かめてから push します。`npm run test:all` で、最初の失敗で止まらずに、すべての結果を 1 回で見られます。ただし、終わらない段階があると、`test:all` もそこで止まります(時間の上限は設けていません)。その段階は、「テストが止まる・遅いとき」の手順で原因を確かめます。
 - `verify` に含まないもの: `npm run test:e2e`(ブラウザを使う通し確認で重い。CI の `e2e` ジョブが通す。画面の動きを変えたときは、手元でも実行する)、`check:pr-closes`(PR の番号が要る。PR の前は `npm run check:pr-closes -- --body-file <下書き>` で下書きを検査する)。

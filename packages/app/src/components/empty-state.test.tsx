@@ -5,9 +5,9 @@ import { EmptyState } from "./empty-state.tsx";
 
 describe("EmptyState", () => {
   it("タイトルと説明を表示する", () => {
-    render(<EmptyState title="結果がありません" description="問題を解くと表示されます。" />);
+    render(<EmptyState title="結果がありません" description="問題を解いてください。" />);
     expect(screen.getByRole("heading", { name: "結果がありません" })).toBeTruthy();
-    expect(screen.getByText("問題を解くと表示されます。")).toBeTruthy();
+    expect(screen.getByText("問題を解いてください。")).toBeTruthy();
   });
 
   it("見出しの段階_既定は 2_画面の全体のときは 1", () => {
@@ -18,10 +18,11 @@ describe("EmptyState", () => {
     expect(screen.getByRole("heading", { level: 1, name: "t" })).toBeTruthy();
   });
 
-  it("アイコンは飾りとして読み上げない", () => {
-    const { container } = render(<EmptyState icon="📊" title="t" description="d" />);
-    const icon = container.querySelector('[aria-hidden="true"]');
-    expect(icon?.textContent).toBe("📊");
+  it("飾りのアイコン_置かない(絵文字も、常に動く飾りもない)", () => {
+    const { container } = render(<EmptyState title="t" description="d" />);
+    expect(container.querySelector('[aria-hidden="true"]')).toBeNull();
+    expect(container.querySelector(".motion-float")).toBeNull();
+    expect(container.textContent).toBe("td");
   });
 
   it("操作を渡すと_リンクとして表示する", () => {

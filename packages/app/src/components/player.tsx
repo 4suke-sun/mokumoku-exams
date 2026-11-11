@@ -177,7 +177,6 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
   if (state.status === "empty") {
     return (
       <EmptyState
-        icon="📝"
         headingLevel={1}
         title="出題する問題がありません"
         description="モードを選んで、出題を始めてください。"
@@ -338,7 +337,6 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
             </p>
             {remaining !== null ? (
               <p className={`timer-pill ${lowTime ? "timer-pill-low" : ""}`}>
-                <span aria-hidden="true">⏱</span>
                 本番モード / 残り <span className="tabular-nums">{formatRemaining(remaining)}</span>
                 {timeUp ? "(時間切れ)" : lowTime ? "(残りわずか)" : null}
               </p>
@@ -354,7 +352,7 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
             className="h-2 w-full overflow-hidden rounded-full bg-line"
           >
             <div
-              className="motion-bar bg-accent-gradient h-full rounded-full"
+              className="motion-bar h-full rounded-full bg-primary"
               style={{ width: `${((index + 1) / total) * 100}%` }}
             />
           </div>

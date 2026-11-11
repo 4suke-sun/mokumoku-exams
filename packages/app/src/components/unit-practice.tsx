@@ -233,7 +233,6 @@ export function UnitPractice({ exam, questions, next }: Props) {
           </p>
           {streak >= 2 ? (
             <p className="chip tone-correct" aria-live="polite">
-              <span aria-hidden="true">🔥</span>
               {streak} 連続正解
             </p>
           ) : null}
@@ -248,7 +247,7 @@ export function UnitPractice({ exam, questions, next }: Props) {
           className="h-2 w-full overflow-hidden rounded-full bg-line"
         >
           <div
-            className="motion-bar bg-accent-gradient h-full rounded-full"
+            className="motion-bar h-full rounded-full bg-primary"
             style={{ width: `${((index + 1) / questions.length) * 100}%` }}
           />
         </div>

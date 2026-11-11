@@ -6,7 +6,12 @@ import { THEME_COLORS } from "./pwa.ts";
 // globals.css の色の値(リッチ / シンプル × ライト / ダーク)から、配色の約束を確かめる(docs/app/design-tone.md の「色の変数」)。
 // - 文字に使う色は、背景と面の両方に対して 4.5:1 以上(WCAG AA)
 // - 正誤・注意・補助色の面は、本文の色と、同じ組の色の両方に対して 4.5:1 以上
-// - 面の上の文字(--on-primary)は、主要な色とグラデーションの両端に対して 4.5:1 以上
+// - 面の上の文字(--on-primary)は、主要な色に対して 4.5:1 以上
+// - 補助の文字(--muted)は、面(--soft と正誤・注意・補助色の面)の上でも 4.5:1 以上。選択肢の記号の塗り(--correct・--incorrect)の上の文字(--surface)も 4.5:1 以上
+// - 進み具合のバーの塗り(--primary)は、溝(--border)に対して 3:1 以上
+// - ダークの面は、背景より明るくなりすぎない(背景との比 1.5:1 以下)。面の上の本文は 10:1 以上(基準 4.5:1 より厳しく、面が本文に近づかないようにする)
+// - ロゴを載せる面(--plate)は、ロゴの紺の文字に対して 4.5:1 以上。ダークでは、本文の色より明るくしない
+// - グラデーションの変数(--accent-from・--accent-to)は持たない(強調は、--primary の単色で使う)
 // - ライトの背景はホワイト。カードは、影か縁で、背景と区別できる
 // - 端末の設定に従うブロックと、手動の選択のブロックで、値が食い違わない
 
@@ -94,6 +99,16 @@ const SURFACE_PAIRS: [string, string][] = [
   ["orange-soft", "orange"],
 ];
 
+/** ダークの面の明るさの基準(docs/app/design-tone.md の「ライト / ダーク」) */
+const DARK_FACE_MAX_RATIO_TO_BG = 1.5;
+const DARK_FACE_MIN_RATIO_TO_TEXT = 10;
+
+/** ダークで、背景より明るくなりすぎてはいけない面(広い面に使う色) */
+const DARK_FACES = ["surface", ...SURFACE_PAIRS.map(([surface]) => surface)];
+
+/** ロゴの画像(public/brand/logo-full.png)の、いちばん薄い文字の紺。画像から測った値 */
+const LOGO_INK = "#2f537a";
+
 /** ラベル(.chip)の色の段階 */
 const TONES = [
   "primary",
@@ -129,13 +144,36 @@ describe.each(MODES)("配色_%s", (_, vars) => {
     }
   });
 
-  it("面の上の文字_主要な色とグラデーションの両端に対して 4.5:1 以上", () => {
-    for (const name of ["primary", "accent-from", "accent-to"]) {
-      expect(
-        contrast(color(vars, "on-primary"), color(vars, name)),
-        `--on-primary と --${name}`,
-      ).toBeGreaterThanOrEqual(4.5);
+  it("補助の文字(--muted)_面(--soft と正誤・注意・補助色の面)の上でも 4.5:1 以上", () => {
+    for (const face of ["soft", ...SURFACE_PAIRS.map(([surface]) => surface)]) {
+      expect(contrast(color(vars, "muted"), color(vars, face)), `--muted と --${face}`).toBeGreaterThanOrEqual(4.5);
     }
+  });
+
+  it("選択肢の記号(正解・不正解の塗り)_面の色の文字が、塗りの色に対して 4.5:1 以上", () => {
+    for (const fill of ["correct", "incorrect"]) {
+      expect(contrast(color(vars, "surface"), color(vars, fill)), `--surface と --${fill}`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+
+  it("ボタンの文字_主要な色に対して 4.5:1 以上", () => {
+    expect(
+      contrast(color(vars, "on-primary"), color(vars, "primary")),
+      "--on-primary と --primary",
+    ).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("進み具合のバー_塗りの色(--primary)が、溝(--border)から 3:1 以上で見分けられる", () => {
+    expect(contrast(color(vars, "primary"), color(vars, "border")), "--primary と --border").toBeGreaterThanOrEqual(3);
+  });
+
+  it("ロゴを載せる面_ロゴの紺の文字に対して 4.5:1 以上", () => {
+    expect(contrast(color(vars, "plate"), LOGO_INK), "--plate とロゴの紺").toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("グラデーション_変数を持たない(強調は --primary の単色で使う)", () => {
+    expect(vars.has("accent-from")).toBe(false);
+    expect(vars.has("accent-to")).toBe(false);
   });
 
   it("面が背景から浮いて見える_正誤・注意・補助色の面は、背景と違う色", () => {
@@ -150,6 +188,37 @@ describe.each(MODES)("配色_%s", (_, vars) => {
       const face = mix(toneColor, 16, color(vars, "surface"));
       const text = mix(toneColor, 80, color(vars, "text"));
       expect(contrast(face, text), `.chip の ${tone}`).toBeGreaterThanOrEqual(4.5);
+    }
+  });
+});
+
+describe.each(MODES.filter(([name]) => name.includes("ダーク")))("ダークの面の明るさ_%s", (_, vars) => {
+  it("面_背景より明るくなりすぎない(背景との比が 1.5:1 以下)", () => {
+    for (const face of DARK_FACES) {
+      expect(contrast(color(vars, face), color(vars, "bg")), `--${face} と --bg`).toBeLessThanOrEqual(
+        DARK_FACE_MAX_RATIO_TO_BG,
+      );
+    }
+  });
+
+  it("面_本文(--text)を載せたとき 10:1 以上になる暗さ", () => {
+    for (const face of DARK_FACES) {
+      expect(contrast(color(vars, face), color(vars, "text")), `--${face} と --text`).toBeGreaterThanOrEqual(
+        DARK_FACE_MIN_RATIO_TO_TEXT,
+      );
+    }
+  });
+
+  it("ロゴを載せる面_本文の色より明るくしない(白に近い面をダークに置かない)", () => {
+    expect(luminance(color(vars, "plate"))).toBeLessThanOrEqual(luminance(color(vars, "text")));
+    expect(contrast(color(vars, "plate"), color(vars, "bg")), "--plate と --bg").toBeLessThan(
+      contrast("#ffffff", color(vars, "bg")),
+    );
+  });
+
+  it("強調の色_面には使わない(主要な操作の色は、広い面の色になっていない)", () => {
+    for (const face of DARK_FACES) {
+      expect(color(vars, face).toLowerCase(), `--${face}`).not.toBe(color(vars, "primary").toLowerCase());
     }
   });
 });
@@ -201,16 +270,7 @@ describe("端末の設定に従うブロックと手動の選択", () => {
   });
 
   it("4 通りすべてが_同じ役割の色の組を持つ", () => {
-    const roles = [
-      ...TEXT_COLORS,
-      "bg",
-      "surface",
-      "border",
-      "on-primary",
-      "accent-from",
-      "accent-to",
-      ...SURFACE_PAIRS.map(([s]) => s),
-    ];
+    const roles = [...TEXT_COLORS, "bg", "surface", "border", "on-primary", "plate", ...SURFACE_PAIRS.map(([s]) => s)];
     for (const [name, vars] of MODES) {
       for (const role of roles) expect(vars.has(role), `${name} の --${role}`).toBe(true);
     }

@@ -70,9 +70,8 @@ export function AchievementsView({ entries }: { entries: ExamEntry[] }) {
         <h2 className="h2">資格ごとの受験</h2>
         {attempted.length === 0 ? (
           <EmptyState
-            icon="📊"
-            title="まだ結果がありません"
-            description="問題を解くと、資格ごとの受験回数や最高点、合格予測がここに表示されます。"
+            title="受験した資格がありません"
+            description="資格を選んで、問題を解いてください。"
             action={{ label: "資格を選ぶ", href: "/exams" }}
           />
         ) : (
@@ -87,15 +86,15 @@ export function AchievementsView({ entries }: { entries: ExamEntry[] }) {
                     <dl className="grid grid-cols-3 gap-2 text-sm">
                       <div>
                         <dt className="text-muted">受験回数</dt>
-                        <dd className="text-lg font-bold">{summary.attempts} 回</dd>
+                        <dd className="text-lg font-bold tabular-nums">{summary.attempts} 回</dd>
                       </div>
                       <div>
                         <dt className="text-muted">最高点</dt>
-                        <dd className="text-lg font-bold">{best}%</dd>
+                        <dd className="text-lg font-bold tabular-nums">{best}%</dd>
                       </div>
                       <div>
                         <dt className="text-muted">直近の点</dt>
-                        <dd className="text-lg font-bold">{latest?.percent ?? 0}%</dd>
+                        <dd className="text-lg font-bold tabular-nums">{latest?.percent ?? 0}%</dd>
                       </div>
                     </dl>
                     {partial ? (

@@ -333,11 +333,7 @@ export function NotebookSectionView({
           </div>
         </NotebookSectionScope>
       ) : (
-        <EmptyState
-          icon="📝"
-          title="まだ見出しがありません"
-          description="この中分類の見出しは、これから書き足します。"
-        />
+        <EmptyState title="まだ見出しがありません" description="この中分類の見出しは、これから書き足します。" />
       )}
 
       {isLast && unit.comparison ? <ComparisonTable comparison={unit.comparison} /> : null}

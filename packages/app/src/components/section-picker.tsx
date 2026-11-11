@@ -20,7 +20,7 @@ type Props = {
 };
 
 const STATUS: Record<SectionStatus, { mark: string; label: string; className: string }> = {
-  perfect: { mark: "★", label: "満点", className: "chip tone-correct section-perfect" },
+  perfect: { mark: "★", label: "満点", className: "chip tone-correct" },
   passed: { mark: "✓", label: "合格", className: "chip tone-correct" },
   failed: { mark: "✗", label: "未達", className: "chip tone-incorrect" },
   untried: { mark: "-", label: "未挑戦", className: "chip tone-muted" },

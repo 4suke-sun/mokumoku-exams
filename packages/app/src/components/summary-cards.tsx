@@ -98,7 +98,7 @@ export function SummaryCards({ exam, cards }: Props) {
           className="h-2 w-full overflow-hidden rounded-full bg-line"
         >
           <div
-            className="motion-bar bg-accent-gradient h-full rounded-full"
+            className="motion-bar h-full rounded-full bg-primary"
             style={{ width: `${((index + 1) / cards.length) * 100}%` }}
           />
         </div>
@@ -111,9 +111,6 @@ export function SummaryCards({ exam, cards }: Props) {
         >
           <section aria-labelledby={`${answerId}-q`} className="card space-y-3 border-l-4 border-l-primary p-5">
             <h2 id={`${answerId}-q`} className="text-sm font-bold text-primary">
-              <span aria-hidden="true" className="mr-2">
-                ❓
-              </span>
               問い
             </h2>
             <p className="text-lg font-bold leading-relaxed">
@@ -129,9 +126,6 @@ export function SummaryCards({ exam, cards }: Props) {
             className={`card space-y-3 border-l-4 p-5 ${open ? "border-l-correct" : "border-l-line"}`}
           >
             <h2 id={`${answerId}-a`} className={`text-sm font-bold ${open ? "text-correct" : "text-muted"}`}>
-              <span aria-hidden="true" className="mr-2">
-                {open ? "✅" : "🔒"}
-              </span>
               答えと決め手
             </h2>
             <button
@@ -165,9 +159,7 @@ export function SummaryCards({ exam, cards }: Props) {
                     ))}
                   </ul>
                   <p className="rounded-md border-l-4 border-l-orange bg-orange-soft p-3">
-                    <span className="font-bold text-orange">
-                      <span aria-hidden="true">💡 </span>決め手:{" "}
-                    </span>
+                    <span className="font-bold text-orange">決め手: </span>
                     <InlineText text={card.point} />
                   </p>
                 </>

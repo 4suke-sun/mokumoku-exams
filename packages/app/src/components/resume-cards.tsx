@@ -42,8 +42,8 @@ export function ResumeCards({ exams }: Props) {
           const { answered, total } = sessionProgress(session);
           const percent = total === 0 ? 0 : Math.round((answered / total) * 100);
           return (
-            // グラデーションの面の上の文字と部品は、--on-primary の色にそろえる(面との比は、色の変数の規則で保つ)
-            <li key={exam.examCode} className="bg-accent-gradient space-y-3 rounded-lg p-4 shadow-card">
+            // 面は、ほかのカードと同じ単色の面にする。強調は、縁・進み具合のバー・ボタンの点だけで使う
+            <li key={exam.examCode} className="card space-y-3 border-primary p-4">
               <div className="space-y-1">
                 <p className="font-bold">{exam.name}</p>
                 <p className="text-sm">
@@ -57,14 +57,14 @@ export function ResumeCards({ exams }: Props) {
                 aria-valuemax={total}
                 aria-valuenow={answered}
                 aria-valuetext={`${total} 問中 ${answered} 問に回答`}
-                className="h-2 w-full overflow-hidden rounded-full bg-on-primary/30"
+                className="h-2 w-full overflow-hidden rounded-full bg-line"
               >
-                <div className="motion-bar h-full rounded-full bg-on-primary" style={{ width: `${percent}%` }} />
+                <div className="motion-bar h-full rounded-full bg-primary" style={{ width: `${percent}%` }} />
               </div>
               <Link
                 href={`/exams/${exam.examCode}/play`}
                 aria-label={`${exam.name}を続きから解く`}
-                className="block rounded-md bg-on-primary px-5 py-3 text-center font-bold text-primary hover:opacity-90"
+                className="block rounded-md bg-primary px-5 py-3 text-center font-bold text-on-primary hover:opacity-90"
               >
                 続きから解く
               </Link>

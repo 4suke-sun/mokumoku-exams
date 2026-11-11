@@ -180,7 +180,7 @@ function TopBar() {
 }
 
 const dockItemClass = (active: boolean) =>
-  `flex flex-col items-center gap-0.5 rounded-md px-1 py-1.5 text-xs ${
+  `flex flex-col items-center gap-0.5 rounded-md px-1 py-2 text-xs ${
     active ? "bg-soft font-bold text-primary" : "text-fg"
   }`;
 

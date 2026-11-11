@@ -33,9 +33,7 @@ export function HomePredictions({ entries }: { entries: ExamEntry[] }) {
     <div className="space-y-3">
       <h2 className="h2">合格予測</h2>
       {predicted.length === 0 ? (
-        <p className="card-dashed p-4 text-sm text-muted">
-          まだ受験した結果がありません。問題を解くと、資格ごとの合格予測がここに出ます。
-        </p>
+        <p className="card-dashed p-4 text-sm text-muted">まだ受験した結果がありません。</p>
       ) : (
         <>
           <ul className="motion-stagger grid gap-3 sm:grid-cols-2">
