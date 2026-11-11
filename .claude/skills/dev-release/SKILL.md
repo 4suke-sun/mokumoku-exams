@@ -61,6 +61,7 @@ node scripts/release.ts <PR の番号>
 足し忘れに気づいたら、この時点で足す。
 
 1. **計測を足す**: この版で使ったサブエージェントの所要時間とトークン(完了の通知の値)を、`node scripts/metrics.ts agent <役> <ミリ秒> <トークン>` で足す。`npm run metrics` で、どこが重いかを見る。
+   あわせて、`npm run agent-cost -- --since <前の版の締めの日>` で、メインの 1 リクエストあたりの読み込み量と、エージェントごとの費用を見る(セッションの区切りの効果の確かめ方は `CONTRIBUTING.md` の「セッションの区切り(Claude Code)」)。
 2. **状況を確かめる**: `node scripts/lessons.ts list` で対処していない種類と件数を、`node scripts/lessons.ts repeats` で繰り返し(同じキーが 2 回以上。版をまたいで数える)を見る。
 3. **棚卸し**: 似たキーをまとめる。不要になったルール(機械検査で置き換わったもの、使われないもの)の削除候補を挙げる。
 4. **提案**: 「繰り返し」を人に見せ、「一緒に起票しますか」と聞く。起票するものは `node scripts/lessons.ts draft` で下書きを `.drafts/issues/` に作り、
