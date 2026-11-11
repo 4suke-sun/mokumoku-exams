@@ -21,8 +21,9 @@
 node scripts/lessons.ts add --key <キー> --who <誰> --cause <原因> --promote <昇格先> --what <起きたこと> --should <本来どうすべきか>
 node scripts/lessons.ts list        # 種類のキーごとの、対処していない件数
 node scripts/lessons.ts repeats     # 繰り返しの種類(しきい値以上)
-node scripts/lessons.ts draft       # 繰り返しの種類ごとに、Issue の下書きを .drafts/issues/ に作る(投稿はしない)
+node scripts/lessons.ts draft       # 繰り返しの種類ごとに、Issue の下書きを .drafts/issues/ に作り、一覧(manifest.json)へ項目を足す(投稿はしない)
 node scripts/lessons.ts close <キー> <行き先>   # 対処済みにする(これより前の件は数えない)
+node scripts/lessons.ts closed      # 対処済みにした種類の、キーと行き先と日付(読み取りだけ)
 ```
 
 ### 1 件に書くこと
@@ -80,10 +81,17 @@ node scripts/lessons.ts close <キー> <行き先>   # 対処済みにする(こ
   版をまたいで数える(版が違っても、同じキーなら合算する)。
 - 「繰り返し」ごとに、`node scripts/lessons.ts draft` が Issue の下書きを `.drafts/issues/lessons-<キー>.md` に作る。
   下書きは `/dev-pr` の形式(1 行目が `# 題`)で、投稿はしない。すでに同名の下書きがあるときは、人が編集した内容を守るため、上書きしない。
-  複数をまとめて起票するときは、`/dev-pr` の一覧(`.drafts/issues/manifest.json`)を、起票するものを選んでから書く(マイルストーンとラベルは、その場で決める)。
+  あわせて、作った下書きの項目(`action: create`、`file`、`labels: ["lessons"]`)を、一覧(`.drafts/issues/manifest.json`。`/dev-pr` の Step 1)へ足す。
+  一覧にすでに同じ `file` の項目があるときは、書き換えない。すでにあった下書き(上書きしなかったもの)は、一覧に足し直さない(投稿済みかもしれないため)。
+  一覧は、起票するものを選んでから使う(起票しない項目は消す)。マイルストーンは付けないので、起票の場で決めて足す
+  (版が決まっていない新規の Issue は、マイルストーンの代わりにラベル `later` を足す。決めるまで、`scripts/post-issues.ts` の検査が止める)。
+- 受け箱から起票する Issue には、ラベル `lessons`(説明: 受け箱(lessons)由来の Issue)を付ける。受け箱の種類のキーと Issue を、あとから突き合わせるため。
+  `draft` が足す一覧の項目に入っているので、一覧から起票するときは、そのまま付く(一覧の封印にも入る)。
+  一覧を使わずに起票するとき(単発の Issue)は、起票する人が付ける。
 - **版の締め**(`/dev-release` の Step 4)で、対処していない「繰り返し」(版をまたいで数える)の一覧を人に見せ、「一緒に起票しますか」と提案する。
   起票は `/dev-pr` の検査と承認を経る。エージェントが勝手に投稿しない。
 - 起票した、または昇格した種類は、`close` で対処済みにする(行き先に Issue の番号などを書く)。これより前の件は数えない。
+  対処済みにした種類のキーと行き先は、`closed` で、あとから引ける(受け箱は変えない)。
 
 ## 昇格先
 

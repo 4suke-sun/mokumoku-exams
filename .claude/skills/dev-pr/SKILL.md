@@ -65,9 +65,13 @@ PR と Issue のどちらも、次を確かめる:
   [
     { "action": "create", "file": "example.md", "milestone": "v0.99.0", "labels": ["chore"] },
     { "action": "create", "file": "later-example.md", "labels": ["feat", "later"] },
+    { "action": "create", "file": "lessons-example-key.md", "milestone": "v0.99.0", "labels": ["lessons"] },
     { "action": "edit", "file": "123-existing.md", "number": 123, "milestone": "v0.99.0" }
   ]
   ```
+
+  受け箱から起票する Issue(`lessons-<キー>.md`)には、ラベル `lessons` を付ける。`node scripts/lessons.ts draft` が、下書きとともに、この項目(マイルストーンなし)を一覧へ足す。
+  マイルストーンは、ここで決めて足す(`docs/lessons-workflow.md` の「繰り返しと Issue の候補」)。
 
 作成役に依頼する内容:
 

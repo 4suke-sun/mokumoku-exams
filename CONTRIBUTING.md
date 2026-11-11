@@ -25,7 +25,7 @@ npm install   # 依存を入れ、検査フック(.githooks)を有効にしま�
 | `npm run test:e2e` | 主要な画面の通し確認(Playwright)。開発サーバーを代替の認証で起動して通す。初回は `npx playwright install chromium` が必要 |
 | `npm run check:release-notes` | リリースノートとタグの対応の検査 |
 | `npm run validate:data` | 資格マスタ・問題データ・非公開の問題・カリキュラム・体系ノート・コードドリル・要約カード・使い方ページのデータの検査(仕様: `docs/data-spec.md`) |
-| `npm run lessons -- <add\|list\|repeats\|draft\|close>` | 引っかかりの受け箱(`.git` の共有領域)の記録と集計。手順は `docs/lessons-workflow.md` |
+| `npm run lessons -- <add\|list\|repeats\|draft\|close\|closed>` | 引っかかりの受け箱(`.git` の共有領域)の記録と集計。手順は `docs/lessons-workflow.md` |
 | `npm run metrics` | 手元の計測の集計(`verify` の段階ごとの時間、サブエージェントの時間とトークン、検査の台帳の内訳)。`-- agent <役> <ミリ秒> <トークン>` で記録を足す |
 | `npm run agent-cost -- [--since <日付>] [--until <日付>] [--dir <置き場>]` | Claude Code のセッション記録(jsonl)から、エージェント定義ごと・モデルごとのトークンと API 換算の費用(見積もりで、請求額ではない)、起動分、メインの 1 リクエストあたりの読み込み量を集計する(読み取りだけ)。日付は `YYYY-MM-DD`(どちらもその日を含む)。既定の置き場は、リポジトリと作業ツリーのセッションの記録(`CLAUDE_CONFIG_DIR` か `~/.claude/projects/` の下)で、`--dir` で指定もできる。単価表は `scripts/data/model-prices.json`。出力に記録の本文・パス・セッションの識別子は出さない。手で足す計測(`npm run metrics` の `agent`)とは併用する。手順は `docs/lessons-workflow.md` の「計測」 |
 | `npm run -s mask` | 標準入力の出力から値を伏せて出す(コミット・push・PR の検査と同じ正規表現と許可されていないメールアドレス、数字だけの 12 桁、`.env` の 4 文字以上の値、拒否リストの語。伏せきれない行は出さない)。合成と差分の出力を読むときに通す。伏せない形と注意は `docs/app/lessons/0004-mask-diff-output.md` |
@@ -232,6 +232,7 @@ GitHub Actions を、それぞれ 1 件の PR にまとめます。題とコミ�
 - マイルストーンを新設するときは、説明に、その版の主題と、前の版から何を前提にするかを書きます。
 - 起票の前に、似た題の Issue を検索し、候補を人に見せます(`gh issue list --state all --search "<題の語>"`)。「重複」と決めるのは人です。
 - 起票・編集は、下書きとマイルストーン・ラベルの一覧(マニフェスト)から、`scripts/post-issues.ts` でまとめて行います(手順: `.claude/skills/dev-pr`)。承認の時点の封印(下書きのハッシュと、一覧の項目 action・number・milestone・labels のハッシュ)を一覧に記録し、投稿の前に一致を確かめます。投稿のあと、番号・題・URL の結果を一覧に書き戻して表示します。途中で失敗しても、投稿済みの行は飛ばして再実行できます。既存の Issue の編集では、ラベルは追加だけで、マイルストーンを付けるときはラベル `later` を外します。
+- 受け箱から起票する Issue には、ラベル `lessons` を付けます(`node scripts/lessons.ts draft` が、一覧の項目に入れます。決まりは [docs/lessons-workflow.md](docs/lessons-workflow.md) の「繰り返しと Issue の候補」)。
 
 ## Pull Request
 
