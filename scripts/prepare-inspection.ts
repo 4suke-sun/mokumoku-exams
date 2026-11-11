@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * 検査役に読ませるファイルを .drafts/inspect/ に書き出す。
- *   node scripts/prepare-inspection.ts --cached            ステージした差分(commit)
+ *   node scripts/prepare-inspection.ts --cached            ステージした差分(commit。公開済みのコミットを取り込むマージの途中は、競合を解消した部分だけ。公開済みの内容は covered.txt に挙げる)
  *   node scripts/prepare-inspection.ts --range <範囲>       範囲の全コミットの差分(push。例: origin/main..HEAD)
  *   node scripts/prepare-inspection.ts --pr [<基準>]        基準との差分と全コミット(PR。既定は origin/main)
  *   node scripts/prepare-inspection.ts --verify <スタンプ>  検査役の報告のスタンプが、いまの入力と一致するかを確かめる(違えば終了コード 1)

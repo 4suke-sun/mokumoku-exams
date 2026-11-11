@@ -160,6 +160,134 @@ describe("prepare-inspection", () => {
     });
   });
 
+  describe("マージの途中", () => {
+    const NOT_CONFLICT = "own.txt";
+
+    /**
+     * 作業のブランチ(work)に、別のブランチ(incoming)を取り込むマージを、コミットの前の状態で作る。
+     * incoming は pub.txt を足す。conflict なら、両方が a.txt の同じ行を変えて競合させ、解消の内容(resolved-line)をステージする。
+     * published が真なら、origin/main が incoming を指す(公開済み)。偽なら、origin/main は取り込む前の基点を指す。
+     */
+    function makeMerge(options: { conflict: boolean; published: boolean | "none" }): string {
+      const dir = mkdtempSync(join(tmpdir(), "inspect-merge-"));
+      git(dir, "init", "-q", "-b", "work");
+      git(dir, "config", "user.email", NOREPLY);
+      git(dir, "config", "user.name", "tester");
+      writeFileSync(join(dir, "a.txt"), "first\n");
+      git(dir, "add", "-A");
+      git(dir, "commit", "-q", "-m", "chore: first");
+      const base = git(dir, "rev-parse", "HEAD");
+      git(dir, "switch", "-q", "-c", "incoming");
+      writeFileSync(join(dir, "pub.txt"), "published-line\n");
+      if (options.conflict) writeFileSync(join(dir, "a.txt"), "first\nincoming-edit\n");
+      git(dir, "add", "-A");
+      git(dir, "commit", "-q", "-m", "chore: incoming");
+      if (options.published !== "none") {
+        git(dir, "update-ref", "refs/remotes/origin/main", options.published ? git(dir, "rev-parse", "HEAD") : base);
+      }
+      git(dir, "switch", "-q", "work");
+      writeFileSync(join(dir, NOT_CONFLICT), "own-line\n");
+      if (options.conflict) writeFileSync(join(dir, "a.txt"), "first\nwork-edit\n");
+      git(dir, "add", "-A");
+      git(dir, "commit", "-q", "-m", "chore: work");
+      spawnSync("git", ["merge", "--no-commit", "--no-ff", "incoming"], { cwd: dir, encoding: "utf8" });
+      return dir;
+    }
+
+    const resolve = (dir: string) => {
+      writeFileSync(join(dir, "a.txt"), "first\nresolved-line\n");
+      git(dir, "add", "a.txt");
+    };
+
+    it("競合のないマージで公開済みを取り込む_取り込む側と同じ内容のファイルを差分から省き、covered.txt に挙げる", () => {
+      const dir = makeMerge({ conflict: false, published: true });
+      expect(run(dir, "--cached").status).toBe(0);
+      expect(read(dir, "diff.patch")).not.toContain("published-line");
+      expect(read(dir, "diff.patch")).toContain("省略");
+      expect(read(dir, "covered.txt")).toContain("pub.txt");
+      expect(read(dir, "files.txt")).toContain("pub.txt");
+    });
+
+    it("競合を解消したファイルがある_解消の内容は差分に残し、取り込む側と同じ内容のファイルだけを省く", () => {
+      const dir = makeMerge({ conflict: true, published: true });
+      resolve(dir);
+      expect(run(dir, "--cached").status).toBe(0);
+      const diff = read(dir, "diff.patch");
+      expect(diff).toContain("diff --combined a.txt");
+      expect(diff).toContain("resolved-line");
+      expect(diff).not.toContain("published-line");
+      const covered = read(dir, "covered.txt");
+      expect(covered).toContain("pub.txt");
+      expect(covered).not.toContain("a.txt");
+    });
+
+    it("取り込む側が origin/main に含まれない_絞らず、ステージした差分をすべて出す", () => {
+      const dir = makeMerge({ conflict: true, published: false });
+      resolve(dir);
+      expect(run(dir, "--cached").status).toBe(0);
+      expect(read(dir, "diff.patch")).toContain("published-line");
+      expect(read(dir, "diff.patch")).toContain("resolved-line");
+      expect(read(dir, "covered.txt")).toContain("なし");
+    });
+
+    it("origin/main がない_絞らず、ステージした差分をすべて出す", () => {
+      const dir = makeMerge({ conflict: false, published: "none" });
+      expect(run(dir, "--cached").status).toBe(0);
+      expect(read(dir, "diff.patch")).toContain("published-line");
+      expect(read(dir, "covered.txt")).toContain("なし");
+    });
+
+    it("競合が残ったまま_絞らず、ステージした差分をすべて出す", () => {
+      const dir = makeMerge({ conflict: true, published: true });
+      expect(run(dir, "--cached").status).toBe(0);
+      expect(read(dir, "diff.patch")).toContain("published-line");
+      expect(read(dir, "covered.txt")).toContain("なし");
+    });
+
+    it("マージの途中でない_公開済みの内容でも絞らない", () => {
+      const dir = makeMerge({ conflict: false, published: true });
+      git(dir, "commit", "-q", "-m", "chore: merge");
+      writeFileSync(join(dir, "pub.txt"), "published-line\nlater-line\n");
+      git(dir, "add", "-A");
+      expect(run(dir, "--cached").status).toBe(0);
+      expect(read(dir, "diff.patch")).toContain("later-line");
+      expect(read(dir, "covered.txt")).toContain("なし");
+    });
+
+    it("絞った入力_スタンプが一致して通り、解消のあとに差分が変わると止める", () => {
+      const dir = makeMerge({ conflict: true, published: true });
+      resolve(dir);
+      const stamp = /^スタンプ: ([0-9a-f]+)$/m.exec(run(dir, "--cached").stdout)?.[1] ?? "";
+      expect(run(dir, "--verify", stamp).status).toBe(0);
+      writeFileSync(join(dir, "a.txt"), "first\nresolved-again\n");
+      git(dir, "add", "a.txt");
+      expect(run(dir, "--verify", stamp).status).toBe(1);
+    });
+
+    it("解消した内容が目安を超える_結合した差分も分担に分け、一覧に最初のファイルの名前を書く", () => {
+      const dir = makeMerge({ conflict: true, published: true });
+      writeFileSync(join(dir, "a.txt"), Array.from({ length: INSPECT_PART_LINES + 500 }, (_, i) => `r${i}\n`).join(""));
+      git(dir, "add", "a.txt");
+      expect(run(dir, "--cached").status).toBe(0);
+      expect(existsSync(join(dir, ".drafts/inspect/diff.patch"))).toBe(false);
+      expect(read(dir, "parts.txt")).toContain("最初のファイル: a.txt");
+      expect(read(dir, "diff-1.patch")).toContain("diff --combined a.txt");
+    });
+
+    it("絞る前後_ステージの内容・参照・追跡しているファイルの状態は変わらない", () => {
+      const dir = makeMerge({ conflict: true, published: true });
+      resolve(dir);
+      const state = () => [
+        git(dir, "write-tree"),
+        git(dir, "rev-parse", "HEAD"),
+        git(dir, "status", "--short", "--untracked-files=no"),
+      ];
+      const before = state();
+      run(dir, "--cached");
+      expect(state()).toEqual(before);
+    });
+  });
+
   it("拒否リストがない_照合できなかったと報告させる印を書く", () => {
     const dir = makeRepo();
     run(dir, "--cached");
@@ -279,6 +407,15 @@ describe("prepare-inspection", () => {
       const parts = splitDiff(diff, 100);
       expect(parts.length).toBe(2);
       expect(parts[1]?.startsWith("diff --cc m.txt")).toBe(true);
+      expect(parts.join("")).toBe(diff);
+    });
+
+    it("結合した差分の見出し(diff --combined)_ファイルの境目として分ける", () => {
+      const merged = fileDiff("m.txt", 60).replace("diff --git a/m.txt b/m.txt", "diff --combined m.txt");
+      const diff = fileDiff("a.txt", 60) + merged;
+      const parts = splitDiff(diff, 100);
+      expect(parts.length).toBe(2);
+      expect(parts[1]?.startsWith("diff --combined m.txt")).toBe(true);
       expect(parts.join("")).toBe(diff);
     });
 
