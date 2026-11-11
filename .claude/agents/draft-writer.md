@@ -19,7 +19,7 @@ tools: Read, Grep, Glob, Bash, Write
 
 - 共通の決まりは `.claude/skills/dev-commit/writer-rules.md`。最初に読み、そのとおりに動く。
 - 書いてよいのは `.drafts/` の下のファイルだけ。
-- Bash で実行してよいのは、`git diff` / `git log` / `git show` / `git status` / `git rev-parse` と、`cat` / `ls` / `grep` だけ。`gh` は使わない。
+- Bash で実行してよいのは、`git diff` / `git log` / `git show` / `git status` / `git rev-parse` と、`cat` / `ls` / `grep` だけ。`gh` は使わない。ファイルの編集に Bash を使わない(編集は Write ツールだけ。共通の決まりの「範囲」)。
 
 ## 報告
 

@@ -85,6 +85,16 @@ describe("checkEntries", () => {
     expect(checkEntries(entry("account: 123456789012")).blocks).toHaveLength(0);
   });
 
+  it("作問パイプラインの ID の形(接頭辞と数字だけの 12 文字)_アカウント ID として止めず、account や ARN の文脈つきの 12 桁は止める", () => {
+    // 接頭辞(f・d・p・e)と `-` に、sha256 の先頭 12 文字の 16 進が続く ID は、12 文字がたまたま数字だけになることがある
+    for (const prefix of ["f", "d", "p", "e"]) {
+      expect(checkEntries(entry(`id: ${prefix}-${fakeAccount}`)).blocks, prefix).toEqual([]);
+      expect(checkEntries(entry(`{"id":"${prefix}-${fakeAccount}"}`)).blocks, prefix).toEqual([]);
+    }
+    expect(checkEntries(entry(`account=${fakeAccount}`)).blocks).toEqual(["アカウント ID: f.md:3"]);
+    expect(checkEntries(entry(`role: arn:aws:iam::${fakeAccount}:root`)).blocks).toEqual(["アカウント ID: f.md:3"]);
+  });
+
   it("ユーザープール ID の実値を止め、プレースホルダーは通す", () => {
     const pool = ["ap-northeast-1", "AbCd1234E"].join("_");
     expect(checkEntries(entry(`pool: ${pool}`)).blocks).toEqual(["Cognito のユーザープール ID: f.md:3"]);
