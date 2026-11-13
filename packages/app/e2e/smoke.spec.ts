@@ -44,6 +44,15 @@ async function clickUntilUrl(page: Page, target: Locator, url: RegExp) {
   }).toPass({ timeout: 60_000 });
 }
 
+// 画面の準備(ハイドレーション)の前のチェックは、状態を変えないことがある。チェックが付くまで押し直す。
+// 選択肢やチェックボックスは、この補助だけでチェックする(直接の check は、scripts/e2e-check-helper.test.ts が止める)
+async function checkUntilChecked(target: Locator) {
+  await expect(async () => {
+    await target.check({ force: true, timeout: 5_000 });
+    await expect(target).toBeChecked({ timeout: 2_000 });
+  }).toPass({ timeout: 30_000 });
+}
+
 // 読み込みが終わる前に押すと、フォームがページごと送信されてしまう。React が受け持つまで待つ
 async function openLogin(page: Page) {
   await page.goto("/login");
@@ -79,7 +88,7 @@ async function answerAndFinish(page: Page) {
   await expect(page.getByRole("progressbar", { name: "進み具合" })).toBeVisible();
   for (let i = 0; i < 20; i++) {
     const choice = page.locator("input[type=radio], input[type=checkbox]").first();
-    if (await choice.count()) await choice.check({ force: true });
+    if (await choice.count()) await checkUntilChecked(choice);
     if (await page.getByRole("button", { name: "採点する" }).count()) break;
     await page.getByRole("button", { name: /次の問題へ|回答せずに次へ/ }).click();
   }
