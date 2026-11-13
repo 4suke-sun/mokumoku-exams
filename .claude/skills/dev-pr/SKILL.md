@@ -128,7 +128,7 @@ node scripts/prepare-inspection.ts --cached
   (基準との差分。検査済みで `covered.txt` に挙げられたコミットの差分は除く。全コミットのメッセージ、ブランチ名)を確認する」
 - Step 0 の 8 で検索した語と、食い違いを直さないと決めた箇所(場所と理由)。検査役は、渡された語でリポジトリを検索して確かめてよい
 - 作成役の報告の「置いた前提」にある照合の記録(開いた関数・定数、文書と節の名前、確かめた境界の場合。`.claude/skills/dev-commit/writer-rules.md` の「書き方」)。検査役は、記録を読んで、照合の抜けを探す
-- 判定の範囲(`/dev-commit` の Step 3 の「判定の範囲」のとおり。参照先として渡すファイルは、既存で差分の対象ではないと書く。再検査では、前回の指摘の一覧と、直した箇所を添える。`.claude/skills/dev-commit/reconfirm.md` の「再検査の範囲と回数」)
+- 検査の程度(`/dev-commit` の Step 3 の「検査の程度」のとおり。程度ごとの判定の範囲は `inspector-rules.md` の「判定の範囲」。参照先として渡すファイルは、既存で差分の対象ではないと書く。再検査では、前回の指摘の一覧と、直した箇所を添える。`.claude/skills/dev-commit/reconfirm.md` の「再検査の範囲と回数」)
 - 「報告は、チェックリストの『報告のしかた(必ず守る)』に従う(値を引用しない。`.drafts/inspect/stamp.txt` のスタンプを書き写す。最後に `判定: OK/WARN/BLOCK`)」
 
 検査役の報告のスタンプが、いまの入力と一致することを確かめる(`node scripts/prepare-inspection.ts --verify <報告のスタンプ>`。`inspector-deep` も使ったときは、報告ごとに、それぞれのスタンプで実行する)。
@@ -190,7 +190,7 @@ node scripts/post-issues.ts .drafts/issues/manifest.json --seal
    git push -u origin "$(git branch --show-current)"
    ```
 
-3. 下書きのファイルから投稿する(本文を手で打ち直さない):
+3. 下書きのファイルから投稿する(本文を手で打ち直さない。コマンドを組み替えるときは、zsh と BSD 版の道具で動く形にする。`docs/app/lessons/0015-zsh-and-bsd-command-pitfalls.md`):
 
    ```sh
    # PR(1 行目をタイトル、3 行目以降を本文として扱う)

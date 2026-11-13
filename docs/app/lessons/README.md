@@ -54,4 +54,5 @@
 - [0012 判定の単位を変えたら、依存するテストの期待を先に洗い出す](./0012-list-tests-before-changing-judgment-unit.md)
 - [0013 E2E の画面の移動を待つ確認は、押し直しと長めの待ちの形にそろえる](./0013-e2e-navigation-wait-retry.md)
 - [0014 書き込みを取り消す処理は、元がない場合と、後続の失敗の両方をテストで確かめる](./0014-test-rollback-without-original-and-later-failure.md)
+- [0015 手順に書くコマンドは、zsh と BSD 版の道具でも動く形にする](./0015-zsh-and-bsd-command-pitfalls.md)
 <!-- lessons:end -->
