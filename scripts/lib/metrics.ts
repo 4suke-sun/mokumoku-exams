@@ -21,6 +21,13 @@ const METRICS_FILE = "mokumoku-metrics.jsonl";
 /** サブエージェントの役の名前の形。書き込み(scripts/metrics.ts)と読み込み(parseMetrics)の両方で使う。 */
 export const AGENT_NAME = /^[a-z][a-z0-9-]{1,39}$/;
 
+/**
+ * サブエージェント 1 回分の記録の下限。実測ではない仮の値(0 や 1)を、記録も集計もしない。
+ * 書き込み(scripts/metrics.ts)と読み込み(parseMetrics)の両方で効く。verify の段階の時間には効かせない(1 秒に満たない段階がある)。
+ */
+export const AGENT_MIN_MS = 1000;
+export const AGENT_MIN_TOKENS = 100;
+
 export function metricsPath(gitCommonDir: string): string {
   return join(gitCommonDir, METRICS_FILE);
 }
@@ -54,14 +61,39 @@ function toMetric(value: unknown): MetricRecord | null {
     typeof r.name === "string" &&
     AGENT_NAME.test(r.name) &&
     isCount(r.ms) &&
-    isCount(r.tokens)
+    isCount(r.tokens) &&
+    r.ms >= AGENT_MIN_MS &&
+    r.tokens >= AGENT_MIN_TOKENS
   ) {
     return { type: "agent", at: r.at, name: r.name, ms: r.ms, tokens: r.tokens };
   }
   return null;
 }
 
-/** 記録を読む。壊れた行・形の合わない行は飛ばす。 */
+/**
+ * 記録の本文から、最後に足したサブエージェントの記録(type が agent の、末尾に最も近い 1 行)を除く。
+ * 下限に届かず集計から外れている行も、消す対象にする。ほかの行(verify の記録、読めない行)は、そのまま残す。
+ * removed は、除いた行の役の名前(名前が読めなければ空文字)。除いた行がなければ null。
+ */
+export function removeLastAgent(text: string): { text: string; removed: string | null } {
+  const lines = text.split("\n");
+  for (let i = lines.length - 1; i >= 0; i--) {
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(lines[i] ?? "");
+    } catch {
+      continue;
+    }
+    if (typeof parsed === "object" && parsed !== null && (parsed as { type?: unknown }).type === "agent") {
+      lines.splice(i, 1);
+      const name = (parsed as { name?: unknown }).name;
+      return { text: lines.join("\n"), removed: typeof name === "string" ? name : "" };
+    }
+  }
+  return { text, removed: null };
+}
+
+/** 記録を読む。壊れた行・形の合わない行(下限に届かないサブエージェントの記録を含む)は飛ばす。 */
 export function parseMetrics(text: string): MetricRecord[] {
   const out: MetricRecord[] = [];
   for (const line of text.split("\n")) {

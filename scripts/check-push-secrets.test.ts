@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
-import { CLAUDE_NOREPLY } from "./lib/pr-secrets-check.ts";
+import { CLAUDE_NOREPLY, DEPENDABOT_NOREPLY, DEPENDABOT_SIGNOFF } from "./lib/pr-secrets-check.ts";
 
 const script = fileURLToPath(new URL("./check-push-secrets.ts", import.meta.url));
 const ZERO = "0".repeat(40);
@@ -86,6 +86,32 @@ describe("check-push-secrets(基準のブランチが無い最初の push)", () 
     const r = runCheck(dir);
     expect(r.status).toBe(1);
     expect(r.stderr).toMatch(/noreply ではない作者アドレス/);
+  });
+
+  it("作者が Dependabot で、メッセージに Dependabot の署名の行_通す", () => {
+    const message = `chore(deps): bump x\n\nSigned-off-by: dependabot[bot] <${DEPENDABOT_SIGNOFF}>`;
+    const dir = makeRepo(DEPENDABOT_NOREPLY, { "a.txt": "ok\n" }, message);
+    const r = runCheck(dir);
+    expect(r.status, r.stderr).toBe(0);
+  });
+
+  it("作者が人のコミットで、メッセージに Dependabot の署名の行_止める", () => {
+    const message = `chore(deps): bump x\n\nSigned-off-by: dependabot[bot] <${DEPENDABOT_SIGNOFF}>`;
+    const dir = makeRepo(NOREPLY, { "a.txt": "ok\n" }, message);
+    const r = runCheck(dir);
+    expect(r.status).toBe(1);
+    expect(r.stderr).toMatch(/許可されていないメールアドレス/);
+  });
+
+  it("作者が Dependabot で、署名の行でない本文にそのアドレス_止める", () => {
+    const dir = makeRepo(
+      DEPENDABOT_NOREPLY,
+      { "a.txt": "ok\n" },
+      `chore(deps): bump x\n\n連絡先 ${DEPENDABOT_SIGNOFF}`,
+    );
+    const r = runCheck(dir);
+    expect(r.status).toBe(1);
+    expect(r.stderr).toMatch(/許可されていないメールアドレス/);
   });
 
   it("問題がなければ通す", () => {

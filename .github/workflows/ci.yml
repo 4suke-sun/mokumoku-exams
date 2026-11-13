@@ -84,6 +84,11 @@ jobs:
       - run: npx vitest run
       - run: npm test -w @mokumoku-exams/data-schema
       - run: npm run check:release-notes
+      # 配信するデータを変える PR は、新しい版のエントリを伴う(版・リリースノート・タグなしで配信に出さない)
+      - if: github.event_name == 'pull_request'
+        run: npm run check:data-release -- --base "$BASE_SHA"
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
       - run: npm run check:lessons
       - run: npm run check:test-titles
       - run: npm run check:docs

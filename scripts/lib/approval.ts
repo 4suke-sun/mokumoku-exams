@@ -16,6 +16,10 @@ export interface ApprovalEntry {
   base: string;
   /** 承認した下書きのハッシュ。下書きのない push は空。 */
   draftHash: string;
+  /** 下書きから取り出した題のハッシュ(題を直書きで渡す形の照合に使う)。古い印と push は持たない。 */
+  titleHash?: string;
+  /** 下書きから書き出した本文のファイルのハッシュ。古い印と push は持たない。 */
+  bodyHash?: string;
   /** 有効期限(エポックミリ秒) */
   expiresAt: number;
 }
@@ -45,6 +49,8 @@ function isEntry(e: unknown): e is ApprovalEntry {
     typeof x.count === "number" &&
     typeof x.base === "string" &&
     typeof x.draftHash === "string" &&
+    (x.titleHash === undefined || typeof x.titleHash === "string") &&
+    (x.bodyHash === undefined || typeof x.bodyHash === "string") &&
     typeof x.expiresAt === "number"
   );
 }
@@ -79,6 +85,24 @@ export function sha256(text: string | Buffer): string {
   return createHash("sha256").update(text).digest("hex");
 }
 
+/**
+ * 下書きを、題と本文に分ける。1 行目が題(Issue は先頭の `# ` を除く)、3 行目以降が本文
+ * (`head -n 1` と `tail -n +3` と同じ範囲)。
+ */
+export function splitDraft(text: string, kind: "pr" | "issue"): { title: string; body: string } {
+  const lines = text.split("\n");
+  const first = (lines[0] ?? "").replace(/\r$/, "");
+  return { title: kind === "issue" ? first.replace(/^# /, "") : first, body: lines.slice(2).join("\n") };
+}
+
+/** 承認のときに書き出す、本文だけのファイルのパス(`<下書き>.md` → `<下書き>.body.md`)。 */
+export function bodyPathFor(draft: string): string {
+  return draft.endsWith(".md") ? `${draft.slice(0, -3)}.body.md` : `${draft}.body`;
+}
+
+/** 直書きの題に使えない文字。シェルが展開・解釈しうる文字を含む題は、`$(head …)` の形で渡す。 */
+export const UNSAFE_TITLE = /[$`\\"'!]/;
+
 /** 止める操作の種類。 */
 export type Gate = {
   kind: ApprovalKind;
@@ -95,6 +119,10 @@ export interface Classified {
   drafts: string[];
   /** HEAD やブランチを変える git の操作(`commit`、`switch` など)があるか */
   movesHead: boolean;
+  /** 直書きの題(`--title`、`-t` の値。`$(…)` の形は含めない)。承認した下書きの題と照合する */
+  titles: string[];
+  /** 粗い区切りの判定で、直書きの題を見たか。細かい区切りで題を拾えなかったときに止めるため */
+  coarseTitle?: boolean;
 }
 
 // 引用符の中の `;` や `&&` も区切りとして扱う。判定が厳しい側(止める側)にだけ倒れる。
@@ -144,8 +172,8 @@ interface GhTextFlags {
   editsText: boolean;
   /** 本文の直書き(`--body`、`-b`)があるか */
   inlineBody: boolean;
-  /** 題の直書き(`--title`、`-t` に、`$(…)` でない値が続く形)があるか */
-  inlineTitle: boolean;
+  /** 題の直書き(`--title`、`-t` に、`$(…)` でない値が続く形)の値 */
+  inlineTitles: string[];
   /** 本文のファイル指定(`--body-file`、`-F`)の値。`<` は、`<(…)` の形 */
   bodyFiles: string[];
 }
@@ -155,7 +183,7 @@ interface GhTextFlags {
  * 先頭に真偽値のオプション(`-d`、`-f`、`-w`、`-e`)が付く形(`-db`)も見る。
  */
 function ghTextFlags(tokens: string[]): GhTextFlags {
-  const flags: GhTextFlags = { editsText: false, inlineBody: false, inlineTitle: false, bodyFiles: [] };
+  const flags: GhTextFlags = { editsText: false, inlineBody: false, inlineTitles: [], bodyFiles: [] };
   tokens.forEach((t, i) => {
     const eq = t.indexOf("=");
     const key = eq >= 0 ? t.slice(0, eq) : t;
@@ -164,7 +192,7 @@ function ghTextFlags(tokens: string[]): GhTextFlags {
         flags.editsText = true;
         // `--title "$(head …)"` の、`$(` で区切った細かい判定では、値の語が残らない
         const value = (eq >= 0 ? t.slice(eq + 1) : (tokens[i + 1] ?? "")).replace(/^["']+/, "");
-        if (value !== "" && !isSubstitution(value)) flags.inlineTitle = true;
+        if (!isSubstitution(value)) flags.inlineTitles.push(value);
       }
       if (key === "--body") flags.editsText = flags.inlineBody = true;
       if (key === "--body-file") {
@@ -179,7 +207,7 @@ function ghTextFlags(tokens: string[]): GhTextFlags {
     if (short[1] === "b") flags.inlineBody = true;
     // `-t "$(head …)"`(空白で離した値)は、`--title` と同じく、下書きから取る形として通す
     const titleValue = (short[2] || (tokens[i + 1] ?? "")).replace(/^=/, "");
-    if (short[1] === "t" && titleValue !== "" && !isSubstitution(titleValue)) flags.inlineTitle = true;
+    if (short[1] === "t" && !isSubstitution(titleValue)) flags.inlineTitles.push(titleValue);
     if (short[1] === "F") flags.bodyFiles.push(short[2] ? short[2].replace(/^=/, "") : (tokens[i + 1] ?? ""));
   });
   return flags;
@@ -207,7 +235,8 @@ function withoutRedirects(args: string[]): string[] {
   return kept;
 }
 
-function classifySegment(tokens: string[], out: Classified): void {
+/** `fine` は、括弧と引用符の外だけで区切った判定か。直書きの題の値は、こちらでだけ拾う(粗い区切りでは、題の中の括弧で値が切れる)。 */
+function classifySegment(tokens: string[], out: Classified, fine: boolean): void {
   const git = splitGit(tokens);
   if (git && HEAD_MOVING.has(git.sub)) out.movesHead = true;
   if (git?.sub === "push") {
@@ -261,11 +290,15 @@ function classifySegment(tokens: string[], out: Classified): void {
           "本文の出どころや PR のヘッドを変えるオプション(--template、--recover、--head など)は使えません",
         );
       }
-      if (text.inlineTitle) {
+      // 直書きの題は、承認した下書きの題とハッシュで照合する(decideGate)。シェルが解釈しうる文字を含む題は、照合した値と実際の題がずれうる
+      // 粗い区切りでは、`--title "$(…)"` の値が空に切れるので、値の検査と照合は、細かい区切りの側でだけ行う
+      if (fine && text.inlineTitles.some((t) => t === "" || t.startsWith("-") || UNSAFE_TITLE.test(t))) {
         out.forbidden.push(
-          '題は、承認した下書きの 1 行目から渡してください(--title "$(head -n 1 <下書き>)")。直書きの題は、照合できません',
+          '題の直書きには、空の値、- で始まる値、$ ` \\ " \' ! を含む値を使えません。--title "$(head -n 1 <下書き>)" の形で渡してください',
         );
       }
+      if (fine) out.titles.push(...text.inlineTitles);
+      else if (text.inlineTitles.some((t) => t !== "")) out.coarseTitle = true;
       // 承認した下書きと照合できるのは、本文のファイルが 1 つで、相対の .drafts/ の下にあるときだけ
       const fromDrafts = (v: string) =>
         v === "<" || v.startsWith("<(") || (v.startsWith(".drafts/") && !v.includes(".."));
@@ -430,7 +463,7 @@ function shellTokens(text: string): string[] {
 function classifyInto(command: string, out: Classified, depth: number): void {
   for (const part of splitTopLevel(command)) {
     const tokens = stripWrappers(shellTokens(part.replace(LEADING_SUBSHELL, "")));
-    if (tokens.length > 0) classifySegment(tokens, out);
+    if (tokens.length > 0) classifySegment(tokens, out, true);
   }
   for (const segment of command.split(SEPARATORS)) {
     const tokens = stripWrappers(
@@ -447,14 +480,20 @@ function classifyInto(command: string, out: Classified, depth: number): void {
       // `bash -c "git push"` の中身を、別のコマンドとして判定し直す
       const inner = tokens.slice(cIndex + 1).join(" ");
       classifyInto(inner.replace(/^["']|["']$/g, ""), out, depth + 1);
-    } else if (tokens.length > 0) classifySegment(tokens, out);
+    } else if (tokens.length > 0) classifySegment(tokens, out, false);
   }
 }
 
 /** Bash のコマンド 1 行から、承認が要る操作と、通さない操作を拾う。 */
 export function classifyCommand(command: string): Classified {
-  const out: Classified = { gates: [], forbidden: [], drafts: [], movesHead: false };
+  const out: Classified = { gates: [], forbidden: [], drafts: [], movesHead: false, titles: [] };
   classifyInto(command, out, 0);
+  // 粗い区切りでだけ直書きの題が見えた形は、照合する値を取れないので、通さない
+  if (out.coarseTitle && out.titles.length === 0 && out.gates.some((g) => g.kind !== "push")) {
+    out.forbidden.push("題の値を読み取れません。題は、引用符で囲んで 1 つの語として渡してください");
+  }
+  delete out.coarseTitle;
+  out.titles = [...new Set(out.titles)];
   // 粗い区切りと細かい区切りの両方で判定するので、同じ結果の重なりを除く
   out.gates = [
     ...new Map(out.gates.map((g) => [`${g.kind} ${g.command} ${(g.refspecs ?? []).join(",")}`, g])).values(),
@@ -513,14 +552,21 @@ function pushesCurrentBranch(refspec: string, branch: string): boolean {
   return heads(dst) === branch && (heads(src) === branch || src === "HEAD");
 }
 
-export function decideGate(gate: Gate, drafts: string[], approvals: Approvals, now: number, probe: Probe): Decision {
+export function decideGate(
+  gate: Gate,
+  drafts: string[],
+  approvals: Approvals,
+  now: number,
+  probe: Probe,
+  titles: string[] = [],
+): Decision {
   const live = approvals.entries.filter((e) => e.expiresAt > now && acceptedKinds(gate.kind).includes(e.kind));
   if (live.length === 0) {
     return deny(
       `${gate.command} は、人の承認が要ります(承認の印がない、または有効期限が切れています)。スキルの手順で承認を得てから、承認の印を書いてください`,
     );
   }
-  if (gate.kind === "issue") return checkDrafts(live, drafts, probe);
+  if (gate.kind === "issue") return checkDrafts(live, drafts, probe, titles);
   const stray = (gate.refspecs ?? []).find((r) => !pushesCurrentBranch(r, probe.branch));
   if (stray !== undefined) {
     return deny(
@@ -535,19 +581,31 @@ export function decideGate(gate: Gate, drafts: string[], approvals: Approvals, n
       `${gate.command} の範囲(ブランチ、末尾のコミット、コミット数)が、承認のときと違います。検査と承認をやり直してください`,
     );
   }
-  return gate.kind === "pr" ? checkDrafts(sameRange, drafts, probe) : { ok: true };
+  return gate.kind === "pr" ? checkDrafts(sameRange, drafts, probe, titles) : { ok: true };
 }
 
-function checkDrafts(entries: ApprovalEntry[], drafts: string[], probe: Probe): Decision {
+/**
+ * コマンドに出る下書き(下書きの全体か、承認のときに書き出した本文のファイル)と、直書きの題が、
+ * 同じ 1 件の承認に収まるか。
+ */
+function checkDrafts(entries: ApprovalEntry[], drafts: string[], probe: Probe, titles: string[]): Decision {
   // 承認した下書きと照合できないコマンドは、通さない(スキルの手順は、必ず下書きのファイルから投稿する)
   if (drafts.length === 0)
     return deny("下書きのファイル(.drafts/ の下)から投稿してください。承認した下書きと照合できません");
-  const approved = new Set(entries.map((e) => e.draftHash).filter(Boolean));
-  for (const d of drafts) {
-    const hash = probe.hashOf(d);
-    if (hash === null || !approved.has(hash)) {
-      return deny("下書きの内容が、承認のときと違います(または読めません)。検査と承認をやり直してください");
-    }
+  const hashes = drafts.map((d) => probe.hashOf(d));
+  const titleHashes = titles.map((t) => sha256(t));
+  const draftsMatch = (e: ApprovalEntry) => {
+    const approved = new Set([e.draftHash, e.bodyHash ?? ""].filter(Boolean));
+    return hashes.every((h) => h !== null && approved.has(h));
+  };
+  const titlesMatch = (e: ApprovalEntry) => titleHashes.every((h) => e.titleHash !== undefined && h === e.titleHash);
+  if (!entries.some(draftsMatch)) {
+    return deny("下書きの内容が、承認のときと違います(または読めません)。検査と承認をやり直してください");
+  }
+  if (!entries.some((e) => draftsMatch(e) && titlesMatch(e))) {
+    return deny(
+      "直書きの題が、承認した下書きの題と違います(または、印が題を覆っていません)。承認のときに表示した題を、そのまま渡してください",
+    );
   }
   return { ok: true };
 }
@@ -587,7 +645,7 @@ export function decideHook(input: HookInput, approvals: () => Approvals, now: nu
   }
   const p = probe();
   for (const gate of classified.gates) {
-    const decision = decideGate(gate, classified.drafts, approvals(), now, p);
+    const decision = decideGate(gate, classified.drafts, approvals(), now, p, classified.titles);
     if (!decision.ok) return decision;
   }
   return { ok: true };

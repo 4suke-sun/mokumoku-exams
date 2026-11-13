@@ -6,6 +6,8 @@ import {
   checkProseBodies,
   checkSensitiveFilenames,
   checkUnexpectedPaths,
+  DEPENDABOT_SIGNOFF,
+  disallowedEmails,
   parseAddedLines,
   parseDenylist,
   textToEntries,
@@ -68,6 +70,50 @@ describe("parseAddedLines", () => {
       "+b",
     ].join("\n");
     expect(parseAddedLines(diff).map((e) => e.file)).toEqual(["a.txt", "b.txt"]);
+  });
+});
+
+describe("checkEntries の署名の行のアドレス(signoffEmail)", () => {
+  const entry = (text: string) => [{ file: "message:abc", line: 9, text }];
+  const signoff = `Signed-off-by: dependabot[bot] <${DEPENDABOT_SIGNOFF}>`;
+  const opts = { message: true, history: true, signoffEmail: DEPENDABOT_SIGNOFF };
+  const [local, domain] = DEPENDABOT_SIGNOFF.split("@");
+
+  it("署名の行にそのアドレスがあり、許可を渡す_通す", () => {
+    expect(checkEntries(entry(signoff), [], opts).blocks).toEqual([]);
+  });
+
+  it("署名の行のアドレスの大文字小文字が違う_通す", () => {
+    expect(
+      checkEntries(entry(signoff.toUpperCase().replace("SIGNED-OFF-BY", "Signed-off-by")), [], opts).blocks,
+    ).toEqual([]);
+  });
+
+  it("許可を渡さない(人のコミット、追加行、下書き、コミットの hook)_同じ署名の行を止める", () => {
+    expect(checkEntries(entry(signoff)).blocks).toHaveLength(1);
+    expect(checkEntries(entry(signoff), [], { message: true }).blocks).toHaveLength(1);
+    expect(disallowedEmails(signoff)).toHaveLength(1);
+  });
+
+  it("署名の行でない行(本文、Co-Authored-By:)にそのアドレス_止める", () => {
+    expect(checkEntries(entry(`連絡先: ${DEPENDABOT_SIGNOFF}`), [], opts).blocks).toHaveLength(1);
+    expect(checkEntries(entry(`Co-Authored-By: bot <${DEPENDABOT_SIGNOFF}>`), [], opts).blocks).toHaveLength(1);
+  });
+
+  it("似た形のアドレス(前後に文字を足したもの、サブドメイン、同じドメインの別の宛先)_止める", () => {
+    for (const address of [
+      `x${DEPENDABOT_SIGNOFF}`,
+      `${DEPENDABOT_SIGNOFF}x`,
+      `${local}@sub.${domain}`,
+      `other@${domain}`,
+    ]) {
+      expect(checkEntries(entry(`Signed-off-by: x <${address}>`), [], opts).blocks).toHaveLength(1);
+    }
+  });
+
+  it("署名の行に、そのアドレスのほかに許可されていないアドレス_止める", () => {
+    const other = ["someone", "mail.no-such-domain.zz"].join("@");
+    expect(checkEntries(entry(`${signoff}, ${other}`), [], opts).blocks).toHaveLength(1);
   });
 });
 

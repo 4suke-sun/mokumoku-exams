@@ -31,6 +31,7 @@
     "check:docs": "node scripts/check-docs.ts",
     "check:env": "node scripts/check-env-contract.ts",
     "check:pr-closes": "node scripts/check-pr-closes.ts",
+    "check:data-release": "node scripts/check-data-release.ts",
     "check:boundary": "node scripts/check-pipeline-boundary.ts",
     "check:retired-ids": "node scripts/check-retired-ids.ts",
     "check:ui-patterns": "node scripts/check-ui-patterns.ts",

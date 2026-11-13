@@ -14,6 +14,12 @@ description: 1 つの版(マイルストーン)の Issue を、着手から PR �
 1 つの版の Issue を、着手から、PR の承認の依頼までまとめて進める手順。検査と承認の決まりは、`CLAUDE.md` と既存のスキル(`/dev-commit`、`/dev-pr`、`/dev-push`、`/dev-release`)のとおりで、このスキルは変えない。
 このスキルが決めるのは、**人に確かめる時機(その場か、版の最後にまとめてか)**と、**最後の確認の形**だけ。
 
+## 引数
+
+- `/dev-version <版> [--level=low|medium|high]`。`--level` は検査の程度で、既定は `medium`。
+- 受け取った程度を、この版で使う `/dev-commit`・`/dev-pr`・`/dev-push` の検査役への依頼に、そのまま書く(程度ごとの判定の範囲は `.claude/skills/dev-commit/inspector-rules.md` の「判定の範囲」、回し方は `.claude/skills/dev-commit/reconfirm.md` の「再検査の範囲と回数」)。
+- マージ・タグ・Release・デプロイは、どの程度でも、人の明示の指示ごとに行う(下の表のとおり)。
+
 ## 進め方
 
 | 操作 | 進め方 |

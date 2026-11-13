@@ -2,11 +2,14 @@ import { describe, expect, it } from "vitest";
 import {
   type ApprovalEntry,
   type Approvals,
+  bodyPathFor,
   classifyCommand,
   decideHook,
   grant,
   type Probe,
   parseApprovals,
+  sha256,
+  splitDraft,
   TTL_MS,
 } from "./approval.ts";
 
@@ -171,13 +174,14 @@ describe("classifyCommand", () => {
     expect(classifyCommand("git status && git push").forbidden).toEqual([]);
   });
 
-  it("題の直書き_通さない操作にする。下書きの 1 行目から取る形は通す", () => {
-    expect(classifyCommand("gh pr create --title 'feat: x' --body-file .drafts/p.md").forbidden.length).toBeGreaterThan(
-      0,
-    );
-    expect(classifyCommand("gh pr edit 3 --title=New").forbidden.length).toBeGreaterThan(0);
-    expect(classifyCommand("gh pr edit 3 -tNew").forbidden.length).toBeGreaterThan(0);
-    expect(classifyCommand("gh pr edit 3 -t New").forbidden.length).toBeGreaterThan(0);
+  it("題の直書き_通さない操作にせず、照合する題として集める。下書きの 1 行目から取る形は集めない", () => {
+    const c = classifyCommand("gh pr create --title 'feat(x): y' --body-file .drafts/p.body.md");
+    expect(c.forbidden).toEqual([]);
+    expect(c.titles).toEqual(["feat(x): y"]);
+    expect(classifyCommand("gh pr edit 3 --title=New").titles).toEqual(["New"]);
+    expect(classifyCommand("gh pr edit 3 -tNew").titles).toEqual(["New"]);
+    expect(classifyCommand("gh pr edit 3 -t New").titles).toEqual(["New"]);
+    expect(classifyCommand('gh pr create --title "$(head -n 1 .drafts/pr.md)"').titles).toEqual([]);
     const ok = 'gh pr create --base main --title "$(head -n 1 .drafts/pr.md)" --body-file <(tail -n +3 .drafts/pr.md)';
     expect(classifyCommand(ok).forbidden).toEqual([]);
     expect(classifyCommand('gh issue create --title "$(head -n 1 .drafts/i.md | sed s/x//)"').forbidden).toEqual([]);
@@ -227,11 +231,12 @@ describe("classifyCommand", () => {
 
   it("短い -t に $(…) の題_直書きとみなさない", () => {
     expect(classifyCommand('gh pr edit 3 -t "$(head -n 1 .drafts/p.md)"').forbidden).toEqual([]);
-    expect(classifyCommand("gh pr edit 3 -t New").forbidden.length).toBeGreaterThan(0);
+    expect(classifyCommand('gh pr edit 3 -t "$(head -n 1 .drafts/p.md)"').titles).toEqual([]);
+    expect(classifyCommand("gh pr edit 3 -t New").titles).toEqual(["New"]);
   });
 
   it("本文のファイル指定の <(…) を先に置いた形_通さない操作にしない", () => {
-    expect(classifyCommand("gh pr create --body-file <(tail -n +3 .drafts/p.md) --title t").forbidden.length).toBe(1);
+    expect(classifyCommand("gh pr create --body-file <(tail -n +3 .drafts/p.md) --title t").titles).toEqual(["t"]);
     expect(classifyCommand("gh pr create --body-file <(tail -n +3 .drafts/p.md) --base main").forbidden).toEqual([]);
   });
 
@@ -443,6 +448,68 @@ describe("decideHook", () => {
     expect(run("gh issue create --body-file .drafts/i.md", approvals).ok).toBe(true);
   });
 
+  describe("直書きの題と本文のファイル(置換を使わない形)", () => {
+    const title = "fix(scripts): 題の例";
+    const withTitle = (over: Partial<ApprovalEntry> = {}) =>
+      entry({ draftHash: "h-draft", bodyHash: "h-body", titleHash: sha256(title), ...over });
+    const bodyProbe = probe({ hashOf: (p) => (p.endsWith(".body.md") ? "h-body" : "h-draft") });
+    const cmd = (t: string) => `gh pr create --base main --title '${t}' --body-file .drafts/pr-fix-1-v0.1.0.body.md`;
+
+    it("承認した題と本文のファイル_PR の作成を通す", () => {
+      expect(run(cmd(title), { entries: [withTitle()] }, bodyProbe).ok).toBe(true);
+    });
+
+    it("承認した題と違う直書きの題_止める", () => {
+      expect(run(cmd("fix(scripts): 別の題"), { entries: [withTitle()] }, bodyProbe).ok).toBe(false);
+    });
+
+    it("題のハッシュを持たない古い印_直書きの題を止める", () => {
+      expect(run(cmd(title), { entries: [withTitle({ titleHash: undefined })] }, bodyProbe).ok).toBe(false);
+    });
+
+    it("承認のあとに本文のファイルが変わった_止める", () => {
+      expect(run(cmd(title), { entries: [withTitle()] }, probe({ hashOf: () => "h-other" })).ok).toBe(false);
+    });
+
+    it("承認した範囲と違う末尾のコミット_止める", () => {
+      expect(run(cmd(title), { entries: [withTitle()] }, probe({ ...bodyProbe, head: "bbb" })).ok).toBe(false);
+    });
+
+    it("Issue の作成と、題・本文を変える編集_同じ形で通し、違う題は止める", () => {
+      const issue = {
+        entries: [withTitle({ kind: "issue", branch: "", head: "", count: 0, base: "" })],
+      };
+      const body = "--body-file .drafts/issues/x.body.md";
+      expect(run(`gh issue create --title '${title}' ${body}`, issue, bodyProbe).ok).toBe(true);
+      expect(run(`gh issue edit 3 --title '${title}' ${body}`, issue, bodyProbe).ok).toBe(true);
+      expect(run(`gh pr edit 3 -t '${title}' ${body}`, { entries: [withTitle()] }, bodyProbe).ok).toBe(true);
+      expect(run(`gh issue edit 3 --title 'x' ${body}`, issue, bodyProbe).ok).toBe(false);
+    });
+
+    it("シェルが解釈しうる文字や空の値の直書きの題_通さない操作にする", () => {
+      for (const t of ["a $(b)", "a `b`", "a\\b", "a!b"]) {
+        expect(classifyCommand(`gh pr create --title "${t}" --body-file .drafts/p.body.md`).forbidden.length).toBe(1);
+      }
+      expect(classifyCommand('gh pr create --title "it\'s" --body-file .drafts/p.body.md').forbidden).toHaveLength(1);
+      expect(classifyCommand("gh pr create --body-file .drafts/p.body.md --title").forbidden).toHaveLength(1);
+    });
+  });
+
+  describe("# を含む下書きのパス", () => {
+    const draft = ".drafts/pr-fix-#1-v0.1.0.md";
+
+    it("手順どおりの $(…) と <(…) の形_パスを取り出し、承認した下書きなら通す", () => {
+      const c = `gh pr create --base main --title "$(head -n 1 ${draft})" --body-file <(tail -n +3 ${draft})`;
+      expect(classifyCommand(c).drafts).toEqual([draft]);
+      expect(run(c, { entries: [entry()] }).ok).toBe(true);
+      expect(run(c, { entries: [entry()] }, probe({ hashOf: () => "h2" })).ok).toBe(false);
+    });
+
+    it("引用符で囲んだパス_引用符を含めずに取り出す", () => {
+      expect(classifyCommand(`gh pr create --body-file '${draft}'`).drafts).toEqual([draft]);
+    });
+  });
+
   it("承認があっても強制 push_止める", () => {
     expect(run("git push -f", { entries: [entry({ kind: "push" })] }).ok).toBe(false);
   });
@@ -495,8 +562,34 @@ describe("grant と parseApprovals", () => {
     expect(grant(expired, entry(), NOW).entries).toHaveLength(1);
   });
 
+  it("題と本文のハッシュを持つ印_読み込みで落とさない。型の違う値は落とす", () => {
+    const ok = JSON.stringify({ entries: [entry({ titleHash: "t", bodyHash: "b" })] });
+    expect(parseApprovals(ok).entries).toHaveLength(1);
+    const bad = JSON.stringify({ entries: [{ ...entry(), titleHash: 1 }] });
+    expect(parseApprovals(bad).entries).toEqual([]);
+  });
+
   it("壊れた承認の印のファイル_承認なしとして読む", () => {
     expect(parseApprovals("{壊れた")).toEqual({ entries: [] });
     expect(parseApprovals('{"entries":[{"kind":"x"}]}')).toEqual({ entries: [] });
+  });
+});
+
+describe("splitDraft と bodyPathFor", () => {
+  it("PR の下書き_1 行目を題、3 行目以降を本文にする", () => {
+    expect(splitDraft("fix: 題\n\n本文 1\n本文 2\n", "pr")).toEqual({ title: "fix: 題", body: "本文 1\n本文 2\n" });
+  });
+
+  it("Issue の下書き_題の先頭の「# 」を除く", () => {
+    expect(splitDraft("# feat: 題\n\n本文\n", "issue").title).toBe("feat: 題");
+  });
+
+  it("改行が CRLF の 1 行目_題の末尾の CR を除く", () => {
+    expect(splitDraft("fix: 題\r\n\r\n本文\r\n", "pr").title).toBe("fix: 題");
+  });
+
+  it("拡張子が .md の下書き_.body.md の名前にする。ほかは .body を足す", () => {
+    expect(bodyPathFor(".drafts/pr-fix-1-v0.1.0.md")).toBe(".drafts/pr-fix-1-v0.1.0.body.md");
+    expect(bodyPathFor(".drafts/x.txt")).toBe(".drafts/x.txt.body");
   });
 });

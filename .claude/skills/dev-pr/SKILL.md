@@ -56,7 +56,7 @@ PR と Issue のどちらも、次を確かめる:
 
 下書きの置き場所(gitignore 済み):
 
-- PR: `.drafts/pr-<ブランチ名>.md`(1 行目がタイトル、空行を挟んで本文)
+- PR: `.drafts/pr-<ブランチ名>.md`(1 行目がタイトル、空行を挟んで本文)。ブランチ名の `/` は `-` に置き換え、`#` は除く(例: `fix/#12-v0.9.0` → `.drafts/pr-fix-12-v0.9.0.md`)
 - Issue: 新規は `.drafts/issues/<slug>.md`(番号は投稿まで決まらない)、既存の Issue の編集は `.drafts/issues/<番号>-<slug>.md`。1 行目が `# タイトル`、2 行目が空行、3 行目以降が本文
 - 複数の Issue をまとめて起票・編集するときは、一覧(マニフェスト) `.drafts/issues/manifest.json` も書く(メインのセッションが書いてよい)。
   1 行が 1 件で、`action`(`create` / `edit`)、`file`(下書きのファイル名)、編集なら `number`、`milestone`、`labels` を持つ:
@@ -128,7 +128,7 @@ node scripts/prepare-inspection.ts --cached
   (基準との差分。検査済みで `covered.txt` に挙げられたコミットの差分は除く。全コミットのメッセージ、ブランチ名)を確認する」
 - Step 0 の 8 で検索した語と、食い違いを直さないと決めた箇所(場所と理由)。検査役は、渡された語でリポジトリを検索して確かめてよい
 - 作成役の報告の「置いた前提」にある照合の記録(開いた関数・定数、文書と節の名前、確かめた境界の場合。`.claude/skills/dev-commit/writer-rules.md` の「書き方」)。検査役は、記録を読んで、照合の抜けを探す
-- 判定の範囲(`/dev-commit` の Step 3 の「判定の範囲」のとおり。参照先として渡すファイルは、既存で差分の対象ではないと書く。再検査では、前回の指摘の一覧と、直した箇所を添える。`.claude/skills/dev-commit/reconfirm.md` の「再検査の範囲と回数」)
+- 検査の程度(`/dev-commit` の Step 3 の「検査の程度」のとおり。程度ごとの判定の範囲は `inspector-rules.md` の「判定の範囲」。参照先として渡すファイルは、既存で差分の対象ではないと書く。再検査では、前回の指摘の一覧と、直した箇所を添える。`.claude/skills/dev-commit/reconfirm.md` の「再検査の範囲と回数」)
 - 「報告は、チェックリストの『報告のしかた(必ず守る)』に従う(値を引用しない。`.drafts/inspect/stamp.txt` のスタンプを書き写す。最後に `判定: OK/WARN/BLOCK`)」
 
 検査役の報告のスタンプが、いまの入力と一致することを確かめる(`node scripts/prepare-inspection.ts --verify <報告のスタンプ>`。`inspector-deep` も使ったときは、報告ごとに、それぞれのスタンプで実行する)。
@@ -167,7 +167,7 @@ git rev-parse HEAD && git rev-list --count origin/main..HEAD
 
 承認の直後に、メインのセッションが承認の印を書く(`.git` の下。有効 60 分。サブエージェントには書かせない。フックが止めるのは、サブエージェントからの `scripts/approval.ts grant` という直接の形だけ)。印がないと、フック(`scripts/approval-hook.ts`)が
 push と、`gh pr create`・`gh issue create`、題・本文を変える `gh pr edit`・`gh issue edit` を止める(ラベルやマイルストーンだけの編集は止めない。`post-issues.ts` の中の投稿は、スクリプトの封印が止める)。印は、PR は範囲(ブランチ、末尾のコミット、コミット数)と下書きのハッシュを、
-Issue は下書きのハッシュを覆う:
+Issue は下書きのハッシュを覆う。`grant pr`・`grant issue` は、下書きの 3 行目以降を `<下書き>.body.md` に書き出し、題と本文のハッシュも印に入れて、置換を使わない投稿のコマンドを表示する:
 
 ```sh
 node scripts/approval.ts grant pr <下書きファイル>      # PR(push も覆う)
@@ -190,13 +190,22 @@ node scripts/post-issues.ts .drafts/issues/manifest.json --seal
    git push -u origin "$(git branch --show-current)"
    ```
 
-3. 下書きのファイルから投稿する(本文を手で打ち直さない):
+3. 下書きのファイルから投稿する(本文を手で打ち直さない。コマンドを組み替えるときは、zsh と BSD 版の道具で動く形にする。`docs/app/lessons/0015-zsh-and-bsd-command-pitfalls.md`):
 
    ```sh
    # PR(1 行目をタイトル、3 行目以降を本文として扱う)
    gh pr create --base main --title "$(head -n 1 <下書き>)" --body-file <(tail -n +3 <下書き>)
    # Issue(1 行目の「# 」を除いてタイトル、3 行目以降を本文として扱う)
    gh issue create --title "$(head -n 1 <下書き> | sed 's/^# //')" --body-file <(tail -n +3 <下書き>)
+   ```
+
+   作業ツリーに入ったセッションは、コマンド置換(`$(…)`)とプロセス置換(`<(…)`)を含む git・gh のコマンドを、実行の前に断る。そのときは、置換を使わない形にする。
+   push は、送り先のブランチ名を直書きする(`git push -u origin <ブランチ名>`)。投稿は、`grant` が表示したコマンド(題の直書きと、書き出した本文のファイル)をそのまま使う。
+   `gh pr edit`・`gh issue edit` で題・本文を変えるときも、同じ `--title '<題>' --body-file <下書き>.body.md` の形を使う:
+
+   ```sh
+   gh pr create --base main --title '<題>' --body-file <下書き>.body.md
+   gh issue create --title '<題>' --body-file <下書き>.body.md
    ```
 
    Issue を一覧(マニフェスト)から投稿するときは、スクリプトを使う。投稿(フラグなし)では、封印(承認の時点のハッシュ)と一致しない下書き、

@@ -124,10 +124,20 @@ export function disallowedEmails(text: string): string[] {
   return found.filter((address) => !ALLOWED_EMAIL.test(address));
 }
 
-function scanEmails(entries: AddedLine[]): string[] {
+const SIGNED_OFF_LINE = /^\s*Signed-off-by:/i;
+
+/**
+ * 許可されていないメールアドレスを探す。`signoffEmail` を渡したときだけ、`Signed-off-by:` の行にある
+ * そのアドレス(完全一致。大文字小文字は区別しない)を除く。同じ行のほかのアドレスは、引き続き止める。
+ */
+function scanEmails(entries: AddedLine[], signoffEmail?: string): string[] {
   const hits: string[] = [];
+  const allowed = signoffEmail?.toLowerCase();
   for (const { file, line, text } of entries) {
-    if (disallowedEmails(text).length > 0) hits.push(`許可されていないメールアドレス: ${file}:${line}`);
+    const found = disallowedEmails(text).filter(
+      (address) => !(allowed && SIGNED_OFF_LINE.test(text) && address.toLowerCase() === allowed),
+    );
+    if (found.length > 0) hits.push(`許可されていないメールアドレス: ${file}:${line}`);
   }
   return hits;
 }
@@ -142,6 +152,10 @@ const NOREPLY = /@users\.noreply\.github\.com$/;
 // Claude の署名の行で使う noreply アドレス。個人情報ではないので、作者・コミッターにも認める(完全一致だけ。大文字小文字は区別しない)。
 // 追加行のメールアドレスの検査(ALLOWED_EMAIL)には足さないので、そのまま書かずに組み立てる。
 export const CLAUDE_NOREPLY = ["noreply", "anthropic.com"].join("@");
+// Dependabot のコミットの作者(noreply)と、Dependabot がメッセージの末尾に付ける署名の行(Signed-off-by:)のアドレス。
+// 署名の行のアドレスは、作者が Dependabot のコミットのメッセージの検査(checkCommits)でだけ認める。追加行の検査には足さないので、組み立てる。
+export const DEPENDABOT_NOREPLY = ["49699333+dependabot[bot]", "users.noreply.github.com"].join("@");
+export const DEPENDABOT_SIGNOFF = ["support", "github.com"].join("@");
 // GitHub 上でマージしたときに、GitHub が作るマージコミットのコミッター(作者ではなく、コミッターにだけ認める)
 const GITHUB_WEB_COMMITTER = "noreply@github.com";
 
@@ -282,12 +296,21 @@ export function checkProseBodies(entries: AddedLine[]): string[] {
 export function checkEntries(
   entries: AddedLine[],
   denylistTerms: string[] = [],
-  { message = false, history = false }: { message?: boolean; history?: boolean } = {},
+  {
+    message = false,
+    history = false,
+    signoffEmail,
+  }: {
+    message?: boolean;
+    history?: boolean;
+    /** `Signed-off-by:` の行にだけ認めるアドレス。既定は、なし(コミットのメッセージの検査が、作者を見て渡す) */
+    signoffEmail?: string;
+  } = {},
 ): CheckResult {
   const blocks = [
     ...scan(entries, SECRET_CONTENT_PATTERNS),
     ...scan(entries, ENV_INFO_PATTERNS),
-    ...scanEmails(entries),
+    ...scanEmails(entries, signoffEmail),
     ...scanDenylist(entries, denylistTerms),
     ...checkProseBodies(entries),
     ...(message ? scan(entries, MESSAGE_PHRASE_PATTERNS) : []),

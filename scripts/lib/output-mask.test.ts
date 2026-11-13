@@ -82,6 +82,44 @@ describe("maskLine", () => {
   });
 });
 
+describe("maskLine のホームの下のパス", () => {
+  // ダミーのパスは、連結で組み立てる(docs/app/lessons/0001-test-dummy-values-concat.md)
+  const HOME = "/Us" + "ers/someone";
+
+  it("後半が英数字だけのパス_全体を伏せる", () => {
+    expect(maskLine(`cwd: ${HOME}/work/repo-x/src`, []).text).toBe(`cwd: ${MASK}`);
+  });
+
+  it("後半に日本語を含むパス_全体を伏せる", () => {
+    expect(maskLine(`${HOME}/書類/練習/app`, []).text).toBe(MASK);
+  });
+
+  it("引用符・括弧・カンマで囲まれた、または区切られたパス_パスだけを伏せ、前後の文字を残す", () => {
+    expect(maskLine(`"${HOME}/a/b", (${HOME}/c) x`, []).text).toBe(`"${MASK}", (${MASK}) x`);
+    expect(maskLine(`'${HOME}/a';next`, []).text).toBe(`'${MASK}';next`);
+  });
+
+  it("1 行に 2 つ以上のパス_すべてを伏せる", () => {
+    expect(maskLine(`cp ${HOME}/a/x ${HOME}/b/y`, []).text).toBe(`cp ${MASK} ${MASK}`);
+  });
+
+  it("ホームの直下だけのパス_伏せる", () => {
+    expect(maskLine(`home=${HOME}`, []).text).toBe(`home=${MASK}`);
+  });
+
+  it("空白を含むパス_空白の前までを伏せ、残りは検査に掛からなければ出す", () => {
+    const r = maskLine(`${HOME}/my dir/file`, []);
+    expect(r.text).toBe(`${MASK} dir/file`);
+    expect(r.leaked).toBe(false);
+  });
+
+  it("プレースホルダーのパス_伏せない", () => {
+    for (const line of ["/Us" + "ers/<ユーザー名>/work", "/Us" + "ers/example/work"]) {
+      expect(maskLine(line, [])).toEqual({ text: line, masked: false, leaked: false });
+    }
+  });
+});
+
 describe("envValues と maskValues", () => {
   it("空・短い値・プレースホルダー_伏せる値に含めず、まとめた値は重複を除いて長い順に並べる", () => {
     const env = envValues({ A: "", B: "abc", C: "<プロファイル名>", D: "abcd", E: "abcdefgh", F: " abcd " });

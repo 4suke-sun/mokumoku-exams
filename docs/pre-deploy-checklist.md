@@ -60,6 +60,7 @@
 
 | 項目 | 確認の方法 |
 | --- | --- |
+| デプロイする作業ツリーの先頭が、最新のタグと同じコミットである | `git describe --tags --exact-match HEAD` が成功し、最新のタグ(`git tag --list 'v*' --sort=-v:refname` の先頭)を指す。未コミットの変更がない(`git status --short` が空)。一致しないときは、タグのない変更を含むので、デプロイしない(版を切ってからデプロイする) |
 | ルートの検査が通る | `npm run lint`、`npm run typecheck`、`npm test`、`npm run build` が通る |
 | Lambda に載せる成果物を作れる | `npm run build:lambda` が成功する(CI の `app` ジョブも、`npm run build` のあとに実行する。先に `npm run build` が要る) |
 | 非公開の問題が配信に含まれない | `npm run check:unpublished-bundle` が通る(`npm run build` のあとに実行する。非公開の問題(`data/unpublished.<コード>.json`)の設問文と ID が、`.next` にないこと(設問文が 12 文字未満の問題は、設問文を探さず、ID だけを探す(偶然の一致を避けるため))。CI の `app` ジョブも実行する) |
