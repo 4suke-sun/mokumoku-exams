@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
+  AGENT_MIN_MS,
+  AGENT_MIN_TOKENS,
   formatReport,
   type MetricRecord,
   metricsPath,
   parseCount,
   parseMetrics,
+  removeLastAgent,
   serializeMetric,
   summarizeAgents,
   summarizeLedger,
@@ -62,9 +65,68 @@ describe("serializeMetric", () => {
         ["lint", 0, true],
         ["test", 999_999_999_999, false],
       ]),
-      { type: "agent", at: "t", name: "inspector-deep", ms: 0, tokens: 999_999_999_999 },
+      { type: "agent", at: "t", name: "inspector-deep", ms: AGENT_MIN_MS, tokens: 999_999_999_999 },
     ];
     expect(parseMetrics(records.map(serializeMetric).join(""))).toEqual(records);
+  });
+});
+
+describe("サブエージェントの記録の下限", () => {
+  const agent = (ms: number, tokens: number): MetricRecord => ({
+    type: "agent",
+    at: "t",
+    name: "inspector",
+    ms,
+    tokens,
+  });
+
+  it("下限ちょうどの値_書き出せる", () => {
+    expect(() => serializeMetric(agent(AGENT_MIN_MS, AGENT_MIN_TOKENS))).not.toThrow();
+  });
+
+  it("下限未満の所要時間かトークン(0・1 など)_書き出さずに例外にする", () => {
+    for (const record of [
+      agent(0, 2000),
+      agent(1, 2000),
+      agent(AGENT_MIN_MS - 1, 2000),
+      agent(5000, AGENT_MIN_TOKENS - 1),
+    ]) {
+      expect(() => serializeMetric(record)).toThrow();
+    }
+  });
+
+  it("下限に届かない行がファイルにある_読み込まず、集計に含めない", () => {
+    const text = [agent(5000, 2000), agent(1, 1), agent(0, 0)].map((r) => `${JSON.stringify(r)}\n`).join("");
+    expect(parseMetrics(text)).toEqual([agent(5000, 2000)]);
+    expect(summarizeAgents(parseMetrics(text))[0]?.runs).toBe(1);
+  });
+
+  it("verify の段階の時間_下限を当てず、0 ミリ秒も読み込む", () => {
+    expect(parseMetrics(serializeMetric(verify([["lint", 0, true]])))).toHaveLength(1);
+  });
+});
+
+describe("removeLastAgent", () => {
+  const line = (r: Record<string, unknown>) => JSON.stringify(r);
+  const a1 = line({ type: "agent", at: "t1", name: "inspector", ms: 5000, tokens: 2000 });
+  const a2 = line({ type: "agent", at: "t2", name: "commit-writer", ms: 6000, tokens: 3000 });
+  const v = line({ type: "verify", at: "t3", stages: [{ name: "lint", ms: 10, ok: true }] });
+
+  it("最後のサブエージェントの記録_その 1 行だけを消し、消したあとの集計に含めない", () => {
+    const { text, removed } = removeLastAgent(`${a1}\n${a2}\n${v}\n`);
+    expect(removed).toBe("commit-writer");
+    expect(text).toBe(`${a1}\n${v}\n`);
+    expect(summarizeAgents(parseMetrics(text)).map((s) => s.name)).toEqual(["inspector"]);
+  });
+
+  it("下限に届かず集計から外れた行_消す対象にする", () => {
+    const bad = line({ type: "agent", at: "t4", name: "inspector", ms: 1, tokens: 1 });
+    expect(removeLastAgent(`${a1}\n${bad}\n`)).toEqual({ text: `${a1}\n`, removed: "inspector" });
+  });
+
+  it("サブエージェントの記録がない_何も消さない", () => {
+    expect(removeLastAgent(`${v}\nこわれた行\n`)).toEqual({ text: `${v}\nこわれた行\n`, removed: null });
+    expect(removeLastAgent("")).toEqual({ text: "", removed: null });
   });
 });
 
