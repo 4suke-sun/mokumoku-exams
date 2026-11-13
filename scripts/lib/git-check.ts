@@ -7,6 +7,8 @@ import {
   checkEntries,
   checkSensitiveFilenames,
   checkUnexpectedPaths,
+  DEPENDABOT_NOREPLY,
+  DEPENDABOT_SIGNOFF,
   parseAddedLines,
   textToEntries,
 } from "./pr-secrets-check.ts";
@@ -72,8 +74,15 @@ export function checkCommits(start: string | null, end: string): string[] {
     const [sha = "", authorEmail = "", committerEmail = "", body = ""] = record.split("\x1f");
     const short = sha.slice(0, 7);
     authors.push({ sha: short, authorEmail, committerEmail });
+    // Dependabot のコミットだけ、メッセージの末尾の署名の行(Signed-off-by:)の、Dependabot のアドレスを認める
+    const signoffEmail =
+      authorEmail.toLowerCase() === DEPENDABOT_NOREPLY.toLowerCase() ? DEPENDABOT_SIGNOFF : undefined;
     blocks.push(
-      ...checkEntries(textToEntries(body, `message:${short}`), denylist, { message: true, history: true }).blocks,
+      ...checkEntries(textToEntries(body, `message:${short}`), denylist, {
+        message: true,
+        history: true,
+        signoffEmail,
+      }).blocks,
     );
   }
   return [...checkAuthors(authors), ...blocks];
