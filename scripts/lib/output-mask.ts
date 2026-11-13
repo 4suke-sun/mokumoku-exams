@@ -1,6 +1,7 @@
 /**
  * コマンドの出力(デプロイと、デプロイ前の差分など)から、値を伏せる。伏せるのは次のものだけで、ほかの形は伏せない。
- * - コミット・push・PR の検査と同じ正規表現(認証情報、環境固有の値、個人情報)と、許可されていないメールアドレス
+ * - コミット・push・PR の検査と同じ正規表現(認証情報、環境固有の値、個人情報)と、許可されていないメールアドレス。
+ *   ホームの下のパスは、名前の部分だけでなく、続くパスの残り(空白・引用符・括弧・カンマ・セミコロンか行末まで)も含めて全体を伏せる
  * - 検査にはなく、ここでだけ伏せる形(数字だけの 12 桁。アカウント ID が前後の文脈なしで出る形)
  * - 渡された値(.env の値と、拒否リストの語。大文字小文字は区別しない)
  * 伏せたあとも、上のどれかに掛かる行は、表示しない(通過した行だけを出す)。
@@ -21,6 +22,11 @@ const PATTERNS: RegExp[] = [
   ...[...SECRET_CONTENT_PATTERNS, ...ENV_INFO_PATTERNS, ...PII_CONTENT_PATTERNS].map((p) => p.re),
   /\b\d{12}\b/,
 ];
+// ホームの下のパスは、名前の部分(検査の正規表現)だけでなく、続くパスの残りも含めて全体を伏せる。
+// 終わりは、空白・引用符・括弧・カンマ・セミコロンか行末(空白を含むパスは、空白の前までを伏せ、残りは検査で見る)。
+const HOME_NAME = PII_CONTENT_PATTERNS.find((p) => p.name === "ローカルのユーザーディレクトリのパス")?.re;
+if (!HOME_NAME) throw new Error("ローカルのユーザーディレクトリのパスの正規表現が見つかりません");
+const HOME_PATH = new RegExp(`${HOME_NAME.source}[^\\s"'\`()<>\\[\\]{},;]*`, "g");
 // 端末の色などの制御の並び。値の途中に入ると、どの形にも一致しなくなるので、照合の前に除く
 // biome-ignore lint/suspicious/noControlCharactersInRegex: 制御の並びそのものを除くため
 const ANSI_ESCAPE = /\u001b\[[0-9;?]*[A-Za-z]/g;
@@ -53,7 +59,8 @@ function leaks(text: string, values: readonly string[]): boolean {
 /** 1 行を伏せる。伏せたあとも検査に掛かれば leaked */
 export function maskLine(line: string, values: readonly string[]): { text: string; masked: boolean; leaked: boolean } {
   const plain = line.replace(ANSI_ESCAPE, "");
-  let text = plain;
+  // ホームの下のパスは、全体を先に伏せる(検査の正規表現は名前の部分だけに一致し、後半が残るため)
+  let text = plain.replace(HOME_PATH, MASK);
   // 正規表現は、元の行に先に掛ける。値を先に置き換えると、正規表現が要る前後の文脈(ARN の中のリージョンなど)が崩れる
   for (const re of PATTERNS) text = text.replace(new RegExp(re.source, `${re.flags.replace("g", "")}g`), MASK);
   for (const email of disallowedEmails(text)) text = text.split(email).join(MASK);
