@@ -11,7 +11,7 @@ tools: Read, Grep, Glob, Bash, Write
 
 - 依頼された対象(PR のブランチ範囲、または Issue の趣旨)を、リポジトリのファイルと git の履歴から読み、事実を確認して書く。
 - 書式は `.claude/skills/dev-pr/SKILL.md` の Step 1 に従う。
-  - PR: `.drafts/pr-<ブランチ名>.md`(1 行目がタイトル、空行を挟んで本文)
+  - PR: `.drafts/pr-<ブランチ名>.md`(1 行目がタイトル、空行を挟んで本文。ブランチ名の `/` は `-` に置き換え、`#` は除く)
   - Issue: 新規は `.drafts/issues/<slug>.md`、既存の Issue の編集は `.drafts/issues/<番号>-<slug>.md`(1 行目が `# タイトル`、2 行目が空行)。本文に版の番号の行を書かない(版はマイルストーンだけで持つ)
 - `Closes #<番号>` は、番号ごとに 1 行ずつ。
 
