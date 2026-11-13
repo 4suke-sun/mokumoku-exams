@@ -43,11 +43,24 @@ describe("前回の続きのカード", () => {
     expect((bar.firstElementChild as HTMLElement).style.width).toBe("33%");
   });
 
-  it("グラデーションの面_カードに使う", async () => {
+  it("カードの面_ほかのカードと同じ単色の面で、グラデーションを使わない", async () => {
     saveSession(browserStore(), session("TEST", ["TEST-0001"], {}, "2026-10-11T00:00:00.000Z"));
     render(<ResumeCards exams={exams} />);
     const link = await screen.findByRole("link", { name: "テスト資格を続きから解く" });
-    expect(link.closest("li")?.className).toContain("bg-accent-gradient");
+    const card = link.closest("li");
+    expect(card?.className).toContain("card");
+    expect(card?.className).not.toContain("gradient");
+  });
+
+  it("強調の色_バーの塗りとボタンの点で使い_カードの面には塗らない", async () => {
+    saveSession(browserStore(), session("TEST", ["TEST-0001"], {}, "2026-10-11T00:00:00.000Z"));
+    render(<ResumeCards exams={exams} />);
+    const link = await screen.findByRole("link", { name: "テスト資格を続きから解く" });
+    expect(link.className).toContain("bg-primary");
+    expect(link.className).toContain("text-on-primary");
+    const bar = screen.getByRole("progressbar", { name: "テスト資格の進み具合" });
+    expect((bar.firstElementChild as HTMLElement).className).toContain("bg-primary");
+    expect(link.closest("li")?.className).not.toContain("bg-primary");
   });
 
   it("複数の資格に途中の状態がある_新しく始めた順に並べる", async () => {

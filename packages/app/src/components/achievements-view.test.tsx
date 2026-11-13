@@ -85,7 +85,8 @@ describe("AchievementsView", () => {
   it("結果がまったくない_案内を出す", async () => {
     stubServer({ results: [], days: [] });
     render(<AchievementsView entries={entries} />);
-    expect(await screen.findByText("まだ結果がありません")).toBeTruthy();
+    expect(await screen.findByText("受験した資格がありません")).toBeTruthy();
+    expect(screen.queryByText(/ここに/)).toBeNull();
     expect(screen.getByRole("link", { name: "資格を選ぶ" }).getAttribute("href")).toBe("/exams");
   });
 

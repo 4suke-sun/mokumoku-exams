@@ -193,7 +193,6 @@ export function ResultView({ exam, outline }: Props) {
   if (state.target === "not-found") {
     return (
       <EmptyState
-        icon="🔍"
         headingLevel={1}
         title="その回の結果は見つかりません"
         description="結果が消えたか、アドレスが違う可能性があります。最新の結果か、学習の状況の一覧から開き直してください。"
@@ -218,10 +217,9 @@ export function ResultView({ exam, outline }: Props) {
   if (!latest || answered.length === 0) {
     return (
       <EmptyState
-        icon="📝"
         headingLevel={1}
         title="結果がありません"
-        description="問題を解くと、ここに結果が表示されます。"
+        description="問題を解いてください。"
         action={{ label: "モード選択へ", href: `/exams/${exam.examCode}` }}
       />
     );
@@ -402,9 +400,7 @@ export function ResultView({ exam, outline }: Props) {
           className="space-y-4 lg:sticky lg:top-4 lg:col-start-2 lg:row-start-1 lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto"
         >
           <div
-            className={`card space-y-4 border-2 p-5 ${reached ? "border-correct bg-correct-bg" : "border-warn bg-warn-bg"} ${
-              perfect ? "motion-shine" : ""
-            }`}
+            className={`card space-y-4 border-2 p-5 ${reached ? "border-correct bg-correct-bg" : "border-warn bg-warn-bg"}`}
           >
             <p className={`font-bold ${reached ? "text-correct" : "text-warn"}`}>
               <span aria-hidden="true">{reached ? "✓ " : "△ "}</span>

@@ -9,5 +9,5 @@ tools: Read, Grep, Glob
 
 最初に、次の 2 つの文書を読み、そのとおりに動きます。
 
-- `.claude/skills/dev-commit/inspector-rules.md`: 検査役の共通の決まり(道具、入力、拒否リスト、署名、報告)
+- `.claude/skills/dev-commit/inspector-rules.md`: 検査役の共通の決まり(道具、入力、入力の読み方、判定の範囲、拒否リスト、署名、報告)
 - `.claude/skills/dev-commit/checklist.md`: 見るものと、報告のしかた(必ず守る)

@@ -1,0 +1,41 @@
+{
+  "source": "Anthropic の料金の文書(Pricing)",
+  "checkedOn": "2026-11-03",
+  "unit": "100万トークンあたりのドル",
+  "notes": [
+    "Haiku 5.5 のキャッシュ読み込みは、文書の「キャッシュ読み込みは入力の 0.1 倍(一部のモデルを除く)」から出した値。",
+    "Haiku 5.5 の longContext は、入力(入力とキャッシュの合計)が overTokens を超えるリクエストの単価。キャッシュは、入力に対する倍率(書き込み 5 分 1.25 倍、1 時間 2 倍、読み込み 0.1 倍)から出した値。",
+    "有効な期間は持たず、いまの単価で見る。新しい単価は、モデルの ID の項目を足し、確かめた日を更新する。"
+  ],
+  "models": {
+    "claude-opus-5-5": {
+      "input": 4,
+      "cacheWrite5m": 5,
+      "cacheWrite1h": 8,
+      "cacheRead": 0.2,
+      "output": 20
+    },
+    "claude-sonnet-5-5": {
+      "input": 2,
+      "cacheWrite5m": 2.5,
+      "cacheWrite1h": 4,
+      "cacheRead": 0.1,
+      "output": 10
+    },
+    "claude-haiku-5-5": {
+      "input": 0.1,
+      "cacheWrite5m": 0.125,
+      "cacheWrite1h": 0.2,
+      "cacheRead": 0.01,
+      "output": 0.5,
+      "longContext": {
+        "overTokens": 100000,
+        "input": 0.5,
+        "cacheWrite5m": 0.625,
+        "cacheWrite1h": 1,
+        "cacheRead": 0.05,
+        "output": 2.5
+      }
+    }
+  }
+}

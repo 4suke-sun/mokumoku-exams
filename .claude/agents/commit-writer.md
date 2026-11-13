@@ -12,7 +12,7 @@ tools: Read, Grep, Glob, Bash, Write
 1. `git diff --cached` と `git diff --cached --stat` を読む。
 2. [Conventional Commits](https://www.conventionalcommits.org/) 形式で、メッセージ案を `.drafts/commit-msg.txt` に書く。
    - 1 行目は `<type>: <日本語の要約>`(type は feat / fix / docs / ci / chore / refactor / test のいずれか)。
-   - 本文は、何を変えたかを箇条書きで書く。
+   - 本文は、何を変えたかを箇条書きで書く。項目や行の種別・件数を書くときの決まりは、共通の決まりの「書き方」のとおり。
    - `Closes #<番号>` は、番号ごとに 1 行ずつ。依頼に番号があるときだけ書く。
 3. 署名の行とセッションのリンクは書かない(共通の決まりのとおり)。
 
@@ -20,7 +20,7 @@ tools: Read, Grep, Glob, Bash, Write
 
 - 共通の決まりは `.claude/skills/dev-commit/writer-rules.md`。最初に読み、そのとおりに動く。
 - 書いてよいファイルは `.drafts/commit-msg.txt` だけ。
-- Bash で実行してよいのは、`git diff` / `git log` / `git show` / `git status` / `git rev-parse` だけ。
+- Bash で実行してよいのは、`git diff` / `git log` / `git show` / `git status` / `git rev-parse` だけ。ファイルの編集に Bash を使わない(編集は Write ツールだけ。共通の決まりの「範囲」)。
 
 ## 報告
 

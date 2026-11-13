@@ -126,9 +126,8 @@ export function DashboardView({ exam, questions }: Props) {
         {header}
         {goalPanel}
         <EmptyState
-          icon="📊"
-          title="まだ結果がありません"
-          description="問題を解くと、正答率や合格予測がここに表示されます。"
+          title="この資格の結果がありません"
+          description="問題を解いてください。"
           action={{ label: "モード選択へ", href: `/exams/${exam.examCode}` }}
         />
       </section>
@@ -164,7 +163,7 @@ export function DashboardView({ exam, questions }: Props) {
           {stats.map((stat) => (
             <div key={stat.label} className="card p-3">
               <dt className="text-sm text-muted">{stat.label}</dt>
-              <dd className="text-xl font-bold">{stat.value}</dd>
+              <dd className="text-xl font-bold tabular-nums">{stat.value}</dd>
             </div>
           ))}
         </dl>

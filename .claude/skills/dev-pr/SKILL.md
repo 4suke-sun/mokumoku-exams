@@ -17,7 +17,7 @@ PR を出すときは、push も含めて、検査を 1 回、人の承認を 1 
 
 | 役 | やること | してはいけないこと |
 |---|---|---|
-| 作成役(`draft-writer`) | 差分・Issue をもとに、タイトルと本文を `.drafts/` に書く | `.drafts/` 以外の編集、git の書き込み、`gh` の書き込み系、ネットワーク操作 |
+| 作成役(`draft-writer`) | 差分・Issue をもとに、タイトルと本文を `.drafts/` に書く | `.drafts/` 以外の編集、git の書き込み、`gh` の書き込み系、ネットワーク操作、Bash でのファイルの編集(編集は Write ツールだけ) |
 | 検査役(別のサブエージェント。`inspector`、必要なら `inspector-deep`) | 下書きと差分を、`checklist.md` に沿って確認し、判定を返す | **一切の書き込み**(読み取り専用) |
 | メイン | 各役を起動し、人の承認後に、承認された下書きから投稿する | 承認前の投稿、承認後の下書きの編集 |
 
@@ -49,7 +49,7 @@ Issue の場合は、さらに次を確かめる(決まりは `CONTRIBUTING.md` 
 
 PR と Issue のどちらも、次を確かめる:
 
-8. **同じ記述の洗い出し**: 下書きに仕様・名前・数・振る舞いを書くときは、`/dev-commit` の Step 0 の 5 と同じ語で検索し、
+8. **同じ記述の洗い出し**: 下書きに仕様・名前・数・振る舞いを書くときは、`/dev-commit` の Step 0 の 5 と同じ語(言い換えや列挙まで広げた検索語を含む)で検索し、
    リポジトリの文書や関係する Issue の記述と食い違わないことを、検査に出す前に確かめる
 
 ## Step 1. 作成役: 下書きを書く
@@ -65,14 +65,19 @@ PR と Issue のどちらも、次を確かめる:
   [
     { "action": "create", "file": "example.md", "milestone": "v0.99.0", "labels": ["chore"] },
     { "action": "create", "file": "later-example.md", "labels": ["feat", "later"] },
+    { "action": "create", "file": "lessons-example-key.md", "milestone": "v0.99.0", "labels": ["lessons"] },
     { "action": "edit", "file": "123-existing.md", "number": 123, "milestone": "v0.99.0" }
   ]
   ```
+
+  受け箱から起票する Issue(`lessons-<キー>.md`)には、ラベル `lessons` を付ける。`node scripts/lessons.ts draft` が、下書きとともに、この項目(マイルストーンなし)を一覧へ足す。
+  マイルストーンは、ここで決めて足す(`docs/lessons-workflow.md` の「繰り返しと Issue の候補」)。
 
 作成役に依頼する内容:
 
 - 作業ディレクトリ、対象(PR のブランチ範囲 `origin/main..HEAD`、または Issue の趣旨)
 - 「上の形式で下書きを書く。`Closes #<番号>` は番号ごとに 1 行ずつ」
+- 材料の渡し方は、`/dev-commit` の Step 2 のとおり(現在の問題と決まりの形で渡す。回数・版・過去の作業の経緯は入れない。設定の値は、値と、値を選んだ理由を分ける)
 
 ## Step 2. 機械的な検査
 
@@ -122,6 +127,8 @@ node scripts/prepare-inspection.ts --cached
 - 「`.claude/skills/dev-commit/checklist.md` を読み、その項目に沿って、下書きと、PR の場合は `.drafts/inspect/` のファイル
   (基準との差分。検査済みで `covered.txt` に挙げられたコミットの差分は除く。全コミットのメッセージ、ブランチ名)を確認する」
 - Step 0 の 8 で検索した語と、食い違いを直さないと決めた箇所(場所と理由)。検査役は、渡された語でリポジトリを検索して確かめてよい
+- 作成役の報告の「置いた前提」にある照合の記録(開いた関数・定数、文書と節の名前、確かめた境界の場合。`.claude/skills/dev-commit/writer-rules.md` の「書き方」)。検査役は、記録を読んで、照合の抜けを探す
+- 判定の範囲(`/dev-commit` の Step 3 の「判定の範囲」のとおり。参照先として渡すファイルは、既存で差分の対象ではないと書く。再検査では、前回の指摘の一覧と、直した箇所を添える。`.claude/skills/dev-commit/reconfirm.md` の「再検査の範囲と回数」)
 - 「報告は、チェックリストの『報告のしかた(必ず守る)』に従う(値を引用しない。`.drafts/inspect/stamp.txt` のスタンプを書き写す。最後に `判定: OK/WARN/BLOCK`)」
 
 検査役の報告のスタンプが、いまの入力と一致することを確かめる(`node scripts/prepare-inspection.ts --verify <報告のスタンプ>`。`inspector-deep` も使ったときは、報告ごとに、それぞれのスタンプで実行する)。

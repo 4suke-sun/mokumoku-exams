@@ -25,20 +25,22 @@ npm install   # 依存を入れ、検査フック(.githooks)を有効にしま�
 | `npm run test:e2e` | 主要な画面の通し確認(Playwright)。開発サーバーを代替の認証で起動して通す。初回は `npx playwright install chromium` が必要 |
 | `npm run check:release-notes` | リリースノートとタグの対応の検査 |
 | `npm run validate:data` | 資格マスタ・問題データ・非公開の問題・カリキュラム・体系ノート・コードドリル・要約カード・使い方ページのデータの検査(仕様: `docs/data-spec.md`) |
-| `npm run lessons -- <add\|list\|repeats\|draft\|close>` | 引っかかりの受け箱(`.git` の共有領域)の記録と集計。手順は `docs/lessons-workflow.md` |
+| `npm run lessons -- <add\|list\|repeats\|draft\|close\|closed>` | 引っかかりの受け箱(`.git` の共有領域)の記録と集計。手順は `docs/lessons-workflow.md` |
 | `npm run metrics` | 手元の計測の集計(`verify` の段階ごとの時間、サブエージェントの時間とトークン、検査の台帳の内訳)。`-- agent <役> <ミリ秒> <トークン>` で記録を足す |
+| `npm run agent-cost -- [--since <日付>] [--until <日付>] [--dir <置き場>]` | Claude Code のセッション記録(jsonl)から、エージェント定義ごと・モデルごとのトークンと API 換算の費用(見積もりで、請求額ではない)、起動分、メインの 1 リクエストあたりの読み込み量を集計する(読み取りだけ)。日付は `YYYY-MM-DD`(どちらもその日を含む)。既定の置き場は、リポジトリと作業ツリーのセッションの記録(`CLAUDE_CONFIG_DIR` か `~/.claude/projects/` の下)で、`--dir` で指定もできる。単価表は `scripts/data/model-prices.json`。出力に記録の本文・パス・セッションの識別子は出さない。手で足す計測(`npm run metrics` の `agent`)とは併用する。手順は `docs/lessons-workflow.md` の「計測」 |
 | `npm run -s mask` | 標準入力の出力から値を伏せて出す(コミット・push・PR の検査と同じ正規表現と許可されていないメールアドレス、数字だけの 12 桁、`.env` の 4 文字以上の値、拒否リストの語。伏せきれない行は出さない)。合成と差分の出力を読むときに通す。伏せない形と注意は `docs/app/lessons/0004-mask-diff-output.md` |
 | `npm run check:lessons` | 学びの記録(`docs/app/lessons/`)の書式の検査。`-- --write` で一覧を更新 |
 | `npm run check:test-titles` | テストの題(`it` / `test`)の形の検査。`-- --write` で、直した題を基準から消す |
 | `npm run check:docs` | 文書の相対リンクの先と、`npm run <名前>` のスクリプトが実在することの検査(対象: `README.md`、`CLAUDE.md`、`CONTRIBUTING.md`、`docs/`、`.claude/skills/`、`packages/*/README.md`) |
 | `npm run check:env` | アプリ(`packages/app`)が読む環境変数が、CDK(`packages/infra/lib/web-stack.ts`)から Lambda へ渡されることの検査。Lambda が自動で与える変数と開発用の変数は、`scripts/lib/env-contract-check.ts` の一覧で除く。通知の送信の Lambda と、動的な参照(`env[変数]` など)は対象にしない |
+| `npm run check:ui-patterns` | 画面の書き方の型の検査(アプリの画面の部品と CSS。`transition: all`、ホバーの拡大、無限に繰り返す動き、極太・斜体・英字の大文字と字間、全角の「！」、グラデーション、半端な余白、待機メッセージの文型、絵文字、1 辺だけの太い色線、丸い錠剤形、色の直書き、本文の行間など。決まりは `docs/app/design-tone.md` の「型を除く決まり」)。意図して残す箇所は、`scripts/lib/ui-patterns-check.ts` の許可の一覧に、理由つきで置く(件数が合わないと止める)。報告は場所と種類だけ |
 | `npm run check:pr-closes -- --pr <番号>` | PR の `Closes` の Issue が同じ版のマイルストーンで、リリースノートの最新の版がそのマイルストーンの名前(`vX.Y.Z`)と同じで、マイルストーンに `Closes` にない未完了の Issue がないことの検査(`gh` で読む)。`--body-file <下書き>` で、投稿の前に下書きを検査できる。CI の PR で実行する |
 
 ### 手元の検査(PR の前)
 
 PR を出す前に、`npm run verify` を通します。`verify` の各検査は、CI でもそれぞれ実行されます(`check:*` は CI の `check` ジョブのステップ(build のあとの `check:unpublished-bundle` だけは `app` ジョブのステップ)、ワークスペースごとのテストは `app`・`infra`・`pipeline` のジョブ(`data-schema` のテストは `check` ジョブ)、build は `app` のジョブ。`verify` 自体は CI で動きません)。
 
-- `verify` が順に実行するもの: `lint`、`typecheck`、`check:release-notes`・`check:lessons`・`check:test-titles`・`check:docs`・`check:env`・`check:boundary`・`check:retired-ids`(CI の `check` ジョブが実行するもの。フック用の `check:branch`・`check:commit` と、`check:pr-closes` は含まない)、`validate:data`、関係するテスト、関係するワークスペースの `build`、アプリを選んだときは、build のあとの `check:unpublished-bundle`(非公開の問題がビルド成果物に含まれないこと)。失敗した段階の名前を示して、終了コード 1 で止まります。段階ごとの時間も表示します。
+- `verify` が順に実行するもの: `lint`、`typecheck`、`check:release-notes`・`check:lessons`・`check:test-titles`・`check:docs`・`check:env`・`check:boundary`・`check:retired-ids`・`check:ui-patterns`(CI の `check` ジョブが実行するもの。フック用の `check:branch`・`check:commit` と、`check:pr-closes` は含まない)、`validate:data`、関係するテスト、関係するワークスペースの `build`、アプリを選んだときは、build のあとの `check:unpublished-bundle`(非公開の問題がビルド成果物に含まれないこと)。失敗した段階の名前を示して、終了コード 1 で止まります。段階ごとの時間も表示します。
 - 関係するワークスペース(app / infra / pipeline)は、`origin/main` との差分と、未コミット・未追跡の変更から選びます。`origin/main` がないなど、変更が分からないときは、すべて選びます。選び方は、CI の `changes` ジョブと同じです(指定の文字列が CI とずれないことは、テストが確かめます)。契約(`packages/data-schema`)、ルートの設定、`scripts/`、CI の定義が変わったときは、すべて選びます。`scripts/` のテストと `packages/data-schema` のテストは、常に実行します。
 - テストが途中で止まったとき(失敗や、時間の上限による中断)は、止まった 1 件だけを流し直して通っても、後ろのテストの結果は分かりません。ワークスペースごとにすべて流し直して、全件の結果を確かめてから push します。`npm run test:all` で、最初の失敗で止まらずに、すべての結果を 1 回で見られます。ただし、終わらない段階があると、`test:all` もそこで止まります(時間の上限は設けていません)。その段階は、「テストが止まる・遅いとき」の手順で原因を確かめます。
 - `verify` に含まないもの: `npm run test:e2e`(ブラウザを使う通し確認で重い。CI の `e2e` ジョブが通す。画面の動きを変えたときは、手元でも実行する)、`check:pr-closes`(PR の番号が要る。PR の前は `npm run check:pr-closes -- --body-file <下書き>` で下書きを検査する)。
@@ -68,7 +70,7 @@ E2E の試験は、再試行なしで通ることを求めます。CI は、失�
 1. 負荷を確かめる。ほかのテストの並行実行、開発サーバー、E2E、ブラウザが動いていると、子プロセスを起動するテストが遅くなります。並行して実行せず、`npm run verify` を 1 つだけ実行します。
 2. 終わらないプロセスを探す: `npx vitest run --reporter=hanging-process`(ワークスペースの中では、そのワークスペースのテストだけを調べる)。
 3. 遅いテストを探す: `npx vitest run --reporter=verbose`。
-4. 子プロセスを起動するテストのタイムアウトは、ルートと作問パイプライン(`packages/pipeline`)が 30 秒(それぞれの `vitest.config.ts`)、スタックの合成(`packages/infra`)が長く設定してあります。これを延ばして直す前に、上の 1〜3 で原因を確かめます。
+4. 子プロセスを起動するテストのタイムアウトは、ルートが 60 秒で、同時に動くワーカーを CPU の半分に絞ってあります(ルートの `vitest.config.ts`)。作問パイプライン(`packages/pipeline`)は 30 秒(その `vitest.config.ts`)、スタックの合成(`packages/infra`)が長く設定してあります。これを延ばして直す前に、上の 1〜3 で原因を確かめます。
 
 ## ブランチ
 
@@ -209,9 +211,23 @@ GitHub Actions を、それぞれ 1 件の PR にまとめます。題とコミ�
 - 拒否リスト: 主の作業ツリーの `.pr-secrets-denylist` が、作業ツリーでも効きます(`### 拒否リスト`)。複製は要りません。
 - 並列の上限: 実装を担当するサブエージェント(実装役)は、同時に 2 体までにします。
 - 直列にする条件: 同じ画面やデータに触る版は、並列にせず、直列にします。触る範囲が重なるかは、各版の変更予定のパス(`packages/app/src/app/` の同じ画面、`data/` の同じファイル、`packages/data-schema/`)を比べて見分けます。重なれば直列です。
-- リリースノート: どの版も `data/release-notes.json` の先頭にエントリを足すので、並列の版は同じ位置が変わります。版の順にマージし、あとの版は、前の版のマージのあとの `main` を取り込んで、競合を解消してからマージします。
+- リリースノート: どの版も `data/release-notes.json` の先頭にエントリを足すので、並列の版は同じ位置が変わります。版の順にマージし、あとの版は、前の版のマージのあとの `main` を取り込んで、競合を解消してからマージします。この取り込みのコミットでは、検査の入力が、競合を解消したファイルだけに絞られます(`/dev-commit` の Step 3)。
 - 長い作業: 端末のスリープで作業が止まらないよう、スリープを防ぎます(macOS では `caffeinate -i <コマンド>`)。
 - 後始末: 作業ツリーの削除(`git worktree remove`)は、版のマージとタグのあとに、最後にまとめて行います。未コミットの変更がないことを確かめてから消します。
+
+## セッションの区切り(Claude Code)
+
+メインのセッションは、応答のたびに、それまでの会話の全体を読み直します。セッションが長くなるほど、1 リクエストあたりの読み込み量が増え、費用の大半がその読み直しになります。
+読み込み量は、`npm run agent-cost` の「メイン」(1 リクエストあたりの平均の読み込み量と、セッションごとの分布)で見ます([docs/lessons-workflow.md](docs/lessons-workflow.md) の「計測」)。
+
+- 区切り: 次の 2 つで、新しいセッションに分けます。
+    - 版ごと: 版のマージとタグ(`/dev-release`)のあと、次の版に着手する前。
+    - 作業ツリーごと: 1 つの作業ツリーを、1 つのセッションが担当します(`## 並行する作業(作業ツリー)`)。
+    - 版の途中(Issue ごと)では分けません。版の途中の決定と理由は、最後の報告の材料として会話に控えるため(`/dev-version` の Step 2)です。
+- 分けてよい状態: 未コミットの変更と未 push のコミットがなく(`npm run status`)、検査と承認の途中でないとき。検査役が走っている間と、承認の印を書いてから push・投稿が済むまで(`### 承認の印(Claude Code のフック)`)は、分けません。
+  分ける前に、決めたことと理由が、Issue・PR・コミットのメッセージ・文書に書かれていることを確かめます(会話にだけ残さない)。
+- 再開: `CLAUDE.md` の「進め方」のとおり、`npm run status` で状態を確かめます。手書きの引き継ぎのメモは使いません。
+- 効果の確かめ方: 版の締め(`/dev-release` の Step 4)で、メインの 1 リクエストあたりの読み込み量を見ます。同じ長さの期間・同程度の作業量で比べ、読み込み量が減らないか、再開の手戻りが増えるときは、この節を戻します(履歴は書き換えず、次のコミットで直します)。
 
 ## 書いてはいけないもの
 
@@ -231,6 +247,7 @@ GitHub Actions を、それぞれ 1 件の PR にまとめます。題とコミ�
 - マイルストーンを新設するときは、説明に、その版の主題と、前の版から何を前提にするかを書きます。
 - 起票の前に、似た題の Issue を検索し、候補を人に見せます(`gh issue list --state all --search "<題の語>"`)。「重複」と決めるのは人です。
 - 起票・編集は、下書きとマイルストーン・ラベルの一覧(マニフェスト)から、`scripts/post-issues.ts` でまとめて行います(手順: `.claude/skills/dev-pr`)。承認の時点の封印(下書きのハッシュと、一覧の項目 action・number・milestone・labels のハッシュ)を一覧に記録し、投稿の前に一致を確かめます。投稿のあと、番号・題・URL の結果を一覧に書き戻して表示します。途中で失敗しても、投稿済みの行は飛ばして再実行できます。既存の Issue の編集では、ラベルは追加だけで、マイルストーンを付けるときはラベル `later` を外します。
+- 受け箱から起票する Issue には、ラベル `lessons` を付けます(`node scripts/lessons.ts draft` が、一覧の項目に入れます。決まりは [docs/lessons-workflow.md](docs/lessons-workflow.md) の「繰り返しと Issue の候補」)。
 
 ## Pull Request
 

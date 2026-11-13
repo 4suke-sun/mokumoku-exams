@@ -101,9 +101,8 @@ export function ReviewView({ exams }: { exams: ReviewExam[] }) {
       {message ? <Notice kind={message.kind}>{message.text}</Notice> : null}
       {groups.length === 0 ? (
         <EmptyState
-          icon="🎉"
           title="復習を待っている問題はありません"
-          description="間違えた問題があると、ここに並びます。"
+          description="間違えた問題と、自信なしの印を付けた問題が、復習の対象になります。"
           action={{ label: "資格を選ぶ", href: "/exams" }}
         />
       ) : (

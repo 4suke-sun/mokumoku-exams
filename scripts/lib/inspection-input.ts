@@ -3,6 +3,7 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { git } from "./git-check.ts";
 import { coveredCommits } from "./inspection-covered.ts";
+import { type MergeNarrowing, narrowMergeInput } from "./inspection-merge.ts";
 import { findDenylistPaths } from "./local-denylist.ts";
 
 export const INSPECT_DIR = ".drafts/inspect";
@@ -19,9 +20,11 @@ export type InspectionMode = { kind: "cached" } | { kind: "range"; range: string
 
 const COMMIT_FORMAT = "=== コミット %h%n作者: %ae%nコミッター: %ce%n%n%B";
 const OMITTED = "(すべてのコミットが検査済みのため、差分は省略した。covered.txt を参照)\n";
+const MERGE_OMITTED =
+  "(取り込む側とも今の HEAD とも違う内容になったファイルがないため、差分は省略した。covered.txt を参照)\n";
 
 /** 差分の 1 ファイル分(またはコミットの見出し)の始まりの行。分担は、この境目で切る。 */
-const BOUNDARY = /^(diff --git |diff --cc |=== コミット )/;
+const BOUNDARY = /^(diff --git |diff --cc |diff --combined |=== コミット )/;
 
 /**
  * 差分を、行数の目安以下の分担に分ける。ファイルの境目で切り、1 ファイルが目安を超えるときは、行の範囲で切る。
@@ -62,10 +65,31 @@ export function splitDiff(diff: string, limit = INSPECT_PART_LINES): string[] {
 function partsList(parts: string[]): string {
   const rows = parts.map((part, i) => {
     const lines = part.split(/(?<=\n)/).length;
-    const firstFile = /^diff (?:--git a\/|--cc )(\S+)/m.exec(part)?.[1] ?? "(前の分担のファイルの続き)";
+    const firstFile = /^diff (?:--git a\/|--cc |--combined )(\S+)/m.exec(part)?.[1] ?? "(前の分担のファイルの続き)";
     return `分担 ${i + 1}\tdiff-${i + 1}.patch\t${lines} 行\t最初のファイル: ${firstFile}`;
   });
   return `差分が ${INSPECT_PART_LINES} 行(INSPECT_PART_LINES)を超えたため、${parts.length} つの分担に分けた。\n${rows.join("\n")}\n`;
+}
+
+/** マージの途中の絞り込みができないとき(git の実行に失敗したなど)は、絞らず、ステージした差分をすべて出す。 */
+function safeMergeNarrowing(): MergeNarrowing | null {
+  try {
+    return narrowMergeInput();
+  } catch {
+    return null;
+  }
+}
+
+/** covered.txt の本文。省いたコミットか、マージで省いたファイルを挙げる。省いたものがなければ「なし」。 */
+function coveredText(covered: string[], merge: MergeNarrowing | null): string {
+  if (merge) {
+    const omitted = merge.covered.length > 0 ? `:\n${merge.covered.join("\n")}\n` : "(なし)\n";
+    return `マージの途中で、取り込む側(MERGE_HEAD)が公開済み(origin/main に含まれる)のため、差分のファイルは、取り込む側とも今の HEAD とも違う内容になったファイルだけを、結合した差分(diff --combined)で出している。取り込む側と同じ内容になったファイルは、公開済みとして差分から省いた${omitted}`;
+  }
+  if (covered.length > 0) {
+    return `検査済みのため、差分のファイル(diff.patch、分けたときは diff-N.patch)から差分を省いたコミット(メッセージと作者は commits.txt にある):\n${covered.map((sha) => sha.slice(0, 7)).join("\n")}\n`;
+  }
+  return "なし(すべてのコミットの差分を、差分のファイルに出している)\n";
 }
 
 /** 台帳が読めないときは、省略せず、すべてのコミットの差分を出す。 */
@@ -82,6 +106,8 @@ function safeCovered(range: string, root: string): string[] {
  * 差分・ログ・ブランチ名・拒否リストの置き場は、メインのセッションがここに用意する。
  * 範囲(push・PR)では、commit のときに検査した差分(台帳にある)の本文は省き、covered.txt に挙げる。
  * コミットのメッセージと作者は、検査済みでも、毎回 commits.txt に出す。
+ * commit(ステージした差分)で、公開済みのコミットを取り込むマージの途中のときは、公開済みの内容(取り込む側と同じ内容になったファイル)の
+ * 差分を省き、競合を解消した部分だけを出す。省いたファイルは covered.txt に挙げる(scripts/lib/inspection-merge.ts)。
  */
 export function buildInspection(mode: InspectionMode, root: string): Record<string, string> {
   const range = mode.kind === "range" ? mode.range : mode.kind === "pr" ? `${mode.base}..HEAD` : null;
@@ -92,6 +118,7 @@ export function buildInspection(mode: InspectionMode, root: string): Record<stri
   let diff: string;
   let names: string;
   let commits: string;
+  let merge: MergeNarrowing | null = null;
   if (range) {
     if (covered.length === 0) {
       diff =
@@ -112,7 +139,8 @@ export function buildInspection(mode: InspectionMode, root: string): Record<stri
         : `${git(["log", "--name-status", `--format=${COMMIT_FORMAT}`, range])}\n=== 範囲の正味の差分 ===\n${git(["diff", "--name-status", range])}`;
     commits = git(["log", `--format=${COMMIT_FORMAT}`, range]);
   } else {
-    diff = git(["diff", "--cached"]);
+    merge = safeMergeNarrowing();
+    diff = merge ? (merge.diff.trim() === "" ? MERGE_OMITTED : merge.diff) : git(["diff", "--cached"]);
     names = git(["diff", "--cached", "--name-status"]);
     commits = `作者(これから作るコミット): ${git(["config", "user.email"]).trim()}\n`;
   }
@@ -130,10 +158,7 @@ export function buildInspection(mode: InspectionMode, root: string): Record<stri
     ...diffFiles,
     "files.txt": names,
     "commits.txt": commits,
-    "covered.txt":
-      covered.length > 0
-        ? `検査済みのため、差分のファイル(diff.patch、分けたときは diff-N.patch)から差分を省いたコミット(メッセージと作者は commits.txt にある):\n${covered.map((sha) => sha.slice(0, 7)).join("\n")}\n`
-        : "なし(すべてのコミットの差分を、差分のファイルに出している)\n",
+    "covered.txt": coveredText(covered, merge),
     "branch.txt": `${git(["branch", "--show-current"]).trim()}\n`,
     "denylist.txt":
       denylist.length > 0

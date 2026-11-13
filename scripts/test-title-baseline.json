@@ -10,8 +10,7 @@
     "色はテーマの役割の色だけを使う(ライトとダーク・リッチとシンプルで切り替わる)"
   ],
   "packages/app/src/components/empty-state.test.tsx": [
-    "タイトルと説明を表示する",
-    "アイコンは飾りとして読み上げない"
+    "タイトルと説明を表示する"
   ],
   "packages/app/src/components/exam-info.test.tsx": [
     "モード選択へ戻るリンク"

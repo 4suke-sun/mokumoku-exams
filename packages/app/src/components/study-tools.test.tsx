@@ -201,7 +201,8 @@ describe("学習の状況", () => {
   it("結果がない_案内を表示し_合格予測は出さない", async () => {
     stubServer({ results: [], review: [], bookmarks: [] });
     render(<DashboardView exam={exam} questions={questions} />);
-    expect(await screen.findByText("まだ結果がありません")).toBeTruthy();
+    expect(await screen.findByText("この資格の結果がありません")).toBeTruthy();
+    expect(screen.queryByText(/ここに/)).toBeNull();
     expect(screen.queryByText("合格予測")).toBeNull();
   });
 });

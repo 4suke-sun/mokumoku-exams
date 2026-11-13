@@ -46,7 +46,7 @@ function Bars({ rows, caption }: Pick<Props, "rows" | "caption">) {
 
 function Table({ rows, caption, valueLabel = "結果" }: Pick<Props, "rows" | "caption" | "valueLabel">) {
   return (
-    <table className="w-full text-left text-sm">
+    <table className="w-full text-left text-sm tabular-nums">
       <caption className="sr-only">{caption}</caption>
       <thead>
         <tr className="border-b border-line text-muted">
@@ -61,11 +61,11 @@ function Table({ rows, caption, valueLabel = "結果" }: Pick<Props, "rows" | "c
       <tbody>
         {rows.map((row) => (
           <tr key={row.key} className="border-b border-line last:border-0">
-            <th scope="row" className={`py-1.5 pr-3 font-bold ${row.textClass ?? ""}`}>
+            <th scope="row" className={`py-2 pr-3 font-bold ${row.textClass ?? ""}`}>
               {row.label}
               {row.warn ? <span className="ml-2 chip tone-orange">合格ラインより下</span> : null}
             </th>
-            <td className="py-1.5">{row.detail}</td>
+            <td className="py-2">{row.detail}</td>
           </tr>
         ))}
       </tbody>

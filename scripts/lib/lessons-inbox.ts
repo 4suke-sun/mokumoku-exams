@@ -4,6 +4,7 @@
  * 純粋な関数だけを置く(読み書きと CLI は scripts/lessons.ts)。
  */
 import { join } from "node:path";
+import type { ManifestEntry } from "./issue-manifest.ts";
 
 /** 誰の問題か */
 export const WHOS = ["main", "subagent", "human", "system"] as const;
@@ -244,6 +245,39 @@ export function formatIssueDraft(repeat: Repeat): string {
     "",
   ];
   return lines.join("\n");
+}
+
+/** 受け箱から起票する Issue に付けるラベル。決まりは docs/lessons-workflow.md の「繰り返しと Issue の候補」。 */
+export const LESSONS_LABEL = "lessons";
+
+/** 繰り返しの種類の下書きのファイル名(`.drafts/issues/` の下)。 */
+export function draftFileName(key: string): string {
+  return `lessons-${key}.md`;
+}
+
+/**
+ * Issue の下書きの一覧(`.drafts/issues/manifest.json`)に、作った下書きの項目(新規、ラベル `lessons`)を足す。
+ * 一覧にすでに同じ `file` の項目があるときは、足さず、書き換えない(人が直したラベルやマイルストーン、投稿の結果を守る)。
+ * マイルストーンは付けない。起票の場で決める(版が決まっていない新規の Issue は、一覧の検査で、マイルストーンかラベル `later` を求められる)。
+ * 一覧が配列でないときは null(足さない)。
+ */
+export function addDraftEntries(
+  manifest: unknown,
+  files: string[],
+): { entries: unknown[]; added: string[]; skipped: string[] } | null {
+  if (!Array.isArray(manifest)) return null;
+  const present = new Set<unknown>(manifest.map((entry) => (entry as { file?: unknown } | null)?.file));
+  const added = files.filter((file) => !present.has(file));
+  const skipped = files.filter((file) => present.has(file));
+  const fresh: ManifestEntry[] = added.map((file) => ({ action: "create", file, labels: [LESSONS_LABEL] }));
+  return { entries: [...manifest, ...fresh], added, skipped };
+}
+
+/** 対処済みにした記録(キー・行き先・日付)。記録した順。対処していないキーは含まない。 */
+export function closedMarks(records: InboxRecord[]): { key: string; ref: string; date: string }[] {
+  return records.flatMap((record) =>
+    record.type === "closed" ? [{ key: record.key, ref: record.ref, date: record.at.slice(0, 10) }] : [],
+  );
 }
 
 /** 受け箱の集計(原因・誰の問題か・昇格先ごとの件数)。計測に使う。 */

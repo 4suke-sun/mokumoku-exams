@@ -35,7 +35,7 @@ export function QuestionGrid({ total, current, answered, flagged, onSelect }: Pr
       >
         {open ? "一覧を閉じる" : "一覧を開く"}
       </button>
-      <ol id={listId} className={`${open ? "grid" : "hidden"} grid-cols-5 gap-1.5 lg:grid`}>
+      <ol id={listId} className={`${open ? "grid" : "hidden"} grid-cols-5 gap-2 lg:grid`}>
         {Array.from({ length: total }, (_, i) => {
           const states = [answered[i] ? "回答済み" : "未回答", ...(flagged[i] ? ["見直し"] : [])];
           return (

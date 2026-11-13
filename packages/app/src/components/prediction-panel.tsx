@@ -71,7 +71,7 @@ export function PredictionPanel({ exam, prediction }: { exam: PublishedExam; pre
 
       <details className="card p-4">
         <summary className="cursor-pointer font-bold">分野ごとの配点・正答率・平均回答時間</summary>
-        <table className="mt-3 w-full text-left text-sm">
+        <table className="mt-3 w-full text-left text-sm tabular-nums">
           <caption className="sr-only">分野ごとの配点・正答率・平均回答時間</caption>
           <thead>
             <tr className="border-b border-line text-muted">
@@ -92,12 +92,12 @@ export function PredictionPanel({ exam, prediction }: { exam: PublishedExam; pre
           <tbody>
             {prediction.domains.map((row) => (
               <tr key={row.domain} className="border-b border-line last:border-0">
-                <th scope="row" className="py-1.5 pr-3 font-bold">
+                <th scope="row" className="py-2 pr-3 font-bold">
                   {names.get(row.domain) ?? row.domain}
                 </th>
-                <td className="py-1.5 pr-3">{Math.round(row.weight * 1000) / 10}%</td>
-                <td className="py-1.5 pr-3">{row.substituted ? "出題なし" : `${row.percent}%`}</td>
-                <td className="py-1.5">{row.avgTimeMs === null ? "-" : `${formatAnswerTime(row.avgTimeMs)}/問`}</td>
+                <td className="py-2 pr-3">{Math.round(row.weight * 1000) / 10}%</td>
+                <td className="py-2 pr-3">{row.substituted ? "出題なし" : `${row.percent}%`}</td>
+                <td className="py-2">{row.avgTimeMs === null ? "-" : `${formatAnswerTime(row.avgTimeMs)}/問`}</td>
               </tr>
             ))}
           </tbody>

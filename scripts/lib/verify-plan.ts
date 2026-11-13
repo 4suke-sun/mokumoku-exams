@@ -47,6 +47,7 @@ export const CHECK_SCRIPTS = [
   "check:env",
   "check:boundary",
   "check:retired-ids",
+  "check:ui-patterns",
 ];
 
 /** CI の `app` ジョブが、build のあとに実行する検査(verify でも、build のあとに実行する) */

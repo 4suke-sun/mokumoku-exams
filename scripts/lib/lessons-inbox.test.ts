@@ -1,12 +1,17 @@
 import { describe, expect, it } from "vitest";
+import { sealInput, validateManifest } from "./issue-manifest.ts";
 import {
+  addDraftEntries,
   buildCandidate,
   type Candidate,
+  closedMarks,
   DEFAULT_THRESHOLD,
+  draftFileName,
   findRepeats,
   formatIssueDraft,
   type InboxRecord,
   inboxPath,
+  LESSONS_LABEL,
   openByKey,
   parseInbox,
   serializeRecord,
@@ -166,6 +171,93 @@ describe("formatIssueDraft", () => {
     expect(text).not.toMatch(/v\d+\.\d+\.\d+/);
     expect(text).toContain("2 件");
     expect(text).toContain("機械検査・テスト・フック");
+  });
+});
+
+describe("addDraftEntries", () => {
+  it("一覧が空_新規でラベル lessons の項目を足し、マイルストーンは付けない", () => {
+    const result = addDraftEntries([], [draftFileName("stale-input")]);
+    expect(result).toEqual({
+      entries: [{ action: "create", file: "lessons-stale-input.md", labels: [LESSONS_LABEL] }],
+      added: ["lessons-stale-input.md"],
+      skipped: [],
+    });
+  });
+
+  it("一覧に同じ file の項目がある_書き換えず、足さずに skipped へ挙げる", () => {
+    const existing = { action: "create", file: "lessons-stale-input.md", milestone: "v0.80.0", labels: ["chore"] };
+    const result = addDraftEntries([existing], ["lessons-stale-input.md", "lessons-other-key.md"]);
+    expect(result?.entries[0]).toBe(existing);
+    expect(result?.entries).toHaveLength(2);
+    expect(result?.added).toEqual(["lessons-other-key.md"]);
+    expect(result?.skipped).toEqual(["lessons-stale-input.md"]);
+  });
+
+  it("一覧に別の項目がある_その項目を残して、末尾に足す", () => {
+    const other = { action: "edit", file: "5-existing.md", number: 5 };
+    const result = addDraftEntries([other], ["lessons-stale-input.md"]);
+    expect(result?.entries[0]).toBe(other);
+    expect(result?.entries[1]).toMatchObject({ file: "lessons-stale-input.md" });
+  });
+
+  it("一覧が配列でない_足さずに null を返す", () => {
+    expect(addDraftEntries({}, ["lessons-stale-input.md"])).toBeNull();
+    expect(addDraftEntries(null, ["lessons-stale-input.md"])).toBeNull();
+  });
+
+  it("元の一覧_変えない", () => {
+    const manifest: unknown[] = [];
+    addDraftEntries(manifest, ["lessons-stale-input.md"]);
+    expect(manifest).toEqual([]);
+  });
+
+  it("足した項目にマイルストーンを付ける_一覧の検査に通り、封印にラベル lessons が入る", () => {
+    const [entry] = addDraftEntries([], ["lessons-stale-input.md"])?.entries ?? [];
+    const withMilestone = { ...(entry as Record<string, unknown>), milestone: "v0.80.0" };
+    expect(validateManifest([withMilestone])).toEqual([]);
+    const sealed = sealInput(withMilestone as Parameters<typeof sealInput>[0], "hash");
+    expect(sealed).toContain(LESSONS_LABEL);
+    expect(sealInput({ ...(withMilestone as Parameters<typeof sealInput>[0]), labels: [] }, "hash")).not.toBe(sealed);
+  });
+
+  it("足した項目にマイルストーンを付けない_一覧の検査が、マイルストーンかラベル later を求めて止める", () => {
+    const [entry] = addDraftEntries([], ["lessons-stale-input.md"])?.entries ?? [];
+    expect(validateManifest([entry])).toHaveLength(1);
+  });
+});
+
+describe("draftFileName", () => {
+  it("種類のキー_lessons- を前に付けた下書きのファイル名にする", () => {
+    expect(draftFileName("stale-input")).toBe("lessons-stale-input.md");
+  });
+});
+
+describe("closedMarks", () => {
+  it("対処済みの印がある_キーと行き先と日付を、記録した順に返す", () => {
+    const records: InboxRecord[] = [
+      candidate(),
+      { type: "closed", at: "2026-10-20T01:02:03.000Z", key: "stale-input", ref: "#341" },
+      candidate({ key: "other-key" }),
+      { type: "closed", at: "2026-10-25T00:00:00.000Z", key: "other-key", ref: "#350" },
+    ];
+    expect(closedMarks(records)).toEqual([
+      { key: "stale-input", ref: "#341", date: "2026-10-20" },
+      { key: "other-key", ref: "#350", date: "2026-10-25" },
+    ]);
+  });
+
+  it("対処していないキーだけ_空を返す", () => {
+    expect(closedMarks([candidate(), candidate({ key: "other-key" })])).toEqual([]);
+  });
+
+  it("同じキーを 2 回対処済みにした_両方の行き先を返す", () => {
+    const records: InboxRecord[] = [
+      candidate(),
+      { type: "closed", at: "2026-10-20T00:00:00.000Z", key: "stale-input", ref: "#341" },
+      candidate(),
+      { type: "closed", at: "2026-10-25T00:00:00.000Z", key: "stale-input", ref: "#350" },
+    ];
+    expect(closedMarks(records).map((m) => m.ref)).toEqual(["#341", "#350"]);
   });
 });
 

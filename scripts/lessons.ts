@@ -4,24 +4,30 @@
  *   node scripts/lessons.ts add --key <キー> --who <誰> --cause <原因> --promote <昇格先> --what <起きたこと> --should <本来どうすべきか>
  *   node scripts/lessons.ts list                      種類のキーごとの、対処していない件数
  *   node scripts/lessons.ts repeats [--threshold 2]   繰り返しの種類(しきい値以上)
- *   node scripts/lessons.ts draft [--threshold 2]     繰り返しの種類ごとに、Issue の下書きを .drafts/issues/ に作る(投稿はしない。すでにある下書きは上書きしない)
+ *   node scripts/lessons.ts draft [--threshold 2]     繰り返しの種類ごとに、Issue の下書きを .drafts/issues/ に作る(投稿はしない。すでにある下書きは上書きしない)。
+ *                                                     作った下書きの項目(新規、ラベル lessons)を、一覧 .drafts/issues/manifest.json に足す(すでにある項目は書き換えない。マイルストーンは起票の場で決める)
  *   node scripts/lessons.ts close <キー> <行き先>     種類を対処済みにする(これより前の件は数えない)
+ *   node scripts/lessons.ts closed                    対処済みにした種類の、キーと行き先と日付(読み取りだけ。対処していない種類は出さない)
  * 受け箱は `.git` の共有領域にあり、作業ツリーをまたいで合算される。起きたことの文章に、値(認証情報など)を書かない。
  */
 import { execFileSync } from "node:child_process";
-import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, existsSync, mkdirSync, readFileSync, renameSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseArgs } from "node:util";
 import { git } from "./lib/git-check.ts";
 import {
+  addDraftEntries,
   buildCandidate,
   CAUSES,
+  closedMarks,
   DEFAULT_THRESHOLD,
+  draftFileName,
   findRepeats,
   formatIssueDraft,
   inboxPath,
   isText,
   KEY_PATTERN,
+  LESSONS_LABEL,
   openByKey,
   PROMOTIONS,
   parseInbox,
@@ -55,11 +61,45 @@ function usage(): void {
       `    who: ${WHOS.join(" | ")}`,
       `    cause: ${CAUSES.join(" | ")}`,
       `    promote: ${PROMOTIONS.join(" | ")}`,
-      "  node scripts/lessons.ts list | repeats [--threshold N] | draft [--threshold N] | close <キー> <行き先>",
+      "  node scripts/lessons.ts list | repeats [--threshold N] | draft [--threshold N] | close <キー> <行き先> | closed",
       "",
     ].join("\n"),
   );
   process.exitCode = 2;
+}
+
+/**
+ * 作った下書きの項目を、一覧(manifest.json)に足す。一覧がなければ作る。すでに同じ file の項目があれば、書き換えない。
+ * 一覧を読めないときは、足さずに終了コード 1 にする(人が書いた一覧を、壊さない)。
+ */
+function addToManifest(path: string, files: string[]): void {
+  let current: unknown = [];
+  if (existsSync(path)) {
+    try {
+      current = JSON.parse(readFileSync(path, "utf8"));
+    } catch {
+      current = null;
+    }
+  }
+  const result = addDraftEntries(current, files);
+  if (result === null) {
+    process.stderr.write(
+      "一覧(.drafts/issues/manifest.json)を読めないため、項目を足していません。一覧を直して、手で足してください。\n",
+    );
+    process.exitCode = 1;
+    return;
+  }
+  if (result.added.length > 0) {
+    const tmp = `${path}.tmp`;
+    writeFileSync(tmp, `${JSON.stringify(result.entries, null, 2)}\n`);
+    renameSync(tmp, path);
+    process.stdout.write(
+      `一覧(.drafts/issues/manifest.json)に足しました(ラベル ${LESSONS_LABEL}。マイルストーンは起票の場で決めます): ${result.added.join(", ")}\n`,
+    );
+  }
+  if (result.skipped.length > 0) {
+    process.stdout.write(`一覧にすでに項目があります(書き換えません): ${result.skipped.join(", ")}\n`);
+  }
 }
 
 function thresholdOf(value: string | undefined): number {
@@ -106,17 +146,21 @@ try {
     } else {
       const dir = join(git(["rev-parse", "--show-toplevel"]).trim(), ".drafts", "issues");
       mkdirSync(dir, { recursive: true });
+      const created: string[] = [];
       for (const r of repeats) {
-        const file = join(dir, `lessons-${r.key}.md`);
+        const name = draftFileName(r.key);
         try {
           // 排他的に作る(wx)。すでにあるファイル(人が編集した下書き、同名のリンクを含む)は上書きしない
-          writeFileSync(file, formatIssueDraft(r), { flag: "wx" });
-          process.stdout.write(`下書きを作りました: .drafts/issues/lessons-${r.key}.md(${r.count} 件)\n`);
+          writeFileSync(join(dir, name), formatIssueDraft(r), { flag: "wx" });
+          created.push(name);
+          process.stdout.write(`下書きを作りました: .drafts/issues/${name}(${r.count} 件)\n`);
         } catch (error) {
           if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
-          process.stdout.write(`下書きがすでにあります(上書きしません): .drafts/issues/lessons-${r.key}.md\n`);
+          process.stdout.write(`下書きがすでにあります(上書きしません): .drafts/issues/${name}\n`);
         }
       }
+      // 作った下書きだけを一覧に足す(すでにある下書きは、投稿済みかもしれないので、足し直さない)
+      if (created.length > 0) addToManifest(join(dir, "manifest.json"), created);
       process.stdout.write("投稿はしていません。起票は /dev-pr の検査と承認を経ます。\n");
     }
   } else if (command === "close" && rest[0] && rest[1]) {
@@ -131,6 +175,10 @@ try {
       appendFileSync(path, serializeRecord({ type: "closed", at: new Date().toISOString(), key, ref }));
       process.stdout.write(`対処済みにしました(${key})\n`);
     }
+  } else if (command === "closed") {
+    const marks = closedMarks(records);
+    if (marks.length === 0) process.stdout.write("対処済みにした種類はありません\n");
+    for (const mark of marks) process.stdout.write(`${mark.key}\t${mark.ref}\t${mark.date}\n`);
   } else {
     usage();
   }

@@ -376,7 +376,7 @@ function InteractiveFrame({ diagram, id, children }: { diagram: Diagram; id: str
 }
 
 const BUTTON =
-  "rounded-md border border-line bg-surface px-3 py-1.5 text-sm font-medium text-fg hover:border-primary disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-line";
+  "rounded-md border border-line bg-surface px-3 py-2 text-sm font-bold text-fg hover:border-primary disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:border-line";
 
 /** 状態の読み上げ。画面には出さず、変わったときに伝える(`aria-live`) */
 function LiveText({ children }: { children: string }) {
@@ -596,7 +596,7 @@ function DecisionView({ diagram, id }: { diagram: DecisionDiagram; id: string })
                 <span aria-hidden="true">✓ </span>
                 {past.question}
               </p>
-              <ul className="mt-1 flex flex-wrap gap-1.5">
+              <ul className="mt-1 flex flex-wrap gap-2">
                 {past.choices.map((c, i) => (
                   <li
                     key={c.label}
@@ -844,7 +844,7 @@ function LayersView({ diagram, id }: { diagram: LayersDiagram; id: string }) {
                 {hasContent ? (
                   <div id={panelId} hidden={!isOpen} className="mt-2 space-y-1">
                     {layer.items ? (
-                      <ul className="flex flex-wrap gap-1.5">
+                      <ul className="flex flex-wrap gap-2">
                         {layer.items.map((item) => (
                           <li
                             key={item}
