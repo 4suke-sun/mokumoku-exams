@@ -149,7 +149,7 @@ describe("節の確認と完了の記録", () => {
     await renderWith(section(two));
     await answerCheck("問い 1", "問い 1の A");
     expect(client.putNotebookEntry).not.toHaveBeenCalled();
-    expect(nextLink()).toBeNull();
+    expect(nextLink()).not.toBeNull();
     await answerCheck("問い 2", "問い 2の B");
     expect(client.putNotebookEntry).toHaveBeenCalledTimes(1);
     expect(client.putNotebookEntry).toHaveBeenCalledWith("TEST", "domain1-1", "e1");
@@ -163,7 +163,7 @@ describe("節の確認と完了の記録", () => {
     await renderWith(section());
     await answerCheck("問い 1", "問い 1の B");
     expect(client.putNotebookEntry).not.toHaveBeenCalled();
-    expect(nextLink()).toBeNull();
+    expect(nextLink()).not.toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "もう一度" }));
     await answerCheck("問い 1", "問い 1の A");
     expect(client.putNotebookEntry).toHaveBeenCalledTimes(1);
@@ -208,12 +208,12 @@ describe("節の確認と完了の記録", () => {
     expect(document.body.textContent).not.toContain("記録できませんでした");
   });
 
-  it("読み込み中_記録の状態を出さず次の節へも出さない_正解したあとは記録の結果と次の節へを出す", async () => {
+  it("読み込み中_記録の状態を出さず_正解したあとは記録の結果を出し_次の節へは最初から出す", async () => {
     client.fetchNotebook.mockReturnValue(new Promise(() => {}));
     client.putNotebookEntry.mockResolvedValue(true);
     await renderWith(section());
     expect(document.body.textContent).not.toContain("記録");
-    expect(nextLink()).toBeNull();
+    expect(nextLink()).not.toBeNull();
     await answerCheck("問い 1", "問い 1の A");
     expect(document.body.textContent).toContain("完了として記録しました");
     expect(nextLink()).not.toBeNull();
@@ -224,15 +224,15 @@ describe("節の確認と完了の記録", () => {
     client.putNotebookEntry.mockResolvedValue(false);
     await renderWith(section());
     expect(document.body.textContent).not.toContain("記録");
-    expect(nextLink()).toBeNull();
+    expect(nextLink()).not.toBeNull();
     await answerCheck("問い 1", "問い 1の A");
     expect(document.body.textContent).toContain("記録できませんでした");
     expect(nextLink()).not.toBeNull();
   });
 
-  it("管理者のプレビュー_読まず記録もせず_プレビューでは記録しませんと出し_次の節へは正解のあとに出す", async () => {
+  it("管理者のプレビュー_読まず記録もせず_プレビューでは記録しませんと出し_次の節へは最初から出す", async () => {
     await renderWith(section(), true);
-    expect(nextLink()).toBeNull();
+    expect(nextLink()).not.toBeNull();
     await answerCheck("問い 1", "問い 1の A");
     expect(client.fetchNotebook).not.toHaveBeenCalled();
     expect(client.putNotebookEntry).not.toHaveBeenCalled();

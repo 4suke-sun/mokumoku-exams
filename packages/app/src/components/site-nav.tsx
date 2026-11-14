@@ -116,7 +116,7 @@ const railItemClass = (active: boolean) =>
     active ? "font-bold text-primary" : "text-fg hover:bg-bg"
   }`;
 
-/** サイドバーの開閉のボタン。印の「…」は飾りで、名前は文字で添える */
+/** サイドバーの開閉のボタン。印の三本線(NavIcon の menu)は飾りで、名前は文字で添える */
 function SidebarToggle({
   collapsed,
   controls,
@@ -136,7 +136,7 @@ function SidebarToggle({
       onClick={onToggle}
       className="inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-line text-lg leading-none font-bold text-muted hover:border-primary hover:text-primary"
     >
-      <span aria-hidden="true">…</span>
+      <NavIcon name="menu" className="size-5" />
       <span className="sr-only">{label}</span>
     </button>
   );

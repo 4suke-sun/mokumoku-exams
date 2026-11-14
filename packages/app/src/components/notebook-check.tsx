@@ -329,8 +329,8 @@ function RecordStatus() {
 type SectionLink = { id: string; term: string };
 
 /**
- * 節の前後への移動。前の節へは、いつでも戻れる。「次の節へ」は、この節の確認に正解したあと(すでに完了している節では、最初から)。
- * 最後の節には、次の節がないので出さない(比較の表とおさらいが続く)。
+ * 節の前後への移動。前の節へも「次の節へ」も、確認の正誤によらず、いつでも移れる(目次と同じく、先へ進むのを止めない)。
+ * 節の完了の記録は、確認に正解したときだけ付ける。最後の節には、次の節がないので出さない(比較の表とおさらいが続く)。
  */
 export function NotebookSectionPager({
   basePath,
@@ -343,9 +343,7 @@ export function NotebookSectionPager({
   prev: SectionLink | null;
   next: SectionLink | null;
 }) {
-  const { allPassed, done } = useSectionScope();
-  const showNext = next !== null && (allPassed || done);
-  if (!prev && !showNext) return null;
+  if (!prev && !next) return null;
   return (
     <nav aria-label="節の移動" className="grid gap-3 sm:grid-cols-2">
       {prev ? (
@@ -356,7 +354,7 @@ export function NotebookSectionPager({
       ) : (
         <span />
       )}
-      {showNext && next ? (
+      {next ? (
         <Link href={`${basePath}/${unitId}/${next.id}`} className="card p-3 text-right text-sm">
           <span className="block text-muted">次の節へ →</span>
           <span className="block font-bold text-primary">{next.term}</span>
