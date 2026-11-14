@@ -34,7 +34,7 @@
       "kind": "official-doc"
     },
     {
-      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Dashboard-Sharing.html",
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch-dashboard-sharing.html",
       "kind": "official-doc"
     },
     {
@@ -390,7 +390,7 @@
       "kind": "official-doc"
     },
     {
-      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-NetworkMonitor.html",
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/what-is-network-monitor.html",
       "kind": "official-doc"
     }
   ],

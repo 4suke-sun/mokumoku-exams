@@ -778,42 +778,6 @@
         }
       ],
       "claims": [],
-      "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "fetchedAt": "2026-11-14",
-      "kind": "official-doc",
-      "status": "active",
-      "target": {
-        "edition": "C03",
-        "examCode": "AWS-SOA-C03"
-      },
-      "title": "Amazon CloudWatch",
-      "updatedAt": "2026-11-14",
-      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Dashboard-Sharing.html"
-    },
-    {
-      "checks": [
-        {
-          "name": "official",
-          "result": "pass"
-        },
-        {
-          "name": "target",
-          "result": "pass"
-        },
-        {
-          "name": "deprecation",
-          "result": "pass"
-        },
-        {
-          "name": "freshness",
-          "result": "pass"
-        },
-        {
-          "name": "liveness",
-          "result": "pass"
-        }
-      ],
-      "claims": [],
       "contentHash": "8b732d57f334b17121241e2b62b75bb046158bf3a279604ec3a1ae76e12ca23a",
       "fetchedAt": "2026-11-14",
       "kind": "official-doc",
@@ -825,42 +789,6 @@
       "title": "Using Internet Monitor - Amazon CloudWatch",
       "updatedAt": "2026-11-14",
       "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-InternetMonitor.html"
-    },
-    {
-      "checks": [
-        {
-          "name": "official",
-          "result": "pass"
-        },
-        {
-          "name": "target",
-          "result": "pass"
-        },
-        {
-          "name": "deprecation",
-          "result": "pass"
-        },
-        {
-          "name": "freshness",
-          "result": "pass"
-        },
-        {
-          "name": "liveness",
-          "result": "pass"
-        }
-      ],
-      "claims": [],
-      "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-      "fetchedAt": "2026-11-14",
-      "kind": "official-doc",
-      "status": "active",
-      "target": {
-        "edition": "C03",
-        "examCode": "AWS-SOA-C03"
-      },
-      "title": "Amazon CloudWatch",
-      "updatedAt": "2026-11-14",
-      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-NetworkMonitor.html"
     },
     {
       "checks": [
@@ -1041,6 +969,78 @@
       "title": "What is Amazon CloudWatch? - Amazon CloudWatch",
       "updatedAt": "2026-11-14",
       "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "c75cbd0961f699f6cf51494f25c7eecbae2445d81ec322149006592813b08d30",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Sharing CloudWatch dashboards - Amazon CloudWatch",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch-dashboard-sharing.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "33e9a07ce952b5f08aad6041e2c21a060b97f0f6ec49d1d8d30005f3eaf22be9",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Using Network Synthetic Monitor - Amazon CloudWatch",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/what-is-network-monitor.html"
     },
     {
       "checks": [
