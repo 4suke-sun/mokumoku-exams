@@ -50,19 +50,27 @@ function useAdmin(): boolean {
   return state.status === "signed-in" && state.isAdmin === true;
 }
 
-/** 項目の名前。リリースノートには、未読の目印を添える */
-function ItemLabel({ item, unread }: { item: NavItem; unread: boolean }) {
+/** 項目の名前。リリースノートには、未読の目印を添える。細い列(`compact`)では、名前を読み上げだけに残す */
+function ItemLabel({ item, unread, compact = false }: { item: NavItem; unread: boolean; compact?: boolean }) {
   return (
     <>
       <NavIcon name={item.icon} />
-      <span className="whitespace-nowrap">{item.label}</span>
+      <span className={compact ? "sr-only" : "whitespace-nowrap"}>{item.label}</span>
       {unread && item.href === "/release-notes" ? <UnreadDot /> : null}
     </>
   );
 }
 
 /** ログイン中は、アカウントとログアウト。そうでなければ、ログインへの案内 */
-function AccountLinks({ pathname, itemClass }: { pathname: string; itemClass: (active: boolean) => string }) {
+function AccountLinks({
+  pathname,
+  itemClass,
+  compact = false,
+}: {
+  pathname: string;
+  itemClass: (active: boolean) => string;
+  compact?: boolean;
+}) {
   const { state } = useSession();
   if (state.status === "loading") return null;
   const item: NavItem =
@@ -71,9 +79,14 @@ function AccountLinks({ pathname, itemClass }: { pathname: string; itemClass: (a
       : { label: "ログイン", href: "/login", icon: "login" };
   const active = isActive(pathname, item.href);
   return (
-    <Link href={item.href} aria-current={active ? "page" : undefined} className={itemClass(active)}>
+    <Link
+      href={item.href}
+      aria-current={active ? "page" : undefined}
+      title={compact ? item.label : undefined}
+      className={itemClass(active)}
+    >
       <NavIcon name={item.icon} />
-      <span className="whitespace-nowrap">{item.label}</span>
+      <span className={compact ? "sr-only" : "whitespace-nowrap"}>{item.label}</span>
     </Link>
   );
 }
@@ -97,40 +110,101 @@ const sideItemClass = (active: boolean) =>
     active ? "font-bold text-primary" : "text-fg hover:bg-bg"
   }`;
 
-/** 幅が広い画面の、左のカード状のサイドバー。選択中の背景が、項目の間を滑って動く */
+/** 細い列の項目。アイコンだけを中央に置く(名前は読み上げに残す) */
+const railItemClass = (active: boolean) =>
+  `relative z-10 flex items-center justify-center rounded-md py-2 text-sm ${
+    active ? "font-bold text-primary" : "text-fg hover:bg-bg"
+  }`;
+
+/** サイドバーの開閉のボタン。印の「…」は飾りで、名前は文字で添える */
+function SidebarToggle({
+  collapsed,
+  controls,
+  onToggle,
+}: {
+  collapsed: boolean;
+  controls: string;
+  onToggle: () => void;
+}) {
+  const label = collapsed ? "サイドバーを開く" : "サイドバーを閉じる";
+  return (
+    <button
+      type="button"
+      aria-expanded={!collapsed}
+      aria-controls={controls}
+      title={label}
+      onClick={onToggle}
+      className="inline-flex size-9 shrink-0 items-center justify-center rounded-md border border-line text-lg leading-none font-bold text-muted hover:border-primary hover:text-primary"
+    >
+      <span aria-hidden="true">…</span>
+      <span className="sr-only">{label}</span>
+    </button>
+  );
+}
+
+/**
+ * 幅が広い画面の、左のカード状のサイドバー。選択中の背景が、項目の間を滑って動く。
+ * 開閉のボタンで、アイコンだけの細い列に縮める。状態はこの部品(ルートのレイアウト)に置くので、
+ * 画面をまたいで保ち、再読み込みで開いた状態に戻る。
+ */
 function Sidebar() {
   const pathname = usePathname();
   const isAdmin = useAdmin();
   const unread = useUnreadRelease();
   const listRef = useRef<HTMLUListElement>(null);
   const [indicator, setIndicator] = useState<{ top: number; height: number } | null>(null);
+  const [collapsed, setCollapsed] = useState(false);
+  const navId = useId();
   const { state } = useSession();
+  const itemClass = collapsed ? railItemClass : sideItemClass;
 
-  // 選択中の項目の位置に、背景を動かす(ログイン状態で項目が増減しても、位置を取り直す)
-  // biome-ignore lint/correctness/useExhaustiveDependencies: 現在地とログイン状態が変わったら、位置を取り直す
+  // 選択中の項目の位置に、背景を動かす(ログイン状態や開閉で項目の位置が変わっても、取り直す)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: 現在地・ログイン状態・開閉が変わったら、位置を取り直す
   useEffect(() => {
     const current = listRef.current?.querySelector<HTMLElement>('[aria-current="page"]');
     setIndicator(current ? { top: current.offsetTop, height: current.offsetHeight } : null);
-  }, [pathname, isAdmin, state.status]);
+  }, [pathname, isAdmin, state.status, collapsed]);
 
   const link = (item: NavItem) => {
     const active = isActive(pathname, item.href);
     return (
       <li key={item.href}>
-        <Link href={item.href} aria-current={active ? "page" : undefined} className={sideItemClass(active)}>
-          <ItemLabel item={item} unread={unread} />
+        <Link
+          href={item.href}
+          aria-current={active ? "page" : undefined}
+          title={collapsed ? item.label : undefined}
+          className={itemClass(active)}
+        >
+          <ItemLabel item={item} unread={unread} compact={collapsed} />
         </Link>
       </li>
     );
   };
 
+  const toggle = <SidebarToggle collapsed={collapsed} controls={navId} onToggle={() => setCollapsed((v) => !v)} />;
+
   return (
-    <aside className="sticky top-4 hidden h-[calc(100dvh-2rem)] w-60 shrink-0 lg:block">
-      <div className="card flex h-full flex-col gap-5 overflow-y-auto p-3">
-        <div className="px-2 pt-1">
-          <Brand />
-        </div>
-        <nav aria-label="主要メニュー">
+    <aside
+      data-testid="sidebar"
+      data-collapsed={collapsed ? "true" : "false"}
+      className={`sticky top-4 hidden h-[calc(100dvh-2rem)] shrink-0 lg:block ${collapsed ? "w-16" : "w-60"}`}
+    >
+      <div className={`card flex h-full flex-col gap-5 overflow-y-auto ${collapsed ? "p-2" : "p-3"}`}>
+        {collapsed ? (
+          <div className="flex flex-col items-center gap-3 pt-1">
+            {toggle}
+            <Link href="/" aria-label="もくもく問題集(ホーム)" className="rounded-md">
+              {/* biome-ignore lint/performance/noImgElement: 小さな固定の画像なので、最適化の経路を通さずに出す */}
+              <img src="/brand/mascot.png" alt="" width={256} height={256} className="size-9" />
+            </Link>
+          </div>
+        ) : (
+          <div className="flex items-center justify-between gap-2 px-2 pt-1">
+            <Brand />
+            {toggle}
+          </div>
+        )}
+        <nav id={navId} aria-label="主要メニュー">
           <ul ref={listRef} className="relative space-y-1">
             {indicator ? (
               <li
@@ -143,16 +217,18 @@ function Sidebar() {
             <li aria-hidden="true" className="mx-3 my-3 border-t border-line" />
             {SUB_NAV_ITEMS.map(link)}
             <li>
-              <AccountLinks pathname={pathname} itemClass={sideItemClass} />
+              <AccountLinks pathname={pathname} itemClass={itemClass} compact={collapsed} />
             </li>
             {isAdmin ? link(ADMIN_NAV_ITEM) : null}
           </ul>
         </nav>
-        <div className="mt-auto space-y-3 px-1 pb-1">
-          <ThemeToggle />
-          <StyleToggle />
-          <SignOutButton />
-        </div>
+        {collapsed ? null : (
+          <div className="mt-auto space-y-3 px-1 pb-1">
+            <ThemeToggle />
+            <StyleToggle />
+            <SignOutButton />
+          </div>
+        )}
       </div>
     </aside>
   );
