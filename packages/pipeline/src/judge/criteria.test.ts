@@ -31,7 +31,7 @@ describe("判定の基準の取り出し", () => {
 });
 
 describe("資格の判定の基準", () => {
-  it.each(["AWS-CLF-C02", "AWS-DVA-C02", "AWS-AIB-C01", "DBX-DEA-2605"])(
+  it.each(["AWS-CLF-C02", "AWS-DVA-C02", "AWS-AIB-C01", "AWS-SOA-C03", "DBX-DEA-2605"])(
     "%s_資格別の文書に節があり_ハッシュが 64 桁で決まる",
     (code) => {
       const a = readCriteria(repoRoot, code);

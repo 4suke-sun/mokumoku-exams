@@ -8,7 +8,7 @@
 | 層 | 文書 | 内容 |
 | --- | --- | --- |
 | ベンダー共通 | [aws-common.md](./aws-common.md)、[dbx-common.md](./dbx-common.md) | ベンダーの資格に共通の構成・問いの形・選択肢・要件の言い回し |
-| 資格別 | [aws-clf.md](./aws-clf.md)、[aws-dva.md](./aws-dva.md)、[aws-aib.md](./aws-aib.md)、[dbx-dea.md](./dbx-dea.md) | 資格ごとの長さの目安・設問の型・選択肢の形・判定の基準 |
+| 資格別 | [aws-clf.md](./aws-clf.md)、[aws-dva.md](./aws-dva.md)、[aws-aib.md](./aws-aib.md)、[aws-soa.md](./aws-soa.md)、[dbx-dea.md](./dbx-dea.md) | 資格ごとの長さの目安・設問の型・選択肢の形・判定の基準 |
 
 作問役は、依頼の `styleGuides` に挙がった文書(ベンダー共通と資格別)を読んで書きます。採点の仕組みは [scorecard.md](./scorecard.md) です(`npm run pipeline -- score <資格コード>`)。
 文書の資格別の値と、点数票の帯(`packages/pipeline/src/scorecard/profiles.ts`)は、同じ値を持ちます。主な値の食い違いは、テストが見つけます。

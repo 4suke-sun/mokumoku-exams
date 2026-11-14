@@ -191,6 +191,27 @@ export const EXAM_OVERRIDES: Readonly<Record<string, ExamOverride>> = {
       openerPrefixChars: 8,
     },
   },
+  // CloudOps Engineer - Associate: 形は Developer - Associate に近い(状況の段落と問いの段落、並行する文の選択肢)。中身は稼働中の環境への運用の処置で、書き出しは業種つきの企業や CloudOps エンジニアも通す
+  "AWS-SOA-C03": {
+    stemLength: { full: [150, 360], partial: [110, 450] },
+    contextSentences: [2, 6],
+    optionMaxLength: [150, 220],
+    lengthRatio: [3, 4.5],
+    similarityMax: 0.97,
+    openers: ["ある.{0,20}?(企業|会社|銀行|組織|団体|機関|法人|メーカー|商社|社)", "あなた", "CloudOps ?エンジニア"],
+    separateQuestionParagraph: true,
+    points: { contextRequirement: 6, optionLength: 3, opener: 3, questionEnding: 3, questionParagraph: 5 },
+    batch: {
+      situationShare: [0.9, 1],
+      stemMedian: [180, 290],
+      stemP90Max: 370,
+      nameShare: null,
+      phraseShare: null,
+      sentenceShare: [0.8, 1],
+      openerTopMax: 0.45,
+      openerPrefixChars: 8,
+    },
+  },
   // Data Engineer Associate: 状況の問が約 6 割、知識の問が約 4 割。単一選択が中心で、複数選択は約 1 割(上限はベンダー共通)。
   // 書き出しの偏りの上限は、公式の試験ガイドの例題(10 問のうち 6 問が「データエンジニア」から書き出す。チームを含めると 8 問)に合わせる
   "DBX-DEA-2605": {
