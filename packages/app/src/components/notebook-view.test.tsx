@@ -162,9 +162,11 @@ describe("NotebookSectionView", () => {
     );
   });
 
-  it("次の節へ_確認に正解するまで出さず_すでに完了している節では最初から出す", async () => {
+  it("次の節へ_確認に正解していなくても_すでに完了していても_最初から出す", async () => {
     await renderSection("domain1-1", "external-table", false);
-    expect(screen.queryByRole("link", { name: /次の節へ/ })).toBeNull();
+    expect(screen.getByRole("link", { name: /次の節へ/ }).getAttribute("href")).toBe(
+      "/exams/TEST/notebook/domain1-1/managed-table",
+    );
     document.body.innerHTML = "";
     client.fetchNotebook.mockResolvedValue(done(["external-table"]));
     await renderSection("domain1-1", "external-table", false);

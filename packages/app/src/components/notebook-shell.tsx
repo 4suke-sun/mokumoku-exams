@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { type ReactNode, type RefObject, useCallback, useEffect, useId, useRef, useState } from "react";
+import { NavIcon } from "@/components/nav-icon.tsx";
 import { NotebookProgressProvider, useNotebookProgress } from "@/components/notebook-progress.tsx";
 import type { TocDomain } from "@/lib/notebook-data.ts";
 import { currentOf, isEntryDone, unitProgress } from "@/lib/notebook-review.ts";
@@ -314,7 +315,8 @@ export function NotebookShell({ examCode, preview, basePath, toc, children }: Pr
                   onClick={toggleToc}
                   className="inline-flex items-center gap-1 rounded-md border border-line px-2 py-1 text-xs font-bold text-muted hover:border-primary hover:text-primary"
                 >
-                  <span aria-hidden="true">…</span>目次を隠す
+                  <NavIcon name="menu" className="size-4" />
+                  目次を隠す
                 </button>
               </div>
               <NotebookToc basePath={basePath} toc={toc} />
@@ -331,7 +333,8 @@ export function NotebookShell({ examCode, preview, basePath, toc, children }: Pr
                 onClick={toggleToc}
                 className="inline-flex items-center gap-2 rounded-md border border-line bg-surface px-3 py-2 text-sm font-bold shadow-sm hover:border-primary"
               >
-                <span aria-hidden="true">…</span>目次を出す
+                <NavIcon name="menu" className="size-4" />
+                目次を出す
               </button>
             </div>
           )}
