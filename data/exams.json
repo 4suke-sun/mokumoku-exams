@@ -221,10 +221,20 @@
       "examCode": "AWS-SOA-C03",
       "status": "coming-soon",
       "vendor": "AWS",
+      "edition": "C03",
       "name": "AWS Certified CloudOps Engineer - Associate",
       "shortName": "CloudOps Engineer",
       "level": "Associate",
-      "abbr": "SOA"
+      "abbr": "SOA",
+      "officialQuestionCount": 65,
+      "domains": [
+        { "code": "domain1", "name": "モニタリング、ログ記録、分析、修復、パフォーマンスの最適化", "weight": 0.22 },
+        { "code": "domain2", "name": "信頼性と事業の継続性", "weight": 0.22 },
+        { "code": "domain3", "name": "デプロイ、プロビジョニング、オートメーション", "weight": 0.22 },
+        { "code": "domain4", "name": "セキュリティとコンプライアンス", "weight": 0.16 },
+        { "code": "domain5", "name": "ネットワークとコンテンツ配信", "weight": 0.18 }
+      ],
+      "idPrefix": "SOA"
     },
     {
       "examCode": "AWS-DEA-C01",

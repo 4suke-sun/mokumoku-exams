@@ -1,0 +1,4106 @@
+{
+  "examCode": "AWS-SOA-C03",
+  "guide": {
+    "agent": {
+      "definitionHash": "6c8e7bcff5f40397d65f6d90eed2cffba5bd4b3587aff43f5d9eb7889d3b4402",
+      "model": "claude-haiku-5-5",
+      "role": "guide-extractor"
+    },
+    "contentHash": "b7bc0d9ddbb264f5821ef450b51a9107db47a9e2127f6e1d76cb98b5ed7c7f35",
+    "domains": [
+      {
+        "code": "domain1",
+        "name": "監視・ログ・分析、是正、性能最適化",
+        "scope": [
+          "CloudWatch、CloudTrail、マネージド Prometheus などで、サーバーレス・コンピュート・AI のワークロードに監視とログを設定する。",
+          "CloudWatch エージェントを設定・管理し、EC2、ECS、EKS からメトリクスとログを集める。",
+          "CloudWatch アラームを設定し、不具合を切り分ける。EventBridge を経由する場合を含め、どのサービスを呼び出せるかを確かめる。",
+          "複数のアカウントとリージョンにまたがるリソースのメトリクスとアラームを、共有できる形式のダッシュボードで表示する。",
+          "AWS サービスとアラームから SNS へ通知を送る設定を行う。",
+          "性能の指標を分析し、監視・自動化のサービスや AI エージェントを使って是正を自動化する。",
+          "EventBridge でイベントを経路づけ・加工・配信し、イベントバスのルールの問題を切り分ける。",
+          "Systems Manager Automation のランブックを作成または実行し、作業を自動化する。SDK やスクリプトの利用を含む。",
+          "性能の指標とリソースタグ、AWS のツールを使い、コンピュートの性能を最適化して問題を是正する。",
+          "EBS の性能の指標を分析して問題を切り分け、ボリュームの種類を最適化して性能向上とコスト削減を図る。",
+          "S3 の性能戦略を実装・最適化する。DataSync、Transfer Acceleration、マルチパートアップロード、ライフサイクルなどを扱う。",
+          "共有ストレージ(EFS、FSx、S3 Files)を評価して選び、EFS のライフサイクルポリシーなどで用途に合わせて最適化する。",
+          "RDS の指標を監視し、Performance Insights や RDS Proxy などで設定を見直して性能効率を高める。",
+          "EC2 インスタンスと関連するストレージ・ネットワークを実装・監視・最適化する。配置グループを含む。"
+        ],
+        "weight": 0.22
+      },
+      {
+        "code": "domain2",
+        "name": "信頼性と事業継続",
+        "scope": [
+          "コンピュート環境のスケーリングの仕組みを設定・管理する。",
+          "CloudFront や ElastiCache などのキャッシュを使い、動的なスケーラビリティを高める。",
+          "RDS や DynamoDB などのマネージドデータベースのスケーリングを設定・管理する。",
+          "ELB と Route 53 のヘルスチェックを設定し、不具合を切り分ける。",
+          "マルチ AZ 配置などで、障害に強いシステムを構成する。",
+          "EC2、RDS、EBS、S3、DynamoDB などのスナップショットとバックアップを、AWS Backup などで自動化する。",
+          "ポイントインタイムリストアなど複数の方法でデータベースを復元し、RTO、RPO、コストの要件を満たす。",
+          "S3 や FSx などのストレージサービスでバージョニングを実装する。",
+          "災害復旧の手順と手法(バックアップとリストア、パイロットライト、ウォームスタンバイ、アクティブ/アクティブ)に従う。"
+        ],
+        "weight": 0.22
+      },
+      {
+        "code": "domain3",
+        "name": "デプロイ、プロビジョニング、自動化",
+        "scope": [
+          "EC2 Image Builder などで AMI とコンテナイメージを作成・管理する。",
+          "CloudFormation と AWS CDK で AWS リソースを作成・管理する。",
+          "デプロイの問題(サブネットのサイズ、CloudFormation のエラー、権限など)を特定し、是正する。",
+          "AWS RAM や CloudFormation StackSets を使い、複数のリージョンとアカウントにまたがってリソースを提供・共有する。",
+          "デプロイの戦略とサービスを実装する。",
+          "Terraform や Git などのサードパーティツールで、リソースのデプロイを自動化して管理する。",
+          "Systems Manager などで、運用の手順を自動化する。",
+          "Lambda、S3 イベント通知、EventBridge、AWS DevOps Agent を使い、イベント駆動の自動化を実装する。"
+        ],
+        "weight": 0.22
+      },
+      {
+        "code": "domain4",
+        "name": "セキュリティとコンプライアンス",
+        "scope": [
+          "IAM の機能(パスワードポリシー、MFA、ロール、フェデレーション、リソースポリシー、ポリシーの条件)を実装する。",
+          "CloudTrail、IAM Access Analyzer、ポリシーシミュレーターを使い、アクセスの問題を切り分けて監査する。",
+          "Organizations、SCP、IAM Identity Center を使い、複数アカウントの体制を安全に実装する。",
+          "Trusted Advisor のセキュリティチェックの結果に基づいて、是正を実施する。",
+          "リージョンとサービスの選択、Config の適合パックなどで、コンプライアンス要件を強制し、継続的に監視する。",
+          "データ分類の仕組みを実装し、適用する。",
+          "KMS などを使い、保存時の暗号化を実装・設定し、問題を切り分ける。",
+          "ACM などを使い、転送時の暗号化を実装・設定し、問題を切り分ける。",
+          "AWS のサービスを使い、シークレットを安全に保管する。",
+          "脅威や脆弱性を検出するセキュリティサービスのレポートを設定し、検出結果を是正する。"
+        ],
+        "weight": 0.16
+      },
+      {
+        "code": "domain5",
+        "name": "ネットワークとコンテンツ配信",
+        "scope": [
+          "VPC を構成する。サブネット、ルートテーブル、ネットワーク ACL、セキュリティグループ、NAT・インターネット・Egress-only インターネットゲートウェイを含む。",
+          "VPC エンドポイント、PrivateLink、VPC ピアリングで、プライベートなネットワーク接続を構成する。",
+          "単一アカウント内で、ネットワークを守る各種の保護サービスの設定を監査する。",
+          "ネットワーク構成のコストを最適化する。",
+          "Route 53 Resolver などで DNS を構成する。",
+          "Route 53 のルーティングポリシー、設定、クエリログを実装する。",
+          "CloudFront や Global Accelerator で、コンテンツとサービスを配信する。",
+          "VPC の構成(サブネット、ルートテーブル、ネットワーク ACL、セキュリティグループ、Transit Gateway、NAT ゲートウェイ)の問題を切り分ける。",
+          "VPC フローログ、ELB・WAF・CloudFront のログ、コンテナのログを収集して解釈し、問題を切り分ける。",
+          "CloudFront のキャッシュの問題を特定し、是正する。",
+          "ハイブリッド接続とプライベート接続の問題を特定し、切り分ける。",
+          "CloudWatch のネットワーク監視サービスを設定し、分析する。"
+        ],
+        "weight": 0.18
+      }
+    ],
+    "exam": {
+      "passingScore": 720,
+      "questionCount": 65,
+      "scoredQuestionCount": 50,
+      "totalScore": 1000
+    },
+    "excludedServices": [
+      "AWS Clean Rooms",
+      "AWS Data Exchange",
+      "Amazon EMR",
+      "Amazon FinSpace",
+      "Amazon Managed Streaming for Apache Kafka (Amazon MSK)",
+      "Amazon AppFlow",
+      "Amazon Managed Workflows for Apache Airflow (Amazon MWAA)",
+      "Amazon Simple Workflow Service (Amazon SWF)",
+      "Amazon Managed Blockchain (AMB)",
+      "AWS AppFabric",
+      "Amazon Connect",
+      "AWS End User Messaging SMS",
+      "Amazon One Enterprise",
+      "Amazon Pinpoint",
+      "AWS Supply Chain",
+      "Amazon WorkMail",
+      "Amazon Lightsail",
+      "AWS Nitro Enclaves",
+      "AWS Parallel Computing Service",
+      "AWS SimSpace Weaver",
+      "Amazon Neptune",
+      "Amazon Timestream",
+      "AWS AppConfig",
+      "AWS App Studio",
+      "Amazon WorkSpaces applications",
+      "Amazon WorkSpaces",
+      "AWS Device Farm",
+      "Amazon Location Service",
+      "Amazon CodeGuru",
+      "Amazon Comprehend",
+      "AWS Deep Learning AMIs (DLAMI)",
+      "AWS HealthLake",
+      "AWS HealthOmics",
+      "Amazon Lex",
+      "Amazon Polly",
+      "Amazon Rekognition",
+      "Amazon Textract",
+      "Amazon Transcribe",
+      "Amazon Translate",
+      "AWS Application Discovery Service",
+      "AWS Application Migration Service",
+      "AWS Migration Hub",
+      "AWS Transfer Family",
+      "AWS App Mesh",
+      "AWS Cloud WAN",
+      "AWS CloudHSM",
+      "AWS Payment Cryptography",
+      "Amazon Security Lake",
+      "AWS Signer",
+      "Amazon FSx for OpenZFS"
+    ],
+    "importedAt": "2026-11-14",
+    "pages": [
+      {
+        "contentHash": "ee60202e67e43f5abd171a236f9e701b975cbad0fb00bd3bcf624cc7020e0080",
+        "url": "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/sysops-administrator-associate-03-domain1.html"
+      },
+      {
+        "contentHash": "d6c85e8f84d5593ffdb7c1cb6ccd6e23e8b91e3c3003e9c297d3b605131007e2",
+        "url": "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/sysops-administrator-associate-03-domain2.html"
+      },
+      {
+        "contentHash": "7abfaeff319ebfdb806e26a0bc977ddc127ba8373c1dd4e9636ae5632db999f4",
+        "url": "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/sysops-administrator-associate-03-domain3.html"
+      },
+      {
+        "contentHash": "677f81b13bcb1dd87e94eb536c86e7036bc43aae3713ac88f0f064dd21ec52f4",
+        "url": "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/sysops-administrator-associate-03-domain4.html"
+      },
+      {
+        "contentHash": "ef9e42cd45ba27809bc08b55abe54249a6e08d93f781d3c1aa2f38f9c3b78087",
+        "url": "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/sysops-administrator-associate-03-domain5.html"
+      },
+      {
+        "contentHash": "588cd70a5a36c62107a37a39ced8909f663adc866fe8c4f44af9e8b9b0b5d8da",
+        "url": "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/soa-03-service-mentions.html"
+      },
+      {
+        "contentHash": "d262f7e8e568df4462633c1bb39d7a4bbf6abd4edf7aaef34945efc3cfe24b67",
+        "url": "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/soa-03-in-scope-services.html"
+      },
+      {
+        "contentHash": "8bd6ca1d667f12ebabe0385a8ecf49ad4a094a7d3d616921eb4ce5ffac5b939c",
+        "url": "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/soa-03-out-of-scope-services.html"
+      }
+    ],
+    "services": [
+      "Amazon Athena",
+      "Amazon Data Firehose",
+      "Amazon EventBridge",
+      "Amazon SNS",
+      "Amazon SQS",
+      "AWS Step Functions",
+      "Amazon SES",
+      "AWS Cost and Usage Reports",
+      "AWS Cost Explorer",
+      "Savings Plans",
+      "Amazon EC2",
+      "Amazon EC2 Image Builder",
+      "AWS Lambda",
+      "Amazon ECR",
+      "Amazon ECS",
+      "Amazon EKS",
+      "Amazon Aurora",
+      "Amazon Aurora Serverless v2",
+      "Amazon DynamoDB",
+      "Amazon DynamoDB Accelerator (DAX)",
+      "Amazon ElastiCache",
+      "Amazon RDS",
+      "Amazon RDS Proxy",
+      "AWS X-Ray",
+      "Kiro",
+      "Amazon Bedrock",
+      "AWS Auto Scaling",
+      "AWS CDK",
+      "AWS CloudFormation",
+      "AWS CloudTrail",
+      "Amazon CloudWatch",
+      "AWS Compute Optimizer",
+      "AWS Config",
+      "AWS Control Tower",
+      "AWS DevOps Agent",
+      "AWS Health Dashboard",
+      "Amazon Managed Grafana",
+      "AWS Managed Service for Prometheus",
+      "AWS Organizations",
+      "AWS Resource Access Manager (AWS RAM)",
+      "AWS Service Catalog",
+      "Service control policies (SCPs)",
+      "AWS Systems Manager",
+      "AWS Trusted Advisor",
+      "Amazon VPC IP Address Manager (IPAM)",
+      "AWS DataSync",
+      "Amazon Application Recovery Controller",
+      "AWS Client VPN",
+      "Amazon CloudFront",
+      "Elastic IP addresses",
+      "AWS Global Accelerator",
+      "AWS PrivateLink",
+      "Amazon Route 53",
+      "Amazon Route 53 Resolver DNS Firewall",
+      "AWS Site-to-Site VPN",
+      "AWS Transit Gateway",
+      "Amazon VPC",
+      "VPC endpoints",
+      "VPC Flow Logs",
+      "VPC peering",
+      "VPC Reachability Analyzer",
+      "AWS Certificate Manager (ACM)",
+      "Amazon EC2 security groups",
+      "Egress-only internet gateways",
+      "Elastic Load Balancing (ELB)",
+      "Amazon GuardDuty",
+      "AWS IAM Access Analyzer",
+      "AWS IAM Identity Center",
+      "IAM",
+      "Amazon Inspector",
+      "Internet gateways",
+      "AWS KMS",
+      "Amazon Macie",
+      "AWS Network Firewall",
+      "NAT gateways",
+      "Network ACLs",
+      "AWS Secrets Manager",
+      "AWS Security Agent",
+      "AWS Security Hub",
+      "AWS Shield",
+      "AWS WAF",
+      "AWS Backup",
+      "Amazon EBS",
+      "Amazon EFS",
+      "Amazon FSx",
+      "Amazon S3",
+      "AWS Storage Gateway"
+    ],
+    "sourceUrl": "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/sysops-administrator-associate-03.html"
+  },
+  "recheck": {
+    "facts": [],
+    "questions": []
+  },
+  "sources": [
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "51d14795454663d034c1dd3f5c82a2c213da8947add97a8303c515ce908bac3d",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What is CloudFormation? - AWS CloudFormation",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "89aab348161dee96c28d887f2238f89badc6532cc0bfccad8c096208b3f7ec6f",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "How CloudFormation works - AWS CloudFormation",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-whatis-concepts.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "06b24162bcaaef9d5e133e1092ef66b0d2d71e53e0fe994acbe80cb38fc54d7c",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Troubleshooting CloudFormation - AWS CloudFormation",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "496947f44f3685f9eedda0b1f1986c5524a32a4c1f02d2f38316d2622b307bfe",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Continue rolling back an update - AWS CloudFormation",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-continueupdaterollback.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "24c08b8c8e690de7436e0d134f6599c2c1121aea4ac089145a29664913aa396e",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Amazon EC2 instance types - Amazon Elastic Compute Cloud",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "9226eb67ba2ef3565edd4f6fcf21ea1c862ed3e3200d48107cfbc1ae75b232f0",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Placement groups for your Amazon EC2 instances - Amazon Elastic Compute Cloud",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-groups.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "f8c6af461426ab7e2410d0b3dd97de47416dac70d785ce4888d3c0734999c8a5",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Caching and availability - Amazon CloudFront",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/ConfiguringCaching.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "64a5b66b9682933f73becb915facafc5ae56403dce87e47f3fb4aa6e598ca2d5",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Manage how long content stays in the cache (expiration) - Amazon CloudFront",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Expiration.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "6984d02d8a16440d9d01a40beb1a8125192bfac3db8e2294d64a7ef766cefac9",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "How CloudFront delivers content - Amazon CloudFront",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/HowCloudFrontWorks.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "6a5de211535fbaafd7a7e3a7b23781626b61df9a547dae7589a8380457e5a043",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What is Amazon CloudFront? - Amazon CloudFront",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "62f6cec98110adad555c4856b87cb587151de9d3cc7561436d0ef21ead529408",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Increase the proportion of requests that are served directly from the CloudFront caches (cache hit ratio) - Amazon CloudFront",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cache-hit-ratio.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "7b39566ef968a67baca774f523d809e38774cdc13b87ce68e6f9a332c9e89b57",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Using Amazon CloudWatch alarms - Amazon CloudWatch",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "b32a65e882fcb0444aa71c70a3d3b1f06450dc8be43dd0c1a011247fb040e4bf",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Manually create or edit the CloudWatch agent configuration file - Amazon CloudWatch",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Agent-Configuration-File-Details.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Amazon CloudWatch",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Dashboard-Sharing.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "8b732d57f334b17121241e2b62b75bb046158bf3a279604ec3a1ae76e12ca23a",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Using Internet Monitor - Amazon CloudWatch",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-InternetMonitor.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Amazon CloudWatch",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-NetworkMonitor.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "f7712a50145bbd1b29245e9cc146d81223ad05363d7a6b7d5489223e496c3341",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Using Amazon CloudWatch dashboards - Amazon CloudWatch",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Dashboards.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "af37ac77256c0f1d4dbf55f07829596de87870bd4a82f8ac5f479e38788c8a2b",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Create a CloudWatch alarm based on a static threshold - Amazon CloudWatch",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/ConsoleAlarms.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "4d84c2cd2c43de32483fa5be574168133c01d1e6d129f2eb75790e7a43024ec3",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Collect metrics, logs, and traces using the CloudWatch agent - Amazon CloudWatch",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "132293a01ab9fac757644b4aa47f07c55cfdcf729585126fc0ed17bc723a4184",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Notifying users on alarm changes - Amazon CloudWatch",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Notify_Users_Alarm_Changes.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "178d6a8c5b47d0bcf51f3994503e3d379679b504d985a379713bc985fafbfd72",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What is Amazon CloudWatch? - Amazon CloudWatch",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "7490ce5f1dfbaf3e477d400204698de0603c83673abe151599cc222645c1f039",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Amazon Aurora Auto Scaling with Aurora Replicas - Amazon Aurora",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Integrating.AutoScaling.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "64c4901c9293f6e7eb0b6a622ce550d7d24d25b0fff6370c6c6d1e1d50c43a22",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Configuring and managing a Multi-AZ deployment for Amazon RDS - Amazon Relational Database Service",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "18cd08cb0ed00fdd53aaeca0f2e164b9c91faa120252992f0266bee590810e12",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Restoring a DB instance to a specified time for Amazon RDS - Amazon Relational Database Service",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_PIT.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "418f4c9a024f18afe89ab01ed4c219db3ba64393904a4fe6562a9eff1b4745e6",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Monitoring DB load with Amazon CloudWatch Database Insights on Amazon RDS - Amazon Relational Database Service",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_PerfInsights.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "dcb1bdaecd8ea0fb6f83230667a373758dc1dbb972545fdd5eb24d8aab78d31c",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Working with DB instance read replicas - Amazon Relational Database Service",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ReadRepl.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "95cceace63a6a303f15607ac16e9aaf5a6b5592ad3fb5e33261b9b64baddbfc7",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Restoring to a DB instance - Amazon Relational Database Service",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_RestoreFromSnapshot.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "4fcf1917dc0c31dc47b9acd88bc62bbf2d2e25eb602d4c828c7b0359f5a64e88",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Multi-AZ DB cluster deployments for Amazon RDS - Amazon Relational Database Service",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/multi-az-db-clusters-concepts.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "a6acff74933d0fa2d252d7b2d38ddb7b0fd35e728f8fa8561cb366d0bb51f327",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Amazon RDS Proxy - Amazon Relational Database Service",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "20036b4337513e7a0c6f6d81cd62a0d9178ffbf024f1dfbeeb6c4398919e434a",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Deleting object versions from a versioning-enabled bucket - Amazon Simple Storage Service",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/DeletingObjectVersions.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "adedaf205b21339d7922cd7b35aab3ce6fc45b8c1cf09f04cf5a9bafac9bf204",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Retaining multiple versions of objects with S3 Versioning - Amazon Simple Storage Service",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "5c26c59822d648d8a469d20e436652c7529925ca3403c27289068e519879eb05",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Best practices design patterns: optimizing Amazon S3 performance - Amazon Simple Storage Service",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/optimizing-performance.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "960f1ce99312d01fd23ae109835019e8bbdbca5c3a8ddc647aa63cf2f8fb7fed",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Configuring fast, secure file transfers using Amazon S3 Transfer Acceleration - Amazon Simple Storage Service",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/transfer-acceleration.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "2975794faeea41658b920343bb4f1f815bbfb8011ab6c8d4e52d9c8d7a267fec",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "AWS Multi-factor authentication in IAM - AWS Identity and Access Management",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "0ab78620039d1f7f626beeb2b216955b2d6dbe3dcb768129cea57a267487cc4c",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Set an account password policy for IAM users - AWS Identity and Access Management",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_passwords_account-policy.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "3848aa771ecbedd4166bd2e56548af817ff0ec8338f41acdf779254e35c7f798",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Using AWS Identity and Access Management Access Analyzer - AWS Identity and Access Management",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/what-is-access-analyzer.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "8ce90793a060a7b1919f2cc31b31f322bb2c72181142fd137d9183f2d3406e45",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Resolving DNS queries between VPCs and your network - Amazon Route 53",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resolver-overview-DSN-queries-to-vpc.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "98365c10f62154d8ad654d5c00b00e77fa00f97110637536ba14edcb04f0d2bf",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What is Route 53 VPC Resolver? - Amazon Route 53",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resolver.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "13d4eee4534a65732df4cfbbb4c1ead9cb1136a787a57b2650c7d97a52bb9636",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Latency-based routing - Amazon Route 53",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy-latency.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "4c2cb5135c63f50d904435e605b1bb7c65bdfdf79b07fbb4a0fb3699425b9a19",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Choosing a routing policy - Amazon Route 53",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "eb7fc672d42a6c6367202c6fe0060aa430ce50148e95e1064b6245ddb5bc3638",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What is AWS Certificate Manager? - AWS Certificate Manager",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "fceb4493f89518bfe95e39dfe802be13ed29dfae6ff04d1529bb76747edb7140",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "AWS Certificate Manager DNS validation - AWS Certificate Manager",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/acm/latest/userguide/dns-validation.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "c91b6f23992a93adf17c2960278e629ac0c0110ac3f2a1b79f7496d04a525166",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Dynamic scaling for Amazon EC2 Auto Scaling - Amazon EC2 Auto Scaling",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-scale-based-on-demand.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "99c9bca4d264337eed8a0d6c0ab1cd0ec548dcf02ec6f24c6424123b372a4be8",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What is Amazon EC2 Auto Scaling? - Amazon EC2 Auto Scaling",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "1c75c3662dd112ce94d136d257c2528465efaee5f5eeb795ab87ba86a23999c0",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Create a backup plan - AWS Backup",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/aws-backup/latest/devguide/creating-a-backup-plan.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "64891718a3a3ce138571562402c7fcc06e0f90365f0a0f34352bc449d6833660",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What is AWS Backup? - AWS Backup",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/aws-backup/latest/devguide/whatisbackup.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "d262f7e8e568df4462633c1bb39d7a4bbf6abd4edf7aaef34945efc3cfe24b67",
+      "fetchedAt": "2026-11-14",
+      "kind": "exam-guide",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "In-Scope AWS Services - AWS Certified CloudOps Engineer - Associate",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/soa-03-in-scope-services.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "8bd6ca1d667f12ebabe0385a8ecf49ad4a094a7d3d616921eb4ce5ffac5b939c",
+      "fetchedAt": "2026-11-14",
+      "kind": "exam-guide",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Out-of-Scope AWS Services - AWS Certified CloudOps Engineer - Associate",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/soa-03-out-of-scope-services.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "588cd70a5a36c62107a37a39ced8909f663adc866fe8c4f44af9e8b9b0b5d8da",
+      "fetchedAt": "2026-11-14",
+      "kind": "exam-guide",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Mentions of AWS services on the exam - AWS Certified CloudOps Engineer - Associate",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/soa-03-service-mentions.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "ee60202e67e43f5abd171a236f9e701b975cbad0fb00bd3bcf624cc7020e0080",
+      "fetchedAt": "2026-11-14",
+      "kind": "exam-guide",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Content Domain 1: Monitoring, Logging, Analysis, Remediation, and Performance Optimization - AWS Certified CloudOps Engineer - Associate",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/sysops-administrator-associate-03-domain1.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "d6c85e8f84d5593ffdb7c1cb6ccd6e23e8b91e3c3003e9c297d3b605131007e2",
+      "fetchedAt": "2026-11-14",
+      "kind": "exam-guide",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Content Domain 2: Reliability and Business Continuity - AWS Certified CloudOps Engineer - Associate",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/sysops-administrator-associate-03-domain2.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "7abfaeff319ebfdb806e26a0bc977ddc127ba8373c1dd4e9636ae5632db999f4",
+      "fetchedAt": "2026-11-14",
+      "kind": "exam-guide",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Content Domain 3: Deployment, Provisioning, and Automation - AWS Certified CloudOps Engineer - Associate",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/sysops-administrator-associate-03-domain3.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "677f81b13bcb1dd87e94eb536c86e7036bc43aae3713ac88f0f064dd21ec52f4",
+      "fetchedAt": "2026-11-14",
+      "kind": "exam-guide",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Content Domain 4: Security and Compliance - AWS Certified CloudOps Engineer - Associate",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/sysops-administrator-associate-03-domain4.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "ef9e42cd45ba27809bc08b55abe54249a6e08d93f781d3c1aa2f38f9c3b78087",
+      "fetchedAt": "2026-11-14",
+      "kind": "exam-guide",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Content Domain 5: Networking and Content Delivery - AWS Certified CloudOps Engineer - Associate",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/sysops-administrator-associate-03-domain5.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "b7bc0d9ddbb264f5821ef450b51a9107db47a9e2127f6e1d76cb98b5ed7c7f35",
+      "fetchedAt": "2026-11-14",
+      "kind": "exam-guide",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "AWS Certified CloudOps Engineer - Associate (SOA-C03) - AWS Certified CloudOps Engineer - Associate",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/sysops-administrator-associate-03.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "1f573b5252f820907cb38469b3637d8195dac1935f7e8a5b20a698b6c42ba92a",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What Is AWS CloudTrail? - AWS CloudTrail",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "0f32131f31c130a0e378a87c0d2e40c0d69d0788d19b6024b6100636a3a63bea",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Get started with Trusted Advisor Recommendations - AWS Support",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/awssupport/latest/user/get-started-with-aws-trusted-advisor.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "c49300a7e64bf1ba97dc90b5beafa72dd4e5845d27b62dd4c7ad0fb5683696f4",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "AWS Trusted Advisor - AWS Support",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/awssupport/latest/user/trusted-advisor.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "ef10584a8e6be77d56d5fc26a8b4dbbe3c4e75db9d8bd84726b93b1fd56c57ec",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Viewing EC2 instance recommendations - AWS Compute Optimizer",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/compute-optimizer/latest/ug/view-ec2-recommendations.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "b78e4aca6fc1044e0012baab640192734866851fefb312653afaf9f9f62ce855",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What is AWS Compute Optimizer? - AWS Compute Optimizer",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/compute-optimizer/latest/ug/what-is-compute-optimizer.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "43a371fcee4a67e4489bd36bc45b89a68f887b01e0a8155b408312eae884f84f",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What Is AWS Config? - AWS Config",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "342ed11592fa8238ef8015eee615fa58a143dbd8c66931b7c2c3dfd766c6ae18",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Conformance Packs for AWS Config - AWS Config",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/config/latest/developerguide/conformance-packs.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "d8350920c6e12b918f27e77766b612f2c555b94d3f92b3adaab880190bfbd63d",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What is Direct Connect? - AWS Direct Connect",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "8ab7eae64b2cc5b19d785e1871734002ff99734d8b598f91231ea23d55908c66",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "AWS Direct Connect Resiliency Toolkit - AWS Direct Connect",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/resiliency_toolkit.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "e426a018d4a952f9bef53bdcc7d3fd094e8825e7b3428d7df23744f2fb7b637d",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What are connections? - Developer Tools console",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/dtconsole/latest/userguide/welcome-connections.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "f825295bd750390de9c9c3b257de47de0608244d549994ea6a11b70e772fc9a9",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Amazon EBS I/O characteristics and monitoring - Amazon EBS",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-io-characteristics.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "560ff0c7a1494e5b7a928b813d8cdc64d558b050ba9b00bb4a4773810d7fec1d",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Amazon EBS volume types - Amazon EBS",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "d81eac77567545dab21be2ca947a98316e4daa9719327c74c33fdf03daa2221a",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Managing storage lifecycle - Amazon Elastic File System",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/efs/latest/ug/lifecycle-management-efs.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "cc5fbeb09b645bbdbfdd37ce6de2d753f0445c64d01e672aca0be0a90fb3dd11",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What is Amazon Elastic File System? - Amazon Elastic File System",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/efs/latest/ug/whatisefs.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "1c046abbbca94ba641d737218177e888d422aeee184f87cd2705c5c2c892650c",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Access logs for your Application Load Balancer - Elastic Load Balancing",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "0cdab9ec90b4d1c2ee1eb2bf65fb3d45346def79e71e7208f1f33de6716b981f",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Troubleshoot your Application Load Balancers - Elastic Load Balancing",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-troubleshooting.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "6ffa009c1013ee5289d2ef3b9a211fe5e9d1c5226f08f6d441277a7c6b2aee90",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Health checks for Application Load Balancer target groups - Elastic Load Balancing",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/target-group-health-checks.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "eff3778a0e39babb88a28cd66a4ebadced2f9499e622e4cc357fc4f19ea198e0",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Rules in Amazon EventBridge - Amazon EventBridge",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-rules.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "54295a62e645152ea10a2c7745315e83823ea6da1c3b41ce352b1f1f4d8bfb53",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What Is Amazon EventBridge? - Amazon EventBridge",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "2d70c60a651538454ccc4314ac975f817f476a59450ac08f0574df6480299a07",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What is Amazon GuardDuty? - Amazon GuardDuty",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "3d3812b2a44aa4ea5827422c6e7e8caa3830d2145adce1bae54b38ae273092ba",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "How EC2 Image Builder works - EC2 Image Builder",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/imagebuilder/latest/userguide/how-image-builder-works.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "0c0d6dfb6e14d5d8fa1e53fad79dbbe73e6089765b29bb61f5395be8c568bb5a",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What is Image Builder? - EC2 Image Builder",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/imagebuilder/latest/userguide/what-is-image-builder.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "76df012024f240420e2e63fc4c7cf406c5f4b3b4199b2471c2a6e2a1abefb032",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Key policies in AWS KMS - AWS Key Management Service",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/kms/latest/developerguide/key-policies.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "83034bb1334152740c8145c3e31e354e6ba45bba9b105540722a7792517f247d",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "AWS Key Management Service - AWS Key Management Service",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "7327700b952431e3b5efe82c91fe779e1bb46367d998fa94621a71cbc63e7768",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Monitoring, debugging, and troubleshooting Lambda Event Functions - AWS Lambda",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-monitoring.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "517f48a64b7c9e88826c049cde2123ee4807e39e633c2555b7f6324165111a1e",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Using managed data identifiers - Amazon Macie",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/macie/latest/user/managed-data-identifiers.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "323dc2714e18736c9e569604f1ba1030ed3bad9a57aad19bb0a99a94c57eec99",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What is Amazon Macie? - Amazon Macie",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "958026d80603c6e1f7ae0ac2074f71c5d4cd502d42f654e422d80fba84689e72",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What is AWS Network Firewall? - AWS Network Firewall",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/network-firewall/latest/developerguide/what-is-aws-network-firewall.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "47242488009b90dce9b233c0dc9e144eda14356322a6f3f62501fb7d74272463",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What is AWS Organizations? - AWS Organizations",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_introduction.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "ca4e4f1384494e671afd59c824708c49f311117f2a60cfca08ae7a3a44e22f1b",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Service control policies (SCPs) - AWS Organizations",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "86d62330202d2974b477ee37d47756c410fc8b1cd3bd7ba2708e26fac02e0913",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Best practices for using the Terraform AWS Provider - AWS Prescriptive Guidance",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/terraform-aws-provider-best-practices/introduction.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "1b21bbb3ee27ac2e519ea8c13b6f0f9b5e5fdc901606c3ad55f476d9362ba9e9",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Shareable AWS resources - AWS Resource Access Manager",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/ram/latest/userguide/shareable.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "d2b791d932fa285dd81a312737995b46f3b3a09cc2d85c8b728e7ac4eae9fc41",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What is AWS Resource Access Manager? - AWS Resource Access Manager",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/ram/latest/userguide/what-is.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "b05eb36d9dd8f5426965964d1ddb6c3cb2aeba4149e2975794ba3bde3eaddd3c",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Create an AWS Secrets Manager secret - AWS Secrets Manager",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/create_secret.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "3c31ee9febff5ce163c4cc61b5239ee1523ddc3c32d5e5749d366e36a5936034",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What is AWS Secrets Manager? - AWS Secrets Manager",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "158918437ff113e4f476c6981d97d388428d01c41cf4f6a2b377ae8add50ed93",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Introduction to AWS Security Hub CSPM - AWS Security Hub",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "accdbf92342d49be57a44efb2dc48d32d8ba640b54fcfa7114e540f5c621ff3e",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What is Amazon SNS? - Amazon Simple Notification Service",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/sns/latest/dg/welcome.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "4fb750db8fbe217f5975e95be33f6b9a7c056e47dd08a5bc2e92ad379469130a",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Systems Manager Automation actions reference - AWS Systems Manager",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/automation-actions.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "223ef044da9d477853de1013b7c4ff25392354b3ef86fd5f58ae1fca81ed10a1",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "AWS Systems Manager Automation - AWS Systems Manager",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-automation.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "079439916cebda035495426c3f6498760fcdbf27e1749fbc0258c725a48ede71",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What is AWS Systems Manager? - AWS Systems Manager",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/what-is-systems-manager.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "d36657d28039e37dc220581918c4dbd9e1510410f7a5bd3ad389e689bbf82ef9",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "AWS PrivateLink concepts - Amazon Virtual Private Cloud",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/vpc/latest/privatelink/concepts.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "22b32b253a636d9098f3105aea7b2ea9e68249a562717219041bd9ac8f7fe080",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What is AWS PrivateLink? - Amazon Virtual Private Cloud",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/vpc/latest/privatelink/what-is-privatelink.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "a8e67e87934c3a470185eafbe41ff55597766798ca1ed9ad457e98654d2e8dee",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What is Reachability Analyzer? - Amazon Virtual Private Cloud",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/vpc/latest/reachability/what-is-reachability-analyzer.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "69f654e5cd2448696f265411b45087f4de6992d3e750af19189756ffac44d780",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Subnets for your VPC - Amazon Virtual Private Cloud",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "829a22562b71c9969477c63c9460e7a0288112344a67f6381f2f1a9560f15602",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Logging IP traffic using VPC Flow Logs - Amazon Virtual Private Cloud",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "6befbb3b9438c3e4a9e2e4395a0541330e99714ea1cb0752f4e1c7e199118dd0",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "What is Amazon VPC? - Amazon Virtual Private Cloud",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "8d7ed9ef0a37602775f6efc521b84d0a8b27d6132371c3b70e88b272e7c192bc",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "AWS WAF - AWS WAF, AWS Firewall Manager, AWS Shield Advanced, and AWS Shield network security director",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/waf/latest/developerguide/waf-chapter.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "01e82839edcb6973cd060b0b14a1652af167f2fb001e27e596d907c21d625018",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Blue/Green Deployments on AWS - Blue/Green Deployments on AWS",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/blue-green-deployments/welcome.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "e9bf23065a74e0abf76e2fd9b88279adf0896e8dd42f9051d4a55323fb63dfc8",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Disaster recovery options in the cloud - Disaster Recovery of Workloads on AWS: Recovery in the Cloud",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "34fa74784c6b5a4686795a54ad5a8f0bed37b9cddd97fa7f648db2317f7bd299",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Disaster Recovery of Workloads on AWS: Recovery in the Cloud - Disaster Recovery of Workloads on AWS: Recovery in the Cloud",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-workloads-on-aws.html"
+    },
+    {
+      "checks": [
+        {
+          "name": "official",
+          "result": "pass"
+        },
+        {
+          "name": "target",
+          "result": "pass"
+        },
+        {
+          "name": "deprecation",
+          "result": "pass"
+        },
+        {
+          "name": "freshness",
+          "result": "pass"
+        },
+        {
+          "name": "liveness",
+          "result": "pass"
+        }
+      ],
+      "claims": [],
+      "contentHash": "171a5b3a246ea93b9755f8fa6836f0829825328908a23724d6ee2c909d3ef91a",
+      "fetchedAt": "2026-11-14",
+      "kind": "official-doc",
+      "status": "active",
+      "target": {
+        "edition": "C03",
+        "examCode": "AWS-SOA-C03"
+      },
+      "title": "Overview of Deployment Options on AWS - Overview of Deployment Options on AWS",
+      "updatedAt": "2026-11-14",
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-deployment-options/welcome.html"
+    }
+  ]
+}
