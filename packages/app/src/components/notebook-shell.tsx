@@ -261,8 +261,14 @@ export function revealCurrent(container: HTMLElement) {
 export function NotebookShell({ examCode, preview, basePath, toc, children }: Props) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  // 広い画面の目次の列の開閉。この部品(体系ノートのレイアウト)に置くので、体系ノートの中の移動では保ち、外から入ると開いた状態に戻る
+  const [tocShown, setTocShown] = useState(true);
+  const toggled = useRef(false);
+  const hideButton = useRef<HTMLButtonElement>(null);
+  const showButton = useRef<HTMLButtonElement>(null);
   const button = useRef<HTMLButtonElement>(null);
   const drawerId = useId();
+  const tocColumnId = useId();
   const close = useCallback(() => setOpen(false), []);
   const side = useRef<HTMLDivElement>(null);
 
@@ -272,19 +278,63 @@ export function NotebookShell({ examCode, preview, basePath, toc, children }: Pr
     if (side.current) revealCurrent(side.current);
   }, [pathname]);
 
+  // 目次を隠したら「目次を出す」へ、出したら「目次を隠す」へ、フォーカスを移す(押した操作のあとだけ)
+  useEffect(() => {
+    if (!toggled.current) return;
+    toggled.current = false;
+    (tocShown ? hideButton : showButton).current?.focus();
+    if (tocShown && side.current) revealCurrent(side.current);
+  }, [tocShown]);
+
+  const toggleToc = () => {
+    toggled.current = true;
+    setTocShown((v) => !v);
+  };
+
   return (
     <NotebookProgressProvider examCode={examCode} preview={preview}>
-      <div className="md:grid md:grid-cols-[15rem_minmax(0,1fr)] md:gap-8">
-        <aside className="hidden md:block">
-          {/* `lg` 未満は、サイトの上のバー(上に固定。高さ約 3rem)の下に固定する */}
-          <div
-            ref={side}
-            className="sticky top-16 max-h-[calc(100dvh-5rem)] overflow-y-auto pb-4 lg:top-4 lg:max-h-[calc(100dvh-2rem)]"
-          >
-            <NotebookToc basePath={basePath} toc={toc} />
-          </div>
-        </aside>
+      <div
+        data-testid="notebook-layout"
+        data-toc={tocShown ? "shown" : "hidden"}
+        className={tocShown ? "md:grid md:grid-cols-[15rem_minmax(0,1fr)] md:gap-8" : ""}
+      >
+        {tocShown ? (
+          <aside id={tocColumnId} className="hidden md:block">
+            {/* `lg` 未満は、サイトの上のバー(上に固定。高さ約 3rem)の下に固定する */}
+            <div
+              ref={side}
+              className="sticky top-16 max-h-[calc(100dvh-5rem)] overflow-y-auto pb-4 lg:top-4 lg:max-h-[calc(100dvh-2rem)]"
+            >
+              <div className="mb-2 flex justify-end">
+                <button
+                  ref={hideButton}
+                  type="button"
+                  aria-expanded={true}
+                  aria-controls={tocColumnId}
+                  onClick={toggleToc}
+                  className="inline-flex items-center gap-1 rounded-md border border-line px-2 py-1 text-xs font-bold text-muted hover:border-primary hover:text-primary"
+                >
+                  <span aria-hidden="true">…</span>目次を隠す
+                </button>
+              </div>
+              <NotebookToc basePath={basePath} toc={toc} />
+            </div>
+          </aside>
+        ) : null}
         <div className="min-w-0">
+          {tocShown ? null : (
+            <div className="mb-4 hidden md:block">
+              <button
+                ref={showButton}
+                type="button"
+                aria-expanded={false}
+                onClick={toggleToc}
+                className="inline-flex items-center gap-2 rounded-md border border-line bg-surface px-3 py-2 text-sm font-bold shadow-sm hover:border-primary"
+              >
+                <span aria-hidden="true">…</span>目次を出す
+              </button>
+            </div>
+          )}
           {/* 上のバー(高さ約 3rem)の下に、少し間を空けて固定する(`top-14`)。ボタンの外側は、下の本文を押せるよう、押す対象にしない */}
           <div data-testid="notebook-toc-bar" className="pointer-events-none sticky top-14 z-20 mb-4 md:hidden">
             <button

@@ -92,6 +92,39 @@ describe("NotebookShell", () => {
     expect(within(nav).queryByRole("link", { name: /用語 x/ })).toBeNull();
   });
 
+  it("広い画面の目次を隠す_列をなくし_目次を出すへフォーカスし_出すと戻る", async () => {
+    await renderShell();
+    const layout = screen.getByTestId("notebook-layout");
+    const hide = screen.getByRole("button", { name: "目次を隠す" });
+    expect(hide.getAttribute("aria-expanded")).toBe("true");
+
+    fireEvent.click(hide);
+    expect(layout.getAttribute("data-toc")).toBe("hidden");
+    expect(screen.queryByRole("navigation", { name: "体系ノートの目次" })).toBeNull();
+    const show = screen.getByRole("button", { name: "目次を出す" });
+    expect(show.getAttribute("aria-expanded")).toBe("false");
+    expect(document.activeElement).toBe(show);
+    expect(screen.getByText("本文")).toBeTruthy();
+
+    fireEvent.click(show);
+    expect(layout.getAttribute("data-toc")).toBe("shown");
+    expect(screen.getByRole("navigation", { name: "体系ノートの目次" })).toBeTruthy();
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "目次を隠す" }));
+  });
+
+  it("目次を隠したまま節を移る_隠した状態を保つ", async () => {
+    const view = await renderShell();
+    fireEvent.click(screen.getByRole("button", { name: "目次を隠す" }));
+    nav.pathname = "/exams/TEST/notebook/domain1-1/one";
+    view.rerender(
+      <NotebookShell examCode="TEST" preview={true} basePath="/exams/TEST/notebook" toc={toc}>
+        <p>本文</p>
+      </NotebookShell>,
+    );
+    await act(async () => {});
+    expect(screen.getByTestId("notebook-layout").getAttribute("data-toc")).toBe("hidden");
+  });
+
   it("中分類の行を押す_節を開閉する", async () => {
     await renderShell();
     const nav = screen.getByRole("navigation", { name: "体系ノートの目次" });

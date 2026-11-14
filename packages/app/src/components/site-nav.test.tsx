@@ -114,6 +114,46 @@ describe("ドックと上のバー", () => {
   });
 });
 
+describe("サイドバーの開閉", () => {
+  it("閉じる_アイコンだけの細い列にし_名前と現在地を保ち_開くと戻る", () => {
+    signedIn(false);
+    pathname = "/bookmarks";
+    renderNav();
+    const sidebar = screen.getByTestId("sidebar");
+    const toggle = within(sidebar).getByRole("button", { name: "サイドバーを閉じる" });
+    expect(toggle.getAttribute("aria-expanded")).toBe("true");
+    expect(within(sidebar).getByRole("group", { name: "表示テーマ" })).toBeTruthy();
+
+    fireEvent.click(toggle);
+    expect(sidebar.getAttribute("data-collapsed")).toBe("true");
+    const reopen = within(sidebar).getByRole("button", { name: "サイドバーを開く" });
+    expect(reopen.getAttribute("aria-expanded")).toBe("false");
+    expect(document.getElementById(reopen.getAttribute("aria-controls") ?? "")).toBeTruthy();
+    const current = within(sidebar).getByRole("link", { name: "ブックマーク" });
+    expect(current.getAttribute("aria-current")).toBe("page");
+    expect(within(sidebar).getByRole("link", { name: "ホーム" }).getAttribute("href")).toBe("/");
+    expect(within(sidebar).queryByRole("group", { name: "表示テーマ" })).toBeNull();
+
+    fireEvent.click(reopen);
+    expect(sidebar.getAttribute("data-collapsed")).toBe("false");
+    expect(within(sidebar).getByRole("button", { name: "サイドバーを閉じる" })).toBeTruthy();
+  });
+
+  it("閉じたまま別の画面へ移る_閉じた状態を保つ", () => {
+    signedIn(false);
+    pathname = "/";
+    const view = renderNav();
+    fireEvent.click(within(screen.getByTestId("sidebar")).getByRole("button", { name: "サイドバーを閉じる" }));
+    pathname = "/exams";
+    view.rerender(
+      <SessionProvider>
+        <SiteNav />
+      </SessionProvider>,
+    );
+    expect(screen.getByTestId("sidebar").getAttribute("data-collapsed")).toBe("true");
+  });
+});
+
 describe("リリースノートの未読の目印", () => {
   it("まだ見ていない_目印を出し_見た版を保存すると消える", async () => {
     signedIn(false);
