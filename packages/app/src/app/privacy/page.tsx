@@ -239,7 +239,11 @@ export default function PrivacyPage() {
         </Article>
       </section>
 
-      <p className="text-right text-sm">2026 年 11 月 6 日 制定</p>
+      <p className="text-right text-sm">
+        2026 年 11 月 6 日 制定
+        <br />
+        2026 年 11 月 15 日 改定
+      </p>
     </article>
   );
 }

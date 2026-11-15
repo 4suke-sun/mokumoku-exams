@@ -45,6 +45,12 @@ describe("PrivacyPage", () => {
     expect(screen.getByText(/プッシュの仕組みへ、購読の情報と通知の本文を送ります/)).toBeTruthy();
   });
 
+  it("末尾の日付_制定の日と改定の日を出す", () => {
+    render(<PrivacyPage />);
+    expect(screen.getByText(/2026 年 11 月 6 日 制定/)).toBeTruthy();
+    expect(screen.getByText(/2026 年 11 月 15 日 改定/)).toBeTruthy();
+  });
+
   it("フォームで送った内容_GitHub に保存し_退会しても消えないことを示す", () => {
     render(<PrivacyPage />);
     expect(screen.getByText(/GitHub に、このサービスのリポジトリの Issue として保存します/)).toBeTruthy();
