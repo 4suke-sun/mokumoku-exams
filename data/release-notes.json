@@ -1,6 +1,21 @@
 {
   "releases": [
     {
+      "version": "v0.83.0",
+      "date": "2026-11-15",
+      "title": "CloudOps Engineer - Associate の問題を公開しました",
+      "items": [
+        {
+          "type": "feat",
+          "text": "AWS Certified CloudOps Engineer - Associate(SOA-C03)を公開しました。問題は 65 問(単一選択 43 問、複数選択 22 問)で、5 つの分野から出題します。本番モードは、65 問・130 分です。"
+        },
+        {
+          "type": "dev",
+          "text": "CloudOps Engineer - Associate の書き方の指針、点数票の帯、判定の基準、出典の収集の計画を足しました。"
+        }
+      ]
+    },
+    {
       "version": "v0.82.1",
       "date": "2026-11-14",
       "title": "開閉のボタンの印を三本線にし、体系ノートの「次の節へ」を最初から出すようにしました",

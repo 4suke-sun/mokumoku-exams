@@ -1,0 +1,415 @@
+{
+  "examCode": "AWS-SOA-C03",
+  "sources": [
+    {
+      "url": "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/sysops-administrator-associate-03.html",
+      "kind": "exam-guide"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/lambda/latest/dg/lambda-monitoring.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Install-CloudWatch-Agent.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-Agent-Configuration-File-Details.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/ConsoleAlarms.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Dashboards.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch-dashboard-sharing.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Notify_Users_Alarm_Changes.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/sns/latest/dg/welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/compute-optimizer/latest/ug/what-is-compute-optimizer.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-automation.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-rules.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/automation-actions.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/compute-optimizer/latest/ug/view-ec2-recommendations.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-volume-types.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-io-characteristics.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/optimizing-performance.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/transfer-acceleration.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/efs/latest/ug/whatisefs.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/efs/latest/ug/lifecycle-management-efs.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_PerfInsights.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-groups.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-scale-based-on-demand.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Introduction.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/ConfiguringCaching.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ReadRepl.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.Integrating.AutoScaling.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/target-group-health-checks.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-troubleshooting.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/multi-az-db-clusters-concepts.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/aws-backup/latest/devguide/whatisbackup.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/aws-backup/latest/devguide/creating-a-backup-plan.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_PIT.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_RestoreFromSnapshot.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/DeletingObjectVersions.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-workloads-on-aws.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/imagebuilder/latest/userguide/what-is-image-builder.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/imagebuilder/latest/userguide/how-image-builder-works.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-whatis-concepts.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-continueupdaterollback.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/ram/latest/userguide/what-is.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/ram/latest/userguide/shareable.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/overview-deployment-options/welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/whitepapers/latest/blue-green-deployments/welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/prescriptive-guidance/latest/terraform-aws-provider-best-practices/introduction.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/dtconsole/latest/userguide/welcome-connections.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/what-is-systems-manager.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_passwords_account-policy.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/awscloudtrail/latest/userguide/cloudtrail-user-guide.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/what-is-access-analyzer.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_introduction.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/awssupport/latest/user/trusted-advisor.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/awssupport/latest/user/get-started-with-aws-trusted-advisor.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/config/latest/developerguide/conformance-packs.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/macie/latest/user/what-is-macie.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/macie/latest/user/managed-data-identifiers.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/kms/latest/developerguide/key-policies.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/acm/latest/userguide/dns-validation.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/create_secret.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/guardduty/latest/ug/what-is-guardduty.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/vpc/latest/privatelink/what-is-privatelink.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/vpc/latest/privatelink/concepts.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/network-firewall/latest/developerguide/what-is-aws-network-firewall.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/waf/latest/developerguide/waf-chapter.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resolver.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resolver-overview-DSN-queries-to-vpc.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy-latency.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/HowCloudFrontWorks.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/vpc/latest/reachability/what-is-reachability-analyzer.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cache-hit-ratio.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Expiration.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/resiliency_toolkit.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-InternetMonitor.html",
+      "kind": "official-doc"
+    },
+    {
+      "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/what-is-network-monitor.html",
+      "kind": "official-doc"
+    }
+  ],
+  "guidePages": [
+    "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/sysops-administrator-associate-03-domain1.html",
+    "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/sysops-administrator-associate-03-domain2.html",
+    "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/sysops-administrator-associate-03-domain3.html",
+    "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/sysops-administrator-associate-03-domain4.html",
+    "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/sysops-administrator-associate-03-domain5.html",
+    "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/soa-03-service-mentions.html",
+    "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/soa-03-in-scope-services.html",
+    "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/soa-03-out-of-scope-services.html"
+  ],
+  "scope": {
+    "prefixes": [
+      "https://docs.aws.amazon.com/aws-certification/latest/sysops-administrator-associate-03/",
+      "https://docs.aws.amazon.com/"
+    ],
+    "maxDepth": 0
+  },
+  "exclude": []
+}

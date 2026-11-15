@@ -49,6 +49,7 @@ function exportRoot() {
   cpSync(join(repoRoot, "data/questions.aws-clf-c02.json"), join(root, "data/questions.aws-clf-c02.json"));
   cpSync(join(repoRoot, "data/questions.aws-dva-c02.json"), join(root, "data/questions.aws-dva-c02.json"));
   cpSync(join(repoRoot, "data/questions.dbx-dea-2605.json"), join(root, "data/questions.dbx-dea-2605.json"));
+  cpSync(join(repoRoot, "data/questions.aws-soa-c03.json"), join(root, "data/questions.aws-soa-c03.json"));
   return root;
 }
 

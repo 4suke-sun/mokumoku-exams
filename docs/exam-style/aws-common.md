@@ -1,6 +1,6 @@
 # AWS の資格に共通の書き方
 
-AWS の資格の問題に共通する、文章の構成の特徴です。資格ごとの値は、[Cloud Practitioner](./aws-clf.md)・[Developer - Associate](./aws-dva.md)・[AI Business Strategist](./aws-aib.md) にあります。
+AWS の資格の問題に共通する、文章の構成の特徴です。資格ごとの値は、[Cloud Practitioner](./aws-clf.md)・[Developer - Associate](./aws-dva.md)・[AI Business Strategist](./aws-aib.md)・[CloudOps Engineer - Associate](./aws-soa.md) にあります。
 採点は [点数票](./scorecard.md) です。
 
 ## 1. 設問の構成

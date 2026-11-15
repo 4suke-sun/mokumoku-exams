@@ -1,0 +1,557 @@
+{
+  "examCode": "AWS-SOA-C03",
+  "decisions": [
+    {
+      "target": "draft",
+      "id": "d-03074e9b8cae",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-0448743add4b",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-08f21164c33a",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-090fc73d6df8",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-0a78f77abc4f",
+      "decision": "reject",
+      "reason": "fact-unverified"
+    },
+    {
+      "target": "draft",
+      "id": "d-0b13025c9832",
+      "decision": "reject",
+      "reason": "fact-mismatch"
+    },
+    {
+      "target": "draft",
+      "id": "d-0c789bba8167",
+      "decision": "reject",
+      "reason": "fact-unverified"
+    },
+    {
+      "target": "draft",
+      "id": "d-0ff4b1e8135d",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-10249015be7b",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-13c78a10abec",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-13ed0fc03551",
+      "decision": "reject",
+      "reason": "similar-question"
+    },
+    {
+      "target": "draft",
+      "id": "d-1424aeffb3a5",
+      "decision": "reject",
+      "reason": "fact-mismatch"
+    },
+    {
+      "target": "draft",
+      "id": "d-18401e0d42b0",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-18d741213a97",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-2490ae112187",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-24f99dd4313b",
+      "decision": "reject",
+      "reason": "fact-mismatch"
+    },
+    {
+      "target": "draft",
+      "id": "d-256d994d038c",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-28d38f54771c",
+      "decision": "reject",
+      "reason": "fact-mismatch"
+    },
+    {
+      "target": "draft",
+      "id": "d-29195158dc8e",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-2b0a15f295a0",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-2b25fcbcf9d1",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-3057cabdbfd0",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-30b598cc1947",
+      "decision": "reject",
+      "reason": "fact-unverified"
+    },
+    {
+      "target": "draft",
+      "id": "d-344ecf0dc545",
+      "decision": "reject",
+      "reason": "similar-question"
+    },
+    {
+      "target": "draft",
+      "id": "d-357e7c4ceff7",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-38f9868cac17",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-3d8b0688d32f",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-40a79255286d",
+      "decision": "reject",
+      "reason": "fact-mismatch"
+    },
+    {
+      "target": "draft",
+      "id": "d-40dfaaa4f4e0",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-446bf4aace2f",
+      "decision": "reject",
+      "reason": "similar-question"
+    },
+    {
+      "target": "draft",
+      "id": "d-4784688fdced",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-4a1007e21946",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-4b4419ab3a3a",
+      "decision": "reject",
+      "reason": "fact-unverified"
+    },
+    {
+      "target": "draft",
+      "id": "d-534babe04264",
+      "decision": "reject",
+      "reason": "similar-question"
+    },
+    {
+      "target": "draft",
+      "id": "d-54052a1dc822",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-56a3ab26de39",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-61610a0d1551",
+      "decision": "reject",
+      "reason": "fact-mismatch"
+    },
+    {
+      "target": "draft",
+      "id": "d-61d9266b1563",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-61f5a7bcd99d",
+      "decision": "reject",
+      "reason": "fact-mismatch"
+    },
+    {
+      "target": "draft",
+      "id": "d-6402a889c5fa",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-6621388593ab",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-6790d0c78f2e",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-680cfdf20776",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-70622266b2ee",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-71f0dc1c3731",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-727a1c7d19bf",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-7464b8e06efc",
+      "decision": "reject",
+      "reason": "similar-question"
+    },
+    {
+      "target": "draft",
+      "id": "d-7681790e10a4",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-76ba191e5f00",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-7a53d0dd20f1",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-82206ea99261",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-825973338c8f",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-82b9ecbed4d0",
+      "decision": "reject",
+      "reason": "fact-unverified"
+    },
+    {
+      "target": "draft",
+      "id": "d-8be91eecf4e7",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-8f4b65c81312",
+      "decision": "reject",
+      "reason": "similar-question"
+    },
+    {
+      "target": "draft",
+      "id": "d-9279b5799460",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-9282703607b1",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-92867ca78a4b",
+      "decision": "reject",
+      "reason": "fact-unverified"
+    },
+    {
+      "target": "draft",
+      "id": "d-96fb32900039",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-9d194ad90a02",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-9f80ed4641e6",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-a9ab2f88ecf6",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-aa76a71e726b",
+      "decision": "reject",
+      "reason": "fact-mismatch"
+    },
+    {
+      "target": "draft",
+      "id": "d-aace708afd44",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-ada2ca9649cf",
+      "decision": "reject",
+      "reason": "fact-mismatch"
+    },
+    {
+      "target": "draft",
+      "id": "d-ae182ac6d2a7",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-b18a1b56a5a5",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-b4b687af3bb6",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-b7a9c967f709",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-b7ff6e370403",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-b90cd3e252fa",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-bd2bfcd1f1eb",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-bfee0c62f25d",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-bff7c8661f5f",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-c0d8500d2251",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-c44f95059ce7",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-c7caa96ffdcc",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-c82e91498d57",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-cb90c421caff",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-cbdd359bc6f1",
+      "decision": "reject",
+      "reason": "fact-unverified"
+    },
+    {
+      "target": "draft",
+      "id": "d-d0e483728c66",
+      "decision": "reject",
+      "reason": "fact-unverified"
+    },
+    {
+      "target": "draft",
+      "id": "d-d4b029addbe5",
+      "decision": "reject",
+      "reason": "similar-question"
+    },
+    {
+      "target": "draft",
+      "id": "d-dbef4092eb4d",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-dd97f21c08de",
+      "decision": "reject",
+      "reason": "fact-unverified"
+    },
+    {
+      "target": "draft",
+      "id": "d-e3db7219804f",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-e891eb0659b4",
+      "decision": "reject",
+      "reason": "fact-mismatch"
+    },
+    {
+      "target": "draft",
+      "id": "d-ea32298caab1",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-ef2788e9bfd0",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-f0225b634571",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-f0a39aa96b72",
+      "decision": "approve",
+      "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-f6c6c7cc997d",
+      "decision": "reject",
+      "reason": "fact-mismatch"
+    },
+    {
+      "target": "draft",
+      "id": "d-fa4e13fb83d6",
+      "decision": "approve",
+      "reason": "human-approved"
+    }
+  ]
+}
