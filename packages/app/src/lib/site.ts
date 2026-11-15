@@ -15,7 +15,7 @@ export function siteUrl(env: Record<string, string | undefined> = process.env): 
 /** このサービスのリポジトリ */
 export const REPOSITORY_URL = "https://github.com/4suke-sun/mokumoku-exams";
 
-/** 問い合わせ先(リポジトリの Issue の一覧)。利用規約とプライバシーポリシーの画面に出す。 */
+/** リポジトリの Issue の一覧。送信フォームで送った内容の起票先として、利用規約とプライバシーポリシーの画面に出す。 */
 export const ISSUES_URL = `${REPOSITORY_URL}/issues`;
 
 /** 検索エンジンに案内するのは、ログインなしで開ける画面だけ。ほかはすべて対象外にする。 */

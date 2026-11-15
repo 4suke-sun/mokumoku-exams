@@ -9,6 +9,7 @@
 - 合格予測、分野別の正答数、実績の表示
 - メールアドレスとパスワードで自分で登録して使うログイン(Cognito)。学習の記録、表示の設定、ブックマークをアカウントに保存する。退会もできる
 - 管理者の画面(利用者の一覧・無効化、全問のプレビュー)
+- 開発者へ一方向で送る、お問い合わせと問題の誤りの報告のフォーム(送った内容は、このリポジトリの Issue として起票する。返信はしない)
 
 資格と問題のデータは、リポジトリ直下の `data/` の JSON です。仕様は [docs/data-spec.md](./docs/data-spec.md)、資格の足し方は
 [docs/adding-an-exam.md](./docs/adding-an-exam.md)、作問パイプラインで問題を作る手順は [docs/question-production.md](./docs/question-production.md) にあります。

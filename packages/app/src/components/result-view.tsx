@@ -15,6 +15,7 @@ import { ResultSkeleton } from "@/components/page-skeletons.tsx";
 import { QuestionChips } from "@/components/question-chips.tsx";
 import { QuestionGrid } from "@/components/question-grid.tsx";
 import { ReferenceList } from "@/components/reference-list.tsx";
+import { ReportLink } from "@/components/report-link.tsx";
 import { RichText } from "@/components/rich-text.tsx";
 import { FreeTextScore } from "@/components/rubric-view.tsx";
 import { ScoreRing } from "@/components/score-ring.tsx";
@@ -544,6 +545,7 @@ export function ResultView({ exam, outline }: Props) {
                     <ExplanationView question={question} choiceOrder={latest.choiceOrder} headingLevel={4} />
                   </div>
                   <ReferenceList references={question.references} />
+                  <ReportLink examCode={exam.examCode} questionId={question.questionId} />
                 </li>
               ))}
             </ol>

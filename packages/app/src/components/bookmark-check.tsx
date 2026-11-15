@@ -7,6 +7,7 @@ import { ChoiceChip, ChoiceReview } from "@/components/choice-review.tsx";
 import { ExplanationView } from "@/components/explanation-view.tsx";
 import { QuestionChips } from "@/components/question-chips.tsx";
 import { ReferenceList } from "@/components/reference-list.tsx";
+import { ReportLink } from "@/components/report-link.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
 import { RubricView } from "@/components/rubric-view.tsx";
 import { fetchQuestions } from "@/lib/questions/client.ts";
@@ -95,12 +96,12 @@ export function BookmarkCheck({ exam, order }: Props) {
                   <div className="flex justify-end">
                     <BookmarkToggle questionId={question.questionId} bookmarks={bookmarks} />
                   </div>
-                  <QuestionFace question={question} revealed domains={exam.domains} />
+                  <QuestionFace question={question} revealed domains={exam.domains} examCode={exam.examCode} />
                 </li>
               ))}
             </ol>
           ) : (
-            <FlashCards questions={shown} bookmarks={bookmarks} domains={exam.domains} />
+            <FlashCards questions={shown} bookmarks={bookmarks} domains={exam.domains} examCode={exam.examCode} />
           )}
         </>
       )}
@@ -116,10 +117,12 @@ function QuestionFace({
   question,
   revealed,
   domains,
+  examCode,
 }: {
   question: Question;
   revealed: boolean;
   domains: PublishedExam["domains"];
+  examCode: string;
 }) {
   return (
     <>
@@ -152,6 +155,7 @@ function QuestionFace({
           <ReferenceList references={question.references} />
         </div>
       ) : null}
+      <ReportLink examCode={examCode} questionId={question.questionId} />
     </>
   );
 }
@@ -161,10 +165,12 @@ function FlashCards({
   questions,
   bookmarks,
   domains,
+  examCode,
 }: {
   questions: Question[];
   bookmarks: Bookmarks;
   domains: PublishedExam["domains"];
+  examCode: string;
 }) {
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
@@ -186,7 +192,7 @@ function FlashCards({
         </p>
         <BookmarkToggle questionId={question.questionId} bookmarks={bookmarks} />
       </div>
-      <QuestionFace question={question} revealed={revealed} domains={domains} />
+      <QuestionFace question={question} revealed={revealed} domains={domains} examCode={examCode} />
       <button
         type="button"
         onClick={() => setRevealed((r) => !r)}

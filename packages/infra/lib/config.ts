@@ -11,6 +11,9 @@ export const OPTIONAL_VARIABLES = [
   "VAPID_PUBLIC_KEY",
   "VAPID_PRIVATE_KEY_PARAMETER",
   "VAPID_SUBJECT",
+  "FEEDBACK_GITHUB_APP_ID",
+  "FEEDBACK_GITHUB_INSTALLATION_ID",
+  "FEEDBACK_GITHUB_PRIVATE_KEY_PARAMETER",
   "DOMAIN_NAME",
   "CERTIFICATE_ARN",
   "HOSTED_ZONE_ID",
@@ -23,6 +26,16 @@ export const OPTIONAL_VARIABLES = [
  * 秘密鍵の値そのものは扱わない(SecureString のパラメーターとして、運用者が作る。docs/app/infra.md)。
  */
 const VAPID_VARIABLES = ["VAPID_PUBLIC_KEY", "VAPID_PRIVATE_KEY_PARAMETER", "VAPID_SUBJECT"] as const;
+
+/**
+ * 送信フォームの起票に使う GitHub App の ID、インストールの ID、秘密鍵を置いた SSM パラメーターの名前。3 つそろえて設定する(どれかだけは不可)。
+ * 秘密鍵の値そのものは扱わない(SecureString のパラメーターとして、運用者が作る。docs/app/infra.md)。
+ */
+const FEEDBACK_VARIABLES = [
+  "FEEDBACK_GITHUB_APP_ID",
+  "FEEDBACK_GITHUB_INSTALLATION_ID",
+  "FEEDBACK_GITHUB_PRIVATE_KEY_PARAMETER",
+] as const;
 
 /** 月の費用の予算の金額(USD)と、知らせる先のメールアドレス。2 つそろえて設定する(どれかだけは不可)。 */
 const BUDGET_VARIABLES = ["BUDGET_MONTHLY_USD", "BUDGET_EMAIL"] as const;
@@ -43,6 +56,8 @@ export type InfraConfig = {
   siteUrl?: string;
   /** プッシュ通知の VAPID の公開鍵、秘密鍵のパラメーターの名前、連絡先。なければ、通知の送信の仕組み(PushStack)を作らない */
   push?: PushConfig;
+  /** 送信フォームの起票に使う GitHub App の設定。なければ、起票しない(送信の API は 503) */
+  feedback?: FeedbackConfig;
   /** 独自ドメイン。なければ、CloudFront の既定のドメインで配信する */
   customDomain?: CustomDomain;
   /**
@@ -77,6 +92,15 @@ export type PushConfig = {
   subject: string;
 };
 
+export type FeedbackConfig = {
+  /** GitHub App の ID(数字) */
+  appId: string;
+  /** App のインストールの ID(数字) */
+  installationId: string;
+  /** App の秘密鍵(PEM)を置いた SSM パラメーター(SecureString)の名前。値は Lambda が実行時に読む */
+  privateKeyParameter: string;
+};
+
 export type Env = Record<string, string | undefined>;
 
 const DEFAULT_STACK_PREFIX = "mokumoku-exams";
@@ -89,6 +113,8 @@ const SITE_URL = /^https:\/\/[A-Za-z0-9.-]+(:\d{1,5})?$/;
 const VAPID_PUBLIC_KEY = /^[A-Za-z0-9_-]{87}$/;
 // SSM パラメーターの名前。権限をこのパラメーター 1 つの ARN に絞るため、`/` で始まる階層の名前に限る
 const SSM_PARAMETER_NAME = /^(?=.{2,1011}$)(\/[A-Za-z0-9_.-]+)+$/;
+// GitHub App の ID とインストールの ID は数字
+const GITHUB_NUMERIC_ID = /^[0-9]{1,20}$/;
 const VAPID_SUBJECT = /^(mailto:[^\s@]+@[^\s@]+\.[^\s@]+|https:\/\/\S+)$/;
 const DOMAIN_NAME = /^(?=.{1,253}$)([a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,63}$/;
 // CloudFront に付ける証明書は、us-east-1 に置く必要がある
@@ -160,6 +186,7 @@ export function loadConfig(env: Env): InfraConfig {
       problems.push("VAPID_SUBJECT は、mailto: か https:// で始まる連絡先にしてください");
   }
 
+  const feedback = loadFeedback(env, problems);
   const customDomain = loadCustomDomain(env, problems);
   const budget = loadBudget(env, problems);
 
@@ -174,9 +201,33 @@ export function loadConfig(env: Env): InfraConfig {
     ...(siteUrl ? { siteUrl } : {}),
     ...(appReservedConcurrency !== undefined ? { appReservedConcurrency } : {}),
     ...(push ? { push } : {}),
+    ...(feedback ? { feedback } : {}),
     ...(customDomain ? { customDomain } : {}),
     ...(budget ? { budget } : {}),
   };
+}
+
+/** 送信フォームの GitHub App の設定。3 つそろえて渡す。どれもなければ、起票しない。 */
+function loadFeedback(env: Env, problems: string[]): FeedbackConfig | undefined {
+  const set = FEEDBACK_VARIABLES.filter((name) => env[name]);
+  if (set.length === 0) return undefined;
+  if (set.length < FEEDBACK_VARIABLES.length) {
+    problems.push(`${FEEDBACK_VARIABLES.join(" / ")} は、3 つそろえて設定してください`);
+    return undefined;
+  }
+  const feedback = {
+    appId: env.FEEDBACK_GITHUB_APP_ID ?? "",
+    installationId: env.FEEDBACK_GITHUB_INSTALLATION_ID ?? "",
+    privateKeyParameter: env.FEEDBACK_GITHUB_PRIVATE_KEY_PARAMETER ?? "",
+  };
+  if (!GITHUB_NUMERIC_ID.test(feedback.appId)) problems.push("FEEDBACK_GITHUB_APP_ID は、数字にしてください");
+  if (!GITHUB_NUMERIC_ID.test(feedback.installationId)) {
+    problems.push("FEEDBACK_GITHUB_INSTALLATION_ID は、数字にしてください");
+  }
+  if (!SSM_PARAMETER_NAME.test(feedback.privateKeyParameter)) {
+    problems.push("FEEDBACK_GITHUB_PRIVATE_KEY_PARAMETER は、`/` で始まる SSM パラメーターの名前にしてください");
+  }
+  return feedback;
 }
 
 /** 月の費用の予算。金額と宛先はそろえて渡す。どちらもなければ、予算を作らない。 */

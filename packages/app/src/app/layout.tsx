@@ -85,6 +85,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                   <Link href="/privacy" className="ml-3 underline">
                     利用規約とプライバシーポリシー
                   </Link>
+                  <Link href="/contact" className="ml-3 underline">
+                    お問い合わせ
+                  </Link>
                 </p>
               </PageFooter>
             </div>

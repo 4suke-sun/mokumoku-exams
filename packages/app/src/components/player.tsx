@@ -12,6 +12,7 @@ import { QuestionChips } from "@/components/question-chips.tsx";
 import { QuestionGrid } from "@/components/question-grid.tsx";
 import { RecentMarks, useQuestionStats } from "@/components/question-stats.tsx";
 import { ReferenceList } from "@/components/reference-list.tsx";
+import { ReportLink } from "@/components/report-link.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
 import { FreeTextScore } from "@/components/rubric-view.tsx";
 import { type AnswerTimer, createTimer, elapsedTimes, setVisible, showQuestion } from "@/lib/answer-timer.ts";
@@ -455,6 +456,7 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
             </>
           )}
         </fieldset>
+        <ReportLink examCode={exam.examCode} questionId={question.questionId} />
 
         {isChecked ? (
           <div className="space-y-3">

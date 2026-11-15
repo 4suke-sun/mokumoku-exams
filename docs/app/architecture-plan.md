@@ -19,6 +19,7 @@ flowchart LR
   push -->|秘密鍵の読み取り| ssm[SSM パラメーター]
   push -->|リマインド| browserpush[ブラウザのプッシュサービス]
   fn -.->|秘密鍵の読み取り| ssm
+  fn -.->|送信フォームの起票\nGitHub App| github[GitHub の Issue]
 ```
 
 ## 構成要素
@@ -26,7 +27,7 @@ flowchart LR
 | 要素 | 役割 | 実装する版(目安) |
 | --- | --- | --- |
 | 画面(`packages/app`) | 資格の一覧、モード選択、出題、採点、結果、復習、ダッシュボードなど | v0.5.0 以降 |
-| API(`packages/app` の API ルート) | 学習履歴の保存と取得、管理者の操作 | v0.12.0 以降 |
+| API(`packages/app` の API ルート) | 学習履歴の保存と取得、管理者の操作、送信フォームの起票(GitHub App で、このリポジトリの Issue に起票する。[送信フォームの仕様](./specs/feedback.md)) | v0.12.0 以降(送信フォームは v0.84.0 以降) |
 | 認証 | Cognito UserPool のみ。セルフサインアップ(確認コードで確かめる)、利用者自身による退会、管理者グループ | v0.9.0 以降(セルフサインアップは v0.76.0 以降) |
 | データ | 学習履歴は DynamoDB の単一テーブル。問題データは、リポジトリの静的な JSON | v0.3.0(問題データ)、v0.12.0(履歴) |
 | ホスティング | Lambda Web Adapter + CloudFront + S3 | v0.9.0 以降 |

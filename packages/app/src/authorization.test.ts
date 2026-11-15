@@ -9,6 +9,7 @@ import * as adminDisableRoute from "@/app/api/admin/users/disable/route.ts";
 import * as adminUsersRoute from "@/app/api/admin/users/route.ts";
 import * as changePasswordRoute from "@/app/api/auth/change-password/route.ts";
 import * as deleteAccountRoute from "@/app/api/auth/delete-account/route.ts";
+import * as feedbackRoute from "@/app/api/feedback/route.ts";
 import * as bookmarksRoute from "@/app/api/history/bookmarks/route.ts";
 import * as daysRoute from "@/app/api/history/days/route.ts";
 import * as goalRoute from "@/app/api/history/goal/route.ts";
@@ -105,6 +106,8 @@ const PROTECTED_PAGES = [
   "/admin/preview/sample/notebook/sample",
   "/admin/preview/sample/notebook/sample/sample",
   "/bookmarks",
+  "/contact",
+  "/contact/question",
   "/exams",
   "/exams/sample",
   "/exams/sample/cards",
@@ -155,6 +158,7 @@ const PROTECTED_APIS = [
   "/api/admin/users/disable",
   "/api/auth/change-password",
   "/api/auth/delete-account",
+  "/api/feedback",
   "/api/history/bookmarks",
   "/api/history/days",
   "/api/history/goal",
@@ -369,6 +373,13 @@ describe("認可: 未ログインの拒否", () => {
     expect(await response.text()).not.toContain("correctAnswers");
   });
 
+  it("送信フォームの API 本体_入口を通らなくても未ログインを断る(二重の防御)", async () => {
+    const response = await feedbackRoute.POST(
+      request("/api/feedback", { method: "POST", body: { form: "contact", category: "bug", text: "x" } }),
+    );
+    expect(response.status).toBe(401);
+  });
+
   it("パスワード変更の API 本体_入口を通らなくても未ログインを断る(二重の防御)", async () => {
     const response = await changePasswordRoute.POST(
       request("/api/auth/change-password", {
@@ -408,6 +419,7 @@ describe("認可: 未ログインの拒否", () => {
     expect(methods(adminDisableRoute)).toEqual(["POST"]);
     expect(methods(pushSubscriptionRoute).sort()).toEqual(["DELETE", "PUT"]);
     expect(methods(pushTestRoute)).toEqual(["POST"]);
+    expect(methods(feedbackRoute)).toEqual(["POST"]);
   });
 });
 
@@ -416,6 +428,7 @@ describe("認可: 他人のデータに触れない", () => {
     vi.stubEnv("AUTH_FAKE", "1");
     delete (globalThis as { __mokumokuFakeHistory?: unknown }).__mokumokuFakeHistory;
     delete (globalThis as { __mokumokuFakePush?: unknown }).__mokumokuFakePush;
+    delete (globalThis as { __mokumokuFakeFeedback?: unknown }).__mokumokuFakeFeedback;
   });
   afterEach(() => {
     vi.unstubAllEnvs();
@@ -466,6 +479,17 @@ describe("認可: 他人のデータに触れない", () => {
     const response = await historyRoute.GET(withHeaders);
     expect(response.status).toBe(200);
     expect(((await response.json()) as { results: unknown[] }).results).toEqual([]);
+  });
+
+  it("送信フォームで利用者の識別子を本文で渡す_拒否される", async () => {
+    const own = await cookie();
+    const body = { form: "contact", category: "bug", text: "x" };
+    for (const key of ["sub", "userId", "email", "PK", "SK"]) {
+      const response = await feedbackRoute.POST(
+        request("/api/feedback", { method: "POST", cookie: own, body: { ...body, [key]: "other-user" } }),
+      );
+      expect(response.status, key).toBe(400);
+    }
   });
 
   it("ブックマークで利用者の識別子を本文・問い合わせで渡す_拒否される", async () => {

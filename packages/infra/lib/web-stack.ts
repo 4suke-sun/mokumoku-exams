@@ -16,9 +16,29 @@ import * as sns from "aws-cdk-lib/aws-sns";
 import * as subscriptions from "aws-cdk-lib/aws-sns-subscriptions";
 import type { Construct } from "constructs";
 import { USER_ADMIN_ACTIONS } from "./auth-stack.ts";
-import type { InfraConfig } from "./config.ts";
+import type { FeedbackConfig, InfraConfig } from "./config.ts";
 import { HISTORY_TABLE_ACTIONS } from "./data-stack.ts";
-import { grantReadVapidPrivateKey, vapidEnvironment } from "./push-stack.ts";
+import { grantReadVapidPrivateKey, VAPID_PRIVATE_KEY_ACTIONS, vapidEnvironment } from "./push-stack.ts";
+
+/** Lambda に渡す、送信フォームの GitHub App の設定。秘密鍵は値ではなく、パラメーターの名前だけを渡す。 */
+export function feedbackEnvironment(feedback: FeedbackConfig): Record<string, string> {
+  return {
+    FEEDBACK_GITHUB_APP_ID: feedback.appId,
+    FEEDBACK_GITHUB_INSTALLATION_ID: feedback.installationId,
+    FEEDBACK_GITHUB_PRIVATE_KEY_PARAMETER: feedback.privateKeyParameter,
+  };
+}
+
+/** App の秘密鍵のパラメーター 1 つだけを、Lambda に読ませる(許す操作は、VAPID の秘密鍵と同じく読み出しだけ)。 */
+export function grantReadFeedbackPrivateKey(fn: lambda.Function, feedback: FeedbackConfig): void {
+  // 名前は `/` で始まる(config.ts で確かめる)。ARN は `...:parameter/<名前の先頭の / を除いたもの>`
+  const parameterArn = Stack.of(fn).formatArn({
+    service: "ssm",
+    resource: "parameter",
+    resourceName: feedback.privateKeyParameter.slice(1),
+  });
+  fn.addToRolePolicy(new iam.PolicyStatement({ actions: VAPID_PRIVATE_KEY_ACTIONS, resources: [parameterArn] }));
+}
 
 /** アプリがオリジンの合言葉を確かめるヘッダー名(packages/app/src/lib/origin-verify.ts と同じ) */
 export const ORIGIN_VERIFY_HEADER = "x-origin-verify";
@@ -127,6 +147,8 @@ export class WebStack extends Stack {
         // 設定したときだけ渡す。sitemap の絶対 URL と、通知(購読の公開鍵と、テスト通知の送信)に使う
         ...(config.siteUrl ? { SITE_URL: config.siteUrl } : {}),
         ...(config.push ? vapidEnvironment(config.push) : {}),
+        // 設定したときだけ渡す。送信フォームの起票(GitHub App)に使う。秘密鍵は値ではなく、パラメーターの名前だけ
+        ...(config.feedback ? feedbackEnvironment(config.feedback) : {}),
       },
     });
     // 履歴のテーブルに対して、必要な操作だけを許す(スキャンやテーブルの管理はできない)
@@ -140,6 +162,8 @@ export class WebStack extends Stack {
 
     // テスト通知の送信に使う秘密鍵は、そのパラメーター 1 つだけを読める
     if (config.push) grantReadVapidPrivateKey(appFunction, config.push);
+    // 送信フォームの起票に使う App の秘密鍵も、そのパラメーター 1 つだけを読める
+    if (config.feedback) grantReadFeedbackPrivateKey(appFunction, config.feedback);
 
     // Function URL は認証なし。CloudFront が付ける合言葉のヘッダーを、アプリが確かめて、直接のアクセスを断る
     const functionUrl = appFunction.addFunctionUrl({ authType: lambda.FunctionUrlAuthType.NONE });
