@@ -29,8 +29,10 @@ describe("PrivacyPage", () => {
     );
   });
 
-  it("問い合わせ_公開の場なので個人情報を書かないよう注意書きを出す", () => {
+  it("問い合わせ_フォームへ案内し_返信しないことと_公開されうるので個人情報を書かないよう注意書きを出す", () => {
     render(<PrivacyPage />);
+    expect(screen.getByRole("link", { name: "お問い合わせのフォーム" }).getAttribute("href")).toBe("/contact");
+    expect(screen.getByText(/返信はしません。/)).toBeTruthy();
     const link = screen.getByRole("link", { name: "このサービスのリポジトリの Issue" });
     expect(link.getAttribute("href")).toBe(ISSUES_URL);
     expect(ISSUES_URL).toMatch(/^https:\/\/github\.com\/[^/]+\/[^/]+\/issues$/);
@@ -41,5 +43,11 @@ describe("PrivacyPage", () => {
     render(<PrivacyPage />);
     expect(screen.getByText("広告には使いません。")).toBeTruthy();
     expect(screen.getByText(/プッシュの仕組みへ、購読の情報と通知の本文を送ります/)).toBeTruthy();
+  });
+
+  it("フォームで送った内容_GitHub に保存し_退会しても消えないことを示す", () => {
+    render(<PrivacyPage />);
+    expect(screen.getByText(/GitHub に、このサービスのリポジトリの Issue として保存します/)).toBeTruthy();
+    expect(screen.getByText(/Issue として残り、退会しても消えません/)).toBeTruthy();
   });
 });

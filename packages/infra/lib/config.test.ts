@@ -90,6 +90,38 @@ describe("loadConfig", () => {
     }
   });
 
+  it("送信フォームの App の設定を 3 つそろえて指定する_その値を使い_なければ起票の設定を持たない", () => {
+    const app = {
+      FEEDBACK_GITHUB_APP_ID: "123",
+      FEEDBACK_GITHUB_INSTALLATION_ID: "456",
+      FEEDBACK_GITHUB_PRIVATE_KEY_PARAMETER: "/example/feedback/github-app-private-key",
+    };
+    expect(loadConfig({ ...valid, ...app }).feedback).toEqual({
+      appId: app.FEEDBACK_GITHUB_APP_ID,
+      installationId: app.FEEDBACK_GITHUB_INSTALLATION_ID,
+      privateKeyParameter: app.FEEDBACK_GITHUB_PRIVATE_KEY_PARAMETER,
+    });
+    expect(loadConfig(valid).feedback).toBeUndefined();
+  });
+
+  it("送信フォームの App の設定が一部だけ・形が違う_値を出さずに失敗する", () => {
+    expect(() => loadConfig({ ...valid, FEEDBACK_GITHUB_APP_ID: "123" })).toThrow(/3 つそろえて/);
+    const marker = "marker-parameter-name";
+    const bad = {
+      FEEDBACK_GITHUB_APP_ID: "app-x",
+      FEEDBACK_GITHUB_INSTALLATION_ID: "install-x",
+      FEEDBACK_GITHUB_PRIVATE_KEY_PARAMETER: marker,
+    };
+    try {
+      loadConfig({ ...valid, ...bad });
+      expect.unreachable();
+    } catch (error) {
+      const message = (error as Error).message;
+      for (const name of Object.keys(bad)) expect(message).toContain(name);
+      for (const value of Object.values(bad)) expect(message).not.toContain(value);
+    }
+  });
+
   it("通知の設定が一部だけ・形が違う_値を出さずに失敗する", () => {
     expect(() => loadConfig({ ...valid, VAPID_PUBLIC_KEY: "P".repeat(87) })).toThrow(/3 つそろえて/);
     const marker = "marker-parameter-name";

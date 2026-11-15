@@ -7,6 +7,7 @@ import { ExplanationView } from "@/components/explanation-view.tsx";
 import { Notice } from "@/components/notice.tsx";
 import { QuestionChips } from "@/components/question-chips.tsx";
 import { ReferenceList } from "@/components/reference-list.tsx";
+import { ReportLink } from "@/components/report-link.tsx";
 import { InlineText, RichText } from "@/components/rich-text.tsx";
 import { ScoreRing } from "@/components/score-ring.tsx";
 import { type AnswerTimer, createTimer, elapsedTimes, setVisible, showQuestion } from "@/lib/answer-timer.ts";
@@ -297,6 +298,7 @@ export function UnitPractice({ exam, questions, next }: Props) {
           </>
         )}
       </fieldset>
+      <ReportLink examCode={exam.examCode} questionId={question.questionId} />
 
       {checked ? (
         <div className="space-y-3">

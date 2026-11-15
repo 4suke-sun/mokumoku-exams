@@ -36,20 +36,24 @@ export const readSsmParameter: ParameterReader = async (name) => {
 
 /**
  * 秘密鍵を読む関数を作る。名前ごとに 1 度だけ読み、プロセスの中で覚えておく(同時に呼ばれても、読むのは 1 回)。
- * 読めないとき(値がない・空も含む)は、値と原因を捨てて `VapidKeyUnavailableError` にし、次に呼ばれたときに読み直す。
+ * 読めないとき(値がない・空も含む)は、値と原因を捨てて `unavailable` の例外(既定は `VapidKeyUnavailableError`)にし、
+ * 次に呼ばれたときに読み直す。
  */
-export function createPrivateKeyLoader(read: ParameterReader): (name: string) => Promise<string> {
+export function createPrivateKeyLoader(
+  read: ParameterReader,
+  unavailable: () => Error = () => new VapidKeyUnavailableError(),
+): (name: string) => Promise<string> {
   const cache = new Map<string, Promise<string>>();
   return (name) => {
     const cached = cache.get(name);
     if (cached) return cached;
     const loading = read(name).then(
       (value) => {
-        if (!value) throw new VapidKeyUnavailableError();
+        if (!value) throw unavailable();
         return value;
       },
       () => {
-        throw new VapidKeyUnavailableError();
+        throw unavailable();
       },
     );
     cache.set(name, loading);

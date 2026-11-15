@@ -120,7 +120,8 @@ describe("UnitPractice", () => {
     await user.click(screen.getByRole("button", { name: "回答する" }));
     expect(screen.getByText("解説 1")).toBeTruthy();
     expect(screen.queryByRole("heading", { name: "出典" })).toBeNull();
-    expect(screen.queryByRole("link")).toBeNull();
+    // 出典のリンクはなく、あるのは誤りの報告のリンクだけ
+    expect(screen.getAllByRole("link").map((link) => link.textContent)).toEqual(["この問題の誤りを報告"]);
   });
 
   it("不正解を回答する_正解を示し_揺れる動きの印を付ける", async () => {

@@ -15,7 +15,8 @@
 
 `<接頭辞>-web` の Lambda には、`COGNITO_USER_POOL_ID`(ID トークンの検証)と `HISTORY_TABLE_NAME`(履歴のテーブル)が渡されます。
 設定したときだけ、`SITE_URL`(sitemap の絶対 URL)と、`VAPID_PUBLIC_KEY`・`VAPID_PRIVATE_KEY_PARAMETER`・`VAPID_SUBJECT`(通知の購読とテスト通知)も渡されます。
-VAPID の秘密鍵は、値ではなく、置き場所(SSM パラメーター)の名前だけを渡します(「VAPID の秘密鍵」)。
+設定したときだけ、`FEEDBACK_GITHUB_APP_ID`・`FEEDBACK_GITHUB_INSTALLATION_ID`・`FEEDBACK_GITHUB_PRIVATE_KEY_PARAMETER`(送信フォームの起票)も渡されます。
+VAPID の秘密鍵と、送信フォームの GitHub App の秘密鍵は、値ではなく、置き場所(SSM パラメーター)の名前だけを渡します(「VAPID の秘密鍵」「GitHub App の秘密鍵」)。
 履歴のテーブルに許す操作は、`GetItem`・`PutItem`・`UpdateItem`・`Query`・`DeleteItem` だけです(テーブル 1 つに限り、スキャンやテーブルの管理はできません)。管理者の操作の記録も、このテーブルに置きます。
 Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminDisableUser` と、登録し直し(確認がまだのアカウントの状態を読み、24 時間たったものだけを消す)が使う `AdminGetUser`・`AdminDeleteUser` だけです(`<接頭辞>-auth` スタックの UserPool 1 つに限ります)。
 それ以外の、登録・確認・確認コードの送り直し・退会(本人による削除)は、認証情報のいらない Cognito の API で行うため、Lambda の権限は要りません(登録したメールアドレスがすでにあるときの登録し直しだけは、上の `AdminGetUser`・`AdminDeleteUser` を使います)。
@@ -158,6 +159,9 @@ Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminDis
    | `VAPID_PUBLIC_KEY` | (省略可)プッシュ通知の VAPID の公開鍵。下の 2 つとそろえて渡します |
    | `VAPID_PRIVATE_KEY_PARAMETER` | (省略可)VAPID の秘密鍵を置いた SSM パラメーター(SecureString)の名前。`/` で始まる階層の名前にします。値は `.env` に書きません |
    | `VAPID_SUBJECT` | (省略可)送信者の連絡先(`mailto:` か `https://` で始まる)。プッシュサービスが、問題があったときの連絡に使います |
+   | `FEEDBACK_GITHUB_APP_ID` | (省略可)送信フォームの起票に使う GitHub App の ID(数字)。下の 2 つとそろえて渡します。渡さないときは起票せず、送信の API は `503` を返します(「GitHub App の秘密鍵」) |
+   | `FEEDBACK_GITHUB_INSTALLATION_ID` | (省略可)その App の、このリポジトリへのインストールの ID(数字) |
+   | `FEEDBACK_GITHUB_PRIVATE_KEY_PARAMETER` | (省略可)App の秘密鍵(PEM)を置いた SSM パラメーター(SecureString)の名前。`/` で始まる階層の名前にします。値は `.env` に書きません |
    | `DOMAIN_NAME`、`CERTIFICATE_ARN`、`HOSTED_ZONE_ID` | (省略可)独自ドメイン。「独自ドメイン」を参照 |
    | `BUDGET_MONTHLY_USD` | (省略可)月の費用の予算の金額(USD。小数は 2 桁まで)。`BUDGET_EMAIL` とそろえて渡します(「費用の予算と共通のタグ」) |
    | `BUDGET_EMAIL` | (省略可)予算を超えそうなときに知らせるメールアドレス |
@@ -183,10 +187,52 @@ aws ssm put-parameter --type SecureString --name /<パラメーターの名前> 
 
 - 暗号化の鍵は、既定の `aws/ssm`(AWS 管理の鍵)を使います(`--key-id` を付けません)。この鍵のポリシーは、アカウント内のロールに、
   Systems Manager を経た復号を許すため、Lambda には `kms:Decrypt` を付けていません。自分で管理する鍵で暗号化したときは、その鍵の復号を別に許す必要があります。
-- Lambda(アプリと送信)に許すのは、このパラメーター 1 つの `ssm:GetParameter` だけです(ARN にワイルドカードを使いません)。
+- この秘密鍵について、Lambda(アプリと送信)に許すのは、このパラメーター 1 つの `ssm:GetParameter` だけです(ARN にワイルドカードを使いません)。
+  アプリの Lambda は、送信フォームを設定したときは、App の秘密鍵のパラメーターも読めます(「GitHub App の秘密鍵」。読めるパラメーターは、合わせて 2 つです)。
 - Lambda は、最初に送るときに 1 度だけ読み(`WithDecryption`)、そのプロセスの間は覚えておきます。読めないときは、値も原因も出しません。
   テスト通知の API は `503` を返し、毎日の送信は「鍵を読めない」の種類だけをログに出して、失敗として終わります。
 - 鍵を変えるときは、`aws ssm put-parameter --overwrite` で値を上書きします。動いている Lambda は前の値を覚えているため、新しい値は、Lambda が次に起動したときから使われます。
+
+### GitHub App の秘密鍵
+
+送信フォーム([送信フォームの仕様](./specs/feedback.md))の内容は、このリポジトリ専用の GitHub App として、このリポジトリの Issue に起票します。
+起票した Issue の作成者は `<App の名前>[bot]` になります。
+
+App の作成とインストールは、人が GitHub の画面で行います。
+
+1. App を作ります(個人の設定の Developer settings → GitHub Apps → New GitHub App)。
+   - Webhook は使いません(Active のチェックを外します)。
+   - 権限は、Repository permissions の Issues を Read and write にするだけです(Metadata の Read-only は、自動で付きます)。ほかの権限は付けません。
+   - インストールできる範囲は、自分のアカウントだけにします(Only on this account)。
+2. App を、このリポジトリだけにインストールします(Only select repositories)。インストールの ID は、インストールの設定の画面の URL の末尾の数字です。
+3. 秘密鍵(PEM)を作り、SSM Parameter Store の SecureString に置きます。CDK が扱うのは、パラメーターの名前(`FEEDBACK_GITHUB_PRIVATE_KEY_PARAMETER`)だけです。
+   置いたあと、手元の PEM のファイルは消します。
+
+```sh
+# 名前とファイルのパスはプレースホルダー。値はファイルから読み、シェルの履歴に残さない
+aws ssm put-parameter --type SecureString --name /<パラメーターの名前> --value file://<PEM のファイル>
+```
+
+4. App の ID とインストールの ID を `.env` に書きます(秘密ではありませんが、環境固有の値なので、リポジトリには書きません)。
+
+- 暗号化の鍵と、Lambda に `kms:Decrypt` を付けない理由は、「VAPID の秘密鍵」と同じです。この秘密鍵について、アプリの Lambda に許すのは、このパラメーター 1 つの `ssm:GetParameter` だけです(ARN にワイルドカードを使いません)。
+  3 つの変数を渡さないときは、読む権限を付けません。
+- アプリの Lambda は、最初に送るときに 1 度だけ秘密鍵を読み(`WithDecryption`)、そのプロセスの間は覚えておきます。
+  秘密鍵から RS256 の JWT(`iat` は 60 秒前、`exp` は 9 分後、`iss` は App の ID)を Node の標準の `crypto` で作り、
+  インストールのアクセストークンを発行します(`POST /app/installations/{installation_id}/access_tokens`)。
+  発行のときに、リポジトリを起票先の 1 つ(`repositories`)に、権限を Issues の書き込み(`permissions` の `issues: write`)に絞ります。
+  トークンは 1 時間で切れるので、切れる 5 分前までは、プロセスの間で使い回します。起票は `POST /repos/{owner}/{repo}/issues` です。
+- 秘密鍵の値、JWT、インストールのトークンの値と、読めない・呼べない原因は、ログとエラー応答に出しません。失敗は、例外の名前(`GithubUnavailableError`)だけが記録に残ります。
+- GitHub の API の制約(GitHub の公式の文書「Rate limits for the REST API」による):
+  - 「Primary rate limit for GitHub App installations」: インストールのトークンの回数の上限は、1 時間あたり 5,000 回以上です。
+  - 「About secondary rate limits」: 内容を作る操作(Issue の起票を含む)は、1 分に 80 回、1 時間に 500 回までです(Web の画面の操作も同じ枠)。
+  - 1 件の送信で、起票の 1 回(トークンを発行し直すときは、発行の 1 回を足す)を使います。1 人 1 日 10 件の上限で、全利用者の合計が枠を超えたときは、送信の API が `503` を返し、数えた 1 を戻します。
+- 料金: GitHub App の作成と利用について、公式の文書に料金の記載はありません。SSM の標準のパラメーターに、追加の料金はかかりません。
+- 秘密鍵は、App の設定の画面(Credentials の Key pairs)で作ります。ダウンロードした PEM が、秘密鍵の唯一の写しです(GitHub は公開鍵の部分だけを持ちます)。
+- 秘密鍵を入れ替えるときは、App の設定の画面で新しい秘密鍵を作り、`aws ssm put-parameter --overwrite` で値を上書きしてから、古い秘密鍵を App の設定の画面で消します
+  (GitHub の公式の文書「Managing private keys for GitHub Apps」)。動いている Lambda は前の値を覚えているため、新しい値は、Lambda が次に起動したときから使われます。
+  古い秘密鍵を消すのは、上書きから 1 日おいてからにします(動いている Lambda の実行環境が入れ替わるのを待つため。先に消すと、古い値を覚えた実行環境で起票が失敗し、送信の API が `503` を返します)。
+- 秘密鍵に有効期限はなく、消すまで使えます。漏れたときは、新しい秘密鍵を作って上の手順で入れ替え、漏れた秘密鍵をすぐに消します(App の最後の 1 つの秘密鍵は消せないため、先に新しいものを作ります)。
 
 ## ビルドとデプロイ
 
@@ -213,7 +259,7 @@ npm run deploy -w @mokumoku-exams/infra -- --all   # すべてのスタックを
 
 - AWS の値(アカウント ID、ARN、ドメイン、ID)は、コードにもドキュメントにも書きません。例を書くときは、`123456789012` や `example.com` を使います。
 - 合言葉の値は、Lambda の環境変数と CloudFront のオリジンのヘッダーに入ります。値を変えるときは、`.env` を直して再デプロイします。
-- VAPID の秘密鍵は、Lambda の環境変数に入りません。SSM パラメーターの名前だけが入ります(「VAPID の秘密鍵」)。
+- VAPID の秘密鍵と GitHub App の秘密鍵は、Lambda の環境変数に入りません。SSM パラメーターの名前だけが入ります(「VAPID の秘密鍵」「GitHub App の秘密鍵」)。
 - `dist/push` は、`packages/app/src/lib/push/daily.ts` から相対で読み込むファイルを JavaScript にしたものと、使うパッケージ(`web-push` と AWS SDK の DynamoDB・SSM)です。
   このディレクトリのファイルは、`@/` の別名を使いません(使うと `npm run build:lambda` が失敗します)。
 - スタックの変更後は、`packages/infra` のスナップショットを更新します(`npx vitest run -u -w @mokumoku-exams/infra`)。差分が意図したものか、確かめてから更新します。

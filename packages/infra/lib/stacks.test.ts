@@ -12,7 +12,7 @@ import {
   USER_ADMIN_ACTIONS,
 } from "./auth-stack.ts";
 import { BUDGET_NOTIFICATIONS, BudgetStack } from "./budget-stack.ts";
-import type { BudgetConfig, CustomDomain, InfraConfig, PushConfig } from "./config.ts";
+import type { BudgetConfig, CustomDomain, FeedbackConfig, InfraConfig, PushConfig } from "./config.ts";
 import { DataStack, HISTORY_TABLE_ACTIONS, POINT_IN_TIME_RECOVERY_DAYS } from "./data-stack.ts";
 import {
   PUSH_HANDLER,
@@ -52,6 +52,23 @@ const PARAMETER_ARN = {
   ],
 };
 
+// 送信フォームの GitHub App の見本の設定(すべてプレースホルダー)
+const feedback: FeedbackConfig = {
+  appId: "123",
+  installationId: "456",
+  privateKeyParameter: "/example/feedback/github-app-private-key",
+};
+const FEEDBACK_PARAMETER_ARN = {
+  "Fn::Join": [
+    "",
+    [
+      "arn:",
+      { Ref: "AWS::Partition" },
+      ":ssm:us-east-1:123456789012:parameter/example/feedback/github-app-private-key",
+    ],
+  ],
+};
+
 /** テンプレートの IAM ポリシーの文の一覧 */
 function statementsOf(template: Template) {
   return Object.values(template.findResources("AWS::IAM::Policy")).flatMap(
@@ -59,13 +76,19 @@ function statementsOf(template: Template) {
   );
 }
 
-/** 秘密鍵のパラメーターを読む文が、そのパラメーター 1 つだけに限られ、KMS の権限を足していないことを確かめる。 */
-function expectParameterReadOnly(template: Template): void {
+/**
+ * 秘密鍵のパラメーターを読む文が、渡したパラメーター(既定は VAPID の 1 つ)だけに限られ、それぞれ読み出しだけで、
+ * ワイルドカードを使わず、KMS の権限を足していないことを確かめる。文は、パラメーター 1 つにつき 1 つと数える。
+ */
+function expectParameterReadOnly(template: Template, parameterArns: unknown[] = [PARAMETER_ARN]): void {
   const statements = statementsOf(template);
   const ssm = statements.filter((s) => JSON.stringify(s.Action).includes("ssm:"));
-  expect(ssm).toHaveLength(1);
-  expect([ssm[0]?.Action].flat()).toEqual(VAPID_PRIVATE_KEY_ACTIONS);
-  expect(ssm[0]?.Resource).toEqual(PARAMETER_ARN);
+  expect(ssm).toHaveLength(parameterArns.length);
+  for (const statement of ssm) {
+    expect([statement.Action].flat()).toEqual(VAPID_PRIVATE_KEY_ACTIONS);
+    expect(JSON.stringify(statement.Resource)).not.toContain("*");
+  }
+  expect(ssm.map((statement) => statement.Resource)).toEqual(expect.arrayContaining(parameterArns));
   expect(statements.filter((s) => JSON.stringify(s.Action).includes("kms:"))).toEqual([]);
 }
 // 独自ドメインの見本の値(すべてプレースホルダー)
@@ -469,6 +492,38 @@ describe("WebStack", () => {
     expectParameterReadOnly(template);
     // 通知を設定しなければ、パラメーターを読む権限も付けない
     expect(statementsOf(webTemplate()).filter((s) => JSON.stringify(s.Action).includes("ssm:"))).toEqual([]);
+  });
+
+  it("送信フォームの App の設定_ID と秘密鍵のパラメーターの名前だけを渡し_秘密鍵の値は渡さない", () => {
+    const [plain] = Object.values(webTemplate().findResources("AWS::Lambda::Function")).filter(
+      (f) => f.Properties.Handler === "run.sh",
+    );
+    for (const name of [
+      "FEEDBACK_GITHUB_APP_ID",
+      "FEEDBACK_GITHUB_INSTALLATION_ID",
+      "FEEDBACK_GITHUB_PRIVATE_KEY_PARAMETER",
+    ]) {
+      expect(plain?.Properties.Environment.Variables[name], name).toBeUndefined();
+    }
+    const template = webTemplate(undefined, { feedback });
+    template.hasResourceProperties("AWS::Lambda::Function", {
+      Environment: {
+        Variables: {
+          FEEDBACK_GITHUB_APP_ID: feedback.appId,
+          FEEDBACK_GITHUB_INSTALLATION_ID: feedback.installationId,
+          FEEDBACK_GITHUB_PRIVATE_KEY_PARAMETER: feedback.privateKeyParameter,
+        },
+      },
+    });
+    const [app] = Object.values(template.findResources("AWS::Lambda::Function")).filter(
+      (f) => f.Properties.Handler === "run.sh",
+    );
+    expect(app?.Properties.Environment.Variables.FEEDBACK_GITHUB_PRIVATE_KEY).toBeUndefined();
+    expectParameterReadOnly(template, [FEEDBACK_PARAMETER_ARN]);
+  });
+
+  it("通知と送信フォームの両方を設定_アプリの Lambda は 2 つのパラメーターだけを読み出しだけで読める", () => {
+    expectParameterReadOnly(webTemplate(undefined, { push, feedback }), [PARAMETER_ARN, FEEDBACK_PARAMETER_ARN]);
   });
 
   it("通知先のメールは_指定したときだけ購読される", () => {

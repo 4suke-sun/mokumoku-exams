@@ -535,7 +535,18 @@ describe("Player の 1 問ごとの解答の表示", () => {
     await screen.findByText("○ 正解です");
     await user.click(screen.getByText("解説を見る"));
     expect(screen.queryByRole("heading", { name: "出典" })).toBeNull();
-    expect(screen.queryByRole("link")).toBeNull();
+    // 出典のリンクはなく、あるのは誤りの報告のリンクだけ
+    expect(screen.getAllByRole("link").map((link) => link.textContent)).toEqual(["この問題の誤りを報告"]);
+  });
+
+  it("問題を出す_問題の下に_資格コードと問題 ID を添えた誤りの報告のリンクを出す", async () => {
+    render(<Player exam={exam} questions={questions} />);
+    await screen.findByText("問題文 1");
+    const link = screen.getByRole("link", { name: "この問題の誤りを報告" });
+    const href = new URL(link.getAttribute("href") ?? "", "http://localhost");
+    expect(href.pathname).toBe("/contact/question");
+    expect(href.searchParams.get("exam")).toBe("TEST");
+    expect(href.searchParams.get("id")).toBe(questions[0]?.questionId);
   });
 });
 
