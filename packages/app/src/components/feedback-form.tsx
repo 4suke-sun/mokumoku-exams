@@ -64,7 +64,12 @@ function CategoryPicker<K extends string>(props: {
   );
 }
 
-const SENT_MESSAGE = "送りました。返信はしません。";
+/** 送れたときの表示(お礼の言葉)。返信しないことは、送る前の注意(`FeedbackCaution`)で伝える */
+const SENT_MESSAGES = {
+  contact:
+    "お問い合わせを受け付けました。ありがとうございます。いただいた内容は、今後の改善の参考にさせていただきます。",
+  question: "ご報告ありがとうございます。いただいた内容をもとに、問題を確認します。",
+} as const;
 
 /** 失敗の応答を、利用者に見せる文言にする */
 function failureMessage(status: number): string {
@@ -142,7 +147,7 @@ export function FeedbackForm(props: Props) {
       </div>
       <FeedbackCaution />
       <FormError message={error} />
-      {sent ? <Notice kind="success">{SENT_MESSAGE}</Notice> : null}
+      {sent ? <Notice kind="success">{SENT_MESSAGES[props.form]}</Notice> : null}
       {sent && props.form === "question" ? props.backLink : null}
       <SubmitButton busy={busy}>送る</SubmitButton>
     </form>
