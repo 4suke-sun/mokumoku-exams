@@ -202,6 +202,13 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
   const answeredList = session.questionIds.map(
     (id) => answerFor(session.answers, id).length > 0 || hasText(textAnswerFor(session.textAnswers, id)),
   );
+  // 1 問ごとに解答を出すときだけ、「回答する」を押した問題の正誤を、問題一覧に示す(まとめて最後に出すときは、採点まで示さない)
+  const verdicts = revealEach
+    ? session.questionIds.map((id, i) => {
+        const q = byId.get(id);
+        return checked[i] === true && q ? isQuestionCorrect(q, session.answers, session.textAnswers) : undefined;
+      })
+    : undefined;
   const answered = answeredList[index] === true;
   const unansweredCount = answeredList.filter((a) => !a).length;
   // 時間切れのあとは、どの問題からでも採点へ進む
@@ -578,7 +585,14 @@ export function Player({ exam, questions, clock = systemClock }: Props) {
       </div>
 
       <aside className="lg:sticky lg:top-4">
-        <QuestionGrid total={total} current={index} answered={answeredList} flagged={flagged} onSelect={goTo} />
+        <QuestionGrid
+          total={total}
+          current={index}
+          answered={answeredList}
+          flagged={flagged}
+          verdicts={verdicts}
+          onSelect={goTo}
+        />
       </aside>
     </section>
   );

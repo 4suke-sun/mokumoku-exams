@@ -122,6 +122,34 @@ describe("ResultView", () => {
     expect(screen.getByText("問題文 1")).toBeTruthy();
   });
 
+  it("問題一覧_マスごとに正誤を示し_正解の数を添える", async () => {
+    saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["B"] });
+    renderView(questions);
+    const grid = await screen.findByRole("navigation", { name: "問題一覧" });
+    expect(grid.textContent).toContain("1 / 3 問正解");
+    const correct = screen.getByRole("button", { name: "問題 1(正解)" });
+    expect(correct.className).toContain("q-cell-correct");
+    expect(screen.getByRole("button", { name: "問題 2(不正解)" }).className).toContain("q-cell-incorrect");
+    // 未回答は不正解として数える
+    expect(screen.getByRole("button", { name: "問題 3(不正解)" }).className).not.toContain("q-cell-answered");
+    expect(grid.textContent).not.toContain("枠: 今の問題");
+  });
+
+  it("間違えた問題だけを見直す中に正解のマスを押す_すべての問題の表示に戻して_その問題へ移る", async () => {
+    saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["B"], "TEST-0003": ["A"] });
+    renderView(questions);
+    const user = userEvent.setup();
+
+    await user.click(await screen.findByRole("button", { name: /間違えた問題だけを見直す/ }));
+    expect(screen.queryByText("問題文 1")).toBeNull();
+    await user.click(screen.getByRole("button", { name: "問題 1(正解)" }));
+    expect(await screen.findByText("問題文 1")).toBeTruthy();
+    expect(document.activeElement?.id).toBe("result-q-1");
+
+    await user.click(screen.getByRole("button", { name: "問題 3(不正解)" }));
+    expect(document.activeElement?.id).toBe("result-q-3");
+  });
+
   it("すべて正解_見直しの切り替えは出さず_その旨を表示する", async () => {
     saveAnswers({ "TEST-0001": ["A"], "TEST-0002": ["A"], "TEST-0003": ["B"] });
     renderView(questions);

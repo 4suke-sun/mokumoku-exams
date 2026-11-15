@@ -441,7 +441,7 @@ body {
     color: var(--incorrect);
   }
 
-  /* 問題一覧のマス。回答済みは塗り、今の問題は枠、見直しの印は点で示す */
+  /* 問題一覧のマス。回答済みは塗り、正誤は色と ○・×、今の問題は枠、見直しの印は点で示す */
   .q-cell {
     position: relative;
     display: grid;
@@ -458,6 +458,23 @@ body {
     background: var(--soft);
     color: var(--primary);
     font-weight: 700;
+  }
+  .q-cell-correct {
+    border-color: var(--correct);
+    background: var(--correct-bg);
+    color: var(--correct);
+  }
+  .q-cell-incorrect {
+    border-color: var(--incorrect);
+    background: var(--incorrect-bg);
+    color: var(--incorrect);
+  }
+  .q-cell-mark {
+    position: absolute;
+    top: 0.1rem;
+    left: 0.3rem;
+    font-size: 0.625rem;
+    line-height: 1;
   }
   .q-cell-current {
     outline: 2px solid var(--primary);

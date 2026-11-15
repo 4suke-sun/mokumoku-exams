@@ -297,6 +297,22 @@ describe("Player の自由記述", () => {
     expect(loadStageProgress(browserStore(), "TEST").last).toMatchObject({ percent: 100, passed: true });
   });
 
+  it("1 問ごとの表示で自由記述に回答する_問題一覧のマスに観点の判定による正誤を示す", async () => {
+    saveSession(browserStore(), {
+      examCode: "TEST",
+      questionIds: [freeText.questionId],
+      answers: {},
+      index: 0,
+      startedAt: "2026-10-10T00:00:00.000Z",
+      reveal: "each",
+    });
+    render(<Player exam={exam} questions={[freeText]} />);
+    const user = userEvent.setup();
+    await user.type(await screen.findByRole("textbox", { name: "回答" }), "関係のない回答");
+    await user.click(screen.getByRole("button", { name: "回答する" }));
+    expect(await screen.findByRole("button", { name: "問題 1(不正解)" })).toBeTruthy();
+  });
+
   it("1 問ごとの表示で回答する_観点ごとの判定と得点と合格点を出す", async () => {
     const twoCriteria = {
       ...freeText,
@@ -468,6 +484,29 @@ describe("Player の 1 問ごとの解答の表示", () => {
     expect(screen.queryAllByRole("radio")).toHaveLength(0);
   });
 
+  it("回答した問題_問題一覧のマスに正誤を示し_回答する前の問題には示さない", async () => {
+    render(<Player exam={exam} questions={questions} />);
+    const user = userEvent.setup();
+    await screen.findByText("問題文 1");
+
+    await user.keyboard("1");
+    expect(screen.getByRole("button", { name: "問題 1(回答済み)" })).toBeTruthy();
+    await user.keyboard("{Enter}");
+    await screen.findByText("○ 正解です");
+    const correct = screen.getByRole("button", { name: "問題 1(正解)" });
+    expect(correct.className).toContain("q-cell-correct");
+    expect(correct.textContent).toBe("○1");
+
+    await user.keyboard("{Enter}");
+    await screen.findByText("問題文 2");
+    await user.keyboard("1{Enter}");
+    await screen.findByText(/× 不正解です/);
+    const incorrect = screen.getByRole("button", { name: "問題 2(不正解)" });
+    expect(incorrect.className).toContain("q-cell-incorrect");
+    expect(incorrect.textContent).toBe("×2");
+    expect(screen.getByText(/○: 正解 \/ ×: 不正解/)).toBeTruthy();
+  });
+
   it("出典のある問題を回答する_解説を見るを開くと_出典の一覧が出る", async () => {
     const withReferences = [
       {
@@ -521,6 +560,18 @@ describe("Player の印と問題一覧", () => {
 
     await user.click(screen.getByRole("button", { name: "このまま採点する" }));
     await waitFor(() => expect(push).toHaveBeenCalledWith(expect.stringMatching(RESULT_DETAIL)));
+  });
+
+  it("解答をまとめて最後に出す_回答しても問題一覧に正誤を示さない", async () => {
+    render(<Player exam={exam} questions={questions} />);
+    const user = userEvent.setup();
+    await screen.findByText("問題文 1");
+
+    await user.keyboard("a");
+    const cell = screen.getByRole("button", { name: "問題 1(回答済み)" });
+    expect(cell.className).not.toMatch(/q-cell-(correct|incorrect)/);
+    expect(cell.textContent).toBe("1");
+    expect(screen.queryByText(/○: 正解/)).toBeNull();
   });
 
   it("自信なしと見直しの印_途中保存と結果に残す_回答時間も結果に残す", async () => {
