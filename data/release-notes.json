@@ -1,6 +1,17 @@
 {
   "releases": [
     {
+      "version": "v0.83.2",
+      "date": "2026-11-15",
+      "title": "Data Engineer Associate(Databricks)の問題で、用語を「リネージ」にそろえました",
+      "items": [
+        {
+          "type": "fix",
+          "text": "Data Engineer Associate(Databricks)の問題で、Unity Catalog の lineage を「系譜」と書いていた 3 問を、公式の日本語のドキュメントや体系ノートと同じ「リネージ」に直しました。問題の内容と正解は変わりません。"
+        }
+      ]
+    },
+    {
       "version": "v0.83.1",
       "date": "2026-11-15",
       "title": "問題一覧で、正解・不正解がわかるようにしました",
