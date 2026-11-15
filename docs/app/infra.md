@@ -14,7 +14,7 @@
 | `<接頭辞>-budget` | (予算の設定をそろえたときだけ)月の費用の予算(AWS Budgets)。「費用の予算と共通のタグ」 |
 
 `<接頭辞>-web` の Lambda には、`COGNITO_USER_POOL_ID`(ID トークンの検証)と `HISTORY_TABLE_NAME`(履歴のテーブル)が渡されます。
-設定したときだけ、`SITE_URL`(sitemap の絶対 URL)と、`VAPID_PUBLIC_KEY`・`VAPID_PRIVATE_KEY_PARAMETER`・`VAPID_SUBJECT`(通知の購読とテスト通知)も渡されます。
+設定したときだけ、`SITE_URL`(sitemap と robots、共有のカードの画像の絶対 URL)と、`VAPID_PUBLIC_KEY`・`VAPID_PRIVATE_KEY_PARAMETER`・`VAPID_SUBJECT`(通知の購読とテスト通知)も渡されます。
 設定したときだけ、`FEEDBACK_GITHUB_APP_ID`・`FEEDBACK_GITHUB_INSTALLATION_ID`・`FEEDBACK_GITHUB_PRIVATE_KEY_PARAMETER`(送信フォームの起票)も渡されます。
 VAPID の秘密鍵と、送信フォームの GitHub App の秘密鍵は、値ではなく、置き場所(SSM パラメーター)の名前だけを渡します(「VAPID の秘密鍵」「GitHub App の秘密鍵」)。
 履歴のテーブルに許す操作は、`GetItem`・`PutItem`・`UpdateItem`・`Query`・`DeleteItem` だけです(テーブル 1 つに限り、スキャンやテーブルの管理はできません)。管理者の操作の記録も、このテーブルに置きます。
@@ -155,7 +155,7 @@ Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminDis
    | `STACK_PREFIX` | (省略可)リソース名の先頭に付ける文字列。既定は `mokumoku-exams` |
    | `ALARM_EMAIL` | (省略可)アラームの通知先のメールアドレス |
    | `APP_RESERVED_CONCURRENCY` | (省略可)アプリの Lambda の同時実行の上限(1〜1000 の整数)。渡したときだけ付けます(「同時実行の上限」) |
-   | `SITE_URL` | (省略可)公開の URL の起点(`https://example.com` の形。末尾のスラッシュなし)。sitemap と robots の絶対 URL に使います。渡さないときは、sitemap は空です |
+   | `SITE_URL` | (省略可)公開の URL の起点(`https://example.com` の形。末尾のスラッシュなし)。sitemap と robots、共有のカード(X・Qiita などのリンクの表示)の画像の絶対 URL に使います。渡さないときは、sitemap は空で、カードに画像は出ません |
    | `VAPID_PUBLIC_KEY` | (省略可)プッシュ通知の VAPID の公開鍵。下の 2 つとそろえて渡します |
    | `VAPID_PRIVATE_KEY_PARAMETER` | (省略可)VAPID の秘密鍵を置いた SSM パラメーター(SecureString)の名前。`/` で始まる階層の名前にします。値は `.env` に書きません |
    | `VAPID_SUBJECT` | (省略可)送信者の連絡先(`mailto:` か `https://` で始まる)。プッシュサービスが、問題があったときの連絡に使います |

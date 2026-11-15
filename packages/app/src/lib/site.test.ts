@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { isPublicPath } from "@/lib/auth/guard.ts";
-import { robotsOf, sitemapOf, siteUrl } from "./site.ts";
+import { robotsOf, SHARE_IMAGE, shareMetadataOf, sitemapOf, siteUrl } from "./site.ts";
 
 describe("siteUrl", () => {
   it("https のホストだけの形_その値を使う", () => {
@@ -53,5 +53,32 @@ describe("robots", () => {
 
   it("公開の URL が設定されていない_sitemap の案内を書かない", () => {
     expect(robotsOf(null).sitemap).toBeUndefined();
+  });
+});
+
+describe("shareMetadataOf", () => {
+  const text = { title: "題", description: "説明", siteName: "サイト" };
+
+  it("公開の URL がある_カードの画像にアイコンの絶対 URL を付け_X のカードは summary にする", () => {
+    const meta = shareMetadataOf("https://example.com", text);
+    expect(meta.metadataBase?.toString()).toBe("https://example.com/");
+    expect(meta.openGraph).toMatchObject({
+      title: "題",
+      siteName: "サイト",
+      images: [{ url: "https://example.com/icons/icon-512.png", width: 512, height: 512 }],
+    });
+    expect(meta.twitter).toMatchObject({ card: "summary", images: ["https://example.com/icons/icon-512.png"] });
+  });
+
+  it("公開の URL がない_画像を付けず_相対の URL も出さない", () => {
+    const meta = shareMetadataOf(null, text);
+    expect(meta.metadataBase).toBeUndefined();
+    expect(meta.openGraph).not.toHaveProperty("images");
+    expect(meta.twitter).not.toHaveProperty("images");
+    expect(meta.twitter).toMatchObject({ card: "summary" });
+  });
+
+  it("カードの画像_ログインなしで取れる公開のファイルである", () => {
+    expect(isPublicPath(SHARE_IMAGE.path)).toBe(true);
   });
 });

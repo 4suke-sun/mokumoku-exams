@@ -144,7 +144,7 @@ export class WebStack extends Stack {
         COGNITO_CLIENT_ID: props.userPoolClientId,
         COGNITO_USER_POOL_ID: props.userPoolId,
         HISTORY_TABLE_NAME: props.historyTable.tableName,
-        // 設定したときだけ渡す。sitemap の絶対 URL と、通知(購読の公開鍵と、テスト通知の送信)に使う
+        // 設定したときだけ渡す。sitemap・robots・共有のカードの画像の絶対 URL と、通知(購読の公開鍵と、テスト通知の送信)に使う
         ...(config.siteUrl ? { SITE_URL: config.siteUrl } : {}),
         ...(config.push ? vapidEnvironment(config.push) : {}),
         // 設定したときだけ渡す。送信フォームの起票(GitHub App)に使う。秘密鍵は値ではなく、パラメーターの名前だけ

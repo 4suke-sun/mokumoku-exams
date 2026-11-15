@@ -104,8 +104,8 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: printf 'refs/heads/pr %s refs/heads/main %s\n' "$HEAD_SHA" "$BASE_SHA" | node scripts/check-push-secrets.ts
-      # main への push(PR のマージを含む)の範囲の機密検査。ブランチ保護が使えない間の、直接 push の検知。
-      # push のあとの検査なので、止めるのではなく、検知して直すためのもの
+      # main への push(PR のマージ)の範囲の機密検査。main はルールセットで PR を必須にしているので、範囲は PR で検査済みのもの。
+      # マージで入った範囲を、もう一度確かめる(push のあとの検査なので、止めるのではなく、検知して直すためのもの)
       - name: 機密検査(main への push の範囲)
         if: github.event_name == 'push'
         env:

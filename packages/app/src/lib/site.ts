@@ -1,4 +1,4 @@
-import type { MetadataRoute } from "next";
+import type { Metadata, MetadataRoute } from "next";
 import { PUBLIC_PAGE_PATHS } from "@/lib/auth/guard.ts";
 
 // robots と sitemap の中身。sitemap の URL は絶対 URL が要るが、配信のドメインは環境ごとに違うため、
@@ -10,6 +10,40 @@ const SITE_URL_PATTERN = /^https:\/\/[A-Za-z0-9.-]+(:\d{1,5})?$/;
 export function siteUrl(env: Record<string, string | undefined> = process.env): string | null {
   const value = env.SITE_URL;
   return value && SITE_URL_PATTERN.test(value) ? value : null;
+}
+
+/** 共有のカードの画像。ログインなしで取れる公開のファイル(CloudFront が S3 から配る)のアイコン。正方形 */
+export const SHARE_IMAGE = { path: "/icons/icon-512.png", width: 512, height: 512 } as const;
+
+/**
+ * 共有したとき(X・Qiita などのリンクのカード)の表示。画像は絶対 URL が要るので、公開の URL の起点(`SITE_URL`)があるときだけ付ける。
+ * 起点がない環境(手元の開発など)では、画像を付けない(相対の URL は、カードを作る側が読めないため出さない)。
+ * 画像が正方形なので、X のカードは、小さな正方形の画像の `summary` にする。
+ */
+export function shareMetadataOf(
+  origin: string | null,
+  text: { title: string; description: string; siteName: string },
+): Pick<Metadata, "metadataBase" | "openGraph" | "twitter"> {
+  const image = origin
+    ? { url: `${origin}${SHARE_IMAGE.path}`, width: SHARE_IMAGE.width, height: SHARE_IMAGE.height }
+    : null;
+  return {
+    ...(origin ? { metadataBase: new URL(origin) } : {}),
+    openGraph: {
+      title: text.title,
+      description: text.description,
+      siteName: text.siteName,
+      locale: "ja_JP",
+      type: "website",
+      ...(image ? { images: [{ ...image, alt: text.siteName }] } : {}),
+    },
+    twitter: {
+      card: "summary",
+      title: text.title,
+      description: text.description,
+      ...(image ? { images: [image.url] } : {}),
+    },
+  };
 }
 
 /** このサービスのリポジトリ */

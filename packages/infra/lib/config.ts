@@ -52,7 +52,7 @@ export type InfraConfig = {
   originVerifyValue: string;
   /** アラームの通知先のメールアドレス。なければ、通知先は作らない(アラームの状態は画面で確かめる) */
   alarmEmail?: string;
-  /** 公開の URL の起点(`https://<ホスト>`)。sitemap と robots の絶対 URL に使う。なければ sitemap は空 */
+  /** 公開の URL の起点(`https://<ホスト>`)。sitemap と robots、共有のカードの画像の絶対 URL に使う。なければ sitemap は空で、カードに画像は出ない */
   siteUrl?: string;
   /** プッシュ通知の VAPID の公開鍵、秘密鍵のパラメーターの名前、連絡先。なければ、通知の送信の仕組み(PushStack)を作らない */
   push?: PushConfig;

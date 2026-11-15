@@ -9,6 +9,7 @@ import { SiteNav } from "@/components/site-nav.tsx";
 import { guardDeps } from "@/lib/auth/deps.ts";
 import { prefsForRequest } from "@/lib/prefs-server.ts";
 import { THEME_COLORS } from "@/lib/pwa.ts";
+import { shareMetadataOf, siteUrl } from "@/lib/site.ts";
 import { THEME_INIT_SCRIPT } from "@/lib/theme.ts";
 import { STYLE_INIT_SCRIPT } from "@/lib/visual-style.ts";
 import "./globals.css";
@@ -16,15 +17,18 @@ import "./globals.css";
 const SITE_NAME = "もくもく問題集";
 const DESCRIPTION = "クラウド資格の学習用に、問題を解き、間違いを復習できます。";
 
-export const metadata: Metadata = {
-  title: { default: SITE_NAME, template: `%s | ${SITE_NAME}` },
-  description: DESCRIPTION,
-  // ホーム画面に追加したときのアイコンと表示(マニフェストは app/manifest.ts)
-  icons: { icon: { url: "/icons/icon-192.png", type: "image/png" }, apple: "/icons/apple-touch-icon.png" },
-  appleWebApp: { capable: true, title: SITE_NAME, statusBarStyle: "default" },
-  // 共有したときの表示は最小限にする(ログインが必要なので、URL と画像は持たない)
-  openGraph: { title: SITE_NAME, description: DESCRIPTION, siteName: SITE_NAME, locale: "ja_JP", type: "website" },
-};
+// 共有のカードの画像の絶対 URL は、実行の環境(Lambda の環境変数)の SITE_URL から作るので、ビルドのときではなく、要求ごとに作る
+export function generateMetadata(): Metadata {
+  return {
+    title: { default: SITE_NAME, template: `%s | ${SITE_NAME}` },
+    description: DESCRIPTION,
+    // ホーム画面に追加したときのアイコンと表示(マニフェストは app/manifest.ts)
+    icons: { icon: { url: "/icons/icon-192.png", type: "image/png" }, apple: "/icons/apple-touch-icon.png" },
+    appleWebApp: { capable: true, title: SITE_NAME, statusBarStyle: "default" },
+    // 共有したとき(X・Qiita などのリンクのカード)の表示。画像は、ログインなしで取れるアイコン
+    ...shareMetadataOf(siteUrl(), { title: SITE_NAME, description: DESCRIPTION, siteName: SITE_NAME }),
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: [
