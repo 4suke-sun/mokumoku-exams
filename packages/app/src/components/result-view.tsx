@@ -13,6 +13,7 @@ import { MoreResults } from "@/components/more-results.tsx";
 import { Notice } from "@/components/notice.tsx";
 import { ResultSkeleton } from "@/components/page-skeletons.tsx";
 import { QuestionChips } from "@/components/question-chips.tsx";
+import { QuestionGrid } from "@/components/question-grid.tsx";
 import { ReferenceList } from "@/components/reference-list.tsx";
 import { RichText } from "@/components/rich-text.tsx";
 import { FreeTextScore } from "@/components/rubric-view.tsx";
@@ -27,6 +28,7 @@ import { fetchQuestions } from "@/lib/questions/client.ts";
 import {
   answerFor,
   displayLabels,
+  hasText,
   isQuestionCorrect,
   labelKeys,
   orderChoices,
@@ -109,11 +111,21 @@ export function ResultView({ exam, outline }: Props) {
   const [state, setState] = useState<State>({ status: "loading" });
   const [retryError, setRetryError] = useState<string | null>(null);
   const [wrongOnly, setWrongOnly] = useState(false);
+  // 問題一覧から移る先の問題番号(見直しの絞り込みを外したあとに、描き終えてから移る)
+  const [jumpTo, setJumpTo] = useState<number | null>(null);
   const [migration, setMigration] = useState<"idle" | "busy" | "failed">("idle");
   const [stageCheck, setStageCheck] = useState<StageCheck | null>(null);
   const [sectionCheck, setSectionCheck] = useState<SectionProgress["last"] | null>(null);
   const bookmarks = useBookmarks(exam.examCode);
   const owner = useStorageOwner();
+
+  useEffect(() => {
+    if (jumpTo === null) return;
+    const card = document.getElementById(`result-q-${jumpTo}`);
+    card?.scrollIntoView?.({ block: "start" });
+    card?.focus();
+    setJumpTo(null);
+  }, [jumpTo]);
 
   useEffect(() => {
     // 持ち主の印が取れるまでは、端末の記録を読まない(印が取れたら、読み直す)
@@ -472,12 +484,29 @@ export function ResultView({ exam, outline }: Props) {
               ) : null}
             </div>
             <BookmarkError bookmarks={bookmarks} />
+            <QuestionGrid
+              total={allRows.length}
+              answered={allRows.map(
+                ({ question }) =>
+                  answerFor(latest.answers, question.questionId).length > 0 ||
+                  hasText(textAnswerFor(latest.textAnswers, question.questionId)),
+              )}
+              flagged={allRows.map((row) => row.flagged)}
+              verdicts={allRows.map((row) => row.correct)}
+              summary={`${result.correct} / ${result.total} 問正解`}
+              onSelect={(i) => {
+                if (wrongOnly && allRows[i]?.correct) setWrongOnly(false);
+                setJumpTo(i + 1);
+              }}
+            />
             {wrongCount === 0 ? <p className="text-correct">すべて正解でした。見直す問題はありません。</p> : null}
             <ol className="motion-stagger space-y-4">
               {rows.map(({ question, number, correct, unsure, flagged, timeMs }) => (
                 <li
                   key={question.questionId}
-                  className={`card space-y-3 border-l-4 p-4 ${correct ? "border-l-correct" : "border-l-incorrect"}`}
+                  id={`result-q-${number}`}
+                  tabIndex={-1}
+                  className={`card scroll-mt-4 space-y-3 border-l-4 p-4 ${correct ? "border-l-correct" : "border-l-incorrect"}`}
                 >
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <p className={`font-bold ${correct ? "text-correct" : "text-incorrect"}`}>
