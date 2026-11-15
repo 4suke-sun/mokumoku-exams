@@ -32,14 +32,20 @@ describe("FeedbackForm", () => {
     expect(screen.getByText(/公開されることがあります/)).toBeTruthy();
   });
 
-  it("種類と内容を入れて送る_API に送り_送れた旨を出して入力を空にする", async () => {
+  it("種類と内容を入れて送る_API に送り_お礼の言葉を出して入力を空にする", async () => {
     render(<FeedbackForm form="contact" />);
     const user = userEvent.setup();
     await user.click(screen.getByRole("radio", { name: "不具合" }));
     await user.type(screen.getByLabelText("内容"), "動かない");
     await user.click(screen.getByRole("button", { name: "送る" }));
 
-    expect(await screen.findByText("送りました。返信はしません。")).toBeTruthy();
+    expect(
+      await screen.findByText(
+        "お問い合わせを受け付けました。ありがとうございます。いただいた内容は、今後の改善の参考にさせていただきます。",
+      ),
+    ).toBeTruthy();
+    // 返信しないことは、送る前の注意にだけ出し、お礼の言葉には入れない
+    expect(screen.getAllByText(/返信はしません/)).toHaveLength(1);
     const [url, init] = fetchMock.mock.calls[0] ?? [];
     expect(url).toBe("/api/feedback");
     expect(JSON.parse(init?.body ?? "{}")).toEqual({ form: "contact", category: "bug", text: "動かない" });
@@ -81,7 +87,9 @@ describe("FeedbackForm", () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole("radio", { name: "解説が違う" }));
     await user.click(screen.getByRole("button", { name: "送る" }));
-    expect(await screen.findByText("送りました。返信はしません。")).toBeTruthy();
+    expect(
+      await screen.findByText("ご報告ありがとうございます。いただいた内容をもとに、問題を確認します。"),
+    ).toBeTruthy();
     expect(JSON.parse(fetchMock.mock.calls[0]?.[1]?.body ?? "{}")).toEqual({
       form: "question",
       category: "explanation",
