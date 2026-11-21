@@ -13,10 +13,10 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@aws-sdk/client-cognito-identity-provider": "3.1169.0",
-    "@aws-sdk/client-dynamodb": "3.1169.0",
-    "@aws-sdk/client-ssm": "3.1169.0",
-    "@aws-sdk/lib-dynamodb": "3.1169.0",
+    "@aws-sdk/client-cognito-identity-provider": "3.1171.0",
+    "@aws-sdk/client-dynamodb": "3.1171.0",
+    "@aws-sdk/client-ssm": "3.1171.0",
+    "@aws-sdk/lib-dynamodb": "3.1171.0",
     "@mokumoku-exams/data-schema": "*",
     "next": "16.4.6",
     "react": "19.3.1",
