@@ -1,4 +1,4 @@
-import webpush from "web-push";
+import { sendNotification } from "web-push";
 import { loadVapidPrivateKey, VapidKeyUnavailableError, type VapidSettings } from "./vapid.ts";
 
 // 送信の処理。アプリのテスト通知の API と、毎日の送信の Lambda(daily.ts)が共通で使う。
@@ -55,7 +55,7 @@ export function webPushSender(
       throw new VapidKeyUnavailableError();
     }
     try {
-      await webpush.sendNotification(
+      await sendNotification(
         { endpoint: target.endpoint, keys: { p256dh: target.p256dh, auth: target.auth } },
         payload,
         {
