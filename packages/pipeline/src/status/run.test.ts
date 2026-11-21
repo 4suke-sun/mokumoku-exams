@@ -8,6 +8,7 @@ import {
   EXAM,
   markVerified,
   readChoiceRequests,
+  readRequests,
   runMain,
   setupDraftRoot,
   workPath,
@@ -110,6 +111,39 @@ describe("status", () => {
     }
     expect(r.out).toContain(`1 回の実行の上限 ${100} 件`);
     expect(r.out).not.toMatch(/費用|トークン|円|ドル/);
+  });
+
+  it("直しの依頼と下書きの依頼が混ざる_依頼待ちを直しの役と下書きの作成役に分けて数え、出力が済んだ依頼と読めない依頼は直しに数えない", async () => {
+    const root = setupDraftRoot();
+    await runMain(root, ["plan", EXAM]);
+    await runMain(root, ["draft", EXAM]);
+    // 下書きの依頼(選択式と自由記述)の数。直しの依頼と読めない依頼を置く前に数える
+    const drafted = readRequests(root).length;
+    const done = readChoiceRequests(root)[0] as ReturnType<typeof readChoiceRequests>[number];
+    const requestsDir = workPath(root, "requests");
+    // 直しの依頼(revise を持つ)を 3 件と、読めない依頼を 1 件置く。依頼待ちの数え方だけを見るので、中身は最小にする
+    for (const n of [1, 2, 3]) {
+      writeFileSync(
+        join(requestsDir, `revise-${n}.json`),
+        JSON.stringify({ revise: { draftId: `d-00000000000${n}` } }),
+      );
+    }
+    writeFileSync(join(requestsDir, "broken.json"), '{"revise": ');
+    // 直しの依頼 1 件と、下書きの依頼 1 件は、出力が済んでいる
+    const outDir = workPath(root, "out");
+    mkdirSync(outDir, { recursive: true });
+    writeFileSync(join(outDir, "revise-3.json"), "{}");
+    writeOutput(root, done, [draftFor(done)]);
+    const waiting = (out: string, role: string) => {
+      const m = new RegExp(`見積もり .*${role} (\\d+) 件`).exec(out);
+      return m ? Number(m[1]) : Number.NaN;
+    };
+    const r = await status(root);
+    expect(r.code).toBe(EXIT.ok);
+    expect(waiting(r.out, "question-reviser")).toBe(2);
+    // 下書きの作成役: 出力のない下書きの依頼と、読めない依頼(直しとして数えない)
+    expect(waiting(r.out, "question-drafter")).toBe(drafted - 1 + 1);
+    expect(count(r.out, "下書き", "依頼待ち")).toBe(drafted - 1 + 2 + 1);
   });
 
   it("再検証の印がある_件数を出す", async () => {

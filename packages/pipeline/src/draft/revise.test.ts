@@ -232,6 +232,64 @@ describe("draft --revise と取り込み", () => {
     expect(replaced.agent?.role).toBe("question-reviser");
   });
 
+  it("設問文と根拠を変えず検査に通らない直し_置き換えを不採用にし、直す前の記録は保留のまま変わらず、再実行で同じ依頼を出し直さない", async () => {
+    const root = setupDraftRoot();
+    const id = await heldDraft(root);
+    await runMain(root, ["draft", EXAM, "--revise"]);
+    const request = reviseRequests(root)[0] as DraftRequest;
+    const original = request.revise?.draft as ReturnType<typeof choiceDraft>;
+    const before = readDrafts(workPath(root, "drafts.json"), EXAM).drafts.find((d) => d.id === id);
+    // 誤答の理由を短くして、誤答の検査で不採用にする(設問文と根拠の事実カードは変えないので、同じ ID になる)
+    const distractors = original.distractors?.map((d, i) => (i === 0 ? { ...d, reason: "短い" } : d));
+    writeOutput(root, request, [{ ...original, distractors }]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.code, r.err).toBe(EXIT.ok);
+    expect(r.out).toContain("取り込み: 通過 0 件、保留 0 件、不採用 1 件");
+    expect(r.out).not.toContain("直しの取り込み:");
+    const drafts = readDrafts(workPath(root, "drafts.json"), EXAM).drafts.filter((d) => d.id === id);
+    expect(drafts).toEqual([before]);
+    expect(drafts[0]?.status).toBe("held");
+    // 依頼のファイルは消え、取り込み済みの記録(鍵)だけが残るので、同じ入力で再実行しても出し直さない
+    const again = await runMain(root, ["draft", EXAM, "--revise"]);
+    expect(again.out).toContain("直しの依頼 0 件、依頼済みで待っている 0 件、取り込み済みの入力で飛ばした 1 件");
+    expect(reviseRequests(root)).toEqual([]);
+  });
+
+  it("設問文と根拠を変えず保留の条件に当たる直し_直す前の記録を直した内容で置き換えて保留のままにし、検証の結果を外し、再実行で同じ依頼を出し直さない", async () => {
+    const root = setupDraftRoot();
+    const id = await heldDraft(root);
+    await runMain(root, ["draft", EXAM, "--revise"]);
+    const request = reviseRequests(root)[0] as DraftRequest;
+    const original = request.revise?.draft as ReturnType<typeof choiceDraft>;
+    // 正答と、ほぼ同じ文言の選択肢を誤答に混ぜて、正答が複数になりうる保留にする
+    const correctKey = original.correctAnswers[0];
+    const long = "リージョンごとに数えられる上限として、アカウントに定められている数";
+    const choices = original.choices.map((c, i) => {
+      if (c.key === correctKey) return { ...c, text: long };
+      if (i === original.choices.length - 1) return { ...c, text: `${long}です` };
+      return c;
+    });
+    writeOutput(root, request, [{ ...original, choices }]);
+    const r = await runMain(root, ["draft", EXAM, "--import"]);
+    expect(r.code, r.err).toBe(EXIT.ok);
+    expect(r.out).toContain("取り込み: 通過 0 件、保留 1 件、不採用 0 件");
+    expect(r.out).toContain(`直しの取り込み: ${id}(同じ ID で置き換え)`);
+    const drafts = readDrafts(workPath(root, "drafts.json"), EXAM).drafts.filter((d) => d.id === id);
+    expect(drafts).toHaveLength(1);
+    const replaced = drafts[0] as DraftRecord;
+    expect(replaced.status).toBe("held");
+    expect(replaced.reasons).toContain("ambiguous:similar-to-correct");
+    expect(replaced.reasons).not.toContain("verify:answer-mismatch");
+    expect(replaced.draft).toEqual({ ...original, choices });
+    expect(replaced.verification).toBeUndefined();
+    expect(replaced.revisionOf).toBeUndefined();
+    expect(replaced.agent?.role).toBe("question-reviser");
+    // 依頼のファイルは消え、取り込み済みの記録(鍵)だけが残るので、同じ入力で再実行しても出し直さない
+    const again = await runMain(root, ["draft", EXAM, "--revise"]);
+    expect(again.out).toContain("直しの依頼 0 件、依頼済みで待っている 0 件、取り込み済みの入力で飛ばした 1 件");
+    expect(reviseRequests(root)).toEqual([]);
+  });
+
   it("直した下書きが不採用_直す前の下書きは保留のまま残る", async () => {
     const root = setupDraftRoot();
     const id = await heldDraft(root);
