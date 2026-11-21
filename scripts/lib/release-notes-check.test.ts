@@ -3,9 +3,14 @@ import type { Release } from "./release-notes-check.ts";
 import {
   checkTagCorrespondence,
   checkTagHasEntry,
+  checkWritingStyle,
   compareVersions,
   formatRelease,
+  isUserFacingItem,
+  MAX_ITEM_LENGTH,
+  MAX_TITLE_LENGTH,
   validateReleaseNotes,
+  WRITING_STYLE_SINCE,
 } from "./release-notes-check.ts";
 
 const release = (version: string, overrides: Partial<Release> = {}): Release => ({
@@ -140,5 +145,73 @@ describe("formatRelease", () => {
   it("タイトルと項目を、種類のラベルつきの Markdown にする", () => {
     const body = formatRelease(release("v0.0.1", { title: "題", items: [{ type: "feat", text: "追加した" }] }));
     expect(body).toBe("題\n\n- 機能: 追加した\n");
+  });
+
+  it("開発の項目を含む版_開発の項目も本文に出す", () => {
+    const items = [
+      { type: "fix", text: "直した" },
+      { type: "dev", text: "検査を足した" },
+    ];
+    expect(formatRelease(release("v0.0.1", { title: "題", items }))).toBe(
+      "題\n\n- 修正: 直した\n- 開発: 検査を足した\n",
+    );
+  });
+});
+
+describe("isUserFacingItem", () => {
+  it("機能・修正・文書_利用者向けにする", () => {
+    for (const type of ["feat", "fix", "docs"]) expect(isUserFacingItem({ type }), type).toBe(true);
+  });
+
+  it("開発_利用者向けにしない", () => {
+    expect(isUserFacingItem({ type: "dev" })).toBe(false);
+  });
+});
+
+describe("checkWritingStyle", () => {
+  const NEW = "v99.0.0";
+  const one = (type: string, text: string, version = NEW) => [release(version, { items: [{ type, text }] })];
+
+  it("基準の版より新しいエントリで内部の語のない利用者向けの項目_通す", () => {
+    expect(checkWritingStyle(one("feat", "Next.js の画面で、問題を解けるようにしました。"))).toEqual([]);
+  });
+
+  it.each([
+    ["コードの書式", "設定の `value` を足しました。"],
+    ["ファイル名", "release-notes.json を直しました。"],
+    ["パス", "scripts/ の検査を直しました。"],
+    ["コマンド", "npm run verify で確かめます。"],
+    ["検査の名前", "check:docs を足しました。"],
+    ["Issue の番号", "不具合(#123)を直しました。"],
+  ])("利用者向けの項目に%s_止める", (_name, text) => {
+    const errors = checkWritingStyle(one("fix", text));
+    expect(errors).toHaveLength(1);
+    expect(errors[0]).toMatch(/^releases\[0\]\.items\[0\]\.text: 利用者向けの項目に、内部の語/);
+  });
+
+  it("開発の項目に内部の語_止めない", () => {
+    expect(checkWritingStyle(one("dev", "`check:docs` を scripts/check-docs.ts に足しました(#123)。"))).toEqual([]);
+  });
+
+  it("項目が上限の文字数を超える_種類によらず止める", () => {
+    const text = "あ".repeat(MAX_ITEM_LENGTH + 1);
+    expect(checkWritingStyle(one("dev", text))).toEqual(["releases[0].items[0].text: 200 文字を超えています"]);
+    expect(checkWritingStyle(one("feat", "あ".repeat(MAX_ITEM_LENGTH)))).toEqual([]);
+  });
+
+  it("タイトルが上限の文字数を超える_止める", () => {
+    const releases = [release(NEW, { title: "あ".repeat(MAX_TITLE_LENGTH + 1) })];
+    expect(checkWritingStyle(releases)).toEqual(["releases[0].title: 80 文字を超えています"]);
+  });
+
+  it("基準の版とそれより前のエントリ_検査しない", () => {
+    const releases = [
+      release(WRITING_STYLE_SINCE, {
+        title: "あ".repeat(MAX_TITLE_LENGTH + 1),
+        items: [{ type: "feat", text: "`x`" }],
+      }),
+      release("v0.0.1", { items: [{ type: "docs", text: "README.md を直しました。" }] }),
+    ];
+    expect(checkWritingStyle(releases)).toEqual([]);
   });
 });

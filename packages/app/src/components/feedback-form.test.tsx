@@ -52,6 +52,27 @@ describe("FeedbackForm", () => {
     expect((screen.getByLabelText("内容") as HTMLTextAreaElement).value).toBe("");
   });
 
+  it("試験の画面から開いたお問い合わせ_対象の試験を表示し_資格コードを添えて送り_送ったあとも表示を残す", async () => {
+    render(
+      <FeedbackForm form="contact" examCode="EX-SMP-XX">
+        <p>対象の試験の表示</p>
+      </FeedbackForm>,
+    );
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("radio", { name: "その他" }));
+    await user.type(screen.getByLabelText("内容"), "x");
+    await user.click(screen.getByRole("button", { name: "送る" }));
+    await screen.findByText(/お問い合わせを受け付けました/);
+    const [, init] = fetchMock.mock.calls[0] ?? [];
+    expect(JSON.parse(init?.body ?? "{}")).toEqual({
+      form: "contact",
+      category: "other",
+      text: "x",
+      examCode: "EX-SMP-XX",
+    });
+    expect(screen.getByText("対象の試験の表示")).toBeTruthy();
+  });
+
   it("種類を選ばずに送る_送らずに選ぶよう促す", async () => {
     render(<FeedbackForm form="contact" />);
     const user = userEvent.setup();

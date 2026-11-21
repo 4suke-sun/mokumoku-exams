@@ -29,6 +29,7 @@ export function feedbackDeps(): FeedbackDeps {
       if (!exam) return false;
       return (await loadQuestions(exam)).some((question) => question.questionId === questionId);
     },
+    examExists: async (examCode) => findPublishedExam(examCode) !== undefined,
     appVersion: listReleases()[0]?.version ?? "不明",
   };
 }

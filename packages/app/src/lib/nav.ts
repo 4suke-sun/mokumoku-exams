@@ -61,9 +61,23 @@ export function isPlaying(pathname: string): boolean {
   return /^\/exams\/[^/]+\/play$/.test(pathname);
 }
 
+/** 資格の中の画面の経路の形。1 つめの組が、資格コードの区切り */
+const EXAM_PATH = /^\/exams\/([^/]+)(\/|$)/;
+
 /** 資格の中の画面か。スマホの上のバーに「資格の一覧へ」を出す */
 export function isInExam(pathname: string): boolean {
-  return /^\/exams\/[^/]+(\/|$)/.test(pathname);
+  return EXAM_PATH.test(pathname);
+}
+
+/** 資格の中の画面なら、その資格コード(公開中かどうかは確かめない。`/contact` の画面が確かめる)。資格の外の画面は null */
+export function examCodeOf(pathname: string): string | null {
+  const match = EXAM_PATH.exec(pathname);
+  if (!match?.[1]) return null;
+  try {
+    return decodeURIComponent(match[1]);
+  } catch {
+    return null;
+  }
 }
 
 /** 画面の幅の段階。読む(文章のページ)、学ぶ(出題・結果・単元)、広い(一覧・状況) */

@@ -29,11 +29,20 @@ export function buildFeedbackIssue(request: FeedbackRequest, appVersion: string)
   const written = text ? fence(text) : "(なし)";
   if (request.form === "contact") {
     const category = CONTACT_CATEGORIES[request.category];
+    // 資格コードは、サーバーで公開中の資格と照合した値(利用者の自由記述ではない)
+    const { examCode } = request;
     return {
-      title: `お問い合わせ: ${category}`,
-      body: ["フォーム: お問い合わせ", `種類: ${category}`, `アプリの版: ${appVersion}`, "", "内容:", "", written].join(
-        "\n",
-      ),
+      title: examCode ? `お問い合わせ: ${category}(${examCode})` : `お問い合わせ: ${category}`,
+      body: [
+        "フォーム: お問い合わせ",
+        `種類: ${category}`,
+        ...(examCode ? [`資格コード: ${examCode}`] : []),
+        `アプリの版: ${appVersion}`,
+        "",
+        "内容:",
+        "",
+        written,
+      ].join("\n"),
       labels: CONTACT_LABELS[request.category],
     };
   }

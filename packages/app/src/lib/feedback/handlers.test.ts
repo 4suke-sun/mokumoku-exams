@@ -35,6 +35,7 @@ function deps(overrides: Partial<FeedbackDeps> = {}): FeedbackDeps {
     repository: createMemoryFeedbackRepository(),
     createIssue: recordingCreator().create,
     questionExists: async (examCode, questionId) => examCode === "EX-SMP-XX" && questionId === "SAMPLE-0001",
+    examExists: async (examCode) => examCode === "EX-SMP-XX",
     appVersion: "v0.84.0",
     now: () => Date.parse("2026-11-15T00:00:00Z"),
     ...overrides,
@@ -93,12 +94,58 @@ describe("handleFeedback", () => {
     expect(consume).not.toHaveBeenCalled();
   });
 
+  it("お問い合わせに公開中の資格コードを添える_起票し_題と本文に資格コードが載る", async () => {
+    const creator = recordingCreator();
+    const response = await handleFeedback(
+      post({ ...contact, examCode: "EX-SMP-XX" }),
+      deps({ createIssue: creator.create }),
+    );
+    expect(response.status).toBe(201);
+    expect(creator.issues[0]?.title).toBe("お問い合わせ: 不具合(EX-SMP-XX)");
+    expect(creator.issues[0]?.body).toContain("資格コード: EX-SMP-XX");
+  });
+
+  it("お問い合わせに資格コードを添えない_従来どおりの題と本文で起票する", async () => {
+    const creator = recordingCreator();
+    const examExists = vi.fn(async () => true);
+    await handleFeedback(post(contact), deps({ createIssue: creator.create, examExists }));
+    expect(creator.issues[0]?.title).toBe("お問い合わせ: 不具合");
+    expect(creator.issues[0]?.body).not.toContain("資格コード");
+    expect(examExists).not.toHaveBeenCalled();
+  });
+
+  it("お問い合わせに存在しない資格コードを添える_400 で断り_回数を増やさず_起票しない", async () => {
+    const creator = recordingCreator();
+    const repository = createMemoryFeedbackRepository();
+    const consume = vi.spyOn(repository, "consume");
+    const response = await handleFeedback(
+      post({ ...contact, examCode: "NO-SUCH-XX" }),
+      deps({ createIssue: creator.create, repository }),
+    );
+    expect(response.status).toBe(400);
+    expect(consume).not.toHaveBeenCalled();
+    expect(creator.issues).toHaveLength(0);
+  });
+
+  it("お問い合わせの資格コードが形に合わない_400 で断る", async () => {
+    for (const examCode of ["", "ex-smp-xx", 1]) {
+      expect((await handleFeedback(post({ ...contact, examCode }), deps())).status, String(examCode)).toBe(400);
+    }
+  });
+
+  it("資格の有無を確かめられない_503 を返す", async () => {
+    const examExists = async () => {
+      throw new Error("boom");
+    };
+    expect((await handleFeedback(post({ ...contact, examCode: "EX-SMP-XX" }), deps({ examExists }))).status).toBe(503);
+  });
+
   it("未ログイン_401 で断る", async () => {
     expect((await handleFeedback(post(contact, { sub: null }), deps())).status).toBe(401);
   });
 
   it("本文に未知の項目や利用者の識別子がある_400 で断る", async () => {
-    for (const key of ["sub", "userId", "email", "PK"]) {
+    for (const key of ["sub", "userId", "email", "PK", "questionId"]) {
       expect((await handleFeedback(post({ ...contact, [key]: "x" }), deps())).status, key).toBe(400);
     }
   });

@@ -3,6 +3,7 @@
  * data/release-notes.json の検証と、タグとの 1:1 の対応の検査。
  *   node scripts/check-release-notes.ts              構造・本文の検査と、既存のタグとの対応の検査
  *   node scripts/check-release-notes.ts --tag vX.Y.Z  そのタグに対応するエントリがあることの検査(タグを切るとき)
+ * どちらの形でも、書き方の基準のうち機械で守れるもの(長さ、利用者向けの項目の内部の語)を検査する。
  * 失敗したら終了コード 1。
  */
 import { execFileSync } from "node:child_process";
@@ -11,7 +12,12 @@ import { report } from "./lib/git-check.ts";
 import { readLocalDenylist } from "./lib/local-denylist.ts";
 import { checkEntries, textToEntries } from "./lib/pr-secrets-check.ts";
 import type { Release } from "./lib/release-notes-check.ts";
-import { checkTagCorrespondence, checkTagHasEntry, validateReleaseNotes } from "./lib/release-notes-check.ts";
+import {
+  checkTagCorrespondence,
+  checkTagHasEntry,
+  checkWritingStyle,
+  validateReleaseNotes,
+} from "./lib/release-notes-check.ts";
 
 const FILE = "data/release-notes.json";
 const args = process.argv.slice(2);
@@ -33,6 +39,7 @@ try {
 
   if (structure.length === 0) {
     const releases = (data as { releases: Release[] }).releases;
+    blocks.push(...checkWritingStyle(releases));
     const tag = args[1];
     if (args[0] === "--tag" && tag) {
       blocks.push(...checkTagHasEntry(releases, tag));
@@ -53,5 +60,5 @@ report(
   "リリースノートの検査に失敗しました。",
   blocks,
   warns,
-  "data/release-notes.json を直してください(新しい版を先頭に、版・日付・タイトル・項目を書きます)。",
+  "data/release-notes.json を直してください(新しい版を先頭に、版・日付・タイトル・項目を書きます。書き方は CONTRIBUTING.md の「リリースノートの書き方」)。",
 );

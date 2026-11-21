@@ -79,7 +79,8 @@ function failureMessage(status: number): string {
 }
 
 type Props =
-  | { form: "contact" }
+  /** `examCode` は、試験の画面から開いたときだけ渡す(子に、対象の試験の表示を渡す) */
+  | { form: "contact"; examCode?: string; children?: ReactNode }
   | { form: "question"; examCode: string; questionId: string; children?: ReactNode; backLink?: ReactNode };
 
 /** お問い合わせと、問題の誤りの報告のフォーム。送れたら入力を空にし、失敗したら入力を残す。 */
@@ -101,7 +102,7 @@ export function FeedbackForm(props: Props) {
     if (length > MAX_FEEDBACK_TEXT_LENGTH) return setError(`${MAX_FEEDBACK_TEXT_LENGTH} 文字以内で書いてください。`);
     const body = (
       props.form === "contact"
-        ? { form: "contact", category, text }
+        ? { form: "contact", category, text, ...(props.examCode ? { examCode: props.examCode } : {}) }
         : { form: "question", category, text, examCode: props.examCode, questionId: props.questionId }
     ) as FeedbackRequest;
     setBusy(true);
@@ -123,7 +124,7 @@ export function FeedbackForm(props: Props) {
 
   return (
     <form onSubmit={submit} className="space-y-5" noValidate>
-      {props.form === "question" ? props.children : null}
+      {props.children}
       {isContact ? (
         <CategoryPicker legend="種類" options={CONTACT_CATEGORIES} value={category} onChange={setCategory} />
       ) : (

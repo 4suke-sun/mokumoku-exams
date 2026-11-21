@@ -127,7 +127,7 @@
 | `POST /api/questions` | 公開中の資格の問題(正解と解説を含む)を、問題 ID を指定して返す(本文は `{ "examCode", "questionIds" }`。ID は 1〜1000 個、32KB まで。返すのは `{ "questions": [...] }` で、指定の順、いまのデータにない問題は入らない)。読み出しだが、ID の一覧を本文で受けるので POST。公開中でない資格は 400。出題・結果・ブックマークの画面が、表示に要る問題だけを取るのに使う |
 | `PUT /api/push/subscription` | この端末の通知の購読を保存する(本文は `{ "endpoint", "keys": { "p256dh", "auth" } }`) |
 | `DELETE /api/push/subscription` | この端末の通知の購読を消す(本文は `{ "endpoint" }`) |
-| `POST /api/feedback` | 送信フォームの内容を、GitHub の Issue として起票する(本文は `{ "form": "contact", "category", "text" }` か `{ "form": "question", "category", "text", "examCode", "questionId" }`。16KB まで)。成功は `201`(`{ "status": "sent" }`。Issue の番号や URL は返さない)。1 人 1 日 10 件を超えると `429`。存在しない問題は `400`。起票の設定がない・GitHub の API の失敗は `503`([送信フォームの仕様](./specs/feedback.md)) |
+| `POST /api/feedback` | 送信フォームの内容を、GitHub の Issue として起票する(本文は `{ "form": "contact", "category", "text" }`(試験の画面から開いたときは、任意の `"examCode"` を足す)か `{ "form": "question", "category", "text", "examCode", "questionId" }`。16KB まで)。成功は `201`(`{ "status": "sent" }`。Issue の番号や URL は返さない)。1 人 1 日 10 件を超えると `429`。存在しない問題・存在しない資格は `400`。起票の設定がない・問題や資格の有無を確かめられない・GitHub の API の失敗は `503`([送信フォームの仕様](./specs/feedback.md)) |
 | `POST /api/push/test` | 管理者だけ。自分の購読(すべての端末)に、テスト通知を送る(本文は `{}`)。送れた数を返す(`{ "sent": 1 }`)。管理者でなければ `403` |
 
 管理者の API(`/api/admin/*`。利用者の一覧・無効化)は、[認証の仕組み](./auth.md) の「管理者の画面」に書きます。
@@ -205,7 +205,7 @@
 | `413` | `too-large` | 本文が上限(結果は 100KB、ブックマークと目標日は 1KB、通知は 4KB、送信フォームは 16KB)を超える(申告された大きさで、読み込む前にも断る) |
 | `415` | `bad-request` | `Content-Type` が JSON でない |
 | `429` | `limit-exceeded` | 送信フォームの、1 人 1 日の上限(10 件)を超えた |
-| `503` | `unavailable` | 保存先の失敗。通知の鍵が設定されていない、または秘密鍵を読めない(テスト通知)。送信フォームの App の設定がない、秘密鍵を読めない、または GitHub の API の失敗(送信フォーム)。原因は返さない |
+| `503` | `unavailable` | 保存先の失敗。通知の鍵が設定されていない、または秘密鍵を読めない(テスト通知)。送信フォームの App の設定がない、秘密鍵を読めない、問題や資格の有無を確かめられない、または GitHub の API の失敗(送信フォーム)。原因は返さない |
 
 保存は、同じ資格・同じ完了時刻なら上書きです。失敗したあとに同じ内容を送り直しても、重複しません。
 

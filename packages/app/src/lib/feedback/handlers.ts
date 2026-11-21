@@ -14,6 +14,8 @@ export type FeedbackDeps = {
   createIssue: IssueCreator | null;
   /** 公開中の問題に、その資格コードと問題 ID があるか */
   questionExists: (examCode: string, questionId: string) => Promise<boolean>;
+  /** 公開中の資格に、その資格コードがあるか(試験についてのお問い合わせ) */
+  examExists: (examCode: string) => Promise<boolean>;
   /** Issue の本文に書く、アプリの版 */
   appVersion: string;
   now?: () => number;
@@ -35,6 +37,9 @@ export async function handleFeedback(request: Request, deps: FeedbackDeps): Prom
 
   try {
     if (body.form === "question" && !(await deps.questionExists(body.examCode, body.questionId))) {
+      return fail("bad-request", 400, auth.setCookies);
+    }
+    if (body.form === "contact" && body.examCode !== undefined && !(await deps.examExists(body.examCode))) {
       return fail("bad-request", 400, auth.setCookies);
     }
   } catch (error) {
