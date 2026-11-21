@@ -52,10 +52,13 @@ export const REPOSITORY_URL = "https://github.com/4suke-sun/mokumoku-exams";
 /** リポジトリの Issue の一覧。送信フォームで送った内容の起票先として、利用規約とプライバシーポリシーの画面に出す。 */
 export const ISSUES_URL = `${REPOSITORY_URL}/issues`;
 
-/** 検索エンジンに案内するのは、ログインなしで開ける画面だけ。ほかはすべて対象外にする。 */
+/**
+ * 検索エンジンに案内するのは、ログインなしで開ける画面だけ。ほかはすべて対象外にする。
+ * 共有のカードの画像も許す(X などのカードの取得は robots.txt に従うため、許さないと画像が出ない)。
+ */
 export function robotsOf(origin: string | null): MetadataRoute.Robots {
   return {
-    rules: { userAgent: "*", allow: [...PUBLIC_PAGE_PATHS], disallow: "/" },
+    rules: { userAgent: "*", allow: [...PUBLIC_PAGE_PATHS, SHARE_IMAGE.path], disallow: "/" },
     ...(origin ? { sitemap: `${origin}/sitemap.xml` } : {}),
   };
 }
