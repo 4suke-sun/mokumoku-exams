@@ -23,7 +23,7 @@ npm install   # 依存を入れ、検査フック(.githooks)を有効にしま�
 | `npm run build` | ビルド |
 | `npm test` | テスト(Vitest) |
 | `npm run test:e2e` | 主要な画面の通し確認(Playwright)。開発サーバーを代替の認証で起動して通す。初回は `npx playwright install chromium` が必要 |
-| `npm run check:release-notes` | リリースノートとタグの対応の検査 |
+| `npm run check:release-notes` | リリースノートの構造とタグの対応の検査と、書き方の検査(文字数の上限、利用者向けの項目の内部の語。「リリースノートの書き方」) |
 | `npm run validate:data` | 資格マスタ・問題データ・非公開の問題・カリキュラム・体系ノート・コードドリル・要約カード・使い方ページのデータの検査(仕様: `docs/data-spec.md`) |
 | `npm run lessons -- <add\|list\|repeats\|draft\|close\|closed>` | 引っかかりの受け箱(`.git` の共有領域)の記録と集計。手順は `docs/lessons-workflow.md` |
 | `npm run metrics` | 手元の計測の集計(`verify` の段階ごとの時間、サブエージェントの時間とトークン、検査の台帳の内訳)。`-- agent <役> <ミリ秒> <トークン>` で記録を足す |
