@@ -10,15 +10,15 @@ export function examContactHref(examCode: string): string {
 }
 
 /**
- * フッターに置く「この試験についてお問い合わせ」のリンク。試験の画面(`exams/[code]/` の下)にだけ出す。
+ * フッターに置く「お問い合わせ」のリンク。試験の画面(`exams/[code]/` の下)では、その資格コードを付けて開く
+ * (開いた先で、その試験についてか全般かを選ぶ)。それ以外の画面では、資格コードを付けずに開く。
  * 資格が公開中かどうかは、開いた先の `/contact` が確かめる(docs/app/specs/feedback.md)。
  */
-export function ExamContactLink({ className }: { className?: string }) {
+export function ContactLink({ className }: { className?: string }) {
   const examCode = examCodeOf(usePathname());
-  if (!examCode) return null;
   return (
-    <Link href={examContactHref(examCode)} className={className}>
-      この試験についてお問い合わせ
+    <Link href={examCode ? examContactHref(examCode) : "/contact"} className={className}>
+      お問い合わせ
     </Link>
   );
 }

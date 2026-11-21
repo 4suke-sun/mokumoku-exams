@@ -52,13 +52,14 @@ describe("FeedbackForm", () => {
     expect((screen.getByLabelText("内容") as HTMLTextAreaElement).value).toBe("");
   });
 
-  it("試験の画面から開いたお問い合わせ_対象の試験を表示し_資格コードを添えて送り_送ったあとも表示を残す", async () => {
-    render(
-      <FeedbackForm form="contact" examCode="EX-SMP-XX">
-        <p>対象の試験の表示</p>
-      </FeedbackForm>,
-    );
+  it("試験の画面から開いたお問い合わせ_対象はこの試験についてが既定で_資格コードを添えて送り_送ったあとも表示を残す", async () => {
+    render(<FeedbackForm form="contact" exam={{ examCode: "EX-SMP-XX", name: "見本の資格" }} />);
     const user = userEvent.setup();
+    expect((screen.getByRole("radio", { name: "この試験について(見本の資格)" }) as HTMLInputElement).checked).toBe(
+      true,
+    );
+    expect((screen.getByRole("radio", { name: "全般" }) as HTMLInputElement).checked).toBe(false);
+    expect(screen.getByText("EX-SMP-XX")).toBeTruthy();
     await user.click(screen.getByRole("radio", { name: "その他" }));
     await user.type(screen.getByLabelText("内容"), "x");
     await user.click(screen.getByRole("button", { name: "送る" }));
@@ -70,7 +71,42 @@ describe("FeedbackForm", () => {
       text: "x",
       examCode: "EX-SMP-XX",
     });
-    expect(screen.getByText("対象の試験の表示")).toBeTruthy();
+    expect((screen.getByRole("radio", { name: "この試験について(見本の資格)" }) as HTMLInputElement).checked).toBe(
+      true,
+    );
+    expect(screen.getByText("EX-SMP-XX")).toBeTruthy();
+  });
+
+  it("試験の画面から開いたお問い合わせで全般を選ぶ_資格コードを添えずに送り_試験の表示を消す", async () => {
+    render(<FeedbackForm form="contact" exam={{ examCode: "EX-SMP-XX", name: "見本の資格" }} />);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("radio", { name: "全般" }));
+    expect(screen.queryByText("EX-SMP-XX")).toBeNull();
+    await user.click(screen.getByRole("radio", { name: "その他" }));
+    // 対象と種類は別の組なので、種類を選んでも対象の選択は外れない
+    expect((screen.getByRole("radio", { name: "全般" }) as HTMLInputElement).checked).toBe(true);
+    await user.type(screen.getByLabelText("内容"), "x");
+    await user.click(screen.getByRole("button", { name: "送る" }));
+    await screen.findByText(/お問い合わせを受け付けました/);
+    const [, init] = fetchMock.mock.calls[0] ?? [];
+    expect(JSON.parse(init?.body ?? "{}")).toEqual({ form: "contact", category: "other", text: "x" });
+  });
+
+  it("試験の画面以外から開いたお問い合わせ_対象の選択を出さない", () => {
+    render(<FeedbackForm form="contact" />);
+    expect(screen.queryByRole("radio", { name: "全般" })).toBeNull();
+    expect(screen.queryByText("対象")).toBeNull();
+  });
+
+  it("お問い合わせを送る前_戻るの部品を出さず_送れたあとに出す", async () => {
+    render(<FeedbackForm form="contact" backLink={<button type="button">戻る部品</button>} />);
+    expect(screen.queryByRole("button", { name: "戻る部品" })).toBeNull();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("radio", { name: "不具合" }));
+    await user.type(screen.getByLabelText("内容"), "x");
+    await user.click(screen.getByRole("button", { name: "送る" }));
+    await screen.findByText(/お問い合わせを受け付けました/);
+    expect(screen.getByRole("button", { name: "戻る部品" })).toBeTruthy();
   });
 
   it("種類を選ばずに送る_送らずに選ぶよう促す", async () => {
