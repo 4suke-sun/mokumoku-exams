@@ -42,6 +42,8 @@ export const FeedbackRequestSchema = z.discriminatedUnion("form", [
     form: z.literal("contact"),
     category: z.enum(keysOf(CONTACT_CATEGORIES)),
     text: trimmedLength(1),
+    /** 試験の画面から開いたときだけ送る、対象の試験の資格コード(公開中の資格に実在することは、サーバーで確かめる) */
+    examCode: z.string().regex(EXAM_CODE).optional(),
   }),
   z.strictObject({
     form: z.literal("question"),

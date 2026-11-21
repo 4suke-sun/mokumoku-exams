@@ -1,5 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { ADMIN_NAV_ITEM, DOCK_ITEMS, isActive, isInExam, isPlaying, NAV_ITEMS, navItems, pageWidth } from "./nav.ts";
+import {
+  ADMIN_NAV_ITEM,
+  DOCK_ITEMS,
+  examCodeOf,
+  isActive,
+  isInExam,
+  isPlaying,
+  NAV_ITEMS,
+  navItems,
+  pageWidth,
+} from "./nav.ts";
 
 describe("isActive", () => {
   it("ホームで/_ホームが現在地", () => {
@@ -59,6 +69,26 @@ describe("DOCK_ITEMS", () => {
   it("メニューと合わせて 6 つまで_管理を含まない", () => {
     expect(DOCK_ITEMS.length + 1).toBeLessThanOrEqual(6);
     expect(DOCK_ITEMS.some((item) => item.href.startsWith("/admin"))).toBe(false);
+  });
+});
+
+describe("examCodeOf", () => {
+  it("資格の中の画面_その資格コードを返す", () => {
+    expect(examCodeOf("/exams/EX-SMP-XX")).toBe("EX-SMP-XX");
+    expect(examCodeOf("/exams/EX-SMP-XX/")).toBe("EX-SMP-XX");
+    expect(examCodeOf("/exams/EX-SMP-XX/notebook/basics/entry")).toBe("EX-SMP-XX");
+  });
+
+  it("資格の外の画面_null を返す", () => {
+    expect(examCodeOf("/exams")).toBeNull();
+    expect(examCodeOf("/exams/")).toBeNull();
+    expect(examCodeOf("/")).toBeNull();
+    expect(examCodeOf("/contact")).toBeNull();
+  });
+
+  it("符号化された区切り_元に戻し_戻せないときは null を返す", () => {
+    expect(examCodeOf("/exams/A%26B")).toBe("A&B");
+    expect(examCodeOf("/exams/%E0%A4%A")).toBeNull();
   });
 });
 

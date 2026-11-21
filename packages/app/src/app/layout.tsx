@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { ExamContactLink } from "@/components/exam-contact-link.tsx";
 import { NavigationProgress } from "@/components/navigation-progress.tsx";
 import { PageFooter, PageMain } from "@/components/page-main.tsx";
 import { SessionProvider } from "@/components/session-provider.tsx";
@@ -92,6 +93,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                   <Link href="/contact" className="ml-3 underline">
                     お問い合わせ
                   </Link>
+                  <ExamContactLink className="ml-3 underline" />
                 </p>
               </PageFooter>
             </div>
