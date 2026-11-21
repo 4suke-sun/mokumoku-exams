@@ -1,4 +1,4 @@
-// web-push(3.x)のうち、このアプリが使う部分だけの型。パッケージ自体は型を持たない。
+// web-push(4.x)のうち、このアプリが使う部分だけの型。パッケージ自体は型を持たない。
 declare module "web-push" {
   type Subscription = { endpoint: string; keys: { p256dh: string; auth: string } };
   type RequestOptions = {
@@ -9,12 +9,9 @@ declare module "web-push" {
   };
   type SendResult = { statusCode: number; body: string; headers: Record<string, string> };
 
-  const webpush: {
-    sendNotification(
-      subscription: Subscription,
-      payload?: string | null,
-      options?: RequestOptions,
-    ): Promise<SendResult>;
-  };
-  export default webpush;
+  export function sendNotification(
+    subscription: Subscription,
+    payload?: string | null,
+    options?: RequestOptions,
+  ): Promise<SendResult>;
 }

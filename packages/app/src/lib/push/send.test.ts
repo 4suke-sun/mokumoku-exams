@@ -1,7 +1,10 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import webpush from "web-push";
+import { sendNotification } from "web-push";
 import { DAILY_MESSAGE, type PushTarget, sendToAll, webPushSender } from "./send.ts";
 import { VapidKeyUnavailableError } from "./vapid.ts";
+
+// web-push は ES モジュールで、名前付きのエクスポートを spyOn で差し替えられないため、モジュールごと差し替える
+vi.mock("web-push", () => ({ sendNotification: vi.fn() }));
 
 const target = (n: number): PushTarget => ({
   endpoint: `https://fcm.googleapis.com/fcm/send/${n}`,
@@ -41,6 +44,7 @@ describe("webPushSender", () => {
 
   afterEach(() => {
     vi.restoreAllMocks();
+    vi.mocked(sendNotification).mockReset();
   });
 
   it("送り先がない_秘密鍵を読まない", async () => {
@@ -54,7 +58,7 @@ describe("webPushSender", () => {
   });
 
   it("パラメーターの名前で秘密鍵を読み_公開鍵と連絡先と合わせて送る", async () => {
-    const send = vi.spyOn(webpush, "sendNotification").mockResolvedValue({ statusCode: 201, body: "", headers: {} });
+    const send = vi.mocked(sendNotification).mockResolvedValue({ statusCode: 201, body: "", headers: {} });
     const load = vi.fn(async () => privateKey);
     const summary = await sendToAll([target(1), target(2)], DAILY_MESSAGE, webPushSender(vapid, 60, load));
     expect(summary.sent).toBe(2);
@@ -67,7 +71,7 @@ describe("webPushSender", () => {
   });
 
   it("秘密鍵を読めない_1 件の失敗ではなく_送信の全体を失敗にし_原因を持ち出さない", async () => {
-    const send = vi.spyOn(webpush, "sendNotification");
+    const send = vi.mocked(sendNotification);
     const cause = `AccessDenied: ${vapid.privateKeyParameter}`;
     const sender = webPushSender(vapid, 60, async () => {
       throw new Error(cause);
