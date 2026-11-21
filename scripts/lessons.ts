@@ -154,7 +154,7 @@ try {
     } else if (command === "draft" && !isManifestName(manifestName)) {
       // 並行するセッションと一覧が重ならないよう、用途ごとの別名だけを受け付ける(既定の manifest.json は使わない)
       process.stderr.write(
-        "一覧の名前は、用途ごとの別名(manifest-<用途>.json。用途は英小文字・数字・ハイフン)にしてください\n",
+        "一覧の名前は、用途ごとの別名(manifest-<用途>.json。用途は英小文字・数字・ハイフンで、先頭は英小文字か数字、40 文字まで)にしてください\n",
       );
       process.exitCode = 2;
     } else if (repeats.length === 0) {

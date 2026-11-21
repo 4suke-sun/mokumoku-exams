@@ -132,7 +132,7 @@ export function sealInput(entry: ManifestEntry, fileHash: string): string {
 }
 
 /**
- * 一覧のファイル名の決まり。用途ごとの別名(`manifest-<用途>.json`。用途は英小文字・数字・ハイフン)にし、既定の名前(`manifest.json`)は使わない。
+ * 一覧のファイル名の決まり。用途ごとの別名(`manifest-<用途>.json`。用途は英小文字・数字・ハイフンで、先頭は英小文字か数字、40 文字まで)にし、既定の名前(`manifest.json`)は使わない。
  * 並行するセッションが、同じ名前の一覧を書き換え合わないため(手順: .claude/skills/dev-pr の Step 1)。
  */
 export const MANIFEST_NAME = /^manifest-[a-z0-9][a-z0-9-]{0,39}\.json$/;

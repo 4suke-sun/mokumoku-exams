@@ -55,7 +55,7 @@ function writeManifest(entries: ManifestEntry[]): void {
 // 並行するセッションと一覧が重ならないよう、用途ごとの別名だけを受け付ける
 if (!isManifestName(basename(manifestPath))) {
   fail([
-    "一覧の名前は、用途ごとの別名(manifest-<用途>.json。用途は英小文字・数字・ハイフン)にする(既定の manifest.json は使わない)",
+    "一覧の名前は、用途ごとの別名(manifest-<用途>.json。用途は英小文字・数字・ハイフンで、先頭は英小文字か数字、40 文字まで)にする(既定の manifest.json は使わない)",
   ]);
 }
 

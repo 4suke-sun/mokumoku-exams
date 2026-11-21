@@ -61,7 +61,7 @@ PR と Issue のどちらも、次を確かめる:
 - PR: `.drafts/pr-<ブランチ名>.md`(1 行目がタイトル、空行を挟んで本文)。ブランチ名の `/` は `-` に置き換え、`#` は除く(例: `fix/#12-v0.9.0` → `.drafts/pr-fix-12-v0.9.0.md`)
 - Issue: 新規は `.drafts/issues/<slug>.md`(番号は投稿まで決まらない)、既存の Issue の編集は `.drafts/issues/<番号>-<slug>.md`。1 行目が `# タイトル`、2 行目が空行、3 行目以降が本文
 - 複数の Issue をまとめて起票・編集するときは、一覧(マニフェスト)も書く(メインのセッションが書いてよい)。一覧は、用途ごとの別名 `.drafts/issues/manifest-<用途>.json`
-  (用途は英小文字・数字・ハイフン。例: `manifest-v0-99-0.json`、受け箱からの起票は `manifest-lessons.json`)にし、既定の名前(`manifest.json`)は使わない。
+  (用途は英小文字・数字・ハイフンで、先頭は英小文字か数字、40 文字まで。例: `manifest-v0-99-0.json`、受け箱からの起票は `manifest-lessons.json`)にし、既定の名前(`manifest.json`)は使わない。
   `.drafts/` は同じ作業ツリーで並行するセッションが共有するので、名前を分けて、別のセッションの一覧と重ならないようにする(`scripts/post-issues.ts` は、決まりの形でない名前の一覧を拒否する)。
   1 行が 1 件で、`action`(`create` / `edit`)、`file`(下書きのファイル名)、編集なら `number`、`milestone`、`labels` を持つ:
 
