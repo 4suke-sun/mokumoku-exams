@@ -21,7 +21,7 @@
 node scripts/lessons.ts add --key <キー> --who <誰> --cause <原因> --promote <昇格先> --what <起きたこと> --should <本来どうすべきか>
 node scripts/lessons.ts list        # 種類のキーごとの、対処していない件数
 node scripts/lessons.ts repeats     # 繰り返しの種類(しきい値以上)
-node scripts/lessons.ts draft       # 繰り返しの種類ごとに、Issue の下書きを .drafts/issues/ に作り、一覧(manifest.json)へ項目を足す(投稿はしない)
+node scripts/lessons.ts draft       # 繰り返しの種類ごとに、Issue の下書きを .drafts/issues/ に作り、一覧(既定は manifest-lessons.json。--manifest manifest-<用途>.json で指定できる)へ項目を足す(投稿はしない)
 node scripts/lessons.ts close <キー> <行き先>   # 対処済みにする(これより前の件は数えない)
 node scripts/lessons.ts closed      # 対処済みにした種類の、キーと行き先と日付(読み取りだけ)
 ```
@@ -74,7 +74,7 @@ node scripts/lessons.ts closed      # 対処済みにした種類の、キーと
 | 範囲外を指摘した、範囲外を編集した | `out-of-scope` |
 | 検査の報告に、見つけた値を引用した | `value-quoted` |
 | 既存の本文を書き換えた(編集の依頼で、追記だけのはずが) | `rewrote-existing` |
-| 許可されていないコマンドで、ファイルを編集した(編集は Write ツールだけ) | `subagent-disallowed-command` |
+| 定義が許す外のコマンドを使った(編集・読み取り・集計・機械検査。編集は Write ツールだけ。作成役の許可の外のコマンドはフックが止める。読み取り役の書き込みは、別の Issue で扱う(いまは定義の決まりだけ)) | `subagent-disallowed-command` |
 | 入力の範囲を読み違えた(差分から省かれた旧い文言、差分の対象ではない既存のファイル) | `inspector-stale-diff-misread` |
 
 ## 繰り返しと Issue の候補
@@ -83,7 +83,8 @@ node scripts/lessons.ts closed      # 対処済みにした種類の、キーと
   版をまたいで数える(版が違っても、同じキーなら合算する)。
 - 「繰り返し」ごとに、`node scripts/lessons.ts draft` が Issue の下書きを `.drafts/issues/lessons-<キー>.md` に作る。
   下書きは `/dev-pr` の形式(1 行目が `# 題`)で、投稿はしない。すでに同名の下書きがあるときは、人が編集した内容を守るため、上書きしない。
-  あわせて、作った下書きの項目(`action: create`、`file`、`labels: ["lessons"]`)を、一覧(`.drafts/issues/manifest.json`。`/dev-pr` の Step 1)へ足す。
+  あわせて、作った下書きの項目(`action: create`、`file`、`labels: ["lessons"]`)を、一覧(既定は `.drafts/issues/manifest-lessons.json`。`/dev-pr` の Step 1)へ足す。
+  一覧は、用途ごとの別名(`manifest-<用途>.json`)にする決まりで、既定の名前(`manifest.json`)は使わない(並行するセッションと一覧が重ならないため)。別の名前の一覧に足すときは `--manifest` で指定する(決まりの形でない名前は、終了コード 2 で止まる)。
   一覧にすでに同じ `file` の項目があるときは、書き換えない。すでにあった下書き(上書きしなかったもの)は、一覧に足し直さない(投稿済みかもしれないため)。
   一覧は、起票するものを選んでから使う(起票しない項目は消す)。マイルストーンは付けないので、起票の場で決めて足す
   (版が決まっていない新規の Issue は、マイルストーンの代わりにラベル `later` を足す。決めるまで、`scripts/post-issues.ts` の検査が止める)。
@@ -119,7 +120,8 @@ node scripts/lessons.ts closed      # 対処済みにした種類の、キーと
 | 範囲 | 触ってよいファイルと、触ってはいけないファイル |
 | 完了の条件 | 返答に何が含まれていればよいか |
 
-コード例・例データ(接続先、グループ名・役割名、番号)を書かせる依頼の制約には、値の形を、`.claude/skills/dev-commit/checklist.md` の「プレースホルダーの書き方」のとおりにすることを入れる。
+コード例・例データ(接続先、グループ名・役割名、番号。図や表の例データ、テストのダミーを含む)を書かせる依頼の制約には、値の形を、`.claude/skills/dev-commit/checklist.md` の「プレースホルダーの書き方」のとおりにすることを入れる。
+メインのセッションが自分で書くときも、同じ形にする。
 
 サブエージェントの返答の最後に、**「置いた前提」**の欄を入れさせる(1〜3 行。なければ「なし」)。
 依頼に書かれていなくて、自分で決めたこと(読んだ範囲、仮定した事実、確かめていないこと)を書く欄である。

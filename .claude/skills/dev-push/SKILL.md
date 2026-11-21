@@ -55,6 +55,7 @@ node scripts/prepare-inspection.ts --range <Step 0 で決めた範囲>
 - 作業ディレクトリ
 - 「`.claude/skills/dev-commit/checklist.md` を読み、その項目に沿って、`.drafts/inspect/` のファイル
   (範囲の全コミットの差分。検査済みで `covered.txt` に挙げられたコミットの差分は除く。**コミットメッセージ、ブランチ名**)を確認する。最後のコミットだけで済ませない」
+- 「`.drafts/inspect/denylist.txt` に挙がった拒否リストの置き場は、作業ツリーの外のものも含めて、すべて読む。1 つでも読めないときは、判定を `OK` にしない」(`inspector-rules.md` の「拒否リスト」)
 - 検査の程度(`/dev-commit` の Step 3 の「検査の程度」のとおり。程度ごとの判定の範囲は `inspector-rules.md` の「判定の範囲」。参照先として渡すファイルは、既存で差分の対象ではないと書く。再検査では、前回の指摘の一覧と、直した箇所を添える。`.claude/skills/dev-commit/reconfirm.md` の「再検査の範囲と回数」)
 - 「報告は、チェックリストの『報告のしかた(必ず守る)』に従う(値を引用しない。`.drafts/inspect/stamp.txt` のスタンプを書き写す。最後に `判定: OK/WARN/BLOCK`)」
 

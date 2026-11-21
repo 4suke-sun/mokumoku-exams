@@ -144,6 +144,21 @@ describe("draft の依頼", () => {
     expect((await runMain(root, ["facts", EXAM, "--domain=domain1"])).code).toBe(EXIT.inputError);
   });
 
+  it("直しの依頼を分野の絞り込み・ほかの動作と同時に指定、または draft 以外のコマンドに指定_入力の誤りになる", async () => {
+    const root = setupDraftRoot();
+    await runMain(root, ["plan", EXAM]);
+    // 単独の --revise は受け付ける(以下の入力の誤りが、ほかの理由でないことの確かめ)
+    expect((await runMain(root, ["draft", EXAM, "--revise"])).code).toBe(EXIT.ok);
+    expect((await runMain(root, ["draft", EXAM, "--domain=domain1", "--revise"])).code).toBe(EXIT.inputError);
+    expect((await runMain(root, ["draft", EXAM, "--revise", "--domain=domain1"])).code).toBe(EXIT.inputError);
+    for (const mode of ["--import", "--check", "--review", "--decide"]) {
+      expect((await runMain(root, ["draft", EXAM, "--revise", mode])).code, mode).toBe(EXIT.inputError);
+    }
+    for (const command of ["collect", "facts", "plan", "verify", "status", "judge"]) {
+      expect((await runMain(root, [command, EXAM, "--revise"])).code, command).toBe(EXIT.inputError);
+    }
+  });
+
   it("前の実行の未達が解消した_次の実行で記録から外れる", async () => {
     const root = setupDraftRoot();
     await runMain(root, ["plan", EXAM]);

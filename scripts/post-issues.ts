@@ -2,10 +2,12 @@
 /**
  * Issue の下書きの一覧(マニフェスト)から、新規の起票と既存の Issue の編集をまとめて行う。
  *   node scripts/post-issues.ts <一覧.json> --seal      承認の時点の封印(下書きと、一覧の項目のハッシュ)を、一覧に記録する(承認の直後に行う)。
- *                                                       すでに封印があり、内容が変わっているときは拒否する(承認をやり直して、--reseal で封印し直す)
+ *                                                       すでに封印があり、内容が変わっているときは拒否する(承認をやり直して、--reseal で封印し直す)。
+ *                                                       封印のある未投稿の行と、封印のない未投稿の行が混ざっているとき(承認のあとに足された項目)も拒否する
  *   node scripts/post-issues.ts <一覧.json> --reseal    封印し直す(検査と承認をやり直したあとにだけ使う)
  *   node scripts/post-issues.ts <一覧.json> --dry-run   検査して、投稿する内容の概要を表示する(何も投稿しない。封印は求めない。承認の前に見せるために使う)
  *   node scripts/post-issues.ts <一覧.json>             検査して投稿し、結果(番号・題・URL)を一覧に書き戻して表示する
+ * 一覧は、用途ごとの別名(`manifest-<用途>.json`)にする。既定の名前(`manifest.json`)などの、決まりの形でない名前は、どのモードでも拒否する。
  * 一覧と下書きは .drafts/(gitignore 済み)に置く。投稿は、承認した内容と封印が一致するときだけ行う。
  * 途中で失敗しても、結果を書き戻した行は、再実行で飛ばす(gh の成功のあと、書き戻しの前に止まった行は、再実行の前に GitHub で重複を確かめる)。
  * 人の承認のあとにだけ実行する(スキル: .claude/skills/dev-pr)。
@@ -14,15 +16,17 @@ import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { mkdtempSync, readFileSync, realpathSync, renameSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join, resolve, sep } from "node:path";
+import { basename, dirname, join, resolve, sep } from "node:path";
 import {
   checkDraft,
   formatResults,
   ghArgs,
+  isManifestName,
   issueNumberFromUrl,
   type ManifestEntry,
   parseDraft,
   sealInput,
+  unsealedAmongSealed,
   validateManifest,
   verifySeals,
 } from "./lib/issue-manifest.ts";
@@ -46,6 +50,13 @@ function writeManifest(entries: ManifestEntry[]): void {
   const tmp = `${manifestPath}.tmp`;
   writeFileSync(tmp, `${JSON.stringify(entries, null, 2)}\n`);
   renameSync(tmp, manifestPath);
+}
+
+// 並行するセッションと一覧が重ならないよう、用途ごとの別名だけを受け付ける
+if (!isManifestName(basename(manifestPath))) {
+  fail([
+    "一覧の名前は、用途ごとの別名(manifest-<用途>.json。用途は英小文字・数字・ハイフンで、先頭は英小文字か数字、40 文字まで)にする(既定の manifest.json は使わない)",
+  ]);
 }
 
 const baseDir = dirname(resolve(manifestPath));
@@ -81,9 +92,15 @@ if (draftErrors.length > 0) fail(draftErrors);
 if (mode === "--seal" || mode === "--reseal") {
   // 承認のあとに内容を変えて、承認のやり直しなしに封印し直すことを防ぐ
   const changed = entries.filter((e) => !e.result && e.sha256 !== undefined && e.sha256 !== seals[e.file]);
-  if (mode === "--seal" && changed.length > 0) {
+  // 承認のあとに足された項目(封印のない行)を、封印のある行と一緒に封印しない
+  const added = mode === "--seal" ? unsealedAmongSealed(entries) : [];
+  if (mode === "--seal" && (changed.length > 0 || added.length > 0)) {
     fail([
       ...changed.map((e) => `${e.file}: すでに封印があり、内容が変わっている(検査と承認をやり直してから --reseal)`),
+      ...added.map(
+        (file) =>
+          `${file}: 封印のある行と同じ一覧に、封印のない行がある(承認のあとに足された項目。検査と承認をやり直してから --reseal)`,
+      ),
     ]);
   }
   for (const e of entries) {

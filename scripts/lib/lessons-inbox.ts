@@ -250,13 +250,19 @@ export function formatIssueDraft(repeat: Repeat): string {
 /** 受け箱から起票する Issue に付けるラベル。決まりは docs/lessons-workflow.md の「繰り返しと Issue の候補」。 */
 export const LESSONS_LABEL = "lessons";
 
+/**
+ * `draft` が項目を足す一覧の既定の名前(`.drafts/issues/` の下)。一覧は用途ごとの別名(`manifest-<用途>.json`)にする決まりで、
+ * 受け箱からの起票の用途の名前を既定にする(`--manifest` で別の名前を指定できる)。
+ */
+export const LESSONS_MANIFEST = "manifest-lessons.json";
+
 /** 繰り返しの種類の下書きのファイル名(`.drafts/issues/` の下)。 */
 export function draftFileName(key: string): string {
   return `lessons-${key}.md`;
 }
 
 /**
- * Issue の下書きの一覧(`.drafts/issues/manifest.json`)に、作った下書きの項目(新規、ラベル `lessons`)を足す。
+ * Issue の下書きの一覧(既定は `.drafts/issues/manifest-lessons.json`)に、作った下書きの項目(新規、ラベル `lessons`)を足す。
  * 一覧にすでに同じ `file` の項目があるときは、足さず、書き換えない(人が直したラベルやマイルストーン、投稿の結果を守る)。
  * マイルストーンは付けない。起票の場で決める(版が決まっていない新規の Issue は、一覧の検査で、マイルストーンかラベル `later` を求められる)。
  * 一覧が配列でないときは null(足さない)。

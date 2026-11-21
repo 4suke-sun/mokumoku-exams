@@ -8,6 +8,7 @@ import {
   checkUnexpectedPaths,
   DEPENDABOT_SIGNOFF,
   disallowedEmails,
+  isPlaceholderDomain,
   parseAddedLines,
   parseDenylist,
   textToEntries,
@@ -181,8 +182,8 @@ describe("checkEntries", () => {
   });
 
   it("許可する宛先以外のメールアドレスを止め、場所と種類だけを報告する", () => {
-    const personal = ["someone", "gmail.com"].join("@");
-    const corporate = ["a.b+c", "mail.example.co.jp"].join("@");
+    const personal = ["someone", "mail.no-such-domain.zz"].join("@");
+    const corporate = ["a.b+c", "mail.example-corp.zz"].join("@");
     expect(checkEntries(entry(`連絡先: ${personal}`)).blocks).toEqual(["許可されていないメールアドレス: f.md:3"]);
     expect(checkEntries(entry(corporate)).blocks).toHaveLength(1);
     expect(checkEntries(entry(personal)).blocks.join()).not.toContain("someone");
@@ -210,7 +211,7 @@ describe("checkEntries", () => {
   });
 
   it("JSON の文字列で改行の直後にメールアドレスがある_止める", () => {
-    const personal = ["someone", "gmail.com"].join("@");
+    const personal = ["someone", "mail.no-such-domain.zz"].join("@");
     const body = `${String.raw`"body": "連絡先\n`}${personal}"`;
     expect(checkEntries(entry(body)).blocks).toHaveLength(1);
   });
@@ -396,5 +397,48 @@ describe("checkProseBodies", () => {
 
   it("作業用の置き場のパス_混入として止める", () => {
     expect(checkUnexpectedPaths(["pipeline-work/guide.html"])).toHaveLength(1);
+  });
+});
+
+describe("テストのダミーのアドレスの組み立て", () => {
+  // 検査する行そのものは、このファイルの中で組み立てる形に見えないよう、引用符を分けて作る
+  const joined = (domain: string) => `["someone", ${'"'}${domain}${'"'}].join(${'"'}@${'"'})`;
+  const at = (file: string, text: string) => checkEntries([{ file, line: 4, text }]).blocks;
+
+  it("テストのファイルで実在しうるドメインで組み立てる_止め、場所と種類だけを報告する", () => {
+    const blocks = at("scripts/x.test.ts", `const a = ${joined("gmail.com")};`);
+    expect(blocks).toEqual([
+      "テストのダミーのアドレスに、予約済みでも存在しないトップレベルドメインでもないドメイン: scripts/x.test.ts:4",
+    ]);
+    expect(blocks.join()).not.toContain("gmail");
+  });
+
+  it("テストのファイルで存在しないトップレベルドメインか予約済みのドメインで組み立てる_止めない", () => {
+    for (const domain of [
+      "mail.no-such-domain.zz",
+      "host.xa",
+      "example.com",
+      "mail.example.org",
+      "host.test",
+      "a.invalid",
+    ]) {
+      expect(at("packages/app/src/y.test.tsx", `const a = ${joined(domain)};`), domain).toEqual([]);
+    }
+  });
+
+  it("spec のファイルで実在しうるドメインで組み立てる_止める", () => {
+    expect(at("packages/app/e2e/z.spec.ts", `const a = ${joined("gmail.com")};`)).toHaveLength(1);
+  });
+
+  it("テストではないファイル_この検査では止めない", () => {
+    expect(at("scripts/lib/x.ts", `const a = ${joined("gmail.com")};`)).toEqual([]);
+  });
+
+  it("isPlaceholderDomain_利用者割り当ての 2 文字のコードと予約済みのドメインだけを認める", () => {
+    expect(isPlaceholderDomain("a.zz")).toBe(true);
+    expect(isPlaceholderDomain("a.qm")).toBe(true);
+    expect(isPlaceholderDomain("a.example.net")).toBe(true);
+    expect(isPlaceholderDomain("a.co")).toBe(false);
+    expect(isPlaceholderDomain("example.co.jp")).toBe(false);
   });
 });

@@ -131,6 +131,28 @@ export function sealInput(entry: ManifestEntry, fileHash: string): string {
   });
 }
 
+/**
+ * 一覧のファイル名の決まり。用途ごとの別名(`manifest-<用途>.json`。用途は英小文字・数字・ハイフンで、先頭は英小文字か数字、40 文字まで)にし、既定の名前(`manifest.json`)は使わない。
+ * 並行するセッションが、同じ名前の一覧を書き換え合わないため(手順: .claude/skills/dev-pr の Step 1)。
+ */
+export const MANIFEST_NAME = /^manifest-[a-z0-9][a-z0-9-]{0,39}\.json$/;
+
+/** 一覧のファイル名(パスの最後の部分)が、決まりの形か。 */
+export function isManifestName(name: string): boolean {
+  return MANIFEST_NAME.test(name);
+}
+
+/**
+ * 封印のある未投稿の行と、封印のない未投稿の行が混ざっているとき、封印のない行の file を返す(混ざっていなければ空)。
+ * 承認のあとに足された項目を、`--seal` で、検査と承認なしに封印しないため。投稿済みの行(result を持つ行)は数えない。
+ * 封印のない行だけの一覧(最初の封印)は、承認のあとの追加と見分けられないので、空を返す。
+ */
+export function unsealedAmongSealed(entries: ManifestEntry[]): string[] {
+  const pending = entries.filter((e) => !e.result);
+  if (!pending.some((e) => e.sha256 !== undefined)) return [];
+  return pending.filter((e) => e.sha256 === undefined).map((e) => e.file);
+}
+
 /** 封印(承認の時点の値)と、現在の値の照合。`current` は、ファイルごとの現在の封印。投稿済みの行は照合しない。 */
 export function verifySeals(entries: ManifestEntry[], current: Record<string, string>): string[] {
   const errors: string[] = [];

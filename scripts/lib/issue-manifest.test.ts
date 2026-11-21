@@ -3,10 +3,12 @@ import {
   checkDraft,
   formatResults,
   ghArgs,
+  isManifestName,
   issueNumberFromUrl,
   type ManifestEntry,
   parseDraft,
   sealInput,
+  unsealedAmongSealed,
   validateManifest,
   verifySeals,
 } from "./issue-manifest.ts";
@@ -208,5 +210,49 @@ describe("issueNumberFromUrl と formatResults", () => {
     ]);
     expect(table).toContain("| #5 | chore: 題 | https://example.com/5 |");
     expect(table).toContain("| (未投稿) | b.md | |");
+  });
+});
+
+describe("isManifestName", () => {
+  it("用途ごとの別名_受け付ける", () => {
+    expect(isManifestName("manifest-lessons.json")).toBe(true);
+    expect(isManifestName("manifest-v0-99-0.json")).toBe(true);
+  });
+
+  it("既定の名前や決まりの外の名前_受け付けない", () => {
+    for (const name of [
+      "manifest.json",
+      "manifest-.json",
+      "manifest-Lessons.json",
+      "other.json",
+      "manifest-a.json.bak",
+    ]) {
+      expect(isManifestName(name)).toBe(false);
+    }
+  });
+});
+
+describe("unsealedAmongSealed", () => {
+  const seal = "0".repeat(64);
+  const posted = { number: 9, title: "chore: 題", url: "https://example.com/9" };
+
+  it("封印のある行と封印のない行が混ざる_封印のない行の file を返す", () => {
+    expect(unsealedAmongSealed([create({ sha256: seal }), create({ file: "b.md" })])).toEqual(["b.md"]);
+  });
+
+  it("封印のない行だけ_空を返す", () => {
+    expect(unsealedAmongSealed([create(), create({ file: "b.md" })])).toEqual([]);
+  });
+
+  it("封印のある行だけ_空を返す", () => {
+    expect(unsealedAmongSealed([create({ sha256: seal }), create({ file: "b.md", sha256: seal })])).toEqual([]);
+  });
+
+  it("封印のある行が投稿済みだけ_投稿済みの行を数えず空を返す", () => {
+    expect(unsealedAmongSealed([create({ sha256: seal, result: posted }), create({ file: "b.md" })])).toEqual([]);
+  });
+
+  it("投稿済みで封印のない行_数えない", () => {
+    expect(unsealedAmongSealed([create({ sha256: seal }), create({ file: "b.md", result: posted })])).toEqual([]);
   });
 });
