@@ -29,6 +29,9 @@ export default async function ReportQuestionPage({
 
   return (
     <section className="space-y-6">
+      <p>
+        <BackLink />
+      </p>
       <h1 className="h1">問題の誤りを報告</h1>
       {exam && question ? (
         <FeedbackForm form="question" examCode={exam.examCode} questionId={question.questionId} backLink={<BackLink />}>

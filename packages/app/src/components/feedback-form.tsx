@@ -30,6 +30,8 @@ export function FeedbackCaution() {
 /** 種類の選択。ボタンの並びから 1 つを選ぶ(ラジオの役割) */
 function CategoryPicker<K extends string>(props: {
   legend: string;
+  /** ラジオの組の名前(1 つのフォームに 2 つ置くときに分ける) */
+  name: string;
   options: Record<K, string>;
   value: K | null;
   onChange: (value: K) => void;
@@ -49,7 +51,7 @@ function CategoryPicker<K extends string>(props: {
             >
               <input
                 type="radio"
-                name="category"
+                name={props.name}
                 value={key}
                 checked={on}
                 onChange={() => props.onChange(key)}
@@ -78,21 +80,46 @@ function failureMessage(status: number): string {
   return "いまは送れません。時間をおいてお試しください。";
 }
 
+/** 試験の画面から開いたお問い合わせの、対象の試験 */
+type ContactExam = { examCode: string; name: string };
+
+/** お問い合わせの対象。試験の画面から開いたときだけ選ばせる(既定は、その試験について) */
+type ContactTarget = "exam" | "general";
+
 type Props =
-  /** `examCode` は、試験の画面から開いたときだけ渡す(子に、対象の試験の表示を渡す) */
-  | { form: "contact"; examCode?: string; children?: ReactNode }
+  /** `exam` は、試験の画面から開いたときだけ渡す(対象の選択と、対象の試験の表示を出す)。`backLink` は、送れたあとに出す */
+  | { form: "contact"; exam?: ContactExam; backLink?: ReactNode }
   | { form: "question"; examCode: string; questionId: string; children?: ReactNode; backLink?: ReactNode };
+
+/** 対象の試験の表示(資格の名前と資格コード。利用者が書き換えられない表示) */
+function ExamCard({ exam }: { exam: ContactExam }) {
+  return (
+    <dl className="card space-y-1 p-4 text-sm">
+      <div className="flex gap-2">
+        <dt className="text-muted">資格</dt>
+        <dd>{exam.name}</dd>
+      </div>
+      <div className="flex gap-2">
+        <dt className="text-muted">資格コード</dt>
+        <dd>{exam.examCode}</dd>
+      </div>
+    </dl>
+  );
+}
 
 /** お問い合わせと、問題の誤りの報告のフォーム。送れたら入力を空にし、失敗したら入力を残す。 */
 export function FeedbackForm(props: Props) {
   const { reload } = useSession();
   const [category, setCategory] = useState<string | null>(null);
+  const [target, setTarget] = useState<ContactTarget>("exam");
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sent, setSent] = useState(false);
   const isContact = props.form === "contact";
   const length = [...text.trim()].length;
+  /** 資格コードを添えるお問い合わせの対象の試験(全般を選んだときは添えない) */
+  const contactExam = props.form === "contact" && target === "exam" ? props.exam : undefined;
 
   async function submit(event: FormEvent) {
     event.preventDefault();
@@ -102,7 +129,7 @@ export function FeedbackForm(props: Props) {
     if (length > MAX_FEEDBACK_TEXT_LENGTH) return setError(`${MAX_FEEDBACK_TEXT_LENGTH} 文字以内で書いてください。`);
     const body = (
       props.form === "contact"
-        ? { form: "contact", category, text, ...(props.examCode ? { examCode: props.examCode } : {}) }
+        ? { form: "contact", category, text, ...(contactExam ? { examCode: contactExam.examCode } : {}) }
         : { form: "question", category, text, examCode: props.examCode, questionId: props.questionId }
     ) as FeedbackRequest;
     setBusy(true);
@@ -124,11 +151,35 @@ export function FeedbackForm(props: Props) {
 
   return (
     <form onSubmit={submit} className="space-y-5" noValidate>
-      {props.children}
+      {props.form === "question" ? props.children : null}
+      {props.form === "contact" && props.exam ? (
+        <>
+          <CategoryPicker
+            legend="対象"
+            name="target"
+            options={{ exam: `この試験について(${props.exam.name})`, general: "全般" }}
+            value={target}
+            onChange={setTarget}
+          />
+          {contactExam ? <ExamCard exam={contactExam} /> : null}
+        </>
+      ) : null}
       {isContact ? (
-        <CategoryPicker legend="種類" options={CONTACT_CATEGORIES} value={category} onChange={setCategory} />
+        <CategoryPicker
+          legend="種類"
+          name="category"
+          options={CONTACT_CATEGORIES}
+          value={category}
+          onChange={setCategory}
+        />
       ) : (
-        <CategoryPicker legend="誤りの種類" options={QUESTION_CATEGORIES} value={category} onChange={setCategory} />
+        <CategoryPicker
+          legend="誤りの種類"
+          name="category"
+          options={QUESTION_CATEGORIES}
+          value={category}
+          onChange={setCategory}
+        />
       )}
       <div className="space-y-1">
         <label htmlFor="feedback-text" className="block font-bold">
@@ -149,7 +200,7 @@ export function FeedbackForm(props: Props) {
       <FeedbackCaution />
       <FormError message={error} />
       {sent ? <Notice kind="success">{SENT_MESSAGES[props.form]}</Notice> : null}
-      {sent && props.form === "question" ? props.backLink : null}
+      {sent ? props.backLink : null}
       <SubmitButton busy={busy}>送る</SubmitButton>
     </form>
   );
