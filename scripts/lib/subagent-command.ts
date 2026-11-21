@@ -5,7 +5,7 @@
  * - 作成役(commit-writer・draft-writer): 定義(.claude/agents/)の「Bash で実行してよいのは」に挙げたコマンドを、1 つだけ、1 行だけ通す。
  *   次を含むコマンドは通さない: 改行(行の継続の `\` を含む)、閉じない引用符と末尾の `\`、引用符の外の演算子
  *   (`;`・`&`・`|`・`<`・`>`・括弧・`` ` ``。ヒアドキュメント `<<`・`<<<` を含む)、`$`(変数の展開、コマンドの置換、`$'…'`。二重引用符の中を含む)、
- *   引用符の外で `#` から始まる語(コメント)、`git -C`・`git -c`、`--output`。
+ *   引用符の外で `#` から始まる語(コメント)、引用符の外の `{`・`}`(波括弧の展開で、語を字面からずらす形)、`git -C`・`git -c`、`--output`。
  * - ほかの役(読み取り役を含む)と、役の名前が入力にないとき: この判定では止めない(承認の判定は、別に行う)。
  *   読み取り役の書き込みは、別の Issue で扱う(いまは定義の決まりだけ)。
  */
@@ -27,6 +27,8 @@ interface Lexed {
   expansion: boolean;
   /** 引用符の外で `#` から始まる語 */
   comment: boolean;
+  /** 引用符の外の `{`・`}`(波括弧の展開) */
+  brace: boolean;
   /** 閉じない引用符、末尾のバックスラッシュ */
   unterminated: boolean;
 }
@@ -35,7 +37,14 @@ const OPERATORS = new Set([";", "&", "|", "<", ">", "(", ")", "`"]);
 
 /** 1 行のコマンドを、引用符とバックスラッシュを 1 文字ずつ追って、語に分ける。 */
 export function lex(command: string): Lexed {
-  const out: Lexed = { words: [], operator: false, expansion: false, comment: false, unterminated: false };
+  const out: Lexed = {
+    words: [],
+    operator: false,
+    expansion: false,
+    comment: false,
+    brace: false,
+    unterminated: false,
+  };
   let word = "";
   let inWord = false;
   let state: "none" | "single" | "double" = "none";
@@ -89,6 +98,7 @@ export function lex(command: string): Lexed {
     }
     if (c === "$") out.expansion = true;
     if (c === "#" && !inWord) out.comment = true;
+    if (c === "{" || c === "}") out.brace = true;
     word += c;
     inWord = true;
   }
@@ -108,6 +118,7 @@ function writerDecision(agentType: string, allowed: readonly string[], command: 
   if (lexed.expansion) return deny("変数の展開かコマンドの置換を含む");
   if (lexed.operator) return deny("連結・パイプ・リダイレクト・括弧を含む");
   if (lexed.comment) return deny("コメントを含む");
+  if (lexed.brace) return deny("引用符の外の波括弧を含む");
   const ws = lexed.words;
   const head = ws[0] === "git" ? `git ${ws[1] ?? ""}` : (ws[0] ?? "");
   if (!allowed.includes(head)) return deny("許可の一覧の外のコマンド");

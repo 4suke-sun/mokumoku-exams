@@ -99,6 +99,17 @@ describe("decideSubagentCommand(作成役の区切りと展開)", () => {
     expect(ok("draft-writer", "grep -n '#' docs/a.md")).toBe(true);
   });
 
+  it("引用符の外の波括弧_展開で--outputを字面からずらす形も止める", () => {
+    expect(ok("commit-writer", "git diff --{output,stat}=x.patch")).toBe(false);
+    expect(ok("commit-writer", "git diff {--output=x.patch,--stat}")).toBe(false);
+    expect(ok("draft-writer", "ls {a,b}")).toBe(false);
+  });
+
+  it("引用符の中の波括弧_通す", () => {
+    expect(ok("draft-writer", "grep -n '{a,b}' docs/a.md")).toBe(true);
+    expect(ok("draft-writer", 'grep -n "}" docs/a.md')).toBe(true);
+  });
+
   it("ドル記号の付いた単一引用符_止める", () => {
     expect(ok("draft-writer", "grep $'a\\nb' docs/a.md")).toBe(false);
   });
@@ -145,7 +156,7 @@ describe("decideSubagentCommand(ほかの役)", () => {
     expect(ok("", "echo x > a")).toBe(true);
   });
 
-  it("作成役でない役_止めない", () => {
+  it("作成役でない役(読み取り役は別の Issue で扱う)_この判定では止めない", () => {
     expect(ok("general-purpose", "npm test > out.txt")).toBe(true);
     expect(ok("Explore", "echo x > a")).toBe(true);
   });
