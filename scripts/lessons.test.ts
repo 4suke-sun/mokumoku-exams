@@ -60,8 +60,8 @@ describe("lessons コマンド", { timeout: 120_000 }, () => {
     expect(readFileSync(file, "utf8")).toBe("# 人が編集した下書き\n");
   });
 
-  describe("一覧(manifest.json)", () => {
-    const manifestPath = (dir: string) => join(dir, ".drafts", "issues", "manifest.json");
+  describe("一覧(manifest-lessons.json)", () => {
+    const manifestPath = (dir: string, name = "manifest-lessons.json") => join(dir, ".drafts", "issues", name);
     const readManifest = (dir: string) => JSON.parse(readFileSync(manifestPath(dir), "utf8")) as unknown;
     const repeat = (dir: string) => {
       add(dir, "stale-input", "一回目");
@@ -124,6 +124,34 @@ describe("lessons コマンド", { timeout: 120_000 }, () => {
       expect(result.status).toBe(1);
       expect(result.stderr).toContain("読めない");
       expect(readFileSync(manifestPath(dir), "utf8")).toBe("{ broken");
+    });
+
+    it("一覧の名前を指定する_その名前の一覧に足し_既定の一覧は作らない", () => {
+      const dir = makeRepo();
+      repeat(dir);
+      expect(run(dir, "draft", "--manifest", "manifest-v0-99-0.json").status).toBe(0);
+      expect(JSON.parse(readFileSync(manifestPath(dir, "manifest-v0-99-0.json"), "utf8"))).toEqual([
+        { action: "create", file: "lessons-stale-input.md", labels: ["lessons"] },
+      ]);
+      expect(existsSync(manifestPath(dir))).toBe(false);
+    });
+
+    it("一覧の名前が既定の manifest.json_下書きも一覧も作らず終了コード2で止まる", () => {
+      const dir = makeRepo();
+      repeat(dir);
+      const result = run(dir, "draft", "--manifest", "manifest.json");
+      expect(result.status).toBe(2);
+      expect(result.stderr).toContain("manifest-<用途>.json");
+      expect(existsSync(manifestPath(dir, "manifest.json"))).toBe(false);
+      expect(existsSync(join(dir, ".drafts", "issues", "lessons-stale-input.md"))).toBe(false);
+    });
+
+    it("repeats に一覧の名前を渡す_終了コード2で止まる", () => {
+      const dir = makeRepo();
+      repeat(dir);
+      const result = run(dir, "repeats", "--manifest", "manifest-lessons.json");
+      expect(result.status).toBe(2);
+      expect(result.stderr).toContain("draft だけ");
     });
 
     it("繰り返しがない_一覧を作らない", () => {

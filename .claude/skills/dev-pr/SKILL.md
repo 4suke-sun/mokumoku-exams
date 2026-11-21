@@ -17,7 +17,7 @@ PR を出すときは、push も含めて、検査を 1 回、人の承認を 1 
 
 | 役 | やること | してはいけないこと |
 |---|---|---|
-| 作成役(`draft-writer`) | 差分・Issue をもとに、タイトルと本文を `.drafts/` に書く | `.drafts/` 以外の編集、git の書き込み、`gh` の書き込み系、ネットワーク操作、Bash でのファイルの編集(編集は Write ツールだけ) |
+| 作成役(`draft-writer`) | 差分・Issue をもとに、タイトルと本文を `.drafts/` に書く | `.drafts/` 以外の編集、git の書き込み、`gh` の書き込み系、ネットワーク操作、Bash でのファイルの編集(編集は Write ツールだけ)、定義が許す外の Bash(読み取り・集計・機械検査を含む。フックが止める) |
 | 検査役(別のサブエージェント。`inspector`、必要なら `inspector-deep`) | 下書きと差分を、`checklist.md` に沿って確認し、判定を返す | **一切の書き込み**(読み取り専用) |
 | メイン | 各役を起動し、人の承認後に、承認された下書きから投稿する | 承認前の投稿、承認後の下書きの編集 |
 
@@ -51,6 +51,8 @@ PR と Issue のどちらも、次を確かめる:
 
 8. **同じ記述の洗い出し**: 下書きに仕様・名前・数・振る舞いを書くときは、`/dev-commit` の Step 0 の 5 と同じ語(言い換えや列挙まで広げた検索語を含む)で検索し、
    リポジトリの文書や関係する Issue の記述と食い違わないことを、検査に出す前に確かめる
+9. **手順の確かめ**: 下書き(Issue の「作業」など)に、人やメインのセッションが順に実行する手順を書くときは、`/dev-commit` の Step 0 の 8 と同じく、
+   各段の入出力を実装で追い、通して実行して確かめてから書く。通して確かめていない手順は書かず、確かめられたことだけを書いて、手順は別の Issue に分ける
 
 ## Step 1. 作成役: 下書きを書く
 
@@ -58,7 +60,9 @@ PR と Issue のどちらも、次を確かめる:
 
 - PR: `.drafts/pr-<ブランチ名>.md`(1 行目がタイトル、空行を挟んで本文)。ブランチ名の `/` は `-` に置き換え、`#` は除く(例: `fix/#12-v0.9.0` → `.drafts/pr-fix-12-v0.9.0.md`)
 - Issue: 新規は `.drafts/issues/<slug>.md`(番号は投稿まで決まらない)、既存の Issue の編集は `.drafts/issues/<番号>-<slug>.md`。1 行目が `# タイトル`、2 行目が空行、3 行目以降が本文
-- 複数の Issue をまとめて起票・編集するときは、一覧(マニフェスト) `.drafts/issues/manifest.json` も書く(メインのセッションが書いてよい)。
+- 複数の Issue をまとめて起票・編集するときは、一覧(マニフェスト)も書く(メインのセッションが書いてよい)。一覧は、用途ごとの別名 `.drafts/issues/manifest-<用途>.json`
+  (用途は英小文字・数字・ハイフン。例: `manifest-v0-99-0.json`、受け箱からの起票は `manifest-lessons.json`)にし、既定の名前(`manifest.json`)は使わない。
+  `.drafts/` は同じ作業ツリーで並行するセッションが共有するので、名前を分けて、別のセッションの一覧と重ならないようにする(`scripts/post-issues.ts` は、決まりの形でない名前の一覧を拒否する)。
   1 行が 1 件で、`action`(`create` / `edit`)、`file`(下書きのファイル名)、編集なら `number`、`milestone`、`labels` を持つ:
 
   ```json
@@ -70,7 +74,8 @@ PR と Issue のどちらも、次を確かめる:
   ]
   ```
 
-  受け箱から起票する Issue(`lessons-<キー>.md`)には、ラベル `lessons` を付ける。`node scripts/lessons.ts draft` が、下書きとともに、この項目(マイルストーンなし)を一覧へ足す。
+  受け箱から起票する Issue(`lessons-<キー>.md`)には、ラベル `lessons` を付ける。`node scripts/lessons.ts draft` が、下書きとともに、この項目(マイルストーンなし)を一覧へ足す
+  (既定は `manifest-lessons.json`。`--manifest manifest-<用途>.json` で別の名前の一覧に足せる)。
   マイルストーンは、ここで決めて足す(`docs/lessons-workflow.md` の「繰り返しと Issue の候補」)。
 
 作成役に依頼する内容:
@@ -126,7 +131,9 @@ node scripts/prepare-inspection.ts --cached
 - 作業ディレクトリと、下書きファイルのパス
 - 「`.claude/skills/dev-commit/checklist.md` を読み、その項目に沿って、下書きと、PR の場合は `.drafts/inspect/` のファイル
   (基準との差分。検査済みで `covered.txt` に挙げられたコミットの差分は除く。全コミットのメッセージ、ブランチ名)を確認する」
+- 「`.drafts/inspect/denylist.txt` に挙がった拒否リストの置き場は、作業ツリーの外のものも含めて、すべて読む。1 つでも読めないときは、判定を `OK` にしない」(`inspector-rules.md` の「拒否リスト」)
 - Step 0 の 8 で検索した語と、食い違いを直さないと決めた箇所(場所と理由)。検査役は、渡された語でリポジトリを検索して確かめてよい
+- 下書きに手順を書いたときは、Step 0 の 9 の確かめの記録(確かめた段と、通して実行したかどうか)
 - 作成役の報告の「置いた前提」にある照合の記録(開いた関数・定数、文書と節の名前、確かめた境界の場合。`.claude/skills/dev-commit/writer-rules.md` の「書き方」)。検査役は、記録を読んで、照合の抜けを探す
 - 検査の程度(`/dev-commit` の Step 3 の「検査の程度」のとおり。程度ごとの判定の範囲は `inspector-rules.md` の「判定の範囲」。参照先として渡すファイルは、既存で差分の対象ではないと書く。再検査では、前回の指摘の一覧と、直した箇所を添える。`.claude/skills/dev-commit/reconfirm.md` の「再検査の範囲と回数」)
 - 「報告は、チェックリストの『報告のしかた(必ず守る)』に従う(値を引用しない。`.drafts/inspect/stamp.txt` のスタンプを書き写す。最後に `判定: OK/WARN/BLOCK`)」
@@ -174,11 +181,15 @@ node scripts/approval.ts grant pr <下書きファイル>      # PR(push も覆�
 node scripts/approval.ts grant issue <下書きファイル>   # Issue
 ```
 
-一覧から Issue を投稿するときは(承認の前に見せる `--dry-run` のコマンドは、Step 6)、承認の直後に、一覧へ封印(下書きのハッシュと、一覧の項目 action・number・milestone・labels のハッシュ)を記録する。投稿は、封印と一致する下書きだけを行う:
+一覧から Issue を投稿するときは(承認の前に見せる `--dry-run` のコマンドは、Step 6)、承認の直後に、一覧へ封印(下書きのハッシュと、一覧の項目 action・number・milestone・labels のハッシュ)を記録する。投稿は、封印と一致する下書きだけを行う。
+封印の前に、一覧を読み直し、各項目の `file` が、検査と人の確認の対象にした下書きと一致する(足された行も、欠けた行もない)ことを確かめる。一致しなければ封印せず、検査と承認をやり直す:
 
 ```sh
-node scripts/post-issues.ts .drafts/issues/manifest.json --seal
+node scripts/post-issues.ts .drafts/issues/manifest-<用途>.json --seal
 ```
+
+`--seal` は、封印のある項目の内容が変わっているときと、封印のある未投稿の行と封印のない未投稿の行が同じ一覧に混ざっているとき(承認のあとに足された項目)に、終了コード 1 で止まる(投稿済みの行は数えない)。
+止まったら、足された項目も含めて検査と承認をやり直し、`--reseal` で封印し直す。一覧が丸ごと入れ替わり、どの行にも封印がないときは、最初の封印と見分けられないので、上の `file` の確かめで受ける。
 
 ## Step 6. 投稿
 
@@ -213,8 +224,8 @@ node scripts/post-issues.ts .drafts/issues/manifest.json --seal
    投稿せずに止まる:
 
    ```sh
-   node scripts/post-issues.ts .drafts/issues/manifest.json --dry-run   # 検査して、投稿する内容の概要(新規か編集か、ファイル、マイルストーン、ラベル)を表示する(何も投稿しない。封印は求めない。承認の前に見せる)
-   node scripts/post-issues.ts .drafts/issues/manifest.json             # 投稿し、結果(番号・題・URL)を一覧に書き戻して表示する
+   node scripts/post-issues.ts .drafts/issues/manifest-<用途>.json --dry-run   # 検査して、投稿する内容の概要(新規か編集か、ファイル、マイルストーン、ラベル)を表示する(何も投稿しない。封印は求めない。承認の前に見せる)
+   node scripts/post-issues.ts .drafts/issues/manifest-<用途>.json      # 投稿し、結果(番号・題・URL)を一覧に書き戻して表示する
    ```
 
    投稿の結果の一覧(番号・題・URL)は、人に報告する。一覧は `.drafts/`(gitignore 済み)に残る。

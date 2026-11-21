@@ -13,12 +13,13 @@ afterEach(() => {
 });
 
 /** 一覧と下書きを置いた一時フォルダを作り、一覧のパスを返す。 */
-function setup(entries: unknown, draft = "# chore: 題\n\n本文\n"): string {
+function setup(entries: unknown, draft = "# chore: 題\n\n本文\n", name = "manifest-test.json"): string {
   const dir = mkdtempSync(join(tmpdir(), "post-issues-"));
   dirs.push(dir);
   writeFileSync(join(dir, "a.md"), draft);
-  writeFileSync(join(dir, "manifest.json"), JSON.stringify(entries));
-  return join(dir, "manifest.json");
+  writeFileSync(join(dir, "b.md"), "# chore: 別の題\n\n本文\n");
+  writeFileSync(join(dir, name), JSON.stringify(entries));
+  return join(dir, name);
 }
 
 const entry = { action: "create", file: "a.md", milestone: "v0.5.0", labels: ["chore"] };
@@ -35,7 +36,7 @@ describe("post-issues", () => {
   });
 
   it("一覧を読めない_スタックトレースを出さず終了コード1で終わる", () => {
-    const result = run([join(tmpdir(), "no-such-manifest.json"), "--dry-run"]);
+    const result = run([join(tmpdir(), "manifest-no-such.json"), "--dry-run"]);
     expect(result.status).toBe(1);
     expect(result.stderr).toContain("一覧を読めない");
     expect(result.stderr).not.toContain("at ");
@@ -117,5 +118,48 @@ describe("post-issues", () => {
     const result = run([manifest, "--seal"]);
     expect(result.status).toBe(1);
     expect(result.stderr).toContain("版の番号の行");
+  });
+  it("既定の名前の一覧_どのモードでも終了コード1で止まる", () => {
+    const manifest = setup([entry], undefined, "manifest.json");
+    for (const mode of ["--seal", "--dry-run"]) {
+      const result = run([manifest, mode]);
+      expect(result.status).toBe(1);
+      expect(result.stderr).toContain("manifest-<用途>.json");
+    }
+    expect(run([manifest]).status).toBe(1);
+  });
+
+  it("封印のある行と封印のない行が混ざった一覧への_seal_終了コード1で止まり_reseal_なら通る", () => {
+    const manifest = setup([entry]);
+    expect(run([manifest, "--seal"]).status).toBe(0);
+    const sealed = JSON.parse(readFileSync(manifest, "utf8"));
+    writeFileSync(manifest, JSON.stringify([...sealed, { ...entry, file: "b.md" }]));
+    const again = run([manifest, "--seal"]);
+    expect(again.status).toBe(1);
+    expect(again.stderr).toContain("b.md");
+    expect(again.stderr).toContain("封印のない行");
+    expect(JSON.parse(readFileSync(manifest, "utf8"))[1].sha256).toBeUndefined();
+    expect(run([manifest, "--reseal"]).status).toBe(0);
+  });
+
+  it("封印のない行だけの一覧への_seal_通る", () => {
+    const manifest = setup([entry, { ...entry, file: "b.md" }]);
+    expect(run([manifest, "--seal"]).status).toBe(0);
+  });
+
+  it("封印のある行がすべて変わっていない一覧への_seal_通る", () => {
+    const manifest = setup([entry, { ...entry, file: "b.md" }]);
+    expect(run([manifest, "--seal"]).status).toBe(0);
+    expect(run([manifest, "--seal"]).status).toBe(0);
+  });
+
+  it("投稿済みの行と封印のない行だけの一覧への_seal_投稿済みの行を数えず通る", () => {
+    const posted = {
+      ...entry,
+      sha256: "0".repeat(64),
+      result: { number: 9, title: "chore: 題", url: "https://example.com/9" },
+    };
+    const manifest = setup([posted, { ...entry, file: "b.md" }]);
+    expect(run([manifest, "--seal"]).status).toBe(0);
   });
 });

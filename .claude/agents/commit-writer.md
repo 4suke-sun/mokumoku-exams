@@ -21,6 +21,7 @@ tools: Read, Grep, Glob, Bash, Write
 - 共通の決まりは `.claude/skills/dev-commit/writer-rules.md`。最初に読み、そのとおりに動く。
 - 書いてよいファイルは `.drafts/commit-msg.txt` だけ。
 - Bash で実行してよいのは、`git diff` / `git log` / `git show` / `git status` / `git rev-parse` だけ。ファイルの編集に Bash を使わない(編集は Write ツールだけ。共通の決まりの「範囲」)。
+  ファイルの読み取りは Read、検索は Grep を使う。許可の外のコマンドはフックが止める。止められたら回避せず、できないことを報告に書く。
 
 ## 報告
 

@@ -142,6 +142,33 @@ function scanEmails(entries: AddedLine[], signoffEmail?: string): string[] {
   return hits;
 }
 
+// テストのファイルで、メールアドレスを、検査をよけるために分けて組み立てる形(["名前", "ドメイン"].join("@"))。
+// 許可されないアドレスのダミーは、存在しないトップレベルドメインで組み立てる(予約済みのドメインは、許可される宛先になる)。
+// 存在しないトップレベルドメインは、国や地域に割り当てない 2 文字のコード(ISO 3166-1 の利用者割り当ての範囲: aa、qm〜qz、xa〜xz、zz)。
+const TEST_FILE = /\.(?:test|spec)\.[cm]?[jt]sx?$/;
+const JOINED_ADDRESS = /\[\s*(["'`])[^"'`]*\1\s*,\s*(["'`])([^"'`$]+)\2\s*\]\s*\.join\(\s*(["'`])@\4\s*\)/g;
+const NONEXISTENT_TLD = /\.(?:aa|q[m-z]|x[a-z]|zz)$/i;
+
+/** テストで組み立てたアドレスのドメインが、予約済みのドメインか、存在しないトップレベルドメインか。 */
+export function isPlaceholderDomain(domain: string): boolean {
+  return NONEXISTENT_TLD.test(domain) || ALLOWED_EMAIL.test(`x@${domain}`);
+}
+
+/** テストのファイルの追加行で、予約済みでも存在しないトップレベルドメインでもないドメインで、アドレスを組み立てている行。 */
+function scanJoinedAddresses(entries: AddedLine[]): string[] {
+  const hits: string[] = [];
+  for (const { file, line, text } of entries) {
+    if (!TEST_FILE.test(file)) continue;
+    const domains = [...text.matchAll(JOINED_ADDRESS)].map((m) => m[3] as string);
+    if (domains.some((d) => !isPlaceholderDomain(d))) {
+      hits.push(
+        `テストのダミーのアドレスに、予約済みでも存在しないトップレベルドメインでもないドメイン: ${file}:${line}`,
+      );
+    }
+  }
+  return hits;
+}
+
 // セッションへのリンクは、これから書くメッセージと下書きにだけ適用する。すでに履歴にあるものは、push の範囲の検査では見ない。
 const SESSION_LINK_PATTERN: Pattern = {
   name: "Claude のセッションへのリンク",
@@ -311,6 +338,7 @@ export function checkEntries(
     ...scan(entries, SECRET_CONTENT_PATTERNS),
     ...scan(entries, ENV_INFO_PATTERNS),
     ...scanEmails(entries, signoffEmail),
+    ...scanJoinedAddresses(entries),
     ...scanDenylist(entries, denylistTerms),
     ...checkProseBodies(entries),
     ...(message ? scan(entries, MESSAGE_PHRASE_PATTERNS) : []),

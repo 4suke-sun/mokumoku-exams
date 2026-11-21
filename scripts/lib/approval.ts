@@ -1,6 +1,7 @@
 import { createHash } from "node:crypto";
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { decideSubagentCommand } from "./subagent-command.ts";
 
 export type ApprovalKind = "push" | "pr" | "issue";
 
@@ -615,6 +616,8 @@ export interface HookInput {
   tool_input?: { command?: string; file_path?: string };
   /** サブエージェントの中から呼ばれたときだけ付く */
   agent_id?: string;
+  /** サブエージェントの役(エージェント定義の名前)。付かないときは、作成役の判定(scripts/lib/subagent-command.ts)をしない */
+  agent_type?: string;
 }
 
 /**
@@ -634,6 +637,11 @@ export function decideHook(input: HookInput, approvals: () => Approvals, now: nu
   if (touchesMarkerDirectly(command)) return deny("承認の印は、scripts/approval.ts だけが書きます");
   if (isSubagent && /scripts\/approval\.ts\s+grant/.test(command)) {
     return deny("サブエージェントは、承認の印を書けません。人の承認を受けるのは、メインのセッションです");
+  }
+  // 作成役は、定義が許すコマンドを 1 つだけ、1 行だけ(agent_id と役の名前が入力にあるときだけ)
+  if (isSubagent) {
+    const byRole = decideSubagentCommand(input.agent_type, command);
+    if (!byRole.ok) return byRole;
   }
   const classified = classifyCommand(command);
   if (classified.forbidden.length > 0) return deny(classified.forbidden[0] ?? "止める操作です");
