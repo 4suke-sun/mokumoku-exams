@@ -52,6 +52,11 @@ export const REPOSITORY_URL = "https://github.com/4suke-sun/mokumoku-exams";
 /** リポジトリの Issue の一覧。送信フォームで送った内容の起票先として、利用規約とプライバシーポリシーの画面に出す。 */
 export const ISSUES_URL = `${REPOSITORY_URL}/issues`;
 
+/** 版(`vX.Y.Z`)の GitHub の Release のページ。開発の項目だけの版の、リリースノートの画面から案内する。 */
+export function releaseUrl(version: string): string {
+  return `${REPOSITORY_URL}/releases/tag/${encodeURIComponent(version)}`;
+}
+
 /**
  * 検索エンジンに案内するのは、ログインなしで開ける画面だけ。ほかはすべて対象外にする。
  * 共有のカードの画像も許す(X などのカードの取得は robots.txt に従うため、許さないと画像が出ない)。

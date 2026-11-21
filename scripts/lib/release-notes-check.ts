@@ -19,6 +19,37 @@ export interface Release {
 /** 項目の種類: feat(機能)、fix(修正)、docs(文書)、dev(開発者向け)。 */
 export const ITEM_TYPES = ["feat", "fix", "docs", "dev"] as const;
 
+/**
+ * 利用者向けの種類。アプリのリリースノートの画面は、この種類の項目だけを出す。
+ * `dev` は、GitHub の Release の本文にだけ出す(書き方の基準は CONTRIBUTING.md の「リリースノートの書き方」)。
+ */
+export const USER_ITEM_TYPES = ["feat", "fix", "docs"] as const;
+
+export function isUserFacingItem(item: { type: string }): boolean {
+  return (USER_ITEM_TYPES as readonly string[]).includes(item.type);
+}
+
+/** 書き方の検査(checkWritingStyle)の対象は、この版より新しいエントリ。これ以前のエントリは書き直さない。 */
+export const WRITING_STYLE_SINCE = "v0.85.1";
+/** 版のタイトルの文字数の上限 */
+export const MAX_TITLE_LENGTH = 80;
+/** 項目の文字数の上限(種類によらない) */
+export const MAX_ITEM_LENGTH = 200;
+
+/** 利用者向けの項目に書かない内部の語の形(報告には種類の名前だけを出す)。 */
+const INTERNAL_TERMS: { name: string; pattern: RegExp }[] = [
+  { name: "コードの書式(`)", pattern: /`/ },
+  // 拡張子は、製品名(Next.js、Node.js など)と紛れる js を外す。
+  {
+    name: "ファイル名・パス",
+    pattern:
+      /[\w.-]+\.(?:ts|tsx|json|jsonl|md|ya?ml|css|sh)\b|(?:^|[^\w.])(?:scripts|packages|docs|data|\.claude|\.github)\//,
+  },
+  { name: "コマンド(npm run など)", pattern: /\b(?:npm|npx|node|git|gh)\s+[a-z-]/ },
+  { name: "検査・スクリプトの名前(check: など)", pattern: /\b(?:check|validate|test|build):[a-z]/ },
+  { name: "Issue・PR の番号", pattern: /(?:^|[^\w&])#\d+/ },
+];
+
 // 先頭ゼロは認めない(v01.2.3 と v1.2.3 を別の版として扱ってしまうため)。桁数にも上限を付ける。
 const VERSION = /^v(0|[1-9]\d{0,5})\.(0|[1-9]\d{0,5})\.(0|[1-9]\d{0,5})$/;
 const DATE = /^\d{4}-\d{2}-\d{2}$/;
@@ -144,7 +175,36 @@ export function checkTagHasEntry(releases: Release[], tag: string): string[] {
   return releases.some((r) => r.version === tag) ? [] : [`タグ ${tag} に対応するリリースノートのエントリがありません`];
 }
 
-/** GitHub のリリース本文(Markdown)を作る。 */
+/**
+ * 書き方の基準のうち、機械で守れるものの検査(WRITING_STYLE_SINCE より新しいエントリが対象)。
+ * - 版のタイトルは MAX_TITLE_LENGTH 文字以下、項目は MAX_ITEM_LENGTH 文字以下
+ * - 利用者向けの項目(feat・fix・docs)に、内部の語(INTERNAL_TERMS)を書かない
+ * 構造の検査(validateReleaseNotes)を通ったあとに呼ぶ。報告は場所と種類だけ。
+ */
+export function checkWritingStyle(releases: Release[]): string[] {
+  const errors: string[] = [];
+  releases.forEach((release, i) => {
+    if (compareVersions(release.version, WRITING_STYLE_SINCE) <= 0) return;
+    const at = `releases[${i}]`;
+    if ([...release.title].length > MAX_TITLE_LENGTH) {
+      errors.push(`${at}.title: ${MAX_TITLE_LENGTH} 文字を超えています`);
+    }
+    release.items.forEach((item, j) => {
+      const itemAt = `${at}.items[${j}]`;
+      if ([...item.text].length > MAX_ITEM_LENGTH) {
+        errors.push(`${itemAt}.text: ${MAX_ITEM_LENGTH} 文字を超えています`);
+      }
+      if (!isUserFacingItem(item)) return;
+      for (const term of INTERNAL_TERMS) {
+        if (term.pattern.test(item.text))
+          errors.push(`${itemAt}.text: 利用者向けの項目に、内部の語(${term.name})があります`);
+      }
+    });
+  });
+  return errors;
+}
+
+/** GitHub のリリース本文(Markdown)を作る。開発(`dev`)を含む、すべての項目を出す(画面と違い、リポジトリを読む人向け)。 */
 export function formatRelease(release: Release): string {
   const labels: Record<string, string> = { feat: "機能", fix: "修正", docs: "文書", dev: "開発" };
   const lines = [`${release.title}`, ""];

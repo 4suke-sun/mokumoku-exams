@@ -51,3 +51,4 @@
 - [0024 試験ガイドの対象サービス・対象外サービスの一覧で、問題の範囲を検査する](./0024-scope-check-by-exam-guide-service-lists.md)
 - [0025 出典の変更の検出を、見える本文のハッシュで行う](./0025-source-content-hash-of-visible-text.md)
 - [0026 動的なページと API は、当面 Lambda Web Adapter の構成のままにする](./0026-keep-lambda-web-adapter-for-now.md)
+- [0027 リリースノートの読み手を項目の種類で分け、開発の項目は画面に出さない](./0027-release-notes-audience-by-item-type.md)
