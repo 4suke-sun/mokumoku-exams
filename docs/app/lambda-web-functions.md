@@ -78,10 +78,23 @@
   ([WebFunction](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-webfunction.html)、[WebFunctionRevision](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-webfunctionrevision.html)、[WebFunctionEndpoint](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-resource-lambda-webfunctionendpoint.html))
 - CloudFront の OAC は、種類 `lambda`、署名の動作 `always-amz-auth` を CloudFormation で指定できます。
   ([OriginAccessControlConfig](https://docs.aws.amazon.com/AWSCloudFormation/latest/TemplateReference/aws-properties-cloudfront-originaccesscontrol-originaccesscontrolconfig.html))
-- このリポジトリで固定している `aws-cdk-lib`(2.275.0)には、L1 の `CfnWebFunction`・`CfnWebFunctionRevision`・`CfnWebFunctionEndpoint` と、
-  リソースベースのポリシーの `CfnResourcePolicy`(`AWS::Lambda::ResourcePolicy`)があります。L2 の構成はありません。
-  CloudFront の側も、Web Function のオリジンの L2 はなく、カスタムのオリジンに OAC の ID を後から差し込む形になります。
-- 固定している `cdkd`(0.305.0)は、`AWS::Lambda::WebFunctionRevision` と `AWS::Lambda::WebFunctionEndpoint` に専用の処理を持ちます。
+- このリポジトリで固定している `aws-cdk-lib`(2.277.0)には、L1 の `CfnWebFunction`・`CfnWebFunctionRevision`・`CfnWebFunctionEndpoint`・`CfnResourcePolicy` に加えて、
+  `aws-lambda` に L2 の構成があります(型定義で確かめました)。
+  - `WebFunction` は、本体・リビジョン・エンドポイント(`endpoint`)を 1 つの構成で作ります。ランタイム(`WebFunctionRuntime.NODEJS_24_X` など)、入口のファイル(`entryPoint`)、
+    環境変数、実行ロール、ロググループ、タイムアウト、`maxConcurrencyPerEnvironment` を指定できます。`addEndpoint()` でエンドポイントを足せます。
+  - `WebFunctionCode` は、コードの置き場を選びます。`fromAssetToManagedBucket()` は、版管理と SSE-S3 の暗号化と、`lambda.amazonaws.com` の読み取りの許可を備えたバケットを、スタックごとに作ります。
+    自分のバケットに置くのは `fromAssetToProvidedBucket()`、すでにあるバケットのオブジェクト(バケットとキー)を使うのは `fromBucket()` です。
+    版管理のないバケットは、この app で定義したバケットなら合成の時点で、取り込んだバケットなら配備の時点で失敗します。
+  - エンドポイントの `grants.invoke()` は、サービスプリンシパルなどへの許可を、関数のリソースベースのポリシー(`AWS::Lambda::ResourcePolicy`)に書きます。
+    CloudFront に呼ばせる許可は、これか `addToResourcePolicy()` で書けます。
+  - エンドポイントの主な設定は、認証(`defaultEndpointAuth`)、名前(`endpointName`)、説明(`endpointDescription`)、場所(`endpointLocation`)、`maxEnvironments`、`rateLimit` です。
+  - リビジョンへの振り分け(`WebFunctionTraffic`)は `single()` だけで、1 つのリビジョンにすべてを送ります。重みの指定はありません。
+    `autoDeploymentMode` に当たる設定は、L2 にも L1(`CfnWebFunctionEndpoint`)の型定義にもありません。
+    重みで段階的に移す、前のリビジョンへ戻す、には、L1 の `RevisionWeights` の上書きか、CLI が要る見込みです。
+  - CloudFront の側は、種類 `lambda` の OAC の L2 が `FunctionUrlOriginAccessControl` で、その props の `signing` に `Signing.SIGV4_ALWAYS_AMZ_AUTH` を渡します
+    (列挙の `SigningBehavior.ALWAYS_AMZ_AUTH` は、CloudFormation の値 `always-amz-auth` に当たる列挙です)。
+    Web Function 専用のオリジンの構成(`aws-cloudfront-origins`)はなく、`HttpOrigin` にエンドポイントのドメインと OAC の ID(`originAccessControlId`)を渡す形になります。
+- 固定している `cdkd`(0.322.1)は、`AWS::Lambda::WebFunctionRevision` と `AWS::Lambda::WebFunctionEndpoint` に専用の処理を持ちます。
   `AWS::Lambda::WebFunction` 本体には専用の処理がなく、Cloud Control API の経由で扱う形になります。
   Cloud Control API の対応の一覧には、`AWS::Lambda::WebFunction` の 3 つが載っていません
   ([対応するリソース](https://docs.aws.amazon.com/cloudcontrolapi/latest/userguide/supported-resources.html)。一覧の更新日は 2025-12)。
