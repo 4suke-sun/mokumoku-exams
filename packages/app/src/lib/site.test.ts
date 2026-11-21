@@ -41,11 +41,11 @@ describe("sitemap", () => {
 });
 
 describe("robots", () => {
-  it("ログインなしで開ける画面だけをクロールの対象にし_ほかは対象外にする", () => {
+  it("ログインなしで開ける画面と共有のカードの画像だけをクロールの対象にし_ほかは対象外にする", () => {
     const robots = robotsOf("https://example.com");
     expect(robots.rules).toEqual({
       userAgent: "*",
-      allow: ["/login", "/forgot-password", "/signup", "/privacy"],
+      allow: ["/login", "/forgot-password", "/signup", "/privacy", "/icons/icon-512.png"],
       disallow: "/",
     });
     expect(robots.sitemap).toBe("https://example.com/sitemap.xml");
