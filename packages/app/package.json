@@ -13,10 +13,10 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@aws-sdk/client-cognito-identity-provider": "3.1169.0",
-    "@aws-sdk/client-dynamodb": "3.1169.0",
-    "@aws-sdk/client-ssm": "3.1169.0",
-    "@aws-sdk/lib-dynamodb": "3.1169.0",
+    "@aws-sdk/client-cognito-identity-provider": "3.1172.0",
+    "@aws-sdk/client-dynamodb": "3.1172.0",
+    "@aws-sdk/client-ssm": "3.1172.0",
+    "@aws-sdk/lib-dynamodb": "3.1172.0",
     "@mokumoku-exams/data-schema": "*",
     "next": "16.4.6",
     "react": "19.3.1",
@@ -30,7 +30,7 @@
     "@tailwindcss/postcss": "4.3.5",
     "@testing-library/dom": "10.4.2",
     "@testing-library/react": "16.3.3",
-    "@testing-library/user-event": "14.6.12",
+    "@testing-library/user-event": "14.6.13",
     "@types/react": "19.3.0",
     "@types/react-dom": "19.3.0",
     "jsdom": "31.0.1",
