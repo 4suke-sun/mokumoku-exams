@@ -35,6 +35,8 @@
       "Bash(npm*run*release*)",
       "Bash(*cdkd*deploy*)",
       "Bash(npm*run*deploy*)",
+      "Bash(*cdkd*destroy*)",
+      "Bash(npm*run*destroy*)",
       "Bash(*scripts/post-issues.ts*)"
     ],
     "deny": ["Bash(git*--force*)", "Bash(git*--no-verify*)"]

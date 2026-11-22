@@ -189,10 +189,10 @@ Claude Code からの push と、`gh` での PR・Issue の作成、題・本文
 
 ### 権限の確認(ask)の範囲
 
-`.claude/settings.json` の `ask` は、外に出す操作だけに絞ります。読むだけの操作で確認が出て、作業が止まるのを減らすためです。
+`.claude/settings.json` の `ask` は、外に出す操作と、環境を消す操作だけに絞ります。読むだけの操作で確認が出て、作業が止まるのを減らすためです。
 `ask` は `allow` より先に効くので、`allow` の `Bash(gh api *)`・`Bash(gh issue edit *)` に当たっても、下の確認の形に当たれば確認が出ます。
 
-- 確認が出る操作: `git push`、`gh pr create`・`edit`・`merge`・`close`、`gh issue create`・`close`、`gh label create`、`scripts/release.ts`・`npm run release`、`cdkd deploy`(`packages/infra` の `deploy` のスクリプトを含む)、`scripts/post-issues.ts`。
+- 確認が出る操作: `git push`、`gh pr create`・`edit`・`merge`・`close`、`gh issue create`・`close`、`gh label create`、`scripts/release.ts`・`npm run release`、`cdkd deploy`(`packages/infra` の `deploy` のスクリプトを含む)、`scripts/post-issues.ts`、環境を消す `cdkd destroy`(`packages/infra` の `destroy` のスクリプトを含む)。
 - `gh issue edit` は、題・本文などを変えるオプションを含むときだけ確認が出ます: `--body`・`-b`、`--body-file`・`-F`、`--title`・`-t`、`--add-project`・`--remove-project`、`--repo`・`-R`、`$`・`` ` ``(変数とコマンドの置換。中身が見えないため)。
   ラベル・マイルストーン・担当者だけの編集(`--add-label`・`--remove-label`・`--milestone`・`-m`・`--remove-milestone`・`--add-assignee`・`--remove-assignee`)は、確認なしで通ります。
 - `gh api` は、書き込みになりうるオプションを含むときだけ確認が出ます: `-X`・`--method`(`-X GET` も含む)、`-f`・`--raw-field`、`-F`・`--field`、`--input`、`$`・`` ` ``。`graphql` は `-f query=…` を使うので、読むだけの問い合わせでも確認が出ます。
