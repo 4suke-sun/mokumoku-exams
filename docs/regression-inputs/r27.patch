@@ -1,0 +1,30 @@
+diff --git a/scripts/lib/version-tag.test.ts b/scripts/lib/version-tag.test.ts
+new file mode 100644
+index 0000000..1098b89
+--- /dev/null
++++ b/scripts/lib/version-tag.test.ts
+@@ -0,0 +1,12 @@
++import { describe, expect, it } from "vitest";
++import { parseVersionTag } from "./version-tag.ts";
++
++describe("parseVersionTag", () => {
++  it("正しい形のタグ_3 つの数に分ける", () => {
++    expect(parseVersionTag("v0.12.3")).toEqual({ major: 0, minor: 12, patch: 3 });
++  });
++
++  it("先頭に v のないタグ_null を返す", () => {
++    expect(parseVersionTag("0.12.3")).toBeNull();
++  });
++});
+diff --git a/scripts/lib/version-tag.ts b/scripts/lib/version-tag.ts
+new file mode 100644
+index 0000000..cde665a
+--- /dev/null
++++ b/scripts/lib/version-tag.ts
+@@ -0,0 +1,6 @@
++/** タグの名前(`v0.12.3`)を、メジャー・マイナー・パッチに分ける。形が違えば null。 */
++export function parseVersionTag(tag: string): { major: number; minor: number; patch: number } | null {
++  const m = /^v(\d+)\.(\d+)\.(\d+)$/.exec(tag);
++  if (!m) return null;
++  return { major: Number(m[1]), minor: Number(m[2]), patch: Number(m[3]) };
++}

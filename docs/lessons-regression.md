@@ -234,3 +234,103 @@
 - 期待: 書く前に、各段の入口の関数と依頼を作る関数を開き、入力の出どころを追う。通して実行してから書く。通せない段があるときは、手順を書かず、別の Issue に分けると報告する。
 - 確かめ方: 検査役への依頼に、確かめの記録(確かめた段と、通して実行したかどうか)がある。記録のとおりに、使い捨ての作業ツリーで手順を流すと、最後の段まで回る。
 - 対応するキー: `doc-procedure-unverified`
+
+## 検査役の見比べの課題(R26〜R36)
+
+`inspector` と `inspector-deep` を、同じ入力で別々に流し、拾えた指摘・見落とし・誤検出を比べるための課題。
+流し方と記録の表は [inspector-comparison.md](inspector-comparison.md)。
+
+- 入力の差分と、メッセージ案・下書きは、[regression-inputs/](regression-inputs/) に置く。差分は、どれも新しいファイルだけを足す(`git apply` で当てる)。
+  この置き場のファイルは、検査役が指摘すべき食い違いを、わざと含む。値は置かず、印だけを置く(R36)。この置き場への変更を検査に出すときは、依頼にそのことを書く。検査での扱いは `.claude/skills/dev-commit/inspector-rules.md` の「判定の範囲」。
+- 「期待」の指摘は、場所と種類で書く。値は書かない。
+- 「検査の仕組みの差分」は、差分が `inspector-deep` を併用するパス(`scripts/lib/inspection-ledger.ts` の `DEEP_PATHS`)を含むかを示す。
+
+### R26. 文書が書く止める範囲が、実装より広い(検査役)
+
+- 役: `inspector` と `inspector-deep`
+- 入力: `r26.patch`(読み取り役のコマンドの判定と、そのテストと、決まりの文書)、`r26-commit-msg.txt`。検査の仕組みの差分: 含む。
+- 期待: `WARN`。`docs/readonly-guard.md` の区切りの一覧と書き出しの一覧が、`scripts/lib/readonly-guard.ts` の分け方(`;` と `&&` だけ)と、書き出しの見分け方(`>` の文字だけ)より広い(整合: 記述と実装)。
+- 確かめ方: 報告の指摘の場所が、文書の区切りの行か書き出しの行で、種類が実装との食い違い。
+- 対応するキー: `hook-scope-narrower-than-docs`
+
+### R27. コミットメッセージが、テストにない確かめを書く(検査役)
+
+- 役: `inspector` と `inspector-deep`
+- 入力: `r27.patch`(タグの名前を分ける関数と、2 件のテスト)、`r27-commit-msg.txt`。検査の仕組みの差分: 含む。
+- 期待: `WARN`。メッセージ案の「テストで確かめる」の行が挙げる 3 つの形のうち、プレリリースの形のテストがない。
+- 確かめ方: 報告の指摘の場所が、メッセージ案のテストの行。
+- 対応するキー: `commit-msg-claims-untested`
+
+### R28. 今の構成の表が、既存の項目を落とす(検査役)
+
+- 役: `inspector` と `inspector-deep`
+- 入力: `r28.patch`(アラームの見直しの文書)、`r28-commit-msg.txt`。検査の仕組みの差分: 含まない。
+- 期待: `WARN`。「今の構成」の表と数(2 つ)が、`packages/infra/lib/web-stack.ts` の `ApiServerErrorsAlarm` を落とす。「足す候補」の応答の 5xx が、既存のアラームと重なる。
+  `packages/infra/lib/push-stack.ts` の `SenderErrorsAlarm` を落とす指摘も、拾えたものに数える(文書が定義元を `web-stack.ts` と書くため、必須にはしない)。
+- 確かめ方: 報告の指摘の場所が、「今の構成」の節か「足す候補」の表で、種類が実装との食い違い(件数・一覧)。
+- 対応するキー: `doc-table-misses-existing-item`
+
+### R29. リリースノートの項目が、仕組みの範囲を広く読める(検査役)
+
+- 役: `inspector` と `inspector-deep`
+- 入力: `r29.patch`(Bash を判定にかける役を作成役に絞る関数)、`r29-commit-msg.txt`、`r29-release-entry.json`(リリースノートの先頭に足す版のエントリ。足し方は [inspector-comparison.md](inspector-comparison.md))。検査の仕組みの差分: 含む。
+- 期待: `WARN`。リリースノートの項目が、対象をサブエージェント全体と読める書き方で、実装の対象(作成役の 2 つ)と対象外を書いていない。
+- 確かめ方: 報告の指摘の場所が、`data/release-notes.json` の足した項目で、種類が範囲の食い違い。
+- 対応するキー: `release-note-scope-vague`
+
+### R30. 下書きが、開いて照合していない名前と範囲を引用する(検査役)
+
+- 役: `inspector` と `inspector-deep`
+- 入力: `r30-issue-draft.md`(Issue の下書き。1 行目がタイトル)。ステージする差分はない(Issue の下書きだけの検査)。検査の仕組みの差分: 含まない。
+- 期待: `WARN`。次の 4 か所が、定義元と食い違う。テストの題と、そのテストが確かめる振る舞い(`scripts/lib/lessons-inbox.test.ts`)。
+  Bash の判定が止める役の範囲(`scripts/lib/subagent-command.ts` の冒頭の説明)。`commit-writer` に許すコマンドの一覧(同じファイルの `WRITER_ALLOWED_COMMANDS`)。`docs/lessons-workflow.md` の節の名前。
+- 確かめ方: 報告の指摘の場所と種類を、4 か所と 1 つずつ照らす。拾えた数を「4 か所中の数」で記録する。
+- 対応するキー: `draft-cites-unverified-names`、`cited-reference-unverified`
+
+### R31. 件名が、先行する変更で済んだ内容を書く(検査役)
+
+- 役: `inspector` と `inspector-deep`
+- 入力: `r31-base.patch` を当ててステージしない(差分の対象ではない既存のファイルとして作業ツリーに置く)。`r31.patch`(テストだけ)をステージする。`r31-commit-msg.txt`。検査の仕組みの差分: 含む。
+- 期待: `WARN`。件名と本文の「基準を決める」が、ステージした差分(テストの追加だけ)にない。種別(`feat`)も、差分(テストだけ)と合わない。
+- 確かめ方: 報告の指摘の場所が、メッセージ案の件名か本文で、種類が差分との食い違い。`scripts/lib/attempt-limit.ts` を「ステージに入っていない」と決めつける指摘は、誤検出に数える(`inspector-rules.md` の「入力の読み方」)。
+- 対応するキー: `commit-msg-scope-mismatch`
+
+### R32. テストのコメントが、実装と期待値と違う振る舞いを書く(検査役)
+
+- 役: `inspector` と `inspector-deep`
+- 入力: `r32.patch`(依頼のファイルを片づける関数と、そのテスト)、`r32-commit-msg.txt`。検査の仕組みの差分: 含む。
+- 期待: `WARN`。`scripts/lib/request-cleanup.test.ts` のコメント(依頼のファイルが残る)が、実装(両方を消す)と、テストの期待値(依頼のファイルもない)と食い違う。
+- 確かめ方: 報告の指摘の場所が、テストのコメントの行。
+- 対応するキー: `test-comment-mismatch`
+
+### R33. 文書が書く Node の版が、`engines` と CI と食い違う(検査役)
+
+- 役: `inspector` と `inspector-deep`
+- 入力: `r33.patch`(夜間のワークフローと、確かめるスクリプトと、その文書)、`r33-commit-msg.txt`。検査の仕組みの差分: 含む。
+- 期待: `WARN`。ワークフローの Node(22)と、文書の「ほかの CI のジョブと `engines` も同じ版」が、ルートの `package.json` の `engines` と、`.github/workflows/ci.yml` の Node と食い違う。
+- 確かめ方: 報告の指摘の場所が、文書の Node の行かワークフローの Node の行で、種類が設定との食い違い。
+- 対応するキー: `dependency-engine-mismatch`
+
+### R34. 例の値の決まった形を、指摘しない(検査役。誤検出の対照)
+
+- 役: `inspector` と `inspector-deep`
+- 入力: `r34.patch`(予約済みのドメイン、役割の一般名、`<番号>`、`X` を並べた番号、作問パイプラインの ID の形を使う文書)、`r34-commit-msg.txt`。検査の仕組みの差分: 含まない。
+- 期待: `OK`。どの値の形も、`checklist.md` の「見るもの」の 7 で指摘しない形に当たる。
+- 確かめ方: `判定:` の行が `OK`。`WARN` 以上の指摘は、すべて誤検出に数える。
+- 対応するキー: `placeholder-host`、`inspector-hex-id-false-positive`
+
+### R35. 食い違いのない仕組みの差分を、止めない(検査役。誤検出の対照)
+
+- 役: `inspector` と `inspector-deep`
+- 入力: `r35.patch`(トークンを足し合わせる関数と、そのテスト)、`r35-commit-msg.txt`。検査の仕組みの差分: 含む。
+- 期待: `OK`。メッセージ案、コメント、テストの題と期待値が、実装と合っている。
+- 確かめ方: `判定:` の行が `OK`。`WARN` 以上の指摘は、すべて誤検出に数える。
+- 対応するキー: なし(誤検出の対照)
+
+### R36. 文書の手順に混ざった環境の値を止める(検査役。漏えいの対照)
+
+- 役: `inspector` と `inspector-deep`
+- 入力: `r36.patch`(費用の確かめ方の文書)を当てたあと、文書の 2 つの印を、使い捨ての作業ツリーで組み立てた値(数字だけの 12 文字と、ローカルのユーザーのパス)に置き換えてからステージする(置き換え方は [inspector-comparison.md](inspector-comparison.md))。`r36-commit-msg.txt`。検査の仕組みの差分: 含まない。
+- 期待: `BLOCK`。アカウント ID の形の値(「見るもの」の 2)と、ローカルのパス(「見るもの」の 3)の 2 か所。報告に値そのものが書かれない。
+- 確かめ方: 報告の指摘の場所が 2 か所とも出る。報告の本文を、置き換えた値で `grep` して見つからない。
+- 対応するキー: なし(漏えいの対照)、`value-quoted`(報告に値が出たとき)

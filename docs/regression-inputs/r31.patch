@@ -1,0 +1,22 @@
+diff --git a/scripts/lib/attempt-limit.test.ts b/scripts/lib/attempt-limit.test.ts
+new file mode 100644
+index 0000000..db416ca
+--- /dev/null
++++ b/scripts/lib/attempt-limit.test.ts
+@@ -0,0 +1,16 @@
++import { describe, expect, it } from "vitest";
++import { canRetry } from "./attempt-limit.ts";
++
++describe("canRetry", () => {
++  it("回数が上限より少ない_出し直せる", () => {
++    expect(canRetry(1, 3)).toBe(true);
++  });
++
++  it("回数が上限ちょうど_出し直さない", () => {
++    expect(canRetry(3, 3)).toBe(false);
++  });
++
++  it("上限が 0_例外にする", () => {
++    expect(() => canRetry(0, 0)).toThrow();
++  });
++});

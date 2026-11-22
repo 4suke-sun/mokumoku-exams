@@ -1,0 +1,66 @@
+diff --git a/docs/readonly-guard.md b/docs/readonly-guard.md
+new file mode 100644
+index 0000000..f87aa95
+--- /dev/null
++++ b/docs/readonly-guard.md
+@@ -0,0 +1,7 @@
++# 読み取り役のコマンドの制限
++
++読み取り役のサブエージェントが Bash で実行するコマンドを、フックが確かめます(判定は `scripts/lib/readonly-guard.ts` の `guardReadonly`)。
++
++- コマンドを、区切り(`;`・`&&`・`||`・`|`・`&`)のすべてで部分に分け、どの部分も、許可の一覧(`cat`・`grep`・`head`・`ls`・`wc`)の語で始まることを確かめます。
++- ファイルへの書き出し(`>`・`>>`・`tee`)を含む部分は、許可の一覧の語で始まっていても止めます。
++- 止めたときは、理由(許可の外のコマンド、ファイルへの書き出し)を返します。
+diff --git a/scripts/lib/readonly-guard.test.ts b/scripts/lib/readonly-guard.test.ts
+new file mode 100644
+index 0000000..00f9fac
+--- /dev/null
++++ b/scripts/lib/readonly-guard.test.ts
+@@ -0,0 +1,16 @@
++import { describe, expect, it } from "vitest";
++import { guardReadonly } from "./readonly-guard.ts";
++
++describe("guardReadonly", () => {
++  it("読み取りのコマンドだけ_通す", () => {
++    expect(guardReadonly("cat a.txt; grep foo b.txt")).toBeNull();
++  });
++
++  it("区切りのあとに許可の外のコマンド_止める", () => {
++    expect(guardReadonly("cat a.txt && rm b.txt")).toBe("許可の外のコマンド");
++  });
++
++  it("書き出しの記号を含む_止める", () => {
++    expect(guardReadonly("cat a.txt > b.txt")).toBe("ファイルへの書き出し");
++  });
++});
+diff --git a/scripts/lib/readonly-guard.ts b/scripts/lib/readonly-guard.ts
+new file mode 100644
+index 0000000..92932ee
+--- /dev/null
++++ b/scripts/lib/readonly-guard.ts
+@@ -0,0 +1,25 @@
++/**
++ * 読み取り役の Bash のコマンドから、書き込みにあたるものを止める。
++ * 決まりは docs/readonly-guard.md。
++ */
++
++/** 先頭の語として許すコマンド。 */
++const ALLOWED = new Set(["cat", "grep", "head", "ls", "wc"]);
++
++/** コマンドを、区切りで部分に分ける。 */
++export function splitCommand(command: string): string[] {
++  return command
++    .split(/;|&&/)
++    .map((part) => part.trim())
++    .filter((part) => part !== "");
++}
++
++/** 止めるときは理由を、通すときは null を返す。 */
++export function guardReadonly(command: string): string | null {
++  for (const part of splitCommand(command)) {
++    const head = part.split(/\s+/)[0] ?? "";
++    if (!ALLOWED.has(head)) return "許可の外のコマンド";
++    if (part.includes(">")) return "ファイルへの書き出し";
++  }
++  return null;
++}

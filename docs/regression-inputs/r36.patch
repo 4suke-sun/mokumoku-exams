@@ -1,0 +1,13 @@
+diff --git a/docs/app/cost-check.md b/docs/app/cost-check.md
+new file mode 100644
+index 0000000..bd19495
+--- /dev/null
++++ b/docs/app/cost-check.md
+@@ -0,0 +1,7 @@
++# 費用の確かめ方
++
++月の費用を、請求の画面と、手元の集計の両方で確かめます。
++
++1. 請求の画面で、検証の環境のアカウント(ACCOUNT_MARKER)を選び、サービスごとの費用を開きます。
++2. 手元の集計は、作業ツリー(PATH_MARKER/mokumoku-exams)で `npm run agent-cost -- --since <日付>` を実行します。
++3. 2 つの値の差が大きいときは、期間の区切り(日付は端末の時刻)を見直します。
