@@ -1,0 +1,44 @@
+diff --git a/scripts/lib/request-cleanup.test.ts b/scripts/lib/request-cleanup.test.ts
+new file mode 100644
+index 0000000..14c0d76
+--- /dev/null
++++ b/scripts/lib/request-cleanup.test.ts
+@@ -0,0 +1,19 @@
++import { existsSync, mkdtempSync, writeFileSync } from "node:fs";
++import { tmpdir } from "node:os";
++import { join } from "node:path";
++import { describe, expect, it } from "vitest";
++import { finishRequest } from "./request-cleanup.ts";
++
++describe("finishRequest", () => {
++  it("取り込んだ依頼_出力のファイルを消す", () => {
++    const dir = mkdtempSync(join(tmpdir(), "request-cleanup-"));
++    writeFileSync(join(dir, "a.request.json"), "{}");
++    writeFileSync(join(dir, "a.output.json"), "{}");
++
++    finishRequest(dir, "a");
++
++    // 出力のファイルは消え、依頼のファイルは出し直しに使うため残る
++    expect(existsSync(join(dir, "a.output.json"))).toBe(false);
++    expect(existsSync(join(dir, "a.request.json"))).toBe(false);
++  });
++});
+diff --git a/scripts/lib/request-cleanup.ts b/scripts/lib/request-cleanup.ts
+new file mode 100644
+index 0000000..672a126
+--- /dev/null
++++ b/scripts/lib/request-cleanup.ts
+@@ -0,0 +1,13 @@
++import { existsSync, rmSync } from "node:fs";
++import { join } from "node:path";
++
++/**
++ * 出力を取り込んだ依頼を片づける。依頼のファイルと出力のファイルを、どちらも消す。
++ * 取り込みに失敗した依頼は、この関数を呼ばない(出し直しのために残す)。
++ */
++export function finishRequest(dir: string, name: string): void {
++  for (const file of [`${name}.request.json`, `${name}.output.json`]) {
++    const path = join(dir, file);
++    if (existsSync(path)) rmSync(path);
++  }
++}

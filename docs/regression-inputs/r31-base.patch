@@ -1,0 +1,14 @@
+diff --git a/scripts/lib/attempt-limit.ts b/scripts/lib/attempt-limit.ts
+new file mode 100644
+index 0000000..d84c987
+--- /dev/null
++++ b/scripts/lib/attempt-limit.ts
+@@ -0,0 +1,8 @@
++/**
++ * 依頼を出し直せるかの基準。出し直しの回数が上限に達した依頼は、出し直さない(人が原因を直す)。
++ * 上限は、設定の値(1 以上の整数)をそのまま使う。
++ */
++export function canRetry(attempts: number, maxAttempts: number): boolean {
++  if (!Number.isInteger(maxAttempts) || maxAttempts < 1) throw new Error("上限は 1 以上の整数にする");
++  return attempts < maxAttempts;
++}

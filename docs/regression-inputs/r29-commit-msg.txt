@@ -1,0 +1,4 @@
+feat(scripts): Bash を許可のコマンドの判定にかける役を決める
+
+作成役(commit-writer・draft-writer)の Bash を、許可のコマンドの判定にかける(`isCheckedRole`)。
+リリースノートに項目を足す。

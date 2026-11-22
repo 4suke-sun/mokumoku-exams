@@ -1,0 +1,25 @@
+diff --git a/docs/app/alarm-review.md b/docs/app/alarm-review.md
+new file mode 100644
+index 0000000..e3a0366
+--- /dev/null
++++ b/docs/app/alarm-review.md
+@@ -0,0 +1,19 @@
++# アラームの見直し
++
++通知の数と、見落としの出方を比べて、アラームを足すかを決めるための材料です。
++
++## 今の構成
++
++今の構成のアラームは、次の 2 つです(定義は `packages/infra/lib/web-stack.ts`)。どちらも、5 分の合計が 1 以上で鳴り、通知の宛先の SNS のトピックに送ります。
++
++| アラーム | 見るもの |
++| --- | --- |
++| `AppErrorsAlarm` | アプリの Lambda のエラー |
++| `AppThrottlesAlarm` | アプリの Lambda の実行の制限 |
++
++## 足す候補
++
++| 候補 | 見るもの | 足す理由 |
++| --- | --- | --- |
++| 応答の 5xx | アプリが返す 5xx の件数 | Lambda の呼び出しとしては成功するため、今の 2 つでは拾えない |
++| 配信のエラー率 | CloudFront の 5xx の割合 | 利用者から見た失敗を、配信の側で見る |

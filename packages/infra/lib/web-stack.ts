@@ -123,6 +123,7 @@ export class WebStack extends Stack {
     const appFunction = new lambda.Function(this, "AppFunction", {
       functionName: `${config.stackPrefix}-app`,
       logGroup: appLogGroup,
+      // 手元と CI は Node 24 だが、Lambda は 22 のまま(Node 24 を求める依存は Lambda に載らない。CONTRIBUTING.md の「準備」)
       runtime: lambda.Runtime.NODEJS_22_X,
       architecture: lambda.Architecture.X86_64,
       // Lambda Web Adapter が、run.sh の起動したサーバーへリクエストを渡す

@@ -4,7 +4,10 @@
 
 ## 準備
 
-必要なもの: Node.js 22.18 以上
+必要なもの: Node.js 24(24.15 以上)。CI も Node 24 で動かします
+
+- 下限(`package.json` の `engines`)は、依存が求める Node をすべて満たす値です(作問パイプラインの PDF の取り出しは Node 24 以上、画面部品のテストの jsdom は 24 なら 24.15 以上)。
+- アプリの Lambda(と通知の送信の Lambda)の実行環境は、Node 22(`nodejs22.x`)のままです。下限を決める依存(unpdf・jsdom)は、作問パイプラインとテストだけで使い、Lambda には載りません。ランタイムを上げるときは、デプロイの差分(`cdkd diff`)で確かめる別の作業として扱います。
 
 ```sh
 npm install   # 依存を入れ、検査フック(.githooks)を有効にします
@@ -187,6 +190,19 @@ Claude Code からの push と、`gh` での PR・Issue の作成、題・本文
 - フックの失敗(入力が読めない、git が動かないなど)は、止める側に倒します(終了コード 2 と `onFailure: "block"`。`onFailure` は Claude Code v2.1.295 以降の設定です)。
   フックの起動コマンドは `git rev-parse --show-toplevel` を使うので、リポジトリの外で Bash・Write・Edit を使うと、すべて止まります。
 
+### 権限の確認(ask)の範囲
+
+`.claude/settings.json` の `ask` は、外に出す操作と、環境を消す操作だけに絞ります。読むだけの操作で確認が出て、作業が止まるのを減らすためです。
+`ask` は `allow` より先に効くので、`allow` の `Bash(gh api *)`・`Bash(gh issue edit *)` に当たっても、下の確認の形に当たれば確認が出ます。
+
+- 確認が出る操作: `git push`、`gh pr create`・`edit`・`merge`・`close`、`gh issue create`・`close`、`gh label create`、`scripts/release.ts`・`npm run release`、`cdkd deploy`(`packages/infra` の `deploy` のスクリプトを含む)、`scripts/post-issues.ts`、環境を消す `cdkd destroy`(`packages/infra` の `destroy` のスクリプトを含む)。
+- `gh issue edit` は、題・本文などを変えるオプションを含むときだけ確認が出ます: `--body`・`-b`、`--body-file`・`-F`、`--title`・`-t`、`--add-project`・`--remove-project`、`--repo`・`-R`、`$`・`` ` ``(変数とコマンドの置換。中身が見えないため)。
+  ラベル・マイルストーン・担当者だけの編集(`--add-label`・`--remove-label`・`--milestone`・`-m`・`--remove-milestone`・`--add-assignee`・`--remove-assignee`)は、確認なしで通ります。
+- `gh api` は、書き込みになりうるオプションを含むときだけ確認が出ます: `-X`・`--method`(`-X GET` も含む)、`-f`・`--raw-field`、`-F`・`--field`、`--input`、`$`・`` ` ``。`graphql` は `-f query=…` を使うので、読むだけの問い合わせでも確認が出ます。
+- 照合は文字列の部分一致なので、止める側に倒れます。ラベルの名前や `--jq` の式に `-t`・`-f` などが含まれると、読むだけでも確認が出ます。
+  `gh api` と `gh issue edit` の確認の形は、先頭に `*` を付けて、`env`・`xargs -n1`・`bash -c "…"` などの後ろにある呼び出しも拾います。複合コマンド(`&&`・`;`・`|`)、`$(…)` の中、`for` の中の呼び出しも、Claude Code が分けて照合します。
+- `ask` は、権限の確認を省く動作モードでは効きません。題・本文の編集は、承認の印のフック(上の「承認の印」)も止めます。書き込みの `gh api` を止めるのは `ask` だけです。
+
 ### 拒否リスト
 
 個人固有の語(氏名など)は、リポジトリに入れず、手元の拒否リスト `.pr-secrets-denylist`(gitignore 済み)で検査します。
@@ -205,7 +221,7 @@ GitHub Actions を、それぞれ 1 件の PR にまとめます。題とコミ�
   更新の PR は、取り込んだことを書いて閉じます。
 - 急ぐ更新(脆弱性の修正など)は、Issue を立てて、Issue 単位の PR で取り込みます。
 - Dependabot は、コミットのメッセージの末尾に署名の行(`Signed-off-by:`)を付けます。その行のアドレスは noreply の形ではありませんが、機密検査(PR の範囲)は、作者が Dependabot のコミットの、署名の行にある Dependabot のアドレスだけを認めます(完全一致。同じ行のほかのアドレスと、ほかの行・人のコミットのものは止めます)。
-- `@types/node` のメジャーの更新は、出しません(`.github/dependabot.yml` の `ignore`)。型の版を、実行環境の Node に合わせるためです。実行環境の Node を上げるときは、この設定を外して、同時に `@types/node` を上げます。
+- `@types/node` のメジャーの更新は、出しません(`.github/dependabot.yml` の `ignore`)。型の版を、アプリの Lambda の Node(22)に合わせるためです。手元と CI は Node 24 ですが、Lambda で動くコードが Node 24 にしかない API を使わないよう、型は Lambda に合わせます。Lambda のランタイムを上げるときは、この設定を外して、同時に `@types/node` を上げます。
 
 ## 並行する作業(作業ツリー)
 

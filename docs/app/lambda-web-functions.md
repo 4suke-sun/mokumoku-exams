@@ -94,7 +94,7 @@
   - CloudFront の側は、種類 `lambda` の OAC の L2 が `FunctionUrlOriginAccessControl` で、その props の `signing` に `Signing.SIGV4_ALWAYS_AMZ_AUTH` を渡します
     (列挙の `SigningBehavior.ALWAYS_AMZ_AUTH` は、CloudFormation の値 `always-amz-auth` に当たる列挙です)。
     Web Function 専用のオリジンの構成(`aws-cloudfront-origins`)はなく、`HttpOrigin` にエンドポイントのドメインと OAC の ID(`originAccessControlId`)を渡す形になります。
-- 固定している `cdkd`(0.322.1)は、`AWS::Lambda::WebFunctionRevision` と `AWS::Lambda::WebFunctionEndpoint` に専用の処理を持ちます。
+- 固定している `cdkd`(0.363.0)は、`AWS::Lambda::WebFunctionRevision` と `AWS::Lambda::WebFunctionEndpoint` に専用の処理を持ちます。
   `AWS::Lambda::WebFunction` 本体には専用の処理がなく、Cloud Control API の経由で扱う形になります。
   Cloud Control API の対応の一覧には、`AWS::Lambda::WebFunction` の 3 つが載っていません
   ([対応するリソース](https://docs.aws.amazon.com/cloudcontrolapi/latest/userguide/supported-resources.html)。一覧の更新日は 2025-12)。

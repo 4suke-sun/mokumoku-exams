@@ -1,0 +1,69 @@
+diff --git a/.github/workflows/nightly-links.yml b/.github/workflows/nightly-links.yml
+new file mode 100644
+index 0000000..4a1ed35
+--- /dev/null
++++ b/.github/workflows/nightly-links.yml
+@@ -0,0 +1,21 @@
++name: nightly-links
++
++on:
++  schedule:
++    - cron: "0 18 * * *"
++  workflow_dispatch:
++
++permissions:
++  contents: read
++
++jobs:
++  links:
++    runs-on: ubuntu-latest
++    steps:
++      - uses: actions/checkout@v4
++      - uses: actions/setup-node@v4
++        with:
++          node-version: 22
++          cache: npm
++      - run: npm ci
++      - run: node scripts/check-reference-links.ts
+diff --git a/docs/nightly-links.md b/docs/nightly-links.md
+new file mode 100644
+index 0000000..e7ac2e7
+--- /dev/null
++++ b/docs/nightly-links.md
+@@ -0,0 +1,6 @@
++# 出典のリンクの夜間の確認
++
++問題データの出典の URL が開けるかを、毎日 1 回確かめます(`.github/workflows/nightly-links.yml`)。
++
++- 確かめるスクリプトは `scripts/check-reference-links.ts` です。開けない URL があれば、ファイルと問題の番号を出し、終了コード 1 で止まります。
++- このワークフローは、Node 22 で動かします。ほかの CI のジョブと、ルートの `package.json` の `engines` も、同じ版にそろえています。
+diff --git a/scripts/check-reference-links.ts b/scripts/check-reference-links.ts
+new file mode 100644
+index 0000000..95b0b93
+--- /dev/null
++++ b/scripts/check-reference-links.ts
+@@ -0,0 +1,24 @@
++#!/usr/bin/env node
++/**
++ * 問題データの出典の URL が開けるかを確かめる。開けない URL があれば終了コード 1(場所だけを出す)。
++ *   node scripts/check-reference-links.ts
++ */
++import { readdirSync, readFileSync } from "node:fs";
++
++const files = readdirSync("data").filter((f) => /^questions\..+\.json$/.test(f));
++let failed = 0;
++for (const file of files) {
++  const { questions } = JSON.parse(readFileSync(`data/${file}`, "utf8")) as {
++    questions: { references?: { url: string }[] }[];
++  };
++  for (const [i, q] of questions.entries()) {
++    for (const ref of q.references ?? []) {
++      const res = await fetch(ref.url, { method: "HEAD" });
++      if (!res.ok) {
++        console.error(`${file} の ${i + 1} 問目: 出典が開けない(${res.status})`);
++        failed += 1;
++      }
++    }
++  }
++}
++process.exit(failed > 0 ? 1 : 0);

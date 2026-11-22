@@ -76,6 +76,7 @@ export class PushStack extends Stack {
     this.senderFunction = new lambda.Function(this, "SenderFunction", {
       functionName: `${config.stackPrefix}-push-sender`,
       logGroup,
+      // 手元と CI は Node 24 だが、Lambda は 22 のまま(Node 24 を求める依存は Lambda に載らない。CONTRIBUTING.md の「準備」)
       runtime: lambda.Runtime.NODEJS_22_X,
       architecture: lambda.Architecture.X86_64,
       handler: PUSH_HANDLER,

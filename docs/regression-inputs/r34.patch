@@ -1,0 +1,35 @@
+diff --git a/docs/example-values.md b/docs/example-values.md
+new file mode 100644
+index 0000000..3b9ebf2
+--- /dev/null
++++ b/docs/example-values.md
+@@ -0,0 +1,29 @@
++# 例の値の書き方
++
++文書・Issue・PR に、設定や記録の例を載せるときの書き方です。実際の環境の値は書きません。
++
++## 設定の例
++
++```json
++{
++  "endpoint": "https://api.example.com/v1",
++  "callbackUrl": "https://admin.example.com/callback",
++  "roles": {
++    "admin": ["questions:write"],
++    "reader": ["questions:read"]
++  },
++  "ticket": "<番号>"
++}
++```
++
++- 接続先は `example.com` のサブドメインにします。
++- 役割の名前は、`admin`・`reader` のような一般名にします。
++- 番号は `<番号>` か、`XXXX-XXXX` のように `X` を並べた形にします。
++
++## 作問パイプラインの ID の例
++
++| 項目 | 例 |
++| --- | --- |
++| 事実カード | `f-3a9c0e7b21d4` |
++| 下書き | `d-b07e2c91f4a8` |
++| 出題計画の項目 | `p-5d1e8a0c3f92` |

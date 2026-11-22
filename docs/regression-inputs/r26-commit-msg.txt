@@ -1,0 +1,4 @@
+feat(scripts): 読み取り役のコマンドを止める判定を足す
+
+読み取り役の Bash のコマンドを、区切りで部分に分け、許可の一覧の外のコマンドと、
+ファイルへの書き出しを止める(`guardReadonly`)。決まりを docs/readonly-guard.md に書く。

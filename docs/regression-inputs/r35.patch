@@ -1,0 +1,41 @@
+diff --git a/scripts/lib/sum-tokens.test.ts b/scripts/lib/sum-tokens.test.ts
+new file mode 100644
+index 0000000..219ac69
+--- /dev/null
++++ b/scripts/lib/sum-tokens.test.ts
+@@ -0,0 +1,17 @@
++import { describe, expect, it } from "vitest";
++import { sumTokens } from "./sum-tokens.ts";
++
++describe("sumTokens", () => {
++  it("記録が空_どれも 0 を返す", () => {
++    expect(sumTokens([])).toEqual({ input: 0, output: 0 });
++  });
++
++  it("記録が 2 件_種類ごとに足す", () => {
++    expect(
++      sumTokens([
++        { input: 10, output: 2 },
++        { input: 5, output: 3 },
++      ]),
++    ).toEqual({ input: 15, output: 5 });
++  });
++});
+diff --git a/scripts/lib/sum-tokens.ts b/scripts/lib/sum-tokens.ts
+new file mode 100644
+index 0000000..b036485
+--- /dev/null
++++ b/scripts/lib/sum-tokens.ts
+@@ -0,0 +1,12 @@
++/** 応答ごとのトークンの記録を、種類ごとに足し合わせる。記録が空なら、どれも 0 を返す。 */
++export interface TokenUsage {
++  input: number;
++  output: number;
++}
++
++export function sumTokens(records: readonly TokenUsage[]): TokenUsage {
++  return records.reduce((acc, r) => ({ input: acc.input + r.input, output: acc.output + r.output }), {
++    input: 0,
++    output: 0,
++  });
++}

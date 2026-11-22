@@ -1,0 +1,36 @@
+diff --git a/scripts/lib/writer-bash-scope.test.ts b/scripts/lib/writer-bash-scope.test.ts
+new file mode 100644
+index 0000000..96fdb39
+--- /dev/null
++++ b/scripts/lib/writer-bash-scope.test.ts
+@@ -0,0 +1,14 @@
++import { describe, expect, it } from "vitest";
++import { isCheckedRole } from "./writer-bash-scope.ts";
++
++describe("isCheckedRole", () => {
++  it("作成役_判定にかける", () => {
++    expect(isCheckedRole("commit-writer")).toBe(true);
++    expect(isCheckedRole("draft-writer")).toBe(true);
++  });
++
++  it("作成役でない役か役がない_判定にかけない", () => {
++    expect(isCheckedRole("question-drafter")).toBe(false);
++    expect(isCheckedRole(undefined)).toBe(false);
++  });
++});
+diff --git a/scripts/lib/writer-bash-scope.ts b/scripts/lib/writer-bash-scope.ts
+new file mode 100644
+index 0000000..c8104f1
+--- /dev/null
++++ b/scripts/lib/writer-bash-scope.ts
+@@ -0,0 +1,10 @@
++/**
++ * Bash の許可のコマンドを確かめる対象の役。フックの入力の `agent_type` で見分ける。
++ * 対象の外の役(メイン、検査役、作問パイプラインの役)は、この判定では止めない。
++ */
++const CHECKED_ROLES = new Set(["commit-writer", "draft-writer"]);
++
++/** この役の Bash を、許可のコマンドの判定にかけるか。 */
++export function isCheckedRole(agentType: string | undefined): boolean {
++  return agentType !== undefined && CHECKED_ROLES.has(agentType);
++}

@@ -28,7 +28,7 @@
 
 ## 開発の始め方
 
-必要なもの: Node.js 22.18 以上(TypeScript をそのまま実行できる版)
+必要なもの: Node.js 24(24.15 以上)。CI も Node 24 で動かします
 
 ```sh
 npm install                # 依存を入れ、検査フック(.githooks)を有効にします
