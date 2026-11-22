@@ -10,7 +10,7 @@ updates:
     groups:
       npm:
         patterns: ["*"]
-    # 型の版を、実行環境(アプリの Lambda と CI)の Node 22 に合わせる。実行環境の Node を上げるときは、この設定を外して @types/node も上げる。
+    # 型の版を、アプリの Lambda の Node 22 に合わせる(手元と CI は Node 24)。Lambda のランタイムを上げるときは、この設定を外して @types/node も上げる。
     ignore:
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]

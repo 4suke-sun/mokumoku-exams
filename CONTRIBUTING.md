@@ -4,7 +4,10 @@
 
 ## 準備
 
-必要なもの: Node.js 22.18 以上
+必要なもの: Node.js 24(24.15 以上)。CI も Node 24 で動かします
+
+- 下限(`package.json` の `engines`)は、依存が求める Node をすべて満たす値です(作問パイプラインの PDF の取り出しは Node 24 以上、画面部品のテストの jsdom は 24 なら 24.15 以上)。
+- アプリの Lambda(と通知の送信の Lambda)の実行環境は、Node 22(`nodejs22.x`)のままです。下限を決める依存(unpdf・jsdom)は、作問パイプラインとテストだけで使い、Lambda には載りません。ランタイムを上げるときは、デプロイの差分(`cdkd diff`)で確かめる別の作業として扱います。
 
 ```sh
 npm install   # 依存を入れ、検査フック(.githooks)を有効にします
@@ -205,7 +208,7 @@ GitHub Actions を、それぞれ 1 件の PR にまとめます。題とコミ�
   更新の PR は、取り込んだことを書いて閉じます。
 - 急ぐ更新(脆弱性の修正など)は、Issue を立てて、Issue 単位の PR で取り込みます。
 - Dependabot は、コミットのメッセージの末尾に署名の行(`Signed-off-by:`)を付けます。その行のアドレスは noreply の形ではありませんが、機密検査(PR の範囲)は、作者が Dependabot のコミットの、署名の行にある Dependabot のアドレスだけを認めます(完全一致。同じ行のほかのアドレスと、ほかの行・人のコミットのものは止めます)。
-- `@types/node` のメジャーの更新は、出しません(`.github/dependabot.yml` の `ignore`)。型の版を、実行環境の Node に合わせるためです。実行環境の Node を上げるときは、この設定を外して、同時に `@types/node` を上げます。
+- `@types/node` のメジャーの更新は、出しません(`.github/dependabot.yml` の `ignore`)。型の版を、アプリの Lambda の Node(22)に合わせるためです。手元と CI は Node 24 ですが、Lambda で動くコードが Node 24 にしかない API を使わないよう、型は Lambda に合わせます。Lambda のランタイムを上げるときは、この設定を外して、同時に `@types/node` を上げます。
 
 ## 並行する作業(作業ツリー)
 
