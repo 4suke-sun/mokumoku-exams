@@ -5,6 +5,7 @@
   "provenanceDir": "packages/pipeline/provenance",
   "decisionsDir": "packages/pipeline/decisions",
   "plansDir": "packages/pipeline/plans",
+  "recordsDir": "packages/pipeline/records",
   "examsFile": "data/exams.json",
   "maxItemsPerRun": 20,
   "fetch": {

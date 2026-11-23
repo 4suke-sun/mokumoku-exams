@@ -81,6 +81,7 @@ description: 作問パイプラインを、収集から検証・人の確認ま�
 
 判定役の指示かモデル、判定の基準を変えたときは、`judge-eval <資格コード>` で評価を流す(人が `/pipeline-run <資格コード> judge-eval` と指示したときだけ。手順は `judge` と同じ形で、取り込みは `judge-eval <資格コード> --import`)。
 レポート(`pipeline-work/judge-eval/<コード>/report.md`)を人に見せ、目標を下回ったときは、変更を取り入れない([判定役の評価](../../../docs/evaluation.md))。
+役の定義・モデル・評価に関わる設定を変えて、評価が目標を満たしたときは、合格の記録を足す(`eval-gate --record --role=<verifier|judge>`。[評価の義務](../../../docs/evaluation.md)の「8」)。
 
 ## 止まる条件
 
