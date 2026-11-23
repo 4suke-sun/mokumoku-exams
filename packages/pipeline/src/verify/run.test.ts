@@ -601,6 +601,19 @@ describe("verify --bundles", () => {
     expect(listed.some((f) => f.includes(old.requestKey))).toBe(false);
     expect(r.out + r.err).toContain("検証役の定義が依頼のあとに変わった依頼 1 件");
   });
+
+  it("出し直しの回数が上限に達し、依頼のあとに検証役の定義も変わった依頼がある_定義が変わった依頼として数え、上限の件数には数えない", async () => {
+    const root = await withRequests();
+    const [both] = verifyRequests(root) as [VerifyRequest];
+    writeFileSync(verifyDir(root, "state.json"), JSON.stringify({ [both.requestKey]: baseConfig.verify.maxAttempts }));
+    const path = verifyDir(root, "requests", `${both.requestKey}.json`);
+    const request = JSON.parse(readFileSync(path, "utf8"));
+    writeFileSync(path, JSON.stringify({ ...request, agent: { ...request.agent, definitionHash: "0".repeat(64) } }));
+    const r = await runMain(root, ["verify", EXAM, "--bundles"], bundled);
+    expect(r.code).toBe(EXIT.ok);
+    expect(r.out + r.err).toContain("検証役の定義が依頼のあとに変わった依頼 1 件");
+    expect(r.out + r.err).not.toContain("出し直しの回数が上限に達した依頼");
+  });
 });
 
 describe("判定の優先順位と理由コード", () => {

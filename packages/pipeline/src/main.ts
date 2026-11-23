@@ -23,7 +23,7 @@ import { runRehash } from "./rehash/run.ts";
 import { runRestore } from "./restore/run.ts";
 import { runScore } from "./scorecard/run.ts";
 import { readAgentStampOrReport } from "./shared/agents.ts";
-import { readJsonFile } from "./shared/request-flow.ts";
+import { readAttemptsFile } from "./shared/bundles.ts";
 import { runStatus } from "./status/run.ts";
 import { runEvalSweep } from "./tuning/run.ts";
 import { runUnpublish } from "./unpublish/run.ts";
@@ -543,11 +543,7 @@ function reportBundles(
   const stamp = readAgentStampOrReport(output, rootDir, "question-verifier");
   if (stamp === null) return EXIT.checkFailed;
   const dir = join(resolve(rootDir, config.workDir), stage, examCode.toLowerCase());
-  const state = readJsonFile(join(dir, "state.json"));
-  const attempts =
-    state !== null && typeof state === "object"
-      ? (Object.fromEntries(Object.entries(state).filter(([, v]) => typeof v === "number")) as Record<string, number>)
-      : {};
+  const attempts = readAttemptsFile(join(dir, "state.json"));
   const { bundles, invalid, exhausted, stale } = bundleRequests({
     rootDir,
     requestsDir: join(dir, "requests"),
