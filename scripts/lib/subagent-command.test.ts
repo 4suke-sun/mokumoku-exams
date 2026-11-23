@@ -224,19 +224,22 @@ describe("decideSubagentCommand(読み取り役)", () => {
     }
   });
 
-  it("find の書き込み・起動・削除のオプション_止める", () => {
+  it("find の書き込み・起動・削除のオプション_ほかの規則に当たらない形でも、find の判定で止める", () => {
+    // 波括弧は引用符で包み、`;` はバックスラッシュで打ち消して、字句の規則では止まらない形にし、find のオプションの判定だけを確かめる
     for (const option of [
-      "-exec rm {} ;",
-      "-execdir cat {} ;",
-      "-ok rm {} ;",
-      "-okdir rm {} ;",
+      "-exec rm '{}' \\;",
+      "-execdir cat '{}' \\;",
+      "-ok rm '{}' \\;",
+      "-okdir rm '{}' \\;",
       "-delete",
       "-fprint out.txt",
       "-fprint0 out",
       "-fprintf out x",
       "-fls out",
     ]) {
-      expect(ok("Explore", `find . ${option}`)).toBe(false);
+      const decision = decideSubagentCommand("Explore", `find . ${option}`);
+      expect(decision.ok).toBe(false);
+      expect(decision.ok ? "" : decision.reason).toContain("find の書き込み・起動・削除のオプション");
     }
   });
 
