@@ -144,7 +144,7 @@ Closes #12
 Claude Code からの push と、`gh` での PR・Issue の作成、題・本文の編集は、人の承認の印がないと、PreToolUse のフック(`scripts/approval-hook.ts`。`.claude/settings.json`)が止めます。
 権限の確認(`ask`)は、権限の確認を省く動作モードでは確認にならないため、フックで止めます。
 
-守る範囲は、**うっかりした操作と、権限の確認を省くモードでの素通り**です。コマンドの文字列を読んで判定するので、書き方を変えてわざと抜ける形(下の「見分けられない形」)は、対象外です。対象は、push と、PR・Issue の作成と題・本文の編集だけです。`gh pr merge`・`gh pr close`・`gh issue close` は、`ask` の設定だけが守ります。
+守る範囲は、**うっかりした操作と、権限の確認を省くモードでの素通り**です。コマンドの文字列を読んで判定するので、書き方を変えてわざと抜ける形(下の「見分けられない形」)は、対象外です。対象は、push と、PR・Issue の作成と題・本文の編集だけです。`gh pr merge`・`close`・`review`・`comment`、`gh issue close`・`reopen`・`delete`・`transfer`、`gh release create` は、`ask` の設定だけが守ります。
 
 - 印は、スキル(`/dev-push`、`/dev-pr`)で人の承認を得た直後に、メインのセッションが `node scripts/approval.ts grant push`、`grant pr <下書き>`、`grant issue <下書き>` で書きます(`pr`・`issue` は下書きが必須です)。
   置き場は `.git` の下(追跡されない)で、有効期限は 60 分です。`status` で確かめ、`revoke` で消せます。
@@ -161,10 +161,16 @@ Claude Code からの push と、`gh` での PR・Issue の作成、題・本文
     - 承認は、使っても消えません。有効な 60 分の間は、同じ範囲・同じ下書きで何度でも通ります。PR・Issue の番号と、PR の `--base` は、承認が覆いません。
     - Issue の承認は、直前の 1 件だけが有効です。下書きを複数投稿するときは、1 件ごとに印を書き直します。
 - サブエージェントからの呼び出しは、承認の印があっても止めます(フックの入力の `agent_id` で見分けます。`agent_id` と、`cd` のあとの作業ディレクトリを指す `cwd` の出典: 公式の文書の hooks の「Common input fields」。導入したバージョンは、文書に書かれていません)。印のファイルの名前を含むコマンドも止めます。
-- 作成役のサブエージェントの Bash は、役(フックの入力の `agent_type`。出典: 公式の文書の hooks の「Common input fields」)を見て、許可のコマンドかも確かめます(判定は `scripts/lib/subagent-command.ts`)。
+- 読み取り役のサブエージェントの Bash は、役(フックの入力の `agent_type`。出典: 公式の文書の hooks の「Common input fields」)を見て、許可のコマンドかも確かめます(判定は `scripts/lib/subagent-command.ts`)。
     - コマンドは、引用符とバックスラッシュを 1 文字ずつ追って字句に分けてから見ます。閉じない引用符など、迷う形は止める側に倒します。
-    - 作成役(`commit-writer`・`draft-writer`)は、定義(`.claude/agents/`)の「Bash で実行してよいのは」に挙げたコマンドを、1 つだけ、1 行だけ通します。改行(行の継続の `\` を含む)、閉じない引用符と末尾の `\`、引用符の外の演算子(`;`・`&`・`|`・`<`・`>`・括弧・`` ` ``。ヒアドキュメント `<<`・`<<<` を含む)、`$`(変数の展開、コマンドの置換、`$'…'`。二重引用符の中を含む)、引用符の外で `#` から始まる語(コメント)、引用符の外の `{`・`}`(波括弧の展開)、`git -C`・`git -c`、`--output` は通しません。定義の一覧と判定の一覧の一致は、テストが確かめます。
-    - 作成役でない役(読み取り役を含む)と、`agent_id` か `agent_type` がない呼び出し(メインのセッションを含む)は、この確かめをしません。読み取り役の書き込みは、別の Issue で扱います(いまは定義の決まりだけです)。
+    - 読み取り役(書き込みの道具を持たない組み込みの役)は、読み取りのコマンドだけを、許可リストで通します。書き込みになる形を拒否リストで追うと、1 つ止めるたびに別の形が抜けるためです。
+        - 読み取り役の名前は、`Explore`・`Plan` だけです。組み込みの役には定義ファイルがないので、一覧の出どころは `READONLY_ROLES`(`scripts/lib/subagent-command.ts`)です。
+        - 読み取り役が Bash で実行してよいのは、`cat`・`head`・`tail`・`grep`・`ls`・`wc`・`find`・`git diff`・`git log`・`git show`・`git status`・`git rev-parse`・`git ls-files`・`git ls-tree`・`git cat-file` だけです(`READONLY_ALLOWED_COMMANDS`)。
+        - つなぎ方は、パイプ(`|`)と、`2>/dev/null` だけです。字句の規則(改行、閉じない引用符と末尾の `\`、引用符の外の `$`・`#` のコメント・波括弧、`--output`)と、`git -C`・`git -c`(語の位置が副コマンドでないため、許可の外になります)を通しません。`find` の `-exec`・`-execdir`・`-ok`・`-okdir`・`-delete`・`-fls`・`-fprint` 系も通しません。
+        - 許可に入れないコマンド: `sed`・`awk`・`sort`・`xargs`・`tee`・`env` など、書き込みや別のコマンドの起動になるオプションを持つもの。
+        - 止めたときは、理由と代わりの手段(Read・Grep・Glob の道具、メインのセッションへの依頼)を返します。許可の外の形で回避せず、許可の一覧への追加は、人が判断します。
+        - 一覧の一致は、この文書の 2 つの行とコードの定数との突き合わせで、テストが確かめます。
+    - 読み取り役でない役と、`agent_id` か `agent_type` がない呼び出し(メインのセッションを含む)は、この確かめをしません。
 - 承認の印があっても、常に止めます。必要なときは、人が自分で実行します(`!`。人が `!` で実行する操作には、フックは動きません)。
     - 強制 push(`--force…`、`-f`、`+<ref>`)、`git commit` の `-n`・`--no-verify`
     - ブランチの削除(`--delete`、`-d`、`:<ref>`)、`--all`・`--mirror`・`--prune`
@@ -176,6 +182,7 @@ Claude Code からの push と、`gh` での PR・Issue の作成、題・本文
   ラッパー(`env`、`sudo`、`nohup`、`xargs`、`time`、`timeout`、`nice`、`caffeinate`、`setsid`、`exec`、`command`、`builtin`)と、`bash -c "…"` の中身は、外して見ます。語の前後の引用符は外して見ます(`git 'push'` も拾います)。`gh` の `create` の別名 `new` も、作成として見ます。`gh` は `-R <リポジトリ>` を飛ばして、`pr`・`issue` と動作を見ます。
 - 見分けられない形(権限の確認(`ask`。確認を省く動作モードでは効きません)と `deny` の設定、スキルの手順、スクリプト自身の封印が補います):
     - 文字列を組み立てて実行する形: `eval`、`| sh`、ヒアストリング、変数に入れたコマンド、git の別名、`git send-pack` など。
+    - 読み取り役の Bash の、インタープリタの中の書き込み(`node -e`・`python3 -c`)。許可の一覧に入れないことで止めますが、`git` に外部のコマンドを起動させる設定(外部の差分コマンドなど)は、コマンドの字句から読めません。
     - `$(…)` などで組み立てた、push の送り先の指定。静的に書いた指定(`origin <名前>`、`<元>:<先>`、`HEAD`)は、承認したブランチを同じ名前で送るものだけ通します。
     - PR・Issue の番号は、印が覆いません(承認した下書きで、別の番号の PR・Issue を編集できます)。`gh pr create --fill` で本文を作る形は、同じコマンドに下書きの読み取りがあれば通ります。
     - `gh api` で PR や Issue を作る形。`git -c <設定>=…` や環境変数でコミットの検査を飛ばす形。
@@ -192,15 +199,16 @@ Claude Code からの push と、`gh` での PR・Issue の作成、題・本文
 
 ### 権限の確認(ask)の範囲
 
-`.claude/settings.json` の `ask` は、外に出す操作と、環境を消す操作だけに絞ります。読むだけの操作で確認が出て、作業が止まるのを減らすためです。
+`.claude/settings.json` の `ask` は、外に出す操作と、環境やリポジトリのデータを消す・移す操作だけに絞ります。読むだけの操作で確認が出て、作業が止まるのを減らすためです。
 `ask` は `allow` より先に効くので、`allow` の `Bash(gh api *)`・`Bash(gh issue edit *)` に当たっても、下の確認の形に当たれば確認が出ます。
 
-- 確認が出る操作: `git push`、`gh pr create`・`edit`・`merge`・`close`、`gh issue create`・`close`、`gh label create`、`scripts/release.ts`・`npm run release`、`cdkd deploy`(`packages/infra` の `deploy` のスクリプトを含む)、`scripts/post-issues.ts`、環境を消す `cdkd destroy`(`packages/infra` の `destroy` のスクリプトを含む)。
+- 確認が出る操作: `git push`、`gh pr create`・`edit`・`merge`・`close`・`review`・`comment`、`gh issue create`・`close`・`reopen`、Issue を消す・別のリポジトリへ移す `gh issue delete`・`transfer`、`gh label create`、`gh release create`、`scripts/release.ts`・`npm run release`、`cdkd deploy`(`packages/infra` の `deploy` のスクリプトを含む)、`scripts/post-issues.ts`、環境を消す `cdkd destroy`(`packages/infra` の `destroy` のスクリプトを含む)。
 - `gh issue edit` は、題・本文などを変えるオプションを含むときだけ確認が出ます: `--body`・`-b`、`--body-file`・`-F`、`--title`・`-t`、`--add-project`・`--remove-project`、`--repo`・`-R`、`$`・`` ` ``(変数とコマンドの置換。中身が見えないため)。
   ラベル・マイルストーン・担当者だけの編集(`--add-label`・`--remove-label`・`--milestone`・`-m`・`--remove-milestone`・`--add-assignee`・`--remove-assignee`)は、確認なしで通ります。
 - `gh api` は、書き込みになりうるオプションを含むときだけ確認が出ます: `-X`・`--method`(`-X GET` も含む)、`-f`・`--raw-field`、`-F`・`--field`、`--input`、`$`・`` ` ``。`graphql` は `-f query=…` を使うので、読むだけの問い合わせでも確認が出ます。
 - 照合は文字列の部分一致なので、止める側に倒れます。ラベルの名前や `--jq` の式に `-t`・`-f` などが含まれると、読むだけでも確認が出ます。
-  `gh api` と `gh issue edit` の確認の形は、先頭に `*` を付けて、`env`・`xargs -n1`・`bash -c "…"` などの後ろにある呼び出しも拾います。複合コマンド(`&&`・`;`・`|`)、`$(…)` の中、`for` の中の呼び出しも、Claude Code が分けて照合します。
+  確認の形は、すべて先頭に `*` を付けて、`env`・`xargs -n1`・`bash -c "…"` などの後ろにある呼び出しも拾います。`echo "gh pr create"` のように、語が引数にあるだけでも確認が出ます(止める側に倒れます)。複合コマンド(`&&`・`;`・`|`)、`$(…)` の中、`for` の中の呼び出しも、Claude Code が分けて照合します。
+  Issue のコメント(`gh issue comment`)は、確認なしで通ります。確認の形と、確認が出ない読み取りの例は、`scripts/settings-ask.test.ts` が照合します。
 - `ask` は、権限の確認を省く動作モードでは効きません。題・本文の編集は、承認の印のフック(上の「承認の印」)も止めます。書き込みの `gh api` を止めるのは `ask` だけです。
 
 ### 拒否リスト
@@ -222,6 +230,13 @@ GitHub Actions を、それぞれ 1 件の PR にまとめます。題とコミ�
 - 急ぐ更新(脆弱性の修正など)は、Issue を立てて、Issue 単位の PR で取り込みます。
 - Dependabot は、コミットのメッセージの末尾に署名の行(`Signed-off-by:`)を付けます。その行のアドレスは noreply の形ではありませんが、機密検査(PR の範囲)は、作者が Dependabot のコミットの、署名の行にある Dependabot のアドレスだけを認めます(完全一致。同じ行のほかのアドレスと、ほかの行・人のコミットのものは止めます)。
 - `@types/node` のメジャーの更新は、出しません(`.github/dependabot.yml` の `ignore`)。型の版を、アプリの Lambda の Node(22)に合わせるためです。手元と CI は Node 24 ですが、Lambda で動くコードが Node 24 にしかない API を使わないよう、型は Lambda に合わせます。Lambda のランタイムを上げるときは、この設定を外して、同時に `@types/node` を上げます。
+
+## サブエージェントの使い分け
+
+- 用途に合う定義(`.claude/agents/`)があるときは、その定義を使います。定義を持たないサブエージェント(`general-purpose`)は、メインのセッションと同じモデルで動き、費用が高いので、合う定義がない用途だけに使います。
+- 用途ごとの割り当て(どの定義を使うか、定義を持たないか)は、[docs/subagent-usage.md](docs/subagent-usage.md) の一覧にあります。
+- 取りこぼしが公開に直結する判断(保留の再判定、生成物の検証)のモデルを下げるときは、同じ入力を、今のモデルと下げたあとのモデルで処理し、判定が変わらないことを確かめてから下げます。変わるなら、下げません。バッチでの生成は、書く範囲が `.drafts/batch/` の 1 ファイルに限られ、結果が公開のデータに直接入らず、メインのセッションが反映したあとに PR の人の確認を通るので、確かめずに Sonnet にします。
+- この決まりは、機械では止められません。守られているかは、`npm run agent-cost` の `general-purpose` の回数と費用で見ます([docs/lessons-workflow.md](docs/lessons-workflow.md) の「計測」)。
 
 ## 並行する作業(作業ツリー)
 

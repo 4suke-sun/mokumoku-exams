@@ -27,7 +27,7 @@
 
 - [0001 言語とツールの統一(TypeScript、Biome、Vitest)](./0001-language-and-tooling.md)(置き換え済み: 0028)
 - [0002 データの検証に Zod を使う](./0002-schema-validation-zod.md)
-- [0003 作成役と検査役のモデルを使い分ける](./0003-model-split-for-agents.md)
+- [0003 作成役と検査役のモデルを使い分ける](./0003-model-split-for-agents.md)(置き換え済み: 0029)
 - [0004 アプリは問題データの型を、スキーマから型だけ参照する](./0004-app-shares-data-types-by-type-import.md)
 - [0005 作問パイプラインを同じリポジトリの 3 つ目のワークスペースに置き、境界を守る](./0005-pipeline-workspace-and-boundary.md)
 - [0006 一次情報は、リンクと言い換えだけを台帳に持つ](./0006-source-ledger-and-rights.md)
@@ -53,3 +53,4 @@
 - [0026 動的なページと API は、当面 Lambda Web Adapter の構成のままにする](./0026-keep-lambda-web-adapter-for-now.md)
 - [0027 リリースノートの読み手を項目の種類で分け、開発の項目は画面に出さない](./0027-release-notes-audience-by-item-type.md)
 - [0028 言語とツールの統一(TypeScript、Biome、Vitest)と、手元と CI の Node 24](./0028-node-24-for-development-and-ci.md)
+- [0029 開発のサブエージェントの役の割り当てと、モデルの使い分け](./0029-dev-agent-roles-and-models.md)
