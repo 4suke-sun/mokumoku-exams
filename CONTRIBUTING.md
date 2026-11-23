@@ -144,7 +144,7 @@ Closes #12
 Claude Code からの push と、`gh` での PR・Issue の作成、題・本文の編集は、人の承認の印がないと、PreToolUse のフック(`scripts/approval-hook.ts`。`.claude/settings.json`)が止めます。
 権限の確認(`ask`)は、権限の確認を省く動作モードでは確認にならないため、フックで止めます。
 
-守る範囲は、**うっかりした操作と、権限の確認を省くモードでの素通り**です。コマンドの文字列を読んで判定するので、書き方を変えてわざと抜ける形(下の「見分けられない形」)は、対象外です。対象は、push と、PR・Issue の作成と題・本文の編集だけです。`gh pr merge`・`gh pr close`・`gh issue close` は、`ask` の設定だけが守ります。
+守る範囲は、**うっかりした操作と、権限の確認を省くモードでの素通り**です。コマンドの文字列を読んで判定するので、書き方を変えてわざと抜ける形(下の「見分けられない形」)は、対象外です。対象は、push と、PR・Issue の作成と題・本文の編集だけです。`gh pr merge`・`close`・`review`・`comment`、`gh issue close`・`reopen`・`delete`・`transfer`、`gh release create` は、`ask` の設定だけが守ります。
 
 - 印は、スキル(`/dev-push`、`/dev-pr`)で人の承認を得た直後に、メインのセッションが `node scripts/approval.ts grant push`、`grant pr <下書き>`、`grant issue <下書き>` で書きます(`pr`・`issue` は下書きが必須です)。
   置き場は `.git` の下(追跡されない)で、有効期限は 60 分です。`status` で確かめ、`revoke` で消せます。
@@ -200,15 +200,16 @@ Claude Code からの push と、`gh` での PR・Issue の作成、題・本文
 
 ### 権限の確認(ask)の範囲
 
-`.claude/settings.json` の `ask` は、外に出す操作と、環境を消す操作だけに絞ります。読むだけの操作で確認が出て、作業が止まるのを減らすためです。
+`.claude/settings.json` の `ask` は、外に出す操作と、環境やリポジトリのデータを消す・移す操作だけに絞ります。読むだけの操作で確認が出て、作業が止まるのを減らすためです。
 `ask` は `allow` より先に効くので、`allow` の `Bash(gh api *)`・`Bash(gh issue edit *)` に当たっても、下の確認の形に当たれば確認が出ます。
 
-- 確認が出る操作: `git push`、`gh pr create`・`edit`・`merge`・`close`、`gh issue create`・`close`、`gh label create`、`scripts/release.ts`・`npm run release`、`cdkd deploy`(`packages/infra` の `deploy` のスクリプトを含む)、`scripts/post-issues.ts`、環境を消す `cdkd destroy`(`packages/infra` の `destroy` のスクリプトを含む)。
+- 確認が出る操作: `git push`、`gh pr create`・`edit`・`merge`・`close`・`review`・`comment`、`gh issue create`・`close`・`reopen`、Issue を消す・別のリポジトリへ移す `gh issue delete`・`transfer`、`gh label create`、`gh release create`、`scripts/release.ts`・`npm run release`、`cdkd deploy`(`packages/infra` の `deploy` のスクリプトを含む)、`scripts/post-issues.ts`、環境を消す `cdkd destroy`(`packages/infra` の `destroy` のスクリプトを含む)。
 - `gh issue edit` は、題・本文などを変えるオプションを含むときだけ確認が出ます: `--body`・`-b`、`--body-file`・`-F`、`--title`・`-t`、`--add-project`・`--remove-project`、`--repo`・`-R`、`$`・`` ` ``(変数とコマンドの置換。中身が見えないため)。
   ラベル・マイルストーン・担当者だけの編集(`--add-label`・`--remove-label`・`--milestone`・`-m`・`--remove-milestone`・`--add-assignee`・`--remove-assignee`)は、確認なしで通ります。
 - `gh api` は、書き込みになりうるオプションを含むときだけ確認が出ます: `-X`・`--method`(`-X GET` も含む)、`-f`・`--raw-field`、`-F`・`--field`、`--input`、`$`・`` ` ``。`graphql` は `-f query=…` を使うので、読むだけの問い合わせでも確認が出ます。
 - 照合は文字列の部分一致なので、止める側に倒れます。ラベルの名前や `--jq` の式に `-t`・`-f` などが含まれると、読むだけでも確認が出ます。
-  `gh api` と `gh issue edit` の確認の形は、先頭に `*` を付けて、`env`・`xargs -n1`・`bash -c "…"` などの後ろにある呼び出しも拾います。複合コマンド(`&&`・`;`・`|`)、`$(…)` の中、`for` の中の呼び出しも、Claude Code が分けて照合します。
+  確認の形は、すべて先頭に `*` を付けて、`env`・`xargs -n1`・`bash -c "…"` などの後ろにある呼び出しも拾います。`echo "gh pr create"` のように、語が引数にあるだけでも確認が出ます(止める側に倒れます)。複合コマンド(`&&`・`;`・`|`)、`$(…)` の中、`for` の中の呼び出しも、Claude Code が分けて照合します。
+  Issue のコメント(`gh issue comment`)は、確認なしで通ります。確認の形と、確認が出ない読み取りの例は、`scripts/settings-ask.test.ts` が照合します。
 - `ask` は、権限の確認を省く動作モードでは効きません。題・本文の編集は、承認の印のフック(上の「承認の印」)も止めます。書き込みの `gh api` を止めるのは `ask` だけです。
 
 ### 拒否リスト
