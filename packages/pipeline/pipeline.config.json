@@ -58,7 +58,8 @@
     }
   },
   "verify": {
-    "maxAttempts": 3
+    "maxAttempts": 3,
+    "bundleSize": 10
   },
   "judge": {
     "maxAttempts": 3,

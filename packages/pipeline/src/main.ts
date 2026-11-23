@@ -1,10 +1,12 @@
 import { writeFileSync } from "node:fs";
+import { join, resolve } from "node:path";
 import { runCandidates } from "./collect/candidates.ts";
 import { type CollectDeps, runCollect } from "./collect/collect.ts";
 import { defaultDeps, Fetcher } from "./collect/fetcher.ts";
 import { runTitles } from "./collect/title.ts";
 import { COMMANDS } from "./commands.ts";
 import { type Config, ConfigError, loadConfig } from "./config.ts";
+import { EXAM_CODE } from "./contract.ts";
 import { runDraft } from "./draft/run.ts";
 import { runEval } from "./eval/run.ts";
 import { EXIT, type ExitCode } from "./exit-codes.ts";
@@ -20,9 +22,12 @@ import { runReasons } from "./reasons/run.ts";
 import { runRehash } from "./rehash/run.ts";
 import { runRestore } from "./restore/run.ts";
 import { runScore } from "./scorecard/run.ts";
+import { readAgentStampOrReport } from "./shared/agents.ts";
+import { readJsonFile } from "./shared/request-flow.ts";
 import { runStatus } from "./status/run.ts";
 import { runEvalSweep } from "./tuning/run.ts";
 import { runUnpublish } from "./unpublish/run.ts";
+import { bundleRequests } from "./verify/bundles.ts";
 import { runVerify } from "./verify/run.ts";
 
 export interface Context {
@@ -61,6 +66,7 @@ export const KNOWN_FLAGS = [
   "--rewrite",
   "--refetch",
   "--record",
+  "--bundles",
 ];
 const VALUE_OPTION = /^--(domain|targets|reason|role)=/;
 /** 値を取るオプションを、受け付けるコマンド */
@@ -76,8 +82,8 @@ const MODE_FLAGS: Record<string, readonly string[]> = {
   export: ["--titles"],
   facts: ["--import", "--coverage", "--report"],
   draft: ["--import", "--check", "--review", "--decide", "--revise", "--rewrite"],
-  verify: ["--import"],
-  eval: ["--import"],
+  verify: ["--import", "--bundles"],
+  eval: ["--import", "--bundles"],
   judge: ["--import"],
   "judge-eval": ["--import"],
   rehash: ["--refetch"],
@@ -128,8 +134,10 @@ function helpText(): string {
     "draft <資格コード> --rewrite        非公開の問題(判定が書き直しで復帰できる)ごとに、ブラッシュアップ役への書き直しの依頼を書く(取り込みは --import)",
     "verify <資格コード>                 下書きごとに、根拠の節だけを読んで正誤を再導出する検証の依頼を書く",
     "verify <資格コード> --import       検証役の出力を、下書きの宣言と照合して取り込む",
+    "verify <資格コード> --bundles      待っている検証の依頼を、検証役の 1 回の起動に渡す束(同じ check、設定の verify.bundleSize 件ずつ)に分けて表示する。読むだけ",
     "eval <資格コード>                   人が承認した下書きから評価用のデータを作り、検証役の評価の依頼を書く",
     "eval <資格コード> --import         検証役の出力を期待する判定と照合し、検出率・誤検出率などのレポートを書く",
+    "eval <資格コード> --bundles        待っている評価の依頼を、検証と同じ束に分けて表示する。読むだけ",
     "eval-sweep <資格コード> --targets=…  検証役の評価の結果に、目標の候補(<全体>/<種類ごと>/<誤検出の上限>)を当てて比べる。モデルは呼ばない",
     "eval-sweep <資格コード> --record --reason=<理由> --targets=…  設定の目標を、比べた表と理由つきで、しきい値の台帳に足す",
     "eval-gate                          評価の対象(役の定義・設定)が、最後に合格した記録と同じかを検査する。ネットワークもモデルも使わない",
@@ -233,12 +241,12 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
         facts: "使い方: facts <資格コード> [--import | --coverage | --report]\n",
         plan: "使い方: plan <資格コード>\n",
         export: "使い方: export <資格コード> [--titles]\n",
-        verify: "使い方: verify <資格コード> [--import]\n",
+        verify: "使い方: verify <資格コード> [--import | --bundles]\n",
         status: "使い方: status <資格コード>\n",
         score: "使い方: score <資格コード>\n",
         rehash: "使い方: rehash <資格コード> [--refetch]\n",
         reasons: "使い方: reasons <資格コード>\n",
-        eval: "使い方: eval <資格コード> [--import]\n",
+        eval: "使い方: eval <資格コード> [--import | --bundles]\n",
         judge: "使い方: judge <資格コード> [--import]\n",
         "judge-eval": "使い方: judge-eval <資格コード> [--import]\n",
         "eval-sweep":
@@ -338,6 +346,7 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
         report(output, "入力の誤り", "資格コードの指定がない");
         return EXIT.inputError;
       }
+      if (flags.includes("--bundles")) return reportBundles(config, rootDir, "eval", examCode, output);
       return runEval({
         config,
         rootDir,
@@ -458,6 +467,7 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
         report(output, "入力の誤り", "資格コードの指定がない");
         return EXIT.inputError;
       }
+      if (flags.includes("--bundles")) return reportBundles(config, rootDir, "verify", examCode, output);
       return runVerify({
         config,
         rootDir,
@@ -516,4 +526,47 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
     reportInternalError(output, error);
     return EXIT.internalError;
   }
+}
+
+/** 待っている検証(または検証役の評価)の依頼を、検証役の 1 回の起動に渡す束に分けて表示する。読むだけ */
+function reportBundles(
+  config: Config,
+  rootDir: string,
+  stage: "verify" | "eval",
+  examCode: string,
+  output: Output,
+): ExitCode {
+  if (!EXAM_CODE.test(examCode)) {
+    report(output, "入力の誤り", "資格コードの形");
+    return EXIT.inputError;
+  }
+  const stamp = readAgentStampOrReport(output, rootDir, "question-verifier");
+  if (stamp === null) return EXIT.checkFailed;
+  const dir = join(resolve(rootDir, config.workDir), stage, examCode.toLowerCase());
+  const state = readJsonFile(join(dir, "state.json"));
+  const attempts =
+    state !== null && typeof state === "object"
+      ? (Object.fromEntries(Object.entries(state).filter(([, v]) => typeof v === "number")) as Record<string, number>)
+      : {};
+  const { bundles, invalid, exhausted, stale } = bundleRequests({
+    rootDir,
+    requestsDir: join(dir, "requests"),
+    outDir: join(dir, "out"),
+    size: config.verify.bundleSize,
+    attempts,
+    maxAttempts: stage === "verify" ? config.verify.maxAttempts : config.eval.maxAttempts,
+    stamp,
+  });
+  const kind = stage === "verify" ? "検証の束" : "評価の束";
+  for (const b of bundles) report(output, kind, `${b.check} ${b.files.length} 件 ${b.files.join(" ")}`);
+  for (const path of invalid) report(output, "入力の誤り", `読めない依頼 ${path}`);
+  if (exhausted > 0) report(output, "情報", `出し直しの回数が上限に達した依頼 ${exhausted} 件(束に入れない)`);
+  if (stale > 0)
+    report(
+      output,
+      "情報",
+      `検証役の定義が依頼のあとに変わった依頼 ${stale} 件(束に入れない。依頼を書くコマンドが、新しい定義の依頼を書く)`,
+    );
+  report(output, "情報", `束 ${bundles.length} 個(束の大きさ ${config.verify.bundleSize} 件)`);
+  return invalid.length > 0 ? EXIT.inputError : EXIT.ok;
 }

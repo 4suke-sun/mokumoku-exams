@@ -10,6 +10,7 @@ import {
   readRequests,
   runMain,
   setupDraftRoot,
+  stubAgent,
   workPath,
   writeOutput,
 } from "../draft/test-helpers.ts";
@@ -468,6 +469,137 @@ describe("verify --import: 出力と依頼の照合", () => {
     const r = await runMain(root, ["verify", EXAM, "--import"]);
     expect(r.code).toBe(EXIT.ok);
     expect(r.err).toContain(`検証の出力なし: ${request.requestKey}`);
+  });
+
+  it("束の途中で止まり一部の依頼だけ出力がある_出力のある依頼だけを取り込み、残りの依頼は待ちのまま残って、あとから取り込める", async () => {
+    const root = setupDraftRoot();
+    await runMain(root, ["plan", EXAM]);
+    await runMain(root, ["draft", EXAM]);
+    stubAgent(root);
+    expect((await runMain(root, ["draft", EXAM, "--import"])).code).toBe(EXIT.ok);
+    await runMain(root, ["verify", EXAM]);
+    const requests = verifyRequests(root).filter((q) => q.check === "rederive");
+    expect(requests.length).toBeGreaterThanOrEqual(2);
+    const [done, waiting] = requests as [VerifyRequest, VerifyRequest];
+    const correctFor = (q: VerifyRequest) => {
+      const d = records(root).find((x) => x.id === q.draftId)?.draft;
+      return d !== null && d !== undefined && "correctAnswers" in d ? d.correctAnswers : [];
+    };
+    const byId = (id: string) => records(root).find((x) => x.id === id);
+    writeVerifierOutput(root, done, rederiveBody(done, correctFor(done)));
+    const partial = await runMain(root, ["verify", EXAM, "--import"]);
+    expect(partial.code).toBe(EXIT.ok);
+    expect(partial.err).toContain(`検証の出力なし: ${waiting.requestKey}`);
+    expect(byId(done.draftId)?.verification?.checks.rederive?.result).toBe("pass");
+    expect(byId(waiting.draftId)?.verification).toBeUndefined();
+    const left = verifyRequests(root).map((q) => q.requestKey);
+    expect(left).toContain(waiting.requestKey);
+    expect(left).not.toContain(done.requestKey);
+    // 残った依頼を、別の起動で処理した出力も、同じ形で取り込める
+    writeVerifierOutput(root, waiting, rederiveBody(waiting, correctFor(waiting)));
+    expect((await runMain(root, ["verify", EXAM, "--import"])).code).toBe(EXIT.ok);
+    expect(byId(waiting.draftId)?.verification?.checks.rederive?.result).toBe("pass");
+  });
+});
+
+describe("verify --bundles", () => {
+  async function withRequests() {
+    const root = setupDraftRoot();
+    await runMain(root, ["plan", EXAM]);
+    await runMain(root, ["draft", EXAM]);
+    stubAgent(root);
+    await runMain(root, ["draft", EXAM, "--import"]);
+    await runMain(root, ["verify", EXAM]);
+    return root;
+  }
+  const bundled = { verify: { ...baseConfig.verify, bundleSize: 2 } };
+  const bundleLines = (out: string) =>
+    out
+      .split("\n")
+      .filter((l) => l.startsWith("検証の束: "))
+      .map((l) => l.slice("検証の束: ".length).split(" "));
+
+  it("待っている依頼が束の大きさより多い_同じ check の依頼を大きさの数ずつ区切り、すべての依頼を 1 回ずつ挙げる。何も書かない", async () => {
+    const root = await withRequests();
+    const requests = verifyRequests(root);
+    expect(requests.length).toBeGreaterThan(2);
+    const before = readdirSync(verifyDir(root, "requests")).sort();
+    const r = await runMain(root, ["verify", EXAM, "--bundles"], bundled);
+    expect(r.code).toBe(EXIT.ok);
+    const lines = bundleLines(r.out);
+    expect(lines.length).toBe(Math.ceil(requests.length / 2));
+    const listed = lines.flatMap(([check, count, _unit, ...files]) => {
+      expect(check).toBe("rederive");
+      expect(Number(count)).toBe(files.length);
+      expect(files.length).toBeLessThanOrEqual(2);
+      return files;
+    });
+    expect(listed.sort()).toEqual(
+      requests.map((q) => join(baseConfig.workDir, "verify", "aws-aib-c01", "requests", `${q.requestKey}.json`)).sort(),
+    );
+    expect(readdirSync(verifyDir(root, "requests")).sort()).toEqual(before);
+  });
+
+  it("出力のある依頼と、再導出・解説の確認が混ざる_出力のある依頼は挙げず、check ごとに別の束にする", async () => {
+    const root = await withRequests();
+    const [first, second] = verifyRequests(root) as [VerifyRequest, VerifyRequest];
+    const correctFor = (q: VerifyRequest) => {
+      const d = records(root).find((x) => x.id === q.draftId)?.draft;
+      return d !== null && d !== undefined && "correctAnswers" in d ? d.correctAnswers : [];
+    };
+    writeVerifierOutput(root, first, rederiveBody(first, correctFor(first)));
+    await runMain(root, ["verify", EXAM, "--import"]);
+    await runMain(root, ["verify", EXAM]);
+    writeVerifierOutput(root, second, rederiveBody(second, correctFor(second)));
+    const lines = bundleLines((await runMain(root, ["verify", EXAM, "--bundles"], bundled)).out);
+    const checks = lines.map(([check]) => check);
+    expect(checks).toContain("explanation");
+    expect(checks.indexOf("explanation")).toBeGreaterThan(checks.lastIndexOf("rederive"));
+    const listed = lines.flatMap(([, , , ...files]) => files);
+    expect(listed.some((f) => f.includes(second.requestKey))).toBe(false);
+    const explanation = verifyRequests(root).find((q) => q.check === "explanation") as VerifyRequest;
+    const line = lines.find((l) => l.some((f) => f.includes(explanation.requestKey)));
+    expect(line?.[0]).toBe("explanation");
+  });
+
+  it("読めない依頼のファイルがある_束に入れず、場所を入力の誤りとして報告して終了コード 2", async () => {
+    const root = await withRequests();
+    writeFileSync(join(verifyDir(root, "requests"), "0000000000000000.json"), "{");
+    const r = await runMain(root, ["verify", EXAM, "--bundles"], bundled);
+    expect(r.code).toBe(EXIT.inputError);
+    expect(r.err).toContain("入力の誤り: 読めない依頼");
+    expect(r.out).not.toContain("0000000000000000");
+  });
+
+  it("出し直しの回数が上限ちょうどの依頼と、上限の 1 つ手前の依頼がある_上限の依頼だけを束に入れず、件数を報告する", async () => {
+    const root = await withRequests();
+    const [limit, below] = verifyRequests(root) as [VerifyRequest, VerifyRequest];
+    writeFileSync(
+      verifyDir(root, "state.json"),
+      JSON.stringify({
+        [limit.requestKey]: baseConfig.verify.maxAttempts,
+        [below.requestKey]: baseConfig.verify.maxAttempts - 1,
+      }),
+    );
+    const r = await runMain(root, ["verify", EXAM, "--bundles"], bundled);
+    expect(r.code).toBe(EXIT.ok);
+    const listed = bundleLines(r.out).flatMap(([, , , ...files]) => files);
+    expect(listed.some((f) => f.includes(limit.requestKey))).toBe(false);
+    expect(listed.some((f) => f.includes(below.requestKey))).toBe(true);
+    expect(r.out + r.err).toContain("出し直しの回数が上限に達した依頼 1 件");
+  });
+
+  it("依頼のあとに検証役の定義が変わった依頼がある_束に入れず、件数を報告する", async () => {
+    const root = await withRequests();
+    const [old] = verifyRequests(root) as [VerifyRequest];
+    const path = verifyDir(root, "requests", `${old.requestKey}.json`);
+    const request = JSON.parse(readFileSync(path, "utf8"));
+    writeFileSync(path, JSON.stringify({ ...request, agent: { ...request.agent, definitionHash: "0".repeat(64) } }));
+    const r = await runMain(root, ["verify", EXAM, "--bundles"], bundled);
+    expect(r.code).toBe(EXIT.ok);
+    const listed = bundleLines(r.out).flatMap(([, , , ...files]) => files);
+    expect(listed.some((f) => f.includes(old.requestKey))).toBe(false);
+    expect(r.out + r.err).toContain("検証役の定義が依頼のあとに変わった依頼 1 件");
   });
 });
 

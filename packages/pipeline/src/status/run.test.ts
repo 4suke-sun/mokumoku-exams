@@ -101,7 +101,7 @@ describe("status", () => {
     expect(r.out).toMatch(/状態: 未達 p-[0-9a-f]{12} no-facts/);
   });
 
-  it("役のモデルと定義のハッシュ_すべての役を出し、依頼待ちの件数 × モデルの見積もりを出す。費用は測らない", async () => {
+  it("役のモデルと定義のハッシュ_すべての役を出し、依頼待ちの件数 × モデルの見積もりと検証役の束の大きさを出す。費用は測らない", async () => {
     const root = await withDrafts();
     const r = await status(root);
     for (const role of PIPELINE_ROLES) {
@@ -109,7 +109,7 @@ describe("status", () => {
       expect(r.out).toContain(`状態: 役 ${role} ${stamp.model} 定義 ${stamp.definitionHash.slice(0, 12)}`);
       expect(r.out).toMatch(new RegExp(`見積もり .*${role} \\d+ 件 × ${stamp.model}`));
     }
-    expect(r.out).toContain(`1 回の実行の上限 ${100} 件`);
+    expect(r.out).toContain(`1 回の実行の上限 ${100} 件、検証役の束の大きさ ${baseConfig.verify.bundleSize} 件`);
     expect(r.out).not.toMatch(/費用|トークン|円|ドル/);
   });
 

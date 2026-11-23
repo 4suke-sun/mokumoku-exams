@@ -125,6 +125,8 @@ export const ConfigSchema = z.strictObject({
   verify: z.strictObject({
     /** 依頼 1 件の取り込みを、形の検査に通らずにやり直せる回数の上限 */
     maxAttempts: z.number().int().positive(),
+    /** 検証役の 1 回の起動に渡す依頼の数(束の大きさ。同じ check の依頼だけで組む。1 は束にしない) */
+    bundleSize: z.number().int().min(1).max(10),
   }),
   /** 判定(公開している問題の質の判定)と、判定役の評価 */
   judge: z.strictObject({

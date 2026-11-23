@@ -314,7 +314,11 @@ function importStep(ctx: Context): ExitCode {
         fail(checked.reason);
         continue;
       }
-      results[c.caseId] = { ...results[c.caseId], rederive: checked.codes.length === 0 ? "pass" : "hold" };
+      results[c.caseId] = {
+        ...results[c.caseId],
+        rederive: checked.codes.length === 0 ? "pass" : "hold",
+        choices: Object.fromEntries(checked.choices.map((x) => [x.key, x.judgement])),
+      };
     } else {
       const parsed = ExplanationOutputSchema.safeParse(raw);
       if (!parsed.success) {
@@ -326,7 +330,11 @@ function importStep(ctx: Context): ExitCode {
         fail(checked.reason);
         continue;
       }
-      results[c.caseId] = { ...results[c.caseId], explanation: checked.findings.length === 0 ? "pass" : "hold" };
+      results[c.caseId] = {
+        ...results[c.caseId],
+        explanation: checked.findings.length === 0 ? "pass" : "hold",
+        findings: checked.findings.map((f) => `${f.where} ${f.code}`),
+      };
     }
     doneFiles.push(file);
   }

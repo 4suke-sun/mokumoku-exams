@@ -1,0 +1,22 @@
+{
+  "records": [
+    {
+      "at": "2026-11-23",
+      "role": "verifier",
+      "subjectHash": "e2468eb645b6dba1678a07b52008d8e4de9a9c988da498aefcac5326645e83d1",
+      "agent": {
+        "role": "question-verifier",
+        "model": "claude-opus-5-5",
+        "definitionHash": "a46251715e021ecbdba37357a4e957c4c9ab4f73d10aa9e59dd3e2c00d04cd90"
+      },
+      "settingsHash": "3087ec058061d9d40421a8dd0629076483fec6a2975217a8e4c8ee8174311889",
+      "reports": [
+        {
+          "examCode": "AWS-SOA-C03",
+          "datasetHash": "a8671c3d5ebf73b9d6d6e3aac3aab7ff05a29e54e7e31e13a6e4f3737386c06a",
+          "cases": 24
+        }
+      ]
+    }
+  ]
+}
