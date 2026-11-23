@@ -74,7 +74,8 @@ node scripts/lessons.ts closed      # 対処済みにした種類の、キーと
 | 範囲外を指摘した、範囲外を編集した | `out-of-scope` |
 | 検査の報告に、見つけた値を引用した | `value-quoted` |
 | 既存の本文を書き換えた(編集の依頼で、追記だけのはずが) | `rewrote-existing` |
-| 定義が許す外のコマンドを使った(編集・読み取り・集計・機械検査。編集は Write ツールだけ。作成役の許可の外のコマンドはフックが止める。読み取り役の書き込みは、別の Issue で扱う(いまは定義の決まりだけ)) | `subagent-disallowed-command` |
+| 定義が許す外のコマンドを使った(編集・読み取り・集計・機械検査。編集は Write ツールだけ。作成役の許可の外のコマンドはフックが止める) | `subagent-disallowed-command` |
+| 読み取り役(`Explore`・`Plan`)が、許可の外のコマンドや書き込みになる形を使った(許可リストの外の形はフックが止める) | `readonly-agent-bash-write` |
 | 入力の範囲を読み違えた(差分から省かれた旧い文言、差分の対象ではない既存のファイル) | `inspector-stale-diff-misread` |
 
 ## 繰り返しと Issue の候補

@@ -1,7 +1,12 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { decideHook } from "./approval.ts";
-import { decideSubagentCommand, WRITER_ALLOWED_COMMANDS } from "./subagent-command.ts";
+import {
+  decideSubagentCommand,
+  READONLY_ALLOWED_COMMANDS,
+  READONLY_ROLES,
+  WRITER_ALLOWED_COMMANDS,
+} from "./subagent-command.ts";
 
 const ok = (agentType: string | undefined, command: string) => decideSubagentCommand(agentType, command).ok;
 
@@ -156,9 +161,127 @@ describe("decideSubagentCommand(ほかの役)", () => {
     expect(ok("", "echo x > a")).toBe(true);
   });
 
-  it("作成役でない役(読み取り役は別の Issue で扱う)_この判定では止めない", () => {
+  it("作成役でも読み取り役でもない役_この判定では止めない", () => {
     expect(ok("general-purpose", "npm test > out.txt")).toBe(true);
-    expect(ok("Explore", "echo x > a")).toBe(true);
+    expect(ok("question-drafter", "echo x > a")).toBe(true);
+  });
+});
+
+describe("decideSubagentCommand(読み取り役)", () => {
+  for (const role of READONLY_ROLES) {
+    it(`${role} の許可のコマンド_通す`, () => {
+      expect(ok(role, "cat docs/a.md")).toBe(true);
+      expect(ok(role, "head -n 20 docs/a.md")).toBe(true);
+      expect(ok(role, "grep -rn 'foo bar' packages/app")).toBe(true);
+      expect(ok(role, "ls -la scripts")).toBe(true);
+      expect(ok(role, "wc -l scripts/lib/approval.ts")).toBe(true);
+      expect(ok(role, "git log --oneline -5")).toBe(true);
+      expect(ok(role, "git diff origin/main..HEAD --stat")).toBe(true);
+      expect(ok(role, "find packages -name '*.ts' -newer package.json")).toBe(true);
+    });
+  }
+
+  it("パイプと 2>/dev/null_許可のコマンドどうしなら通す", () => {
+    expect(ok("Explore", "git log --oneline | head -n 5")).toBe(true);
+    expect(ok("Explore", "grep -rn foo . 2>/dev/null | wc -l")).toBe(true);
+    expect(ok("Explore", "ls missing 2>/dev/null")).toBe(true);
+    expect(ok("Explore", "cat a.md | grep 'a | b' | head")).toBe(true);
+  });
+
+  it("許可の一覧の外のコマンド_止める", () => {
+    for (const command of [
+      "rm -rf tmp",
+      "npm test",
+      "node scripts/x.ts",
+      "sed -i s/a/b/ f",
+      "sort -o out f",
+      "awk 1 f",
+      "xargs cat",
+    ]) {
+      expect(ok("Explore", command)).toBe(false);
+    }
+    expect(ok("Plan", "git push")).toBe(false);
+    expect(ok("Plan", "git branch -D x")).toBe(false);
+    expect(ok("Plan", "git -C ../x log")).toBe(false);
+    expect(ok("Plan", "git -c core.pager=x log")).toBe(false);
+  });
+
+  it("ファイルへの書き出し_リダイレクトとオプションを止める", () => {
+    for (const command of [
+      "cat a > b",
+      "cat a >> b",
+      "cat a 1>b",
+      "cat a >&2",
+      "cat a &> b",
+      "cat a 2>b",
+      "cat a 2>>/dev/null",
+      "cat a 2>/dev/nullx",
+      "echo|tee f",
+      "git diff --output=out.patch",
+      "git log --output out.txt",
+    ]) {
+      expect(ok("Explore", command)).toBe(false);
+    }
+  });
+
+  it("find の書き込み・起動・削除のオプション_止める", () => {
+    for (const option of [
+      "-exec rm {} ;",
+      "-execdir cat {} ;",
+      "-ok rm {} ;",
+      "-okdir rm {} ;",
+      "-delete",
+      "-fprint out.txt",
+      "-fprint0 out",
+      "-fprintf out x",
+      "-fls out",
+    ]) {
+      expect(ok("Explore", `find . ${option}`)).toBe(false);
+    }
+  });
+
+  it("既知のすり抜けの形_止める", () => {
+    for (const command of [
+      "cat a # > b",
+      "cat $'\\x61'",
+      "cat <<EOF",
+      "cat <<<x",
+      "for f in a; do cat $f; done",
+      "if true; then cat a; fi",
+      "bash -lc 'echo x > a'",
+      "$CMD a",
+      "$(echo cat) a",
+      "cat `echo a`",
+      "cat a; rm b",
+      "cat a && rm b",
+      "cat a || rm b",
+      "cat a |& tee b",
+      "(cat a)",
+      "cat a &",
+      "cat a\nrm b",
+      "cat {a,b}",
+      "cat 'a",
+      "cat a\\",
+    ]) {
+      expect(ok("Explore", command)).toBe(false);
+    }
+  });
+
+  it("空のコマンドと、パイプの端が空_止める", () => {
+    expect(ok("Explore", "")).toBe(false);
+    expect(ok("Explore", "| head")).toBe(false);
+    expect(ok("Explore", "cat a |")).toBe(false);
+  });
+
+  it("引用符の中の演算子の文字と2>/dev/null_引数なので通す", () => {
+    expect(ok("Explore", "grep 'a > b' docs/a.md")).toBe(true);
+    expect(ok("Explore", 'grep "x; y" docs/a.md')).toBe(true);
+    expect(ok("Explore", "grep '2>/dev/null' docs/a.md")).toBe(true);
+  });
+
+  it("止めた理由_代わりの手段を添える", () => {
+    const decision = decideSubagentCommand("Explore", "cat a > b");
+    expect(decision.ok ? "" : decision.reason).toContain("Read、検索は Grep・Glob");
   });
 });
 
@@ -186,6 +309,12 @@ describe("decideHook と役ごとの判定", () => {
     expect(push.ok ? "" : push.reason).toContain("サブエージェントからは実行しません");
   });
 
+  it("読み取り役が書き込む形を使う_理由を添えて止める", () => {
+    const decision = hook("cat <<EOF > a.txt", "Explore");
+    expect(decision.ok).toBe(false);
+    expect(hook("cat a.txt | head", "Explore").ok).toBe(true);
+  });
+
   it("サブエージェントの識別子がない_作成役の名前があっても役の判定をしない", () => {
     expect(hook("echo x > a", "draft-writer", "").ok).toBe(true);
   });
@@ -205,4 +334,22 @@ describe("作成役の定義と許可の一覧の一致", () => {
       expect([...listed(name)].sort()).toEqual([...(WRITER_ALLOWED_COMMANDS[name] ?? [])].sort());
     });
   }
+});
+
+describe("読み取り役の一覧と CONTRIBUTING.md の一致", () => {
+  const doc = readFileSync(new URL("../../CONTRIBUTING.md", import.meta.url), "utf8");
+  // 「…は、`a`・`b`…だけ」の行の、だけより前のバッククォートの語
+  const listed = (marker: string): string[] => {
+    const line = doc.split("\n").find((l) => l.includes(marker)) ?? "";
+    const part = line.slice(line.indexOf(marker), line.indexOf("だけ", line.indexOf(marker)));
+    return [...part.matchAll(/`([^`]+)`/g)].map((m) => m[1] as string);
+  };
+
+  it("読み取り役の名前_コードの一覧と同じものを挙げる", () => {
+    expect(listed("読み取り役の名前は").sort()).toEqual([...READONLY_ROLES].sort());
+  });
+
+  it("読み取り役が実行してよいコマンド_コードの一覧と同じものを挙げる", () => {
+    expect(listed("読み取り役が Bash で実行してよいのは").sort()).toEqual([...READONLY_ALLOWED_COMMANDS].sort());
+  });
 });
