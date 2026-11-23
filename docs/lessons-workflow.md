@@ -77,6 +77,7 @@ node scripts/lessons.ts closed      # 対処済みにした種類の、キーと
 | 定義が許す外のコマンドを使った(編集・読み取り・集計・機械検査。編集は Write ツールだけ) | `subagent-disallowed-command` |
 | 読み取り役(`Explore`・`Plan`)が、許可の外のコマンドや書き込みになる形を使った(許可リストの外の形はフックが止める) | `readonly-agent-bash-write` |
 | 入力の範囲を読み違えた(差分から省かれた旧い文言、差分の対象ではない既存のファイル) | `inspector-stale-diff-misread` |
+| 抽出役が、主題の名前のない主張(「この段階では」のように文脈に頼る書き方)や、表を行ごとに分けない主張を書いた | `fact-claim-without-subject` |
 
 ## 繰り返しと Issue の候補
 

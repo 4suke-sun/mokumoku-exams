@@ -1,4 +1,5 @@
 import { containsUrl, HEADING_KINDS, normalizeHeading, unpairedWrongParagraphs } from "../contract.ts";
+import { findAvoidTerms, findUnexpandedAbbreviations, type Terms } from "../shared/terms.ts";
 import { compact } from "../text.ts";
 import { type ChoiceDraft, type Draft, isChoiceDraft } from "./schema.ts";
 import { similarity } from "./similarity.ts";
@@ -9,7 +10,7 @@ import { similarity } from "./similarity.ts";
  */
 
 /** 規則の集合を変えたら上げる。下書きの依頼の鍵に入るので、上げると依頼のキャッシュが切れる */
-export const STYLE_VERSION = 4;
+export const STYLE_VERSION = 5;
 
 export type Severity = "block" | "warn";
 
@@ -27,8 +28,14 @@ export interface StyleRule {
   summary: string;
   /** どの種別の下書きに適用するか。選択式(単一・複数)、自由記述、どちらにも */
   appliesTo: "choice" | "free-text" | "both";
-  /** 違反した場所の一覧。通れば空 */
-  check(draft: Draft): string[];
+  /** 違反した場所の一覧。通れば空。`ctx` は、資格のベンダーの用語の辞書など、下書きの外の入力(なければ、辞書を使う規則は何も止めない) */
+  check(draft: Draft, ctx?: StyleContext): string[];
+}
+
+/** 規則が使う、下書きの外の入力 */
+export interface StyleContext {
+  /** ベンダーの用語の辞書。辞書のないベンダーは null か省略 */
+  terms?: Terms | null;
 }
 
 /** 選択式の下書きにだけ適用する規則の検査を、種別で絞って呼ぶ */
@@ -355,13 +362,52 @@ export const STYLE_RULES: readonly StyleRule[] = [
     summary: "環境固有の値(12 桁のアカウント ID、ARN、アクセスキー、メールアドレス、ローカルのパス)を書かない",
     check: (d) => texts(d).flatMap((t) => (hasEnvValue(t.text) ? [t.path] : [])),
   },
+  {
+    name: "avoid-term",
+    severity: "block",
+    summary: "用語の辞書で使わないと決めた訳語を書かない(辞書の「使う訳語と使わない訳語」の表。別の意味の語は対象外)",
+    appliesTo: "both",
+    check: (d, ctx) => {
+      const terms = ctx?.terms;
+      return terms == null ? [] : texts(d).flatMap((t) => (findAvoidTerms(t.text, terms).length > 0 ? [t.path] : []));
+    },
+  },
+  {
+    name: "abbr-first-use",
+    severity: "block",
+    summary:
+      "用語の辞書の「略語と正式名称」にある略語は、1 問の中の最初の出現(設問文、選択肢、総合解説、選択肢ごとの解説、補足の順)に、「略語(正式名称)」の形で正式名称を補う。補わない略語は対象外",
+    appliesTo: "both",
+    check: (d, ctx) => {
+      const terms = ctx?.terms;
+      return terms == null ? [] : findUnexpandedAbbreviations(readingOrder(d), terms);
+    },
+  },
 ];
 
+/**
+ * 1 問を読む順の本文と場所。設問文 → 選択肢 → 総合解説 → 選択肢ごとの解説 → 補足。
+ * 自由記述は、設問文 → 採点の観点 → 解説 → 補足。
+ */
+function readingOrder(draft: Draft): { path: string; text: string }[] {
+  const all = texts(draft);
+  const isExplanationOfChoice = (path: string) => /^choices\.\d+\.explanation$/.test(path);
+  if (!isChoiceDraft(draft)) return all;
+  const stem = all.filter((t) => t.path === "questionText");
+  const choices = all.filter((t) => /^choices\.\d+\.text$/.test(t.path));
+  const overall = all.filter((t) => t.path === "explanation");
+  const perChoice = all.filter((t) => isExplanationOfChoice(t.path));
+  const supplement = all.filter((t) => t.path === "supplement");
+  return [...stem, ...choices, ...overall, ...perChoice, ...supplement];
+}
+
 /** 下書きにスタイル規則を適用する。結果は、規則の名前・重さ・場所だけ(本文は含まない) */
-export function checkStyle(draft: Draft, rules: readonly StyleRule[] = STYLE_RULES): Finding[] {
+export function checkStyle(draft: Draft, rules: readonly StyleRule[] = STYLE_RULES, ctx?: StyleContext): Finding[] {
   return rules
     .filter((rule) => rule.appliesTo === "both" || rule.appliesTo === (isChoiceDraft(draft) ? "choice" : "free-text"))
-    .flatMap((rule) => rule.check(draft).map((path): Finding => ({ rule: rule.name, severity: rule.severity, path })));
+    .flatMap((rule) =>
+      rule.check(draft, ctx).map((path): Finding => ({ rule: rule.name, severity: rule.severity, path })),
+    );
 }
 
 export interface StyleVerdict {
@@ -371,8 +417,12 @@ export interface StyleVerdict {
   warnings: Finding[];
 }
 
-export function evaluateStyle(draft: Draft, rules: readonly StyleRule[] = STYLE_RULES): StyleVerdict {
-  const all = checkStyle(draft, rules);
+export function evaluateStyle(
+  draft: Draft,
+  rules: readonly StyleRule[] = STYLE_RULES,
+  ctx?: StyleContext,
+): StyleVerdict {
+  const all = checkStyle(draft, rules, ctx);
   return {
     blockers: all.filter((f) => f.severity === "block"),
     warnings: all.filter((f) => f.severity === "warn"),

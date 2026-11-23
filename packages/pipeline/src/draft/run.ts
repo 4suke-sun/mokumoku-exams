@@ -26,7 +26,7 @@ import { planFor, recordedOrComputed } from "../sampling/load.ts";
 import type { SamplingPlan } from "../sampling/plan.ts";
 import { recordOf, writeSampling } from "../sampling/store.ts";
 import { scorecardWarnings } from "../scorecard/draft.ts";
-import { styleGuidePaths } from "../scorecard/profiles.ts";
+import { vendorOf } from "../scorecard/profiles.ts";
 import { type AgentStamp, readAgentStampOrReport } from "../shared/agents.ts";
 import { prepareExam } from "../shared/exam.ts";
 import { writeJson } from "../shared/fs.ts";
@@ -40,9 +40,11 @@ import {
   reportStop,
 } from "../shared/request-flow.ts";
 import { scopeFindings, scopeListsOf } from "../shared/scope.ts";
+import { readTerms, type Terms, TermsError } from "../shared/terms.ts";
 import { copyCheck } from "./copy.ts";
 import { candidateOf, findDuplicates, maxSimilarity, readPublishedCandidates, readPublishedChoices } from "./dedupe.ts";
 import { checkDistractors } from "./distractors.ts";
+import { requestStyleGuides } from "./guides.ts";
 import {
   buildEntry,
   checkProvenance,
@@ -459,7 +461,7 @@ function requestStep(
     report(output, "問題データの誤り", `questions.${examCode.toLowerCase()}.json`);
     return EXIT.checkFailed;
   }
-  const styleGuides = styleGuidePaths(examCode);
+  const styleGuides = requestStyleGuides(rootDir, examCode);
   let requested = 0;
   let satisfied = 0;
   let cached = 0;
@@ -618,7 +620,7 @@ function reviseStep(
   const state = readState(paths.state);
   const usage = new Map<string, number>();
   for (const d of drafts.drafts) for (const id of usedFactIds(d)) usage.set(id, (usage.get(id) ?? 0) + 1);
-  const styleGuides = styleGuidePaths(examCode);
+  const styleGuides = requestStyleGuides(rootDir, examCode);
   let requested = 0;
   let pending = 0;
   let cached = 0;
@@ -724,7 +726,7 @@ function rewriteStep(
   const state = readState(paths.state);
   const usage = new Map<string, number>();
   for (const d of drafts.drafts) for (const id of usedFactIds(d)) usage.set(id, (usage.get(id) ?? 0) + 1);
-  const styleGuides = styleGuidePaths(examCode);
+  const styleGuides = requestStyleGuides(rootDir, examCode);
   let requested = 0;
   let pending = 0;
   let cached = 0;
@@ -865,6 +867,15 @@ function importStep(
     report(output, "問題データの誤り", `unpublished.${examCode.toLowerCase()}.json`);
     return EXIT.checkFailed;
   }
+  // ベンダーの用語の辞書(ない場合は、辞書を使う規則は何も止めない)
+  let terms: Terms | null;
+  try {
+    terms = readTerms(rootDir, vendorOf(examCode));
+  } catch (error) {
+    if (!(error instanceof TermsError)) throw error;
+    for (const p of error.paths) report(output, "用語の辞書の誤り", p);
+    return EXIT.checkFailed;
+  }
   // 重複を比べる相手: 公開済みの問題(読み取り専用)と、不採用でない下書き
   const pool = [
     ...published,
@@ -989,7 +1000,7 @@ function importStep(
       let copied: ReturnType<typeof copyCheck> = "ok";
       if (draft.questionType !== request.kind) reasons.push("kind-mismatch");
       if (!draft.factIds.every((f) => factIds.has(f))) reasons.push("fact-not-in-request");
-      const verdict = evaluateStyle(draft);
+      const verdict = evaluateStyle(draft, undefined, { terms });
       for (const f of verdict.blockers) reasons.push(`style:${f.rule}`);
       // 誤答の検査は選択式だけ(自由記述に誤答はない)
       const distractors = isChoiceDraft(draft)

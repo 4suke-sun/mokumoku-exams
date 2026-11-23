@@ -46,7 +46,7 @@ describe("draft の依頼", () => {
       expect(request.count).toBeLessThanOrEqual(baseConfig.draft.maxPerRequest);
       expect(request.facts.every((f) => f.claim.startsWith("架空の主張"))).toBe(true);
       expect(request.styleRules.length).toBeGreaterThan(0);
-      // 点数票の帯のある資格の依頼には、出題スタイルの指針(ベンダー共通、資格別)を載せる
+      // 点数票の帯のある資格の依頼には、出題スタイルの指針(ベンダー共通、資格別。辞書の文書があれば、その文書も)を載せる
       expect(request.styleGuides).toEqual(["docs/exam-style/aws-common.md", "docs/exam-style/aws-aib.md"]);
     }
     expect(r.out).toContain("下書きの依頼:");
