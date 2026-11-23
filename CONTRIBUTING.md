@@ -391,3 +391,22 @@ npm run release -- <PR の番号>           # マージから確認の一覧ま�
 | マージの方式 | マージコミットだけ(`allow_merge_commit` が `true`、`allow_squash_merge` と `allow_rebase_merge` が `false`) | `gh api repos/{owner}/{repo} --jq '{allow_merge_commit, allow_squash_merge, allow_rebase_merge}'` |
 
 設定の変更は、リポジトリの管理者の操作です(`gh api -X PATCH repos/{owner}/{repo} -F delete_branch_on_merge=true -F allow_squash_merge=false -F allow_rebase_merge=false`)。実行の前に、人の確認を取ります。
+
+## デプロイ
+
+Release まで済んだ版のデプロイは、`scripts/deploy.ts` で、デプロイの前までの段階を進めます(スキル: `.claude/skills/dev-deploy`)。`/dev-release` の最後に、デプロイが要る版かを表示します。
+
+```sh
+node scripts/deploy.ts <版>           # 前提 → 要否 → 静的な確認 → 差分 → 関門(承認待ち)
+node scripts/deploy.ts <版> --after   # デプロイのあと: 人が確かめる項目の一覧
+```
+
+- 前提の確認: 版のタグがあり、それが最新のタグで、作業ツリーの先頭がそのタグのコミットで、変更がなく、`.env` があり、追跡されていない。AWS の認証が使える(`aws` コマンドがなければ、確かめずに進み、差分の段階で分かります)。
+- 要否の判定: 前の版のタグとの差分のパスで見ます。影響するのは、`packages/app/`・`packages/infra/`・`packages/data-schema/`・`data/`(`data/release-notes.json` を含む)・ルート直下のファイルです。
+  `scripts/`・`.github/`・`packages/pipeline/`・`docs/` だけの変更は影響しません(CI の `changes` ジョブは、`scripts/` と `.github/` の変更でも全ジョブを動かすので、同じ区分ではありません)。
+  `data/release-notes.json` だけが影響する版は、人が省くと選べます(次の版のデプロイでまとめて出ます)。
+- 静的な確認: [デプロイ前のチェックリスト](docs/pre-deploy-checklist.md)の、機械で確かめられる項目(環境変数の契約、lint、型検査、テスト、ビルド、Lambda の成果物、非公開の問題の混入)と、前提の確認の `.env` が追跡されていないこと。出力は `mask` を通します。
+- 差分: `npm run diff -w @mokumoku-exams/infra -- --all` の出力を、`mask` に通して読み、要約(変更のあるスタック、リソースの種類と件数、IAM・公開の設定・削除の有無)を出します。伏せた全文は `.drafts/deploy/` に置きます(gitignore 済み)。
+- 関門とデプロイ: 要約を人が確かめて承認したあと、`npm run deploy -w @mokumoku-exams/infra -- --all` を、人が自分の端末で実行します(確認の問いが出うるため)。デプロイの出力は、記録に載せません。
+- デプロイのあと: [デプロイ後の画面確認](docs/post-deploy-smoke.md)の項目を、人が確かめます。通るまで、公開へ進みません。
+- 状態は持たず、再実行してよい作りです。失敗した段階で止まります。戻すときは、前の版のタグを指定して、同じ手順で再デプロイします(自動のロールバック、CI からのデプロイ、複数の環境は、範囲外です)。
