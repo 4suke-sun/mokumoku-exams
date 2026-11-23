@@ -4,8 +4,9 @@ import { sha256 } from "../collect/fetcher.ts";
 import { LedgerError, ledgerPath, readLedger } from "../collect/ledger.ts";
 import type { Config } from "../config.ts";
 import { type Output, report } from "../log.ts";
-import { styleGuidePaths } from "../scorecard/profiles.ts";
+import { styleGuidePaths, vendorOf } from "../scorecard/profiles.ts";
 import { hasScopeLists, type ScopeLists, scopeListsOf } from "../shared/scope.ts";
+import { readTerms, type Terms, TermsError, termsForCriteria } from "../shared/terms.ts";
 
 /**
  * 判定の基準: 資格別の書き方の文書(docs/exam-style/<ベンダー>-<略称>.md)の「判定の基準」の節。
@@ -35,6 +36,21 @@ export function withScope(criteria: Criteria, lists: ScopeLists): Criteria {
   return { ...criteria, text, hash: sha256(Buffer.from(text)) };
 }
 
+/** 用語の辞書の見出し。判定の基準の末尾に足す(範囲の一覧の次) */
+const TERMS_HEADING = "### 用語の辞書(使う語と使わない語。ベンダー共通)";
+
+/**
+ * 判定の基準に、用語の辞書の「使う語と使わない語」の対を足す。判定役は、基準の本文だけを読むので、末尾に載せる。
+ * ハッシュも対を含み、辞書が変わると判定をやり直す。対がなければ、そのまま返す。
+ * 略語の補い方は、取り込みの検査(`abbr-first-use`)が決定的に止めるので、基準には載せない。
+ */
+export function withTerms(criteria: Criteria, terms: Terms | null): Criteria {
+  const lines = terms === null ? [] : termsForCriteria(terms);
+  if (lines.length === 0) return criteria;
+  const text = `${criteria.text}\n\n${[TERMS_HEADING, "", ...lines.map((l) => `- ${l}`)].join("\n")}`;
+  return { ...criteria, text, hash: sha256(Buffer.from(text)) };
+}
+
 /**
  * 判定・書き直しの復帰・非公開への移動が使う判定の基準を読む(基準の文書に、台帳の範囲の一覧を足したもの)。
  * 基準の文書の節がなければ null。台帳が読めなければ、誤りを報告して undefined
@@ -49,8 +65,13 @@ export function readCriteriaWithScope(
   if (criteria === null) return null;
   try {
     const ledger = readLedger(ledgerPath(resolve(rootDir, config.ledgerDir), examCode), examCode);
-    return withScope(criteria, scopeListsOf(ledger.guide));
+    const terms = readTerms(rootDir, vendorOf(examCode));
+    return withTerms(withScope(criteria, scopeListsOf(ledger.guide)), terms);
   } catch (error) {
+    if (error instanceof TermsError) {
+      for (const p of error.paths) report(output, "用語の辞書の誤り", p);
+      return undefined;
+    }
     if (!(error instanceof LedgerError)) throw error;
     for (const p of error.paths) report(output, "台帳の誤り", p);
     return undefined;
