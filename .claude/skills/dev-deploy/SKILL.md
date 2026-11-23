@@ -14,7 +14,7 @@ description: Release まで済んだ版を、デプロイまで進める。段�
 
 ## 守ること
 
-- `cdkd deploy`(`npm run deploy`)は、モデルが実行しない。確認の問いが出うるので、人が自分の端末で実行する(`docs/app/lessons/0004-mask-diff-output.md`)。
+- `cdkd deploy`(インフラのパッケージの `deploy`)は、モデルが実行しない。確認の問いが出うるので、人が自分の端末で実行する(`docs/app/lessons/0004-mask-diff-output.md`)。
   デプロイの出力は、`mask` に通さずに記録しない。人の報告と、終了コードだけを使う。
 - 差分・合成の出力は、必ず `npm run -s mask` を通した形で読む(スクリプトが通す)。伏せていない出力を、会話・記録・コミットに出さない。
 - 素の `cdk` と混在させない。`v1.0.0` までのデプロイは `cdkd` だけ(`CLAUDE.md`)。
@@ -52,5 +52,5 @@ npm run deploy -w @mokumoku-exams/infra -- --all
 node scripts/deploy.ts <版> --after
 ```
 
-人が確かめる項目の一覧(`docs/post-deploy-smoke.md` の「3. 確認する流れ」)を出して止まる。人が確かめて、結果を報告する。
+自動のスモーク(`scripts/smoke.ts`。認証が要らない経路と、使い捨てのユーザーによる認証つきの範囲)を実行し、結果の表と、人が確かめる項目の一覧(`docs/post-deploy-smoke.md` の「3. 確認する流れ」から、自動で確かめた項目を除いたもの)を出して止まる。人が確かめて、結果を報告する。
 **この確認が通るまで、公開へ進まない**(`docs/post-deploy-smoke.md`)。結果は、項目ごとに、成功 / 失敗 / 未確認で、場所と種類だけを書く(値を書かない)。

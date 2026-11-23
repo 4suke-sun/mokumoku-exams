@@ -2,7 +2,7 @@
 /**
  * Release のあとの、デプロイまでの手順(スキル: .claude/skills/dev-deploy)。
  *   node scripts/deploy.ts <版>           前提 → 要否 → 静的な確認 → 差分 → 関門(承認待ち)。デプロイのコマンドを表示して終わる
- *   node scripts/deploy.ts <版> --after   デプロイのあと: 前提 → 人が確かめる項目の一覧
+ *   node scripts/deploy.ts <版> --after   デプロイのあと: 前提 → 自動のスモーク(scripts/smoke.ts)→ 人が確かめる項目の一覧
  * デプロイ自体は、確認の問いが出うるので、人が自分の端末で実行する(docs/app/lessons/0004-mask-diff-output.md)。
  * 出力はすべて `npm run -s mask` を通す。記録には、場所と種類だけを書き、値は載せない。再実行してよい(状態は持たない)。
  */
@@ -25,6 +25,7 @@ import {
   summarizeDiff,
 } from "./lib/deploy-plan.ts";
 import { git } from "./lib/git-check.ts";
+import { humanItemsAfterSmoke, parseSmokeTable } from "./lib/smoke-plan.ts";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const out = `${root}.drafts/deploy/`;
@@ -96,14 +97,25 @@ mkdirSync(out, { recursive: true });
 prerequisites();
 
 if (after) {
+  // 自動のスモーク: 出力は、項目・成否・属性だけ(値を出さない作り)
+  const smoke = spawnSync(process.execPath, [`${root}scripts/smoke.ts`], { cwd: root, encoding: "utf8" });
+  process.stdout.write(smoke.stdout ?? "");
+  const smokeItems = parseSmokeTable(smoke.stdout ?? "");
+  const smokeFailed = smoke.status !== 0;
+  results.push({
+    name: "自動のスモーク",
+    status: smokeFailed ? "fail" : smokeItems.some((i) => i.status === "skip") ? "skip" : "ok",
+    note: smokeFailed ? "失敗した項目がある(上の表)" : "上の表のとおり(省略した項目は、人が確かめる)",
+  });
   const doc = readFileSync(`${root}docs/post-deploy-smoke.md`, "utf8");
-  const items = humanChecklist(doc);
+  const items = humanItemsAfterSmoke(humanChecklist(doc), smokeFailed ? [] : smokeItems);
   record(
     "人の確認の一覧",
     "wait",
-    `docs/post-deploy-smoke.md の「3. 確認する流れ」の ${items.length} 項目を、人が確かめる`,
+    `docs/post-deploy-smoke.md の「3. 確認する流れ」から、人が確かめる ${items.length} 項目`,
   );
   for (const item of items) process.stdout.write(`  - ${item}\n`);
+  process.stdout.write("  - 新規登録の確認コードのメールの届き方(自動では送らない)\n");
   process.stdout.write("  - デプロイした版(アプリが版を返さないため、画面のリリースノートの先頭で確かめる)\n");
   finish();
 }
