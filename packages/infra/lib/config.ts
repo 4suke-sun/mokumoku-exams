@@ -1,5 +1,5 @@
-/** cdkd(と AWS SDK)が読む変数。コードでは使わないが、.env に置く。 */
-export const TOOL_VARIABLES = ["AWS_PROFILE", "AWS_REGION"] as const;
+/** cdkd(と AWS SDK)と、デプロイ直後のスモーク(scripts/smoke.ts)が読む変数。インフラのコードでは使わないが、.env に置く。 */
+export const TOOL_VARIABLES = ["AWS_PROFILE", "AWS_REGION", "FUNCTION_URL"] as const;
 /** 値が必須の変数 */
 export const REQUIRED_VARIABLES = ["WEB_ADAPTER_LAYER_ARN", "ORIGIN_VERIFY_VALUE"] as const;
 /** 省略できる変数 */

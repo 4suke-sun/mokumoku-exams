@@ -68,6 +68,8 @@ done | node scripts/check-push-secrets.ts
 | 管理者の経路が、管理者以外に開かない | `src/authorization.test.ts` が通る。デプロイした環境でも、管理者以外で `/admin` がホームへ戻る |
 | ログイン後の主要な流れが、実機で動く | デプロイした環境で、ログイン → 出題 → 結果 → 実績を、一通り操作する |
 
+この節が正です。`node scripts/smoke.ts`(`/dev-deploy` のデプロイ直後の自動のスモーク。[デプロイ後の画面確認](./post-deploy-smoke.md))が、`/login`・API の 401・Function URL への直接のアクセス・ログイン後の流れの一部を前段で確かめますが、この節の確認の代わりにはなりません。
+
 ## 6. GitHub のリポジトリの設定
 
 プランごとの対応は、GitHub の現行の案内で確かめます([ルールセット](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-rulesets/about-rulesets)、[Secret scanning](https://docs.github.com/code-security/secret-scanning/about-secret-scanning)、[GitHub のセキュリティ機能](https://docs.github.com/en/code-security/getting-started/github-security-features))。

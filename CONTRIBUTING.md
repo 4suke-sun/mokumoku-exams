@@ -141,12 +141,13 @@ Closes #12
 
 ### 承認の印(Claude Code のフック)
 
-Claude Code からの push と、`gh` での PR・Issue の作成、題・本文の編集は、人の承認の印がないと、PreToolUse のフック(`scripts/approval-hook.ts`。`.claude/settings.json`)が止めます。
+Claude Code からの push と、`gh` での PR・Issue の作成、題・本文の編集と、デプロイ(`cdkd deploy`と、インフラのパッケージの `deploy` スクリプト)は、人の承認の印がないと、PreToolUse のフック(`scripts/approval-hook.ts`。`.claude/settings.json`)が止めます。
 権限の確認(`ask`)は、権限の確認を省く動作モードでは確認にならないため、フックで止めます。
 
-守る範囲は、**うっかりした操作と、権限の確認を省くモードでの素通り**です。コマンドの文字列を読んで判定するので、書き方を変えてわざと抜ける形(下の「見分けられない形」)は、対象外です。対象は、push と、PR・Issue の作成と題・本文の編集だけです。`gh pr merge`・`close`・`review`・`comment`、`gh issue close`・`reopen`・`delete`・`transfer`、`gh release create` は、`ask` の設定だけが守ります。
+守る範囲は、**うっかりした操作と、権限の確認を省くモードでの素通り**です。コマンドの文字列を読んで判定するので、書き方を変えてわざと抜ける形(下の「見分けられない形」)は、対象外です。対象は、push と、PR・Issue の作成と題・本文の編集と、デプロイだけです。`gh pr merge`・`close`・`review`・`comment`、`gh issue close`・`reopen`・`delete`・`transfer`、`gh release create` は、`ask` の設定だけが守ります。
 
 - 印は、スキル(`/dev-push`、`/dev-pr`)で人の承認を得た直後に、メインのセッションが `node scripts/approval.ts grant push`、`grant pr <下書き>`、`grant issue <下書き>` で書きます(`pr`・`issue` は下書きが必須です)。
+  デプロイの印は、`/dev-deploy` の関門で人の承認を得た直後に、`node scripts/approval.ts grant deploy <版>` で書きます(版は `vX.Y.Z` で、作業ツリーの先頭がそのタグのコミットであること)。
   置き場は `.git` の下(追跡されない)で、有効期限は 60 分です。`status` で確かめ、`revoke` で消せます。
   フックが確かめるのは、印の有無と、範囲・下書きの一致です。人が承認したこと自体は、フックでは確かめられません(スキルの手順が担います)。
 - 通す条件:
@@ -157,6 +158,7 @@ Claude Code からの push と、`gh` での PR・Issue の作成、題・本文
       題は、値の全体が `$(…)` の形(手順は `--title "$(head -n 1 <下書き>)"`)を通します。`$(…)` の中身が、承認した下書きを読むかどうかは確かめません。
       直書きの題(`--title`、`-t` に値を続けた形)は、承認した下書きの題(1 行目。Issue は先頭の `# ` を除く)とハッシュが一致するときだけ通します。空の値、`-` で始まる値、シェルが解釈しうる文字(`$`、`` ` ``、`\`、`"`、`'`、`!`)を含む値は通しません。
     - `grant pr`・`grant issue` は、下書きの 3 行目以降を `<下書き>.body.md` に書き出し、題と本文のハッシュも印に入れます。コマンド置換・プロセス置換を断る環境(作業ツリーに入ったセッション)では、表示されるコマンド(題の直書きと、書き出した本文のファイル)で投稿します。題・本文のハッシュを持たない印は、直書きの題を通しません。
+    - デプロイ(`cdkd deploy`と、インフラのパッケージの `deploy` スクリプト。`npx`・`node scripts/with-env.ts` 越しと、`-w <パッケージ>` を挟む形を含む)は、作業ツリーの先頭が、印の版のタグのコミットと同じで、差分の置き場(`.drafts/deploy/diff.masked.txt`。`scripts/deploy.ts` が、伏せた差分の全文を書く)の内容のハッシュが、承認のときと同じときだけ通します。差分を取り直すと(ファイルが変わると)、止まります。人が自分の端末で実行する形(`/dev-deploy` の手順)には、フックは動きません。
     - ラベルやマイルストーンだけの編集は、軽い操作として通します。
     - 承認は、使っても消えません。有効な 60 分の間は、同じ範囲・同じ下書きで何度でも通ります。PR・Issue の番号と、PR の `--base` は、承認が覆いません。
     - Issue の承認は、直前の 1 件だけが有効です。下書きを複数投稿するときは、1 件ごとに印を書き直します。
@@ -188,12 +190,13 @@ Claude Code からの push と、`gh` での PR・Issue の作成、題・本文
     - `gh api` で PR や Issue を作る形。`git -c <設定>=…` や環境変数でコミットの検査を飛ばす形。
     - `node scripts/approval.ts grant …` 自体は、`ask` にもフックにも入っていません。メインのセッションが人の承認なしに印を書くことは、止められません(承認の確認は、スキルの手順です)。
     - 承認したブランチと同じ名前のタグの push(ブランチと区別できません)。`git push origin v1.0.0` のような別の名前は、送り先が違うものとして止まります。
+    - デプロイを、コマンドの先頭の語で見分ける形(`cdkd`、`npx cdkd`、`node scripts/with-env.ts cdkd`、`npm` の `run`・`run-script`・`rum`・`urn` で `deploy` を呼ぶ形)以外で書く形: `pnpm`・`yarn` 越し、`cdkd` を別の名前やパスの変数で呼ぶ形、`node` で `cdkd` の実体を直接起動する形。
     - 承認の印のファイル名を、ワイルドカードや分割で書く形。`cd scripts` で移動してから印を書く形。
     - フックのスクリプトや `.claude/settings.json` の書き換え。止めるのは、印のファイルへの Write・Edit だけです(`deny` の設定は Bash の git の形だけで、Write・Edit には効きません)。`MultiEdit` や `NotebookEdit` も対象外です。
     - 同じコマンドの中で、下書きを書き換えてから投稿する形(照合は、コマンドを実行する前です)。
     - 行の継続(`git \` の次の行に `push`)、`env -S "…"` の中身、`-C../x` のように値を連結した形。`<(…)` の中身(別のファイルを足す形)。
     - `scripts/post-issues.ts` と `scripts/release.ts` が中で行う `gh`・`git push`。前者は封印(下書きと一覧のハッシュ)、後者は人の指示と `ask` で担保します。
-- 止めすぎる形があります。`git push --dry-run` も、承認の印を要します。コミットメッセージなどの引用符の中に、`git push` や `commit` の語が、括弧で挟まれて、または `;`・`&&` のあとに出ると、別のコマンドとして見て、止めることがあります。そのときは、メッセージをファイルから渡すなど、書き方を変えてください。
+- 止めすぎる形があります。`git push --dry-run` も、承認の印を要します。コミットメッセージなどの引用符の中に、`git push` や `commit` の語が、括弧で挟まれて、または `;`・`&&` のあとに出ると、別のコマンドとして見て、止めることがあります。そのときは、メッセージをファイルから渡すなど、書き方を変えてください。デプロイは、コマンドの先頭の語だけで見るので、検索の語や、コミットメッセージの文言に `cdkd deploy` が出ても止めません(`cdkd` の引数の中に `deploy` の語があれば、止めます)。
 - フックの失敗(入力が読めない、git が動かないなど)は、止める側に倒します(終了コード 2 と `onFailure: "block"`。`onFailure` は Claude Code v2.1.295 以降の設定です)。
   フックの起動コマンドは `git rev-parse --show-toplevel` を使うので、リポジトリの外で Bash・Write・Edit を使うと、すべて止まります。
 
@@ -391,3 +394,22 @@ npm run release -- <PR の番号>           # マージから確認の一覧ま�
 | マージの方式 | マージコミットだけ(`allow_merge_commit` が `true`、`allow_squash_merge` と `allow_rebase_merge` が `false`) | `gh api repos/{owner}/{repo} --jq '{allow_merge_commit, allow_squash_merge, allow_rebase_merge}'` |
 
 設定の変更は、リポジトリの管理者の操作です(`gh api -X PATCH repos/{owner}/{repo} -F delete_branch_on_merge=true -F allow_squash_merge=false -F allow_rebase_merge=false`)。実行の前に、人の確認を取ります。
+
+## デプロイ
+
+Release まで済んだ版のデプロイは、`scripts/deploy.ts` で、デプロイの前までの段階を進めます(スキル: `.claude/skills/dev-deploy`)。`/dev-release` の最後に、デプロイが要る版かを表示します。
+
+```sh
+node scripts/deploy.ts <版>           # 前提 → 要否 → 静的な確認 → 差分 → 関門(承認待ち)
+node scripts/deploy.ts <版> --after   # デプロイのあと: 自動のスモーク → 人が確かめる項目の一覧
+```
+
+- 前提の確認: 版のタグがあり、それが最新のタグで、作業ツリーの先頭がそのタグのコミットで、変更がなく、`.env` があり、追跡されていない。AWS の認証が使える(`aws` コマンドがなければ、確かめずに進み、差分の段階で分かります)。
+- 要否の判定: 前の版のタグとの差分のパスで見ます。影響するのは、`packages/app/`・`packages/infra/`・`packages/data-schema/`・`data/`(`data/release-notes.json` を含む)・ルート直下のファイルです。
+  `scripts/`・`.github/`・`packages/pipeline/`・`docs/` だけの変更は影響しません(CI の `changes` ジョブは、`scripts/` と `.github/` の変更でも全ジョブを動かすので、同じ区分ではありません)。
+  `data/release-notes.json` だけが影響する版は、人が省くと選べます(次の版のデプロイでまとめて出ます)。
+- 静的な確認: [デプロイ前のチェックリスト](docs/pre-deploy-checklist.md)の、機械で確かめられる項目(環境変数の契約、lint、型検査、テスト、ビルド、Lambda の成果物、非公開の問題の混入)と、前提の確認の `.env` が追跡されていないこと。出力は `mask` を通します。
+- 差分: `npm run diff -w @mokumoku-exams/infra -- --all` の出力を、`mask` に通して読み、要約(変更のあるスタック、リソースの種類と件数、IAM・公開の設定・削除の有無)を出します。伏せた全文は `.drafts/deploy/` に置きます(gitignore 済み)。
+- 関門とデプロイ: 要約を人が確かめて承認したあと、`npm run deploy -w @mokumoku-exams/infra -- --all` を、人が自分の端末で実行します(確認の問いが出うるため)。デプロイの出力は、記録に載せません。
+- デプロイのあと(`--after`): 自動のスモーク(`node scripts/smoke.ts`。この PC のローカルだけで動かし、CI からは行いません)を実行します。認証が要らない経路(`SITE_URL` の `/login` と API の 401。`FUNCTION_URL` があれば Function URL への直接のアクセス)と、実行のたびに作って消す使い捨てのユーザーによる、サインイン・出題から結果・履歴・Cookie の属性・退会です。その結果と、人が確かめる項目の一覧を出します。人が確かめた結果が通るまで、公開へ進みません([デプロイ後の画面確認](docs/post-deploy-smoke.md))。
+- 状態は持たず、再実行してよい作りです。失敗した段階で止まります。戻すときは、前の版のタグを指定して、同じ手順で再デプロイします(自動のロールバック、CI からのデプロイ、複数の環境は、範囲外です)。

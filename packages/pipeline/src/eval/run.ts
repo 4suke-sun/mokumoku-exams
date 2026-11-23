@@ -63,7 +63,7 @@ export interface EvalOptions {
   today(): string;
 }
 
-interface Paths {
+export interface Paths {
   facts: string;
   drafts: string;
   decisions: string;
@@ -78,7 +78,7 @@ interface Paths {
   reportMd: string;
 }
 
-function pathsFor(config: Config, rootDir: string, examCode: string): Paths {
+export function pathsFor(config: Config, rootDir: string, examCode: string): Paths {
   const work = resolve(rootDir, config.workDir);
   const dir = join(work, "eval", examCode.toLowerCase());
   return {
@@ -99,7 +99,7 @@ function pathsFor(config: Config, rootDir: string, examCode: string): Paths {
 
 const ResultsFileSchema = z.record(z.string(), CaseResultSchema);
 
-function readResults(path: string): Record<string, CaseResult> {
+export function readResults(path: string): Record<string, CaseResult> {
   const raw = existsSync(path) ? readJsonFile(path) : undefined;
   const parsed = ResultsFileSchema.safeParse(raw);
   return parsed.success ? parsed.data : {};

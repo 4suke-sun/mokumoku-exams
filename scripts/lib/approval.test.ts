@@ -4,6 +4,7 @@ import {
   type Approvals,
   bodyPathFor,
   classifyCommand,
+  DEPLOY_DIFF_PATH,
   decideHook,
   grant,
   type Probe,
@@ -591,5 +592,103 @@ describe("splitDraft と bodyPathFor", () => {
   it("拡張子が .md の下書き_.body.md の名前にする。ほかは .body を足す", () => {
     expect(bodyPathFor(".drafts/pr-fix-1-v0.1.0.md")).toBe(".drafts/pr-fix-1-v0.1.0.body.md");
     expect(bodyPathFor(".drafts/x.txt")).toBe(".drafts/x.txt.body");
+  });
+});
+
+describe("デプロイの承認", () => {
+  const deployEntry = (over: Partial<ApprovalEntry> = {}) =>
+    entry({ kind: "deploy", branch: "v0.1.0", head: "tag1", count: 0, base: "", draftHash: "diff1", ...over });
+  const deployProbe = (over: Partial<Probe> = {}) =>
+    probe({ head: "tag1", hashOf: (path) => (path === DEPLOY_DIFF_PATH ? "diff1" : null), ...over });
+
+  it("デプロイのコマンドの形_承認が要る操作として拾う", () => {
+    for (const command of [
+      "cdkd deploy --all",
+      "npm run deploy -w @mokumoku-exams/infra -- --all",
+      "npm run deploy",
+      "npx cdkd deploy",
+      "node scripts/with-env.ts cdkd deploy",
+      "bash -c 'npm run deploy -w x'",
+      "FOO=1 npm run-script deploy",
+      "npm -w x run deploy",
+      "cdkd --profile p deploy --all",
+      "npm rum deploy",
+      "npx --yes cdkd deploy",
+      "echo ok; cdkd deploy",
+    ]) {
+      expect(
+        classifyCommand(command).gates.map((g) => g.kind),
+        command,
+      ).toContain("deploy");
+    }
+  });
+
+  it("デプロイでないコマンド_拾わない", () => {
+    for (const command of [
+      "npm run diff -w @mokumoku-exams/infra -- --all",
+      "npm run build",
+      "cdkd diff",
+      "cdkd synth",
+      "echo deploy",
+      "git log --oneline deploy",
+      "npm run -w deploy build",
+      'grep "cdkd deploy" docs/a.md',
+      "echo cdkd deploy",
+      "rg cdkd deploy",
+      'git commit -m "cdkd deploy を止める"',
+      "git commit -F .drafts/commit-msg.txt",
+    ]) {
+      expect(
+        classifyCommand(command).gates.map((g) => g.kind),
+        command,
+      ).not.toContain("deploy");
+    }
+  });
+
+  it("承認の印がないデプロイ_止める", () => {
+    expect(run("cdkd deploy --all", none, deployProbe()).ok).toBe(false);
+    expect(run("npm run deploy -w x", none, deployProbe()).ok).toBe(false);
+  });
+
+  it("版のタグのコミットと差分が承認のときと同じ_通す", () => {
+    expect(run("cdkd deploy --all", { entries: [deployEntry()] }, deployProbe()).ok).toBe(true);
+  });
+
+  it("タグのコミットが違う_止める", () => {
+    expect(run("cdkd deploy", { entries: [deployEntry()] }, deployProbe({ head: "tag2" })).ok).toBe(false);
+  });
+
+  it("差分が承認のときと違う_止める", () => {
+    expect(run("cdkd deploy", { entries: [deployEntry({ draftHash: "other" })] }, deployProbe()).ok).toBe(false);
+  });
+
+  it("差分を読めない_止める", () => {
+    expect(run("cdkd deploy", { entries: [deployEntry()] }, deployProbe({ hashOf: () => null })).ok).toBe(false);
+  });
+
+  it("有効期限が切れた印_止める", () => {
+    expect(run("cdkd deploy", { entries: [deployEntry({ expiresAt: NOW - 1 })] }, deployProbe()).ok).toBe(false);
+  });
+
+  it("push と PR の印_デプロイは通さない", () => {
+    const approvals = { entries: [entry({ kind: "push", head: "tag1" }), entry({ head: "tag1" })] };
+    expect(run("cdkd deploy", approvals, deployProbe()).ok).toBe(false);
+  });
+
+  it("デプロイの印_pushは通さない", () => {
+    expect(run("git push", { entries: [deployEntry()] }, deployProbe()).ok).toBe(false);
+  });
+
+  it("サブエージェントからのデプロイ_印があっても止める", () => {
+    expect(run("cdkd deploy", { entries: [deployEntry()] }, deployProbe(), "agent-1").ok).toBe(false);
+  });
+
+  it("同じ版の承認_置き換える", () => {
+    const next = grant({ entries: [deployEntry({ draftHash: "old" })] }, deployEntry({ draftHash: "new" }), NOW);
+    expect(next.entries.map((e) => e.draftHash)).toEqual(["new"]);
+  });
+
+  it("印の読み込み_deployの種類を受け付ける", () => {
+    expect(parseApprovals(JSON.stringify({ entries: [deployEntry()] })).entries).toHaveLength(1);
   });
 });

@@ -27,6 +27,8 @@ export const ConfigSchema = z.strictObject({
   decisionsDir: z.string().min(1),
   /** 収集の計画の置き場(資格ごとの JSON。コミットする) */
   plansDir: z.string().min(1),
+  /** 評価の記録の置き場(しきい値の調整の台帳と、評価の関門の合格の記録。コミットする) */
+  recordsDir: z.string().min(1),
   /** 資格マスタ(読み取り専用で参照する) */
   examsFile: z.string().min(1),
   /** 1 回の実行で扱う件数の上限(費用の管理)。収集では、取得する URL の数の上限 */

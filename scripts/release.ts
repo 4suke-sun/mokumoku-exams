@@ -7,6 +7,7 @@
  * `--force` 系の push と、`main` への直接の push はしない。
  */
 import { execFileSync } from "node:child_process";
+import { judgeDeployNeed, previousTag } from "./lib/deploy-plan.ts";
 import { git } from "./lib/git-check.ts";
 import { parseCloses } from "./lib/pr-closes-check.ts";
 import {
@@ -281,6 +282,23 @@ async function main() {
     stillOpen.length === 0 ? "ok" : "fail",
     stillOpen.length === 0 ? `${closed.length} 件が閉じている` : `閉じていない: ${stillOpen.join(" ")}`,
   );
+
+  // 9. デプロイの要否(表示だけ。デプロイは /dev-deploy で、人の指示で行う)
+  const tags = (tryGit(["tag", "--list", "v*"]) ?? "").split("\n").filter(Boolean);
+  const previous = previousTag(tags, version);
+  const changed =
+    previous === null
+      ? null
+      : (tryGit(["diff", "--name-only", "--no-renames", `${previous}..${version}`]) ?? "").split("\n").filter(Boolean);
+  const need = changed === null ? { needed: true, releaseNotesOnly: false } : judgeDeployNeed(changed);
+  results.push({
+    name: "デプロイの要否",
+    status: need.needed ? "ok" : "skip",
+    note: need.needed
+      ? `デプロイが要る${need.releaseNotesOnly ? "(影響は data/release-notes.json だけ。省いてもよい)" : ""}。続けるなら /dev-deploy ${version}`
+      : "デプロイは不要",
+  });
+  process.stdout.write(`- デプロイの要否: ${results.at(-1)?.note}\n`);
 
   finish();
 }

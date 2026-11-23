@@ -150,6 +150,7 @@ Cognito に許す操作は、管理者の画面が使う `ListUsers`・`AdminDis
    | --- | --- |
    | `AWS_PROFILE` | 使う AWS のプロファイル名 |
    | `AWS_REGION` | デプロイ先のリージョン |
+   | `FUNCTION_URL` | (省略可)アプリの Lambda の Function URL(`https://example.com` の形。末尾のスラッシュなし)。デプロイ直後の自動のスモーク(`scripts/smoke.ts`。[デプロイ後の画面確認](../post-deploy-smoke.md))だけが読み、合言葉のない直接のアクセスが断られることを確かめます。インフラのコードは読みません。渡さないときは、その項目を省略し、人が確かめます |
    | `WEB_ADAPTER_LAYER_ARN` | Lambda Web Adapter のレイヤーの ARN(バージョン付き)。デプロイ先のリージョンのものを、Lambda Web Adapter の公式の案内から調べます |
    | `ORIGIN_VERIFY_VALUE` | CloudFront とアプリの間の合言葉。32 文字以上のランダムな文字列を、自分で作ります |
    | `STACK_PREFIX` | (省略可)リソース名の先頭に付ける文字列。既定は `mokumoku-exams` |

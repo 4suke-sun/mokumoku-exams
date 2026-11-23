@@ -11,6 +11,7 @@ import { EXIT, type ExitCode } from "./exit-codes.ts";
 import { runExport } from "./export/export.ts";
 import { runFillTitles } from "./export/titles.ts";
 import { type FactsMode, runFacts } from "./facts/facts.ts";
+import { runEvalGate } from "./gate/run.ts";
 import { runJudge } from "./judge/run.ts";
 import { runJudgeEval } from "./judge-eval/run.ts";
 import { type Output, report, reportInternalError } from "./log.ts";
@@ -20,6 +21,7 @@ import { runRehash } from "./rehash/run.ts";
 import { runRestore } from "./restore/run.ts";
 import { runScore } from "./scorecard/run.ts";
 import { runStatus } from "./status/run.ts";
+import { runEvalSweep } from "./tuning/run.ts";
 import { runUnpublish } from "./unpublish/run.ts";
 import { runVerify } from "./verify/run.ts";
 
@@ -58,7 +60,16 @@ export const KNOWN_FLAGS = [
   "--revise",
   "--rewrite",
   "--refetch",
+  "--record",
 ];
+const VALUE_OPTION = /^--(domain|targets|reason|role)=/;
+/** 値を取るオプションを、受け付けるコマンド */
+const VALUE_OPTION_COMMANDS: Record<string, readonly string[]> = {
+  "--domain=": ["draft"],
+  "--targets=": ["eval-sweep"],
+  "--reason=": ["eval-sweep"],
+  "--role=": ["eval-gate"],
+};
 /** コマンドごとに、受け付ける動作のオプション(同時には 1 つだけ) */
 const MODE_FLAGS: Record<string, readonly string[]> = {
   collect: ["--import-guide", "--candidates", "--import-candidates", "--titles"],
@@ -70,6 +81,8 @@ const MODE_FLAGS: Record<string, readonly string[]> = {
   judge: ["--import"],
   "judge-eval": ["--import"],
   rehash: ["--refetch"],
+  "eval-sweep": ["--record"],
+  "eval-gate": ["--record"],
 };
 
 function defaultCollectDeps(config: Config): CollectDeps {
@@ -117,6 +130,10 @@ function helpText(): string {
     "verify <資格コード> --import       検証役の出力を、下書きの宣言と照合して取り込む",
     "eval <資格コード>                   人が承認した下書きから評価用のデータを作り、検証役の評価の依頼を書く",
     "eval <資格コード> --import         検証役の出力を期待する判定と照合し、検出率・誤検出率などのレポートを書く",
+    "eval-sweep <資格コード> --targets=…  検証役の評価の結果に、目標の候補(<全体>/<種類ごと>/<誤検出の上限>)を当てて比べる。モデルは呼ばない",
+    "eval-sweep <資格コード> --record --reason=<理由> --targets=…  設定の目標を、比べた表と理由つきで、しきい値の台帳に足す",
+    "eval-gate                          評価の対象(役の定義・設定)が、最後に合格した記録と同じかを検査する。ネットワークもモデルも使わない",
+    "eval-gate --record --role=<verifier|judge>  現在の定義で評価して目標を満たしたレポートを、合格の記録として台帳に足す。下回るときは作らない",
     "judge <資格コード>                  公開している選択式の問題ごとに、判定の基準に照らす判定の依頼を書く",
     "judge <資格コード> --import        判定役の出力を依頼と照合して取り込み、判定の結果(公開・書き直しで復帰できる・非公開)を書く",
     "judge-eval <資格コード>             人が承認した下書きから評価用のデータを作り、判定役の評価の依頼を書く",
@@ -137,9 +154,11 @@ function helpText(): string {
 
 export async function main({ argv, env, output, configPath, rootDir, collectDeps }: MainOptions): Promise<ExitCode> {
   try {
-    // 値を取るオプションは、--domain=<分野のコード> だけ(draft の依頼で、分野を 1 つに絞る)
-    const domainArgs = argv.filter((a) => a.startsWith("--domain="));
-    const flags = argv.filter((a) => a.startsWith("-") && !a.startsWith("--domain="));
+    // 値を取るオプション: --domain=<分野のコード>(draft の依頼で、分野を 1 つに絞る)、
+    // --targets=<候補>・--reason=<理由>(eval-sweep)、--role=<役>(eval-gate --record)
+    const valueArgs = argv.filter((a) => VALUE_OPTION.test(a));
+    const domainArgs = valueArgs.filter((a) => a.startsWith("--domain="));
+    const flags = argv.filter((a) => a.startsWith("-") && !VALUE_OPTION.test(a));
     const positional = argv.filter((a) => !a.startsWith("-"));
     const help = flags.includes("--help") || flags.includes("-h");
     const dryRun = flags.includes("--dry-run");
@@ -167,6 +186,7 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
       command?.name === "rehash" ||
       command?.name === "reasons" ||
       command?.name === "eval" ||
+      command?.name === "eval-sweep" ||
       command?.name === "judge" ||
       command?.name === "judge-eval" ||
       command?.name === "unpublish" ||
@@ -180,6 +200,22 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
     const allowed = MODE_FLAGS[command.name] ?? [];
     const modes = flags.filter((f) => Object.values(MODE_FLAGS).some((list) => list.includes(f)));
     if (modes.some((f) => !allowed.includes(f)) || modes.length > 1) {
+      report(output, "不明なオプション");
+      return EXIT.inputError;
+    }
+    const valueOptionName = (a: string) => `${a.slice(0, a.indexOf("=") + 1)}`;
+    if (valueArgs.some((a) => !VALUE_OPTION_COMMANDS[valueOptionName(a)]?.includes(command.name))) {
+      report(output, "不明なオプション");
+      return EXIT.inputError;
+    }
+    // 値つきオプション: 空の値、--reason・--role の重複、--record のない --reason・--role は、入力の誤りにする
+    const countOf = (name: string) => valueArgs.filter((a) => a.startsWith(name)).length;
+    if (
+      valueArgs.some((a) => a.endsWith("=")) ||
+      countOf("--reason=") > 1 ||
+      countOf("--role=") > 1 ||
+      ((countOf("--reason=") > 0 || countOf("--role=") > 0) && !flags.includes("--record"))
+    ) {
       report(output, "不明なオプション");
       return EXIT.inputError;
     }
@@ -205,6 +241,9 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
         eval: "使い方: eval <資格コード> [--import]\n",
         judge: "使い方: judge <資格コード> [--import]\n",
         "judge-eval": "使い方: judge-eval <資格コード> [--import]\n",
+        "eval-sweep":
+          "使い方: eval-sweep <資格コード> --targets=<全体>/<種類ごと>/<誤検出の上限> [--targets=…] [--record --reason=<理由>]\n",
+        "eval-gate": "使い方: eval-gate [--record --role=<verifier|judge>]\n",
         unpublish: "使い方: unpublish <資格コード>\n",
         restore: "使い方: restore <資格コード>\n",
         draft:
@@ -304,6 +343,35 @@ export async function main({ argv, env, output, configPath, rootDir, collectDeps
         rootDir,
         examCode,
         mode: flags.includes("--import") ? "import" : "request",
+        dryRun,
+        output,
+        today: () => new Date().toISOString().slice(0, 10),
+      });
+    }
+    if (command.name === "eval-sweep") {
+      const examCode = positional[1];
+      if (examCode === undefined) {
+        report(output, "入力の誤り", "資格コードの指定がない");
+        return EXIT.inputError;
+      }
+      return runEvalSweep({
+        config,
+        rootDir,
+        examCode,
+        candidates: valueArgs.filter((a) => a.startsWith("--targets=")).map((a) => a.slice("--targets=".length)),
+        record: flags.includes("--record"),
+        reason: valueArgs.find((a) => a.startsWith("--reason="))?.slice("--reason=".length),
+        dryRun,
+        output,
+        today: () => new Date().toISOString().slice(0, 10),
+      });
+    }
+    if (command.name === "eval-gate") {
+      return runEvalGate({
+        config,
+        rootDir,
+        record: flags.includes("--record"),
+        role: valueArgs.find((a) => a.startsWith("--role="))?.slice("--role=".length),
         dryRun,
         output,
         today: () => new Date().toISOString().slice(0, 10),
