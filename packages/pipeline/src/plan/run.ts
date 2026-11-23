@@ -10,8 +10,9 @@ import { FactsError, factsPath, readFacts } from "../facts/schema.ts";
 import { type Output, report } from "../log.ts";
 import { readAgentStampOrReport } from "../shared/agents.ts";
 import { prepareExam } from "../shared/exam.ts";
+import { evidenceCounts, MIN_EVIDENCE_CARDS } from "./evidence.ts";
 import { buildPlan, type ExistingQuestion, resolveSettings } from "./plan.ts";
-import { PlanError, planPath, writePlan } from "./schema.ts";
+import { PlanError, type PlanItem, planPath, writePlan } from "./schema.ts";
 import { serviceStatus } from "./services.ts";
 
 export interface PlanOptions {
@@ -121,6 +122,29 @@ function reportServices(options: PlanOptions): boolean {
   return true;
 }
 
+/**
+ * 計画の項目ごとに、根拠にできる事実カードの数を報告する。目安(MIN_EVIDENCE_CARDS)に届かない項目は「不足」と出す。止めない。
+ * 台帳か事実カードが読めない、または取得済みの出典がないときは、何も報告しない(読めない誤りは、ほかの確かめが報告する)。
+ */
+function reportEvidence(options: PlanOptions, items: readonly PlanItem[]): void {
+  const { config, rootDir, examCode, output } = options;
+  try {
+    const ledger = readLedger(ledgerPath(resolve(rootDir, config.ledgerDir), examCode), examCode);
+    if (!ledger.sources.some((s) => s.status === "active" && s.contentHash !== null && s.kind !== "exam-guide")) return;
+    const facts = readFacts(factsPath(resolve(rootDir, config.factsDir), examCode), examCode);
+    const counts = evidenceCounts(items, facts, ledger);
+    for (const c of counts) {
+      report(
+        output,
+        "根拠の事実カード",
+        `${c.itemId} ${c.scope} ${c.cards} 件${c.short ? `(不足。目安 ${MIN_EVIDENCE_CARDS} 件)` : ""}`,
+      );
+    }
+  } catch (error) {
+    if (!(error instanceof LedgerError) && !(error instanceof FactsError)) throw error;
+  }
+}
+
 /** plan コマンド: 分野の配点から目標の問題数を出し、既存の問題との差を、作業用の置き場に書く。data/ は変えない */
 export function runPlan(options: PlanOptions): ExitCode {
   const { config, rootDir, examCode, output, dryRun } = options;
@@ -167,6 +191,7 @@ export function runPlan(options: PlanOptions): ExitCode {
     `目標 ${plan.targetTotal} 件、既存 ${plan.existingTotal} 件、計画の項目 ${plan.items.length} 件`,
   );
   if (!reportServices(options)) return EXIT.checkFailed;
+  reportEvidence(options, plan.items);
   const path = planPath(resolve(rootDir, config.workDir), examCode);
   if (dryRun) {
     report(output, "書き込みをしない(dry-run)");
