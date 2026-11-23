@@ -3,19 +3,19 @@ import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { decideSubagentCommand } from "./subagent-command.ts";
 
-export type ApprovalKind = "push" | "pr" | "issue";
+export type ApprovalKind = "push" | "pr" | "issue" | "deploy";
 
 /** 人の承認 1 件。差分の内容や、検査で見つけた値は持たない。 */
 export interface ApprovalEntry {
   kind: ApprovalKind;
-  /** push と PR の承認の対象のブランチ。Issue は空。 */
+  /** push と PR の承認の対象のブランチ。Issue は空。deploy は、承認した版(`vX.Y.Z`)。 */
   branch: string;
-  /** 承認の時点の範囲の末尾のコミット。Issue は空。 */
+  /** 承認の時点の範囲の末尾のコミット。Issue は空。deploy は、版のタグのコミット。 */
   head: string;
   count: number;
   /** 範囲の起点(`<base>..HEAD` のコミット数を数える)。Issue は空。 */
   base: string;
-  /** 承認した下書きのハッシュ。下書きのない push は空。 */
+  /** 承認した下書きのハッシュ。下書きのない push は空。deploy は、承認した差分(伏せた全文)のハッシュ。 */
   draftHash: string;
   /** 下書きから取り出した題のハッシュ(題を直書きで渡す形の照合に使う)。古い印と push は持たない。 */
   titleHash?: string;
@@ -33,7 +33,10 @@ export interface Approvals {
 export const TTL_MS = 60 * 60 * 1000;
 export const APPROVAL_FILE = "mokumoku-approvals.json";
 
-const KINDS: ApprovalKind[] = ["push", "pr", "issue"];
+const KINDS: ApprovalKind[] = ["push", "pr", "issue", "deploy"];
+
+/** デプロイの差分の置き場(scripts/deploy.ts が書く)。deploy の印は、この内容のハッシュを覆う。 */
+export const DEPLOY_DIFF_PATH = ".drafts/deploy/diff.masked.txt";
 
 export function approvalPath(gitCommonDir: string): string {
   return join(gitCommonDir, APPROVAL_FILE);
@@ -236,6 +239,46 @@ function withoutRedirects(args: string[]): string[] {
   return kept;
 }
 
+/** `cdkd` の語を先頭に持つ形か(`npx cdkd`、`node scripts/with-env.ts cdkd` 越しを含む)。そのあとの語を返す。 */
+function cdkdArguments(tokens: string[]): string[] | null {
+  const head = commandName(tokens[0] ?? "");
+  if (head === "cdkd") return tokens.slice(1);
+  if (head === "npx" || head === "bunx") {
+    const rest = tokens.slice(1).filter((t) => !t.startsWith("-"));
+    return commandName(rest[0] ?? "") === "cdkd" ? rest.slice(1) : null;
+  }
+  if (
+    head === "node" &&
+    /(^|\/)scripts\/with-env\.ts$/.test(tokens[1] ?? "") &&
+    commandName(tokens[2] ?? "") === "cdkd"
+  ) {
+    return tokens.slice(3);
+  }
+  return null;
+}
+
+const NPM_RUN = new Set(["run", "run-script", "rum", "urn"]);
+
+/**
+ * `cdkd deploy` と、`npm run deploy`(`-w <パッケージ>` などを挟む形を含む)。コマンドの先頭の語で見る
+ * (検索の語や、引用符の中の文言を拾わない)。値を取るオプション(`-w`、`--workspace`、`--prefix`)の値は、スクリプト名と取り違えない。
+ * `cdkd` の引数は、`deploy` の語がどこにあっても拾う(オプションの値を挟む形のため)。
+ */
+function isDeployCommand(tokens: string[]): boolean {
+  const cdkd = cdkdArguments(tokens);
+  if (cdkd) return cdkd.includes("deploy");
+  if (tokens[0] !== "npm") return false;
+  const run = tokens.findIndex((t) => NPM_RUN.has(t));
+  if (run < 0) return false;
+  const rest = tokens.slice(run + 1);
+  for (let i = 0; i < rest.length; i++) {
+    const t = rest[i] ?? "";
+    if (t === "-w" || t === "--workspace" || t === "--prefix") i += 1;
+    else if (!t.startsWith("-")) return t === "deploy";
+  }
+  return false;
+}
+
 /** `fine` は、括弧と引用符の外だけで区切った判定か。直書きの題の値は、こちらでだけ拾う(粗い区切りでは、題の中の括弧で値が切れる)。 */
 function classifySegment(tokens: string[], out: Classified, fine: boolean): void {
   const git = splitGit(tokens);
@@ -268,6 +311,8 @@ function classifySegment(tokens: string[], out: Classified, fine: boolean): void
       if (a.includes("refs/tags/") || a === "--follow-tags")
         out.forbidden.push("タグの push は、/dev-release か人が実行する");
     }
+  } else if (isDeployCommand(tokens)) {
+    out.gates.push({ kind: "deploy", command: "デプロイ(cdkd deploy)" });
   } else if (git?.sub === "commit") {
     if (git.args.some((a) => a === "--no-verify" || SHORT_CLUSTER("n").test(a))) {
       out.forbidden.push("コミットの検査(フック)を飛ばす指定は、人が自分で実行する");
@@ -567,6 +612,16 @@ export function decideGate(
       `${gate.command} は、人の承認が要ります(承認の印がない、または有効期限が切れています)。スキルの手順で承認を得てから、承認の印を書いてください`,
     );
   }
+  if (gate.kind === "deploy") {
+    // 版のタグのコミットで、承認した差分と同じ差分(伏せた全文の内容)のときだけ通す
+    const diff = probe.hashOf(DEPLOY_DIFF_PATH);
+    const same = live.some((e) => e.head === probe.head && diff !== null && e.draftHash === diff);
+    return same
+      ? { ok: true }
+      : deny(
+          "デプロイの版(タグのコミット)か差分が、承認のときと違います(または差分を読めません)。差分の確認と承認をやり直してください",
+        );
+  }
   if (gate.kind === "issue") return checkDrafts(live, drafts, probe, titles);
   const stray = (gate.refspecs ?? []).find((r) => !pushesCurrentBranch(r, probe.branch));
   if (stray !== undefined) {
@@ -648,7 +703,7 @@ export function decideHook(input: HookInput, approvals: () => Approvals, now: nu
   if (classified.gates.length === 0) return { ok: true };
   if (isSubagent) {
     return deny(
-      "push、PR・Issue の作成・編集は、サブエージェントからは実行しません。メインのセッションが、人の承認のあとに行います",
+      "push、PR・Issue の作成・編集、デプロイは、サブエージェントからは実行しません。メインのセッションが、人の承認のあとに行います(デプロイは、人が自分の端末で実行します)",
     );
   }
   const p = probe();
