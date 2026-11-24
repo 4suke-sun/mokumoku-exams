@@ -1241,7 +1241,9 @@
       "confidence": "high",
       "domain": "domain5",
       "id": "f-097d5e67fa0d",
-      "reasons": [],
+      "reasons": [
+        "human-rejected"
+      ],
       "scope": {
         "edition": "C03"
       },
@@ -1258,7 +1260,7 @@
           "url": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html"
         }
       ],
-      "status": "passed"
+      "status": "rejected"
     },
     {
       "claim": "物理的に連続した小さな I/O は、EBS が最大の I/O サイズまで 1 回の I/O にまとめようとする。",
@@ -3010,7 +3012,9 @@
       "confidence": "high",
       "domain": "domain5",
       "id": "f-16ac95a5f408",
-      "reasons": [],
+      "reasons": [
+        "human-rejected"
+      ],
       "scope": {
         "edition": "C03"
       },
@@ -3027,7 +3031,7 @@
           "url": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html"
         }
       ],
-      "status": "passed"
+      "status": "rejected"
     },
     {
       "claim": "監視アカウントでは、ソースアカウントのメトリクスを監視するアラームを作成できる。",
@@ -4098,7 +4102,9 @@
       "confidence": "high",
       "domain": "domain5",
       "id": "f-1d17a0e59c80",
-      "reasons": [],
+      "reasons": [
+        "human-rejected"
+      ],
       "scope": {
         "edition": "C03"
       },
@@ -4115,7 +4121,7 @@
           "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resolver.html"
         }
       ],
-      "status": "passed"
+      "status": "rejected"
     },
     {
       "claim": "パイロットライトでは、停止しているアプリケーションサーバーを起動して拡張し、本番並みの環境にできる。",
@@ -4942,7 +4948,9 @@
       "confidence": "high",
       "domain": "domain5",
       "id": "f-225998a2174f",
-      "reasons": [],
+      "reasons": [
+        "human-rejected"
+      ],
       "scope": {
         "edition": "C03"
       },
@@ -4959,7 +4967,7 @@
           "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html"
         }
       ],
-      "status": "passed"
+      "status": "rejected"
     },
     {
       "claim": "ダッシュボードを共有すると、共有相手は、アカウントに対して定められた権限を持つ。公開リンクの場合は、リンクを知る全員が同じ権限を持つ。",
@@ -9358,7 +9366,9 @@
       "confidence": "high",
       "domain": "domain5",
       "id": "f-4145f9ddcd58",
-      "reasons": [],
+      "reasons": [
+        "human-rejected"
+      ],
       "scope": {
         "edition": "C03"
       },
@@ -9375,7 +9385,7 @@
           "url": "https://docs.aws.amazon.com/network-firewall/latest/developerguide/what-is-aws-network-firewall.html"
         }
       ],
-      "status": "passed"
+      "status": "rejected"
     },
     {
       "claim": "HealthyThresholdCount の既定値は 5 である。",
@@ -12461,7 +12471,9 @@
       "confidence": "high",
       "domain": "domain5",
       "id": "f-5be8a4a8038b",
-      "reasons": [],
+      "reasons": [
+        "human-rejected"
+      ],
       "scope": {
         "edition": "C03"
       },
@@ -12478,7 +12490,7 @@
           "url": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html"
         }
       ],
-      "status": "passed"
+      "status": "rejected"
     },
     {
       "claim": "本文の写しのため、内容は保存しない",
@@ -13017,7 +13029,9 @@
       "confidence": "high",
       "domain": "domain5",
       "id": "f-6012bbc160e8",
-      "reasons": [],
+      "reasons": [
+        "human-rejected"
+      ],
       "scope": {
         "edition": "C03"
       },
@@ -13034,7 +13048,7 @@
           "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/what-is-network-monitor.html"
         }
       ],
-      "status": "passed"
+      "status": "rejected"
     },
     {
       "claim": "Query API は HTTPS リクエストで直接呼び出す低レベルの API で、署名の生成や例外処理を利用者側で扱う必要がある。",
@@ -14974,7 +14988,9 @@
       "confidence": "high",
       "domain": "domain5",
       "id": "f-6ec4f20a90ec",
-      "reasons": [],
+      "reasons": [
+        "human-rejected"
+      ],
       "scope": {
         "edition": "C03"
       },
@@ -14991,7 +15007,7 @@
           "url": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html"
         }
       ],
-      "status": "passed"
+      "status": "rejected"
     },
     {
       "claim": "s3:PutAccelerateConfiguration 権限があると、バケットの Transfer Acceleration を有効にも無効にもできる。",
@@ -15825,7 +15841,9 @@
       "confidence": "high",
       "domain": "domain5",
       "id": "f-746e583d0295",
-      "reasons": [],
+      "reasons": [
+        "human-rejected"
+      ],
       "scope": {
         "edition": "C03"
       },
@@ -15843,7 +15861,7 @@
           "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html"
         }
       ],
-      "status": "passed"
+      "status": "rejected"
     },
     {
       "claim": "CloudFront のキャッシュの期限が切れると、次のリクエストで CloudFront はオリジンに問い合わせ、キャッシュの内容が最新かどうかを確かめる。",
@@ -16044,7 +16062,9 @@
       "confidence": "medium",
       "domain": "domain5",
       "id": "f-754eea6156cd",
-      "reasons": [],
+      "reasons": [
+        "human-rejected"
+      ],
       "scope": {
         "edition": "C03"
       },
@@ -16061,7 +16081,7 @@
           "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resolver-overview-DSN-queries-to-vpc.html"
         }
       ],
-      "status": "passed"
+      "status": "rejected"
     },
     {
       "claim": "圧縮が有効でない場合は、Accept-Encoding を値が空の Custom Origin Header として設定すると、キャッシュ率を上げられる。",
@@ -16815,7 +16835,9 @@
       "confidence": "high",
       "domain": "domain5",
       "id": "f-7b72179a2c53",
-      "reasons": [],
+      "reasons": [
+        "human-rejected"
+      ],
       "scope": {
         "edition": "C03"
       },
@@ -16832,7 +16854,7 @@
           "url": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html"
         }
       ],
-      "status": "passed"
+      "status": "rejected"
     },
     {
       "claim": "Amazon EC2 Auto Scaling のグループは、CloudFormation テンプレートを使って作成できる。",
@@ -19247,7 +19269,9 @@
       "confidence": "high",
       "domain": "domain5",
       "id": "f-8fff5994a2cf",
-      "reasons": [],
+      "reasons": [
+        "human-rejected"
+      ],
       "scope": {
         "edition": "C03"
       },
@@ -19265,7 +19289,7 @@
           "url": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html"
         }
       ],
-      "status": "passed"
+      "status": "rejected"
     },
     {
       "claim": "本文の写しのため、内容は保存しない",
@@ -19368,7 +19392,9 @@
       "confidence": "high",
       "domain": "domain5",
       "id": "f-91210573dd6a",
-      "reasons": [],
+      "reasons": [
+        "human-rejected"
+      ],
       "scope": {
         "edition": "C03"
       },
@@ -19385,7 +19411,7 @@
           "url": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html"
         }
       ],
-      "status": "passed"
+      "status": "rejected"
     },
     {
       "claim": "配置グループは任意であり、使わない場合、EC2 は相関する障害を減らすように、インスタンスを基盤ハードウェア全体に分散させようとする。",
@@ -31270,7 +31296,9 @@
       "confidence": "high",
       "domain": "domain5",
       "id": "f-f050cd292163",
-      "reasons": [],
+      "reasons": [
+        "human-rejected"
+      ],
       "scope": {
         "edition": "C03"
       },
@@ -31288,7 +31316,7 @@
           "url": "https://docs.aws.amazon.com/directconnect/latest/UserGuide/Welcome.html"
         }
       ],
-      "status": "passed"
+      "status": "rejected"
     },
     {
       "claim": "外部アクセス分析は、有効にしたリージョンのリソースに適用されたポリシーだけを分析する。全体を見るには、リージョンごとにアナライザーを作る必要がある。",
@@ -31675,7 +31703,9 @@
       "confidence": "medium",
       "domain": "domain5",
       "id": "f-f390bc8497a8",
-      "reasons": [],
+      "reasons": [
+        "human-rejected"
+      ],
       "scope": {
         "edition": "C03"
       },
@@ -31692,7 +31722,7 @@
           "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resolver.html"
         }
       ],
-      "status": "passed"
+      "status": "rejected"
     },
     {
       "claim": "Aurora Auto Scaling が追加したレプリカの DB インスタンス ID には、接頭辞 application-autoscaling- が付く。",

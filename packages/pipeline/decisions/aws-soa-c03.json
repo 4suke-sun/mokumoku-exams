@@ -357,6 +357,12 @@
     },
     {
       "target": "draft",
+      "id": "d-4c0ac5c591c6",
+      "decision": "reject",
+      "reason": "unresolved-overclaim"
+    },
+    {
+      "target": "draft",
       "id": "d-534babe04264",
       "decision": "reject",
       "reason": "similar-question"
@@ -366,6 +372,12 @@
       "id": "d-54052a1dc822",
       "decision": "approve",
       "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-557d1cbfa177",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -456,6 +468,12 @@
       "id": "d-680cfdf20776",
       "decision": "approve",
       "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-6942970a5420",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -753,6 +771,12 @@
     },
     {
       "target": "draft",
+      "id": "d-bf81d276a0f9",
+      "decision": "reject",
+      "reason": "duplicate-topic"
+    },
+    {
+      "target": "draft",
       "id": "d-bfee0c62f25d",
       "decision": "approve",
       "reason": "human-approved"
@@ -867,6 +891,12 @@
     },
     {
       "target": "draft",
+      "id": "d-e4b17bb75b83",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-e891eb0659b4",
       "decision": "reject",
       "reason": "fact-mismatch"
@@ -924,6 +954,96 @@
       "id": "d-fa4e13fb83d6",
       "decision": "approve",
       "reason": "human-approved"
+    },
+    {
+      "target": "fact",
+      "id": "f-097d5e67fa0d",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-16ac95a5f408",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-1d17a0e59c80",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-225998a2174f",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-4145f9ddcd58",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-5be8a4a8038b",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-6012bbc160e8",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-6ec4f20a90ec",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-746e583d0295",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-754eea6156cd",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-7b72179a2c53",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-8fff5994a2cf",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-91210573dd6a",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-f050cd292163",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-f390bc8497a8",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
     }
   ]
 }

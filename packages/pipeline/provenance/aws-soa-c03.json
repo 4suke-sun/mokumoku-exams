@@ -1363,6 +1363,20 @@
       ]
     },
     {
+      "draftId": "d-557d1cbfa177",
+      "questionId": "SOA-0128",
+      "factIds": [
+        "f-4ffa722ed5b5"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/HowCloudFrontWorks.html",
+          "fetchedAt": "2026-11-14",
+          "contentHash": "6984d02d8a16440d9d01a40beb1a8125192bfac3db8e2294d64a7ef766cefac9"
+        }
+      ]
+    },
+    {
       "draftId": "d-56a3ab26de39",
       "questionId": "SOA-0023",
       "factIds": [
@@ -1639,6 +1653,38 @@
           "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/what-is-systems-manager.html",
           "fetchedAt": "2026-11-14",
           "contentHash": "079439916cebda035495426c3f6498760fcdbf27e1749fbc0258c725a48ede71"
+        }
+      ]
+    },
+    {
+      "draftId": "d-6942970a5420",
+      "questionId": "SOA-0129",
+      "factIds": [
+        "f-0373d17fe055",
+        "f-055010468835",
+        "f-18112c8ec5c3",
+        "f-b7757e9b2954"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html",
+          "fetchedAt": "2026-11-14",
+          "contentHash": "178d6a8c5b47d0bcf51f3994503e3d379679b504d985a379713bc985fafbfd72"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html",
+          "fetchedAt": "2026-11-14",
+          "contentHash": "1c046abbbca94ba641d737218177e888d422aeee184f87cd2705c5c2c892650c"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/privatelink/concepts.html",
+          "fetchedAt": "2026-11-14",
+          "contentHash": "d36657d28039e37dc220581918c4dbd9e1510410f7a5bd3ad389e689bbf82ef9"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/what-is-amazon-vpc.html",
+          "fetchedAt": "2026-11-14",
+          "contentHash": "6befbb3b9438c3e4a9e2e4395a0541330e99714ea1cb0752f4e1c7e199118dd0"
         }
       ]
     },
@@ -2740,6 +2786,37 @@
       ]
     },
     {
+      "draftId": "d-bf81d276a0f9",
+      "factIds": [
+        "f-0373d17fe055",
+        "f-055010468835",
+        "f-3f4a542f1890",
+        "f-b7757e9b2954"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/HowCloudFrontWorks.html",
+          "fetchedAt": "2026-11-14",
+          "contentHash": "6984d02d8a16440d9d01a40beb1a8125192bfac3db8e2294d64a7ef766cefac9"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html",
+          "fetchedAt": "2026-11-14",
+          "contentHash": "178d6a8c5b47d0bcf51f3994503e3d379679b504d985a379713bc985fafbfd72"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html",
+          "fetchedAt": "2026-11-14",
+          "contentHash": "1c046abbbca94ba641d737218177e888d422aeee184f87cd2705c5c2c892650c"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/privatelink/concepts.html",
+          "fetchedAt": "2026-11-14",
+          "contentHash": "d36657d28039e37dc220581918c4dbd9e1510410f7a5bd3ad389e689bbf82ef9"
+        }
+      ]
+    },
+    {
       "draftId": "d-bfee0c62f25d",
       "questionId": "SOA-0052",
       "factIds": [
@@ -3118,6 +3195,38 @@
           "url": "https://docs.aws.amazon.com/ram/latest/userguide/shareable.html",
           "fetchedAt": "2026-11-14",
           "contentHash": "1b21bbb3ee27ac2e519ea8c13b6f0f9b5e5fdc901606c3ad55f476d9362ba9e9"
+        }
+      ]
+    },
+    {
+      "draftId": "d-e4b17bb75b83",
+      "questionId": "SOA-0130",
+      "factIds": [
+        "f-0373d17fe055",
+        "f-055010468835",
+        "f-5e5fad8bdf2e",
+        "f-b7757e9b2954"
+      ],
+      "sources": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/WhatIsCloudWatch.html",
+          "fetchedAt": "2026-11-14",
+          "contentHash": "178d6a8c5b47d0bcf51f3994503e3d379679b504d985a379713bc985fafbfd72"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy.html",
+          "fetchedAt": "2026-11-14",
+          "contentHash": "4c2cb5135c63f50d904435e605b1bb7c65bdfdf79b07fbb4a0fb3699425b9a19"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-access-logs.html",
+          "fetchedAt": "2026-11-14",
+          "contentHash": "1c046abbbca94ba641d737218177e888d422aeee184f87cd2705c5c2c892650c"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/privatelink/concepts.html",
+          "fetchedAt": "2026-11-14",
+          "contentHash": "d36657d28039e37dc220581918c4dbd9e1510410f7a5bd3ad389e689bbf82ef9"
         }
       ]
     },
