@@ -2797,6 +2797,2676 @@
         }
       ],
       "correctAnswers": ["C"]
+    },
+    {
+      "questionId": "SOA-0066",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain5",
+      "difficulty": "easy",
+      "questionType": "single",
+      "questionText": "ある企業は、VPC 内の複数のサブネットに EC2 インスタンスを配置し、社内向けのアプリケーションを稼働させています。ある日、アプリケーションのサーバーから別のサブネットのインスタンスへの通信が失敗するようになりました。CloudOps エンジニアは、VPC 内の送信元と送信先のリソースを指定し、両者の間の接続性を構成の面から分析して検査する必要があります。\n\nこの要件を満たす対応はどれでしょうか。",
+      "explanation": "## 問われている要件\nVPC 内の送信元と送信先の 2 つのリソースについて、構成を分析して接続性を検査する手段を選ぶ設問です。実際の通信を監視する機能や、名前解決の仕組みとは、役割を分けて考えます。\n\n## 正解の決め手\nReachability Analyzer は、構成を分析するツールです。送信元と送信先のリソースを決めると、その 2 点の間で接続性を検査できます。設問の「構成の面から分析して検査する」という要件に当たるのは、この機能です。\n\n## 前提知識\nネットワークの確認に使う機能は、目的ごとに役割が分かれています。フローログはインスタンスに届く通信を監視する機能で、Route 53 VPC Resolver は名前解決の問い合わせに答える仕組みです。プローブは、AWS 側のリソースがオンプレミスの宛先へ向けて送る通信で、得られた測定値は CloudWatch に書き込まれます。\n\n## 他の選択肢が誤りである理由\nフローログを使って、インスタンスに届くトラフィックを監視し、接続性を検査する。\n\nフローログが担うのは、インスタンスへ届く通信の監視です。送信元と送信先を指定して構成を分析し、接続性を検査する役割は、Reachability Analyzer が持ちます。\n\nRoute 53 VPC Resolver を使って、送信元と送信先のリソースの名前を解決し、接続性を検査する。\n\nRoute 53 VPC Resolver は、名前解決の問い合わせに答える仕組みで、接続性の検査は担いません。送信元と送信先のリソースの間の接続性を構成の面から検査するのは、Reachability Analyzer です。\n\nプローブを使って、リソースからオンプレミスの接続先へトラフィックを送り、接続性を検査する。\n\nプローブは、AWS 側のリソースからオンプレミスの接続先へ向けて送るトラフィックで、測定値は CloudWatch に書き込まれます。対象はオンプレミスの接続先で、この設問の VPC 内のサブネット間の接続性を構成から分析する手段ではありません。\n\n## まとめ\nVPC 内の 2 つのリソースの間の接続性を、構成の分析によって検査するときは、Reachability Analyzer を使います。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/what-is-network-monitor.html",
+          "title": "Using Network Synthetic Monitor - Amazon CloudWatch"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resolver.html",
+          "title": "What is Route 53 VPC Resolver? - Amazon Route 53"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/reachability/what-is-reachability-analyzer.html",
+          "title": "What is Reachability Analyzer? - Amazon Virtual Private Cloud"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/flow-logs.html",
+          "title": "Logging IP traffic using VPC Flow Logs - Amazon Virtual Private Cloud"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "フローログを使って、インスタンスに届くトラフィックを監視し、接続性を検査する。",
+          "explanation": "フローログが担うのは、インスタンスへ届く通信の監視です。送信元と送信先を指定して構成を分析し、接続性を検査する役割は、Reachability Analyzer が持ちます。"
+        },
+        {
+          "key": "B",
+          "text": "Reachability Analyzer を使って、送信元と送信先のリソースの構成を分析し、接続性を検査する。"
+        },
+        {
+          "key": "C",
+          "text": "Route 53 VPC Resolver を使って、送信元と送信先のリソースの名前を解決し、接続性を検査する。",
+          "explanation": "Route 53 VPC Resolver は、名前解決の問い合わせに答える仕組みで、接続性の検査は担いません。送信元と送信先のリソースの間の接続性を構成の面から検査するのは、Reachability Analyzer です。"
+        },
+        {
+          "key": "D",
+          "text": "プローブを使って、リソースからオンプレミスの接続先へトラフィックを送り、接続性を検査する。",
+          "explanation": "プローブは、AWS 側のリソースからオンプレミスの接続先へ向けて送るトラフィックで、測定値は CloudWatch に書き込まれます。対象はオンプレミスの接続先で、この設問の VPC 内のサブネット間の接続性を構成から分析する手段ではありません。"
+        }
+      ],
+      "correctAnswers": ["B"]
+    },
+    {
+      "questionId": "SOA-0067",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain2",
+      "difficulty": "easy",
+      "questionType": "multiple",
+      "questionText": "ある企業は、AWS Organizations で複数のアカウントを管理しています。各アカウントでは、Amazon DynamoDB、Amazon RDS、Amazon S3 を使って業務のデータを保存しています。CloudOps エンジニアは、データの保護と復元の運用を見直す担当になりました。エンジニアは、AWS Backup と各サービスの復元や削除の仕様を確認しています。\n\nデータの保護と復元に関する説明として正しいものはどれでしょうか。(2 つ選択)",
+      "explanation": "## 問われている要件\n\nデータの保護と復元に関する説明のうち、正しいものを 2 つ選ぶ問いです。AWS Backup の対象になるリソースと、AWS Organizations による統制という、別の層の事実を見分けます。\n\n## 正解の決め手\n\nAmazon DynamoDB のテーブルは、AWS Backup でバックアップできる対象のリソースです。\n\nAWS Organizations のポリシーを使うと、AWS Backup によるバックアップを指定した間隔で実行するよう強制できます。\n\n## 解くための考え方\n\n選択肢を、バックアップの対象、復元後の設定、バージョンの削除、組織の統制という論点に分け、それぞれが事実と合うかを 1 つずつ確かめます。数値を含む説明は、数値が事実と合うかを先に見ます。\n\n## まとめ\n\nDynamoDB のテーブルは AWS Backup の対象で、Organizations のポリシーによってバックアップの実行間隔を強制できます。完了枠の既定値、復元後のパラメータグループ、バージョンの削除に必要な条件は、事実と食い違う説明でした。\n\n## 他の選択肢が誤りである理由\n\nAWS Backup のバックアップウィンドウでは、完了枠(Complete within)の既定値が 1 日に設定されている。\n\nAWS Backup のバックアップウィンドウで、完了枠の既定値は **7 日** です。1 日という数値は事実と合いません。\n\nポイントインタイムリストアで Amazon RDS の DB インスタンスを復元すると、復元元の DB パラメータグループとオプショングループが復元先に引き継がれる。\n\nポイントインタイムリストアで復元した DB インスタンスは、復元元のグループを引き継ぎません。既定の DB パラメータグループとオプショングループに自動的に関連付けられます。\n\nAWS CLI で Amazon S3 のオブジェクトの特定のバージョンを削除するには、オブジェクトのキーだけを指定すればよく、バケットの所有者である必要はない。\n\nAWS CLI で特定のバージョンを削除するには、実行する側がバケットの所有者であり、version-id のサブリソースを使うことが必要です。キーだけの指定では足りません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_PIT.html",
+          "title": "Restoring a DB instance to a specified time for Amazon RDS - Amazon Relational Database Service"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/DeletingObjectVersions.html",
+          "title": "Deleting object versions from a versioning-enabled bucket - Amazon Simple Storage Service"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/aws-backup/latest/devguide/creating-a-backup-plan.html",
+          "title": "Create a backup plan - AWS Backup"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/aws-backup/latest/devguide/whatisbackup.html",
+          "title": "What is AWS Backup? - AWS Backup"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_introduction.html",
+          "title": "What is AWS Organizations? - AWS Organizations"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "AWS Backup のバックアップウィンドウでは、完了枠(Complete within)の既定値が 1 日に設定されている。",
+          "explanation": "AWS Backup のバックアップウィンドウで、完了枠(Complete within)の既定値は **7 日** です。1 日という数値は事実と合いません。"
+        },
+        {
+          "key": "B",
+          "text": "Amazon DynamoDB のテーブルは、AWS Backup でバックアップできる対象のリソースである。"
+        },
+        {
+          "key": "C",
+          "text": "ポイントインタイムリストアで Amazon RDS の DB インスタンスを復元すると、復元元の DB パラメータグループとオプショングループが復元先に引き継がれる。",
+          "explanation": "ポイントインタイムリストアで復元した DB インスタンスは、復元元のグループを引き継ぎません。既定の DB パラメータグループとオプショングループに自動的に関連付けられます。"
+        },
+        {
+          "key": "D",
+          "text": "AWS CLI で Amazon S3 のオブジェクトの特定のバージョンを削除するには、オブジェクトのキーだけを指定すればよく、バケットの所有者である必要はない。",
+          "explanation": "AWS CLI で特定のバージョンを削除するには、実行する側がバケットの所有者であり、version-id のサブリソースを使うことが必要です。キーだけの指定では足りません。"
+        },
+        {
+          "key": "E",
+          "text": "AWS Organizations のポリシーを使うと、AWS Backup によるバックアップを、指定した間隔で実行するよう強制できる。"
+        }
+      ],
+      "correctAnswers": ["B", "E"]
+    },
+    {
+      "questionId": "SOA-0068",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain2",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "ある金融企業は、Amazon RDS の Multi-AZ DB クラスターで、勘定系のデータベースを運用しています。担当者が誤ってテーブルのデータを更新したため、CloudOps エンジニアは、誤更新の直前の時刻を指定して、DB クラスターを復元することにしました。復元の前に、復元によって作成される構成を確認する必要があります。\n\n指定した時刻への復元の結果として、正しいものはどれでしょうか。",
+      "explanation": "## 問われている要件\nある金融企業の CloudOps エンジニアは、誤更新の直前の時刻を指定して Multi-AZ DB クラスターを復元する前に、復元の結果として何が作成されるかを確認する必要があります。\n\n## 正解の決め手\nAmazon RDS の Multi-AZ DB クラスターは、指定した時刻に復元できます。その結果は、新しい Multi-AZ DB クラスターになります。\n\n## 解くための考え方\nCloudOps エンジニアは、復元の操作が既存のクラスターを書き換えるのか、新しいものを作るのかを区別します。あわせて、復元の結果の種類が元のクラスターと同じかどうかも確かめます。\n\n## 他の選択肢が誤りである理由\n元の Multi-AZ DB クラスターが、指定した時刻の状態に置き換わる。\n\n指定した時刻への復元は、元の Multi-AZ DB クラスターを巻き戻す操作ではありません。結果は、新しい Multi-AZ DB クラスターになります。\n\n指定した時刻の状態の、新しいシングル AZ の DB インスタンスが作成される。\n\n復元の結果は、新しい Multi-AZ DB クラスターです。Multi-AZ の構成が、単一の DB インスタンスに変わるわけではありません。\n\n指定した時刻の状態の、新しい Aurora の DB クラスターが作成される。\n\n復元の結果は、新しい Multi-AZ DB クラスターです。Aurora の DB クラスターが作成されるわけではありません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/multi-az-db-clusters-concepts.html",
+          "title": "Multi-AZ DB cluster deployments for Amazon RDS - Amazon Relational Database Service"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "元の Multi-AZ DB クラスターが、指定した時刻の状態に置き換わる。",
+          "explanation": "指定した時刻への復元は、元の Multi-AZ DB クラスターを巻き戻す操作ではありません。結果は、新しい Multi-AZ DB クラスターになります。"
+        },
+        {
+          "key": "B",
+          "text": "指定した時刻の状態の、新しい Multi-AZ DB クラスターが作成される。"
+        },
+        {
+          "key": "C",
+          "text": "指定した時刻の状態の、新しいシングル AZ の DB インスタンスが作成される。",
+          "explanation": "復元の結果は、新しい Multi-AZ DB クラスターです。Multi-AZ の構成が、単一の DB インスタンスに変わるわけではありません。"
+        },
+        {
+          "key": "D",
+          "text": "指定した時刻の状態の、新しい Aurora の DB クラスターが作成される。",
+          "explanation": "復元の結果は、新しい Multi-AZ DB クラスターです。Aurora の DB クラスターが作成されるわけではありません。"
+        }
+      ],
+      "correctAnswers": ["B"]
+    },
+    {
+      "questionId": "SOA-0069",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain1",
+      "difficulty": "easy",
+      "questionType": "multiple",
+      "questionText": "ある企業は、EC2 インスタンスで稼働する業務システムの障害対応を、AWS Systems Manager の Automation で自動化しようとしています。CloudOps エンジニアは、復旧の手順をまとめた Automation runbook(以下、ランブック)を自作する予定です。作成の前に、ランブックの書式と、各手順に書く項目を確認しています。\n\nランブックの作り方について、正しいものはどれでしょうか。(2 つ選択)",
+      "explanation": "## 問われている要件\n\nAutomation runbook は、復旧などの手順を定義して自動で実行させるための文書です。この設問は、ランブックを自作するときの書式と、手順に付ける description の扱いを問うています。\n\n## 正解の決め手\n\n選択肢 A は正しい記述です。Automation runbook は YAML または JSON で書き、含まれる手順は書かれた順番どおりに実行されます。\n\n選択肢 E も正しい記述です。手順の description は、ランブックや手順の目的を説明するための任意の文字列であり、書かなくてもかまいません。\n\n## 他の選択肢が誤りである理由\n\nランブックに含まれる手順は、書いた順序に関係なく、すべて同時に実行が始まる。\n\nランブックに含まれる手順は、書かれた順番どおりに実行されます。順序と無関係に、すべての手順が同時に始まるわけではありません。\n\nランブックは XML の形式で書き、その中に実行する手順を要素として定義する。\n\nランブックを書く形式は YAML か JSON です。XML の形式で書く、という説明は誤りです。\n\nAutomation で実行するランブックの各手順には、目的を説明する description の指定が必要である。\n\n手順の description は、目的を説明するための任意の文字列で、必須の項目ではありません。Automation で実行するランブックでも、書かなくてもかまいません。\n\n## まとめ\n\nランブックの書式は YAML か JSON で、手順は書かれた順番に実行され、description は任意の項目です。この 3 点を組み合わせて覚えておくと、ランブックの作り方を問う設問に答えやすくなります。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/automation-actions.html",
+          "title": "Systems Manager Automation actions reference - AWS Systems Manager"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-automation.html",
+          "title": "AWS Systems Manager Automation - AWS Systems Manager"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "ランブックは YAML か JSON の形式で書き、その中に実行したい手順をまとめて定義する。"
+        },
+        {
+          "key": "B",
+          "text": "ランブックに含まれる手順は、書いた順序に関係なく、すべて同時に実行が始まる。",
+          "explanation": "ランブックに含まれる手順は、書かれた順番どおりに実行されます。順序と無関係に、すべての手順が同時に始まるわけではありません。"
+        },
+        {
+          "key": "C",
+          "text": "ランブックは XML の形式で書き、その中に実行する手順を要素として定義する。",
+          "explanation": "ランブックを書く形式は YAML か JSON です。XML の形式で書く、という説明は誤りです。"
+        },
+        {
+          "key": "D",
+          "text": "Automation で実行するランブックの各手順には、目的を説明する description の指定が必要である。",
+          "explanation": "手順の description は、目的を説明するための任意の文字列で、必須の項目ではありません。Automation で実行するランブックでも、書かなくてもかまいません。"
+        },
+        {
+          "key": "E",
+          "text": "ランブックの各手順の description は、目的を説明したいときに書く任意の項目で、省略してもよい。"
+        }
+      ],
+      "correctAnswers": ["A", "E"]
+    },
+    {
+      "questionId": "SOA-0070",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain1",
+      "difficulty": "hard",
+      "questionType": "multiple",
+      "questionText": "ある企業は、複数の AWS アカウントで業務システムを運用しています。CloudOps エンジニアは、監視アカウントがソースアカウントのメトリクスを参照できる構成にしています。運用チームは、ソースアカウントの EC2 インスタンスの CPU 使用率が基準値を超えたときに、メールで通知を受け取る必要があります。エンジニアは、通知先として SNS トピックを作成し、運用チームのメールアドレスをコンソールでメールの購読として登録しました。アラームの管理は、監視アカウントに集約する方針です。監視の情報は、運用チームのメンバーだけが見られるようにする必要があります。\n\nこれらの要件を満たすために、エンジニアが行う手順の組み合わせはどれでしょうか。(2 つ選択)",
+      "explanation": "## 問われている要件\n\nCloudWatch のアラームを監視アカウントに集約し、運用チームがメールで通知を受け取れる状態にするために、エンジニアが行う手順を 2 つ選ぶ問題です。アラームの置き場所と、メール通知の有効化という、別の層の手順が問われています。閲覧範囲の要件も、選択肢を絞る条件になります。\n\n## 正解の決め手\n\n選択肢 C は、監視アカウントでアラームを作成する手順です。監視アカウントでは、ソースアカウントのメトリクスを監視するアラームを作成できます。静的しきい値のアラームは、選んだ指標がしきい値を超えた評価期間の数が条件に達すると ALARM 状態になるので、CPU 使用率が基準値を超えた状態の検知に使えます。\n\n選択肢 D は、メールの購読を有効にする手順です。コンソールで作ったメールの購読は、届いた確認メールで承認すると有効になります。承認するまでは、購読が有効になっていません。\n\n## 前提知識\n\n監視アカウントとソースアカウント\n\n監視アカウントでは、ソースアカウントのメトリクスを監視するアラームを作成できます。\n\n静的しきい値のアラーム\n\n選んだ指標がしきい値を超えた評価期間の数が条件に達すると、ALARM 状態になります。\n\nメールの購読\n\nコンソールで作ったメールの購読は、届いた確認メールで承認すると有効になります。\n\nダッシュボードの公開共有\n\n1 つのダッシュボードを公開で共有すると、リンクを知っている人なら誰でも閲覧できます。\n\n## 解くための考え方\n\n要件を、アラームの置き場所、通知の有効化、閲覧範囲の 3 つに分けて、それぞれに合う手順を探します。\n\nアラームの置き場所は、監視アカウントに集約する方針なので、監視アカウントで作成する手順(選択肢 C)が合います。通知の有効化は、メールの購読が確認メールの承認で有効になるので、承認する手順(選択肢 D)が合います。閲覧範囲は、公開の共有ではリンクを知っている人なら誰でも見られるため、運用チームのメンバーだけという要件に合いません。\n\n## まとめ\n\n監視アカウントでソースアカウントのメトリクスを監視するアラームを作成し、メールの購読は確認メールの承認で有効にします。ダッシュボードの公開共有は、閲覧範囲の要件に反します。\n\n## 他の選択肢が誤りである理由\n\n各ソースアカウントで、EC2 インスタンスの CPU 使用率に対する静的しきい値のアラームを、アカウントごとに個別に作成する。\n\n各ソースアカウントに個別にアラームを作る方法は、アラームの管理を監視アカウントに集約する方針に合いません。監視アカウントでは、ソースアカウントのメトリクスを監視するアラームを作成できるので、アカウントごとに分ける必要はありません。\n\nCloudWatch のダッシュボードを公開で共有し、運用チームにリンクを伝えて、CPU 使用率を確認してもらう。\n\nダッシュボードを公開で共有すると、リンクを知っている人なら誰でも閲覧できるため、運用チームのメンバーだけが見られるという要件に反します。画面を確認してもらう方法なので、基準値を超えたときにメールで通知を受け取る要件も満たしません。\n\nメールの購読は、コンソールで登録した時点で有効になるため、届いた確認メールへの対応は省略する。\n\nメールの購読は、コンソールで登録しただけでは有効になりません。届いた確認メールで承認すると有効になるので、確認メールへの対応を省くと、通知を受け取る要件を満たせません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Dashboards.html",
+          "title": "Using Amazon CloudWatch dashboards - Amazon CloudWatch"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/ConsoleAlarms.html",
+          "title": "Create a CloudWatch alarm based on a static threshold - Amazon CloudWatch"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Notify_Users_Alarm_Changes.html",
+          "title": "Notifying users on alarm changes - Amazon CloudWatch"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch-dashboard-sharing.html",
+          "title": "Sharing CloudWatch dashboards - Amazon CloudWatch"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "各ソースアカウントで、EC2 インスタンスの CPU 使用率に対する静的しきい値のアラームを、アカウントごとに個別に作成する。",
+          "explanation": "各ソースアカウントに個別にアラームを作る方法は、アラームの管理を監視アカウントに集約する方針に合いません。監視アカウントでは、ソースアカウントのメトリクスを監視するアラームを作成できるので、アカウントごとに分ける必要はありません。"
+        },
+        {
+          "key": "B",
+          "text": "CloudWatch のダッシュボードを公開で共有し、運用チームにリンクを伝えて、CPU 使用率を確認してもらう。",
+          "explanation": "ダッシュボードを公開で共有すると、リンクを知っている人なら誰でも閲覧できるため、運用チームのメンバーだけが見られるという要件に反します。画面を確認してもらう方法なので、基準値を超えたときにメールで通知を受け取る要件も満たしません。"
+        },
+        {
+          "key": "C",
+          "text": "監視アカウントで、ソースアカウントの EC2 インスタンスの CPU 使用率を対象にした静的しきい値のアラームを作成する。"
+        },
+        {
+          "key": "D",
+          "text": "SNS トピックのメールの購読について、届いた確認メールを運用チームの担当者が承認して、購読を有効にする。"
+        },
+        {
+          "key": "E",
+          "text": "メールの購読は、コンソールで登録した時点で有効になるため、届いた確認メールへの対応は省略する。",
+          "explanation": "メールの購読は、コンソールで登録しただけでは有効になりません。届いた確認メールで承認すると有効になるので、確認メールへの対応を省くと、通知を受け取る要件を満たせません。"
+        }
+      ],
+      "correctAnswers": ["C", "D"]
+    },
+    {
+      "questionId": "SOA-0071",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain3",
+      "difficulty": "hard",
+      "questionType": "single",
+      "questionText": "ある企業は、1 つのリージョンで本番のワークロードを運用しており、障害に備えて復旧先のリージョンを決めています。CloudOps エンジニアは、運用中のリージョンが使えなくなったときに、復旧先のリージョンで基盤を素早く正確に再構築できるようにする必要があります。あわせて、基盤の変更履歴を、変更前後の差分として追跡できることも求められています。\n\nこの要件を満たす方法はどれでしょうか。",
+      "explanation": "## 問われている要件\n\nCloudOps エンジニアに求められているのは、復旧先のリージョンで基盤を素早く正確に再構築できることと、基盤の変更履歴を差分として追跡できることの 2 点です。\n\n## 正解の決め手\n\n復旧先のリージョンで基盤を素早く正確に再構築するには、IaC を使い、平常時から基盤をデプロイしておくことが前提になります。また、CloudFormation のテンプレートはテキストファイルなので、テンプレートの差分を追跡すれば、変更履歴を管理できます。平常時からテンプレートでデプロイし、障害時には同じテンプレートを復旧先で使い、履歴をテンプレートの差分で追う選択肢 B が、2 つの要件を両方満たします。\n\n## 前提知識\n\nIaC は、基盤をコードやテンプレートで定義してデプロイする考え方です。復旧のための再構築では、この IaC を、障害が起きてから使い始めるのではなく、平常時のデプロイから使っておくべきだとされています。Systems Manager の自動化は、ノード群に対するレジストリの編集、ユーザー管理、ソフトウェアやパッチの導入といった定型作業を自動にする機能です。\n\n## 解くための考え方\n\n要件を、再構築の速さと正確さ、変更履歴の追跡の 2 つに分けて、選択肢ごとに満たすかを確かめます。次に、IaC を使い始める時期に注目します。テンプレートを使うと書いてあっても、障害が起きてから用意する案は、平常時からのデプロイという前提に合いません。\n\n## 他の選択肢が誤りである理由\n\n障害が起きた時点で、本番の構成を手作業で調べて CloudFormation のテンプレートに書き起こし、復旧先のリージョンにデプロイして、変更履歴をそのテンプレートの差分で追跡する。\n\nこの案は、IaC を使い始める時期を、障害が起きてからにしています。復旧先のリージョンで基盤を素早く正確に再構築するには、平常時から IaC でデプロイしておく必要があり、障害時に手作業でテンプレートへ書き起こす進め方は、この前提と逆になります。\n\n本番の基盤に加えた変更を、手作業で復旧先のリージョンにも反映して構成をそろえておき、変更履歴は操作の記録を残して管理する。\n\n手作業で変更を反映する方法は、IaC によるデプロイではありません。復旧先のリージョンで基盤を素早く正確に再構築するには IaC でデプロイすることが前提で、操作の記録も、テンプレートの差分による変更履歴の管理の代わりにはなりません。\n\nSystems Manager Automation で、稼働中のノード群へのソフトウェアやパッチの導入を自動化し、障害時に復旧先のリージョンでその自動化を実行する。\n\nSystems Manager の自動化が扱うのは、ノード群に対するレジストリの編集、ユーザー管理、ソフトウェアやパッチの導入といった定型作業です。基盤をテンプレートで定義してデプロイする IaC の代わりにはならず、変更履歴を差分で追跡する要件も満たしません。\n\n## まとめ\n\n復旧先のリージョンでの再構築に備えるには、平常時から IaC でデプロイしておくことが重要です。CloudFormation のテンプレートはテキストファイルなので、差分の追跡で変更履歴の管理も兼ねられます。手作業での反映や、ノード群向けの自動化では、この 2 つの要件は満たせません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html",
+          "title": "What is CloudFormation? - AWS CloudFormation"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/what-is-systems-manager.html",
+          "title": "What is AWS Systems Manager? - AWS Systems Manager"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html",
+          "title": "Disaster recovery options in the cloud - Disaster Recovery of Workloads on AWS: Recovery in the Cloud"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "障害が起きた時点で、本番の構成を手作業で調べて CloudFormation のテンプレートに書き起こし、復旧先のリージョンにデプロイして、変更履歴をそのテンプレートの差分で追跡する。",
+          "explanation": "この案は、IaC を使い始める時期を、障害が起きてからにしています。復旧先のリージョンで基盤を素早く正確に再構築するには、平常時から IaC でデプロイしておく必要があり、障害時に手作業でテンプレートへ書き起こす進め方は、この前提と逆になります。"
+        },
+        {
+          "key": "B",
+          "text": "平常時から基盤を CloudFormation のテンプレートでデプロイし、障害時に同じテンプレートを復旧先のリージョンへデプロイして、変更履歴をテンプレートの差分で追跡する。"
+        },
+        {
+          "key": "C",
+          "text": "本番の基盤に加えた変更を、手作業で復旧先のリージョンにも反映して構成をそろえておき、変更履歴は操作の記録を残して管理する。",
+          "explanation": "手作業で変更を反映する方法は、IaC によるデプロイではありません。復旧先のリージョンで基盤を素早く正確に再構築するには IaC でデプロイすることが前提で、操作の記録も、テンプレートの差分による変更履歴の管理の代わりにはなりません。"
+        },
+        {
+          "key": "D",
+          "text": "Systems Manager Automation で、稼働中のノード群へのソフトウェアやパッチの導入を自動化し、障害時に復旧先のリージョンでその自動化を実行する。",
+          "explanation": "Systems Manager の自動化が扱うのは、ノード群に対するレジストリの編集、ユーザー管理、ソフトウェアやパッチの導入といった定型作業です。基盤をテンプレートで定義してデプロイする IaC の代わりにはならず、変更履歴を差分で追跡する要件も満たしません。"
+        }
+      ],
+      "correctAnswers": ["B"]
+    },
+    {
+      "questionId": "SOA-0072",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain2",
+      "difficulty": "easy",
+      "questionType": "single",
+      "questionText": "ある企業は、EC2 インスタンスを Amazon EC2 Auto Scaling のグループで運用しています。CloudOps エンジニアは、グループの台数を自動で調整するため、動的スケーリングを設定する予定です。エンジニアは、動的スケーリングで作成できるポリシーの種類を、設定の前に確認する必要があります。\n\nAmazon EC2 Auto Scaling の動的スケーリングで作成できるポリシーは、次のうちどれでしょうか。",
+      "explanation": "## 問われている要件\nAmazon EC2 Auto Scaling の動的スケーリングで作成できるポリシーを、種類の名前から選ぶ問題です。\n\n## 正解の決め手\n動的スケーリングのポリシーは、ターゲット追跡、ステップ、シンプルの 3 種類です。選択肢のうち、この 3 種類に含まれるのは、ステップスケーリングのポリシーを挙げた C だけです。\n\n## 解くための考え方\nスケーリングの名前が付いた方式は複数あり、似た名前が並びます。動的スケーリングのポリシーの 3 種類を先に思い出し、選択肢の名前を 1 つずつ照らし合わせて選びます。\n\n## 他の選択肢が誤りである理由\n予測スケーリングのポリシーを作成する。\n\n予測スケーリングは、動的スケーリングのポリシーの 3 種類(ターゲット追跡、ステップ、シンプル)に含まれません。名前にスケーリングと付くだけで、動的スケーリングのポリシーとして作成できるとは限りません。\n\nスケジュールスケーリングのポリシーを作成する。\n\nスケジュールスケーリングも、動的スケーリングのポリシーの 3 種類(ターゲット追跡、ステップ、シンプル)に含まれません。似た名前の別の方式を、ポリシーの種類と取り違えた選択肢です。\n\n手動スケーリングのポリシーを作成する。\n\n手動スケーリングという種類のポリシーは、動的スケーリングにありません。動的スケーリングのポリシーは、ターゲット追跡、ステップ、シンプルの 3 種類です。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-scale-based-on-demand.html",
+          "title": "Dynamic scaling for Amazon EC2 Auto Scaling - Amazon EC2 Auto Scaling"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "予測スケーリングのポリシーを作成する。",
+          "explanation": "予測スケーリングは、動的スケーリングのポリシーの 3 種類(ターゲット追跡、ステップ、シンプル)に含まれません。名前にスケーリングと付くだけで、動的スケーリングのポリシーとして作成できるとは限りません。"
+        },
+        {
+          "key": "B",
+          "text": "スケジュールスケーリングのポリシーを作成する。",
+          "explanation": "スケジュールスケーリングも、動的スケーリングのポリシーの 3 種類(ターゲット追跡、ステップ、シンプル)に含まれません。似た名前の別の方式を、ポリシーの種類と取り違えた選択肢です。"
+        },
+        {
+          "key": "C",
+          "text": "ステップスケーリングのポリシーを作成する。"
+        },
+        {
+          "key": "D",
+          "text": "手動スケーリングのポリシーを作成する。",
+          "explanation": "手動スケーリングという種類のポリシーは、動的スケーリングにありません。動的スケーリングのポリシーは、ターゲット追跡、ステップ、シンプルの 3 種類です。"
+        }
+      ],
+      "correctAnswers": ["C"]
+    },
+    {
+      "questionId": "SOA-0073",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain4",
+      "difficulty": "easy",
+      "questionType": "multiple",
+      "questionText": "ある企業は、AWS Organizations の組織で複数のアカウントを運用しています。この企業は、Amazon RDS のデータベースの管理者の認証情報を AWS Secrets Manager で管理し、シークレットの暗号化には自分の AWS KMS のキーを使う予定です。CloudOps エンジニアは、組織のサービスコントロールポリシー(SCP)による統制も併用する前提で、認証情報とキーの扱いについて仕様を確認する必要があります。\n\nこの運用の仕様として正しい記述はどれでしょうか。(2 つ選択)",
+      "explanation": "## 問われている要件\n\nAmazon RDS の管理者の認証情報を Secrets Manager で管理し、暗号化に自分の KMS キーを使う運用について、仕様として正しい記述を 2 つ選ぶ問題です。認証情報の作り方と、暗号化に伴う課金という、役割の違う 2 点を分けて押さえます。\n\n## 正解の決め手\n\n選択肢 D は正しい記述です。RDS と Redshift の管理者の認証情報は、マネージドシークレットとして作成する形が推奨されています。\n\n選択肢 E も正しい記述です。Secrets Manager のシークレットを自分の KMS キーで暗号化すると、AWS KMS の料金が課金されます。\n\n## 前提知識\n\nKMS キーには、キーポリシーがちょうど 1 つ必要です。KMS では、キーポリシーを作成・管理することで、信頼できる利用者だけに鍵へのアクセスを許せます。\n\nSCP は、組織のメンバーアカウントだけに影響します。管理アカウントのユーザーとロールには影響しません。\n\n## 他の選択肢が誤りである理由\n\nKMS キーには、キーポリシーを必要な数だけ付けられ、許可の範囲ごとに別のキーポリシーを使い分ける。\n\nKMS キーには、キーポリシーがちょうど 1 つ必要です。キーポリシーを複数付けて、許可の範囲ごとに使い分けることはできません。\n\nKMS キーへのアクセスは、キーポリシーでは絞れないため、IAM ポリシーだけで制御する。\n\nKMS では、キーポリシーを作成・管理して、信頼できる利用者だけに鍵へのアクセスを許せます。キーポリシーでは絞れないという説明は、この仕様に合いません。\n\nSCP を組織に適用すると、管理アカウントのユーザーとロールにも、メンバーアカウントと同じ制限が及ぶ。\n\nSCP が影響するのは、組織のメンバーアカウントだけです。管理アカウントのユーザーとロールには、SCP の制限が及びません。\n\n## まとめ\n\nRDS の管理者の認証情報はマネージドシークレットとして作成し、自分の KMS キーで暗号化すると AWS KMS の料金が課金されます。あわせて、キーポリシーは KMS キーごとに 1 つ必要であること、SCP は管理アカウントには影響しないことも覚えておきましょう。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/kms/latest/developerguide/key-policies.html",
+          "title": "Key policies in AWS KMS - AWS Key Management Service"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/kms/latest/developerguide/overview.html",
+          "title": "AWS Key Management Service - AWS Key Management Service"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html",
+          "title": "Service control policies (SCPs) - AWS Organizations"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/create_secret.html",
+          "title": "Create an AWS Secrets Manager secret - AWS Secrets Manager"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/secretsmanager/latest/userguide/intro.html",
+          "title": "What is AWS Secrets Manager? - AWS Secrets Manager"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "KMS キーには、キーポリシーを必要な数だけ付けられ、許可の範囲ごとに別のキーポリシーを使い分ける。",
+          "explanation": "KMS キーには、キーポリシーがちょうど 1 つ必要です。キーポリシーを複数付けて、許可の範囲ごとに使い分けることはできません。"
+        },
+        {
+          "key": "B",
+          "text": "KMS キーへのアクセスは、キーポリシーでは絞れないため、IAM ポリシーだけで制御する。",
+          "explanation": "KMS では、キーポリシーを作成・管理して、信頼できる利用者だけに鍵へのアクセスを許せます。キーポリシーでは絞れないという説明は、この仕様に合いません。"
+        },
+        {
+          "key": "C",
+          "text": "SCP を組織に適用すると、管理アカウントのユーザーとロールにも、メンバーアカウントと同じ制限が及ぶ。",
+          "explanation": "SCP が影響するのは、組織のメンバーアカウントだけです。管理アカウントのユーザーとロールには、SCP の制限が及びません。"
+        },
+        {
+          "key": "D",
+          "text": "RDS の管理者の認証情報は、マネージドシークレットとして作成するのが推奨される。"
+        },
+        {
+          "key": "E",
+          "text": "Secrets Manager で自分の KMS キーを使って暗号化すると、AWS KMS の料金が課金される。"
+        }
+      ],
+      "correctAnswers": ["D", "E"]
+    },
+    {
+      "questionId": "SOA-0074",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain1",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "ある企業では、CloudWatch アラームの通知を Amazon SNS のトピックに送っています。CloudOps エンジニアは、この 1 つのトピックから、運用チームのメールアドレスと、後続の処理が順に読み取る SQS(Amazon Simple Queue Service)キューの両方へ、同じ通知を届ける必要があります。通知の配信には、SNS の購読の仕組みだけを使いたいと考えています。\n\nこの要件を満たす設定はどれでしょうか。",
+      "explanation": "## 問われている要件\nCloudOps エンジニアは、1 つの SNS トピックに届いた CloudWatch アラームの通知を、メールアドレスと SQS キューの両方へ、購読の仕組みだけで届ける必要があります。\n\n## 正解の決め手\nSNS トピックの購読先には、メールも SQS キューも直接登録できます。したがって、1 つのトピックに両方を購読先として登録すれば、同じ通知が両方へ届き、中継の処理を作る必要もありません。\n\n## 前提知識\nSNS の購読先として使えるものには、SQS キューや Lambda 関数、HTTP または HTTPS のエンドポイントのほか、メール、モバイルプッシュ、SMS、Amazon Data Firehose などがあります。\n\n## 解くための考え方\n要件は、1 つのトピックから、購読の仕組みだけで両方へ届けることです。中継の処理を足す案と、トピックを分ける案は、この条件に合うかどうかで順に確かめます。\n\n## 他の選択肢が誤りである理由\nトピックの購読先に AWS Lambda 関数を登録し、関数のコードでメールと SQS キューへ配信する。\n\nLambda 関数のコードで中継する案は、購読の仕組みだけで配信するという要件に合いません。SQS キューもメールも購読先として直接登録できるので、中継する関数は要りません。\n\nメール用と SQS キュー用にトピックを 2 つ作り、CloudWatch アラームから両方へ送る。\n\nトピックを 2 つに分ける案は、1 つのトピックから両方へ届けるという条件に合いません。1 つのトピックの購読先に、メールと SQS キューの両方を登録できます。\n\nトピックの購読先に HTTPS エンドポイントを登録し、受け側のプログラムでメールと SQS キューへ配信する。\n\nHTTPS エンドポイントは購読先になりますが、受け側のプログラムで中継する案は、購読の仕組みだけで配信するという要件に合いません。メールと SQS キューは、トピックの購読先に直接登録できます。\n\n## まとめ\nSNS の購読先には、メールと SQS キューの両方を直接登録できます。1 つのトピックに両方を購読させれば、購読の仕組みだけで同じ通知を届けられます。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/sns/latest/dg/welcome.html",
+          "title": "What is Amazon SNS? - Amazon Simple Notification Service"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "トピックの購読先に AWS Lambda 関数を登録し、関数のコードでメールと SQS キューへ配信する。",
+          "explanation": "Lambda 関数のコードで中継する案は、購読の仕組みだけで配信するという要件に合いません。SQS キューもメールも購読先として直接登録できるので、中継する関数は要りません。"
+        },
+        {
+          "key": "B",
+          "text": "メール用と SQS キュー用にトピックを 2 つ作り、CloudWatch アラームから両方へ送る。",
+          "explanation": "トピックを 2 つに分ける案は、1 つのトピックから両方へ届けるという条件に合いません。1 つのトピックの購読先に、メールと SQS キューの両方を登録できます。"
+        },
+        {
+          "key": "C",
+          "text": "トピックの購読先に HTTPS エンドポイントを登録し、受け側のプログラムでメールと SQS キューへ配信する。",
+          "explanation": "HTTPS エンドポイントは購読先になりますが、受け側のプログラムで中継する案は、購読の仕組みだけで配信するという要件に合いません。メールと SQS キューは、トピックの購読先に直接登録できます。"
+        },
+        {
+          "key": "D",
+          "text": "1 つのトピックの購読先に、メールアドレスと SQS キューの両方を、それぞれ直接登録する。"
+        }
+      ],
+      "correctAnswers": ["D"]
+    },
+    {
+      "questionId": "SOA-0075",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain2",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "ある企業は、AWS Organizations で多数のメンバーアカウントを管理しています。各アカウントでは、AWS Backup を使ってデータをバックアップしていますが、実行の間隔がアカウントごとにばらついています。CloudOps エンジニアは、各メンバーアカウントで、バックアップが指定した間隔で実行されることを、組織全体に強制する必要があります。\n\nこの要件を満たす設定はどれでしょうか。",
+      "explanation": "## 問われている要件\nある企業の CloudOps エンジニアは、AWS Backup によるバックアップが指定した間隔で実行されることを、各メンバーアカウントに対して、組織全体に強制する必要があります。\n\n## 正解の決め手\nAWS Organizations のポリシーを使うと、AWS Backup によるバックアップを指定した間隔で実行するよう、組織として強制できます。メンバーアカウントごとの設定や、検知と通知だけの仕組みは、組織としての強制とは別のものです。\n\n## 解くための考え方\n要件の中心は、実行の強制です。各アカウントでの個別の設定、自作の仕組み、評価と通知は、いずれも組織全体に強制する方法にはなりません。\n\n## 他の選択肢が誤りである理由\n各メンバーアカウントの管理者が、AWS Backup のバックアッププランを、指定の間隔で個別に作成する。\n\n各メンバーアカウントの管理者が個別にバックアッププランを作る方法は、設定をアカウントごとに委ねる形です。組織全体に強制する要件を満たせるのは、AWS Organizations のポリシーです。\n\n各メンバーアカウントで、Amazon EventBridge のスケジュールから AWS Lambda 関数を起動し、AWS Backup のバックアップを指定の間隔で開始する。\n\nAmazon EventBridge のスケジュールと AWS Lambda 関数による自作の仕組みを各アカウントに用意しても、組織として強制する方法にはなりません。AWS Organizations のポリシーなら、自作の仕組みを用意しなくても、実行間隔を強制できます。\n\nAWS Config のルールで、各メンバーアカウントのバックアップの実行間隔を評価し、外れた場合に通知する。\n\nAWS Config のルールによる評価と通知は、間隔から外れたバックアップを見つける仕組みで、実行そのものを強制しません。バックアップを指定した間隔で実行するよう強制できるのは、AWS Organizations のポリシーです。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_introduction.html",
+          "title": "What is AWS Organizations? - AWS Organizations"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "各メンバーアカウントの管理者が、AWS Backup のバックアッププランを、指定の間隔で個別に作成する。",
+          "explanation": "各メンバーアカウントの管理者が個別にバックアッププランを作る方法は、設定をアカウントごとに委ねる形です。組織全体に強制する要件を満たせるのは、AWS Organizations のポリシーです。"
+        },
+        {
+          "key": "B",
+          "text": "AWS Organizations のポリシーで、AWS Backup のバックアップを指定の間隔で実行するよう設定し、メンバーアカウントに適用する。"
+        },
+        {
+          "key": "C",
+          "text": "各メンバーアカウントで、Amazon EventBridge のスケジュールから AWS Lambda 関数を起動し、AWS Backup のバックアップを指定の間隔で開始する。",
+          "explanation": "Amazon EventBridge のスケジュールと AWS Lambda 関数による自作の仕組みを各アカウントに用意しても、組織として強制する方法にはなりません。AWS Organizations のポリシーなら、自作の仕組みを用意しなくても、実行間隔を強制できます。"
+        },
+        {
+          "key": "D",
+          "text": "AWS Config のルールで、各メンバーアカウントのバックアップの実行間隔を評価し、外れた場合に通知する。",
+          "explanation": "AWS Config のルールによる評価と通知は、間隔から外れたバックアップを見つける仕組みで、実行そのものを強制しません。バックアップを指定した間隔で実行するよう強制できるのは、AWS Organizations のポリシーです。"
+        }
+      ],
+      "correctAnswers": ["B"]
+    },
+    {
+      "questionId": "SOA-0076",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain5",
+      "difficulty": "easy",
+      "questionType": "multiple",
+      "questionText": "ある企業は、複数の VPC を使うシステムを運用しており、ネットワークの管理を CloudOps エンジニアが担当しています。エンジニアは、新しく加わるメンバー向けに、DNS の名前解決、VPC エンドポイント、IPv6 の設定、接続の分析に関する運用手順書を整備しています。手順書には、機能の仕様に合う説明だけを載せる必要があります。\n\n手順書に載せる説明として、機能の仕様に合うものはどれでしょうか。(2 つ選択)",
+      "explanation": "## 問われている要件\n\nこの設問は、ネットワークの 4 つの機能(DNS の名前解決、VPC エンドポイント、IPv6、接続の分析)について、仕様に合う説明を 2 つ選ぶものです。各機能が自動で行うこと、利用者が満たす前提、使える範囲を区別できるかが問われています。\n\n## 正解の決め手\n\n選択肢 B は、IPv6 を使うときの前提です。デュアルスタックのサブネットは IPv4 と IPv6 の両方の CIDR ブロックを持ち、そのサブネットがある VPC にも両方の CIDR ブロックが必要です。\n\n選択肢 C は、Resolver エンドポイントの動きです。エンドポイントに IP アドレスを指定すると、VPC Resolver が VPC の elastic network interface を自動で作成します。利用者が先に作っておく手順は要りません。\n\n## 解くための考え方\n\n各選択肢を、機能の名前と、その機能が自動で行うこと、利用者が用意すること、使える範囲に分けて読みます。自動で行うことを手作業にした説明や、使える範囲を狭めた説明は、仕様と合いません。\n\n## 他の選択肢が誤りである理由\n\nAWS PrivateLink の VPC エンドポイントは、同じアカウントの同じ VPC 内にある EC2 インスタンスへのアクセスにだけ作成できる。\n\nAWS PrivateLink の VPC エンドポイントは、サービスだけでなく、リソースやネットワークのセグメントへのアクセスにも作成できます。さらに、VPC とアカウントの境界をまたぐ接続にも使えます。同じアカウントの同じ VPC 内にある EC2 インスタンスに限る説明は、この範囲を狭めすぎています。\n\nReachability Analyzer は、VPC 内の送信元から送信先へ実際にトラフィックを送り、その測定値を CloudWatch に書き込む。\n\nReachability Analyzer は、VPC 内の送信元と送信先のリソースの間で、接続できるかどうかを構成の面から調べる分析ツールです。トラフィックを送って測定値を CloudWatch に書き込むのは、プローブ(AWS のリソースからオンプレミスの接続先の IP アドレスへ送られるトラフィック)の説明であり、役割が異なります。\n\nRoute 53 VPC Resolver がプライベートホストゾーンのレコードへの問い合わせに答えるには、EC2 インスタンス上に DNS サーバーを用意する必要がある。\n\nRoute 53 VPC Resolver は、プライベートホストゾーンのレコードへの問い合わせに自動で答えます。利用者が EC2 インスタンス上に DNS サーバーを用意して転送する作業は要りません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/what-is-network-monitor.html",
+          "title": "Using Network Synthetic Monitor - Amazon CloudWatch"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resolver-overview-DSN-queries-to-vpc.html",
+          "title": "Resolving DNS queries between VPCs and your network - Amazon Route 53"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/resolver.html",
+          "title": "What is Route 53 VPC Resolver? - Amazon Route 53"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/privatelink/what-is-privatelink.html",
+          "title": "What is AWS PrivateLink? - Amazon Virtual Private Cloud"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/reachability/what-is-reachability-analyzer.html",
+          "title": "What is Reachability Analyzer? - Amazon Virtual Private Cloud"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html",
+          "title": "Subnets for your VPC - Amazon Virtual Private Cloud"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "AWS PrivateLink の VPC エンドポイントは、同じアカウントの同じ VPC 内にある EC2 インスタンスへのアクセスにだけ作成できる。",
+          "explanation": "AWS PrivateLink の VPC エンドポイントは、サービスだけでなく、リソースやネットワークのセグメントへのアクセスにも作成できます。さらに、VPC とアカウントの境界をまたぐ接続にも使えます。同じアカウントの同じ VPC 内にある EC2 インスタンスに限る説明は、この範囲を狭めすぎています。"
+        },
+        {
+          "key": "B",
+          "text": "デュアルスタックのサブネットは、IPv4 と IPv6 の両方の CIDR ブロックを持ち、その VPC にも両方の CIDR ブロックが必要である。"
+        },
+        {
+          "key": "C",
+          "text": "Resolver エンドポイントに IP アドレスを指定すると、VPC Resolver が VPC に elastic network interface を自動で作成する。"
+        },
+        {
+          "key": "D",
+          "text": "Reachability Analyzer は、VPC 内の送信元から送信先へ実際にトラフィックを送り、その測定値を CloudWatch に書き込む。",
+          "explanation": "Reachability Analyzer は、VPC 内の送信元と送信先のリソースの間で、接続できるかどうかを構成の面から調べる分析ツールです。トラフィックを送って測定値を CloudWatch に書き込むのは、プローブ(AWS のリソースからオンプレミスの接続先の IP アドレスへ送られるトラフィック)の説明であり、役割が異なります。"
+        },
+        {
+          "key": "E",
+          "text": "Route 53 VPC Resolver がプライベートホストゾーンのレコードへの問い合わせに答えるには、EC2 インスタンス上に DNS サーバーを用意する必要がある。",
+          "explanation": "Route 53 VPC Resolver は、プライベートホストゾーンのレコードへの問い合わせに自動で答えます。利用者が EC2 インスタンス上に DNS サーバーを用意して転送する作業は要りません。"
+        }
+      ],
+      "correctAnswers": ["B", "C"]
+    },
+    {
+      "questionId": "SOA-0077",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain1",
+      "difficulty": "easy",
+      "questionType": "single",
+      "questionText": "ある企業は、繰り返し実施している運用の手順を、Automation の runbook として定義し、再利用したいと考えています。CloudOps エンジニアは、複数の手順を含む runbook を新しく書く予定です。記述に使う形式と、手順が実行される順序を、事前に確認する必要があります。\n\nrunbook の記述形式と、手順の実行順序について、正しい組み合わせはどれでしょうか。",
+      "explanation": "## 問われている要件\n\nAutomation の runbook について、記述に使う形式と、含まれる手順の実行順序の両方を正しく述べた組み合わせを選ぶ設問です。\n\n## 正解の決め手\n\nrunbook は、YAML か JSON で書きます。含まれる手順は、書かれた順番どおりに実行されます。この 2 点がそろった選択肢だけが正解です。\n\n## 解くための考え方\n\n選択肢は、記述の形式と手順の実行順序という 2 つの要素の組み合わせでできています。どちらか一方でも事実と違えば誤りなので、2 つの要素を順に確かめます。\n\n## 他の選択肢が誤りである理由\n\nrunbook は XML または CSV で書き、含まれる手順は書かれた順番どおりに実行される。\n\n手順の実行順序は正しい内容です。しかし、記述の形式が違います。runbook を書く形式は YAML または JSON で、XML や CSV ではありません。\n\nrunbook は YAML または JSON で書き、含まれる手順は互いに待たずに並行して実行される。\n\n記述の形式は正しい内容です。しかし、含まれる手順は並行して実行されるのではなく、書かれた順番どおりに実行されます。\n\nrunbook は XML または CSV で書き、含まれる手順は互いに待たずに並行して実行される。\n\n記述の形式と手順の実行順序の、どちらも事実と違います。runbook は YAML または JSON で書き、含まれる手順は書かれた順番どおりに実行されます。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-automation.html",
+          "title": "AWS Systems Manager Automation - AWS Systems Manager"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "runbook は XML または CSV で書き、含まれる手順は書かれた順番どおりに実行される。",
+          "explanation": "手順の実行順序は正しい内容です。しかし、記述の形式が違います。runbook を書く形式は YAML または JSON で、XML や CSV ではありません。"
+        },
+        {
+          "key": "B",
+          "text": "runbook は YAML または JSON で書き、含まれる手順は書かれた順番どおりに実行される。"
+        },
+        {
+          "key": "C",
+          "text": "runbook は YAML または JSON で書き、含まれる手順は互いに待たずに並行して実行される。",
+          "explanation": "記述の形式は正しい内容です。しかし、含まれる手順は並行して実行されるのではなく、書かれた順番どおりに実行されます。"
+        },
+        {
+          "key": "D",
+          "text": "runbook は XML または CSV で書き、含まれる手順は互いに待たずに並行して実行される。",
+          "explanation": "記述の形式と手順の実行順序の、どちらも事実と違います。runbook は YAML または JSON で書き、含まれる手順は書かれた順番どおりに実行されます。"
+        }
+      ],
+      "correctAnswers": ["B"]
+    },
+    {
+      "questionId": "SOA-0078",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain2",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "あるメディア企業は、会員向けサービスのデータベースを、1 つのリージョンの Amazon Aurora の DB クラスターで運用しています。リージョン全体に障害が起きても事業を続けられるように、リージョン間の複製で、データを別のリージョンにも持たせる必要があります。CloudOps エンジニアには、プライマリのリージョンに障害が起きたとき、別のリージョンにあらかじめある DB クラスターを一分未満で昇格できる構成にすることが求められています。\n\nこの要件を満たす構成はどれでしょうか。",
+      "explanation": "## 問われている要件\nあるメディア企業の CloudOps エンジニアは、プライマリのリージョンに障害が起きたとき、別のリージョンにあらかじめある DB クラスターを一分未満で昇格できる構成を選ぶ必要があります。データは、リージョン間の複製で別のリージョンにも持たせます。\n\n## 正解の決め手\nAurora グローバルデータベースは、専用のインフラでデータを別のリージョンへ複製します。プライマリのリージョンに障害が起きたときは、二次リージョンを一分未満で昇格できます。要件にある、別のリージョンの DB クラスターの昇格と、一分未満という時間の両方に合う構成です。\n\n## 解くための考え方\nCloudOps エンジニアは、障害の範囲がリージョン全体である点と、昇格させる対象が別のリージョンにあらかじめある DB クラスターである点を押さえます。そのうえで、各選択肢が、別のリージョンへ複製した DB クラスターを昇格させる構成になっているかを見比べます。\n\n## 他の選択肢が誤りである理由\n同じリージョンの複数のアベイラビリティーゾーンに Aurora Replica を配置し、障害時に Aurora Replica をライターに昇格させる。\n\nこの構成のレプリカは、プライマリと同じリージョンの中に置かれます。要件は、リージョン全体の障害のときに、別のリージョンの DB クラスターを昇格させることです。同じリージョンの中のレプリカをライターに昇格させても、別のリージョンの DB クラスターを昇格させることにはならないため、要件に合いません。\n\nAWS Backup で DB クラスターのバックアップを別のリージョンにコピーし、障害時にそのバックアップから DB クラスターを復元する。\n\nAWS Backup は、バックアップをリージョン間でコピーして、災害復旧用のリージョンに置けます。ただし、バックアップは取得した時点へ戻すための仕組みで、戻せる時点は取得の頻度で決まります。この構成は、障害時にバックアップから DB クラスターを復元するものです。あらかじめ別のリージョンにある DB クラスターを昇格させる構成ではないため、要件に合いません。\n\n別のリージョンに読み取りレプリカを作成し、障害時にそのレプリカへ接続先を切り替えて、昇格の操作をせずに読み書きを任せる。\n\n読み取りレプリカは、災害復旧用のリージョンで読み書きを担うには、プライマリインスタンスへ昇格させる必要があります。昇格の操作をせず、接続先を切り替えるだけで読み書きを任せる構成は成り立たないため、要件に合いません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html",
+          "title": "Disaster recovery options in the cloud - Disaster Recovery of Workloads on AWS: Recovery in the Cloud"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "同じリージョンの複数のアベイラビリティーゾーンに Aurora Replica を配置し、障害時に Aurora Replica をライターに昇格させる。",
+          "explanation": "この構成のレプリカは、プライマリと同じリージョンの中に置かれます。要件は、リージョン全体の障害のときに、別のリージョンの DB クラスターを昇格させることです。同じリージョンの中のレプリカをライターに昇格させても、別のリージョンの DB クラスターを昇格させることにはならないため、要件に合いません。"
+        },
+        {
+          "key": "B",
+          "text": "AWS Backup で DB クラスターのバックアップを別のリージョンにコピーし、障害時にそのバックアップから DB クラスターを復元する。",
+          "explanation": "AWS Backup は、バックアップをリージョン間でコピーして、災害復旧用のリージョンに置けます。ただし、バックアップは取得した時点へ戻すための仕組みで、戻せる時点は取得の頻度で決まります。この構成は、障害時にバックアップから DB クラスターを復元するものです。あらかじめ別のリージョンにある DB クラスターを昇格させる構成ではないため、要件に合いません。"
+        },
+        {
+          "key": "C",
+          "text": "別のリージョンに読み取りレプリカを作成し、障害時にそのレプリカへ接続先を切り替えて、昇格の操作をせずに読み書きを任せる。",
+          "explanation": "読み取りレプリカは、災害復旧用のリージョンで読み書きを担うには、プライマリインスタンスへ昇格させる必要があります。昇格の操作をせず、接続先を切り替えるだけで読み書きを任せる構成は成り立たないため、要件に合いません。"
+        },
+        {
+          "key": "D",
+          "text": "Aurora グローバルデータベースを構成して別のリージョンにデータを複製し、障害時に二次リージョンの DB クラスターを昇格させる。"
+        }
+      ],
+      "correctAnswers": ["D"]
+    },
+    {
+      "questionId": "SOA-0079",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain4",
+      "difficulty": "easy",
+      "questionType": "single",
+      "questionText": "ある企業は、アプリケーションが使う IAM ロールに、広い権限を付けています。CloudOps エンジニアは、ポリシーの生成を使って、このロールが指定した期間に使った操作とサービスを把握する予定です。この情報は、権限を見直すときの材料にします。\n\nポリシーの生成が、ロールの利用実績を読み取る元はどれですか。",
+      "explanation": "## 問われている要件\nこの問題は、ポリシーの生成が、IAM のエンティティ(ここではロール)の利用実績を、どこから読み取るのかを問う問題です。\n\n## 正解の決め手\nポリシーの生成は、CloudTrail のログを読み取ります。読み取る内容は、指定した期間に IAM のエンティティが使った操作とサービスです。したがって、CloudTrail のログから、ロールが使った操作とサービスを読み取るという記述が正答です。\n\n## 解くための考え方\nこの問題は、ポリシーの生成の読み取り元が CloudTrail のログであるという、1 つの事実で決まります。ログや履歴を扱うほかのサービスの名前に引きずられず、読み取り元を事実として覚えておきます。\n\n## まとめ\nポリシーの生成は、CloudTrail のログから、指定した期間にロールなどが使った操作とサービスを読み取ります。\n\n## 他の選択肢が誤りである理由\nAmazon CloudWatch Logs のロググループから、アプリケーションの出力を読み取る。\n\nポリシーの生成が読み取る元は CloudTrail のログです。CloudWatch Logs のロググループに保存されたアプリケーションの出力は、読み取りの元ではありません。\n\nAWS Config の構成履歴から、ロールの設定の変更を読み取る。\n\nポリシーの生成が利用実績を読み取る元は CloudTrail のログです。AWS Config の構成履歴は、読み取りの元ではありません。\n\nVPC フローログから、ロールを使うリソースの通信の記録を読み取る。\n\nポリシーの生成が操作とサービスの利用実績を読み取る元は CloudTrail のログです。VPC フローログの通信の記録は、読み取りの元ではありません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/what-is-access-analyzer.html",
+          "title": "Using AWS Identity and Access Management Access Analyzer - AWS Identity and Access Management"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "Amazon CloudWatch Logs のロググループから、アプリケーションの出力を読み取る。",
+          "explanation": "ポリシーの生成が読み取る元は CloudTrail のログです。CloudWatch Logs のロググループに保存されたアプリケーションの出力は、読み取りの元ではありません。"
+        },
+        {
+          "key": "B",
+          "text": "AWS Config の構成履歴から、ロールの設定の変更を読み取る。",
+          "explanation": "ポリシーの生成が利用実績を読み取る元は CloudTrail のログです。AWS Config の構成履歴は、読み取りの元ではありません。"
+        },
+        {
+          "key": "C",
+          "text": "VPC フローログから、ロールを使うリソースの通信の記録を読み取る。",
+          "explanation": "ポリシーの生成が操作とサービスの利用実績を読み取る元は CloudTrail のログです。VPC フローログの通信の記録は、読み取りの元ではありません。"
+        },
+        {
+          "key": "D",
+          "text": "AWS CloudTrail のログから、ロールが使った操作とサービスを読み取る。"
+        }
+      ],
+      "correctAnswers": ["D"]
+    },
+    {
+      "questionId": "SOA-0080",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain1",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "ある企業では、プライベートサブネットの EC2 インスタンスを運用しています。これまでは、踏み台ホストを経由して SSH でインスタンスにログインし、管理作業をしていました。CloudOps エンジニアは、踏み台ホストと SSH の運用をやめる必要があります。インスタンスは、遠隔から安全に管理できる状態にします。\n\nこの要件を満たす方法はどれでしょうか。",
+      "explanation": "## 問われている要件\nCloudOps エンジニアは、踏み台ホストと SSH の運用をやめたうえで、プライベートサブネットの EC2 インスタンスを遠隔から安全に管理する必要があります。\n\n## 正解の決め手\nSystems Manager は、ノードにログインしなくても、遠隔から安全に管理できる仕組みです。踏み台ホストも SSH も要らなくなるため、運用をやめるという要件を満たします。\n\n## 解くための考え方\n選択肢を、踏み台ホストや SSH に頼るかどうかで見分けます。頼る案は、運用をやめるという要件と食い違います。ログインを伴わない管理の手段を選びます。\n\n## 他の選択肢が誤りである理由\nVPC 内の別のサブネットに踏み台ホストを置き直し、SSH の送信元を管理用の範囲に絞る。\n\nこの案は、踏み台ホストと SSH を使い続けるため、運用をやめるという要件を満たしません。Systems Manager を使えば、踏み台ホストも SSH も要らなくなります。\n\nセキュリティグループで管理用の IP アドレスからの SSH を許可し、インスタンスへ直接ログインする。\n\nSSH の許可元を絞る対処は、SSH の運用を続ける前提の工夫です。SSH の運用をやめるという要件とは別の話で、要件を満たしません。\n\nSystems Manager を使い、管理作業のたびに SSH で EC2 インスタンスへログインして操作する。\n\nSystems Manager を使うと、ログインも SSH も使わずに遠隔から管理できるため、SSH でのログインを前提にする理由がありません。SSH の運用をやめるという要件にも反します。\n\n## まとめ\nSystems Manager を使うと、ノードにログインせずに遠隔から安全に管理でき、踏み台ホストと SSH の運用をやめられます。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/what-is-systems-manager.html",
+          "title": "What is AWS Systems Manager? - AWS Systems Manager"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "Systems Manager を使い、インスタンスにログインせずに、遠隔から安全に管理する。"
+        },
+        {
+          "key": "B",
+          "text": "VPC 内の別のサブネットに踏み台ホストを置き直し、SSH の送信元を管理用の範囲に絞る。",
+          "explanation": "この案は、踏み台ホストと SSH を使い続けるため、運用をやめるという要件を満たしません。Systems Manager を使えば、踏み台ホストも SSH も要らなくなります。"
+        },
+        {
+          "key": "C",
+          "text": "セキュリティグループで管理用の IP アドレスからの SSH を許可し、インスタンスへ直接ログインする。",
+          "explanation": "SSH の許可元を絞る対処は、SSH の運用を続ける前提の工夫です。SSH の運用をやめるという要件とは別の話で、要件を満たしません。"
+        },
+        {
+          "key": "D",
+          "text": "Systems Manager を使い、管理作業のたびに SSH で EC2 インスタンスへログインして操作する。",
+          "explanation": "Systems Manager を使うと、ログインも SSH も使わずに遠隔から管理できるため、SSH でのログインを前提にする理由がありません。SSH の運用をやめるという要件にも反します。"
+        }
+      ],
+      "correctAnswers": ["A"]
+    },
+    {
+      "questionId": "SOA-0081",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain1",
+      "difficulty": "easy",
+      "questionType": "single",
+      "questionText": "ある企業は、データ処理用の EC2 インスタンスで、IOPS をプロビジョニングした SSD のボリュームを使っています。CloudOps エンジニアが CloudWatch のメトリクスを確認すると、処理の実行中は、実際の IOPS がプロビジョニングした値を下回っていました。この処理が 1 回に発行する入出力のサイズは、非常に大きいことが分かっています。\n\nこの状況で、IOPS がプロビジョニングした値を下回る原因として考えられるものはどれでしょうか。",
+      "explanation": "## 問われている要件\n\n設問は、プロビジョニングした IOPS を、実際の IOPS が下回る原因を問うています。手がかりは、1 回に発行する入出力のサイズが非常に大きいという条件です。\n\n## 正解の決め手\n\nSSD のボリュームでは、入出力のサイズが非常に大きいと、ボリュームのスループットの上限に達することがあります。その場合は、プロビジョニングした値より少ない IOPS しか出ません。設問の処理は入出力のサイズが非常に大きいので、この説明に当てはまります。\n\n## 前提知識\n\nEC2 インスタンスでは、CPU・メモリ・インスタンスストアが、特定のインスタンスに専有されます。これらは別のインスタンスと共有されないので、共有を IOPS が下回る原因として考えることはできません。\n\n## 他の選択肢が誤りである理由\n\n入出力のサイズが小さすぎるため、ボリュームのスループット上限に達している。\n\n設問の処理は、入出力のサイズが非常に大きいと述べています。スループットの上限に達する原因になるのは、サイズが大きい場合で、小さすぎることを原因とするのは向きが逆です。\n\n別のインスタンスと CPU を共有しているため、処理能力が不足している。\n\nCPU は、特定のインスタンスが専有する資源で、別のインスタンスとは共有されません。そのため、CPU の共有を原因にはできません。\n\n別のインスタンスとインスタンスストアを共有しているため、読み書きが競合している。\n\nインスタンスストアも、特定のインスタンスが専有する資源で、別のインスタンスとは共有されません。そのため、共有による競合を原因にはできません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html",
+          "title": "Amazon EC2 instance types - Amazon Elastic Compute Cloud"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/ebs/latest/userguide/ebs-io-characteristics.html",
+          "title": "Amazon EBS I/O characteristics and monitoring - Amazon EBS"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "入出力のサイズが小さすぎるため、ボリュームのスループット上限に達している。",
+          "explanation": "設問の処理は、入出力のサイズが非常に大きいと述べています。スループットの上限に達する原因になるのは、サイズが大きい場合で、小さすぎることを原因とするのは向きが逆です。"
+        },
+        {
+          "key": "B",
+          "text": "別のインスタンスと CPU を共有しているため、処理能力が不足している。",
+          "explanation": "CPU は、特定のインスタンスが専有する資源で、別のインスタンスとは共有されません。そのため、CPU の共有を原因にはできません。"
+        },
+        {
+          "key": "C",
+          "text": "別のインスタンスとインスタンスストアを共有しているため、読み書きが競合している。",
+          "explanation": "インスタンスストアも、特定のインスタンスが専有する資源で、別のインスタンスとは共有されません。そのため、共有による競合を原因にはできません。"
+        },
+        {
+          "key": "D",
+          "text": "入出力のサイズが非常に大きいため、ボリュームのスループット上限に達している。"
+        }
+      ],
+      "correctAnswers": ["D"]
+    },
+    {
+      "questionId": "SOA-0082",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain2",
+      "difficulty": "easy",
+      "questionType": "single",
+      "questionText": "ある企業は、Amazon RDS の Multi-AZ DB cluster deployment で、業務システムのデータベースを運用しています。運用チームは、新しく加わった CloudOps エンジニアに、この構成の仕組みを説明する必要があります。エンジニアは、スタンバイ DB インスタンスの数と役割を、正しく把握することが求められています。\n\nMulti-AZ DB cluster deployment のスタンバイ DB インスタンスについて、正しい説明はどれでしょうか。",
+      "explanation": "## 問われている要件\nMulti-AZ DB cluster deployment で、スタンバイ DB インスタンスの数と、そのインスタンスが受け持つ処理を答える問題です。\n\n## 正解の決め手\nMulti-AZ DB cluster deployment には、スタンバイ DB インスタンスが 2 つあります。この 2 つは、障害時のフェイルオーバーの受け皿になるだけでなく、読み取りの処理も受けられます。数と役割の両方に合う説明は、B だけです。\n\n## 解くための考え方\n選択肢は、スタンバイの数と、受け持つ処理の組み合わせでできています。まず数を 2 つに絞り、そのうえで、フェイルオーバーに加えて読み取りも受ける、という役割を確かめると、正答が決まります。\n\n## 他の選択肢が誤りである理由\nスタンバイは 1 つ置かれ、フェイルオーバー専用として待機し、読み取りの処理は受けられない。\n\nスタンバイは 1 つではなく 2 つ置かれます。フェイルオーバーの受け皿になるだけでなく、読み取りの処理も受けられるため、専用とする説明は誤りです。\n\nスタンバイは 1 つ置かれ、フェイルオーバーには使われず、読み取りの処理だけを受け持つ。\n\nフェイルオーバーに使われないのではなく、フェイルオーバーに加えて読み取りの処理も受けるのが正しい役割です。数も 1 つではなく 2 つで、役割と数の両方が合いません。\n\nスタンバイは 3 つ置かれ、フェイルオーバーに加えて、読み取りの処理を受けるのは 1 つだけである。\n\nスタンバイの数は 3 つではなく 2 つです。数が合わないため、読み取りの処理を受けるのが 1 つだけという内容も含めて、この説明は成り立ちません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html",
+          "title": "Configuring and managing a Multi-AZ deployment for Amazon RDS - Amazon Relational Database Service"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "スタンバイは 1 つ置かれ、フェイルオーバー専用として待機し、読み取りの処理は受けられない。",
+          "explanation": "スタンバイは 1 つではなく 2 つ置かれます。フェイルオーバーの受け皿になるだけでなく、読み取りの処理も受けられるため、専用とする説明は誤りです。"
+        },
+        {
+          "key": "B",
+          "text": "スタンバイは 2 つ置かれ、フェイルオーバーの受け皿になるのに加えて、読み取りの処理も受けられる。"
+        },
+        {
+          "key": "C",
+          "text": "スタンバイは 1 つ置かれ、フェイルオーバーには使われず、読み取りの処理だけを受け持つ。",
+          "explanation": "フェイルオーバーに使われないのではなく、フェイルオーバーに加えて読み取りの処理も受けるのが正しい役割です。数も 1 つではなく 2 つで、役割と数の両方が合いません。"
+        },
+        {
+          "key": "D",
+          "text": "スタンバイは 3 つ置かれ、フェイルオーバーに加えて、読み取りの処理を受けるのは 1 つだけである。",
+          "explanation": "スタンバイの数は 3 つではなく 2 つです。数が合わないため、読み取りの処理を受けるのが 1 つだけという内容も含めて、この説明は成り立ちません。"
+        }
+      ],
+      "correctAnswers": ["B"]
+    },
+    {
+      "questionId": "SOA-0083",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain3",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "ある企業は、アカウント内のセキュリティの検出結果を、AWS Security Hub CSPM で管理しています。CloudOps エンジニアは、特定の検出結果が生成されたときに、あらかじめ用意した自動の対応を起動する仕組みを追加する必要があります。起動の契機は、検出結果の生成そのものにすることが求められています。\n\nこの要件を満たす設定はどれでしょうか。",
+      "explanation": "## 問われている要件\n\nAWS Security Hub CSPM で特定の検出結果が生成されたときに、あらかじめ用意した自動の対応を起動する仕組みを追加することが問われています。起動の契機は、検出結果の生成そのものです。\n\n## 正解の決め手\n\nSecurity Hub CSPM では、特定の検出結果が生成されたときに実行するカスタムアクションを定義できます。このカスタムアクションは、Amazon EventBridge と連携して、自動の対応を起動できます。契機が検出結果の生成にあり、起動の仕組みも Security Hub CSPM の機能と Amazon EventBridge の連携で成り立つため、この選択肢が要件を満たします。\n\n## 前提知識\n\nSecurity Hub CSPM のカスタムアクションは、特定の検出結果が生成されたときに実行する動作として定義します。Amazon EventBridge Scheduler は、cron 式や rate 式で繰り返しの予定を作る機能です。Amazon EC2 Auto Scaling のライフサイクルフックは、インスタンスの起動時や終了前に独自の処理を呼び出す機能です。Amazon SNS のファンアウトは、トピックに公開した 1 つのメッセージを複数のエンドポイントへ複製して並行に配信するシナリオです。起動の契機は、それぞれ異なります。\n\n## 解くための考え方\n\n設問が求める契機は、検出結果の生成です。選択肢ごとに、何を契機に自動の対応を起動するのかを読み分けます。一定の間隔、インスタンスの起動や終了、公開されたメッセージの配信を契機にする構成は、要件の契機と合いません。\n\n## 他の選択肢が誤りである理由\n\nAmazon EventBridge Scheduler で rate 式の繰り返しの予定を作成し、一定の間隔で自動の対応を起動する。\n\nAmazon EventBridge Scheduler は、cron 式や rate 式で繰り返しの予定を作り、一度だけの実行も設定できる機能です。この選択肢では、設定した一定の間隔が起動の契機になります。設問が求める契機は検出結果の生成そのものであり、間隔による起動とは異なります。検出結果の生成を契機に自動の対応を起動する仕組みは、Security Hub CSPM のカスタムアクションと Amazon EventBridge の連携です。\n\nAmazon EC2 Auto Scaling のライフサイクルフックを設定し、インスタンスの起動時や終了前に自動の対応を起動する。\n\nAmazon EC2 Auto Scaling のライフサイクルフックは、インスタンスの起動時や終了前に独自の処理を呼び出す機能です。この選択肢では、インスタンスの起動と終了が起動の契機になります。設問が求める契機は、Security Hub CSPM の検出結果の生成であり、契機の範囲が異なります。\n\nAmazon SNS のトピックに公開したメッセージを、ファンアウトで複数のエンドポイントへ複製して配信し、自動の対応を起動する。\n\nAmazon SNS のファンアウトは、トピックに公開した 1 つのメッセージを複数のエンドポイントへ複製して並行に配信するシナリオです。この選択肢が述べているのは、公開されたメッセージの配信です。特定の検出結果が生成されたときに実行する動作を定義して、自動の対応を起動する設定ではありません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html",
+          "title": "What is Amazon EC2 Auto Scaling? - Amazon EC2 Auto Scaling"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/eventbridge/latest/userguide/eb-what-is.html",
+          "title": "What Is Amazon EventBridge? - Amazon EventBridge"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html",
+          "title": "Introduction to AWS Security Hub CSPM - AWS Security Hub"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/sns/latest/dg/welcome.html",
+          "title": "What is Amazon SNS? - Amazon Simple Notification Service"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "Security Hub CSPM でカスタムアクションを定義し、Amazon EventBridge と連携させて、自動の対応を起動する。"
+        },
+        {
+          "key": "B",
+          "text": "Amazon EventBridge Scheduler で rate 式の繰り返しの予定を作成し、一定の間隔で自動の対応を起動する。",
+          "explanation": "Amazon EventBridge Scheduler は、cron 式や rate 式で繰り返しの予定を作り、一度だけの実行も設定できる機能です。この選択肢では、設定した一定の間隔が起動の契機になります。設問が求める契機は検出結果の生成そのものであり、間隔による起動とは異なります。検出結果の生成を契機に自動の対応を起動する仕組みは、Security Hub CSPM のカスタムアクションと Amazon EventBridge の連携です。"
+        },
+        {
+          "key": "C",
+          "text": "Amazon EC2 Auto Scaling のライフサイクルフックを設定し、インスタンスの起動時や終了前に自動の対応を起動する。",
+          "explanation": "Amazon EC2 Auto Scaling のライフサイクルフックは、インスタンスの起動時や終了前に独自の処理を呼び出す機能です。この選択肢では、インスタンスの起動と終了が起動の契機になります。設問が求める契機は、Security Hub CSPM の検出結果の生成であり、契機の範囲が異なります。"
+        },
+        {
+          "key": "D",
+          "text": "Amazon SNS のトピックに公開したメッセージを、ファンアウトで複数のエンドポイントへ複製して配信し、自動の対応を起動する。",
+          "explanation": "Amazon SNS のファンアウトは、トピックに公開した 1 つのメッセージを複数のエンドポイントへ複製して並行に配信するシナリオです。この選択肢が述べているのは、公開されたメッセージの配信です。特定の検出結果が生成されたときに実行する動作を定義して、自動の対応を起動する設定ではありません。"
+        }
+      ],
+      "correctAnswers": ["A"]
+    },
+    {
+      "questionId": "SOA-0084",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain3",
+      "difficulty": "hard",
+      "questionType": "multiple",
+      "questionText": "ある企業は、EC2 Image Builder でゴールデン AMI を作成し、複数のリージョンに配布しています。AMI の起動許可は、利用部門のアカウント向けに、配布の設定で定義しています。CloudOps エンジニアは、協力会社の AWS アカウントにも、同じイメージレシピとコンポーネントを使わせる必要があります。この協力会社のアカウントは、企業の AWS Organizations の組織に所属しておらず、加える予定もありません。また、今後も配布先のリージョンを増やす予定で、増やすたびに起動許可を設定し直す作業は避けたいと考えています。\n\nこれらの要件を満たす対応はどれでしょうか。(2 つ選択)",
+      "explanation": "## 問われている要件\n\nCloudOps エンジニアが、協力会社のアカウントへイメージレシピとコンポーネントを共有する手段と、配布先のリージョンを増やしたときの AMI の起動許可の扱いを、別々の層で選ぶ問題です。協力会社のアカウントが組織に所属せず、加える予定もない点が、共有の手段を決める条件になります。\n\n## 正解の決め手\n\n選択肢 B が、共有の要件に当たります。AWS RAM を使うと、EC2 Image Builder のコンポーネント、イメージ、イメージレシピ、コンテナレシピを、任意のアカウントにも、AWS Organizations 経由でも共有できます。そのため、協力会社のアカウントを共有先に指定すれば、組織に加えなくても、同じイメージレシピとコンポーネントを使わせられます。\n\n選択肢 C が、配布先の増加の要件に当たります。AMI の起動許可を定義したうえで配布先を増やすと、起動許可は配布先のすべてのリージョンの AMI に伝わります。そのため、エンジニアがリージョンを追加するたびに、起動許可を設定し直す必要はありません。\n\n## 前提知識\n\nAWS-UpdateLinuxAmi と AWS-UpdateWindowsAmi の Automation ランブックは、元の AMI からゴールデン AMI を作り、更新の前後に独自のスクリプトを実行します。これは AMI の作成と更新の仕組みで、イメージレシピやコンポーネントを別のアカウントへ共有する仕組みではありません。\n\n## 他の選択肢が誤りである理由\n\nイメージレシピとコンポーネントの共有先は組織内のアカウントに限られるので、協力会社のアカウントを組織に加えてから共有する。\n\n選択肢 A は、共有先が組織内に限られるという前提が誤りです。EC2 Image Builder のイメージレシピとコンポーネントは、AWS RAM で任意のアカウントに共有できるため、協力会社のアカウントを組織に加える必要はありません。共有先が同じ組織内に限られるのは、EC2 のキャパシティブロックの共有です。\n\n配布先のリージョンを追加するたびに、追加先のリージョンの AMI へ、起動許可を個別に設定し直す。\n\n選択肢 D は、不要な作業を足しています。AMI の起動許可を定義して配布先を増やすと、許可は配布先のすべてのリージョンの AMI に伝わります。追加先ごとの設定し直しは要らず、この作業を避けたいという要件にも合いません。\n\n協力会社のアカウントで Systems Manager Automation の AWS-UpdateLinuxAmi ランブックを実行し、ゴールデン AMI を作らせる。\n\n選択肢 E の AWS-UpdateLinuxAmi の Automation ランブックは、元の AMI からゴールデン AMI を作り、更新の前後に独自のスクリプトを実行するためのものです。協力会社のアカウントが別に AMI を作ることになり、企業のイメージレシピとコンポーネントを共有して使わせる要件を満たせません。\n\n## まとめ\n\n別のアカウントへの Image Builder の成果物の共有は、AWS RAM で任意のアカウントを共有先に指定します。配布先のリージョンを増やすときは、起動許可が配布先の AMI に伝わるので、個別に設定し直す必要はありません。共有先が同じ組織内に限られるキャパシティブロックの共有とは、区別して覚えます。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/imagebuilder/latest/userguide/how-image-builder-works.html",
+          "title": "How EC2 Image Builder works - EC2 Image Builder"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/imagebuilder/latest/userguide/what-is-image-builder.html",
+          "title": "What is Image Builder? - EC2 Image Builder"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/ram/latest/userguide/shareable.html",
+          "title": "Shareable AWS resources - AWS Resource Access Manager"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-automation.html",
+          "title": "AWS Systems Manager Automation - AWS Systems Manager"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "イメージレシピとコンポーネントの共有先は組織内のアカウントに限られるので、協力会社のアカウントを組織に加えてから共有する。",
+          "explanation": "EC2 Image Builder のイメージレシピとコンポーネントは、AWS RAM で任意のアカウントに共有できるため、協力会社のアカウントを組織に加える必要はありません。共有先が同じ組織内に限られるのは、EC2 のキャパシティブロックの共有です。"
+        },
+        {
+          "key": "B",
+          "text": "AWS RAM で、協力会社のアカウントを共有先に指定して、イメージレシピとコンポーネントを共有する。"
+        },
+        {
+          "key": "C",
+          "text": "AMI の起動許可を定義した設定のまま、配布先のリージョンを追加し、許可が追加先の AMI に伝わるのに任せる。"
+        },
+        {
+          "key": "D",
+          "text": "配布先のリージョンを追加するたびに、追加先のリージョンの AMI へ、起動許可を個別に設定し直す。",
+          "explanation": "AMI の起動許可を定義して配布先を増やすと、許可は配布先のすべてのリージョンの AMI に伝わります。追加先ごとに設定し直す作業は要らず、この作業を避けたいという要件にも合いません。"
+        },
+        {
+          "key": "E",
+          "text": "協力会社のアカウントで Systems Manager Automation の AWS-UpdateLinuxAmi ランブックを実行し、ゴールデン AMI を作らせる。",
+          "explanation": "AWS-UpdateLinuxAmi の Automation ランブックは、元の AMI からゴールデン AMI を作り、更新の前後に独自のスクリプトを実行するためのものです。イメージレシピとコンポーネントを共有する仕組みではないので、同じ定義を使わせる要件を満たせません。"
+        }
+      ],
+      "correctAnswers": ["B", "C"]
+    },
+    {
+      "questionId": "SOA-0085",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain2",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "あなたの会社は、バージョニングを有効にした Amazon S3 のバケットに、アプリケーションの設定ファイルを保存しています。別のアカウントの開発者が、誤った内容の設定ファイルをアップロードしました。CloudOps エンジニアのあなたは、AWS CLI を使って、そのオブジェクトの特定のバージョンだけを削除する必要があります。\n\nこの要件を満たす実行方法はどれでしょうか。",
+      "explanation": "## 問われている要件\nあなたの会社のバケットで、別のアカウントの開発者がアップロードしたオブジェクトについて、CloudOps エンジニアが AWS CLI を使い、特定のバージョンだけを削除する必要があります。\n\n## 正解の決め手\nAWS CLI で特定のバージョンを削除するには、バケットの所有者として実行し、version-id のサブリソースを使う必要があります。選択肢 A は、この 2 つの条件を両方満たしています。\n\n## 解くための考え方\nCloudOps エンジニアは、実行する人と、削除する対象の指定方法を、別々に確認します。実行する人はバケットの所有者であること、対象の指定には version-id を使うことが、それぞれ必要です。片方だけを満たす選択肢は、要件に合いません。\n\n## 他の選択肢が誤りである理由\nバケットの所有者として、オブジェクトのキーだけを指定し、削除のコマンドを実行する。\n\nオブジェクトのキーだけでは、削除するバージョンを特定できません。特定のバージョンを削除するには、version-id のサブリソースを使う必要があります。\n\nオブジェクトをアップロードした開発者として、オブジェクトのキーに加えて version-id を指定し、削除のコマンドを実行する。\n\nオブジェクトをアップロードしたことは、特定のバージョンを削除する条件ではありません。特定のバージョンを削除するには、バケットの所有者であることが必要です。\n\nオブジェクトをアップロードした開発者として、オブジェクトのキーだけを指定し、削除のコマンドを実行する。\n\nこの方法は、バケットの所有者であることと、version-id のサブリソースを使うことの、どちらの条件も満たしません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/DeletingObjectVersions.html",
+          "title": "Deleting object versions from a versioning-enabled bucket - Amazon Simple Storage Service"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "バケットの所有者として、オブジェクトのキーに加えて version-id を指定し、削除のコマンドを実行する。"
+        },
+        {
+          "key": "B",
+          "text": "バケットの所有者として、オブジェクトのキーだけを指定し、削除のコマンドを実行する。",
+          "explanation": "オブジェクトのキーだけでは、削除するバージョンを特定できません。特定のバージョンを削除するには、version-id のサブリソースを使う必要があります。"
+        },
+        {
+          "key": "C",
+          "text": "オブジェクトをアップロードした開発者として、オブジェクトのキーに加えて version-id を指定し、削除のコマンドを実行する。",
+          "explanation": "オブジェクトをアップロードしたことは、特定のバージョンを削除する条件ではありません。特定のバージョンを削除するには、バケットの所有者であることが必要です。"
+        },
+        {
+          "key": "D",
+          "text": "オブジェクトをアップロードした開発者として、オブジェクトのキーだけを指定し、削除のコマンドを実行する。",
+          "explanation": "この方法は、バケットの所有者であることと、version-id のサブリソースを使うことの、どちらの条件も満たしません。"
+        }
+      ],
+      "correctAnswers": ["A"]
+    },
+    {
+      "questionId": "SOA-0086",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain4",
+      "difficulty": "easy",
+      "questionType": "single",
+      "questionText": "ある企業は、AWS Organizations で、管理アカウントと複数のメンバーアカウントを運用しています。CloudOps エンジニアは、各アカウントのユーザーとロールが実行できる操作を絞るために、SCP を組織に適用する予定です。セキュリティチームは、この SCP の制限がどのアカウントのユーザーとロールに及ぶのかを、事前に整理する必要があります。\n\nこの SCP の制限が及ぶ対象はどれですか。",
+      "explanation": "## 問われている要件\nこの問題は、SCP の制限が、組織のどのアカウントのユーザーとロールに及ぶのかを問う問題です。管理アカウントとメンバーアカウントを区別して答える必要があります。\n\n## 正解の決め手\nSCP は、管理アカウントのユーザーとロールには影響しません。SCP が影響するのは、組織のメンバーアカウントだけです。したがって、メンバーアカウントのユーザーとロールにだけ及び、管理アカウントには及ばないという記述が正答です。\n\n## 解くための考え方\nCloudOps エンジニアは、SCP を組織に適用するとき、管理アカウントが対象から外れることを押さえておきます。そのうえで、管理アカウントを対象に含めている記述を、選択肢から順に外していきます。\n\n## まとめ\nSCP の制限は、メンバーアカウントにだけ効きます。管理アカウントのユーザーとロールは、SCP の影響を受けません。\n\n## 他の選択肢が誤りである理由\n管理アカウントとメンバーアカウントの、どちらのユーザーとロールにも及ぶ。\n\n管理アカウントのユーザーとロールには SCP が影響しないため、管理アカウントまで含めて及ぶという記述は誤りです。\n\n管理アカウントのユーザーとロールだけに及び、メンバーアカウントには及ばない。\n\n対象が逆になっています。SCP が影響するのはメンバーアカウントだけで、管理アカウントのユーザーとロールには影響しません。\n\n管理アカウントのユーザーと、メンバーアカウントのロールにだけ及ぶ。\n\n管理アカウントのユーザーには SCP が影響しないため、管理アカウントのユーザーを対象に含める点が誤りです。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html",
+          "title": "Service control policies (SCPs) - AWS Organizations"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "管理アカウントとメンバーアカウントの、どちらのユーザーとロールにも及ぶ。",
+          "explanation": "管理アカウントのユーザーとロールには SCP が影響しないため、管理アカウントまで含めて及ぶという記述は誤りです。"
+        },
+        {
+          "key": "B",
+          "text": "管理アカウントのユーザーとロールだけに及び、メンバーアカウントには及ばない。",
+          "explanation": "対象が逆になっています。SCP が影響するのはメンバーアカウントだけで、管理アカウントのユーザーとロールには影響しません。"
+        },
+        {
+          "key": "C",
+          "text": "メンバーアカウントのユーザーとロールにだけ及び、管理アカウントには及ばない。"
+        },
+        {
+          "key": "D",
+          "text": "管理アカウントのユーザーと、メンバーアカウントのロールにだけ及ぶ。",
+          "explanation": "管理アカウントのユーザーには SCP が影響しないため、管理アカウントのユーザーを対象に含める点が誤りです。"
+        }
+      ],
+      "correctAnswers": ["C"]
+    },
+    {
+      "questionId": "SOA-0087",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain3",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "ある企業では、AWS CloudFormation のスタックで AWS CodeBuild・AWS CodeDeploy・AWS CodePipeline のリソースを作成しており、これらの複数のリソースがサードパーティのプロバイダーにアクセスしています。現在は、リソースごとにアクセスの設定を別々に管理しており、運用の負担が大きくなっています。CloudOps エンジニアは、これらのリソースからプロバイダーへのアクセスを、一元的に管理する必要があります。さらに、テンプレートでは、保存されたシークレットやパラメーターの参照を省くことが求められています。\n\nこの 2 つの要件を満たす方法はどれでしょうか。",
+      "explanation": "## 問われている要件\n\nCloudOps エンジニアが、CodeBuild・CodeDeploy・CodePipeline の複数のリソースからサードパーティのプロバイダーへのアクセスを一元的に管理しつつ、テンプレートで保存されたシークレットやパラメーターの参照を省く方法が問われています。\n\n## 正解の決め手\n\n接続を作成すると、複数のリソースが同じ接続を通じてプロバイダーにアクセスでき、アクセスの管理を接続に集められます。さらに、スタックのテンプレートで接続の ARN を使えば、保存されたシークレットやパラメーターを参照せずに済みます。この 2 つの要件を同時に満たすのは、接続を作成して ARN をテンプレートに指定する方法です。\n\n## 前提知識\n\nCodeConnections の接続(connection)は、CodePipeline などの AWS リソースを外部のコードリポジトリにつなぐための、名前付きのリソースです。CodeBuild・CodeDeploy・CodePipeline の複数のリソースから、プロバイダーへのアクセスを一元的に管理するために使えます。\n\n## 解くための考え方\n\n要件は、複数のリソースをまたぐ一元的な管理と、テンプレートでの保存済みシークレットやパラメーターの参照の省略の 2 つです。リソースごとに設定が分かれる方法や、一部のサービスだけに接続を使う方法は、一元的な管理になりません。シークレットを参照する方法は、2 つ目の要件と逆になります。\n\n## 他の選択肢が誤りである理由\n\nリソースごとに、プロバイダーへのアクセスの設定を個別に作成し、それぞれのテンプレートに指定する。\n\nリソースごとに個別のアクセス設定を作ると、設定がリソースの数だけ分かれ、一元的な管理になりません。接続を使うと、CodeBuild・CodeDeploy・CodePipeline の複数のリソースから、プロバイダーへのアクセスを一元的に管理できます。\n\nプロバイダーへのアクセスに使う情報をシークレットとして保存し、複数のリソースのテンプレートから、そのシークレットを参照する。\n\nシークレットを保存してテンプレートから参照する方法は、保存されたシークレットやパラメーターの参照を省くという要件と逆になります。接続の ARN をテンプレートで使うと、保存されたシークレットやパラメーターを参照せずに済みます。\n\n接続を AWS CodePipeline のリソースにだけ使い、AWS CodeBuild と AWS CodeDeploy のリソースは、個別にアクセスを設定する。\n\n接続は、CodeBuild・CodeDeploy・CodePipeline の複数のリソースから使えます。CodePipeline のリソースだけに限ると、CodeBuild と CodeDeploy のリソースには個別の設定が残り、一元的な管理になりません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/dtconsole/latest/userguide/welcome-connections.html",
+          "title": "What are connections? - Developer Tools console"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "リソースごとに、プロバイダーへのアクセスの設定を個別に作成し、それぞれのテンプレートに指定する。",
+          "explanation": "リソースごとに個別のアクセス設定を作ると、設定がリソースの数だけ分かれ、一元的な管理になりません。接続を使うと、CodeBuild・CodeDeploy・CodePipeline の複数のリソースから、プロバイダーへのアクセスを一元的に管理できます。"
+        },
+        {
+          "key": "B",
+          "text": "プロバイダーへの接続を作成し、複数のリソースで同じ接続を使い、テンプレートには接続の ARN を指定する。"
+        },
+        {
+          "key": "C",
+          "text": "プロバイダーへのアクセスに使う情報をシークレットとして保存し、複数のリソースのテンプレートから、そのシークレットを参照する。",
+          "explanation": "シークレットを保存してテンプレートから参照する方法は、保存されたシークレットやパラメーターの参照を省くという要件と逆になります。接続の ARN をテンプレートで使うと、保存されたシークレットやパラメーターを参照せずに済みます。"
+        },
+        {
+          "key": "D",
+          "text": "接続を AWS CodePipeline のリソースにだけ使い、AWS CodeBuild と AWS CodeDeploy のリソースは、個別にアクセスを設定する。",
+          "explanation": "接続は、CodeBuild・CodeDeploy・CodePipeline の複数のリソースから使えます。CodePipeline のリソースだけに限ると、CodeBuild と CodeDeploy のリソースには個別の設定が残り、一元的な管理になりません。"
+        }
+      ],
+      "correctAnswers": ["B"]
+    },
+    {
+      "questionId": "SOA-0088",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain1",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "ある企業では、EC2 インスタンス群で、ノード同士が頻繁にデータをやり取りする計算ジョブを動かしています。ジョブの完了が遅く、調べるとノード間の通信遅延が大きいことが分かりました。各インスタンスの CPU とメモリの使用率には、余裕があります。CloudOps エンジニアは、ノード間の通信遅延を小さくする必要があります。\n\nこの要件を満たす対処はどれでしょうか。",
+      "explanation": "## 問われている要件\nCloudOps エンジニアは、CPU とメモリに余裕がある EC2 インスタンス群で、ノード間の通信遅延を小さくする必要があります。\n\n## 正解の決め手\nクラスター配置戦略は、インスタンスを同じアベイラビリティーゾーンの中に密集させて、ノード間の低遅延な通信を狙う方式です。症状がノード間の通信遅延なので、この配置が要件に合います。\n\n## 前提知識\n配置戦略には、クラスター配置戦略のほかに、パーティション配置戦略などがあります。また、EC2 インスタンスでは、CPU・メモリ・インスタンスストアは特定のインスタンスに専有され、ネットワークとディスクは複数のインスタンスで共有されます。\n\n## 解くための考え方\nまず、遅延が出る場所を、CPU やメモリなのか、ネットワークなのかに分けます。今回は CPU とメモリに余裕があり、症状はノード間の通信遅延なので、インスタンスどうしの置き方を決める配置戦略のうち、低遅延な通信を狙う方式を選びます。\n\n## 他の選択肢が誤りである理由\nパーティション配置戦略で、インスタンスをパーティションに分け、パーティションごとに基盤のハードウェアを共有しないように起動する。\n\nパーティション配置戦略は、インスタンスを論理的なパーティションに分け、パーティションごとに基盤のハードウェアを共有しないようにする方式です。ノード間の低遅延な通信を狙う方式は、クラスター配置戦略のほうなので、今回の要件には合いません。\n\n専有ホストにインスタンスを起動し、そのインスタンスをクラスター配置戦略の配置グループに入れる。\n\n専有ホストは、配置グループの中では起動できません。専有ホストに起動したインスタンスを、クラスター配置戦略の配置グループに入れる手順は成り立たないため、この対処は選べません。\n\nインスタンスサイズを大きくして vCPU とメモリを増やし、ネットワークも専有させる。\n\nEC2 インスタンスでは、CPU とメモリは特定のインスタンスに専有されますが、ネットワークは複数のインスタンスで共有される資源です。ネットワークを専有させる対処は成り立たず、今回は CPU とメモリにも余裕があるため、vCPU とメモリを増やしても要件を満たしません。\n\n## まとめ\nノード間の通信遅延を小さくするには、クラスター配置戦略で、インスタンスを同じアベイラビリティーゾーンに密集させます。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/instance-types.html",
+          "title": "Amazon EC2 instance types - Amazon Elastic Compute Cloud"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/placement-groups.html",
+          "title": "Placement groups for your Amazon EC2 instances - Amazon Elastic Compute Cloud"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "パーティション配置戦略で、インスタンスをパーティションに分け、パーティションごとに基盤のハードウェアを共有しないように起動する。",
+          "explanation": "パーティション配置戦略は、インスタンスを論理的なパーティションに分け、パーティションごとに基盤のハードウェアを共有しないようにする方式です。ノード間の低遅延な通信を狙う方式は、クラスター配置戦略のほうなので、今回の要件には合いません。"
+        },
+        {
+          "key": "B",
+          "text": "クラスター配置戦略で、インスタンスを同じアベイラビリティーゾーンに密集させて起動する。"
+        },
+        {
+          "key": "C",
+          "text": "専有ホストにインスタンスを起動し、そのインスタンスをクラスター配置戦略の配置グループに入れる。",
+          "explanation": "専有ホストは、配置グループの中では起動できません。専有ホストに起動したインスタンスを、クラスター配置戦略の配置グループに入れる手順は成り立たないため、この対処は選べません。"
+        },
+        {
+          "key": "D",
+          "text": "インスタンスサイズを大きくして vCPU とメモリを増やし、ネットワークも専有させる。",
+          "explanation": "EC2 インスタンスでは、CPU とメモリは特定のインスタンスに専有されますが、ネットワークは複数のインスタンスで共有される資源です。ネットワークを専有させる対処は成り立たず、今回は CPU とメモリにも余裕があるため、vCPU とメモリを増やしても要件を満たしません。"
+        }
+      ],
+      "correctAnswers": ["B"]
+    },
+    {
+      "questionId": "SOA-0089",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain5",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "ある企業は、VPC 内の EC2 インスタンスで動くアプリケーションから、オンプレミスにある接続先へ通信しています。この通信は業務に直結しており、最近、品質が下がる時間帯があるという報告が上がっています。CloudOps エンジニアは、AWS 側のリソースからオンプレミスの接続先 IP アドレスへ向かうトラフィックを実際に測定し、その測定値を CloudWatch に書き込ませる必要があります。\n\nこの要件を満たす方法はどれでしょうか。",
+      "explanation": "## 問われている要件\n\nCloudOps エンジニアは、AWS 側のリソースからオンプレミスの接続先 IP アドレスへ向かうトラフィックを実際に測定し、その値を CloudWatch に書き込ませる必要があります。構成を調べるだけの手段や、別の対象を測る指標では、この要件を満たせません。\n\n## 正解の決め手\n\nプローブは、AWS 側のリソースからオンプレミスの接続先 IP アドレスへ送られるトラフィックです。プローブで得た測定値は、CloudWatch アカウントに書き込まれます。実際のトラフィックの測定と、CloudWatch への書き込みの両方に合うのは、プローブを使う方法です。\n\n## 他の選択肢が誤りである理由\n\nReachability Analyzer で、EC2 インスタンスからオンプレミスの接続先 IP アドレスまでの経路を分析し、その結果を CloudWatch で確認する。\n\nReachability Analyzer は、VPC 内の送信元と送信先のリソース間の接続性を検査する構成分析ツールです。オンプレミスの接続先 IP アドレスへのトラフィックを実際に測定するものではないため、要件を満たしません。\n\nAWS WAF のウェブ ACL を、オンプレミスの接続先 IP アドレスへ向かう通信に関連付け、その測定値を CloudWatch で確認する。\n\nAWS WAF は、保護対象の Web リソースに届く HTTP と HTTPS のリクエストを監視して、アクセスを制御するものです。AWS 側からオンプレミスの接続先 IP アドレスへ向かうトラフィックを測定する手段ではありません。\n\nCloudFront のディストリビューションにオンプレミスの接続先をオリジンとして登録し、そのキャッシュヒット率を CloudWatch で確認する。\n\nキャッシュヒット率は、閲覧者のリクエストのうち、キャッシュから直接返された割合です。AWS 側のリソースからオンプレミスの接続先 IP アドレスへ向かうトラフィックの測定値とは、別の指標です。\n\n## まとめ\n\nAWS 側からオンプレミスの接続先 IP アドレスへのトラフィックを測るのは、プローブです。構成を検査する Reachability Analyzer、Web リクエストを制御する AWS WAF、配信の指標であるキャッシュヒット率は、それぞれ目的が異なります。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/ConfiguringCaching.html",
+          "title": "Caching and availability - Amazon CloudFront"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/what-is-network-monitor.html",
+          "title": "Using Network Synthetic Monitor - Amazon CloudWatch"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/reachability/what-is-reachability-analyzer.html",
+          "title": "What is Reachability Analyzer? - Amazon Virtual Private Cloud"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/waf/latest/developerguide/waf-chapter.html",
+          "title": "AWS WAF - AWS WAF, AWS Firewall Manager, AWS Shield Advanced, and AWS Shield network security director"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "Reachability Analyzer で、EC2 インスタンスからオンプレミスの接続先 IP アドレスまでの経路を分析し、その結果を CloudWatch で確認する。",
+          "explanation": "Reachability Analyzer は、VPC 内の送信元と送信先のリソース間の接続性を検査する構成分析ツールです。オンプレミスの接続先 IP アドレスへのトラフィックを実際に測定するものではないため、要件を満たしません。"
+        },
+        {
+          "key": "B",
+          "text": "AWS 側のリソースからオンプレミスにある接続先の IP アドレスへ向けてプローブを送り、その測定値を CloudWatch で確認する。"
+        },
+        {
+          "key": "C",
+          "text": "AWS WAF のウェブ ACL を、オンプレミスの接続先 IP アドレスへ向かう通信に関連付け、その測定値を CloudWatch で確認する。",
+          "explanation": "AWS WAF は、保護対象の Web リソースに届く HTTP と HTTPS のリクエストを監視して、アクセスを制御するものです。AWS 側からオンプレミスの接続先 IP アドレスへ向かうトラフィックを測定する手段ではありません。"
+        },
+        {
+          "key": "D",
+          "text": "CloudFront のディストリビューションにオンプレミスの接続先をオリジンとして登録し、そのキャッシュヒット率を CloudWatch で確認する。",
+          "explanation": "キャッシュヒット率は、閲覧者のリクエストのうち、キャッシュから直接返された割合です。AWS 側のリソースからオンプレミスの接続先 IP アドレスへ向かうトラフィックの測定値とは、別の指標です。"
+        }
+      ],
+      "correctAnswers": ["B"]
+    },
+    {
+      "questionId": "SOA-0090",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain3",
+      "difficulty": "medium",
+      "questionType": "multiple",
+      "questionText": "ある企業は、あるリージョンで、VPC、ロードバランサー、EC2 インスタンス、データベースからなる基盤を運用しています。この基盤は、これまでコンソールから手作業で作成されてきました。CloudOps エンジニアは、災害に備えて、復旧先のリージョンで基盤を素早く正確に再構築できる状態にする必要があります。あわせて、インフラストラクチャの変更履歴を管理することも求められています。\n\nこれらの要件を満たすために、CloudOps エンジニアが取るべき対応はどれでしょうか。(2 つ選択)",
+      "explanation": "## 問われている要件\n\nこの設問の要件は 2 つあります。1 つ目は、復旧先のリージョンで基盤を素早く誤りなく再構築できるようにすることです。2 つ目は、インフラストラクチャの変更履歴を管理できるようにすることです。2 つの要件は役割が違うので、それぞれに合う対応を 1 つずつ選びます。\n\n## 正解の決め手\n\n正解は A と E です。\n\nA は、1 つ目の要件に当たります。復旧先のリージョンへ基盤を迅速かつ正確に作り直すには、IaC によるデプロイが適しています。基盤をコードとして定義しておけば、復旧先でも同じコードから基盤を構築できます。\n\nE は、2 つ目の要件に当たります。CloudFormation のテンプレートはテキストファイルなので、CloudOps エンジニアは、テンプレートの差分を追うことで、インフラストラクチャの変更履歴を管理できます。\n\n## 他の選択肢が誤りである理由\n\nSystems Manager で、復旧先のリージョンの EC2 インスタンスに対して、ソフトウェアやパッチの導入を自動化し、基盤を再構築する。\n\nSystems Manager の自動化が扱うのは、ノード群に対するレジストリの編集、ユーザー管理、ソフトウェアやパッチの導入といった定型作業です。これはインスタンスの中身を整える作業であり、基盤そのものを定義して復旧先に作り直す IaC の代わりにはなりません。\n\n復旧先のリージョンに手順書を用意し、障害の発生後に、その手順書に沿ってコンソールから手作業で基盤を構築する。\n\n復旧先のリージョンで基盤を素早く誤りなく再構築するには、IaC でデプロイする方法が適しています。手順書に沿ってコンソールから手作業で作る方法は IaC によるデプロイではなく、この要件に合いません。\n\nSecurity Hub CSPM で、検出結果の生成を契機に動くカスタムアクションを作り、EventBridge と連携させて、インフラストラクチャの変更履歴を管理する。\n\nSecurity Hub CSPM のカスタムアクションは、特定の検出結果が生成されたときに、EventBridge と連携して自動の対応を起動する仕組みです。検出結果への対応のための機能であり、テンプレートの差分を追うような変更履歴の管理を担うものではありません。\n\n## まとめ\n\n要件ごとに、対応を結び付けて覚えます。復旧先のリージョンでの素早く正確な再構築には、IaC でのデプロイです。インフラストラクチャの変更履歴の管理には、テキストファイルである CloudFormation のテンプレートの差分の追跡です。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html",
+          "title": "What is CloudFormation? - AWS CloudFormation"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/securityhub/latest/userguide/what-is-securityhub.html",
+          "title": "Introduction to AWS Security Hub CSPM - AWS Security Hub"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/what-is-systems-manager.html",
+          "title": "What is AWS Systems Manager? - AWS Systems Manager"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html",
+          "title": "Disaster recovery options in the cloud - Disaster Recovery of Workloads on AWS: Recovery in the Cloud"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "基盤のリソースを IaC でコードとして定義し、復旧先のリージョンでも、そのコードからデプロイして基盤を構築する。"
+        },
+        {
+          "key": "B",
+          "text": "Systems Manager で、復旧先のリージョンの EC2 インスタンスに対して、ソフトウェアやパッチの導入を自動化し、基盤を再構築する。",
+          "explanation": "Systems Manager の自動化が扱うのは、ノード群に対するレジストリの編集、ユーザー管理、ソフトウェアやパッチの導入といった定型作業です。これはインスタンスの中身を整える作業であり、基盤そのものを定義して復旧先に作り直す IaC の代わりにはなりません。"
+        },
+        {
+          "key": "C",
+          "text": "復旧先のリージョンに手順書を用意し、障害の発生後に、その手順書に沿ってコンソールから手作業で基盤を構築する。",
+          "explanation": "復旧先のリージョンで基盤を素早く誤りなく再構築するには、IaC でデプロイする方法が適しています。手順書に沿ってコンソールから手作業で作る方法は IaC によるデプロイではなく、この要件に合いません。"
+        },
+        {
+          "key": "D",
+          "text": "Security Hub CSPM で、検出結果の生成を契機に動くカスタムアクションを作り、EventBridge と連携させて、インフラストラクチャの変更履歴を管理する。",
+          "explanation": "Security Hub CSPM のカスタムアクションは、特定の検出結果が生成されたときに、EventBridge と連携して自動の対応を起動する仕組みです。検出結果への対応のための機能であり、テンプレートの差分を追うような変更履歴の管理を担うものではありません。"
+        },
+        {
+          "key": "E",
+          "text": "CloudFormation テンプレートをテキストファイルとして保管し、テンプレートの差分を追跡して変更履歴を管理する。"
+        }
+      ],
+      "correctAnswers": ["A", "E"]
+    },
+    {
+      "questionId": "SOA-0091",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain2",
+      "difficulty": "hard",
+      "questionType": "single",
+      "questionText": "ある企業は、バージョニングを有効にした Amazon S3 バケットに、業務で使う取引データのオブジェクトを保存しています。誤ってアップロードされたオブジェクトについて、特定のバージョンを削除する必要があります。CloudOps エンジニアは、この削除を AWS CLI から実行します。エンジニアは、バケットの所有者であるアカウントと、所有者とは別のアカウントの、両方の認証情報を持っています。\n\nこの要件を満たす削除の実行方法はどれでしょうか。",
+      "explanation": "## 問われている要件\n\nこの問題は、バージョニングを有効にしたバケットで、特定のバージョンを AWS CLI で削除するときの、実行する側の条件と、コマンドでの指定のしかたを問います。\n\n## 正解の決め手\n\nAWS CLI で特定のバージョンを削除するには、実行する側がバケットの所有者であることと、version-id のサブリソースを使うことの 2 つが必要です。この両方を満たすのは、バケットの所有者であるアカウントの認証情報で、version-id のサブリソースを指定する選択肢だけです。\n\n## 解くための考え方\n\n選択肢は、どちらのアカウントの認証情報で実行するか(所有者か、所有者とは別か)と、何を指定するか(キーだけか、version-id か)の 2 つの要素だけが違います。2 つの条件を 1 つずつ確かめ、両方を満たすものを選びます。\n\n## まとめ\n\n特定のバージョンの削除は、所有者の認証情報で、version-id のサブリソースを指定して実行します。\n\n## 他の選択肢が誤りである理由\n\nバケットの所有者であるアカウントの認証情報で、対象のオブジェクトのキーだけを指定して削除コマンドを実行する。\n\n実行する側は所有者で合っていますが、キーだけの指定では、特定のバージョンを削除できません。特定のバージョンの削除には、version-id のサブリソースが必要です。\n\nバケットの所有者とは別のアカウントの認証情報で、version-id のサブリソースを指定して削除コマンドを実行する。\n\nversion-id のサブリソースは指定していますが、実行する側が誤りです。特定のバージョンを削除するには、バケットの所有者である必要があり、別のアカウントの認証情報では条件を満たしません。\n\nバケットの所有者とは別のアカウントの認証情報で、対象のオブジェクトのキーだけを指定して削除コマンドを実行する。\n\n実行する側が所有者ではなく、version-id のサブリソースも使っていないため、2 つの条件のどちらも満たしません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/DeletingObjectVersions.html",
+          "title": "Deleting object versions from a versioning-enabled bucket - Amazon Simple Storage Service"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "バケットの所有者であるアカウントの認証情報で、対象のオブジェクトのキーだけを指定して削除コマンドを実行する。",
+          "explanation": "実行する側は所有者で合っていますが、キーだけの指定では、特定のバージョンを削除できません。特定のバージョンの削除には、version-id のサブリソースが必要です。"
+        },
+        {
+          "key": "B",
+          "text": "バケットの所有者とは別のアカウントの認証情報で、version-id のサブリソースを指定して削除コマンドを実行する。",
+          "explanation": "version-id のサブリソースは指定していますが、実行する側が誤りです。特定のバージョンを削除するには、バケットの所有者である必要があり、別のアカウントの認証情報では条件を満たしません。"
+        },
+        {
+          "key": "C",
+          "text": "バケットの所有者とは別のアカウントの認証情報で、対象のオブジェクトのキーだけを指定して削除コマンドを実行する。",
+          "explanation": "実行する側が所有者ではなく、version-id のサブリソースも使っていないため、2 つの条件のどちらも満たしません。"
+        },
+        {
+          "key": "D",
+          "text": "バケットの所有者であるアカウントの認証情報で、version-id のサブリソースを指定して削除コマンドを実行する。"
+        }
+      ],
+      "correctAnswers": ["D"]
+    },
+    {
+      "questionId": "SOA-0092",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain3",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "ある企業は、Amazon EC2 Auto Scaling のグループと DB インスタンスで構成された本番環境を運用しています。CloudOps エンジニアは、障害対応の訓練のために、同じ構成の検証環境を繰り返し作成する必要があります。検証環境の DB インスタンスは、本番の DB インスタンスのスナップショットから復元して用意します。チームは、AWS CloudFormation を使い、検証環境の作成のすべてを自動化することを求めています。\n\nこの要件を満たす作成方法はどれでしょうか。",
+      "explanation": "## 問われている要件\n\nAuto Scaling グループと、スナップショットから復元する DB インスタンスで構成された検証環境を、繰り返し自動で作成する方法を問う設問です。作成のすべてを自動化する要件を満たすには、2 つの作業がどちらも CloudFormation で実行できる必要があります。\n\n## 正解の決め手\n\nAmazon EC2 Auto Scaling のグループは、CloudFormation のテンプレートを使って作成できます。また、CloudFormation を使うと、DB インスタンスのスナップショットから DB インスタンスを復元できます。\n\nこの 2 つの作業は、どちらもテンプレートで扱えるため、手作業を挟まずに検証環境を作成できます。したがって、両方をテンプレートで行う選択肢 A が正解です。\n\n## 解くための考え方\n\n各選択肢は、Auto Scaling グループの作成と DB インスタンスの復元のそれぞれを、テンプレートと手作業のどちらで行うかを組み合わせたものです。自動化の要件があるため、手作業を含む選択肢は要件に合いません。そのうえで、作業ごとに CloudFormation で行えるかどうかを確かめます。\n\n## 他の選択肢が誤りである理由\n\nAuto Scaling グループの作成は CloudFormation のテンプレートで行い、DB インスタンスの復元は手作業で行う。\n\nDB インスタンスの復元を手作業にしている点が誤りです。CloudFormation を使えば、DB インスタンスをスナップショットから復元できるので、この作業を手作業のまま残す理由がありません。作成のすべてを自動化する要件にも合いません。\n\nAuto Scaling グループの作成は手作業で行い、DB インスタンスの復元は CloudFormation のテンプレートで行う。\n\nAuto Scaling グループの作成を手作業にしている点が誤りです。Amazon EC2 Auto Scaling のグループは CloudFormation のテンプレートで作成できるので、この作業を手作業のまま残す理由がありません。作成のすべてを自動化する要件にも合いません。\n\nAuto Scaling グループの作成も DB インスタンスの復元も、手作業で行う。\n\nどちらの作業も手作業にしている点が誤りです。Auto Scaling グループの作成も、スナップショットからの DB インスタンスの復元も、CloudFormation で実行できます。作成のすべてを自動化する要件に反します。\n\n## まとめ\n\nAuto Scaling グループの作成と、スナップショットからの DB インスタンスの復元は、どちらも CloudFormation で行えます。作成のすべてを自動化する要件では、2 つの作業とも、テンプレートに任せる方法を選びます。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_RestoreFromSnapshot.html",
+          "title": "Restoring to a DB instance - Amazon Relational Database Service"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html",
+          "title": "What is Amazon EC2 Auto Scaling? - Amazon EC2 Auto Scaling"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "Auto Scaling グループの作成も DB インスタンスの復元も、CloudFormation のテンプレートで行う。"
+        },
+        {
+          "key": "B",
+          "text": "Auto Scaling グループの作成は CloudFormation のテンプレートで行い、DB インスタンスの復元は手作業で行う。",
+          "explanation": "DB インスタンスの復元を手作業にしている点が誤りです。CloudFormation を使えば、DB インスタンスのスナップショットから DB インスタンスを復元できるので、この作業を手作業のまま残す理由がありません。作成のすべてを自動化する要件にも合いません。"
+        },
+        {
+          "key": "C",
+          "text": "Auto Scaling グループの作成は手作業で行い、DB インスタンスの復元は CloudFormation のテンプレートで行う。",
+          "explanation": "Auto Scaling グループの作成を手作業にしている点が誤りです。Amazon EC2 Auto Scaling のグループは CloudFormation のテンプレートを使って作成できるので、CloudFormation の対象外と考えて手作業を残す必要はありません。"
+        },
+        {
+          "key": "D",
+          "text": "Auto Scaling グループの作成も DB インスタンスの復元も、手作業で行う。",
+          "explanation": "どちらの作業も手作業にしている点が誤りです。Auto Scaling グループの作成も、スナップショットからの DB インスタンスの復元も、CloudFormation で実行できます。作成のすべてを自動化する要件に反します。"
+        }
+      ],
+      "correctAnswers": ["A"]
+    },
+    {
+      "questionId": "SOA-0093",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain1",
+      "difficulty": "easy",
+      "questionType": "single",
+      "questionText": "ある企業は、EC2 インスタンスが発行する 1 つのメトリクスを、2 つの CloudWatch アラームで監視しています。一方のアラームでは、データが欠けた期間を異常として扱う必要があります。もう一方のアラームでは、データが欠けた期間を評価の対象外にする必要があります。CloudOps エンジニアは、この 2 つの要件を満たす設定を行いたいと考えています。\n\nこの要件を満たす欠損データの扱いの設定として、適切なものはどれでしょうか。",
+      "explanation": "## 問われている要件\n\n2 つのアラームで、欠損データの扱いを別々にする必要があります。そのため、欠損データの扱いを指定する単位がどこかが問われています。\n\n## 正解の決め手\n\n欠損データの扱いは、アラームごとに指定できます。同じメトリクスを監視する 2 つのアラームでも、アラームごとに別の扱いを選べるので、要件を満たせます。\n\n## 解くための考え方\n\n設定の単位がアラームより広いと、同じ単位に属するアラームは同じ扱いになります。アラームごとに扱いを分ける要件があるときは、アラームごとに指定できるかどうかを確かめます。\n\n## 他の選択肢が誤りである理由\n\nリージョンごとに、そのリージョンのすべてのアラームに共通の欠損データの扱いを設定する。\n\n欠損データの扱いは、アラームごとに指定できます。リージョンごとに 1 つにまとめると、同じリージョンのアラームがすべて同じ扱いになり、2 つのアラームで扱いを分ける要件を満たせません。\n\nメトリクスごとに、そのメトリクスを使うすべてのアラームに共通の欠損データの扱いを設定する。\n\n欠損データの扱いは、アラームごとに指定できます。メトリクスごとに共通にすると、同じメトリクスを監視する 2 つのアラームに、別々の扱いを選べません。\n\nEC2 インスタンスごとに、そのインスタンスのアラームに共通の欠損データの扱いを設定する。\n\n欠損データの扱いは、アラームごとに指定できます。EC2 インスタンスごとに共通にすると、同じインスタンスのメトリクスを使う 2 つのアラームに、別々の扱いを選べません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html",
+          "title": "Using Amazon CloudWatch alarms - Amazon CloudWatch"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "リージョンごとに、そのリージョンのすべてのアラームに共通の欠損データの扱いを設定する。",
+          "explanation": "欠損データの扱いは、アラームごとに指定できます。リージョンごとに 1 つにまとめると、同じリージョンのアラームがすべて同じ扱いになり、2 つのアラームで扱いを分ける要件を満たせません。"
+        },
+        {
+          "key": "B",
+          "text": "メトリクスごとに、そのメトリクスを使うすべてのアラームに共通の欠損データの扱いを設定する。",
+          "explanation": "欠損データの扱いは、アラームごとに指定できます。メトリクスごとに共通にすると、同じメトリクスを監視する 2 つのアラームに、別々の扱いを選べません。"
+        },
+        {
+          "key": "C",
+          "text": "EC2 インスタンスごとに、そのインスタンスのアラームに共通の欠損データの扱いを設定する。",
+          "explanation": "欠損データの扱いは、アラームごとに指定できます。EC2 インスタンスごとに共通にすると、同じインスタンスのメトリクスを使う 2 つのアラームに、別々の扱いを選べません。"
+        },
+        {
+          "key": "D",
+          "text": "アラームごとに、そのアラームがデータの欠損をどのように評価するかを個別に設定する。"
+        }
+      ],
+      "correctAnswers": ["D"]
+    },
+    {
+      "questionId": "SOA-0094",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain2",
+      "difficulty": "easy",
+      "questionType": "single",
+      "questionText": "ある企業は、誤った更新でデータが壊れた本番の DB インスタンスを、ポイントインタイムリストアで復元する予定です。CloudOps エンジニアは、復元先の DB インスタンスに関連付けられる DB パラメータグループとオプショングループを、事前に確認する必要があります。運用チームは、復元の前に、グループの扱いも含めて設定を確かめたいと考えています。\n\nポイントインタイムリストアで復元した DB インスタンスについて、グループの扱いとして正しい説明はどれでしょうか。",
+      "explanation": "## 問われている要件\nポイントインタイムリストアで復元した DB インスタンスに、DB パラメータグループとオプショングループがどう関連付けられるかを答える問題です。\n\n## 正解の決め手\nポイントインタイムリストアでは、復元先の DB インスタンスが、既定の DB パラメータグループとオプショングループに、自動的に関連付けられます。パラメータグループとオプショングループの両方が既定のものになり、関連付けが自動で行われる点を述べているのは、D だけです。\n\n## 解くための考え方\n確かめる点は 2 つあります。復元元のグループが引き継がれるかどうかと、関連付けが自動か利用者の作業かです。復元先は既定のグループに自動で関連付けられるため、引き継ぎを述べる選択肢と、手作業を述べる選択肢は外れます。\n\n## 他の選択肢が誤りである理由\n元のインスタンスで使われていたパラメータグループとオプショングループが、そのまま復元先に引き継がれる。\n\n復元元のグループは、復元先に引き継がれません。復元先は、既定のパラメータグループとオプショングループに自動的に関連付けられます。\n\n復元先にはどのグループも関連付けられず、復元後に利用者が関連付けを行う。\n\n復元先には、既定のパラメータグループとオプショングループが自動的に関連付けられます。利用者が関連付けるまでグループが付かないという説明は、自動で関連付けられる点と食い違います。\n\n元のインスタンスのパラメータグループだけが引き継がれ、オプショングループは既定のものになる。\n\nパラメータグループも、復元元のものではなく、既定のものに自動的に関連付けられます。パラメータグループだけを引き継ぐという説明は誤りです。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_PIT.html",
+          "title": "Restoring a DB instance to a specified time for Amazon RDS - Amazon Relational Database Service"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "元のインスタンスで使われていたパラメータグループとオプショングループが、そのまま復元先に引き継がれる。",
+          "explanation": "復元元のグループは、復元先に引き継がれません。復元先は、既定のパラメータグループとオプショングループに自動的に関連付けられます。"
+        },
+        {
+          "key": "B",
+          "text": "復元先にはどのグループも関連付けられず、復元後に利用者が関連付けを行う。",
+          "explanation": "復元先には、既定のパラメータグループとオプショングループが自動的に関連付けられます。利用者が関連付けるまでグループが付かないという説明は、自動で関連付けられる点と食い違います。"
+        },
+        {
+          "key": "C",
+          "text": "元のインスタンスのパラメータグループだけが引き継がれ、オプショングループは既定のものになる。",
+          "explanation": "パラメータグループも、復元元のものではなく、既定のものに自動的に関連付けられます。パラメータグループだけを引き継ぐという説明は誤りです。"
+        },
+        {
+          "key": "D",
+          "text": "パラメータグループとオプショングループが、どちらも既定のものに自動的に関連付けられる。"
+        }
+      ],
+      "correctAnswers": ["D"]
+    },
+    {
+      "questionId": "SOA-0095",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain4",
+      "difficulty": "hard",
+      "questionType": "single",
+      "questionText": "ある企業は、Amazon CloudWatch のアラームを多数運用しています。アラームがアクションを実行できるよう、送り先のリソースのポリシーで、アラームからのアクセスを許可しています。アラームの多くは日本語の名前で、その ARN には ASCII 以外の文字が含まれています。CloudOps エンジニアは、このポリシーの許可を、自社の AWS アカウントのアラームだけに絞る必要があります。\n\nこの要件を満たす条件の設定はどれでしょうか。",
+      "explanation": "## 問われている要件\n\n許可の範囲を、自社のアカウントのアラームだけに絞ることが要件です。アラームの ARN に ASCII 以外の文字が含まれるため、どの条件キーなら絞れるかが問われています。\n\n## 正解の決め手\n\nアラームの ARN に ASCII 以外の文字が含まれるときは、aws:SourceArn では権限を絞れません。この場合は、aws:SourceAccount だけで絞ります。したがって、選択肢 D が正解です。\n\n## 前提知識\n\naws:SourceArn はアラームの ARN で、aws:SourceAccount はアカウントで、アクセス元を絞る条件キーです。ARN の中身に ASCII 以外の文字が入ると、ARN を使う前者は絞り込みに使えず、アカウントを使う後者に頼ることになります。\n\n## 解くための考え方\n\nまず、ARN で絞る条件キーが、問題の条件(ASCII 以外の文字を含む ARN)で使えるかを確かめます。使えないと分かれば、残るのは aws:SourceAccount だけです。ARN の指定のしかた(そのまま、ワイルドカード、併用)は、どれも aws:SourceArn に頼る点が同じなので、同じ理由で外れます。\n\n## まとめ\n\nARN に ASCII 以外の文字を含むアラームは、aws:SourceArn で絞れず、aws:SourceAccount だけで絞ります。\n\n## 他の選択肢が誤りである理由\n\n条件キー aws:SourceArn に、CloudWatch アラームの ARN をそのまま指定して、自社のアカウントのアラームからのアクセスに限って許可する。\n\nこの選択肢では、アラームの ARN に ASCII 以外の文字が含まれるため、aws:SourceArn に ARN をそのまま指定しても権限を絞れません。この場合に絞れるのは、aws:SourceAccount だけです。\n\n条件キー aws:SourceArn に、ワイルドカードを使った CloudWatch アラームの ARN を指定して、自社のアカウントのアラームからのアクセスに限って許可する。\n\nこの選択肢では、ワイルドカードを使った ARN にしても、ASCII 以外の文字を含む ARN のアラームを aws:SourceArn で絞れない点は変わりません。絞れるのは aws:SourceAccount だけです。\n\n条件キー aws:SourceArn と aws:SourceAccount の両方を指定して、CloudWatch アラームの ARN とアカウントの両方が一致するアクセスに限って許可する。\n\nこの選択肢では、aws:SourceArn を併用しても、ARN の側では権限を絞れません。ARN に ASCII 以外の文字が含まれるアラームは、aws:SourceAccount だけで絞ります。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Notify_Users_Alarm_Changes.html",
+          "title": "Notifying users on alarm changes - Amazon CloudWatch"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "条件キー aws:SourceArn に、CloudWatch アラームの ARN をそのまま指定して、自社のアカウントのアラームからのアクセスに限って許可する。",
+          "explanation": "アラームの ARN に ASCII 以外の文字が含まれるときは、aws:SourceArn に ARN をそのまま指定しても、権限を絞れません。この場合に絞れるのは、aws:SourceAccount だけです。"
+        },
+        {
+          "key": "B",
+          "text": "条件キー aws:SourceArn に、ワイルドカードを使った CloudWatch アラームの ARN を指定して、自社のアカウントのアラームからのアクセスに限って許可する。",
+          "explanation": "ワイルドカードを使った ARN にしても、ASCII 以外の文字を含む ARN のアラームを aws:SourceArn で絞れない点は変わりません。絞れるのは aws:SourceAccount だけです。"
+        },
+        {
+          "key": "C",
+          "text": "条件キー aws:SourceArn と aws:SourceAccount の両方を指定して、CloudWatch アラームの ARN とアカウントの両方が一致するアクセスに限って許可する。",
+          "explanation": "aws:SourceArn を併用しても、ARN の側では権限を絞れません。ARN に ASCII 以外の文字が含まれるアラームは、aws:SourceAccount だけで絞ります。"
+        },
+        {
+          "key": "D",
+          "text": "条件キー aws:SourceAccount だけを指定して、自社のアカウントの CloudWatch アラームからのアクセスに限って許可する。"
+        }
+      ],
+      "correctAnswers": ["D"]
+    },
+    {
+      "questionId": "SOA-0096",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain3",
+      "difficulty": "easy",
+      "questionType": "single",
+      "questionText": "ある企業では、AWS CloudFormation のスタックを使って、ロードバランサーと EC2 インスタンスを含む本番の環境を管理しています。CloudOps エンジニアが、定期的な変更のためにスタックを更新したところ、操作の途中でエラーが出ました。エンジニアは、CloudFormation が記録した情報から、そのエラーの原因を特定する必要があります。\n\nこの要件を満たす確認の方法はどれでしょうか。",
+      "explanation": "## 問われている要件\n\nこの企業のエンジニアは、スタックの更新で出たエラーの原因を、CloudFormation が記録した情報から特定しようとしています。どの情報を、どう絞り込んで読むかが問われています。\n\n## 正解の決め手\n\nスタックの操作でエラーが出たときは、エンジニアが操作 ID を使って、その操作に関連するイベントだけを絞り込みます。そのうえで、失敗したイベントの状態の理由を読むと、エラーの原因を特定できます。\n\n## 前提知識\n\nCloudFormation は、スタックの操作で起きたことを、イベントとして記録します。そのイベントは操作 ID で絞り込めるので、同じ操作に関係するものだけを取り出せます。\n\n## 他の選択肢が誤りである理由\n\nCloudFormation の操作 ID でスタックのイベントを絞り込み、直前に成功したイベントの状態の理由を確認する。\n\nエラーの原因の手がかりになるのは、失敗したイベントの状態の理由です。直前に成功したイベントを読む方法は、確認する対象が逆になっているので、この要件には合いません。\n\nTemplate studio でスタックのテンプレートを可視化し、エラーが出た操作の原因を確認する。\n\nTemplate studio は、テンプレートを可視化して検証するための機能です。スタックの操作で出たエラーの原因は、操作 ID で絞り込んだ失敗のイベントの状態の理由から特定するので、この要件には合いません。\n\nスタックのテンプレートの差分を追跡して変更履歴を管理し、エラーが出た操作の原因を確認する。\n\nテンプレートはテキストファイルなので、差分を追跡すれば、インフラストラクチャの変更履歴を管理できます。ただし、これは変更の履歴を管理する方法です。操作のエラーの原因は、失敗したイベントの状態の理由から特定します。\n\n## まとめ\n\nスタックの操作のエラーは、操作 ID でイベントを絞り込み、失敗したイベントの状態の理由から特定します。成功したイベントを読むこと、テンプレートを可視化すること、差分を追跡することは、エラーの原因を特定する手段ではありません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html",
+          "title": "What is CloudFormation? - AWS CloudFormation"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-whatis-concepts.html",
+          "title": "How CloudFormation works - AWS CloudFormation"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/troubleshooting.html",
+          "title": "Troubleshooting CloudFormation - AWS CloudFormation"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "CloudFormation の操作 ID でスタックのイベントを絞り込み、直前に成功したイベントの状態の理由を確認する。",
+          "explanation": "エラーの原因の手がかりになるのは、失敗したイベントの状態の理由です。直前に成功したイベントを読む方法は、確認する対象が逆になっているので、この要件には合いません。"
+        },
+        {
+          "key": "B",
+          "text": "CloudFormation の操作 ID でスタックのイベントを絞り込み、失敗したイベントの状態の理由を確認する。"
+        },
+        {
+          "key": "C",
+          "text": "Template studio でスタックのテンプレートを可視化し、エラーが出た操作の原因を確認する。",
+          "explanation": "Template studio は、テンプレートを可視化して検証するための機能です。スタックの操作で出たエラーの原因は、操作 ID で絞り込んだ失敗のイベントの状態の理由から特定するので、この要件には合いません。"
+        },
+        {
+          "key": "D",
+          "text": "スタックのテンプレートの差分を追跡して変更履歴を管理し、エラーが出た操作の原因を確認する。",
+          "explanation": "テンプレートはテキストファイルなので、差分を追跡すれば、インフラストラクチャの変更履歴を管理できます。ただし、これは変更の履歴を管理する方法です。操作のエラーの原因は、失敗したイベントの状態の理由から特定します。"
+        }
+      ],
+      "correctAnswers": ["B"]
+    },
+    {
+      "questionId": "SOA-0097",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain1",
+      "difficulty": "easy",
+      "questionType": "multiple",
+      "questionText": "ある企業は、世界各地の拠点から送られるログを、Amazon S3 のバケットに集めています。バケットのオブジェクトは、拠点ごとに分けたプレフィックスで整理されています。拠点の数が増えているため、CloudOps エンジニアは、Transfer Acceleration の利用条件と、バケットが処理できる要求の量を確認する必要があります。\n\nS3 の機能と性能について、正しいものはどれでしょうか。(2 つ選択)",
+      "explanation": "## 問われている要件\n\nこの設問は、S3 の Transfer Acceleration を使える範囲と、プレフィックスごとの要求の処理能力を問うています。どちらも、運用の前提として知っておく事実です。\n\n## 正解の決め手\n\n選択肢 B は正しい記述です。Transfer Acceleration を使えるのは、対応リージョンの一覧にあるリージョンのバケットに限られます。\n\n選択肢 C も正しい記述です。S3 は、分割されたプレフィックスごとに、書き込み系の要求を毎秒少なくとも 3,500 件、読み取り系の要求を毎秒少なくとも 5,500 件まで処理できます。\n\n## 他の選択肢が誤りである理由\n\nS3 バケットがどのリージョンにあっても、Transfer Acceleration を有効にして利用できる。\n\nTransfer Acceleration は、使えるリージョンが決まっています。対応リージョンの一覧にあるバケットだけが対象で、どのリージョンのバケットでも使えるわけではありません。\n\nS3 のプレフィックスごとの処理能力は、書き込み系の要求も読み取り系の要求も、毎秒 1,000 件が上限である。\n\nS3 は、分割されたプレフィックスごとに、書き込み系で毎秒少なくとも 3,500 件、読み取り系で毎秒少なくとも 5,500 件を処理できます。毎秒 1,000 件が上限という数値は、実際の処理能力より小さい値です。\n\nバケットの要求の処理能力は、プレフィックスごとに数えるのではなく、バケット単位でまとめて決まる。\n\n要求の処理能力は、バケット単位ではなく、分割されたプレフィックスごとに示される値です。バケット単位でまとめて決まる、という説明は誤りです。\n\n## まとめ\n\nTransfer Acceleration は対応リージョンのバケットだけで使えます。S3 の要求の処理能力は、プレフィックスごとに、書き込み系で毎秒 3,500 件以上、読み取り系で毎秒 5,500 件以上です。範囲と数値を取り違えないように、あわせて覚えてください。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/optimizing-performance.html",
+          "title": "Best practices design patterns: optimizing Amazon S3 performance - Amazon Simple Storage Service"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/transfer-acceleration.html",
+          "title": "Configuring fast, secure file transfers using Amazon S3 Transfer Acceleration - Amazon Simple Storage Service"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "S3 バケットがどのリージョンにあっても、Transfer Acceleration を有効にして利用できる。",
+          "explanation": "Transfer Acceleration は、使えるリージョンが決まっています。対応リージョンの一覧にあるバケットだけが対象で、どのリージョンのバケットでも使えるわけではありません。"
+        },
+        {
+          "key": "B",
+          "text": "Transfer Acceleration を利用できるのは、対応しているリージョンにある S3 バケットだけである。"
+        },
+        {
+          "key": "C",
+          "text": "S3 は、分割されたプレフィックスごとに、書き込み系で毎秒 3,500 件以上、読み取り系で毎秒 5,500 件以上の要求を処理できる。"
+        },
+        {
+          "key": "D",
+          "text": "S3 のプレフィックスごとの処理能力は、書き込み系の要求も読み取り系の要求も、毎秒 1,000 件が上限である。",
+          "explanation": "S3 は、分割されたプレフィックスごとに、書き込み系で毎秒少なくとも 3,500 件、読み取り系で毎秒少なくとも 5,500 件を処理できます。毎秒 1,000 件が上限という数値は、実際の処理能力より小さい値です。"
+        },
+        {
+          "key": "E",
+          "text": "バケットの要求の処理能力は、プレフィックスごとに数えるのではなく、バケット単位でまとめて決まる。",
+          "explanation": "要求の処理能力は、バケット単位ではなく、分割されたプレフィックスごとに示される値です。バケット単位でまとめて決まる、という説明は誤りです。"
+        }
+      ],
+      "correctAnswers": ["B", "C"]
+    },
+    {
+      "questionId": "SOA-0098",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain5",
+      "difficulty": "easy",
+      "questionType": "single",
+      "questionText": "ある企業は、Amazon CloudFront のディストリビューションを使って、Web サイトのコンテンツを世界中の閲覧者へ配信しています。CloudOps エンジニアは、配信の状況を監視するために、CloudFront のキャッシュヒット率を確認しています。チームの新しい担当者から、この値が何の割合を表すのかを尋ねられました。\n\nキャッシュヒット率が表すものはどれでしょうか。",
+      "explanation": "## 問われている要件\nCloudFront のキャッシュヒット率という指標が、何の割合を表すのかを答える設問です。分母と分子がそれぞれ何かを区別します。\n\n## 正解の決め手\nキャッシュヒット率は、閲覧者から届いたリクエストの全体のうち、キャッシュだけで応答できたものの割合です。分母は閲覧者のリクエスト、分子はキャッシュから直接返した分です。\n\n## 解くための考え方\n「ヒット」とは、キャッシュから直接返せた状態を指します。割合の分母が閲覧者のリクエストか、保存されたオブジェクトか、オリジンへの転送かを読み分けると、候補が絞れます。\n\n## 他の選択肢が誤りである理由\n閲覧者から届いたリクエストのうち、キャッシュに該当がなく、オリジンから取得した割合を表す。\n\nこの選択肢が述べているのは、キャッシュから返せずにオリジンから取得した割合で、ヒットの反対側です。キャッシュヒット率は、キャッシュから直接返された割合を指します。\n\nキャッシュに保存されたオブジェクトのうち、実際に閲覧者へ配信された割合を表す。\n\nこの選択肢は、保存されたオブジェクトを分母にしています。キャッシュヒット率の分母は、閲覧者のリクエストです。\n\nオリジンへ転送されたリクエストのうち、正常な応答が返ってきた割合を表す。\n\nこの選択肢は、オリジンへ転送したリクエストを分母にして、応答の成否を見ています。キャッシュヒット率は、閲覧者のリクエストのうち、キャッシュから返された割合です。\n\n## まとめ\nキャッシュヒット率は、閲覧者のリクエストのうち、キャッシュから直接返せた分の割合を表します。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/ConfiguringCaching.html",
+          "title": "Caching and availability - Amazon CloudFront"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "閲覧者から届いたリクエストのうち、キャッシュに該当がなく、オリジンから取得した割合を表す。",
+          "explanation": "この選択肢が述べているのは、キャッシュから返せずにオリジンから取得した割合で、ヒットの反対側です。キャッシュヒット率は、キャッシュから直接返された割合を指します。"
+        },
+        {
+          "key": "B",
+          "text": "キャッシュに保存されたオブジェクトのうち、実際に閲覧者へ配信された割合を表す。",
+          "explanation": "この選択肢は、保存されたオブジェクトを分母にしています。キャッシュヒット率の分母は、閲覧者のリクエストです。"
+        },
+        {
+          "key": "C",
+          "text": "オリジンへ転送されたリクエストのうち、正常な応答が返ってきた割合を表す。",
+          "explanation": "この選択肢は、オリジンへ転送したリクエストを分母にして、応答の成否を見ています。キャッシュヒット率は、閲覧者のリクエストのうち、キャッシュから返された割合です。"
+        },
+        {
+          "key": "D",
+          "text": "閲覧者から届いたリクエストのうち、キャッシュから直接返された割合を表す。"
+        }
+      ],
+      "correctAnswers": ["D"]
+    },
+    {
+      "questionId": "SOA-0099",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain3",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "ある企業では、CloudOps エンジニアが、災害対策のために、復旧先のリージョンでインフラストラクチャを再構築する手順を整えています。障害が起きたときに、復旧先のリージョンで基盤を素早く、正確に再構築する必要があります。また、インフラストラクチャの変更履歴も、追跡できるようにする必要があります。デプロイの方法は、平常時の作業を含めて見直すことにしました。\n\nこの要件を満たすデプロイの方法はどれでしょうか。",
+      "explanation": "## 問われている要件\n\n災害対策として、復旧先のリージョンで基盤を素早く正確に再構築でき、インフラストラクチャの変更履歴も追跡できるデプロイの方法が問われています。\n\n## 正解の決め手\n\n復旧先のリージョンで基盤を素早く正確に再構築するには、コードでインフラストラクチャを定義してデプロイする方法(Infrastructure as Code、IaC)を、平常時から使ってデプロイします。AWS CloudFormation のテンプレートはテキストファイルなので、テンプレートの差分を追跡すれば、変更履歴も管理できます。本番と復旧先のリージョンをテンプレートでデプロイし、その差分を追跡する方法が、2 つの要件を満たします。\n\n## 前提知識\n\nAWS CloudFormation のテンプレートは、テキストファイルです。テキストの差分は、変更の前後を比べて追跡できるため、インフラストラクチャの変更履歴の管理に役立ちます。\n\n## 解くための考え方\n\n手作業でデプロイする案と、IaC を使う範囲やタイミングを限る案を見分けます。要件は、平常時の作業も含めてデプロイの方法を見直す前提なので、使うタイミングや範囲を限る案は、素早く正確な再構築を支えません。\n\n## 他の選択肢が誤りである理由\n\n本番と復旧先のリージョンを、コンソールから手作業で構築し、変更内容を手順書に追記して、変更履歴を管理する。\n\n手作業の構築は、復旧時に基盤を素早く正確に再構築する要件に合いません。復旧先のリージョンで基盤を素早く正確に再構築するには、IaC でデプロイします。変更履歴も、テンプレートの差分で追跡する方法を使っていません。\n\n平常時は手作業でリソースを構築し、障害時にだけ、復旧先のリージョンへ AWS CloudFormation のテンプレートでデプロイする。\n\n平常時の構築を手作業にして、障害時にだけテンプレートを使う方法は、IaC を使うタイミングが障害時に限られています。復旧先のリージョンで基盤を素早く正確に再構築するには、平常時のデプロイも含めて、IaC でデプロイします。\n\n平常時は AWS CloudFormation のテンプレートでデプロイし、復旧先のリージョンは、障害時にコンソールから手作業で構築する。\n\n復旧先のリージョンだけを手作業で構築する方法は、再構築の素早さと正確さを下げます。復旧先のリージョンの基盤を素早く正確に再構築するには、そのリージョンでも IaC でデプロイします。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/Welcome.html",
+          "title": "What is CloudFormation? - AWS CloudFormation"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html",
+          "title": "Disaster recovery options in the cloud - Disaster Recovery of Workloads on AWS: Recovery in the Cloud"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "本番と復旧先のリージョンを、コンソールから手作業で構築し、変更内容を手順書に追記して、変更履歴を管理する。",
+          "explanation": "手作業の構築は、復旧時に基盤を素早く正確に再構築する要件に合いません。復旧先のリージョンで基盤を素早く正確に再構築するには、IaC でデプロイします。変更履歴も、テンプレートの差分で追跡する方法を使っていません。"
+        },
+        {
+          "key": "B",
+          "text": "平常時は手作業でリソースを構築し、障害時にだけ、復旧先のリージョンへ AWS CloudFormation のテンプレートでデプロイする。",
+          "explanation": "平常時の構築を手作業にして、障害時にだけテンプレートを使う方法は、IaC を使うタイミングが障害時に限られています。復旧先のリージョンで基盤を素早く正確に再構築するには、平常時のデプロイも含めて、IaC でデプロイします。"
+        },
+        {
+          "key": "C",
+          "text": "平常時は AWS CloudFormation のテンプレートでデプロイし、復旧先のリージョンは、障害時にコンソールから手作業で構築する。",
+          "explanation": "復旧先のリージョンだけを手作業で構築する方法は、再構築の素早さと正確さを下げます。復旧先のリージョンの基盤を素早く正確に再構築するには、そのリージョンでも IaC でデプロイします。"
+        },
+        {
+          "key": "D",
+          "text": "本番と復旧先のリージョンを、AWS CloudFormation のテンプレートでデプロイし、テンプレートの差分を追跡して変更履歴を管理する。"
+        }
+      ],
+      "correctAnswers": ["D"]
+    },
+    {
+      "questionId": "SOA-0100",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain5",
+      "difficulty": "medium",
+      "questionType": "multiple",
+      "questionText": "ある企業は、複数の AWS リージョンにアプリのリソースを配置し、コンテンツを CloudFront のディストリビューションで配信しています。この企業のドメインは、Route 53 で管理しています。CloudOps エンジニアは、利用者に、最も遅延の小さいリージョンのリソースを返す必要があります。さらに、このディストリビューションで、ACM で新しく用意する証明書を使う必要があります。\n\nこれらの要件を満たす操作はどれでしょうか。(2 つ選択)",
+      "explanation": "## 問われている要件\nこの設問では、複数のリージョンにアプリのリソースがある企業が、遅延の小さいリージョンを利用者に返す方法と、CloudFront で ACM の証明書を使うための手順を、それぞれ選ぶことが求められています。2 つの要件は別々なので、1 つずつ対応する操作を選びます。\n\n## 正解の決め手\nRoute 53 のレイテンシーベースのルーティングは、アプリが複数のリージョンにあるときに、利用者へ最も遅延の小さいリージョンのリソースを返す方式です。したがって、1 つ目の要件を満たすのは A です。\n\nCloudFront で ACM の証明書を使う場合、企業は米国東部(バージニア北部)リージョンで、その証明書を申請するかインポートする必要があります。したがって、2 つ目の要件を満たすのは B です。\n\n## 解くための考え方\n要件ごとに、どの層の話かを切り分けます。利用者へ返すリージョンを決めるのは Route 53 のルーティングの方式で、CloudFront で使う証明書の置き場所は ACM の側の話です。ルーティングの方式は、遅延の小ささを基準にするのか、リソースの所在地を基準にするのかで、選ぶものが変わります。\n\n## まとめ\n遅延の小さいリージョンを返すにはレイテンシーベースのルーティングを、CloudFront で ACM の証明書を使うには米国東部(バージニア北部)リージョンでの申請かインポートを選びます。\n\n## 他の選択肢が誤りである理由\nRoute 53 でジオプロキシミティルーティングを設定し、リソースの所在地に基づいて一部のトラフィックを別の場所のリソースへ移す。\n\nRoute 53 のジオプロキシミティルーティングは、リソースの所在地を基に、一部のトラフィックを別の場所のリソースへ移すときに使う方式です。最も遅延の小さいリージョンを返す要件には、レイテンシーベースのルーティングが対応します。\n\nCloudFront で使う ACM の証明書を、アジアパシフィック(東京)リージョンで申請する。\n\nCloudFront で ACM の証明書を使うには、米国東部(バージニア北部)リージョンで申請するかインポートする必要があります。アジアパシフィック(東京)リージョンの証明書は、この条件に合いません。\n\nCloudWatch Internet Monitor を設定し、利用者に最も遅延の小さいリージョンのリソースを返す。\n\nCloudWatch Internet Monitor は、AWS 上のアプリケーションと利用者の間で、インターネットの問題が性能と可用性に及ぼす影響を見えるようにするサービスです。利用者にリソースを返す方式ではないため、ルーティングの要件は満たせません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch-InternetMonitor.html",
+          "title": "Using Internet Monitor - Amazon CloudWatch"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy-latency.html",
+          "title": "Latency-based routing - Amazon Route 53"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy.html",
+          "title": "Choosing a routing policy - Amazon Route 53"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/acm/latest/userguide/acm-overview.html",
+          "title": "What is AWS Certificate Manager? - AWS Certificate Manager"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "Route 53 でレイテンシーベースのルーティングを設定し、利用者に最も遅延の小さいリージョンのリソースを返す。"
+        },
+        {
+          "key": "B",
+          "text": "CloudFront で使う ACM の証明書を、米国東部(バージニア北部)リージョンで申請する。"
+        },
+        {
+          "key": "C",
+          "text": "Route 53 でジオプロキシミティルーティングを設定し、リソースの所在地に基づいて一部のトラフィックを別の場所のリソースへ移す。",
+          "explanation": "Route 53 のジオプロキシミティルーティングは、リソースの所在地を基に、一部のトラフィックを別の場所のリソースへ移すときに使う方式です。最も遅延の小さいリージョンを返す要件には、レイテンシーベースのルーティングが対応します。"
+        },
+        {
+          "key": "D",
+          "text": "CloudFront で使う ACM の証明書を、アジアパシフィック(東京)リージョンで申請する。",
+          "explanation": "CloudFront で ACM の証明書を使うには、米国東部(バージニア北部)リージョンで申請するかインポートする必要があります。アジアパシフィック(東京)リージョンの証明書は、この条件に合いません。"
+        },
+        {
+          "key": "E",
+          "text": "CloudWatch Internet Monitor を設定し、利用者に最も遅延の小さいリージョンのリソースを返す。",
+          "explanation": "CloudWatch Internet Monitor は、AWS 上のアプリケーションと利用者の間で、インターネットの問題が性能と可用性に及ぼす影響を見えるようにするサービスです。利用者にリソースを返す方式ではないため、ルーティングの要件は満たせません。"
+        }
+      ],
+      "correctAnswers": ["A", "B"]
+    },
+    {
+      "questionId": "SOA-0101",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain3",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "ある企業は、AWS Organizations の組織で複数のアカウントを運用しています。この企業では、組織内でのリソース共有をすでに有効にしています。CloudOps エンジニアは、EC2 の機械学習向けキャパシティブロックを、組織内のほかのアカウントへ共有する作業を担当しています。共有する対象には、UltraServer のキャパシティブロックが含まれています。\n\nこの共有の扱いとして正しいものはどれでしょうか。",
+      "explanation": "## 問われている要件\n\n組織内でのリソース共有をすでに有効にした企業が、EC2 の機械学習向けキャパシティブロックを組織内のアカウントへ共有するときの扱いを問う設問です。見分ける点は、共有に招待の手続きが要るかどうかと、UltraServer のキャパシティブロックを共有できるかどうかの 2 つです。\n\n## 正解の決め手\n\n組織内でのリソース共有を有効にしたあとは、組織やその中のアカウントへ共有するときに、招待の手続きが要りません。設問の企業は、この設定をすでに有効にしているので、招待の手続きは不要です。\n\n一方、UltraServer のキャパシティブロックは、EC2 の機械学習向けキャパシティブロックの共有の対象外です。設問の共有対象にはこのキャパシティブロックが含まれていますが、これは共有できません。\n\nしたがって、招待の手続きは不要で、UltraServer のキャパシティブロックは共有の対象外と述べる選択肢 C が正解です。\n\n## 解くための考え方\n\n各選択肢は、招待の手続きの要否と、UltraServer のキャパシティブロックの扱いという 2 つの要素を組み合わせて作られています。設問文の条件(共有の有効化が済んでいること、UltraServer が対象に含まれること)を要素ごとに当てはめ、両方に合う選択肢を選びます。\n\n## 他の選択肢が誤りである理由\n\nOrganizations の組織内では、招待の手続きが必要で、UltraServer のキャパシティブロックも同じ手順で共有できる。\n\nこの選択肢は、2 つの点で誤りです。組織内でのリソース共有を有効にしたあとは、共有に招待の手続きが要りません。また、UltraServer のキャパシティブロックは、機械学習向けキャパシティブロックの共有の対象外です。\n\nOrganizations の組織内では、招待の手続きは不要で、UltraServer のキャパシティブロックも同じ手順で共有できる。\n\n招待の手続きが不要とする点は正しいものの、UltraServer のキャパシティブロックも共有できるとする点が誤りです。このキャパシティブロックは、EC2 の機械学習向けキャパシティブロックの共有の対象外です。\n\nOrganizations の組織内では、招待の手続きが必要で、UltraServer のキャパシティブロックは共有の対象外である。\n\nUltraServer のキャパシティブロックが共有の対象外とする点は正しいものの、招待の手続きが必要とする点が誤りです。組織内でのリソース共有を有効にしたあとは、組織やその中のアカウントへの共有に招待の手続きが要りません。設問の企業は、すでにこの設定を有効にしています。\n\n## まとめ\n\n組織内でのリソース共有を有効にしたあとは、招待の手続きなしで、組織内のアカウントへ共有できます。ただし、UltraServer のキャパシティブロックは、機械学習向けキャパシティブロックの共有の対象外です。この 2 点を、設問文の条件に当てはめて判断します。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/ram/latest/userguide/shareable.html",
+          "title": "Shareable AWS resources - AWS Resource Access Manager"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/ram/latest/userguide/what-is.html",
+          "title": "What is AWS Resource Access Manager? - AWS Resource Access Manager"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "Organizations の組織内では、招待の手続きが必要で、UltraServer のキャパシティブロックも同じ手順で共有できる。",
+          "explanation": "招待の手続きが必要とする点と、UltraServer のキャパシティブロックも共有できるとする点の、両方が誤りです。組織内でのリソース共有を有効にしたあとは、組織やその中のアカウントへの共有に招待の手続きが要りません。また、UltraServer のキャパシティブロックは、EC2 の機械学習向けキャパシティブロックの共有の対象外です。"
+        },
+        {
+          "key": "B",
+          "text": "Organizations の組織内では、招待の手続きは不要で、UltraServer のキャパシティブロックも同じ手順で共有できる。",
+          "explanation": "招待の手続きが不要とする点は正しいものの、UltraServer のキャパシティブロックも共有できるとする点が誤りです。このキャパシティブロックは、EC2 の機械学習向けキャパシティブロックの共有の対象外なので、設問の共有対象に含まれていても共有できません。"
+        },
+        {
+          "key": "C",
+          "text": "Organizations の組織内では、招待の手続きは不要だが、UltraServer のキャパシティブロックは共有の対象外である。"
+        },
+        {
+          "key": "D",
+          "text": "Organizations の組織内では、招待の手続きが必要で、UltraServer のキャパシティブロックは共有の対象外である。",
+          "explanation": "UltraServer のキャパシティブロックが共有の対象外とする点は正しいものの、招待の手続きが必要とする点が誤りです。組織内でのリソース共有を有効にしたあとは、組織やその中のアカウントへの共有に招待の手続きが要らず、設問の企業はすでにこの設定を有効にしています。"
+        }
+      ],
+      "correctAnswers": ["C"]
+    },
+    {
+      "questionId": "SOA-0102",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain4",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "ある企業では、アプリケーションが使う IAM ロールに、開発時に付けた広い権限を残したまま運用しています。このロールは、本番環境のアプリケーションが継続的に使っています。CloudOps エンジニアは、このロールが実際に使っている操作とサービスだけを許可するポリシーを作成したいと考えています。CloudTrail には、このロールの操作が記録されています。\n\nこの要件を満たす方法はどれでしょうか。",
+      "explanation": "## 問われている要件\n\nこの問いでは、広い権限を持つ IAM ロールについて、実際に使われている操作とサービスだけを許可するポリシーを、すでにある記録から作る方法を選びます。\n\n## 正解の決め手\n\nポリシーの生成は、CloudTrail のログを読み、指定した期間に IAM のエンティティが使った操作とサービスを取り出します。ロールの操作がすでに CloudTrail に記録されているので、期間を指定すれば、実際の利用実績に沿ったポリシーを作れます。\n\n## 解くための考え方\n\nポリシーの生成が何を入力にして、何を出力するかを分けて考えます。入力は CloudTrail のログに残った利用実績で、出力は、指定した期間に使われた操作とサービスに基づくポリシーです。付与済みの権限や別の記録から作る案、使われなかった操作を扱う案は、この入力と出力に合いません。\n\n## 他の選択肢が誤りである理由\n\nポリシーの生成で、ロールに現在付いている権限を読み取り、その権限をそのまま写したポリシーを作成する。\n\nポリシーの生成が読み取るのは、ロールに付いている権限ではなく、CloudTrail のログに残った、実際に使われた操作とサービスです。付与済みの権限を写しても、権限は絞れません。\n\nポリシーの生成で、指定した期間のロールの操作を AWS Config の構成履歴から読み取り、使われた操作とサービスだけを許可するポリシーを作成する。\n\nポリシーの生成が操作を読み取る元は、構成履歴ではなく CloudTrail のログです。似た記録系のサービスに入れ替えた案なので、この機能の動きと合いません。\n\nポリシーの生成で、指定した期間にロールが使わなかった操作とサービスを洗い出し、それらを拒否するポリシーを作成する。\n\nポリシーの生成が読み取るのは、指定した期間にロールが使った操作とサービスです。使わなかったものを洗い出す機能ではなく、求められているのも許可するポリシーです。\n\n## まとめ\n\nポリシーの生成は、CloudTrail のログを元に、指定した期間の利用実績からポリシーを作ります。広い権限のロールを、実際の利用に合わせて絞りたいときの手段です。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/what-is-access-analyzer.html",
+          "title": "Using AWS Identity and Access Management Access Analyzer - AWS Identity and Access Management"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "ポリシーの生成で、ロールに現在付いている権限を読み取り、その権限をそのまま写したポリシーを作成する。",
+          "explanation": "ポリシーの生成が読み取るのは、ロールに付いている権限ではなく、CloudTrail のログに残った、実際に使われた操作とサービスです。付与済みの権限を写しても、権限は絞れません。"
+        },
+        {
+          "key": "B",
+          "text": "ポリシーの生成で、指定した期間のロールの操作を AWS Config の構成履歴から読み取り、使われた操作とサービスだけを許可するポリシーを作成する。",
+          "explanation": "ポリシーの生成が操作を読み取る元は、構成履歴ではなく CloudTrail のログです。似た記録系のサービスに入れ替えた案なので、この機能の動きと合いません。"
+        },
+        {
+          "key": "C",
+          "text": "ポリシーの生成で、期間を指定し、その期間に CloudTrail のログへ記録されたロールの操作とサービスだけを許可するポリシーを作成する。"
+        },
+        {
+          "key": "D",
+          "text": "ポリシーの生成で、指定した期間にロールが使わなかった操作とサービスを洗い出し、それらを拒否するポリシーを作成する。",
+          "explanation": "ポリシーの生成が読み取るのは、指定した期間にロールが使った操作とサービスです。使わなかったものを洗い出す機能ではなく、求められているのも許可するポリシーです。"
+        }
+      ],
+      "correctAnswers": ["C"]
+    },
+    {
+      "questionId": "SOA-0103",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain2",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "ある企業では、本番環境の Amazon RDS の DB インスタンスに、独自の設定値を持つ DB パラメータグループとオプショングループを関連付けています。担当者の誤操作でデータが失われたため、CloudOps エンジニアは、誤操作の直前の時刻を指定してポイントインタイムリストアを実行しました。CloudOps エンジニアは、復元が完了した直後の DB インスタンスの状態を確認します。\n\n復元された DB インスタンスの DB パラメータグループとオプショングループについて、正しい説明はどれでしょうか。",
+      "explanation": "## 問われている要件\nある企業の CloudOps エンジニアは、独自の DB パラメータグループとオプショングループを使っていた DB インスタンスをポイントインタイムリストアで復元し、復元の直後に関連付けられているグループを正しく把握する必要があります。\n\n## 正解の決め手\nAmazon RDS のポイントインタイムリストアでは、復元先の DB インスタンスに、既定の DB パラメータグループとオプショングループが自動的に関連付けられます。元の DB インスタンスで使っていた独自のグループは、復元先に引き継がれません。\n\n## 解くための考え方\nCloudOps エンジニアは、元の DB インスタンスが独自のグループを使っていた点に引きずられないようにします。復元先の DB インスタンスがどのグループを使うかは、元の DB インスタンスの設定ではなく、復元の動作で決まります。\n\n## 他の選択肢が誤りである理由\n復元された DB インスタンスには、元の DB インスタンスと同じ DB パラメータグループとオプショングループが、自動的に関連付けられる。\n\nポイントインタイムリストアでは、元の DB インスタンスの DB パラメータグループとオプショングループは引き継がれません。復元先には、既定のものが自動的に関連付けられます。\n\n復元された DB インスタンスには、元の DB パラメータグループだけが引き継がれ、オプショングループには既定のものが関連付けられる。\n\n既定のものに関連付けられるのは、DB パラメータグループとオプショングループの両方です。DB パラメータグループだけが引き継がれ、オプショングループだけが既定になることはありません。\n\n復元された DB インスタンスには、どちらのグループも関連付けられず、復元後に利用者が指定するまで未設定のままになる。\n\n復元先の DB インスタンスには、既定の DB パラメータグループとオプショングループが自動的に関連付けられます。利用者が指定するまで未設定のままになるわけではありません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_PIT.html",
+          "title": "Restoring a DB instance to a specified time for Amazon RDS - Amazon Relational Database Service"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "復元された DB インスタンスには、元の DB インスタンスと同じ DB パラメータグループとオプショングループが、自動的に関連付けられる。",
+          "explanation": "ポイントインタイムリストアでは、元の DB インスタンスの DB パラメータグループとオプショングループは引き継がれません。復元先には、既定のものが自動的に関連付けられます。"
+        },
+        {
+          "key": "B",
+          "text": "復元された DB インスタンスには、元の DB パラメータグループだけが引き継がれ、オプショングループには既定のものが関連付けられる。",
+          "explanation": "既定のものに関連付けられるのは、DB パラメータグループとオプショングループの両方です。DB パラメータグループだけが引き継がれ、オプショングループだけが既定になることはありません。"
+        },
+        {
+          "key": "C",
+          "text": "復元された DB インスタンスには、既定の DB パラメータグループとオプショングループが、自動的に関連付けられる。"
+        },
+        {
+          "key": "D",
+          "text": "復元された DB インスタンスには、どちらのグループも関連付けられず、復元後に利用者が指定するまで未設定のままになる。",
+          "explanation": "復元先の DB インスタンスには、既定の DB パラメータグループとオプショングループが自動的に関連付けられます。利用者が指定するまで未設定のままになるわけではありません。"
+        }
+      ],
+      "correctAnswers": ["C"]
+    },
+    {
+      "questionId": "SOA-0104",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain1",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "ある企業では、S3 バケットに保存した画像を、多数のアプリケーションサーバーが読み書きしています。現在は、すべてのオブジェクトが 1 つのプレフィックスの下にあります。ピーク時は、毎秒 9,600 件の読み取り要求と、毎秒 8,400 件の書き込み要求が発生します。CloudOps エンジニアは、プレフィックスの数を必要最小限にして、これらの要求を処理できるようにする必要があります。見積もりでは、S3 がプレフィックスごとに少なくとも処理できるとされている件数を、各プレフィックスの上限として扱います。要求は、分けたプレフィックスに均等に振り分けられます。\n\nこの要件を満たす設計はどれでしょうか。",
+      "explanation": "## 問われている要件\nCloudOps エンジニアは、毎秒 9,600 件の読み取りと毎秒 8,400 件の書き込みを処理できるようにしつつ、プレフィックスの数を必要最小限にする必要があります。\n\n## 前提知識\nS3 が示すプレフィックスごとの件数は、少なくとも処理できる件数です。実際の性能は、作業の特徴や利用の仕方、構成によって変わります。そのため、この設問では、示されている最低限の件数を各プレフィックスの上限として扱って見積もります。\n\n## 正解の決め手\nS3 は、分割されたプレフィックスごとに、書き込み系の要求を少なくとも毎秒 3,500 件、読み取り系の要求を少なくとも毎秒 5,500 件まで処理できます。この件数を上限として扱うと、プレフィックスを 3 つに分けたとき、各プレフィックスの負荷は読み取り毎秒 3,200 件、書き込み毎秒 2,800 件になり、どちらも上限に収まります。2 つに分けた場合は、書き込みが各プレフィックスで毎秒 4,200 件になり、上限の毎秒 3,500 件を超えます。したがって、見積もりを満たす最小の数は 3 つです。\n\n## 解くための考え方\nCloudOps エンジニアは、読み取りと書き込みを別々の件数で見積もります。要求を均等に振り分けると、1 つのプレフィックスの負荷は、全体の件数をプレフィックスの数で割った値です。読み取りと書き込みのそれぞれについて、負荷が上限に収まる最小の数を求め、大きいほうに合わせます。読み取りは 2 つで収まりますが、書き込みは 3 つが必要なので、3 つになります。\n\n## 他の選択肢が誤りである理由\nプレフィックスを 1 つのままにし、そのプレフィックスで読み取り毎秒 9,600 件と書き込み毎秒 8,400 件を処理する。\n\n1 つのままにすると、すべての要求が 1 つのプレフィックスに集まり、負荷は読み取り毎秒 9,600 件、書き込み毎秒 8,400 件になります。上限として扱う読み取り毎秒 5,500 件、書き込み毎秒 3,500 件を、どちらも超えます。\n\nプレフィックスを 2 つに分け、各プレフィックスで読み取り毎秒 4,800 件と書き込み毎秒 4,200 件を処理する。\n\n2 つに分けると、読み取りは各プレフィックスで毎秒 4,800 件になり、上限として扱う毎秒 5,500 件に収まります。しかし書き込みは各プレフィックスで毎秒 4,200 件になり、上限として扱う毎秒 3,500 件を超えます。\n\nプレフィックスを 4 つに分け、各プレフィックスで読み取り毎秒 2,400 件と書き込み毎秒 2,100 件を処理する。\n\n4 つに分けても、各プレフィックスの負荷は上限に収まります。しかし 3 つで収まるため、プレフィックスの数を必要最小限にするという要件に合いません。\n\n## まとめ\nプレフィックスの数は、読み取りと書き込みのそれぞれについて、1 つあたりの負荷が上限に収まる最小の数を求め、大きいほうに合わせます。この設問では書き込みで決まり、3 つが必要最小限です。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/optimizing-performance.html",
+          "title": "Best practices design patterns: optimizing Amazon S3 performance - Amazon Simple Storage Service"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "プレフィックスを 1 つのままにし、そのプレフィックスで読み取り毎秒 9,600 件と書き込み毎秒 8,400 件を処理する。",
+          "explanation": "1 つのままにすると、すべての要求が 1 つのプレフィックスに集まり、負荷は読み取り毎秒 9,600 件、書き込み毎秒 8,400 件になります。上限として扱う読み取り毎秒 5,500 件、書き込み毎秒 3,500 件を、どちらも超えます。"
+        },
+        {
+          "key": "B",
+          "text": "プレフィックスを 2 つに分け、各プレフィックスで読み取り毎秒 4,800 件と書き込み毎秒 4,200 件を処理する。",
+          "explanation": "2 つに分けると、読み取りは各プレフィックスで毎秒 4,800 件になり、上限として扱う毎秒 5,500 件に収まります。しかし書き込みは各プレフィックスで毎秒 4,200 件になり、上限として扱う毎秒 3,500 件を超えます。"
+        },
+        {
+          "key": "C",
+          "text": "プレフィックスを 3 つに分け、各プレフィックスで読み取り毎秒 3,200 件と書き込み毎秒 2,800 件を処理する。"
+        },
+        {
+          "key": "D",
+          "text": "プレフィックスを 4 つに分け、各プレフィックスで読み取り毎秒 2,400 件と書き込み毎秒 2,100 件を処理する。",
+          "explanation": "4 つに分けても、各プレフィックスの負荷は上限に収まります。しかし 3 つで収まるため、プレフィックスの数を必要最小限にするという要件に合いません。"
+        }
+      ],
+      "correctAnswers": ["C"]
+    },
+    {
+      "questionId": "SOA-0105",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain1",
+      "difficulty": "medium",
+      "questionType": "multiple",
+      "questionText": "ある企業は、Amazon RDS の DB インスタンスで増えている読み取り負荷と接続数に対応するため、読み取りレプリカを追加し、RDS Proxy を導入しています。CloudOps エンジニアは、読み取りレプリカをソースの DB インスタンスと同じストレージタイプにする作業を、レプリカの作成時の操作だけで完了させる必要があります。また、プロキシのターゲットを登録したあとも、プロキシを使い続けられる状態を保つ必要があります。\n\nこの要件を満たす対応の組み合わせはどれでしょうか。(2 つ選択)",
+      "explanation": "## 問われている要件\n\n読み取りレプリカをソースと同じストレージタイプにする対応と、RDS Proxy を使い続けるための対応を、1 つずつ選ぶ問題です。レプリカの作成時の動きと、プロキシが自動で作るユーザーの扱いが論点です。\n\n## 正解の決め手\n\n読み取りレプリカは、既定ではソースの DB インスタンスと同じストレージタイプで作られます。したがって、作成時の操作だけでそろえる要件は、ストレージタイプを個別に指定せず、既定の設定のまま作成することで満たせます。\n\nRDS Proxy は、ターゲットを登録すると、rdsproxyadmin という保護されたデータベースユーザーを自動で作成します。このユーザーを変更したり削除したりすると、プロキシが使えなくなる原因になります。プロキシを使い続けるには、このユーザーに手を加えず、自動で作られたまま残します。\n\n## まとめ\n\nレプリカ側は既定のままで同じストレージタイプになり、プロキシ側は自動で作られた保護ユーザーに手を加えません。この 2 つの組み合わせが要件を満たします。\n\n## 他の選択肢が誤りである理由\n\n読み取りレプリカはソースと別のストレージタイプで作られるものとして、作成後にソースと同じタイプへ変更する。\n\n読み取りレプリカは、既定ではソースの DB インスタンスと同じストレージタイプで作られます。別のタイプになる前提は逆で、作成後の変更も、作成時の操作だけで完了させる要件に合いません。\n\n不要な管理用ユーザーを整理するため、自動で作られた rdsproxyadmin ユーザーを削除する。\n\nrdsproxyadmin は、プロキシのターゲットを登録すると自動で作られる保護されたデータベースユーザーです。整理の対象として削除すると、プロキシが使えなくなる原因になります。\n\nアプリケーション専用のユーザーとして使うため、自動で作られた rdsproxyadmin ユーザーの認証情報を変更する。\n\nrdsproxyadmin は、プロキシのために自動で作られる保護されたユーザーで、変更するとプロキシが使えなくなる原因になります。アプリケーション用のユーザーへ転用する使い方は、プロキシを使い続ける要件に合いません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ReadRepl.html",
+          "title": "Working with DB instance read replicas - Amazon Relational Database Service"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/rds-proxy.html",
+          "title": "Amazon RDS Proxy - Amazon Relational Database Service"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "読み取りレプリカを作成するときに、ストレージタイプを個別に指定せず、既定の設定のまま作成する。"
+        },
+        {
+          "key": "B",
+          "text": "プロキシのターゲットを登録したときに自動で作られる rdsproxyadmin ユーザーを、変更も削除もせずに残す。"
+        },
+        {
+          "key": "C",
+          "text": "読み取りレプリカはソースと別のストレージタイプで作られるものとして、作成後にソースと同じタイプへ変更する。",
+          "explanation": "読み取りレプリカは、既定ではソースの DB インスタンスと同じストレージタイプで作られます。別のタイプになる前提は逆で、作成後の変更も、作成時の操作だけで完了させる要件に合いません。"
+        },
+        {
+          "key": "D",
+          "text": "不要な管理用ユーザーを整理するため、自動で作られた rdsproxyadmin ユーザーを削除する。",
+          "explanation": "rdsproxyadmin は、プロキシのターゲットを登録すると自動で作られる保護されたデータベースユーザーです。整理の対象として削除すると、プロキシが使えなくなる原因になります。"
+        },
+        {
+          "key": "E",
+          "text": "アプリケーション専用のユーザーとして使うため、自動で作られた rdsproxyadmin ユーザーの認証情報を変更する。",
+          "explanation": "rdsproxyadmin は、プロキシのために自動で作られる保護されたユーザーで、変更するとプロキシが使えなくなる原因になります。アプリケーション用のユーザーへ転用する使い方は、プロキシを使い続ける要件に合いません。"
+        }
+      ],
+      "correctAnswers": ["A", "B"]
+    },
+    {
+      "questionId": "SOA-0106",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain2",
+      "difficulty": "hard",
+      "questionType": "single",
+      "questionText": "ある企業では、Amazon RDS の Multi-AZ DB クラスターで、業務システムのデータベースを運用しています。ある時刻に誤ったバッチ処理がデータを書き換えたため、CloudOps エンジニアは、書き換えの直前の時刻を指定して復元する必要があります。復元後は、Amazon RDS のコンソールで、各インスタンスの行の Multi-AZ の列を見て構成を確認します。\n\n復元の結果と、復元後のクラスターの各インスタンスの行に表示される Multi-AZ の値の組み合わせとして正しいものはどれでしょうか。",
+      "explanation": "## 問われている要件\n\nこの問題は、Multi-AZ DB クラスターを指定した時刻に復元したときの結果と、復元後のクラスターがコンソールでどう表示されるかを、組み合わせて問います。どちらか一方でも事実と違えば、その選択肢は誤りです。\n\n## 正解の決め手\n\nMulti-AZ DB クラスターは、指定した時刻に復元でき、その結果は新しく作られる Multi-AZ DB クラスターです。また、Multi-AZ DB クラスターの各インスタンスの行では、Multi-AZ の列が 3 Zones と表示されます。この 2 点がそろうのは、新しい Multi-AZ DB クラスターになり、3 Zones と表示される選択肢です。\n\n## 解くための考え方\n\n選択肢は、復元の結果(新しいクラスターか、既存のクラスターを戻すものか、別の配置か)と、表示される値(3 Zones か、別の値か)の 2 つの要素だけが違います。要素ごとに事実と照らし、両方が合うものを選びます。\n\n## まとめ\n\n指定した時刻への復元は、新しい Multi-AZ DB クラスターを作ります。復元後も、各インスタンスの行の Multi-AZ の列は 3 Zones です。\n\n## 他の選択肢が誤りである理由\n\n復元の結果は新しい Multi-AZ DB クラスターになり、各インスタンスの行の Multi-AZ には 2 Zones と表示される。\n\n復元の結果は合っていますが、表示の値が誤りです。Multi-AZ DB クラスターの各インスタンスの行は、2 Zones ではなく 3 Zones と表示されます。\n\n復元の結果は既存のクラスターを指定した時刻の状態へ戻すものになり、各インスタンスの行の Multi-AZ には 3 Zones と表示される。\n\n表示の 3 Zones は合っていますが、復元の結果が誤りです。Multi-AZ DB クラスターを指定した時刻に復元すると、既存のクラスターが戻るのではなく、新しい Multi-AZ DB クラスターができます。\n\n復元の結果は新しい Multi-AZ DB インスタンス配置になり、各インスタンスの行の Multi-AZ には 3 Zones と表示される。\n\n復元の結果が誤りです。Multi-AZ DB クラスターを指定した時刻に復元した結果は、Multi-AZ DB インスタンス配置ではなく、新しい Multi-AZ DB クラスターです。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html",
+          "title": "Configuring and managing a Multi-AZ deployment for Amazon RDS - Amazon Relational Database Service"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/multi-az-db-clusters-concepts.html",
+          "title": "Multi-AZ DB cluster deployments for Amazon RDS - Amazon Relational Database Service"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "復元の結果は新しい Multi-AZ DB クラスターになり、各インスタンスの行の Multi-AZ には 2 Zones と表示される。",
+          "explanation": "復元の結果は合っていますが、表示の値が誤りです。Multi-AZ DB クラスターの各インスタンスの行は、2 Zones ではなく 3 Zones と表示されます。"
+        },
+        {
+          "key": "B",
+          "text": "復元の結果は既存のクラスターを指定した時刻の状態へ戻すものになり、各インスタンスの行の Multi-AZ には 3 Zones と表示される。",
+          "explanation": "表示の 3 Zones は合っていますが、復元の結果が誤りです。Multi-AZ DB クラスターを指定した時刻に復元すると、既存のクラスターが戻るのではなく、新しい Multi-AZ DB クラスターができます。"
+        },
+        {
+          "key": "C",
+          "text": "復元の結果は新しい Multi-AZ DB クラスターになり、各インスタンスの行の Multi-AZ には 3 Zones と表示される。"
+        },
+        {
+          "key": "D",
+          "text": "復元の結果は新しい Multi-AZ DB インスタンス配置になり、各インスタンスの行の Multi-AZ には 3 Zones と表示される。",
+          "explanation": "復元の結果が誤りです。Multi-AZ DB クラスターを指定した時刻に復元した結果は、Multi-AZ DB インスタンス配置ではなく、新しい Multi-AZ DB クラスターです。"
+        }
+      ],
+      "correctAnswers": ["C"]
+    },
+    {
+      "questionId": "SOA-0107",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain5",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "ある企業は、同じ Web アプリケーションを複数の AWS リージョンに配置し、Route 53 のレコードで公開しています。各リージョンのリソースは、すでに稼働しています。世界各地の利用者から、遠いリージョンに接続されて応答が遅いという声が上がっています。CloudOps エンジニアは、DNS の応答として、利用者ごとに遅延が最も小さいリージョンのリソースを返す必要があります。\n\nこの要件を満たす設定はどれでしょうか。",
+      "explanation": "## 問われている要件\n\nCloudOps エンジニアは、複数のリージョンで稼働する同じアプリケーションについて、DNS の応答として、利用者ごとに遅延が最も小さいリージョンのリソースを返す必要があります。\n\n## 正解の決め手\n\nRoute 53 のレイテンシーベースのルーティングは、アプリケーションが複数のリージョンにあるときに、利用者へ最も遅延の小さいリージョンのリソースを返すための方式です。リージョンごとのリソースを指すレコードに、この方式を設定すれば、要件に合う応答になります。\n\n## 他の選択肢が誤りである理由\n\n各リージョンの VPC 内にある送信元と送信先のリソースを指定して Reachability Analyzer を実行し、接続性を検査する。\n\nReachability Analyzer は、VPC 内の送信元と送信先のリソース間の接続性を検査する構成分析ツールです。接続性を検査するだけで、DNS の応答として、利用者ごとに遅延が最も小さいリージョンのリソースを返す設定にはなりません。\n\n各リージョンに PrivateLink の VPC エンドポイントを作成し、VPC やアカウントの境界をまたいでリソースにアクセスできるようにする。\n\nPrivateLink の VPC エンドポイントは、VPC とアカウントの境界をまたいで、サービスやリソースにアクセスするために作るものです。アクセスの経路を作るだけで、DNS の応答として、利用者ごとに遅延が最も小さいリージョンのリソースを返す設定にはなりません。\n\n各リージョンのリソースに AWS WAF を設定し、届く HTTP と HTTPS のリクエストを監視してアクセスを制御する。\n\nAWS WAF は、保護対象の Web リソースに届く HTTP と HTTPS のリクエストを監視して、アクセスを制御するものです。リクエストを制御するだけで、DNS の応答として、利用者ごとに遅延が最も小さいリージョンのリソースを返す設定にはなりません。\n\n## まとめ\n\n複数のリージョンで、利用者に最も遅延の小さいリージョンのリソースを返すには、Route 53 のレイテンシーベースのルーティングを使います。接続性の検査、境界をまたぐアクセス、リクエストの制御は、DNS の応答でリージョンを選ぶ仕組みではありません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/Route53/latest/DeveloperGuide/routing-policy-latency.html",
+          "title": "Latency-based routing - Amazon Route 53"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/privatelink/what-is-privatelink.html",
+          "title": "What is AWS PrivateLink? - Amazon Virtual Private Cloud"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/reachability/what-is-reachability-analyzer.html",
+          "title": "What is Reachability Analyzer? - Amazon Virtual Private Cloud"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/waf/latest/developerguide/waf-chapter.html",
+          "title": "AWS WAF - AWS WAF, AWS Firewall Manager, AWS Shield Advanced, and AWS Shield network security director"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "各リージョンの VPC 内にある送信元と送信先のリソースを指定して Reachability Analyzer を実行し、接続性を検査する。",
+          "explanation": "Reachability Analyzer は、VPC 内の送信元と送信先のリソース間の接続性を検査する構成分析ツールです。接続性を検査するだけで、DNS の応答として、利用者ごとに遅延が最も小さいリージョンのリソースを返す設定にはなりません。"
+        },
+        {
+          "key": "B",
+          "text": "各リージョンに PrivateLink の VPC エンドポイントを作成し、VPC やアカウントの境界をまたいでリソースにアクセスできるようにする。",
+          "explanation": "PrivateLink の VPC エンドポイントは、VPC とアカウントの境界をまたいで、サービスやリソースにアクセスするために作るものです。アクセスの経路を作るだけで、DNS の応答として、利用者ごとに遅延が最も小さいリージョンのリソースを返す設定にはなりません。"
+        },
+        {
+          "key": "C",
+          "text": "リージョンごとのリソースを指す Route 53 のレコードを作成し、それぞれにレイテンシーベースのルーティングを設定する。"
+        },
+        {
+          "key": "D",
+          "text": "各リージョンのリソースに AWS WAF を設定し、届く HTTP と HTTPS のリクエストを監視してアクセスを制御する。",
+          "explanation": "AWS WAF は、保護対象の Web リソースに届く HTTP と HTTPS のリクエストを監視して、アクセスを制御するものです。リクエストを制御するだけで、DNS の応答として、利用者ごとに遅延が最も小さいリージョンのリソースを返す設定にはなりません。"
+        }
+      ],
+      "correctAnswers": ["C"]
+    },
+    {
+      "questionId": "SOA-0108",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain4",
+      "difficulty": "easy",
+      "questionType": "single",
+      "questionText": "ある企業は、AWS アカウントのルートユーザーと IAM ユーザーを、MFA で保護しています。CloudOps エンジニアは、デバイスの紛失に備えて、1 人のユーザーに複数の MFA デバイスを登録する運用を検討しています。この運用を設計する前に、登録できるデバイスの数の上限を確認する必要があります。\n\n1 つのルートユーザーまたは IAM ユーザーに登録できる MFA デバイスの上限として、正しいものはどれですか。",
+      "explanation": "## 問われている要件\nこの問題は、1 つのルートユーザーまたは IAM ユーザーに登録できる MFA デバイスの上限を問う問題です。\n\n## 正解の決め手\nルートユーザーと IAM ユーザーは、種類を問わず MFA デバイスを最大 8 台まで登録できます。ルートユーザーと IAM ユーザーで上限は変わりません。したがって、どちらのユーザーにも種類を問わず最大 8 台まで登録できるという記述が正答です。\n\n## 解くための考え方\nCloudOps エンジニアは、上限の数値に加えて、上限がユーザーの種類やデバイスの種類で変わるかどうかも確認します。この問題では、どちらの違いも上限に影響しないため、1 つの数値で答えが決まります。\n\n## まとめ\nMFA デバイスの上限は、ルートユーザーも IAM ユーザーも、デバイスの種類を問わず最大 8 台です。\n\n## 他の選択肢が誤りである理由\nルートユーザーには最大 1 台まで、IAM ユーザーには最大 5 台まで登録できる。\n\nルートユーザーと IAM ユーザーの上限は同じで、どちらも最大 8 台です。ユーザーの種類ごとに上限が違うという前提が誤りです。\n\nどちらのユーザーにも、デバイスの種類ごとに最大 1 台ずつ登録できる。\n\n上限は、デバイスの種類を問わない最大 8 台です。種類ごとに 1 台ずつという制限ではありません。\n\nどちらのユーザーにも、最大 4 台まで登録できる。\n\n上限は 4 台ではなく、最大 8 台です。数値が半分になっている点が誤りです。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa.html",
+          "title": "AWS Multi-factor authentication in IAM - AWS Identity and Access Management"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "どちらのユーザーにも、デバイスの種類を問わず、最大 8 台まで登録できる。"
+        },
+        {
+          "key": "B",
+          "text": "ルートユーザーには最大 1 台まで、IAM ユーザーには最大 5 台まで登録できる。",
+          "explanation": "ルートユーザーと IAM ユーザーの上限は同じで、どちらも最大 8 台です。ユーザーの種類ごとに上限が違うという前提が誤りです。"
+        },
+        {
+          "key": "C",
+          "text": "どちらのユーザーにも、デバイスの種類ごとに最大 1 台ずつ登録できる。",
+          "explanation": "上限は、デバイスの種類を問わない最大 8 台です。種類ごとに 1 台ずつという制限ではありません。"
+        },
+        {
+          "key": "D",
+          "text": "どちらのユーザーにも、最大 4 台まで登録できる。",
+          "explanation": "上限は 4 台ではなく、最大 8 台です。数値が半分になっている点が誤りです。"
+        }
+      ],
+      "correctAnswers": ["A"]
+    },
+    {
+      "questionId": "SOA-0109",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain2",
+      "difficulty": "medium",
+      "questionType": "multiple",
+      "questionText": "ある企業は、すでに多数のオブジェクトを保存している S3 バケットで、バージョニングを有効にする予定です。CloudOps エンジニアは、有効にした場合に、バケット内のオブジェクトと以後の要求がどう扱われるかを、運用の手順書に整理する必要があります。あわせて、保存済みのバージョンのうち不要になった特定のバージョンを AWS CLI で削除する手順も、手順書に記載する必要があります。\n\nこの手順書に記載する内容として正しいものはどれでしょうか。(2 つ選択)",
+      "explanation": "## 問われている要件\n\n手順書には、バージョニングを有効にしたときの動きの説明と、特定のバージョンを AWS CLI で削除する手順の 2 つを書く必要があります。有効化の影響と削除の操作は別の層の話なので、それぞれから 1 つずつ選びます。\n\n## 正解の決め手\n\n選択肢 A は、有効化の影響として正しい内容です。S3 でバージョニングを有効にしても、すでにあるオブジェクトは変わりません。変わるのは、有効にしたあとに届く要求の扱いです。\n\n選択肢 B は、削除の操作として正しい内容です。AWS CLI で特定のバージョンを削除するには、バケットの所有者として操作し、version-id のサブリソースを使う必要があります。\n\n## 解くための考え方\n\n有効化の影響は、保存済みのデータと、これから届く要求に分けて考えます。データは変わらず、要求の扱いが変わります。削除の操作では、オブジェクトのキーだけでは特定のバージョンを指せないので、対象を version-id で絞ります。\n\n## まとめ\n\nバージョニングの有効化は、既存のオブジェクトを書き換えず、以後の要求の扱いを変えます。特定のバージョンの削除は、バケットの所有者が version-id のサブリソースを使って行います。\n\n## 他の選択肢が誤りである理由\n\n保存済みのオブジェクトは有効にした時点で書き換えられるため、有効にする前に別のバケットへ退避しておくと記載する。\n\nS3 でバージョニングを有効にしても、既存のオブジェクトは変わりません。有効にした時点で書き換えられるという説明は誤りで、変わるのは以後の要求の扱いです。\n\n特定のバージョンの削除は、S3 バケットの所有者が AWS CLI でバケット名とオブジェクトのキーだけを指定して行うと記載する。\n\nAWS CLI で特定のバージョンを削除するには、バケットの所有者であることに加えて、version-id のサブリソースを使う必要があります。バケット名とキーだけの指定では、特定のバージョンを指せません。\n\n有効にしても以後の要求の扱いは従来と変わらないので、削除の手順は有効にする前と同じものを使うと記載する。\n\nバージョニングを有効にすると、変わるのは以後の要求の扱いです。扱いが従来と変わらないという前提が誤りなので、有効にする前と同じ手順で足りるという判断も成り立ちません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/DeletingObjectVersions.html",
+          "title": "Deleting object versions from a versioning-enabled bucket - Amazon Simple Storage Service"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html",
+          "title": "Retaining multiple versions of objects with S3 Versioning - Amazon Simple Storage Service"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "すでに保存されているオブジェクトは有効にしても書き換わらず、変わるのは有効にしたあとに届く要求の扱いであると記載する。"
+        },
+        {
+          "key": "B",
+          "text": "特定のバージョンの削除は、S3 バケットの所有者が AWS CLI で version-id のサブリソースを指定して行うと記載する。"
+        },
+        {
+          "key": "C",
+          "text": "保存済みのオブジェクトは有効にした時点で書き換えられるため、有効にする前に別のバケットへ退避しておくと記載する。",
+          "explanation": "S3 でバージョニングを有効にしても、既存のオブジェクトは変わりません。有効にした時点で書き換えられるという説明は誤りで、変わるのは以後の要求の扱いです。"
+        },
+        {
+          "key": "D",
+          "text": "特定のバージョンの削除は、S3 バケットの所有者が AWS CLI でバケット名とオブジェクトのキーだけを指定して行うと記載する。",
+          "explanation": "AWS CLI で特定のバージョンを削除するには、バケットの所有者であることに加えて、version-id のサブリソースを使う必要があります。バケット名とキーだけの指定では、特定のバージョンを指せません。"
+        },
+        {
+          "key": "E",
+          "text": "有効にしても以後の要求の扱いは従来と変わらないので、削除の手順は有効にする前と同じものを使うと記載する。",
+          "explanation": "バージョニングを有効にすると、変わるのは以後の要求の扱いです。扱いが従来と変わらないという前提が誤りなので、有効にする前と同じ手順で足りるという判断も成り立ちません。"
+        }
+      ],
+      "correctAnswers": ["A", "B"]
+    },
+    {
+      "questionId": "SOA-0110",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain4",
+      "difficulty": "hard",
+      "questionType": "single",
+      "questionText": "ある企業では、CloudOps エンジニアが Amazon CloudWatch のダッシュボードを運用チームに共有しています。このダッシュボードには、共有する Lambda 関数を使うカスタムウィジェットが含まれています。共有によって作られた共有用の IAM ロールと、ダッシュボードを管理する管理者用の IAM ロールには、閲覧に必要な権限がすでに付いています。運用チームがカスタムウィジェットを表示できるようにする必要があります。また、管理者が役目を終えたダッシュボードを削除できるようにする必要があります。\n\nこれらの要件を満たすために、各ロールに許可する権限の設定はどれでしょうか。",
+      "explanation": "## 問われている要件\n\n運用チームがカスタムウィジェットを表示できることと、管理者がダッシュボードを削除できることの 2 つを、ロールへの権限の割り当てで満たす設定が問われています。どちらのロールにも閲覧に必要な権限はすでに付いているため、足りない権限をどのロールに足すかが論点です。\n\n## 正解の決め手\n\nカスタムウィジェットを見せるには、共有用ロールに lambda:InvokeFunction の許可を足し、共有する Lambda 関数の ARN を指定します。ダッシュボードを削除するには cloudwatch:DeleteDashboards の権限が必要なので、削除を担う管理者用ロールにこの権限を足します。この 2 つを、それぞれのロールに割り当てた選択肢 D が正解です。\n\n## 前提知識\n\nダッシュボードの閲覧には、cloudwatch:GetDashboard と cloudwatch:ListDashboards の権限が必要です。カスタムウィジェットの表示で足すのは lambda:InvokeFunction、削除で必要なのは cloudwatch:DeleteDashboards であり、閲覧の権限とは別の項目として示されています。\n\n## 解くための考え方\n\nまず、要件を「カスタムウィジェットの表示」と「ダッシュボードの削除」に分けます。次に、表示は共有用ロール、削除は管理者用ロールに足す権限として、それぞれの権限名を結び付けます。最後に、閲覧の権限だけを足している選択肢や、片方の権限が欠けている選択肢を外すと、残るのは 1 つです。\n\n## まとめ\n\n共有用ロールには、共有する Lambda 関数の ARN を指定した lambda:InvokeFunction を足します。管理者用ロールには、cloudwatch:DeleteDashboards を足します。\n\n## 他の選択肢が誤りである理由\n\n共有用ロールには、cloudwatch:GetDashboard と cloudwatch:ListDashboards を許可し、管理者用ロールには cloudwatch:DeleteDashboards を許可する。\n\nこの選択肢は、共有用ロールに閲覧の権限である cloudwatch:GetDashboard と cloudwatch:ListDashboards を許可しています。閲覧の権限はすでに付いています。カスタムウィジェットを見せるために足すと示されているのは、共有する Lambda 関数の ARN を指定した lambda:InvokeFunction です。この選択肢の共有用ロールにはそれがないため、表示の要件を満たしません。\n\n共有用ロールには、共有する Lambda 関数の ARN を指定して lambda:InvokeFunction を許可し、管理者用ロールには cloudwatch:GetDashboard と cloudwatch:ListDashboards を許可する。\n\nこの選択肢は、管理者用ロールに閲覧の権限である cloudwatch:GetDashboard と cloudwatch:ListDashboards を許可しています。ダッシュボードの削除に必要とされているのは cloudwatch:DeleteDashboards の権限で、この選択肢の管理者用ロールにはそれがありません。共有用ロールの設定は合っていても、削除の要件を満たしません。\n\n共有用ロールと管理者用ロールの両方に、cloudwatch:DeleteDashboards を許可する。\n\nこの選択肢は、cloudwatch:DeleteDashboards を両方のロールに許可しています。管理者用ロールの設定は削除の要件に合います。一方、共有用ロールには、カスタムウィジェットを見せるために足すとされている lambda:InvokeFunction と、Lambda 関数の ARN の指定がありません。表示の要件を満たしません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Dashboards.html",
+          "title": "Using Amazon CloudWatch dashboards - Amazon CloudWatch"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch-dashboard-sharing.html",
+          "title": "Sharing CloudWatch dashboards - Amazon CloudWatch"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "共有用ロールには、cloudwatch:GetDashboard と cloudwatch:ListDashboards を許可し、管理者用ロールには cloudwatch:DeleteDashboards を許可する。",
+          "explanation": "この選択肢は、共有用ロールに閲覧の権限である cloudwatch:GetDashboard と cloudwatch:ListDashboards を許可しています。閲覧の権限はすでに付いています。カスタムウィジェットを見せるために足すと示されているのは、共有する Lambda 関数の ARN を指定した lambda:InvokeFunction です。この選択肢の共有用ロールにはそれがないため、表示の要件を満たしません。"
+        },
+        {
+          "key": "B",
+          "text": "共有用ロールには、共有する Lambda 関数の ARN を指定して lambda:InvokeFunction を許可し、管理者用ロールには cloudwatch:GetDashboard と cloudwatch:ListDashboards を許可する。",
+          "explanation": "この選択肢は、管理者用ロールに閲覧の権限である cloudwatch:GetDashboard と cloudwatch:ListDashboards を許可しています。ダッシュボードの削除に必要とされているのは cloudwatch:DeleteDashboards の権限で、この選択肢の管理者用ロールにはそれがありません。共有用ロールの設定は合っていても、削除の要件を満たしません。"
+        },
+        {
+          "key": "C",
+          "text": "共有用ロールと管理者用ロールの両方に、cloudwatch:DeleteDashboards を許可する。",
+          "explanation": "この選択肢は、cloudwatch:DeleteDashboards を両方のロールに許可しています。管理者用ロールの設定は削除の要件に合います。一方、共有用ロールには、カスタムウィジェットを見せるために足すとされている lambda:InvokeFunction と、Lambda 関数の ARN の指定がありません。表示の要件を満たしません。"
+        },
+        {
+          "key": "D",
+          "text": "共有用ロールには、共有する Lambda 関数の ARN を指定して lambda:InvokeFunction を許可し、管理者用ロールには cloudwatch:DeleteDashboards を許可する。"
+        }
+      ],
+      "correctAnswers": ["D"]
+    },
+    {
+      "questionId": "SOA-0111",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain2",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "ある小売企業は、Amazon CloudFront のディストリビューションで、オンラインストアのコンテンツを配信しています。キャッシュポリシーの最小 TTL は、0 より大きい値に設定されています。オリジンに障害が起きて接続が失敗する間、利用者には以前にキャッシュされた内容が配信されています。CloudOps エンジニアは、この間、以前の内容の代わりにエラーを返す動作に変更する必要があります。\n\nこの要件を満たす設定はどれでしょうか。",
+      "explanation": "## 問われている要件\nある小売企業の CloudOps エンジニアは、最小 TTL を 0 より大きい値にしたまま、オリジンに障害が起きている間、以前の内容の代わりにエラーを返す動作へ変更する必要があります。\n\n## 正解の決め手\nCloudFront は、最小 TTL が 0 より大きいとき、オリジンが no-cache などを付けていても、stale-if-error=0 が付いていなければ、オリジンに届かない間は以前の内容を配信します。したがって、エラーを返す動作にするには、オリジンの応答に stale-if-error=0 を付けます。\n\n## 解くための考え方\nCloudOps エンジニアは、まず、以前の内容が配信される条件を整理します。条件は、最小 TTL が 0 より大きいことと、stale-if-error=0 が付いていないことです。最小 TTL の値を 0 より大きい範囲で変えても、条件は変わりません。オリジンが付ける no-cache も、この条件を変えません。\n\n## 他の選択肢が誤りである理由\nオリジンの応答に、no-cache を付ける。\n\nオリジンが no-cache を付けても、最小 TTL が 0 より大きく stale-if-error=0 が付いていなければ、オリジンに届かない間は以前の内容が配信されます。no-cache を付けるだけでは、エラーを返す動作になりません。\n\n最小 TTL を、現在の値より大きい値に変更する。\n\n最小 TTL が 0 より大きい限り、値を大きくしても、以前の内容が配信される条件は変わりません。エラーを返す動作にするには、stale-if-error=0 が必要です。\n\n最小 TTL を、0 より大きい範囲で現在の値より小さい値に変更する。\n\n最小 TTL を、0 より大きい範囲で小さくしても、条件は変わらず、stale-if-error=0 が付いていなければ以前の内容が配信されます。値の大小では、動作を切り替えられません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Expiration.html",
+          "title": "Manage how long content stays in the cache (expiration) - Amazon CloudFront"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "オリジンの応答に、stale-if-error=0 を付ける。"
+        },
+        {
+          "key": "B",
+          "text": "オリジンの応答に、no-cache を付ける。",
+          "explanation": "オリジンが no-cache を付けても、最小 TTL が 0 より大きく stale-if-error=0 が付いていなければ、オリジンに届かない間は以前の内容が配信されます。no-cache を付けるだけでは、エラーを返す動作になりません。"
+        },
+        {
+          "key": "C",
+          "text": "最小 TTL を、現在の値より大きい値に変更する。",
+          "explanation": "最小 TTL が 0 より大きい限り、値を大きくしても、以前の内容が配信される条件は変わりません。エラーを返す動作にするには、stale-if-error=0 が必要です。"
+        },
+        {
+          "key": "D",
+          "text": "最小 TTL を、0 より大きい範囲で現在の値より小さい値に変更する。",
+          "explanation": "最小 TTL を、0 より大きい範囲で小さくしても、条件は変わらず、stale-if-error=0 が付いていなければ以前の内容が配信されます。値の大小では、動作を切り替えられません。"
+        }
+      ],
+      "correctAnswers": ["A"]
+    },
+    {
+      "questionId": "SOA-0112",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain3",
+      "difficulty": "easy",
+      "questionType": "single",
+      "questionText": "ある企業は、複数のアカウントを運用しています。CloudOps エンジニアは、AWS RAM を使って、2 種類のリソースをほかのアカウントに共有する必要があります。1 つは ap-northeast-1 リージョンのリージョナルなリソースで、もう 1 つは特定のリージョンに属さないグローバルリソースです。リソース共有は、これから新しく作成します。\n\n各リソースを含めるリソース共有を作成するリージョンの組み合わせとして、適切なものはどれでしょうか。",
+      "explanation": "## 問われている要件\n\nこの企業は、ap-northeast-1 のリージョナルなリソースと、グローバルリソースを、AWS RAM で共有しようとしています。それぞれのリソースを含めるリソース共有を、どのリージョンに作成するかが問われています。\n\n## 正解の決め手\n\nAWS RAM では、リージョナルなリソースは、同じリージョンのリソース共有にだけ含められます。グローバルリソースは、us-east-1 のリソース共有にだけ含められます。したがって、ap-northeast-1 のリージョナルなリソースは ap-northeast-1 のリソース共有に、グローバルリソースは us-east-1 のリソース共有に含めます。\n\n## 前提知識\n\nリソース共有は、含めるリソースの種類に応じて、作成するリージョンが決まります。リージョナルなリソースの規則と、グローバルリソースの規則を、区別して覚えます。\n\n## 他の選択肢が誤りである理由\n\nリージョナルなリソースは us-east-1、グローバルリソースは ap-northeast-1 のリソース共有に含める。\n\nリージョナルなリソースは同じリージョンのリソース共有にだけ、グローバルリソースは us-east-1 のリソース共有にだけ含められます。この選択肢は、2 つのリージョンの対応が入れ替わっているので、どちらのリソースも含められません。\n\nリージョナルなリソースもグローバルリソースも、ap-northeast-1 のリソース共有に含める。\n\nグローバルリソースを含められるのは、us-east-1 のリソース共有だけです。リージョナルなリソースと同じ ap-northeast-1 のリソース共有に、グローバルリソースを含めることはできません。\n\nリージョナルなリソースは eu-west-1、グローバルリソースは us-east-1 のリソース共有に含める。\n\nリージョナルなリソースを含められるのは、そのリソースと同じリージョンのリソース共有だけです。リソースは ap-northeast-1 にあるので、別のリージョンの eu-west-1 のリソース共有には含められません。\n\n## まとめ\n\nリージョナルなリソースは同じリージョンのリソース共有に、グローバルリソースは us-east-1 のリソース共有に含めます。リソースの種類ごとに、作成するリージョンを決めます。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/ram/latest/userguide/what-is.html",
+          "title": "What is AWS Resource Access Manager? - AWS Resource Access Manager"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "リージョナルなリソースは us-east-1、グローバルリソースは ap-northeast-1 のリソース共有に含める。",
+          "explanation": "リージョナルなリソースは同じリージョンのリソース共有にだけ、グローバルリソースは us-east-1 のリソース共有にだけ含められます。この選択肢は、2 つのリージョンの対応が入れ替わっているので、どちらのリソースも含められません。"
+        },
+        {
+          "key": "B",
+          "text": "リージョナルなリソースもグローバルリソースも、ap-northeast-1 のリソース共有に含める。",
+          "explanation": "グローバルリソースを含められるのは、us-east-1 のリソース共有だけです。リージョナルなリソースと同じ ap-northeast-1 のリソース共有に、グローバルリソースを含めることはできません。"
+        },
+        {
+          "key": "C",
+          "text": "リージョナルなリソースは ap-northeast-1、グローバルリソースは us-east-1 のリソース共有に含める。"
+        },
+        {
+          "key": "D",
+          "text": "リージョナルなリソースは eu-west-1、グローバルリソースは us-east-1 のリソース共有に含める。",
+          "explanation": "リージョナルなリソースを含められるのは、そのリソースと同じリージョンのリソース共有だけです。リソースは ap-northeast-1 にあるので、別のリージョンの eu-west-1 のリソース共有には含められません。"
+        }
+      ],
+      "correctAnswers": ["C"]
+    },
+    {
+      "questionId": "SOA-0113",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain3",
+      "difficulty": "easy",
+      "questionType": "single",
+      "questionText": "ある企業では、複数の EC2 インスタンスと、コンテナで動かすアプリケーションを運用しています。CloudOps エンジニアは、インスタンスの起動に使う AMI と、アプリケーションのコンテナイメージを、同じアカウントの中で作成して管理したいと考えています。チームは、マネージドサービスを使う方針です。\n\nこの要件を満たす操作はどれでしょうか。",
+      "explanation": "## 問われている要件\n\nこの企業は、AMI とコンテナイメージの両方を、同じアカウントの中で作成し、管理したいと考えています。チームの方針は、マネージドサービスを使うことです。\n\n## 正解の決め手\n\nEC2 Image Builder は、AMI とコンテナイメージを作成し、アカウント内で管理するためのマネージドサービスです。要件にある対象(AMI とコンテナイメージ)、作業(作成と管理)、範囲(アカウント内)が、このサービスの役割とそのまま対応します。\n\n## 前提知識\n\nEC2 Image Builder は、イメージの作成と管理を担うサービスです。ほかの選択肢のサービスや機能には、テンプレートの可視化と検証、リソースの共有、外部プロバイダーへのアクセスの管理といった、別の役割があります。\n\n## 他の選択肢が誤りである理由\n\nTemplate studio を使って、AMI とコンテナイメージを作成し、アカウント内で管理する。\n\nTemplate studio は、テンプレートを可視化して検証するための機能です。AMI とコンテナイメージの作成と管理を担うのは、EC2 Image Builder なので、この要件には合いません。\n\nAWS RAM を使って、AMI とコンテナイメージを作成し、アカウント内で管理する。\n\nAWS RAM は、リソースをほかのアカウントや IAM のユーザー・ロールに共有するための仕組みです。イメージを作成して管理するサービスではなく、共有が役割なので、この要件には合いません。\n\nCodePipeline などから共通で使う接続を利用して、AMI とコンテナイメージを作成し、アカウント内で管理する。\n\n接続は、CodeBuild・CodeDeploy・CodePipeline の複数のリソースが、サードパーティのプロバイダーへアクセスする際の管理を、一か所にまとめるための機能です。イメージの作成と管理ではなく、外部プロバイダーへのアクセスの管理が役割なので、この要件には合いません。\n\n## まとめ\n\nAMI とコンテナイメージを作成して管理するマネージドサービスは、EC2 Image Builder です。ほかの選択肢は、サービスや機能の役割を取り違えやすいので、役割ごとに区別して覚えます。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/cfn-whatis-concepts.html",
+          "title": "How CloudFormation works - AWS CloudFormation"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/dtconsole/latest/userguide/welcome-connections.html",
+          "title": "What are connections? - Developer Tools console"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/imagebuilder/latest/userguide/what-is-image-builder.html",
+          "title": "What is Image Builder? - EC2 Image Builder"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/ram/latest/userguide/shareable.html",
+          "title": "Shareable AWS resources - AWS Resource Access Manager"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "EC2 Image Builder を使って、AMI とコンテナイメージを作成し、アカウント内で管理する。"
+        },
+        {
+          "key": "B",
+          "text": "Template studio を使って、AMI とコンテナイメージを作成し、アカウント内で管理する。",
+          "explanation": "Template studio は、テンプレートを可視化して検証するための機能です。AMI とコンテナイメージの作成と管理を担うのは、EC2 Image Builder なので、この要件には合いません。"
+        },
+        {
+          "key": "C",
+          "text": "AWS RAM を使って、AMI とコンテナイメージを作成し、アカウント内で管理する。",
+          "explanation": "AWS RAM は、リソースをほかのアカウントや IAM のユーザー・ロールに共有するための仕組みです。イメージを作成して管理するサービスではなく、共有が役割なので、この要件には合いません。"
+        },
+        {
+          "key": "D",
+          "text": "CodePipeline などから共通で使う接続を利用して、AMI とコンテナイメージを作成し、アカウント内で管理する。",
+          "explanation": "接続は、CodeBuild・CodeDeploy・CodePipeline の複数のリソースが、サードパーティのプロバイダーへアクセスする際の管理を、一か所にまとめるための機能です。イメージの作成と管理ではなく、外部プロバイダーへのアクセスの管理が役割なので、この要件には合いません。"
+        }
+      ],
+      "correctAnswers": ["A"]
+    },
+    {
+      "questionId": "SOA-0114",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain2",
+      "difficulty": "medium",
+      "questionType": "multiple",
+      "questionText": "ある企業は、Amazon RDS の Multi-AZ DB クラスターで、業務用のデータベースを運用しています。ある時刻に実行された誤った更新により、データの一部が壊れていることが分かりました。CloudOps エンジニアは、更新の直前の時刻の状態にデータベースを戻す必要があります。戻したあとは、構成が Multi-AZ DB クラスターであることを、一覧に表示された値で確認する必要があります。\n\nこの要件を満たす対応はどれでしょうか。(2 つ選択)",
+      "explanation": "## 問われている要件\n\nこの状況で、CloudOps エンジニアは 2 つのことを求められています。1 つは、更新の直前の時刻の状態へデータベースを戻すことです。もう 1 つは、戻したあとの構成が Multi-AZ DB クラスターであることを、一覧の値で確認することです。復元のやり方と確認のやり方は別の役割なので、それぞれから 1 つずつ選びます。\n\n## 正解の決め手\n\n選択肢 C は、復元のやり方として正しい内容です。Multi-AZ DB クラスターは、時刻を指定して復元でき、復元の結果は新しい Multi-AZ DB クラスターとして作られます。\n\n選択肢 E は、確認のやり方として正しい内容です。Multi-AZ DB クラスターの構成では、各インスタンスの行に、Multi-AZ の値として 3 Zones が表示されます。\n\n## 解くための考え方\n\n復元の問いでは、既存のものを直す操作なのか、別のものを新しく作る操作なのかを、まず切り分けます。時刻を指定した復元は後者で、結果の種類も Multi-AZ DB クラスターです。確認の問いでは、Multi-AZ DB クラスターの各インスタンスの行に表示される値(3 Zones)を、基準として覚えておきます。\n\n## まとめ\n\nMulti-AZ DB クラスターは、指定した時刻に復元でき、新しい Multi-AZ DB クラスターが作られます。復元後は、各インスタンスの行の Multi-AZ の値が 3 Zones であることで、構成を確かめられます。\n\n## 他の選択肢が誤りである理由\n\n既存のクラスターに対して、更新の直前の時刻の状態へ、その場で巻き戻す操作を実行する。\n\n指定した時刻への復元は、既存のクラスターを巻き戻す操作ではありません。復元の結果は新しい Multi-AZ DB クラスターとして作られるため、その場での巻き戻しを前提にした対応は誤りです。\n\n更新の直前の時刻を指定して復元し、Single-AZ の DB インスタンスとして作成する。\n\nMulti-AZ DB クラスターを指定した時刻に復元すると、結果は新しい Multi-AZ DB クラスターになります。Single-AZ の DB インスタンスとして作られるという説明は、復元後の構成を取り違えています。\n\n復元後の一覧で、Multi-AZ の値が 2 Zones と表示されていることを、各インスタンスの行ごとに確認する。\n\nMulti-AZ DB クラスターの各インスタンスの行では、Multi-AZ の値が 3 Zones と表示されます。2 Zones を確認の基準にすると、期待する値が違います。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/Concepts.MultiAZ.html",
+          "title": "Configuring and managing a Multi-AZ deployment for Amazon RDS - Amazon Relational Database Service"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/multi-az-db-clusters-concepts.html",
+          "title": "Multi-AZ DB cluster deployments for Amazon RDS - Amazon Relational Database Service"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "既存のクラスターに対して、更新の直前の時刻の状態へ、その場で巻き戻す操作を実行する。",
+          "explanation": "指定した時刻への復元は、既存のクラスターを巻き戻す操作ではありません。復元の結果は新しい Multi-AZ DB クラスターとして作られるため、その場での巻き戻しを前提にした対応は誤りです。"
+        },
+        {
+          "key": "B",
+          "text": "更新の直前の時刻を指定して復元し、Single-AZ の DB インスタンスとして作成する。",
+          "explanation": "Multi-AZ DB クラスターを指定した時刻に復元すると、結果は新しい Multi-AZ DB クラスターになります。Single-AZ の DB インスタンスとして作られるという説明は、復元後の構成を取り違えています。"
+        },
+        {
+          "key": "C",
+          "text": "更新の直前の時刻を指定して復元し、新しい Multi-AZ DB クラスターとして作成する。"
+        },
+        {
+          "key": "D",
+          "text": "復元後の一覧で、Multi-AZ の値が 2 Zones と表示されていることを、各インスタンスの行ごとに確認する。",
+          "explanation": "Multi-AZ DB クラスターの各インスタンスの行では、Multi-AZ の値が 3 Zones と表示されます。2 Zones を確認の基準にすると、期待する値が違います。"
+        },
+        {
+          "key": "E",
+          "text": "復元後の一覧で、各インスタンスの行に表示された Multi-AZ の値が 3 Zones であることを確認する。"
+        }
+      ],
+      "correctAnswers": ["C", "E"]
+    },
+    {
+      "questionId": "SOA-0115",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain2",
+      "difficulty": "easy",
+      "questionType": "multiple",
+      "questionText": "ある企業は、Amazon EC2 の Auto Scaling グループで Web 層を運用し、データ層には Amazon RDS と Amazon Aurora を使っています。静的コンテンツは Amazon S3 に置き、Amazon CloudFront で配信しています。CloudOps エンジニアは、台数の調整、リージョンをまたぐ構成、配信の挙動、バージョニングの仕様を整理しています。\n\nこれらのサービスの仕様として正しいものはどれでしょうか。(2 つ選択)",
+      "explanation": "## 問われている要件\n\n各サービスの仕様として正しいものを 2 つ選ぶ問いです。台数の調整と、リージョン障害への備えという、別の層の事実を見分けます。\n\n## 正解の決め手\n\nAmazon EC2 Auto Scaling のグループでは、希望する台数を指定でき、作成後でもいつでも変更できます。\n\nAmazon Aurora グローバルデータベースは、専用のインフラで複製を行い、プライマリのリージョンに障害が起きたとき、二次リージョンを 1 分未満で昇格できます。\n\n## 解くための考え方\n\n各選択肢が対象にしているサービスを確かめ、そのサービスの既定の動きや制約と合うかを 1 つずつ照らします。「〜にしか置けない」のような限定の言い方は、事実で限定が成り立つかを疑います。\n\n## まとめ\n\nAuto Scaling の希望する台数は作成後にも変更でき、Aurora グローバルデータベースは二次リージョンを 1 分未満で昇格できます。読み取りレプリカの置き場所、CloudFront の古い内容の配信、S3 のバージョニングの影響は、事実と食い違う説明でした。\n\n## 他の選択肢が誤りである理由\n\nAmazon RDS の読み取りレプリカは、主 DB インスタンスと同じ AWS リージョンにしか置けない。\n\nAmazon RDS の読み取りレプリカは、主 DB インスタンスとは別の AWS リージョンに置かれることがあります。同じリージョンに限られるわけではありません。\n\nAmazon CloudFront では、最小 TTL が 0 より大きい場合に、オリジンが no-cache を付けると、stale-if-error=0 を付けていなくても、オリジンに届かないとき以前の内容は配信されない。\n\nCloudFront では、最小 TTL が 0 より大きいと、オリジンが no-cache などを付けても、stale-if-error=0 を付けない限り、オリジンに届かないときは以前の内容が配信されます。配信されないという説明は、この動きと逆です。\n\nAmazon S3 でバージョニングを有効にすると、バケットにすでにあるオブジェクトが、新しいバージョンとして保存し直される。\n\nAmazon S3 でバージョニングを有効にしても、すでにあるオブジェクトは変わりません。変わるのは、有効にしたあとに受け付ける要求の扱いです。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/Expiration.html",
+          "title": "Manage how long content stays in the cache (expiration) - Amazon CloudFront"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ReadRepl.html",
+          "title": "Working with DB instance read replicas - Amazon Relational Database Service"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonS3/latest/userguide/Versioning.html",
+          "title": "Retaining multiple versions of objects with S3 Versioning - Amazon Simple Storage Service"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html",
+          "title": "What is Amazon EC2 Auto Scaling? - Amazon EC2 Auto Scaling"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-options-in-the-cloud.html",
+          "title": "Disaster recovery options in the cloud - Disaster Recovery of Workloads on AWS: Recovery in the Cloud"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "Amazon EC2 Auto Scaling のグループでは、希望する台数を指定でき、その値は作成後でも変更できる。"
+        },
+        {
+          "key": "B",
+          "text": "Amazon RDS の読み取りレプリカは、主 DB インスタンスと同じ AWS リージョンにしか置けない。",
+          "explanation": "Amazon RDS の読み取りレプリカは、主 DB インスタンスとは別の AWS リージョンに置かれることがあります。同じリージョンに限られるわけではありません。"
+        },
+        {
+          "key": "C",
+          "text": "Amazon CloudFront では、最小 TTL が 0 より大きい場合に、オリジンが no-cache を付けると、stale-if-error=0 を付けていなくても、オリジンに届かないとき以前の内容は配信されない。",
+          "explanation": "CloudFront では、最小 TTL が 0 より大きいと、オリジンが no-cache などを付けても、stale-if-error=0 を付けない限り、オリジンに届かないときは以前の内容が配信されます。配信されないという説明は、この動きと逆です。"
+        },
+        {
+          "key": "D",
+          "text": "Amazon Aurora グローバルデータベースでは、プライマリのリージョンに障害が起きたとき、二次リージョンを 1 分未満で昇格できる。"
+        },
+        {
+          "key": "E",
+          "text": "Amazon S3 でバージョニングを有効にすると、バケットにすでにあるオブジェクトが、新しいバージョンとして保存し直される。",
+          "explanation": "Amazon S3 でバージョニングを有効にしても、すでにあるオブジェクトは変わりません。変わるのは、有効にしたあとに受け付ける要求の扱いです。"
+        }
+      ],
+      "correctAnswers": ["A", "D"]
+    },
+    {
+      "questionId": "SOA-0116",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain1",
+      "difficulty": "hard",
+      "questionType": "single",
+      "questionText": "ある企業では、EC2 インスタンスの CPU 使用率に静的しきい値のアラームを設定し、ALARM 状態になったときに運用担当者へメールで通知する構成にしています。CloudOps エンジニアは、Amazon SNS のトピックに運用担当者のメールの購読をコンソールで作成し、そのトピックをアラームのアクションに指定しました。負荷試験で、しきい値を超えた評価期間の数が条件に達し、アラームは ALARM 状態になりました。しかし、運用担当者の受信箱にアラームの通知メールは 1 通も入っていません。受信箱には、購読の作成直後に SNS から届いたメールが、開封前の状態で残っています。\n\n運用担当者がアラームの通知メールを受信できるようにする対応として、適切なものはどれでしょうか。",
+      "explanation": "## 問われている要件\nこの設問では、アラームが ALARM 状態になったのに運用担当者へ通知メールが届かない状況で、通知を受け取れるようにする対応が問われています。\n\n## 正解の決め手\nコンソールで作成したメールの購読は、SNS から届く確認メールで承認して初めて有効になります。運用担当者の受信箱には、購読の作成直後に届いたメールが開封前のまま残っているため、運用担当者がそのメールを開いて承認の操作を行えば、購読が有効になり、通知メールが届くようになります。\n\n## 前提知識\n静的しきい値のアラームでは、条件に定めた評価期間の数だけ指標がしきい値を超えると、アラームが ALARM 状態に変わります。この設問のアラームは、すでに ALARM 状態になっているので、アラームの条件に問題はありません。通知が届かない原因は、通知の送り先である購読の側にあると読み取れます。\n\n## 他の選択肢が誤りである理由\nアラームの評価期間の数を減らし、アラームの状態が変わりやすくなるように条件を見直す。\n\nこのアラームは、しきい値の超過が条件の回数に達して、すでに ALARM 状態になっています。評価期間の数を減らして条件を見直しても、メールが届かない原因である購読の状態は変わらないため、通知は受け取れません。\n\nメールの購読をいったん削除し、同じメールアドレスと同じトピックで購読を作り直す。\n\n購読をいったん削除して同じメールアドレスで作り直しても、新しい購読は、確認メールの承認が済むまで有効になりません。運用担当者が承認の操作を行わない限り、同じ状況が続くため、通知は受け取れません。\n\n異常を示す状態になったときではなく、正常な状態に戻ったときにメールを送る設定へ変更する。\n\n通知を送るタイミングを、正常な状態に戻ったときへ変えても、購読が有効でなければメールは届きません。また、この企業が知りたいのは異常を示す状態になった時点であり、設問の要件にも合いません。\n\n## まとめ\nメールの購読を作成したときは、確認メールの承認が済んでいるかを確かめます。アラームが ALARM 状態になっていても、購読が有効でなければ、通知メールは届きません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/ConsoleAlarms.html",
+          "title": "Create a CloudWatch alarm based on a static threshold - Amazon CloudWatch"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Notify_Users_Alarm_Changes.html",
+          "title": "Notifying users on alarm changes - Amazon CloudWatch"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "アラームの評価期間の数を減らし、アラームの状態が変わりやすくなるように条件を見直す。",
+          "explanation": "このアラームは、しきい値の超過が条件の回数に達して、すでに ALARM 状態になっています。評価期間の数を減らして条件を見直しても、メールが届かない原因である購読の状態は変わらないため、通知は受け取れません。"
+        },
+        {
+          "key": "B",
+          "text": "メールの購読をいったん削除し、同じメールアドレスと同じトピックで購読を作り直す。",
+          "explanation": "購読をいったん削除して同じメールアドレスで作り直しても、新しい購読は、確認メールの承認が済むまで有効になりません。運用担当者が承認の操作を行わない限り、同じ状況が続くため、通知は受け取れません。"
+        },
+        {
+          "key": "C",
+          "text": "異常を示す状態になったときではなく、正常な状態に戻ったときにメールを送る設定へ変更する。",
+          "explanation": "通知を送るタイミングを、正常な状態に戻ったときへ変えても、購読が有効でなければメールは届きません。また、この企業が知りたいのは異常を示す状態になった時点であり、設問の要件にも合いません。"
+        },
+        {
+          "key": "D",
+          "text": "運用担当者が SNS から届いた確認メールを開き、承認の操作を行って購読を有効にする。"
+        }
+      ],
+      "correctAnswers": ["D"]
+    },
+    {
+      "questionId": "SOA-0117",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain5",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "ある企業は、S3 バケットをオリジンとする CloudFront のディストリビューションで、商品画像を配信しています。CloudOps エンジニアが調べたところ、キャッシュヒット率が想定より低くなっていました。配信ログを確認すると、同じ内容の画像への要求が、クエリパラメーターの並び順だけが異なる形で届き、別々にオリジンへ送られて別々にキャッシュされていました。同じ内容の要求は、1 つのキャッシュとして扱われるようにする必要があります。\n\nこの要件を満たす対処はどれでしょうか。",
+      "explanation": "## 問われている要件\n\nCloudOps エンジニアは、クエリパラメーターの並び順だけが異なる、同じ内容の要求を、1 つのキャッシュとして扱わせる必要があります。原因は、並び順の違いによって、要求が別のものとして別々にキャッシュされている点にあります。\n\n## 正解の決め手\n\nクエリパラメーターの並び順を統一すると、同じ内容の要求が別々にオリジンへ送られたり、別々にキャッシュされたりすることを避けられます。キャッシュヒット率は、閲覧者のリクエストのうち、キャッシュから直接返された割合です。同じ内容の要求が 1 つのキャッシュにまとまれば、キャッシュから返せる要求が増えます。\n\n## 他の選択肢が誤りである理由\n\nAWS WAF のウェブ ACL をディストリビューションに関連付け、クエリパラメーターの並び順が異なる要求を拒否するルールを追加する。\n\nAWS WAF は、保護対象の Web リソースに届く HTTP と HTTPS のリクエストを監視して、アクセスを制御するものです。並び順が異なる要求を拒否すると、その要求が失敗するだけで、同じ内容の要求を 1 つのキャッシュとして扱う要件は満たせません。\n\nCloudFront のディストリビューションとオリジンの間の接続性を Reachability Analyzer で分析し、要求の経路を 1 つにそろえる。\n\nReachability Analyzer は、VPC 内の送信元と送信先のリソース間の接続性を検査する構成分析ツールです。分析するだけで、同じ内容の要求が別々にキャッシュされる原因であるクエリパラメーターの並び順は変わりません。\n\nオリジンの S3 バケットへの経路として PrivateLink の VPC エンドポイントを作成し、別々の要求をそのエンドポイントに集約する。\n\nPrivateLink の VPC エンドポイントは、VPC やアカウントの境界をまたいで、サービスやリソースにアクセスするために作るものです。オリジンへの経路を変えても、クエリパラメーターの並び順が異なる要求が別々にキャッシュされる状態は変わりません。\n\n## まとめ\n\n同じ内容の要求が並び順の違いで別々にキャッシュされるときは、クエリパラメーターの並び順を統一します。要求の制御や接続性の分析、アクセスの経路は、キャッシュの扱いを変えるものではありません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/ConfiguringCaching.html",
+          "title": "Caching and availability - Amazon CloudFront"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cache-hit-ratio.html",
+          "title": "Increase the proportion of requests that are served directly from the CloudFront caches (cache hit ratio) - Amazon CloudFront"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/privatelink/what-is-privatelink.html",
+          "title": "What is AWS PrivateLink? - Amazon Virtual Private Cloud"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/reachability/what-is-reachability-analyzer.html",
+          "title": "What is Reachability Analyzer? - Amazon Virtual Private Cloud"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/waf/latest/developerguide/waf-chapter.html",
+          "title": "AWS WAF - AWS WAF, AWS Firewall Manager, AWS Shield Advanced, and AWS Shield network security director"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "AWS WAF のウェブ ACL をディストリビューションに関連付け、クエリパラメーターの並び順が異なる要求を拒否するルールを追加する。",
+          "explanation": "AWS WAF は、保護対象の Web リソースに届く HTTP と HTTPS のリクエストを監視して、アクセスを制御するものです。並び順が異なる要求を拒否すると、その要求が失敗するだけで、同じ内容の要求を 1 つのキャッシュとして扱う要件は満たせません。"
+        },
+        {
+          "key": "B",
+          "text": "CloudFront のディストリビューションとオリジンの間の接続性を Reachability Analyzer で分析し、要求の経路を 1 つにそろえる。",
+          "explanation": "Reachability Analyzer は、VPC 内の送信元と送信先のリソース間の接続性を検査する構成分析ツールです。分析するだけで、同じ内容の要求が別々にキャッシュされる原因であるクエリパラメーターの並び順は変わりません。"
+        },
+        {
+          "key": "C",
+          "text": "オリジンの S3 バケットへの経路として PrivateLink の VPC エンドポイントを作成し、別々の要求をそのエンドポイントに集約する。",
+          "explanation": "PrivateLink の VPC エンドポイントは、VPC やアカウントの境界をまたいで、サービスやリソースにアクセスするために作るものです。オリジンへの経路を変えても、クエリパラメーターの並び順が異なる要求が別々にキャッシュされる状態は変わりません。"
+        },
+        {
+          "key": "D",
+          "text": "CloudFront に届く要求のクエリパラメーターの並び順を統一して、同じ内容の要求が別々にキャッシュされることを避ける。"
+        }
+      ],
+      "correctAnswers": ["D"]
+    },
+    {
+      "questionId": "SOA-0118",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain2",
+      "difficulty": "hard",
+      "questionType": "multiple",
+      "questionText": "ある企業は、Amazon EC2 Auto Scaling のグループで動かす Web アプリケーションを、Multi-AZ 配置のデータベースと CloudFront を使って提供しています。ピーク時には、希望する容量が最大サイズに達してスケールアウトが止まり、応答が遅くなります。また、CloudFront の max-age を短く設定しているため、オリジンへの要求が多く、バックエンドの負荷が高くなっています。CloudOps エンジニアは、この 2 つの問題を解消する必要があります。\n\nこの要件を満たす対応はどれでしょうか。(2 つ選択)",
+      "explanation": "## 問われている要件\n\nこの設問には、原因の異なる 2 つの問題があります。1 つ目は、Amazon EC2 Auto Scaling のグループで、希望する容量が最大サイズに達してスケールアウトが止まっていることです。2 つ目は、CloudFront の max-age が短いために、オリジンへの要求が多くなっていることです。それぞれの原因に直接効く対応を、1 つずつ選びます。\n\n## 解くための考え方\n\n症状ごとに、その症状を決めている設定の項目を特定します。台数の頭打ちは、台数の上限である最大サイズが決めています。オリジンへの要求の回数は、max-age の長さが決めています。\n\n## 正解の決め手\n\nC は、Auto Scaling グループの最大サイズを引き上げる対応です。グループの台数は、指定した最小台数と最大台数の範囲に保たれます。希望する容量が最大サイズに達すると、スケールアウトは止まります。上限を引き上げれば、需要が増えたときに台数を増やせます。\n\nD は、max-age を長くする対応です。max-age を短くするほど、CloudFront はオブジェクトの更新を確かめるためにオリジンへ要求を送る回数が増えます。長くすれば、この回数が減り、オリジンの負荷が下がります。\n\n## 他の選択肢が誤りである理由\n\nデータベースの待機レプリカでアプリケーションの読み取りを処理させて、バックエンド全体の負荷を下げる。\n\nMulti-AZ 配置の待機レプリカは、読み取りのトラフィックを処理できません。待機レプリカへアプリケーションの読み取りを振り分ける構成は成り立たず、バックエンド全体の負荷を下げる手段にはなりません。\n\nCloudFront の max-age をさらに短く設定し直して、オリジンへの要求の回数を減らす。\n\nmax-age を短くすると、CloudFront は更新の有無をより頻繁にオリジンへ問い合わせるようになり、要求の回数は増えます。短くする方向は、オリジンへの要求を減らしたい今回の目的とは逆です。\n\nAuto Scaling グループの最小サイズを引き上げて、スケールアウトが止まらないようにする。\n\n最小サイズは、グループの台数が下回らないようにする下限です。今回スケールアウトが止まっているのは、希望する容量が最大サイズに達したためなので、最小サイズを引き上げても、台数の上限は変わりません。\n\n## まとめ\n\n台数の頭打ちには最大サイズ、オリジンへの要求の多さには長めの max-age、というように、症状を決めている設定の項目に合わせて対応を選びます。待機レプリカでは読み取りを処理できず、最小サイズは下限を決めるだけなので、どちらも今回の問題の解消にはなりません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/cache-hit-ratio.html",
+          "title": "Increase the proportion of requests that are served directly from the CloudFront caches (cache hit ratio) - Amazon CloudFront"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_ReadRepl.html",
+          "title": "Working with DB instance read replicas - Amazon Relational Database Service"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/as-scale-based-on-demand.html",
+          "title": "Dynamic scaling for Amazon EC2 Auto Scaling - Amazon EC2 Auto Scaling"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/autoscaling/ec2/userguide/what-is-amazon-ec2-auto-scaling.html",
+          "title": "What is Amazon EC2 Auto Scaling? - Amazon EC2 Auto Scaling"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "データベースの待機レプリカでアプリケーションの読み取りを処理させて、バックエンド全体の負荷を下げる。",
+          "explanation": "Multi-AZ 配置の待機レプリカは、読み取りのトラフィックを処理できません。待機レプリカに読み取りを任せても、バックエンドの負荷は下がらないため、この対応は成り立ちません。"
+        },
+        {
+          "key": "B",
+          "text": "CloudFront の max-age をさらに短く設定し直して、オリジンへの要求の回数を減らす。",
+          "explanation": "max-age を短くすると、CloudFront がオリジンへ更新の有無を確かめる回数が増えます。オリジンへの要求を減らしたい今回の目的とは、向きが逆です。"
+        },
+        {
+          "key": "C",
+          "text": "Auto Scaling グループの最大サイズを引き上げて、希望する容量を増やせるようにする。"
+        },
+        {
+          "key": "D",
+          "text": "CloudFront の max-age を長く設定し直して、オリジンへ変更を確かめる要求の回数を減らす。"
+        },
+        {
+          "key": "E",
+          "text": "Auto Scaling グループの最小サイズを引き上げて、スケールアウトが止まらないようにする。",
+          "explanation": "最小サイズは、グループの台数の下限を決める設定です。スケールアウトが止まるのは希望する容量が最大サイズに達したときなので、最小サイズを引き上げても、台数の上限は広がりません。"
+        }
+      ],
+      "correctAnswers": ["C", "D"]
+    },
+    {
+      "questionId": "SOA-0119",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain3",
+      "difficulty": "hard",
+      "questionType": "single",
+      "questionText": "ある企業は、AWS Organizations で複数のアカウントを運用しています。基盤チームのアカウントでは、EC2 Image Builder でコンポーネントとイメージレシピを作成して管理しています。ほかのアカウントのチームも、それぞれ Image Builder でイメージを作っています。CloudOps エンジニアは、基盤チームが管理するコンポーネントとイメージレシピを、組織内のほかのアカウントでも使えるように共有する必要があります。\n\nこの要件を満たす方法はどれでしょうか。",
+      "explanation": "## 問われている要件\n\n基盤チームが管理している Image Builder のコンポーネントとイメージレシピを、組織内のほかのアカウントでも使えるように共有する方法を選ぶ問題です。共有する対象が、AMI ではなくコンポーネントとイメージレシピである点が、選択肢を分けます。\n\n## 正解の決め手\n\nEC2 Image Builder は AWS RAM と連携しており、コンポーネント、イメージ、イメージレシピ、コンテナレシピを共有の対象にできます。共有先は、個別のアカウントのほか、AWS Organizations を経由した指定もできます。そのため、AWS RAM との連携で、コンポーネントとイメージレシピを AWS Organizations 経由で共有する選択肢 A が、この要件を満たします。\n\n## 前提知識\n\nAMI に関わる仕組みは、名前も目的も近いので混同しやすい点です。AMI の起動許可は、定義すると配布先のすべてのリージョンの AMI に伝わる設定です。Systems Manager Automation のランブックは、元の AMI からゴールデン AMI を作る手段で、更新の前後に独自のスクリプトを実行できます。CloudFormation StackSets は、グループごとにサービスと権限をまとめてアカウントへ提供する機能です。\n\n## 解くための考え方\n\nそれぞれの選択肢が、何を、どこへ扱う機能なのかを確かめます。この問題で共有したい対象はコンポーネントとイメージレシピで、共有先は組織内のアカウントです。この対象と共有先の両方に合う仕組みだけが、正答として残ります。\n\n## 他の選択肢が誤りである理由\n\nAMI の起動許可を定義し、配布先のすべてのリージョンの AMI へ許可を伝播させて、ほかのアカウントに使わせる。\n\nAMI の起動許可が決めるのは、作成済みの AMI を使える範囲で、定義した許可は配布先のすべてのリージョンの AMI に伝わります。コンポーネントやイメージレシピをほかのアカウントへ共有する仕組みではないため、この要件は満たせません。\n\nSystems Manager Automation のランブックで、元の AMI からゴールデン AMI を作り、更新の前後に独自のスクリプトを実行する。\n\nこのランブックは、元の AMI からゴールデン AMI を作り、更新の前後に独自のスクリプトを実行するためのものです。イメージを作る手段であって、Image Builder のコンポーネントやイメージレシピをほかのアカウントへ共有する機能ではありません。\n\nCloudFormation StackSets で、グループごとにサービスと権限をまとめて、組織内のアカウントへ提供する。\n\nStackSets は、グループごとにサービスと権限をまとめてアカウントへ提供する機能です。Image Builder のコンポーネントとイメージレシピの共有は、AWS RAM との連携で行うもので、StackSets の役割ではありません。\n\n## まとめ\n\nImage Builder のコンポーネントとイメージレシピを、組織内のアカウントで共有するときは、AWS RAM との連携を使い、共有先を AWS Organizations 経由で指定します。AMI の起動許可、Automation のランブック、StackSets は、扱う対象がそれぞれ別なので、この要件には合いません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/imagebuilder/latest/userguide/how-image-builder-works.html",
+          "title": "How EC2 Image Builder works - EC2 Image Builder"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/imagebuilder/latest/userguide/what-is-image-builder.html",
+          "title": "What is Image Builder? - EC2 Image Builder"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_introduction.html",
+          "title": "What is AWS Organizations? - AWS Organizations"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/systems-manager/latest/userguide/systems-manager-automation.html",
+          "title": "AWS Systems Manager Automation - AWS Systems Manager"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "EC2 Image Builder の AWS RAM との連携を使い、コンポーネントとイメージレシピを AWS Organizations 経由で共有する。"
+        },
+        {
+          "key": "B",
+          "text": "AMI の起動許可を定義し、配布先のすべてのリージョンの AMI へ許可を伝播させて、ほかのアカウントに使わせる。",
+          "explanation": "AMI の起動許可が決めるのは、作成済みの AMI を使える範囲で、定義した許可は配布先のすべてのリージョンの AMI に伝わります。コンポーネントやイメージレシピをほかのアカウントへ共有する仕組みではないため、この要件は満たせません。"
+        },
+        {
+          "key": "C",
+          "text": "Systems Manager Automation のランブックで、元の AMI からゴールデン AMI を作り、更新の前後に独自のスクリプトを実行する。",
+          "explanation": "このランブックは、元の AMI からゴールデン AMI を作り、更新の前後に独自のスクリプトを実行するためのものです。イメージを作る手段であって、Image Builder のコンポーネントやイメージレシピをほかのアカウントへ共有する機能ではありません。"
+        },
+        {
+          "key": "D",
+          "text": "CloudFormation StackSets で、グループごとにサービスと権限をまとめて、組織内のアカウントへ提供する。",
+          "explanation": "StackSets は、グループごとにサービスと権限をまとめてアカウントへ提供する機能です。Image Builder のコンポーネントとイメージレシピの共有は、AWS RAM との連携で行うもので、StackSets の役割ではありません。"
+        }
+      ],
+      "correctAnswers": ["A"]
+    },
+    {
+      "questionId": "SOA-0120",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain1",
+      "difficulty": "hard",
+      "questionType": "single",
+      "questionText": "ある企業は、事業部ごとに別の AWS アカウントでワークロードを運用しています。どのアカウントでも、EC2 インスタンスの CPU 使用率のメトリクスを Amazon CloudWatch で確認できます。CloudOps エンジニアは、運用チーム用のアカウント 1 つで、すべてのワークロードのアカウントのメトリクスを対象にしたアラームを作成して管理したいと考えています。メトリクスの情報は、社内の関係者だけに見せる方針です。\n\nこの要件を満たす方法はどれでしょうか。",
+      "explanation": "## 問われている要件\nこの設問では、運用チーム用のアカウント 1 つで、複数のワークロードのアカウントのメトリクスを対象にしたアラームを作成して管理し、メトリクスの情報を社内の関係者だけに見せる方法が問われています。\n\n## 正解の決め手\n監視アカウントでは、ソースアカウントのメトリクスを対象にしたアラームを作成できます。運用チーム用のアカウントを監視アカウントにし、ワークロードのアカウントをソースアカウントにすれば、運用チーム用のアカウントだけでアラームを作成して管理できるため、要件を満たします。\n\n## 前提知識\n複数のアカウントを横断して監視するときは、監視アカウントとソースアカウントという役割に分けて考えます。ソースアカウントのメトリクスに対するアラームは、監視アカウントで作成できます。また、ダッシュボードを公開で共有すると、リンクを知っている人なら誰でも閲覧できる状態になります。\n\n## 解くための考え方\n要件は 2 つに分かれます。1 つ目は、アラームを運用チーム用のアカウントで作成して管理することです。2 つ目は、メトリクスの情報を社内の関係者だけに見せることです。1 つ目の要件は、監視アカウントの役割で満たせます。この 2 つに応える選択肢だけが正解になります。\n\n## 他の選択肢が誤りである理由\n各ワークロードのアカウントで、そのアカウント自身のメトリクスを対象にしたアラームを、それぞれ作成する。\n\nこの方法では、アラームがワークロードのアカウントごとに分かれてしまい、運用チーム用のアカウント 1 つで作成して管理する要件を満たせません。ソースアカウントのメトリクスに対するアラームは、監視アカウントで作成できます。\n\n運用チーム用のアカウントでダッシュボードを公開で共有し、リンクからメトリクスの状況を確認できるようにする。\n\n公開で共有したダッシュボードは、リンクを知っている人なら誰でも閲覧できるため、社内の関係者だけに見せる方針に反します。また、この方法には、アラームを作成する内容が含まれておらず、要件の前半にも応えていません。\n\nワークロードのアカウントを監視アカウントにし、運用チーム用のアカウントをソースアカウントにして、各ワークロードのアカウントでアラームを作成する。\n\nソースアカウントのメトリクスに対するアラームを作成するのは、監視アカウントの側です。この選択肢では役割が逆になり、運用チーム用のアカウントのメトリクスが対象になるため、ワークロードのメトリクスをまとめて監視する要件に応えられません。\n\n## まとめ\n複数のアカウントのメトリクスを 1 つのアカウントで監視するときは、監視アカウントとソースアカウントの役割の向きを確かめます。ダッシュボードの公開共有は、閲覧できる範囲が広がる点にも注意が必要です。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Dashboards.html",
+          "title": "Using Amazon CloudWatch dashboards - Amazon CloudWatch"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/cloudwatch-dashboard-sharing.html",
+          "title": "Sharing CloudWatch dashboards - Amazon CloudWatch"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "運用チーム用のアカウントを監視アカウントにし、ワークロードのアカウントをソースアカウントにして、運用チーム用のアカウントでアラームを作成する。"
+        },
+        {
+          "key": "B",
+          "text": "各ワークロードのアカウントで、そのアカウント自身のメトリクスを対象にしたアラームを、それぞれ作成する。",
+          "explanation": "この方法では、アラームがワークロードのアカウントごとに分かれてしまい、運用チーム用のアカウント 1 つで作成して管理する要件を満たせません。ソースアカウントのメトリクスに対するアラームは、監視アカウントで作成できます。"
+        },
+        {
+          "key": "C",
+          "text": "運用チーム用のアカウントでダッシュボードを公開で共有し、リンクからメトリクスの状況を確認できるようにする。",
+          "explanation": "公開で共有したダッシュボードは、リンクを知っている人なら誰でも閲覧できるため、社内の関係者だけに見せる方針に反します。また、この方法には、アラームを作成する内容が含まれておらず、要件の前半にも応えていません。"
+        },
+        {
+          "key": "D",
+          "text": "ワークロードのアカウントを監視アカウントにし、運用チーム用のアカウントをソースアカウントにして、各ワークロードのアカウントでアラームを作成する。",
+          "explanation": "ソースアカウントのメトリクスに対するアラームを作成するのは、監視アカウントの側です。この選択肢では役割が逆になり、運用チーム用のアカウントのメトリクスが対象になるため、ワークロードのメトリクスをまとめて監視する要件に応えられません。"
+        }
+      ],
+      "correctAnswers": ["A"]
+    },
+    {
+      "questionId": "SOA-0121",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain5",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "ある企業は、IPv4 の CIDR ブロックだけを持つ VPC で、既存のアプリケーションを運用しています。新しく開発するアプリケーションのために、IPv4 と IPv6 の両方で通信できるデュアルスタックのサブネットを追加し、EC2 インスタンスを置く予定です。既存のサブネットは、そのまま使い続けます。CloudOps エンジニアは、VPC とサブネットに設定する CIDR ブロックの組み合わせを決める必要があります。\n\nこの要件を満たす設定はどれでしょうか。",
+      "explanation": "## 問われている要件\n\nCloudOps エンジニアは、IPv4 の CIDR ブロックだけを持つ VPC に、IPv4 と IPv6 の両方で通信できるデュアルスタックのサブネットを追加する必要があります。そのために、VPC とサブネットのそれぞれに、どの CIDR ブロックを持たせるかを決めます。\n\n## 正解の決め手\n\nデュアルスタックのサブネットは、IPv4 と IPv6 の両方の CIDR ブロックを持ちます。さらに、そのサブネットが属する VPC にも、両方の CIDR ブロックが必要です。IPv4 だけの VPC には、IPv6 の CIDR ブロックを追加し、サブネットに両方を持たせる設定が合います。\n\n## 他の選択肢が誤りである理由\n\nEC2 インスタンスを置くサブネットだけに IPv6 の CIDR ブロックを追加し、VPC には IPv4 の CIDR ブロックだけを残しておく。\n\nデュアルスタックのサブネットは IPv4 と IPv6 の両方の CIDR ブロックを持ち、VPC にも両方が必要です。VPC に IPv4 の CIDR ブロックだけを残したままでは、条件を満たしません。\n\nVPC と、EC2 インスタンスを置くサブネットの IPv4 の CIDR ブロックを外し、代わりに IPv6 の CIDR ブロックだけを持たせる。\n\nデュアルスタックは、IPv4 と IPv6 の両方の CIDR ブロックを持つ構成です。IPv4 の CIDR ブロックを外して IPv6 だけにすると、IPv4 と IPv6 の両方で通信できるという要件を満たせません。\n\nEC2 インスタンスを置くサブネットに PrivateLink の VPC エンドポイントを作成し、そのサブネットから IPv6 で通信できるようにする。\n\nPrivateLink の VPC エンドポイントは、VPC やアカウントの境界をまたいで、サービスやリソースにアクセスするために作るものです。サブネットに IPv6 の CIDR ブロックを与えるものではなく、デュアルスタックのサブネットには両方の CIDR ブロックが必要です。\n\n## まとめ\n\nデュアルスタックのサブネットを使うときは、サブネットだけでなく VPC にも、IPv4 と IPv6 の両方の CIDR ブロックを用意します。片方だけを設定する案や、別の機能で代用する案は、条件を満たしません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/privatelink/what-is-privatelink.html",
+          "title": "What is AWS PrivateLink? - Amazon Virtual Private Cloud"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html",
+          "title": "Subnets for your VPC - Amazon Virtual Private Cloud"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "VPC に IPv6 の CIDR ブロックを追加し、EC2 インスタンスを置くサブネットには IPv4 と IPv6 の両方の CIDR ブロックを持たせる。"
+        },
+        {
+          "key": "B",
+          "text": "EC2 インスタンスを置くサブネットだけに IPv6 の CIDR ブロックを追加し、VPC には IPv4 の CIDR ブロックだけを残しておく。",
+          "explanation": "デュアルスタックのサブネットは IPv4 と IPv6 の両方の CIDR ブロックを持ち、VPC にも両方が必要です。VPC に IPv4 の CIDR ブロックだけを残したままでは、条件を満たしません。"
+        },
+        {
+          "key": "C",
+          "text": "VPC と、EC2 インスタンスを置くサブネットの IPv4 の CIDR ブロックを外し、代わりに IPv6 の CIDR ブロックだけを持たせる。",
+          "explanation": "デュアルスタックは、IPv4 と IPv6 の両方の CIDR ブロックを持つ構成です。IPv4 の CIDR ブロックを外して IPv6 だけにすると、IPv4 と IPv6 の両方で通信できるという要件を満たせません。"
+        },
+        {
+          "key": "D",
+          "text": "EC2 インスタンスを置くサブネットに PrivateLink の VPC エンドポイントを作成し、そのサブネットから IPv6 で通信できるようにする。",
+          "explanation": "PrivateLink の VPC エンドポイントは、VPC やアカウントの境界をまたいで、サービスやリソースにアクセスするために作るものです。サブネットに IPv6 の CIDR ブロックを与えるものではなく、デュアルスタックのサブネットには両方の CIDR ブロックが必要です。"
+        }
+      ],
+      "correctAnswers": ["A"]
+    },
+    {
+      "questionId": "SOA-0122",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain1",
+      "difficulty": "medium",
+      "questionType": "multiple",
+      "questionText": "ある企業は、複数のソースアカウントで EC2 インスタンスを運用し、そのメトリクスを運用専用の監視アカウントで扱えるようにしています。CloudOps エンジニアは、ソースアカウントの EC2 インスタンスの CPU 使用率が高い状態が続いたときに、運用チームのメールアドレスへ通知する必要があります。アラームは、監視アカウントに集約して管理する必要があります。メールの通知先は、コンソールで作成する Amazon SNS トピックの購読で用意します。\n\nこの要件を満たす手順の組み合わせはどれでしょうか。(2 つ選択)",
+      "explanation": "## 問われている要件\n\nソースアカウントの EC2 インスタンスの CPU 使用率を監視し、高い状態が続いたら運用チームへメールで知らせる仕組みを作る問題です。アラームを監視アカウントに集約することと、通知をメールの購読で受けることが条件です。検知の手順と通知先の手順を、1 つずつ選びます。\n\n## 正解の決め手\n\nアラームの手順では、監視アカウントがソースアカウントのメトリクスを対象にしたアラームを作成できる点が決め手です。この機能があるので、アラームを各アカウントへ分けず、監視アカウントに集約できます。また、静的しきい値のアラームは、しきい値を超えた評価期間の数が条件に達すると ALARM 状態に変わります。そのため、「高い状態が続いたとき」に通知する要件に合います。\n\n通知先の手順では、コンソールで作ったメールの購読が、届いた確認メールを承認して初めて有効になる点が決め手です。購読を登録しただけでは足りず、運用チームのメールアドレスで確認メールを承認する手順が必要です。\n\n## まとめ\n\n検知は監視アカウントのアラーム、通知は SNS のメール購読と確認メールの承認、という役割の分担で組み合わせます。\n\n## 他の選択肢が誤りである理由\n\nSNS トピックの購読先に SQS(Amazon Simple Queue Service)のキューを指定し、運用チームがキューに届いた通知を確認する。\n\nSQS は SNS トピックの購読先の 1 つですが、要件は運用チームのメールアドレスへの通知です。メールで受け取るには、購読先にメールを指定する必要があります。\n\nSNS トピックにメールアドレスを購読として登録し、確認メールの承認を待たずに購読が有効になるものとして通知を受け取る。\n\nコンソールで作ったメールの購読は、確認メールを承認すると有効になります。承認を省略できるという前提は誤りで、承認の手順が抜けた状態では購読は有効になりません。\n\n各ソースアカウントで、自アカウントの EC2 インスタンスの CPU 使用率を対象にしたアラームを個別に作成し、運用チームがアカウントごとに状態を確認する。\n\n監視アカウントは、ソースアカウントのメトリクスを対象にしたアラームを作成できます。各ソースアカウントで個別に作ると、アラームを監視アカウントに集約する要件に合いません。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/CloudWatch_Dashboards.html",
+          "title": "Using Amazon CloudWatch dashboards - Amazon CloudWatch"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/ConsoleAlarms.html",
+          "title": "Create a CloudWatch alarm based on a static threshold - Amazon CloudWatch"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/Notify_Users_Alarm_Changes.html",
+          "title": "Notifying users on alarm changes - Amazon CloudWatch"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/sns/latest/dg/welcome.html",
+          "title": "What is Amazon SNS? - Amazon Simple Notification Service"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "SNS トピックの購読先に SQS(Amazon Simple Queue Service)のキューを指定し、運用チームがキューに届いた通知を確認する。",
+          "explanation": "SQS は SNS トピックの購読先の 1 つですが、要件は運用チームのメールアドレスへの通知です。メールで受け取るには、購読先にメールを指定する必要があります。"
+        },
+        {
+          "key": "B",
+          "text": "SNS トピックにメールアドレスを購読として登録し、確認メールの承認を待たずに購読が有効になるものとして通知を受け取る。",
+          "explanation": "コンソールで作ったメールの購読は、確認メールを承認すると有効になります。承認を省略できるという前提は誤りで、承認の手順が抜けた状態では購読は有効になりません。"
+        },
+        {
+          "key": "C",
+          "text": "各ソースアカウントで、自アカウントの EC2 インスタンスの CPU 使用率を対象にしたアラームを個別に作成し、運用チームがアカウントごとに状態を確認する。",
+          "explanation": "監視アカウントは、ソースアカウントのメトリクスを対象にしたアラームを作成できます。各ソースアカウントで個別に作ると、アラームを監視アカウントに集約する要件に合いません。"
+        },
+        {
+          "key": "D",
+          "text": "監視アカウントで、ソースアカウントの EC2 インスタンスの CPU 使用率を対象に、しきい値を超えた評価期間の数が条件に達したら ALARM 状態になるアラームを作成する。"
+        },
+        {
+          "key": "E",
+          "text": "SNS トピックにメールアドレスを購読として登録し、運用チームに届く確認メールで購読を承認する。"
+        }
+      ],
+      "correctAnswers": ["D", "E"]
+    },
+    {
+      "questionId": "SOA-0123",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain4",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "ある企業は、デバイスの紛失に備えて、ルートユーザーと IAM ユーザーの両方に複数の MFA デバイスを登録する方針を決めました。それぞれのユーザーで、種類の異なるデバイスを混在させる予定です。CloudOps エンジニアは、ルートユーザーと IAM ユーザーのそれぞれに登録できる MFA デバイスの数の上限を、運用手順書に記載する必要があります。\n\nこの上限として適切なものはどれでしょうか。",
+      "explanation": "## 問われている要件\n\nこの問いでは、ルートユーザーと IAM ユーザーのそれぞれに登録できる MFA デバイスの数の上限を答えます。デバイスの種類を混在させる前提なので、種類ごとの上限があるかどうかも判断のポイントです。\n\n## 正解の決め手\n\nIAM では、ルートユーザーも IAM ユーザーも、デバイスの種類を問わず最大 8 つまで MFA デバイスを登録できます。ルートユーザーと IAM ユーザーで上限は変わらず、種類を混ぜても合計の上限が 8 つである点が決め手です。\n\n## 解くための考え方\n\n上限を問う設問では、対象(ルートユーザーか IAM ユーザーか)と、数え方(種類ごとか合計か)を切り分けます。この問いでは、対象を分けても、種類を分けても、上限は同じ 8 つです。この 2 点を確認すれば、数値や条件を入れ替えた選択肢を除けます。\n\n## 他の選択肢が誤りである理由\n\nルートユーザーは 1 つまで、IAM ユーザーは 8 つまで、デバイスの種類を問わず登録できる。\n\nIAM ユーザーの上限は合っていますが、ルートユーザーだけが 1 つという区別はありません。ルートユーザーも IAM ユーザーと同じく、最大 8 つまで登録できます。\n\nルートユーザーも IAM ユーザーも、仮想デバイスとハードウェアで 1 つずつ、合計 2 つまで登録できる。\n\n上限は、種類ごとに 1 つずつという決め方ではありません。種類を問わず、最大 8 つまで登録できます。\n\nルートユーザーも IAM ユーザーも、デバイスの種類を混在させる場合は、合計 4 つまで登録できる。\n\n種類を混在させる場合でも、上限は 4 つではありません。種類を問わず、最大 8 つです。\n\n## まとめ\n\nIAM では、ルートユーザーと IAM ユーザーのどちらも、種類を問わず最大 8 つまで MFA デバイスを登録できます。対象と数え方を分けて確認する癖をつけておきます。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa.html",
+          "title": "AWS Multi-factor authentication in IAM - AWS Identity and Access Management"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "ルートユーザーは 1 つまで、IAM ユーザーは 8 つまで、デバイスの種類を問わず登録できる。",
+          "explanation": "IAM ユーザーの上限は合っていますが、ルートユーザーだけが 1 つという区別はありません。ルートユーザーも IAM ユーザーと同じく、最大 8 つまで登録できます。"
+        },
+        {
+          "key": "B",
+          "text": "ルートユーザーも IAM ユーザーも、仮想デバイスとハードウェアで 1 つずつ、合計 2 つまで登録できる。",
+          "explanation": "上限は、種類ごとに 1 つずつという決め方ではありません。種類を問わず、最大 8 つまで登録できます。"
+        },
+        {
+          "key": "C",
+          "text": "ルートユーザーも IAM ユーザーも、デバイスの種類を混在させる場合は、合計 4 つまで登録できる。",
+          "explanation": "種類を混在させる場合でも、上限は 4 つではありません。種類を問わず、最大 8 つです。"
+        },
+        {
+          "key": "D",
+          "text": "ルートユーザーも IAM ユーザーも、デバイスの種類を問わず、合計 8 つまで登録できる。"
+        }
+      ],
+      "correctAnswers": ["D"]
+    },
+    {
+      "questionId": "SOA-0124",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain4",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "ある企業は、AWS Organizations で管理アカウントと複数のメンバーアカウントを運用しています。セキュリティチームは、特定の操作を拒否する SCP を組織に適用しました。CloudOps エンジニアが動作を確認したところ、メンバーアカウントの IAM ユーザーの操作は拒否されましたが、管理アカウントの IAM ユーザーは同じ操作を実行できました。\n\nこの結果の理由として適切なものはどれでしょうか。",
+      "explanation": "## 問われている要件\n\nこの問いでは、組織に適用した SCP の拒否が、メンバーアカウントの IAM ユーザーには働き、管理アカウントの IAM ユーザーには働かなかった理由を答えます。手がかりは、拒否された側がメンバーアカウントで、実行できた側が管理アカウントであるという、アカウントの種類の違いです。\n\n## 正解の決め手\n\nSCP は、管理アカウントのユーザーとロールには影響しません。SCP が働く対象は、組織のメンバーアカウントだけです。したがって、管理アカウントの IAM ユーザーが同じ操作を実行できたのは、設定の誤りや反映の遅れではなく、SCP の仕様に沿った結果です。\n\n## 解くための考え方\n\nSCP の影響を考えるときは、ユーザーかロールかではなく、そのアカウントが管理アカウントかメンバーアカウントかで切り分けます。管理アカウントのユーザーとロールを SCP で制限できないと分かれば、許可と拒否の優先関係、割り当て方、反映の時間を理由にする選択肢を除けます。\n\n## 他の選択肢が誤りである理由\n\n管理アカウントでは、SCP の拒否より IAM ポリシーの許可が優先されるため、同じ操作を実行できた。\n\n管理アカウントが同じ操作を実行できた理由は、許可と拒否の優先関係ではありません。SCP がそもそも管理アカウントのユーザーとロールに影響しないためです。\n\nSCP は管理アカウントに個別に割り当てた場合にだけ効くため、割り当てていない管理アカウントは同じ操作を実行できた。\n\n管理アカウントに SCP を個別に割り当てても、SCP は管理アカウントのユーザーとロールに影響しません。割り当ての有無で結果が変わる仕組みではありません。\n\nSCP の変更が管理アカウントに反映されるまでに時間がかかるため、反映前の管理アカウントは同じ操作を実行できた。\n\n反映の遅れが原因ではありません。時間がたっても、SCP は管理アカウントのユーザーとロールに影響しません。\n\n## まとめ\n\nSCP は、組織のメンバーアカウントだけに影響し、管理アカウントのユーザーとロールには影響しません。管理アカウントの操作を SCP で止める設計は成り立たない点を押さえておきます。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/organizations/latest/userguide/orgs_manage_policies_scps.html",
+          "title": "Service control policies (SCPs) - AWS Organizations"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "管理アカウントでは、SCP の拒否より IAM ポリシーの許可が優先されるため、同じ操作を実行できた。",
+          "explanation": "管理アカウントが同じ操作を実行できた理由は、許可と拒否の優先関係ではありません。SCP がそもそも管理アカウントのユーザーとロールに影響しないためです。"
+        },
+        {
+          "key": "B",
+          "text": "SCP は管理アカウントのユーザーとロールに影響せず、メンバーアカウントだけに効くため、同じ操作を実行できた。"
+        },
+        {
+          "key": "C",
+          "text": "SCP は管理アカウントに個別に割り当てた場合にだけ効くため、割り当てていない管理アカウントは同じ操作を実行できた。",
+          "explanation": "管理アカウントに SCP を個別に割り当てても、SCP は管理アカウントのユーザーとロールに影響しません。割り当ての有無で結果が変わる仕組みではありません。"
+        },
+        {
+          "key": "D",
+          "text": "SCP の変更が管理アカウントに反映されるまでに時間がかかるため、反映前の管理アカウントは同じ操作を実行できた。",
+          "explanation": "反映の遅れが原因ではありません。時間がたっても、SCP は管理アカウントのユーザーとロールに影響しません。"
+        }
+      ],
+      "correctAnswers": ["B"]
+    },
+    {
+      "questionId": "SOA-0125",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain5",
+      "difficulty": "easy",
+      "questionType": "single",
+      "questionText": "ある企業は、VPC 内の EC2 インスタンスが IPv4 と IPv6 の両方で通信できるように、デュアルスタックのサブネットを新しく作成しようとしています。CloudOps エンジニアは、サブネットの作成の前に、サブネットと VPC のそれぞれに必要な CIDR ブロックを確認する必要があります。\n\nこの構成で、サブネットと VPC に必要な CIDR ブロックの組み合わせはどれでしょうか。",
+      "explanation": "## 問われている要件\nデュアルスタックのサブネットを作るときに、サブネットと VPC のそれぞれへ、どの CIDR ブロックを持たせる必要があるかを答える設問です。\n\n## 正解の決め手\nデュアルスタックとは、サブネットが IPv4 用と IPv6 用の 2 種類の CIDR ブロックを備える形です。このサブネットを収める VPC も、同じく 2 種類の CIDR ブロックを備えている必要があります。サブネットだけでなく VPC でも両方をそろえる点が、決め手です。\n\n## 解くための考え方\nサブネットと VPC という 2 つの階層について、それぞれ IPv4 と IPv6 のどちらが必要かを整理します。両方の階層で両方の CIDR ブロックが必要という条件に合う組み合わせは、1 つだけです。\n\n## 他の選択肢が誤りである理由\nサブネットには IPv4 の CIDR ブロックだけを割り当て、VPC には両方の CIDR ブロックを関連付ける。\n\nデュアルスタックのサブネットには、IPv4 用と IPv6 用の両方の CIDR ブロックが要ります。IPv4 だけを割り当てたサブネットは、デュアルスタックの条件に合いません。\n\nVPC には IPv4 の CIDR ブロックだけを関連付け、サブネットには IPv4 と IPv6 の両方の CIDR ブロックを割り当てる。\n\nサブネット側が両方を備えていても、VPC 側が IPv4 だけでは足りません。VPC にも、IPv4 と IPv6 の両方の CIDR ブロックが必要です。\n\nサブネットには IPv4 と IPv6 の両方の CIDR ブロックを割り当て、VPC には IPv6 の CIDR ブロックだけを関連付ける。\n\nVPC に必要なのは、IPv6 だけではなく、IPv4 と IPv6 の両方です。IPv4 の CIDR ブロックを欠く VPC では、デュアルスタックのサブネットの条件に合いません。\n\n## まとめ\nデュアルスタックのサブネットを作るときは、サブネットと VPC の両方に、IPv4 と IPv6 の CIDR ブロックをそろえます。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/vpc/latest/userguide/configure-subnets.html",
+          "title": "Subnets for your VPC - Amazon Virtual Private Cloud"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "サブネットには IPv4 の CIDR ブロックだけを割り当て、VPC には両方の CIDR ブロックを関連付ける。",
+          "explanation": "デュアルスタックのサブネットには、IPv4 用と IPv6 用の両方の CIDR ブロックが要ります。IPv4 だけを割り当てたサブネットは、デュアルスタックの条件に合いません。"
+        },
+        {
+          "key": "B",
+          "text": "VPC には IPv4 の CIDR ブロックだけを関連付け、サブネットには IPv4 と IPv6 の両方の CIDR ブロックを割り当てる。",
+          "explanation": "サブネット側が両方を備えていても、VPC 側が IPv4 だけでは足りません。VPC にも、IPv4 と IPv6 の両方の CIDR ブロックが必要です。"
+        },
+        {
+          "key": "C",
+          "text": "サブネットには IPv4 と IPv6 の両方の CIDR ブロックを割り当て、VPC にも両方の CIDR ブロックを関連付ける。"
+        },
+        {
+          "key": "D",
+          "text": "サブネットには IPv4 と IPv6 の両方の CIDR ブロックを割り当て、VPC には IPv6 の CIDR ブロックだけを関連付ける。",
+          "explanation": "VPC に必要なのは、IPv6 だけではなく、IPv4 と IPv6 の両方です。IPv4 の CIDR ブロックを欠く VPC では、デュアルスタックのサブネットの条件に合いません。"
+        }
+      ],
+      "correctAnswers": ["C"]
+    },
+    {
+      "questionId": "SOA-0126",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain1",
+      "difficulty": "medium",
+      "questionType": "single",
+      "questionText": "ある企業は、稼働中のアプリケーションに、処理件数をカスタムメトリクスとして CloudWatch に送信する機能を追加する予定です。メトリクスの送信は、機能の展開後に始まります。このカスタムメトリクスは、環境名とサービス名の両方をディメンションに持ちます。CloudOps エンジニアは、送信が始まる前に、このメトリクスのアラームを作成する必要があります。送信の開始後には、そのアラームが有効に動作することも求められています。\n\nこの要件を満たすアラームの作成方法はどれでしょうか。",
+      "explanation": "## 問われている要件\nある企業のカスタムメトリクスは、これから CloudWatch に送信される予定です。CloudOps エンジニアは、送信が始まる前にアラームを作成し、送信の開始後にそのアラームを有効に動作させる必要があります。問われているのは、そのためにアラームの作成時に何を指定するかです。\n\n## 正解の決め手\nCloudWatch では、カスタムメトリクスより先に、そのメトリクスのアラームを作成できます。ただし、アラームを有効にするには、名前空間とメトリクス名に加えて、そのカスタムメトリクスのディメンションをすべて指定する必要があります。このメトリクスは環境名とサービス名の両方をディメンションに持つため、2 つとも指定します。\n\n## 解くための考え方\nCloudOps エンジニアにとって、判断を分ける点は 2 つあります。1 つ目は、メトリクスの送信前にアラームを作れるかどうかです。作れるので、送信の開始を待つ必要はありません。2 つ目は、作成時に指定する項目です。名前空間とメトリクス名だけでなく、ディメンションの指定も要るため、一部のディメンションだけでは足りません。\n\n## 他の選択肢が誤りである理由\n名前空間とメトリクス名だけを指定し、ディメンションを省いてアラームを作成する。\n\n名前空間とメトリクス名だけでは、アラームを有効にするには足りません。カスタムメトリクスのディメンションを、すべて指定する必要があります。このメトリクスは環境名とサービス名のディメンションを持つため、ディメンションを省いたアラームは、送信が始まったあとも有効に動作しません。\n\n名前空間とメトリクス名に加えて、ディメンションを 1 つだけ指定してアラームを作成する。\n\nディメンションを 1 つだけ指定する形も、足りません。このカスタムメトリクスは環境名とサービス名の 2 つのディメンションを持ち、アラームを有効にするには、そのすべてを指定する必要があります。\n\nメトリクスの最初のデータポイントが届くまで待ち、届いたあとにアラームを作成する。\n\nCloudWatch では、カスタムメトリクスより先にアラームを作成できるため、データポイントが届くまで待つ必要はありません。この手順は、送信が始まる前にアラームを作成するという要件にも合いません。\n\n## まとめ\nCloudWatch のアラームは、カスタムメトリクスの送信前にも作成できます。有効に動作させるには、名前空間とメトリクス名に加えて、そのメトリクスのディメンションをすべて指定します。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/AlarmThatSendsEmail.html",
+          "title": "Using Amazon CloudWatch alarms - Amazon CloudWatch"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "名前空間とメトリクス名だけを指定し、ディメンションを省いてアラームを作成する。",
+          "explanation": "名前空間とメトリクス名だけでは、アラームを有効にするには足りません。カスタムメトリクスのディメンションを、すべて指定する必要があります。このメトリクスは環境名とサービス名のディメンションを持つため、ディメンションを省いたアラームは、送信が始まったあとも有効に動作しません。"
+        },
+        {
+          "key": "B",
+          "text": "名前空間とメトリクス名に加えて、ディメンションを 1 つだけ指定してアラームを作成する。",
+          "explanation": "ディメンションを 1 つだけ指定する形も、足りません。このカスタムメトリクスは環境名とサービス名の 2 つのディメンションを持ち、アラームを有効にするには、そのすべてを指定する必要があります。"
+        },
+        {
+          "key": "C",
+          "text": "名前空間とメトリクス名に加えて、ディメンションをすべて指定してアラームを作成する。"
+        },
+        {
+          "key": "D",
+          "text": "メトリクスの最初のデータポイントが届くまで待ち、届いたあとにアラームを作成する。",
+          "explanation": "CloudWatch では、カスタムメトリクスより先にアラームを作成できるため、データポイントが届くまで待つ必要はありません。この手順は、送信が始まる前にアラームを作成するという要件にも合いません。"
+        }
+      ],
+      "correctAnswers": ["C"]
+    },
+    {
+      "questionId": "SOA-0127",
+      "examCode": "AWS-SOA-C03",
+      "domain": "domain4",
+      "difficulty": "medium",
+      "questionType": "multiple",
+      "questionText": "ある企業は、Mexico (Central) リージョン(mx-central-1)で Web アプリケーションを稼働させています。CloudOps エンジニアは、コンプライアンスを確認する複数のルールをひとまとまりにして AWS アカウントへ展開し、そのまとまり全体の状況を一括で把握する必要があります。さらに、この Web サイトで使う AWS Certificate Manager (ACM) の証明書を発行する必要があります。ただし、このエンジニアには、証明書に使うドメインの DNS 設定を編集する権限がありません。\n\nこれらの要件を満たす対応はどれでしょうか。(2 つ選択)",
+      "explanation": "## 問われている要件\nこの問題で CloudOps エンジニアが満たす要件は 2 つあります。1 つは、複数のルールをひとまとまりにして Mexico (Central) リージョンのアカウントへ展開し、全体の状況を一括で把握することです。もう 1 つは、DNS 設定を編集する権限がない状態で、ACM の証明書を発行することです。2 つの要件は別の層の話なので、それぞれに合う対応を 1 つずつ選びます。\n\n## 正解の決め手\nACM では、ドメインの DNS 設定を編集する権限がないとき、DNS 検証の代わりに電子メール検証を使う必要があります。このエンジニアには編集する権限がないので、検証方法に電子メール検証を選ぶ対応が正答です。\n\n適合パックは、複数のルールをひとまとまりにした単位で、AWS アカウントへ展開し、一体として監視できます。Mexico (Central)(mx-central-1)リージョンは、適合パックのサポート対象でもあります。したがって、このリージョンで適合パックを使う対応が正答です。\n\n## 解くための考え方\n要件を 1 つずつ分けて、どの仕組みで満たせるかを考えます。そのうえで、選択肢が前提にしている条件(権限の有無、リージョンの対応状況)が、事実と合っているかを確かめます。\n\n## 他の選択肢が誤りである理由\nACM で証明書を要求し、検証方法に DNS 検証を選んで、証明書を発行する。\n\nこのエンジニアには DNS 設定を編集する権限がないので、DNS 検証は使えません。この条件では、電子メール検証に切り替える必要があります。\n\nMexico (Central) リージョンで、コンプライアンスのルールを 1 つずつ個別に有効にし、ルールごとに結果を監視する。\n\nルールを個別に有効にしても、複数のルールをひとまとまりとして展開し、一体として監視する要件は満たせません。この要件に合うのは、複数のルールをまとめた単位である適合パックです。\n\nMexico (Central) リージョンは適合パックに対応していないので、別のリージョンで適合パックを展開して結果を監視する。\n\nMexico (Central)(mx-central-1)リージョンは適合パックのサポート対象なので、別のリージョンへ回す必要はありません。「対応していない」という前提が誤りです。\n\n## まとめ\nDNS 設定を編集する権限がないときの ACM の検証は電子メール検証です。複数のルールをひとまとまりで展開し、一体として監視するときは適合パックを使います。Mexico (Central) リージョンでも、適合パックは使えます。",
+      "references": [
+        {
+          "url": "https://docs.aws.amazon.com/acm/latest/userguide/dns-validation.html",
+          "title": "AWS Certificate Manager DNS validation - AWS Certificate Manager"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/config/latest/developerguide/WhatIsConfig.html",
+          "title": "What Is AWS Config? - AWS Config"
+        },
+        {
+          "url": "https://docs.aws.amazon.com/config/latest/developerguide/conformance-packs.html",
+          "title": "Conformance Packs for AWS Config - AWS Config"
+        }
+      ],
+      "choices": [
+        {
+          "key": "A",
+          "text": "ACM で証明書を要求し、検証方法に電子メール検証を選んで、証明書を発行する。"
+        },
+        {
+          "key": "B",
+          "text": "ACM で証明書を要求し、検証方法に DNS 検証を選んで、証明書を発行する。",
+          "explanation": "このエンジニアには DNS 設定を編集する権限がないので、DNS 検証は使えません。この条件では、DNS 検証ではなく電子メール検証を使う必要があります。"
+        },
+        {
+          "key": "C",
+          "text": "Mexico (Central) リージョンで、コンプライアンスのルールを 1 つずつ個別に有効にし、ルールごとに結果を監視する。",
+          "explanation": "ルールを個別に有効にしても、複数のルールをひとまとまりとして展開し、一体として監視する要件は満たせません。この要件に合うのは、複数のルールをまとめた単位である適合パックです。"
+        },
+        {
+          "key": "D",
+          "text": "Mexico (Central) リージョンで、適合パックを使って複数のルールをまとめて展開し、結果を一体として監視する。"
+        },
+        {
+          "key": "E",
+          "text": "Mexico (Central) リージョンは適合パックに対応していないので、別のリージョンで適合パックを展開して結果を監視する。",
+          "explanation": "Mexico (Central)(mx-central-1)リージョンは適合パックのサポート対象なので、別のリージョンへ回す必要はありません。「対応していない」という前提が誤りです。"
+        }
+      ],
+      "correctAnswers": ["A", "D"]
     }
   ]
 }
