@@ -151,7 +151,7 @@ function splitGit(tokens: string[]): { sub: string; args: string[] } | null {
 }
 
 // 実行の前後で、HEAD やブランチが変わる git の操作。フックは実行の前の状態で照合するので、同じコマンドに置かせない
-const HEAD_MOVING = new Set([
+export const HEAD_MOVING = new Set([
   "commit",
   "switch",
   "checkout",
@@ -299,7 +299,7 @@ function classifySegment(tokens: string[], out: Classified, fine: boolean): void
       }
       if (
         a === "--delete" ||
-        a === "-d" ||
+        SHORT_CLUSTER("d").test(a) ||
         a === "--tags" ||
         a === "--mirror" ||
         a === "--all" ||
