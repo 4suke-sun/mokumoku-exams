@@ -28,7 +28,7 @@
   },
   "draft": {
     "maxAttempts": 3,
-    "maxPerRequest": 5,
+    "maxPerRequest": 8,
     "maxFactsPerRequest": 12,
     "maxRounds": 3,
     "similarity": { "duplicate": 0.85, "hold": 0.6 }
@@ -58,7 +58,8 @@
     }
   },
   "verify": {
-    "maxAttempts": 3
+    "maxAttempts": 3,
+    "bundleSize": 10
   },
   "judge": {
     "maxAttempts": 3,
@@ -99,7 +100,7 @@
         "targetTotal": 457,
         "services": { "minPerService": 2, "maxShare": 0.15, "minMultiServiceShare": 0.3 }
       },
-      "AWS-SOA-C03": { "targetTotal": 65, "typeMix": { "single": 0.7, "multiple": 0.3, "free-text": 0 } },
+      "AWS-SOA-C03": { "targetTotal": 130, "typeMix": { "single": 0.7, "multiple": 0.3, "free-text": 0 } },
       "DBX-DEA-2605": { "targetTotal": 180, "typeMix": { "single": 0.9, "multiple": 0.1, "free-text": 0 } }
     }
   },

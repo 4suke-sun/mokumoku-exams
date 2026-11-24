@@ -12,6 +12,10 @@ export const CaseResultSchema = z.strictObject({
   explanation: z.enum(["pass", "hold"]).optional(),
   /** 出力の形が違い、出し直しの上限に達した。先へ進めないので、止めたものとして数える */
   stopped: z.boolean().optional(),
+  /** 再導出の選択肢ごとの判定(記号と判定だけ。束の独立性の確かめで、起動ごとの一致を比べるために持つ) */
+  choices: z.record(z.string(), z.enum(["correct", "incorrect", "unknown"])).optional(),
+  /** 解説の確認の指摘(場所と理由コードだけ。`<場所> <理由コード>` の形) */
+  findings: z.array(z.string()).optional(),
 });
 
 export type CaseResult = z.infer<typeof CaseResultSchema>;

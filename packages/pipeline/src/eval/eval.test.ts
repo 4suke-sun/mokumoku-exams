@@ -394,7 +394,7 @@ describe("eval コマンド", () => {
     expect(evalRequests(root)).toHaveLength(requests.length);
   });
 
-  it("取り込み_期待する判定と照合して、種類ごとの検出率・誤検出率のレポートを書く。レポートに定義・モデル・データのハッシュ・日付があり、本文はない", async () => {
+  it("取り込み_期待する判定と照合して、種類ごとの検出率・誤検出率のレポートを書く。レポートに定義・モデル・データのハッシュ・日付があり、本文はない。結果に選択肢ごとの判定と指摘の場所・理由コードを残す", async () => {
     const root = withApproved(6);
     await runMain(root, ["eval", EXAM]);
     stubVerifier(root);
@@ -421,12 +421,35 @@ describe("eval コマンド", () => {
     expect(m.meetsTargets).toBe(false);
     expect(m.counts.pending).toBe(0);
     expect(r.out).toContain("評価の指標: 検出率(全体) 66.7% 4/6");
+    // 結果には、起動ごとの一致を比べるための、選択肢ごとの判定と、指摘の場所・理由コードだけを残す
+    const results = JSON.parse(readFileSync(evalDir(root, "results.json"), "utf8")) as Record<
+      string,
+      { choices?: Record<string, string>; findings?: string[] }
+    >;
+    const finished = Object.values(results);
+    expect(finished.every((x) => x.choices !== undefined && Object.keys(x.choices).length > 0)).toBe(true);
+    expect(finished.some((x) => x.choices?.B === "correct")).toBe(true);
+    expect(finished.some((x) => x.findings?.includes("explanation overclaim"))).toBe(true);
     const md = readFileSync(evalDir(root, "report.md"), "utf8");
     expect(md).toContain("# 検証役の評価");
-    const everything = md + JSON.stringify(report) + r.out + r.err;
+    const everything = md + JSON.stringify(report) + JSON.stringify(results) + r.out + r.err;
     expect(everything).not.toContain("評価の架空の設問");
     expect(everything).not.toContain("上限はいくつですか");
     expect(everything).not.toContain("100 個");
+  });
+
+  it("--bundles_待っている評価の依頼を、検証と同じ束の大きさで区切って挙げ、何も書かない", async () => {
+    const root = withApproved(6);
+    await runMain(root, ["eval", EXAM]);
+    const requests = evalRequests(root);
+    const before = readdirSync(evalDir(root, "requests")).sort();
+    const r = await runMain(root, ["eval", EXAM, "--bundles"], { verify: { ...baseConfig.verify, bundleSize: 5 } });
+    expect(r.code).toBe(EXIT.ok);
+    const lines = r.out.split("\n").filter((l) => l.startsWith("評価の束: rederive "));
+    expect(lines).toHaveLength(Math.ceil(requests.length / 5));
+    const listed = lines.flatMap((l) => l.split(" ").slice(4));
+    expect(listed).toHaveLength(requests.length);
+    expect(readdirSync(evalDir(root, "requests")).sort()).toEqual(before);
   });
 
   it("出力の形が違い、出し直しの上限に達した_止めたものとして数え、評価の割合の分母に入れない", async () => {

@@ -360,6 +360,35 @@ describe("draft の取り込み", () => {
     if (sameItem) expect(sameItem.count).toBe(request.count - 1);
   });
 
+  it("取り込んだ下書きが書き出し済み(来歴に問題 ID がある)_公開済みの問題として計画の既存に数えるので、項目を満たす数には数えない", async () => {
+    const root = setupDraftRoot();
+    const request = await firstRequest(root);
+    writeOutput(root, request, [draftFor(request)]);
+    await runMain(root, ["draft", EXAM, "--import"]);
+    const file = JSON.parse(readFileSync(join(root, baseConfig.provenanceDir, "aws-aib-c01.json"), "utf8")) as {
+      entries: { questionId?: string }[];
+    };
+    for (const entry of file.entries) entry.questionId = "AIB-0001";
+    writeFileSync(join(root, baseConfig.provenanceDir, "aws-aib-c01.json"), JSON.stringify(file));
+    // その項目の数を 1 にする(取り込んだ 1 件で満たす数。分野と総数の目標と不足も同じだけ減らし、計画の検査に通す)
+    const path = planPath(join(root, baseConfig.workDir), EXAM);
+    const plan = readPlan(path);
+    if (plan === null) throw new Error("計画がない");
+    const item = plan.items.find((i) => i.id === request.planItemId);
+    const domain = plan.domains.find((d) => d.domain === item?.domain);
+    if (item === undefined || domain === undefined) throw new Error("項目がない");
+    const cut = item.count - 1;
+    item.count = 1;
+    domain.target -= cut;
+    domain.missing -= cut;
+    plan.targetTotal -= cut;
+    writeFileSync(path, JSON.stringify(plan));
+    const again = await runMain(root, ["draft", EXAM]);
+    expect(again.code, again.err).toBe(EXIT.ok);
+    const sameItem = readRequests(root).find((q) => q.planItemId === request.planItemId);
+    expect(sameItem?.count).toBe(1);
+  });
+
   it("形に合わない出力_上限まで再試行され_超えたら失敗として記録される", async () => {
     const root = setupDraftRoot();
     const request = await firstRequest(root);

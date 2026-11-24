@@ -9,9 +9,33 @@
     },
     {
       "target": "draft",
+      "id": "d-0324e4139ba9",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-0448743add4b",
       "decision": "approve",
       "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-04a6add74235",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-04ee59883337",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-0701fd19a5b7",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -39,6 +63,12 @@
     },
     {
       "target": "draft",
+      "id": "d-0b4b46ed3508",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-0c789bba8167",
       "decision": "reject",
       "reason": "fact-unverified"
@@ -54,6 +84,12 @@
       "id": "d-10249015be7b",
       "decision": "approve",
       "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-13c195e49f88",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -75,15 +111,45 @@
     },
     {
       "target": "draft",
+      "id": "d-16853b5e0b21",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-1747c0e1fb87",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-18401e0d42b0",
       "decision": "approve",
       "reason": "human-approved"
     },
     {
       "target": "draft",
+      "id": "d-1881977f7528",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-18a58fddf349",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-18d741213a97",
       "decision": "approve",
       "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-1ceaddd579da",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -105,6 +171,18 @@
     },
     {
       "target": "draft",
+      "id": "d-2669d8c10b90",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-26a7b257b2fb",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-28d38f54771c",
       "decision": "reject",
       "reason": "fact-mismatch"
@@ -114,6 +192,12 @@
       "id": "d-29195158dc8e",
       "decision": "approve",
       "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-2967c307f137",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -141,9 +225,27 @@
     },
     {
       "target": "draft",
+      "id": "d-3251bf56de79",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-33efe757f7fe",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-344ecf0dc545",
       "decision": "reject",
       "reason": "similar-question"
+    },
+    {
+      "target": "draft",
+      "id": "d-357e1c2ab3b4",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -153,15 +255,57 @@
     },
     {
       "target": "draft",
+      "id": "d-362448f2d235",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-366fabff8ab1",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-37565b25d251",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-37d50db2f39a",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-3823d051d0a5",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-38f9868cac17",
       "decision": "approve",
       "reason": "human-approved"
     },
     {
       "target": "draft",
+      "id": "d-399ed2df62fc",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-3d8b0688d32f",
       "decision": "approve",
       "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-40041d6f6fd6",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -177,9 +321,21 @@
     },
     {
       "target": "draft",
+      "id": "d-43a2d23914ed",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-446bf4aace2f",
       "decision": "reject",
       "reason": "similar-question"
+    },
+    {
+      "target": "draft",
+      "id": "d-473f2ee0b9a5",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -201,6 +357,12 @@
     },
     {
       "target": "draft",
+      "id": "d-4c0ac5c591c6",
+      "decision": "reject",
+      "reason": "unresolved-overclaim"
+    },
+    {
+      "target": "draft",
       "id": "d-534babe04264",
       "decision": "reject",
       "reason": "similar-question"
@@ -213,15 +375,57 @@
     },
     {
       "target": "draft",
+      "id": "d-557d1cbfa177",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-56a3ab26de39",
       "decision": "approve",
       "reason": "human-approved"
     },
     {
       "target": "draft",
+      "id": "d-59cf442803e0",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-5a01250d7233",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-5a9e10ec8f51",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-5d79f486fcf6",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-5d9277bfa60a",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-61610a0d1551",
       "decision": "reject",
       "reason": "fact-mismatch"
+    },
+    {
+      "target": "draft",
+      "id": "d-61bb5aa5f432",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -234,6 +438,12 @@
       "id": "d-61f5a7bcd99d",
       "decision": "reject",
       "reason": "fact-mismatch"
+    },
+    {
+      "target": "draft",
+      "id": "d-62570d942e56",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -261,6 +471,12 @@
     },
     {
       "target": "draft",
+      "id": "d-6942970a5420",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-70622266b2ee",
       "decision": "approve",
       "reason": "human-approved"
@@ -276,6 +492,12 @@
       "id": "d-727a1c7d19bf",
       "decision": "approve",
       "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-73a2c5fecf68",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -297,15 +519,51 @@
     },
     {
       "target": "draft",
+      "id": "d-77a6c6aa1a85",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-790fa545b4e4",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-7a53d0dd20f1",
       "decision": "approve",
       "reason": "human-approved"
     },
     {
       "target": "draft",
+      "id": "d-7cea2d404cc9",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-7ebebf1c60a2",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-819692b9fc19",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-82206ea99261",
       "decision": "approve",
       "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-824b7bb7f028",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -321,15 +579,33 @@
     },
     {
       "target": "draft",
+      "id": "d-82c9d790cd78",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-8be91eecf4e7",
       "decision": "approve",
       "reason": "human-approved"
     },
     {
       "target": "draft",
+      "id": "d-8dfe5dca93d2",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-8f4b65c81312",
       "decision": "reject",
       "reason": "similar-question"
+    },
+    {
+      "target": "draft",
+      "id": "d-8f6a9d63235b",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -351,9 +627,27 @@
     },
     {
       "target": "draft",
+      "id": "d-95fdd665fe0f",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-96fb32900039",
       "decision": "approve",
       "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-9b4bb3b69b58",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-9c6247492e52",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -366,6 +660,18 @@
       "id": "d-9f80ed4641e6",
       "decision": "approve",
       "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-a1f8a5a31f1b",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-a6855c314103",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -387,6 +693,12 @@
     },
     {
       "target": "draft",
+      "id": "d-ad5dad845088",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-ada2ca9649cf",
       "decision": "reject",
       "reason": "fact-mismatch"
@@ -396,6 +708,12 @@
       "id": "d-ae182ac6d2a7",
       "decision": "approve",
       "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-b07c0df7e581",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -429,9 +747,33 @@
     },
     {
       "target": "draft",
+      "id": "d-badfb7a36e07",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-bb4388cbfb2c",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-bd2bfcd1f1eb",
       "decision": "approve",
       "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-bf5d83a5cac0",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-bf81d276a0f9",
+      "decision": "reject",
+      "reason": "duplicate-topic"
     },
     {
       "target": "draft",
@@ -456,6 +798,24 @@
       "id": "d-c44f95059ce7",
       "decision": "approve",
       "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-c6cf7df036ab",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-c71b8b377349",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-c79ccad6292c",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -495,9 +855,27 @@
     },
     {
       "target": "draft",
+      "id": "d-d4e1fa7e5793",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-da04f79aa7bf",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-dbef4092eb4d",
       "decision": "approve",
       "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-dc4149395685",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -513,6 +891,12 @@
     },
     {
       "target": "draft",
+      "id": "d-e4b17bb75b83",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-e891eb0659b4",
       "decision": "reject",
       "reason": "fact-mismatch"
@@ -522,6 +906,12 @@
       "id": "d-ea32298caab1",
       "decision": "approve",
       "reason": "human-approved"
+    },
+    {
+      "target": "draft",
+      "id": "d-ea45fbdecd13",
+      "decision": "approve",
+      "reason": "reviewed"
     },
     {
       "target": "draft",
@@ -543,6 +933,18 @@
     },
     {
       "target": "draft",
+      "id": "d-f2c6649e2e25",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
+      "id": "d-f4a5f38a1e59",
+      "decision": "approve",
+      "reason": "reviewed"
+    },
+    {
+      "target": "draft",
       "id": "d-f6c6c7cc997d",
       "decision": "reject",
       "reason": "fact-mismatch"
@@ -552,6 +954,96 @@
       "id": "d-fa4e13fb83d6",
       "decision": "approve",
       "reason": "human-approved"
+    },
+    {
+      "target": "fact",
+      "id": "f-097d5e67fa0d",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-16ac95a5f408",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-1d17a0e59c80",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-225998a2174f",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-4145f9ddcd58",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-5be8a4a8038b",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-6012bbc160e8",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-6ec4f20a90ec",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-746e583d0295",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-754eea6156cd",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-7b72179a2c53",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-8fff5994a2cf",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-91210573dd6a",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-f050cd292163",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
+    },
+    {
+      "target": "fact",
+      "id": "f-f390bc8497a8",
+      "decision": "reject",
+      "reason": "out-of-scope-service"
     }
   ]
 }

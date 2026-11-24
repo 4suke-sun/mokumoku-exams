@@ -26,7 +26,12 @@ const GUIDE = `${BASE}index.html`;
 const DOC = `${BASE}service.html`;
 const repoRoot = resolve(import.meta.dirname, "../../../..");
 const config = JSON.parse(readFileSync(resolve(import.meta.dirname, "../../pipeline.config.json"), "utf8"));
-const singleOnly = { plan: { ...config.plan, typeMix: { single: 1, multiple: 0, "free-text": 0 } } };
+// 1 依頼あたりの数が多いと下書きの数が増え、検証の依頼が 1 回の件数の上限(maxItemsPerRun)に達して、
+// 検証を決まった回数だけ回す通しの手順(verifyAll)が、件数の上限の通知(終了コード 1)で止まる。通しの確かめでは 5 に固定する
+const singleOnly = {
+  plan: { ...config.plan, typeMix: { single: 1, multiple: 0, "free-text": 0 } },
+  draft: { ...config.draft, maxPerRequest: 5 },
+};
 
 const routes: Record<string, FakeResponse> = {
   "https://docs.aws.amazon.com/robots.txt": ROBOTS_OK,

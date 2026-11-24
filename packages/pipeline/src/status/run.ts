@@ -189,7 +189,7 @@ export function runStatus(options: StatusOptions): ExitCode {
     line(`役 ${role} ${stamp.model} 定義 ${stamp.definitionHash.slice(0, 12)}`);
   }
   line(
-    `見積もり 依頼待ち ${PIPELINE_ROLES.map((role) => `${role} ${waitingByRole[role]} 件 × ${(stamps.get(role) as AgentStamp).model}`).join("、")}。1 回の実行の上限 ${config.maxItemsPerRun} 件`,
+    `見積もり 依頼待ち ${PIPELINE_ROLES.map((role) => `${role} ${waitingByRole[role]} 件 × ${(stamps.get(role) as AgentStamp).model}`).join("、")}。1 回の実行の上限 ${config.maxItemsPerRun} 件、検証役の束の大きさ ${config.verify.bundleSize} 件`,
   );
   return EXIT.ok;
 }
