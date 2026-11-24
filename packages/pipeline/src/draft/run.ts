@@ -210,7 +210,7 @@ export function runDraft(options: DraftOptions): ExitCode {
   if (needsReviser && reviser === null) return EXIT.checkFailed;
   switch (options.mode) {
     case "request":
-      return requestStep(options, paths, master.domains, facts, drafts, ledger, stamp as AgentStamp);
+      return requestStep(options, paths, master.domains, facts, drafts, ledger, provenance, stamp as AgentStamp);
     case "revise":
       return reviseStep(options, paths, master.domains, facts, drafts, ledger, decisions, reviser as AgentStamp);
     case "rewrite":
@@ -414,6 +414,7 @@ function requestStep(
   facts: FactsFile,
   drafts: DraftsFile,
   ledger: LedgerFile,
+  provenance: ProvenanceFile,
   stamp: AgentStamp,
 ): ExitCode {
   const { config, rootDir, examCode, output, dryRun } = options;
@@ -473,10 +474,14 @@ function requestStep(
   for (const [id, reasons] of Object.entries(state.unmet)) report(output, "前回の未達", `${id} ${reasons.join(",")}`);
   const unmet: Record<string, UnmetReason[]> = {};
   const examined = new Set<string>();
+  const exported = new Set(provenance.entries.filter((e) => e.questionId !== undefined).map((e) => e.draftId));
   const items = options.domain === undefined ? plan.items : plan.items.filter((i) => i.domain === options.domain);
   for (const item of items) {
     examined.add(item.id);
-    const have = drafts.drafts.filter((d) => d.planItemId === item.id && d.status !== "rejected").length;
+    // 書き出し済みの下書き(来歴に問題 ID がある)は、公開済みの問題として計画の既存に数えたので、項目を満たす数に数えない
+    const have = drafts.drafts.filter(
+      (d) => d.planItemId === item.id && d.status !== "rejected" && !exported.has(d.id),
+    ).length;
     const remaining = item.count - have;
     if (remaining <= 0) {
       satisfied++;
