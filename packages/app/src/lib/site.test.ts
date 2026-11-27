@@ -20,9 +20,12 @@ describe("sitemap", () => {
   it("ログインなしで開ける画面だけを載せる", () => {
     const entries = sitemapOf("https://example.com");
     expect(entries.map((e) => e.url).sort()).toEqual([
+      "https://example.com/contact",
       "https://example.com/forgot-password",
+      "https://example.com/help",
       "https://example.com/login",
       "https://example.com/privacy",
+      "https://example.com/release-notes",
       "https://example.com/signup",
     ]);
     for (const entry of entries) expect(isPublicPath(new URL(entry.url).pathname), entry.url).toBe(true);
@@ -30,7 +33,7 @@ describe("sitemap", () => {
 
   it("ログインが必要な画面_載せない", () => {
     const paths = sitemapOf("https://example.com").map((e) => new URL(e.url).pathname);
-    for (const path of ["/", "/exams", "/account", "/help", "/release-notes", "/bookmarks"]) {
+    for (const path of ["/", "/exams", "/account", "/bookmarks", "/contact/question"]) {
       expect(paths).not.toContain(path);
     }
   });
@@ -45,7 +48,16 @@ describe("robots", () => {
     const robots = robotsOf("https://example.com");
     expect(robots.rules).toEqual({
       userAgent: "*",
-      allow: ["/login", "/forgot-password", "/signup", "/privacy", "/icons/icon-512.png"],
+      allow: [
+        "/login",
+        "/forgot-password",
+        "/signup",
+        "/privacy",
+        "/help",
+        "/release-notes",
+        "/contact",
+        "/icons/icon-512.png",
+      ],
       disallow: "/",
     });
     expect(robots.sitemap).toBe("https://example.com/sitemap.xml");

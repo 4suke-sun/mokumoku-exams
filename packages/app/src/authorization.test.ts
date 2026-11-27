@@ -92,7 +92,7 @@ function filesOf(): string[] {
   return found.sort();
 }
 
-const PUBLIC_PAGES = ["/forgot-password", "/login", "/privacy", "/signup"];
+const PUBLIC_PAGES = ["/contact", "/forgot-password", "/help", "/login", "/privacy", "/release-notes", "/signup"];
 const PROTECTED_PAGES = [
   "/",
   "/account",
@@ -106,7 +106,6 @@ const PROTECTED_PAGES = [
   "/admin/preview/sample/notebook/sample",
   "/admin/preview/sample/notebook/sample/sample",
   "/bookmarks",
-  "/contact",
   "/contact/question",
   "/exams",
   "/exams/sample",
@@ -124,8 +123,6 @@ const PROTECTED_PAGES = [
   "/exams/sample/study",
   "/exams/sample/study/domains/sample",
   "/exams/sample/study/sample",
-  "/help",
-  "/release-notes",
   "/review",
 ];
 /** 保護される画面のうち、管理者だけが開けるもの */
