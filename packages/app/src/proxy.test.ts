@@ -41,9 +41,18 @@ describe("proxy", () => {
     expect(await response.json()).toEqual({ error: "unauthorized" });
   });
 
+  it("お問い合わせの画面は公開でも_送信の API を未ログインで呼ぶと 401 で断る", async () => {
+    const response = await proxy(request("/api/feedback"));
+    expect(response.status).toBe(401);
+    expect(await response.json()).toEqual({ error: "unauthorized" });
+  });
+
   it.each([
     "/login",
     "/forgot-password",
+    "/help",
+    "/release-notes",
+    "/contact",
     "/api/auth/login",
     "/api/auth/new-password",
     "/api/auth/forgot-password",

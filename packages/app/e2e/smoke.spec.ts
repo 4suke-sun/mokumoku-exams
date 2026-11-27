@@ -171,6 +171,17 @@ test("主要な画面_WCAG 2.1 AA の自動検査で違反がない", async ({ p
   await page.goto("/privacy");
   await expect(page.getByRole("heading", { level: 1, name: "利用規約とプライバシーポリシー" })).toBeVisible();
   await expectAccessible(page, "利用規約とプライバシーポリシー");
+  // 利用者のデータを使わない画面は、ログインなしで開ける
+  await page.goto("/help");
+  await expect(page.getByRole("heading", { level: 1, name: "使い方" })).toBeVisible();
+  await expectAccessible(page, "使い方");
+  await page.goto("/release-notes");
+  await expect(page.getByRole("heading", { level: 1, name: "リリースノート" })).toBeVisible();
+  // お問い合わせは、開けるが、送るにはログインが要る
+  await page.goto("/contact");
+  await expect(page.getByText("お問い合わせを送るには、ログインが必要です。")).toBeVisible();
+  await expect(page.getByRole("button", { name: "送る" })).toHaveCount(0);
+  await expectAccessible(page, "お問い合わせ(ログインなし)");
   await login(page);
 
   await page.goto("/exams");

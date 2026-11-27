@@ -10,8 +10,10 @@ vi.mock("@/lib/exam-data.ts", () => ({
 }));
 const router = vi.hoisted(() => ({ back: vi.fn() }));
 vi.mock("next/navigation", () => ({ useRouter: () => router }));
+/** ログイン状態。既定はログイン中で、ログインなしの場合のテストだけ切り替える */
+const session = vi.hoisted(() => ({ status: "signed-in" as "signed-in" | "signed-out" | "loading" }));
 vi.mock("@/components/session-provider.tsx", () => ({
-  useSession: () => ({ state: { status: "signed-in" }, reload: async () => {}, signOut: async () => {} }),
+  useSession: () => ({ state: { status: session.status }, reload: async () => {}, signOut: async () => {} }),
 }));
 
 const { default: ContactPage } = await import("./page.tsx");
@@ -22,6 +24,7 @@ async function renderPage(query: { exam?: string | string[] } = {}) {
 }
 
 beforeEach(() => {
+  session.status = "signed-in";
   router.back.mockClear();
   vi.stubGlobal(
     "fetch",
@@ -83,5 +86,31 @@ describe("お問い合わせの画面", () => {
       expect(screen.getByRole("link", { name: "試験を指定せずにお問い合わせ" }).getAttribute("href")).toBe("/contact");
       cleanup();
     }
+  });
+
+  it("ログインしていない_フォームの代わりにログインが必要と出し_ログインのあとにこの画面へ戻るリンクを出す", async () => {
+    session.status = "signed-out";
+    for (const [query, next] of [
+      [{}, "/contact"],
+      [{ exam: "EX-SMP-XX" }, "/contact?exam=EX-SMP-XX"],
+    ] as const) {
+      await renderPage(query);
+      expect(screen.getByRole("heading", { level: 1, name: "お問い合わせ" })).toBeTruthy();
+      expect(screen.getByText("お問い合わせを送るには、ログインが必要です。")).toBeTruthy();
+      expect(screen.queryByRole("button", { name: "送る" })).toBeNull();
+      expect(screen.queryByLabelText("内容")).toBeNull();
+      const login = screen.getByRole("link", { name: "ログインする" }).getAttribute("href") ?? "";
+      expect(new URL(login, "https://example.com").searchParams.get("next"), JSON.stringify(query)).toBe(next);
+      expect(screen.getByRole("link", { name: "新規登録" }).getAttribute("href")).toBe("/signup");
+      expect(screen.getAllByRole("button", { name: "元の画面へ戻る" })).toHaveLength(1);
+      cleanup();
+    }
+  });
+
+  it("ログイン状態を確かめている間_フォームもログインの案内も出さない", async () => {
+    session.status = "loading";
+    await renderPage();
+    expect(screen.queryByRole("button", { name: "送る" })).toBeNull();
+    expect(screen.queryByText(/ログインが必要です/)).toBeNull();
   });
 });

@@ -37,9 +37,11 @@ Cognito UserPool による認証です。利用者は、メールアドレスと
 
 `proxy.ts` が、すべてのリクエストの入り口で ID トークンをサーバー側で検証します(`lib/auth/guard.ts` の `authenticate`)。
 
-- **ログインなしで開ける経路**: `/login`、`/signup`、`/forgot-password`、`/privacy`、`/_next/*`、認証の API のうち列挙した 10 個(`login`・`new-password`・`forgot-password`・`reset-password`・`refresh`・`logout`・`session`・`sign-up`・`confirm-sign-up`・`resend-code`)と、
+- **ログインなしで開ける経路**: `/login`、`/signup`、`/forgot-password`、`/privacy`、`/help`、`/release-notes`、`/contact`、`/_next/*`、認証の API のうち列挙した 10 個(`login`・`new-password`・`forgot-password`・`reset-password`・`refresh`・`logout`・`session`・`sign-up`・`confirm-sign-up`・`resend-code`)と、
   ブラウザや検索エンジンが Cookie なしで取りに来るファイル(`/manifest.webmanifest`、`/robots.txt`、`/sitemap.xml`、`/sw.js`、`/icons/` の列挙した 3 つ。`icon-512.png` は、共有のカードの画像にも使う)と、ログインの画面にも出すロゴ(`/brand/` の 2 つ)だけです。どのファイルも、秘密の情報を含みません。
-  ほかは、すべて検証が通らないと開けません(`/api/auth/change-password`・`/api/auth/delete-account` や、資格の一覧・ヘルプも同じです)。列挙は完全一致で、大文字小文字、末尾のスラッシュ、`..`・`%`・`\` を含むものでは広げられません。新しい認証の API とファイルは、列挙に足さない限り保護されます。
+  公開する画面は、ログインと登録に要る画面と、利用者のデータを使わない読み物(使い方、リリースノート、利用規約とプライバシーポリシー)と、お問い合わせの画面です。
+  お問い合わせの画面は開けても、送信の API(`/api/feedback`)は保護したままで、ログインしていなければ、画面はフォームの代わりにログインへの案内を出します(`components/login-required.tsx` の `LoginRequired`)。
+  ほかは、すべて検証が通らないと開けません(`/api/auth/change-password`・`/api/auth/delete-account`・`/api/feedback` や、資格の一覧・問題の誤りの報告の画面も同じです)。列挙は完全一致で、大文字小文字、末尾のスラッシュ、`..`・`%`・`\` を含むものでは広げられません。新しい認証の API とファイルは、列挙に足さない限り保護されます。
   画面・API・ファイルの経路の一覧は `packages/app/src/authorization.test.ts` に固定してあり、新しい画面や API、`public/` のファイルを足すと、一覧に足すまでテストが落ちます(公開するか、保護するかを、意識して決めるためです)。
 - **`public/` のファイルの配信**: 本番では、`public/` のファイル(`/brand/*`・`/icons/*`・`/sw.js`)は、CloudFront が S3 から配り、入口を通りません(「インフラの構築とデプロイ」)。
   このため、この 3 つの経路に置いたファイルは、上の列挙によらず、ログインなしで取れます。公開してよいものだけを置きます。

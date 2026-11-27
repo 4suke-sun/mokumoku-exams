@@ -56,8 +56,20 @@ export const PUBLIC_AUTH_API_PATHS: ReadonlySet<string> = new Set(
   ].map((name) => `/api/auth/${name}`),
 );
 
-/** ログインなしで開ける画面。sitemap に載せるのも、この画面だけ。 */
-export const PUBLIC_PAGE_PATHS: ReadonlySet<string> = new Set(["/login", "/forgot-password", "/signup", "/privacy"]);
+/**
+ * ログインなしで開ける画面。ログインと登録に要る画面と、利用者のデータを使わない読み物(使い方、リリースノート、
+ * 利用規約とプライバシーポリシー)と、お問い合わせの画面(送るにはログインが要り、送信の API は保護したまま)。
+ * sitemap に載せるのも、この画面だけ。
+ */
+export const PUBLIC_PAGE_PATHS: ReadonlySet<string> = new Set([
+  "/login",
+  "/forgot-password",
+  "/signup",
+  "/privacy",
+  "/help",
+  "/release-notes",
+  "/contact",
+]);
 
 /**
  * ログインなしで取れるファイル。ブラウザや検索エンジンが Cookie なしで取りに来るもの(マニフェスト、アイコン、
@@ -77,7 +89,7 @@ export const PUBLIC_FILE_PATHS: ReadonlySet<string> = new Set([
 ]);
 
 /**
- * ログインなしで開けるか。公開する経路は、ログインと登録に必要な画面と、利用規約とプライバシーポリシーの画面、認証の API(列挙したものだけ)、
+ * ログインなしで開けるか。公開する経路は、列挙した画面(`PUBLIC_PAGE_PATHS`)、認証の API(列挙したものだけ)、
  * 列挙したファイル、Next の静的ファイル(`/_next/`)に限る。大文字小文字は区別し、末尾のスラッシュや `..`・`%`・`\` を含むものは公開しない。
  */
 export function isPublicPath(pathname: string): boolean {
