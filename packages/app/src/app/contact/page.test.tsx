@@ -88,7 +88,7 @@ describe("お問い合わせの画面", () => {
     }
   });
 
-  it("ログインしていない_フォームの代わりにログインが必要と出し_ログインのあとにこの画面へ戻るリンクを出す", async () => {
+  it("ログインしていない_フォームの代わりにログインユーザーのみ受け付けると出し_ログインのあとにこの画面へ戻るボタンとアカウントの作成のボタンを出す", async () => {
     session.status = "signed-out";
     for (const [query, next] of [
       [{}, "/contact"],
@@ -96,12 +96,12 @@ describe("お問い合わせの画面", () => {
     ] as const) {
       await renderPage(query);
       expect(screen.getByRole("heading", { level: 1, name: "お問い合わせ" })).toBeTruthy();
-      expect(screen.getByText("お問い合わせを送るには、ログインが必要です。")).toBeTruthy();
+      expect(screen.getByText("投稿はログインユーザーのみ受け付けております。")).toBeTruthy();
       expect(screen.queryByRole("button", { name: "送る" })).toBeNull();
       expect(screen.queryByLabelText("内容")).toBeNull();
       const login = screen.getByRole("link", { name: "ログインする" }).getAttribute("href") ?? "";
       expect(new URL(login, "https://example.com").searchParams.get("next"), JSON.stringify(query)).toBe(next);
-      expect(screen.getByRole("link", { name: "新規登録" }).getAttribute("href")).toBe("/signup");
+      expect(screen.getByRole("link", { name: "アカウントを作成する" }).getAttribute("href")).toBe("/signup");
       expect(screen.getAllByRole("button", { name: "元の画面へ戻る" })).toHaveLength(1);
       cleanup();
     }
@@ -111,6 +111,6 @@ describe("お問い合わせの画面", () => {
     session.status = "loading";
     await renderPage();
     expect(screen.queryByRole("button", { name: "送る" })).toBeNull();
-    expect(screen.queryByText(/ログインが必要です/)).toBeNull();
+    expect(screen.queryByText(/ログインユーザーのみ/)).toBeNull();
   });
 });

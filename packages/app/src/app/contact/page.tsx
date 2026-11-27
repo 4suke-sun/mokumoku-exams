@@ -12,7 +12,7 @@ export const metadata: Metadata = { title: "お問い合わせ" };
  * お問い合わせの画面。`?exam=<資格コード>` が付いたとき(試験の画面のフッターから開いたとき)は、
  * 対象(その試験についてか、全般か)を選ばせ、試験についてを選んだときだけ資格コードを添える。
  * `exam` が公開中の資格に一致しない(空・形の外れ・複数を含む)ときは、フォームを出さず、試験なしの画面へのリンクを出す。
- * 画面はログインなしで開けるが、送るにはログインが要る。ログインしていなければ、フォームの代わりに、ログインへの案内を出す
+ * 画面はログインなしで開けるが、送るにはログインが要る。ログインしていなければ、フォームの代わりに、ログインとアカウントの作成への案内を出す
  * (ログインのあとは、この画面に戻る)。
  */
 export default async function ContactPage({ searchParams }: { searchParams: Promise<{ exam?: string | string[] }> }) {
@@ -28,12 +28,12 @@ export default async function ContactPage({ searchParams }: { searchParams: Prom
       <h1 className="h1">お問い合わせ</h1>
       <p>不具合や要望を、開発者へ送れます。</p>
       {!withExam ? (
-        <LoginRequired action="お問い合わせを送る" next="/contact">
+        <LoginRequired message="投稿はログインユーザーのみ受け付けております。" next="/contact">
           <FeedbackForm form="contact" backLink={<BackLink />} />
         </LoginRequired>
       ) : exam ? (
         <LoginRequired
-          action="お問い合わせを送る"
+          message="投稿はログインユーザーのみ受け付けております。"
           next={`/contact?${new URLSearchParams({ exam: exam.examCode }).toString()}`}
         >
           <FeedbackForm form="contact" exam={{ examCode: exam.examCode, name: exam.name }} backLink={<BackLink />} />

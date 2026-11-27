@@ -15,7 +15,7 @@ afterEach(() => {
 
 function renderGate() {
   return render(
-    <LoginRequired action="お問い合わせを送る" next="/contact?exam=EX-SMP-XX">
+    <LoginRequired message="投稿はログインユーザーのみ受け付けております。" next="/contact?exam=EX-SMP-XX">
       <button type="button">送る</button>
     </LoginRequired>,
   );
@@ -26,18 +26,18 @@ describe("LoginRequired", () => {
     session.status = "signed-in";
     renderGate();
     expect(screen.getByRole("button", { name: "送る" })).toBeTruthy();
-    expect(screen.queryByText(/ログインが必要です/)).toBeNull();
+    expect(screen.queryByText(/ログインユーザーのみ/)).toBeNull();
   });
 
-  it("ログインしていない_中身の代わりに操作の名前を添えてログインが必要と出し_ログインと新規登録のリンクを出す", () => {
+  it("ログインしていない_中身の代わりに案内を出し_ログインとアカウントの作成のボタンを出す", () => {
     session.status = "signed-out";
     renderGate();
     expect(screen.queryByRole("button", { name: "送る" })).toBeNull();
-    expect(screen.getByText("お問い合わせを送るには、ログインが必要です。")).toBeTruthy();
+    expect(screen.getByText("投稿はログインユーザーのみ受け付けております。")).toBeTruthy();
     expect(screen.getByRole("link", { name: "ログインする" }).getAttribute("href")).toBe(
       loginHref("/contact?exam=EX-SMP-XX"),
     );
-    expect(screen.getByRole("link", { name: "新規登録" }).getAttribute("href")).toBe("/signup");
+    expect(screen.getByRole("link", { name: "アカウントを作成する" }).getAttribute("href")).toBe("/signup");
   });
 
   it("ログイン状態を確かめている間_中身もログインの案内も出さない", () => {
